@@ -1,0 +1,15 @@
+id: spokeo
+name: Spokeo
+tier: A
+signals: [search_first, email_link]
+fields: [email, full_name]
+steps:
+  - open: https://www.spokeo.com/optout
+  - search_match: "Search for yourself and confirm which listing is you. Nothing is sent before this."
+  - say: "Paste your listing's URL and enter your email."
+  - wait_for_email:
+      within_minutes: 60
+  - say: "Open the confirmation link from the email."
+    confirm: true
+recheck_days: 120
+verified: null   # PLACEHOLDER steps drafted from docs/DESIGN.md; confirm on first real run
