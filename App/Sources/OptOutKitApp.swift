@@ -15,7 +15,7 @@ struct OptOutKitApp: App {
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active, !ProcessInfo.processInfo.arguments.contains("-uitest-reset") else { return }
-            Task { await model.runDueChecks() }
+            Task { await model.runDueChecks(); await model.runDueAutomation() }
             CheckScheduler.schedule()
         }
     }
@@ -39,6 +39,9 @@ final class AppModel: ObservableObject {
 
     @Published private(set) var pending: Pending = .nothing
     @Published private(set) var isChecking = false
+    /// Last automatic opt-out run per person, in memory. What was actually sent is also saved in each person's progress.
+    @Published private(set) var optOutRun: [UUID: [AutoOptOutRow]] = [:]
+    @Published private(set) var autoBusy: String?
     /// Latest "where am I listed" scan per person. Kept in memory only: it is a snapshot, not a record.
     @Published private(set) var exposure: [UUID: [ScanResult]] = [:]
     @Published private(set) var scanProgress: (done: Int, total: Int)?
@@ -115,6 +118,68 @@ final class AppModel: ObservableObject {
         return "Searches are off for \(p.displayName) (\(why)). Several sites' terms don't allow searching for minors, public officials or celebrities. Opt-out requests still work."
     }
 
+    // MARK: Automatic protection: a daily scan and a weekly opt-out, switched on by the person at first use
+
+    struct AutoOptOutRow: Identifiable, Equatable { let id: String; let domain: String; let result: AutoOptOutResult }
+
+    var autoSettings: AutoSettings { household.autoSettings }
+
+    /// The person's answer to the first-run question, or a later change in Settings.
+    func setAuto(scan: Bool, optOut: Bool) {
+        household.updateAuto { a in
+            if scan || optOut { a.turnOnBoth(now: a.decidedAt ?? Date()) }
+            else { a.declineForNow(now: a.decidedAt ?? Date()) }
+            a.scanEnabled = scan; a.optOutEnabled = optOut
+        }
+        save()
+        if scan || optOut, !ProcessInfo.processInfo.arguments.contains("-uitest-reset") { CheckScheduler.requestNotificationPermission() }
+        CheckScheduler.scheduleAutomation(autoSettings)
+    }
+
+    private func makeSubmitter() -> FormSubmitter {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeSubmitter() }
+        #endif
+        return WebFormSubmitter()
+    }
+
+    /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
+    func runAutoOptOut(for person: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil) async {
+        guard storageProblem == nil else { return }
+        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil ? 2 : 0)
+        let now = Date()
+        let results = await engine.run(entries: directory, person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun)
+        household.mutateProgress(for: person.id) { p in
+            for (entry, result) in results {
+                if let attempt = AutoOptOut.attempt(for: result, now: now) { p.recordOptOutAttempt(attempt, site: entry.id) }
+            }
+        }
+        optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
+        if !dryRun { household.updateAuto { $0.lastOptOut = now } }
+        save()
+        if !dryRun { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
+                                                  needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
+    }
+
+    /// Runs whatever is due: the daily scan and the weekly opt-out, for everyone in the family. Does nothing until the person has said yes.
+    func runDueAutomation(now: Date = Date()) async {
+        guard storageProblem == nil, autoBusy == nil else { return }
+        let settings = household.autoSettings
+        if settings.scanDue(now: now) {
+            autoBusy = "scan"
+            for person in people where person.canBeSearched() { await scanExposure(for: person) }
+            household.updateAuto { $0.lastScan = now }
+            save()
+            autoBusy = nil
+        }
+        if household.autoSettings.optOutDue(now: now) {
+            autoBusy = "optout"
+            for person in people { await runAutoOptOut(for: person) }
+            autoBusy = nil
+        }
+        CheckScheduler.scheduleAutomation(autoSettings)
+    }
+
     // MARK: Terms on the person's behalf (off unless reviewed paragraphs exist AND the person approved this list version)
 
     var termsApproval: TermsApproval? { household.termsApproval }
@@ -175,7 +240,7 @@ final class AppModel: ObservableObject {
         }
         exposure[person.id] = results
         household.mutateProgress(for: person.id) { p in
-            for r in results where r.outcome.result != .inconclusive { p.recordSiteCheck(r.outcome.result, site: r.entry.id, source: .automatic) }
+            for r in results where r.outcome.result.isConclusive { p.recordSiteCheck(r.outcome.result, site: r.entry.id, source: .automatic) }
         }
         save()
     }
@@ -266,6 +331,17 @@ final class AppModel: ObservableObject {
 struct FakeScanFetcher: PageFetcher {
     func fetch(_ url: URL) async throws -> FetchedPage {
         FetchedPage(status: 200, text: "directory search results Pat Example no result sorry")
+    }
+}
+#endif
+
+
+#if DEBUG
+/// UI tests use this so they never contact a real site: every other site "sends", the rest are stopped by a bot check.
+struct FakeSubmitter: FormSubmitter {
+    func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+        if dryRun { return .filledNotSubmitted }
+        return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a bot check")
     }
 }
 #endif

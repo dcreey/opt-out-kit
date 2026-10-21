@@ -274,6 +274,7 @@ struct BrokerInfoView: View {
         switch o.result {
         case .stillListed: return "Listing found"
         case .removed: return "No listing found"
+        case .paywalled: return "Results are behind payment"
         case .inconclusive:
             switch o.reason {
             case .blocked: return "Can't tell: site blocked the check"
@@ -289,7 +290,7 @@ struct BrokerInfoView: View {
         switch o.result {
         case .stillListed: return .red
         case .removed: return .green
-        case .inconclusive: return .orange
+        case .paywalled, .inconclusive: return .orange
         }
     }
 
@@ -493,6 +494,7 @@ struct QuickCheckView: View {
                     Section("What did you see?") {
                         answer("I'm listed here", .stillListed, +3, site, "exclamationmark.triangle", .red)
                         answer("Not found", .removed, +5, site, "checkmark.circle", .green)
+                        answer("Blocked by payment", .paywalled, +2, site, "creditcard", .orange)
                         Button("Skip this one") { skipped.insert(site.id); lastEarned = nil }
                             .accessibilityIdentifier("answer-skip")
                     }
@@ -511,6 +513,6 @@ struct QuickCheckView: View {
         Button { model.recordSelfCheck(result, site: site); lastEarned = points } label: {
             Label(title, systemImage: symbol).foregroundStyle(color)
         }
-        .accessibilityIdentifier(result == .removed ? "answer-clean" : "answer-listed")
+        .accessibilityIdentifier({ switch result { case .removed: return "answer-clean"; case .paywalled: return "answer-paywalled"; default: return "answer-listed" } }())
     }
 }

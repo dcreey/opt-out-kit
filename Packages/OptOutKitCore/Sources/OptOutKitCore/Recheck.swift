@@ -64,6 +64,11 @@ public extension PageFetcher {
 
 public enum CheckResult: String, Codable, Equatable, Sendable {
     case removed, stillListed, inconclusive
+    /// The person looked and the site wanted payment before showing results, so nothing could be seen.
+    case paywalled
+
+    /// Only these two say something about whether a listing exists. Inconclusive and paywalled looks do not.
+    public var isConclusive: Bool { self == .removed || self == .stillListed }
 }
 
 public enum InconclusiveReason: String, Equatable, Sendable {

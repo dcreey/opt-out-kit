@@ -49,6 +49,11 @@ private final class WebViewSession: NSObject, WKNavigationDelegate {
     private var status = 200
     private var loadContinuation: CheckedContinuation<Void, Error>?
 
+    /// For form runs, which drive the session step by step instead of through `run`.
+    static func make() -> WebViewSession { WebViewSession() }
+
+    func close() { webView.stopLoading(); webView.removeFromSuperview() }
+
     private override init() {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
@@ -209,5 +214,152 @@ private final class WebViewSession: NSObject, WKNavigationDelegate {
         guard let c = loadContinuation else { return }
         loadContinuation = nil
         if let error { c.resume(throwing: error) } else { c.resume() }
+    }
+}
+
+// MARK: Opt-out forms
+
+/// Fills in a site's real opt-out form from a person's profile and sends it. It stops, and says so, at anything a person
+/// must handle: a visible bot check, a terms prompt, a form it cannot fill. It never solves a challenge, never ticks a
+/// legal acknowledgement, and only reports "sent" when the site shows a success message.
+struct WebFormSubmitter: FormSubmitter {
+    var maxWait: TimeInterval = 20
+
+    func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+        await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait)
+    }
+
+    /// Test hook: run the same steps against HTML the test supplies.
+    func submit(html: String, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+        await FormRun.run(url: nil, html: html, plan: plan, dryRun: dryRun, maxWait: maxWait)
+    }
+
+    /// Test hook: fill and send a local page, then return the page title it set, so a test can see what the form received.
+    @MainActor
+    func submitReturningTitle(html: String, plan: FillPlan) async -> String {
+        let session = WebViewSession.make()
+        defer { session.close() }
+        guard (try? await session.loadHTML(html)) != nil else { return "" }
+        await session.settlePage(maxWait: 5)
+        _ = await session.fillFields(plan.values)
+        _ = await session.pressSubmit(for: plan.values)
+        await session.settlePage(maxWait: 6)
+        return await session.pageTitle()
+    }
+}
+
+@MainActor
+private enum FormRun {
+    static func run(url: URL?, html: String?, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
+        let session = WebViewSession.make()
+        defer { session.close() }
+        do {
+            if let html { try await session.loadHTML(html) }
+            else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
+            else { return .failed("not a secure page") }
+        } catch { return .failed("the page would not load") }
+        await session.settlePage(maxWait: 10)
+        _ = await session.declineBanner()
+
+        if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
+        if let why = await session.visibleChallenge() { return .challenged(why) }
+
+        let filled = await session.fillFields(plan.values)
+        if filled == 0 { return .failed("the form's fields were not on the page") }
+        if dryRun { return .filledNotSubmitted }
+
+        guard await session.pressSubmit(for: plan.values) else { return .failed("no submit button found") }
+        await session.settlePage(maxWait: maxWait)
+        if let why = await session.visibleChallenge() { return .challenged(why) }
+        return Self.classify(await session.visibleText())
+    }
+
+    static func classify(_ text: String) -> SubmitOutcome {
+        let t = text.lowercased()
+        let success = t.range(of: "thank you|request (has been )?(received|submitted)|successfully|we have received|has been submitted|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)", options: .regularExpression) != nil
+        let needsEmail = t.range(of: "check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|click the link", options: .regularExpression) != nil
+        if success { return .submitted(awaitingEmail: needsEmail) }
+        if t.range(of: "invalid|is required|please enter|please provide|error occurred|try again", options: .regularExpression) != nil {
+            return .rejected("the site flagged a field or asked to try again")
+        }
+        return .failed("no success message was shown")
+    }
+}
+
+extension WebViewSession {
+    func settlePage(maxWait: TimeInterval) async { await settle(maxWait: maxWait) }
+    func declineBanner() async -> Bool { await declineConsentBanner() }
+    func hasTermsPrompt() async -> Bool { await findTermsGate() != nil }
+
+    func pageTitle() async -> String { (try? await webView.evaluateJavaScript("document.title")) as? String ?? "" }
+
+    func visibleText() async -> String {
+        (try? await webView.evaluateJavaScript("document.title + '\\n' + (document.body ? document.body.innerText : '')")) as? String ?? ""
+    }
+
+    /// A bot check a person has to act on, as opposed to an invisible one that passes by itself. Never solved here.
+    func visibleChallenge() async -> String? {
+        let js = #"""
+        (function(){
+          var text=(document.body?document.body.innerText:'').toLowerCase();
+          if(/verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification/.test(text)) return 'a bot check';
+          var frames=document.querySelectorAll('iframe');
+          for(var i=0;i<frames.length;i++){var f=frames[i],src=f.src||'',r=f.getBoundingClientRect();
+            if(r.width<40||r.height<40) continue;
+            if(f.closest&&f.closest('.grecaptcha-badge')) continue;
+            if(/recaptcha\/(api2|enterprise)\/bframe/.test(src)) return 'a reCAPTCHA puzzle';
+            if(/recaptcha\/(api2|enterprise)\/anchor/.test(src)){var ta=document.querySelector('textarea[name="g-recaptcha-response"]'); if(!ta||!ta.value) return 'a reCAPTCHA checkbox';}
+            if(/hcaptcha\.com/.test(src)){var h=document.querySelector('textarea[name="h-captcha-response"]'); if(!h||!h.value) return 'an hCaptcha';}
+            if(/challenges\.cloudflare\.com/.test(src)){var t=document.querySelector('input[name="cf-turnstile-response"]'); if(!t||!t.value) return 'a Cloudflare check';}
+          }
+          return null;})();
+        """#
+        return (try? await webView.evaluateJavaScript(js)) as? String
+    }
+
+    /// Puts each value into its field, matching a dropdown's options by code or name. Returns how many fields were filled.
+    func fillFields(_ values: [FieldValue]) async -> Int {
+        let payload = values.map { ["name": $0.name, "candidates": $0.candidates] as [String: Any] }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return 0 }
+        let js = #"""
+        (function(values){var filled=0;
+        function setValue(el,v){var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+          var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
+          el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
+        values.forEach(function(v){
+          var el=document.querySelector('[name="'+v.name.replace(/"/g,'\"')+'"]')||document.getElementById(v.name); if(!el) return;
+          if(el.tagName==='SELECT'){var done=false;
+            for(var c=0;c<v.candidates.length&&!done;c++){var want=v.candidates[c].toLowerCase();
+              for(var i=0;i<el.options.length;i++){var o=el.options[i];
+                if(o.value.toLowerCase()===want||o.text.trim().toLowerCase()===want){el.value=o.value;done=true;break;}}}
+            if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
+          } else {setValue(el,v.candidates[0]);filled++;}
+        });
+        return filled;})(\#(json));
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Int) ?? 0
+    }
+
+    /// Presses the form's own submit button (never one that says agree or accept), or submits the form directly.
+    func pressSubmit(for values: [FieldValue]) async -> Bool {
+        let first = values.first?.name ?? ""
+        let js = #"""
+        (function(name){
+          var el=document.querySelector('[name="'+name.replace(/"/g,'\"')+'"]')||document.getElementById(name);
+          var form=el&&el.form; if(!form) return false;
+          var buttons=form.querySelectorAll('button,input[type=submit],input[type=button]');
+          for(var i=0;i<buttons.length;i++){var b=buttons[i],t=(b.innerText||b.value||'').trim();
+            if(/agree|accept/i.test(t)) continue;
+            var type=(b.getAttribute('type')||'submit').toLowerCase();
+            if(type==='submit'){b.click();return true;}}
+          if(form.requestSubmit){form.requestSubmit();return true;}
+          form.submit();return true;})(\#(Self.jsLiteral(first)));
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+    }
+
+    private static func jsLiteral(_ s: String) -> String {
+        guard let d = try? JSONSerialization.data(withJSONObject: [s]), let j = String(data: d, encoding: .utf8) else { return "\"\"" }
+        return String(j.dropFirst().dropLast())
     }
 }

@@ -33,10 +33,12 @@ public struct Progress: Codable, Equatable, Sendable {
     public var checks: [String: [CheckRecord]] = [:]
     /// What the person (or a scan) saw on directory sites, whether or not an opt-out was submitted there.
     public var siteChecks: [String: [CheckRecord]] = [:]
+    /// Automatic opt-out submissions (and the ones that were stopped) per directory site.
+    public var optOutAttempts: [String: [OptOutAttempt]] = [:]
 
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case completedSteps, doneAt, checks, siteChecks }
+    enum CodingKeys: String, CodingKey { case completedSteps, doneAt, checks, siteChecks, optOutAttempts }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -44,6 +46,7 @@ public struct Progress: Codable, Equatable, Sendable {
         doneAt = try c.decodeIfPresent([String: Date].self, forKey: .doneAt) ?? [:]
         checks = try c.decodeIfPresent([String: [CheckRecord]].self, forKey: .checks) ?? [:]
         siteChecks = try c.decodeIfPresent([String: [CheckRecord]].self, forKey: .siteChecks) ?? [:]
+        optOutAttempts = try c.decodeIfPresent([String: [OptOutAttempt]].self, forKey: .optOutAttempts) ?? [:]
     }
 
     /// Records what was seen on a directory site: a scan result or the person's own look.
@@ -52,6 +55,7 @@ public struct Progress: Codable, Equatable, Sendable {
     }
 
     public func latestSiteCheck(_ site: String) -> CheckRecord? {
+        // A look counts unless it was inconclusive; "blocked by payment" is a real look, so it is not asked about again soon.
         siteChecks[site]?.filter { $0.result != .inconclusive }.max { $0.date < $1.date }
     }
 
@@ -63,7 +67,7 @@ public struct Progress: Codable, Equatable, Sendable {
     /// in a row on different days, so one odd page cannot mark someone safe. Inconclusive checks are ignored.
     public func verification(for brokerID: String, calendar: Calendar = .current) -> Verification {
         guard let submitted = doneAt[brokerID] else { return .unverified }
-        let conclusive = (checks[brokerID] ?? []).filter { $0.date >= submitted && $0.result != .inconclusive }
+        let conclusive = (checks[brokerID] ?? []).filter { $0.date >= submitted && $0.result.isConclusive }
             .sorted { $0.date < $1.date }
         guard let last = conclusive.last else { return .unverified }
         if last.result == .stillListed { return .relisted(on: last.date) }

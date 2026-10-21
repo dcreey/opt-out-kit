@@ -30,6 +30,8 @@ public struct FormField: Codable, Equatable, Hashable, Sendable {
     public var name: String
     public var label: String
 
+    public init(type: String, name: String, label: String) { self.type = type; self.name = name; self.label = label }
+
     /// What a person would call it: the label if the site gave one, else a tidy version of the field name.
     public var display: String {
         let t = label.trimmingCharacters(in: CharacterSet(charactersIn: " *:"))
@@ -46,6 +48,10 @@ public struct OptOutForm: Codable, Equatable, Hashable, Sendable {
     public var action: URL?
     public var fields: [FormField]
     public var hops: Int
+
+    public init(page: URL, method: String, action: URL?, fields: [FormField], hops: Int) {
+        self.page = page; self.method = method; self.action = action; self.fields = fields; self.hops = hops
+    }
 }
 
 /// How to ask one directory site "is this person listed?", learned by tools/profile_search.py from a made-up

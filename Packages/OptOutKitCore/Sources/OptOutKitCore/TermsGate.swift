@@ -92,6 +92,9 @@ public extension Household {
     var termsApproval: TermsApproval? { settings.termsApproval }
     var consentLog: [ConsentLogEntry] { settings.consentLog }
 
+    var autoSettings: AutoSettings { settings.auto }
+    mutating func updateAuto(_ change: (inout AutoSettings) -> Void) { change(&settings.auto) }
+
     mutating func approveTerms(libraryVersion: Int, now: Date = Date()) { settings.termsApproval = TermsApproval(libraryVersion: libraryVersion, approvedAt: now) }
     mutating func revokeTermsApproval() { settings.termsApproval = nil }
     mutating func logConsent(_ entry: ConsentLogEntry) { settings.consentLog.append(entry) }

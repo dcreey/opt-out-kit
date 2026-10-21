@@ -6,11 +6,19 @@ struct BrokerListView: View {
     @State private var addingPerson = false
     @State private var newName = ""
     @State private var editing: Person?
+    @State private var showAuto = false
 
     var body: some View {
         NavigationStack {
             List {
                 if let error = model.loadError { Text(error).foregroundStyle(.red) }
+                if !model.autoSettings.hasDecided {
+                    Section {
+                        Button { showAuto = true } label: {
+                            Label("Turn on automatic protection", systemImage: "bolt.shield")
+                        }.accessibilityIdentifier("auto-banner")
+                    } footer: { Text("A daily scan and weekly opt-out requests, run for you in the background.") }
+                }
                 if let problem = model.storageProblem {
                     Section {
                         Text(problem).font(.footnote).foregroundStyle(.red)
@@ -68,6 +76,7 @@ struct BrokerListView: View {
             } message: {
                 Text("Family members only: someone who asked you to, or a child you are the parent or guardian of. Their details stay on this phone. Mark children as under 18 so the app never searches for them.")
             }
+            .sheet(isPresented: $showAuto) { AutoProtectionView() }
             .navigationDestination(for: Broker.self) { BrokerDetailView(broker: $0) }
         }
     }

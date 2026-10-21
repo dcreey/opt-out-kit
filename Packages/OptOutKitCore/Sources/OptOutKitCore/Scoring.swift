@@ -19,7 +19,8 @@ public struct Score: Equatable, Sendable {
     ]
 
     /// 10 for an automatically verified opt-out, 5 for each site the person looked at and found clean, 3 for each time
-    /// they honestly report a listing (it is how the list gets finished), 2 for a clean automatic scan result.
+    /// they honestly report a listing (it is how the list gets finished), 2 for reporting results behind payment,
+    /// 2 for a clean automatic scan result.
     public static func compute(_ progress: Progress, brokers: [Broker]) -> Score {
         var points = 0
         for broker in brokers {
@@ -31,6 +32,7 @@ public struct Score: Equatable, Sendable {
             case (.selfReported, .removed): points += 5
             case (.selfReported, .stillListed): points += 3
             case (.automatic, .removed): points += 2
+            case (.selfReported, .paywalled): points += 2      // looked, and found the results behind payment
             default: break
             }
         }

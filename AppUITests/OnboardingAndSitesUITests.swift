@@ -6,7 +6,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<4 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
         app.buttons["onboarding-done"].tap()
         XCTAssertTrue(app.buttons["broker-spokeo"].waitForExistence(timeout: 5), "queue visible after walkthrough")
     }

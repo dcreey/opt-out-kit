@@ -32,8 +32,8 @@ targets:
       properties:
         CFBundleDisplayName: "Opt-Out Kit"
         UILaunchScreen: {}
-        UIBackgroundModes: [fetch]
-        BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck]
+        UIBackgroundModes: [fetch, processing]
+        BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck, dev.optoutkit.app.scan, dev.optoutkit.app.optout]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app

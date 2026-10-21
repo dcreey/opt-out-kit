@@ -11,8 +11,12 @@ private struct Page: Identifiable {
 
 /// First-install walkthrough, also reachable from About. Explains what the app does and how to use it.
 struct OnboardingView: View {
+    /// Called with the person's answers to the automatic-protection page (daily scan, weekly opt-out).
+    var onDecide: ((Bool, Bool) -> Void)?
     let onFinish: () -> Void
     @State private var index = 0
+    @State private var autoScan = true
+    @State private var autoOptOut = true
 
     private let pages: [Page] = [
         Page(id: 0, symbol: "person.crop.circle.badge.minus", title: "Take your data back",
@@ -50,6 +54,16 @@ struct OnboardingView: View {
                     }
                     .tag(page.id)
                 }
+                ScrollView {
+                    VStack(spacing: 16) {
+                        Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+                        Text("Automatic protection").font(.title.bold())
+                        AutoExplainer()
+                        VStack { AutoToggles(scan: $autoScan, optOut: $autoOptOut) }
+                    }
+                    .padding(.horizontal, 28)
+                }
+                .tag(pages.count)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
@@ -57,12 +71,15 @@ struct OnboardingView: View {
             HStack {
                 Button("Skip", action: onFinish).accessibilityIdentifier("onboarding-skip")
                 Spacer()
-                if index < pages.count - 1 {
+                if index < pages.count {
                     Button("Next") { withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
                 } else {
-                    Button("Get started", action: onFinish)
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
+                    Button((autoScan || autoOptOut) ? "Turn on and start" : "Start") {
+                        onDecide?(autoScan, autoOptOut)
+                        onFinish()
+                    }
+                    .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
                 }
             }
             .padding()

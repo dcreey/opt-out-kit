@@ -13,7 +13,7 @@ struct RootView: View {
         .fullScreenCover(isPresented: Binding(
             get: { model.pending == .walkthrough },
             set: { _ in })) {
-            OnboardingView { model.finishAnnouncements() }
+            OnboardingView(onDecide: { scan, optOut in model.setAuto(scan: scan, optOut: optOut) }) { model.finishAnnouncements() }
         }
         .sheet(isPresented: Binding(
             get: { if case .whatsNew = model.pending { return true } else { return false } },

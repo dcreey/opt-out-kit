@@ -985,3 +985,225 @@ final class SafetyFlagTests: XCTestCase {
         XCTAssertEqual(due.map(\.person.displayName), ["A"], "the opt-out is submitted for both, but only the adult is searched")
     }
 }
+
+
+final class PaywallAnswerTests: XCTestCase {
+    private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+
+    func testBlockedByPaymentEarnsPointsButIsNeverAVerdict() {
+        var p = OptOutKitCore.Progress()
+        p.recordSiteCheck(.paywalled, site: "a", source: .selfReported, on: t0)
+        XCTAssertEqual(Score.compute(p, brokers: []).points, 2)
+        XCTAssertFalse(CheckResult.paywalled.isConclusive)
+        XCTAssertNotNil(p.latestSiteCheck("a"), "it counts as a look, so the site is not asked about again soon")
+    }
+
+    func testAPaywalledLookCannotVerifyOrRelistAnOptOut() {
+        let b = Broker(id: "b", name: "B", tier: .A, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil, processingDays: 3)
+        var p = OptOutKitCore.Progress()
+        p.complete(b, step: 0, now: t0)
+        p.record(.removed, for: "b", on: t0 + 4 * 86_400)
+        p.record(.paywalled, for: "b", on: t0 + 5 * 86_400)
+        p.record(.paywalled, for: "b", on: t0 + 6 * 86_400)
+        XCTAssertEqual(p.verification(for: "b"), .unverified, "one real result plus two paywalled looks is still one result")
+    }
+
+    func testAnOlderFileWithoutThePaywallCaseStillDecodes() throws {
+        let r = try JSONDecoder().decode(CheckRecord.self, from: Data(#"{"date":0,"result":"removed"}"#.utf8))
+        XCTAssertEqual(r.result, .removed)
+        XCTAssertEqual(try JSONDecoder().decode(CheckResult.self, from: Data("\"paywalled\"".utf8)), .paywalled)
+    }
+}
+
+final class AutoOptOutTests: XCTestCase {
+    private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+    private let day: TimeInterval = 86_400
+
+    private func form(_ fields: [(String, String, String)], hops: Int = 1) -> OptOutForm {
+        OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: URL(string: "https://x.example/optout")!,
+                   fields: fields.map { FormField(type: $0.0, name: $0.1, label: $0.2) }, hops: hops)
+    }
+    private func entry(_ id: String, form: OptOutForm?, signals: [String]? = nil) -> DirectoryEntry {
+        DirectoryEntry(id: id, domain: "\(id).example", name: id, bucket: "direct", tier: .B, automation: .guided, confidence: nil,
+                       optOutURL: nil, optOutForm: form, family: nil, familyParent: nil, template: nil, searchCheck: nil, signals: signals, profiled: nil)
+    }
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL")], emails: ["pat@example.com"])
+
+    // MARK: field mapping
+
+    func testMapsAProfileOntoACommonOptOutForm() {
+        let f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email"),
+                      ("text", "city", "City"), ("select", "state", "State"), ("hidden", "token", "")])
+        let plan = FormFiller.plan(for: f, signals: nil, person: pat)
+        XCTAssertEqual(plan.verdict, .ready)
+        XCTAssertEqual(plan.values.first { $0.name == "firstname" }?.candidates, ["Pat"])
+        XCTAssertEqual(plan.values.first { $0.name == "lastname" }?.candidates, ["Example"])
+        XCTAssertEqual(plan.values.first { $0.name == "email" }?.candidates, ["pat@example.com"])
+        XCTAssertEqual(plan.values.first { $0.name == "state" }?.candidates, ["IL", "Illinois"], "a dropdown gets the code and the full name to match")
+        XCTAssertNil(plan.values.first { $0.name == "token" }, "hidden fields are left as the site set them")
+    }
+
+    func testAskForWhatIsMissingInsteadOfGuessing() {
+        let noEmail = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
+        let plan = FormFiller.plan(for: form([("email", "email", "Email")]), signals: nil, person: noEmail)
+        XCTAssertEqual(plan.verdict, .needsData(["email address"]))
+    }
+
+    func testAttestationBoxesAreNeverTickedForAnyone() {
+        let f = form([("email", "email", "Email"), ("checkbox", "ack", "I acknowledge that I am the person making this request*")])
+        let plan = FormFiller.plan(for: f, signals: nil, person: pat)
+        guard case .needsYou(let why) = plan.verdict else { return XCTFail("expected needsYou, got \(plan.verdict)") }
+        XCTAssertTrue(why.contains("confirm or certify"))
+    }
+
+    func testFlowsThatNeedAPersonAreLeftToThem() {
+        let f = form([("email", "email", "Email")])
+        for tag in ["login_required", "id_required", "phone_verify", "file_upload", "account_hint"] {
+            guard case .needsYou = FormFiller.plan(for: f, signals: [tag], person: pat).verdict else { return XCTFail("\(tag) must stop automation") }
+        }
+        let agent = form([("text", "agentfirstname", "Agent First Name*"), ("email", "email", "Email")])
+        guard case .needsYou = FormFiller.plan(for: agent, signals: nil, person: pat).verdict else { return XCTFail("agent forms are on-behalf flows") }
+    }
+
+    func testABotCheckSignalDoesNotBlockPlanningBecauseItIsDecidedWhenThePageLoads() {
+        let plan = FormFiller.plan(for: form([("email", "email", "Email")]), signals: ["captcha_turnstile", "email_input"], person: pat)
+        XCTAssertEqual(plan.verdict, .ready)
+    }
+
+    // MARK: the engine's rules
+
+    private struct Recording: FormSubmitter {
+        var outcome: SubmitOutcome
+        let log = SendBox()
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+            log.calls.append((form.page.absoluteString, dryRun)); return dryRun ? .filledNotSubmitted : outcome
+        }
+    }
+    private final class SendBox: @unchecked Sendable { var calls: [(String, Bool)] = [] }
+
+    func testSubmitsEligibleSitesAndSkipsSitesWithoutAForm() async {
+        let ok = entry("ok", form: form([("email", "email", "Email")]))
+        let none = entry("none", form: nil)
+        let sub = Recording(outcome: .submitted(awaitingEmail: true))
+        let results = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [ok, none], person: pat, progress: OptOutKitCore.Progress(), now: t0)
+        XCTAssertEqual(results.count, 1, "a site with no form is not part of the run")
+        XCTAssertEqual(results[0].1, .submitted(awaitingEmail: true))
+    }
+
+    func testNothingIsSentToASiteARecentLookSaysDoesNotHoldYou() async {
+        let e = entry("clean", form: form([("email", "email", "Email")]))
+        var p = OptOutKitCore.Progress()
+        p.recordSiteCheck(.removed, site: "clean", source: .automatic, on: t0 - 3 * day)
+        let sub = Recording(outcome: .submitted(awaitingEmail: false))
+        let results = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0)
+        XCTAssertEqual(results[0].1, .skippedNotListed)
+        XCTAssertTrue(sub.log.calls.isEmpty, "no details were sent")
+        // An old look no longer counts: the person may have been re-listed.
+        p = OptOutKitCore.Progress(); p.recordSiteCheck(.removed, site: "clean", source: .automatic, on: t0 - 40 * day)
+        let again = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0)
+        XCTAssertEqual(again[0].1, .submitted(awaitingEmail: false))
+    }
+
+    func testEachSiteIsSentAtMostOncePerWeek() async {
+        let e = entry("x", form: form([("email", "email", "Email")]))
+        var p = OptOutKitCore.Progress()
+        p.recordOptOutAttempt(OptOutAttempt(date: t0 - 2 * day, outcome: "submitted"), site: "x")
+        let sub = Recording(outcome: .submitted(awaitingEmail: false))
+        let soon = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0)
+        guard case .tooSoon = soon[0].1 else { return XCTFail("expected tooSoon, got \(soon[0].1)") }
+        let later = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0 + 6 * day)
+        XCTAssertEqual(later[0].1, .submitted(awaitingEmail: false), "a week after the last send it goes again")
+        // a failed or challenged attempt does not count as sent
+        var q = OptOutKitCore.Progress(); q.recordOptOutAttempt(OptOutAttempt(date: t0 - day, outcome: "challenged"), site: "x")
+        let retry = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: q, now: t0)
+        XCTAssertEqual(retry[0].1, .submitted(awaitingEmail: false))
+    }
+
+    func testDryRunFillsButNeverSends() async {
+        let e = entry("x", form: form([("email", "email", "Email")]))
+        let sub = Recording(outcome: .submitted(awaitingEmail: false))
+        let results = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: OptOutKitCore.Progress(), now: t0, dryRun: true)
+        XCTAssertEqual(results[0].1, .dryRunReady)
+        XCTAssertEqual(sub.log.calls.count, 1)
+        XCTAssertTrue(sub.log.calls[0].1, "the submitter was told it is a dry run")
+        XCTAssertNil(AutoOptOut.attempt(for: .dryRunReady, now: t0), "a dry run is never recorded as sent")
+    }
+
+    func testOnlyAttemptsThatReachedTheSiteAreRemembered() {
+        XCTAssertEqual(AutoOptOut.attempt(for: .submitted(awaitingEmail: true), now: t0)?.outcome, "submitted_email")
+        XCTAssertEqual(AutoOptOut.attempt(for: .challenged("bot check"), now: t0)?.outcome, "challenged")
+        XCTAssertNil(AutoOptOut.attempt(for: .needsYou("login"), now: t0))
+        XCTAssertNil(AutoOptOut.attempt(for: .skippedNotListed, now: t0))
+        XCTAssertNil(AutoOptOut.attempt(for: .needsData(["email"]), now: t0))
+    }
+
+    func testMinorsAndPublicFiguresCanStillBeOptedOutBecauseThatIsNotASearch() async {
+        let kid = Person(displayName: "K", names: [NameEntry(kind: .legal, name: "Kim Example")], emails: ["k@example.com"], isMinor: true)
+        let e = entry("x", form: form([("email", "email", "Email")]))
+        let sub = Recording(outcome: .submitted(awaitingEmail: false))
+        let results = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: kid, progress: OptOutKitCore.Progress(), now: t0)
+        XCTAssertEqual(results[0].1, .submitted(awaitingEmail: false))
+    }
+
+    // MARK: schedule
+
+    func testScanIsDailyAndOptOutIsWeeklyAndBothStartOffUntilThePersonDecides() {
+        var a = AutoSettings()
+        XCTAssertFalse(a.hasDecided)
+        XCTAssertFalse(a.scanDue(now: t0)); XCTAssertFalse(a.optOutDue(now: t0), "nothing runs before the person says yes")
+        a.turnOnBoth(now: t0)
+        XCTAssertTrue(a.hasDecided)
+        XCTAssertTrue(a.scanDue(now: t0)); XCTAssertTrue(a.optOutDue(now: t0), "first run is due straight away")
+        a.lastScan = t0; a.lastOptOut = t0
+        XCTAssertFalse(a.scanDue(now: t0 + 23 * 3600)); XCTAssertTrue(a.scanDue(now: t0 + day))
+        XCTAssertFalse(a.optOutDue(now: t0 + 6 * day)); XCTAssertTrue(a.optOutDue(now: t0 + 7 * day))
+        a.optOutEnabled = false
+        XCTAssertFalse(a.optOutDue(now: t0 + 30 * day), "switching it off stops it")
+    }
+
+    func testDecliningTurnsEverythingOffButRemembersTheAnswer() {
+        var a = AutoSettings(); a.turnOnBoth(now: t0); a.declineForNow(now: t0)
+        XCTAssertTrue(a.hasDecided); XCTAssertFalse(a.scanEnabled); XCTAssertFalse(a.optOutEnabled)
+    }
+
+    func testSettingsAndAttemptsSurviveEncodingAndOldDataStillLoads() throws {
+        var h = Household()
+        let p = Person(displayName: "P"); h.add(p)
+        h.updateAuto { $0.turnOnBoth(now: self.t0) }
+        h.mutateProgress(for: p.id) { $0.recordOptOutAttempt(OptOutAttempt(date: self.t0, outcome: "submitted"), site: "x") }
+        let back = try JSONDecoder().decode(Household.self, from: JSONEncoder().encode(h))
+        XCTAssertTrue(back.autoSettings.optOutEnabled)
+        XCTAssertEqual(back.progress(for: p.id).optOutAttempts["x"]?.count, 1)
+        let old = try JSONDecoder().decode(Household.self, from: Data(#"{"people":[],"progress":[]}"#.utf8))
+        XCTAssertFalse(old.autoSettings.hasDecided)
+    }
+}
+
+/// How much of the real directory the form filler can handle for a complete profile. Prints the breakdown.
+final class DirectoryEligibilityTests: XCTestCase {
+    func testHowManyRealFormsAreReadyToFillForACompleteProfile() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir).filter { $0.optOutForm != nil }
+        let person = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL")],
+                            emails: ["pat@example.com"], phones: ["555-0100"], birthdate: "1980-01-01")
+        var ready = 0, needsData = 0, why: [String: Int] = [:], readyWithCaptcha = 0
+        var readyList: [String] = []
+        for e in entries {
+            let plan = FormFiller.plan(for: e.optOutForm!, signals: e.signals, person: person)
+            switch plan.verdict {
+            case .ready:
+                ready += 1; readyList.append(e.domain)
+                if (e.signals ?? []).contains(where: { $0.hasPrefix("captcha_") }) { readyWithCaptcha += 1 }
+            case .needsData: needsData += 1
+            case .needsYou(let r):
+                let key = r.contains("confirm or certify") ? "attestation checkbox" : r.contains("login") || r.contains("account") ? "login/account" : r.contains("could not match") ? "no matching fields (search form)" : r.contains("do not have") ? "asks for something we lack" : "other"
+                why[key, default: 0] += 1
+            }
+        }
+        print("ELIGIBILITY forms=\(entries.count) ready=\(ready) (with a bot-check widget on the page: \(readyWithCaptcha)) needsData=\(needsData) needsYou=\(why)")
+        print("ELIGIBILITY readyDomains=\(readyList.prefix(60).joined(separator: ","))")
+        XCTAssertGreaterThan(entries.count, 100)
+    }
+}

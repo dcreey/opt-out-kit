@@ -151,7 +151,16 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
 public struct HouseholdSettings: Codable, Equatable, Sendable {
     public var termsApproval: TermsApproval?
     public var consentLog: [ConsentLogEntry] = []
+    public var auto = AutoSettings()
     public init() {}
+
+    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        termsApproval = try c.decodeIfPresent(TermsApproval.self, forKey: .termsApproval)
+        consentLog = try c.decodeIfPresent([ConsentLogEntry].self, forKey: .consentLog) ?? []
+        auto = try c.decodeIfPresent(AutoSettings.self, forKey: .auto) ?? AutoSettings()
+    }
 }
 
 public struct Household: Codable, Equatable, Sendable {
