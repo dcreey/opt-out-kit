@@ -144,3 +144,15 @@ final class TermsSettingsTests: XCTestCase {
         XCTAssertNil(m.makeTermsPolicy())
     }
 }
+
+final class TermsSummaryTests: XCTestCase {
+    func testSummaryCoversTheClausesAPersonMustKnowAbout() {
+        let all = TermsSummary.sections.flatMap(\.bullets).joined(separator: " ").lowercased()
+        for must in ["indemnity", "minors", "public officials", "cookies", "as-is", "without telling you"] {
+            XCTAssertTrue(all.contains(must), "summary should mention \(must)")
+        }
+        XCTAssertTrue(all.contains("credit, insurance, employment or tenant"), "the CourtRecords.us use restriction")
+        XCTAssertFalse(TermsSummary.basis.isEmpty, "the summary must say what it was based on")
+        XCTAssertGreaterThanOrEqual(TermsSummary.sections.count, 4)
+    }
+}

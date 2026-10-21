@@ -77,6 +77,19 @@ struct TermsApprovalView: View {
                     Text("Some people-search sites show an \"I agree to our terms\" prompt before results. If you allow this, Opt-Out Kit presses that button for you, but only when every paragraph of the prompt and of the terms pages it links to is on a list that a person has read and judged acceptable.")
                     Text("Reviewed paragraphs: \(model.termsReviewedCount) of \(model.termsLibrary?.paragraphs.count ?? 0)").font(.footnote)
                 }
+                Section {
+                    Text("In plain English, here is what these sites' terms say. It is a summary, not legal advice.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    ForEach(TermsSummary.sections) { section in
+                        DisclosureGroup(section.title) {
+                            ForEach(section.bullets, id: \.self) { Text("• " + $0).font(.footnote) }
+                        }
+                    }
+                    Text(TermsSummary.basis).font(.caption2).foregroundStyle(.secondary)
+                } header: {
+                    Text("What you would be agreeing to")
+                }
+                .accessibilityIdentifier("terms-tldr")
                 Section("What stays off the table") {
                     Label("Terms that ban or imply automated access", systemImage: "nosign")
                     Label("Anything a reviewer ruled out", systemImage: "nosign")
