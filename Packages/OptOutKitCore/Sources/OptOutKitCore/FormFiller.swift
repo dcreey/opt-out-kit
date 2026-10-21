@@ -34,6 +34,16 @@ public enum FormFiller {
     ]
     static let attestation = try! NSRegularExpression(pattern: "acknowledg|certif|attest|i agree|i accept|consent|under penalty|terms|authori[sz]e|i am the|on behalf", options: .caseInsensitive)
 
+    /// A plain statement that the person filling the form is the subject of it ("I confirm that I am the person associated with this
+    /// email"). Not a legal certification, an agent statement or an acceptance of terms.
+    static let selfIdentity = try! NSRegularExpression(pattern: "\\bi (confirm|verify|am)\\b.{0,60}\\b(person|owner|me)\\b.{0,40}(email|e-mail|address|account|request|record)", options: .caseInsensitive)
+    static let notSelfIdentity = try! NSRegularExpression(pattern: "penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal", options: .caseInsensitive)
+
+    public static func isSelfIdentityBox(_ text: String) -> Bool {
+        let r = NSRange(text.startIndex..., in: text)
+        return selfIdentity.firstMatch(in: text, range: r) != nil && notSelfIdentity.firstMatch(in: text, range: r) == nil
+    }
+
     public static func plan(for form: OptOutForm, signals: [String]?, person: Person) -> FillPlan {
         if let hit = (signals ?? []).compactMap({ humanOnlySignals[$0] }).first {
             return FillPlan(values: [], verdict: .needsYou("This site \(hit)."))
@@ -57,8 +67,14 @@ public enum FormFiller {
             switch field.type {
             case "hidden", "submit", "button", "image", "reset", "password": continue
             case "checkbox", "radio":
-                if attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") {
-                    needsYou = needsYou ?? "This form asks you to confirm or certify something yourself (\"\(field.display)\")."
+                if attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") || isSelfIdentityBox(key) {
+                    if isSelfIdentityBox(key), person.mayConfirmOwnIdentity() {
+                        // The owner allowed this one plain statement about themselves; the sentinel below ticks it on the live page.
+                    } else if isSelfIdentityBox(key) {
+                        needsYou = needsYou ?? "This form asks the person to confirm \"I am this person\" (\"\(field.display)\"). The app only does that for the account owner, and only if they allowed it."
+                    } else {
+                        needsYou = needsYou ?? "This form asks you to confirm or certify something yourself (\"\(field.display)\")."
+                    }
                 }
                 continue
             default: break
@@ -91,6 +107,12 @@ public enum FormFiller {
         if let needsYou { return FillPlan(values: values, verdict: .needsYou(needsYou)) }
         if !missing.isEmpty { return FillPlan(values: values, verdict: .needsData(Array(Set(missing)).sorted())) }
         if values.isEmpty { return FillPlan(values: [], verdict: .needsYou("We could not match any of this form's fields to your profile.")) }
+        // The account owner allowed "I am this person" boxes to be ticked for them. The page is checked live for such a box;
+        // anything else that certifies, attests or accepts terms is left alone. Never added for anyone else's profile.
+        if person.mayConfirmOwnIdentity() { values.append(FieldValue(name: "", type: confirmIdentityType, candidates: ["on"], label: "")) }
         return FillPlan(values: values, verdict: .ready)
     }
+
+    /// A marker value (not a real field) that tells the web view to tick plain "I am this person" boxes.
+    public static let confirmIdentityType = "confirm-identity"
 }

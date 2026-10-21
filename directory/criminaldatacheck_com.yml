@@ -7,9 +7,7 @@ bucket: "indirect"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://criminaldatacheck.com/privacy-education/"
-family: "truthfinder_com"
-family_parent: "truthfinder.com"
+opt_out_url: "https://criminaldatacheck.com/privacy-education/medical-health-records/"
 signals: [captcha_recaptcha, name_input]
 profiled: "2026-10-21"
 search_check:

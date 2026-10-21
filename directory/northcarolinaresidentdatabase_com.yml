@@ -4,11 +4,11 @@ id: "northcarolinaresidentdatabase_com"
 domain: "northcarolinaresidentdatabase.com"
 name: "northcarolinaresidentdatabase.com"
 bucket: "direct"
-tier: null
-automation: "blocked"
-confidence: "n/a"
-opt_out_url: "https://www.northcarolinaresidentdatabase.com/opt-out"
-signals: []
+tier: "C"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.northcarolinaresidentdatabase.com/"
+signals: [id_required, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "calibrated"

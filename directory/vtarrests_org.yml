@@ -4,11 +4,11 @@ id: "vtarrests_org"
 domain: "vtarrests.org"
 name: "vtarrests.org"
 bucket: "indirect"
-tier: null
-automation: "unknown"
-confidence: "low"
-opt_out_url: "https://www.vtarrests.org/privacy"
-signals: []
+tier: "C"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.vtarrests.org/"
+signals: [id_required, mail_option, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

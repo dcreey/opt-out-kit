@@ -372,8 +372,30 @@ extension WebViewSession {
         return (try? await webView.evaluateJavaScript(js)) as? String
     }
 
+    /// Ticks unticked boxes that only say "I confirm that I am the person associated with this email": a plain statement about the
+    /// account owner, who allowed it. Legal certifications, agent statements and terms are left alone (same rule as
+    /// `FormFiller.isSelfIdentityBox`). Returns how many were ticked.
+    func tickIdentityBoxes() async -> Int {
+        let js = #"""
+        (function(){var yes=/\bi (confirm|verify|am)\b.{0,60}\b(person|owner|me)\b.{0,40}(email|e-mail|address|account|request|record)/i,
+              no=/penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal/i,n=0;
+          document.querySelectorAll('input[type=checkbox]').forEach(function(c){
+            if(c.checked) return;
+            var t='';
+            if(c.id){var l=document.querySelector('label[for="'+c.id+'"]'); if(l) t=l.innerText;}
+            if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
+            if(!t){var q=c.parentElement; t=q?q.innerText:'';}
+            t=t.replace(/\s+/g,' ').trim();
+            if(yes.test(t)&&!no.test(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} n++;}});
+          return n;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Int) ?? 0
+    }
+
     /// Puts each value into its field, matching a dropdown's options by code or name. Returns how many fields were filled.
-    func fillFields(_ values: [FieldValue]) async -> Int {
+    func fillFields(_ allValues: [FieldValue]) async -> Int {
+        if allValues.contains(where: { $0.type == FormFiller.confirmIdentityType }) { _ = await tickIdentityBoxes() }
+        let values = allValues.filter { $0.type != FormFiller.confirmIdentityType }
         let payload = values.map { ["name": $0.name, "candidates": $0.candidates] as [String: Any] }
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return 0 }
         let js = #"""

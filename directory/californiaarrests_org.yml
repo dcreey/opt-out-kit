@@ -7,11 +7,15 @@ bucket: "indirect"
 tier: "B"
 automation: "guided"
 confidence: "high"
-opt_out_url: "https://www.californiaarrests.org/ccpaOptOut/"
-opt_out_form: {"page": "https://www.californiaarrests.org/ccpaOptOut/", "method": "post", "action": "https://www.californiaarrests.org/ccpaOptOut/#wpcf7-f355-p357-o1", "fields": [{"type": "radio", "name": "radio-312", "label": "radio-312"}, {"type": "radio", "name": "radio-312", "label": "radio-312"}, {"type": "radio", "name": "radio-999", "label": "radio-999"}, {"type": "radio", "name": "radio-999", "label": "radio-999"}, {"type": "radio", "name": "radio-999", "label": "radio-999"}, {"type": "text", "name": "first-name", "label": "first-name"}, {"type": "text", "name": "last-name", "label": "last-name"}, {"type": "email", "name": "your-email", "label": "your-email"}, {"type": "text", "name": "age", "label": "age"}, {"type": "text", "name": "current-city", "label": "current-city"}, {"type": "text", "name": "state", "label": "state"}, {"type": "text", "name": "past-city", "label": "past-city"}, {"type": "text", "name": "past-states", "label": "past-states"}, {"type": "text", "name": "relatives", "label": "relatives"}, {"type": "textarea", "name": "more-details", "label": "more-details"}], "hops": 2}
-signals: [captcha_turnstile, email_input, name_input, opt_out_form_found, search_first]
+opt_out_url: "https://www.californiaarrests.org/request-portal/"
+opt_out_form: {"page": "https://www.californiaarrests.org/request-portal/", "method": "post", "action": "https://www.californiaarrests.org/request-portal/", "fields": [{"type": "checkbox", "name": "wpforms[fields][3][]", "label": "I am submitting this request for myself."}, {"type": "checkbox", "name": "wpforms[fields][3][]", "label": "I am an authorized agent submitting this request on behalf o"}, {"type": "text", "name": "wpforms[fields][1]", "label": "Type Name Privacy"}, {"type": "checkbox", "name": "wpforms[fields][4][]", "label": "Access my personal information."}, {"type": "checkbox", "name": "wpforms[fields][4][]", "label": "Delete my personal information."}, {"type": "checkbox", "name": "wpforms[fields][4][]", "label": "Correct my personal information."}, {"type": "checkbox", "name": "wpforms[fields][4][]", "label": "Opt-out of the sale of my personal information."}, {"type": "text", "name": "wpforms[fields][2][first]", "label": "First"}, {"type": "text", "name": "wpforms[fields][2][last]", "label": "Last"}, {"type": "email", "name": "wpforms[fields][5]", "label": "Email *"}, {"type": "text", "name": "wpforms[fields][6][address1]", "label": "Address Line 1"}, {"type": "text", "name": "wpforms[fields][6][address2]", "label": "Address Line 2"}, {"type": "text", "name": "wpforms[fields][6][city]", "label": "City"}, {"type": "select", "name": "wpforms[fields][6][state]", "label": "State"}, {"type": "text", "name": "wpforms[fields][6][postal]", "label": "Zip Code"}, {"type": "textarea", "name": "wpforms[fields][7]", "label": "Additional Details"}], "hops": 1}
+template: "t_6d7fd6"
+signals: [captcha_recaptcha, captcha_turnstile, email_input, email_only_wording, listing_url_input, name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"
   candidate: {"method": "GET", "url": "https://www.californiaarrests.org/Results?fname={first}&lname={last}&stage=1&rType=Warrant&state={state}&city={city}", "body": null}
   checked: "2026-10-21"
+live_check:
+  checked: "2026-10-21"
+  blockers: []

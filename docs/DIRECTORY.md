@@ -30,7 +30,36 @@ and wait one second between fetches to the same site. It never submits a form.
 | **template** | Different sites running the same form (same page path and field names): one flow covers them, one request per site |
 | **family** | Two or more sites whose opt-out leads to the same other site (for example 50 court-records sites) |
 
-The hardest requirement wins. Every tier here is a guess from the page's shape; the app labels it that way.
+The hardest requirement wins. Every tier here is a guess from the page's shape. Tiers are internal: the app no longer shows them.
+It groups sites by who does the work instead (see "How each site gets opted out" below).
+
+## How each site gets opted out (what the app shows)
+
+`OptOutMethods.classify` (core package) puts every site in one of four groups, using the form the profiler found, the page's
+signals, and whether the form filler can map every field for a complete profile. `pipeline/opt-out-methods.md` lists each site
+with the reason; regenerate it with `broker-pipeline --directory directory --methods-report pipeline/opt-out-methods.md`.
+
+| Group | Meaning | Sites (2026-10-21) |
+|---|---|---|
+| Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 82 (83 for an owner who allows "I am this person" boxes) |
+| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you | 3 |
+| Guided, you do the steps | The page is found but needs something only you can do (login, ID, a listing link), or has no readable form, or is a hand-written walkthrough | 104 |
+| Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 25 |
+
+**Measured, not guessed.** A reCAPTCHA or Turnstile script on a page is only a hint: most are invisible. So
+`AppTests/LiveAssistedPreviewTests` loads every fillable form with a made-up profile and sends nothing, and
+`tools/apply_live_check.py` records what actually blocked it as a `live_check:` block in the site's file. On 2026-10-21, 82 of 84
+forms had nothing blocking them; one showed a visible reCAPTCHA checkbox (smartbackgroundchecks.com) and one a required
+"I confirm that I am the person associated with this email" box (searchpeoplefree.com). A site that was never measured with a
+captcha script on the page stays Semi-automated until it is. An invisible check can still appear when a form is sent; the app then
+stops and asks, and that site moves to Semi-automated.
+
+**"I am this person" boxes.** The account owner (the "Me" profile) can allow the app to tick a plain box that says they are the
+person the request is about (About, "Confirm 'I am this person' boxes for me"; off until they turn it on). It never applies to
+family profiles, never to minors, and never to legal certifications ("under penalty of perjury"), agent statements or terms.
+Those always stay with the person.
+
+A group is a measurement from one run, not a promise.
 
 ## From directory to guided flow
 
@@ -100,7 +129,15 @@ sites that really have a prompt (CourtRecords.us shows one on its home page).
 The same lesson applies to opt-out forms: guessed paths such as `/optout` often return a "page not found" screen that still has a
 search box, and privacy-policy pages can embed affiliate search boxes. The profiler now skips error pages, takes the page's
 context from its title and opening text only, and rejects forms that post to another company unless the address is a removal portal.
-That cut the found forms from 119 to 102.
+That cut the found forms from 119 to 102. The full re-profile on 2026-10-21 (with retries, below) found 109.
+
+## Crawler reliability
+
+Every request goes through `Fetcher.get`, which retries transient trouble (timeouts, connection resets, HTTP 408/425/429/500/502/503/504)
+up to 4 tries with exponential backoff (2, 4, 8 seconds plus jitter, capped at 60) and honors `Retry-After`. A real 404 or 403 is final.
+A robots.txt that cannot be read because of a server error or network failure is treated as "stay out" (RFC 9309), not "allowed";
+a missing robots.txt (404) allows. The crawl stays at about one request per second per site. Tests: `python3 -m unittest discover -s tools/tests`
+(run in CI).
 
 ## Quick checks (the guided fallback)
 

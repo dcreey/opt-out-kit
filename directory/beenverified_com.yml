@@ -4,13 +4,11 @@ id: "beenverified_com"
 domain: "beenverified.com"
 name: "beenverified.com"
 bucket: "direct"
-tier: "C"
+tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.beenverified.com/faq/privacy/"
-family: "mozilla_org"
-family_parent: "mozilla.org"
-signals: [captcha_recaptcha, email_contact, email_only_wording, mail_option, phone_verify]
+opt_out_url: "https://www.beenverified.com/"
+signals: [captcha_turnstile, email_input, email_only_wording, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "blocked"

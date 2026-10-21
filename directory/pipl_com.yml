@@ -4,11 +4,11 @@ id: "pipl_com"
 domain: "pipl.com"
 name: "pipl.com"
 bucket: "direct"
-tier: "C"
+tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://pipl.com/california-privacy-notice-individuals"
-signals: [account_hint, id_required, mail_option]
+opt_out_url: "https://pipl.com/personal-information-removal-request"
+signals: [captcha_recaptcha, email_input, listing_url_input, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

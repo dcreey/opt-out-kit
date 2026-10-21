@@ -109,6 +109,15 @@ public struct SearchCheck: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+/// What actually blocked the opt-out form when its real page was loaded with a made-up profile and nothing was sent. Each blocker
+/// is "check: a reCAPTCHA checkbox", "certify: <the box's text>" or "terms". Empty means nothing blocked the form on load.
+/// An invisible check can still appear when the form is sent; the app then stops and asks (see `AutoOptOutResult.challenged`).
+public struct LiveCheck: Codable, Equatable, Hashable, Sendable {
+    public var checked: String
+    public var blockers: [String]
+    public init(checked: String, blockers: [String]) { self.checked = checked; self.blockers = blockers }
+}
+
 /// One site we know about but have no hand-written flow for yet. Generated, provisional, and safe to regenerate.
 public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendable {
     public var id: String
@@ -124,22 +133,23 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var familyParent: String?
     public var template: String?        // sites running the same opt-out form: one flow, one request per site
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
+    public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
     public var signals: [String]?
     public var profiled: String?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
-        case searchCheck = "search_check"
+        case searchCheck = "search_check", liveCheck = "live_check"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

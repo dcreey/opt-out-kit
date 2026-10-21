@@ -4,11 +4,11 @@ id: "searchquarry_com"
 domain: "searchquarry.com"
 name: "searchquarry.com"
 bucket: "direct"
-tier: null
-automation: "unknown"
-confidence: "low"
-opt_out_url: "https://members.searchquarry.com/opt-out"
-signals: [email_contact]
+tier: "C"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.searchquarry.com/"
+signals: [name_input, phone_input, phone_verify]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"

@@ -7,8 +7,8 @@ bucket: "indirect"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.idahoarrests.org/privacy"
-signals: []
+opt_out_url: "https://www.idahoarrests.org/"
+signals: [name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

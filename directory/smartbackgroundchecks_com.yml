@@ -14,3 +14,6 @@ profiled: "2026-10-21"
 search_check:
   status: "blocked"
   checked: "2026-10-20"
+live_check:
+  checked: "2026-10-21"
+  blockers: ["check: a reCAPTCHA checkbox"]

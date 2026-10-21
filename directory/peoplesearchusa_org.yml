@@ -7,7 +7,7 @@ bucket: "direct"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: "https://www.peoplesearchusa.org/opt-out"
+opt_out_url: "https://www.peoplesearchusa.org/"
 signals: [script_rendered_page]
 profiled: "2026-10-21"
 search_check:

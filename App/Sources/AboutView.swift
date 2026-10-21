@@ -51,11 +51,14 @@ extension AboutView {
                 get: { model.autoSettings.optOutEnabled },
                 set: { model.setAuto(scan: model.autoSettings.scanEnabled, optOut: $0) }))
                 .accessibilityIdentifier("settings-optout-toggle")
+            Toggle("Confirm \"I am this person\" boxes for me", isOn: Binding(
+                get: { model.confirmsOwnIdentity }, set: { model.setConfirmsOwnIdentity($0) }))
+                .accessibilityIdentifier("settings-confirm-self-toggle")
             NavigationLink("Activity and run now") { AutoActivityView() }.accessibilityIdentifier("auto-activity")
         } header: {
             Text("Automatic protection")
         } footer: {
-            Text("Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval.")
+            Text("Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. \"Confirm I am this person\" ticks only a plain box saying you are the person the request is about, for your own profile only. Family profiles always ask the person themselves.")
         }
     }
 

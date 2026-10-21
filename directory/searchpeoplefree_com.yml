@@ -14,3 +14,6 @@ profiled: "2026-10-21"
 search_check:
   status: "blocked"
   checked: "2026-10-20"
+live_check:
+  checked: "2026-10-21"
+  blockers: ["certify: I confirm that I am the person associated with this email address and consent to receive an email from Search People FREE. The Information y"]

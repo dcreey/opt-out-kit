@@ -29,12 +29,10 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
-        XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 5))
 
         // Search finds a brand covered by PeopleConnect.
-        let search = app.searchFields.firstMatch
-        search.tap()
-        search.typeText("truthfinder")
+        app.searchSites("truthfinder")
+        XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["site-peopleconnect"].exists)
         XCTAssertFalse(app.buttons["site-spokeo"].exists)
 
@@ -53,6 +51,19 @@ final class OnboardingAndSitesUITests: XCTestCase {
 }
 
 final class DirectoryUITests: XCTestCase {
+    func testSitesAreGroupedByWhoDoesTheWorkAndShowNoTiers() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        let list = app.collectionViews["sites-list"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        let auto = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Automatic opt-out ('")).firstMatch
+        XCTAssertTrue(auto.waitForExistence(timeout: 5), "an automatic section with its site count")
+        XCTAssertTrue(auto.label.hasSuffix("sites)"))
+        XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'tier'")).count, 0, "tiers are not shown")
+    }
+
     func testSitesTabListsAndSearchesTheDirectory() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]

@@ -75,19 +75,22 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
     public var isMinor: Bool
     /// A public official or celebrity. The same terms forbid searching for them. Defaults to no.
     public var isPublicFigure: Bool
+    /// Lets the app tick a plain "I confirm I am this person" box on an opt-out form. Honored only for the account owner
+    /// (`relationship == .me`), never for family profiles: see `mayConfirmOwnIdentity`.
+    public var confirmsOwnIdentity: Bool
 
     public init(id: UUID = UUID(), displayName: String, relationship: Relationship = .otherFamily,
                 names: [NameEntry] = [NameEntry(kind: .legal)], addresses: [Address] = [],
                 emails: [String] = [], phones: [String] = [], birthdate: String? = nil,
-                isMinor: Bool = false, isPublicFigure: Bool = false) {
+                isMinor: Bool = false, isPublicFigure: Bool = false, confirmsOwnIdentity: Bool = false) {
         self.id = id; self.displayName = displayName; self.relationship = relationship
         self.names = names; self.addresses = addresses; self.emails = emails
         self.phones = phones; self.birthdate = birthdate
-        self.isMinor = isMinor; self.isPublicFigure = isPublicFigure
+        self.isMinor = isMinor; self.isPublicFigure = isPublicFigure; self.confirmsOwnIdentity = confirmsOwnIdentity
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, displayName, relationship, names, addresses, emails, phones, birthdate, isMinor, isPublicFigure
+        case id, displayName, relationship, names, addresses, emails, phones, birthdate, isMinor, isPublicFigure, confirmsOwnIdentity
     }
 
     /// Profiles saved before the safety flags existed load with both off.
@@ -103,6 +106,12 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         birthdate = try c.decodeIfPresent(String.self, forKey: .birthdate)
         isMinor = try c.decodeIfPresent(Bool.self, forKey: .isMinor) ?? false
         isPublicFigure = try c.decodeIfPresent(Bool.self, forKey: .isPublicFigure) ?? false
+        confirmsOwnIdentity = try c.decodeIfPresent(Bool.self, forKey: .confirmsOwnIdentity) ?? false
+    }
+
+    /// Whether the app may tick "I am this person" for this profile: only the account owner, only after they allowed it, never a minor.
+    public func mayConfirmOwnIdentity(on date: Date = Date()) -> Bool {
+        relationship == .me && confirmsOwnIdentity && !isMinorNow(on: date)
     }
 
     /// Age in whole years from a "YYYY-MM-DD" birthdate, or nil when there is none or it cannot be read.

@@ -4,11 +4,11 @@ id: "peoplebyname_com"
 domain: "peoplebyname.com"
 name: "peoplebyname.com"
 bucket: "direct"
-tier: null
-automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+tier: "C"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.peoplebyname.com/"
+signals: [phone_input, phone_verify]
 profiled: "2026-10-21"
 search_check:
   status: "blocked"

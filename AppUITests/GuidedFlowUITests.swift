@@ -87,6 +87,7 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
+        app.searchSites("peopleconnect")
         XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 10))
         app.buttons["site-peopleconnect"].tap()
         let guide = app.buttons["guide-me"]
@@ -123,6 +124,7 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
+        app.searchSites("peopleconnect")
         app.buttons["site-peopleconnect"].tap()
         app.buttons["guide-me"].tap()
         XCTAssertTrue(app.staticTexts["guided-progress"].waitForExistence(timeout: 10))

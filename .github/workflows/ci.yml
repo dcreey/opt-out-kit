@@ -18,6 +18,8 @@ jobs:
       - run: pip install check-jsonschema
       - run: check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml
       - run: check-jsonschema --schemafile schema/directory.schema.json directory/*.yml
+      - name: Profiler unit tests (retries, backoff, robots handling)
+        run: python3 -m unittest discover -s tools/tests
 
   core:
     name: Core package tests

@@ -85,7 +85,7 @@ struct BrokerListView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text(broker.name).font(.headline)
-                Text("Tier \(broker.tier.rawValue)\(broker.isVerified ? "" : " · unverified")")
+                Text(broker.isVerified ? "Guided" : "Guided · unverified")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()

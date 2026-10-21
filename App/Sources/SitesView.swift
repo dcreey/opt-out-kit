@@ -84,22 +84,27 @@ struct SitesView: View {
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("sites-filter")
                 }
-                Section("\(shown.count) guided sites") {
-                    ForEach(shown) { broker in
-                        NavigationLink(value: broker) { row(broker) }
-                            .accessibilityIdentifier("site-\(broker.id)")
-                    }
-                }
-                if filter != .done {
-                    Section {
-                        ForEach(shownDirectory.prefix(300)) { entry in
-                            NavigationLink(value: entry) { directoryRow(entry) }
-                                .accessibilityIdentifier("dir-\(entry.id)")
+                ForEach(OptOutMethod.allCases, id: \.self) { method in
+                    let entries = shownDirectory(method)
+                    let brokers = method == .guided ? shown : []
+                    if !entries.isEmpty || !brokers.isEmpty {
+                        Section {
+                            ForEach(brokers) { broker in
+                                NavigationLink(value: broker) { row(broker) }
+                                    .accessibilityIdentifier("site-\(broker.id)")
+                            }
+                            if filter != .done {
+                                ForEach(entries.prefix(300)) { entry in
+                                    NavigationLink(value: entry) { directoryRow(entry) }
+                                        .accessibilityIdentifier("dir-\(entry.id)")
+                                }
+                            }
+                        } header: {
+                            Text("\(method.title) (\(brokers.count + (filter == .done ? 0 : entries.count)) sites)")
+                                .accessibilityIdentifier("method-\(method.rawValue)")
+                        } footer: {
+                            Text(method.explanation)
                         }
-                    } header: {
-                        Text("\(shownDirectory.count) more sites")
-                    } footer: {
-                        Text("Found automatically. We haven't written step-by-step guidance for these yet, so the tier is a guess from the page.")
                     }
                 }
             }
@@ -131,23 +136,21 @@ struct SitesView: View {
         }
     }
 
-    private var shownDirectory: [DirectoryEntry] {
+    private func shownDirectory(_ method: OptOutMethod) -> [DirectoryEntry] {
         let q = search.lowercased()
-        return model.unguidedSites.filter { q.isEmpty || $0.domain.lowercased().contains(q) }
+        return model.unguidedSites.filter { (q.isEmpty || $0.domain.lowercased().contains(q)) && model.method(for: $0).method == method }
     }
 
     private func directoryRow(_ e: DirectoryEntry) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(e.domain).font(.headline)
-                Text(e.automation.label).font(.caption).foregroundStyle(.secondary)
+                Text(model.method(for: e).reason).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 let n = Directory.familySize(of: e, in: model.directory)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
                 if model.activeIssue(for: e.id) != nil { Text("Reported not working").font(.caption).foregroundStyle(.red) }
             }
             Spacer()
-            Text(e.tier.map { "Tier \($0.rawValue)?" } ?? "Tier ?").font(.caption2)
-                .padding(.horizontal, 6).padding(.vertical, 2).background(.quaternary, in: Capsule())
         }
     }
 
@@ -163,8 +166,6 @@ struct SitesView: View {
                 }
             }
             Spacer()
-            Text("Tier \(broker.tier.rawValue)").font(.caption2).padding(.horizontal, 6).padding(.vertical, 2)
-                .background(.quaternary, in: Capsule())
         }
     }
 }
@@ -222,7 +223,8 @@ struct BrokerInfoView: View {
             }
 
             Section("What to expect") {
-                Text(Describe.tier(broker.tier))
+                Text(OptOutMethods.classify(broker).method.title).font(.headline)
+                Text(OptOutMethods.classify(broker).method.explanation).font(.footnote)
                 ForEach(broker.signals ?? [], id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") }
             }
 
@@ -349,12 +351,20 @@ struct DirectoryInfoView: View {
     @State private var browserURL: URL?
     @State private var guide: GuidedRunner?
     @State private var healing = false
+    private var resolvedEntry: DirectoryEntry { model.resolved(entry) }
+    private var subtitle: String {
+        switch model.method(for: entry).method {
+        case .automatic: return "We fill in the form and send it"
+        case .semiAutomatic: return "We fill in the form; you clear the check"
+        case .guided: return "We take you to the page and walk you through it"
+        case .manual: return "We open the site; you find its opt-out link"
+        }
+    }
 
     var body: some View {
         List {
             Section {
-                GuideButton(title: "Opt out with a guide", subtitle: entry.optOutForm != nil
-                            ? "We fill in the form; you clear the check" : "We take you to the page and walk you through it") {
+                GuideButton(title: "Opt out with a guide", subtitle: subtitle) {
                     guide = model.guidedRunner(for: entry)
                 }
             }
@@ -363,12 +373,10 @@ struct DirectoryInfoView: View {
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             Section {
-                Text(entry.automation.label).font(.headline)
-                if let tier = entry.tier {
-                    Text("Provisional tier \(tier.rawValue): \(Describe.tier(tier))").font(.footnote)
-                }
-                Text("This is a guess from the shape of the site's opt-out page (\(entry.confidence ?? "unknown") confidence). It becomes a guided flow once someone walks it for real.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                let verdict = model.method(for: entry)
+                Text(verdict.method.title).font(.headline).accessibilityIdentifier("method-title")
+                Text(verdict.reason).font(.footnote)
+                Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
             }
             let n = Directory.familySize(of: entry, in: model.directory)
             if let parent = entry.familyParent, n > 1 {

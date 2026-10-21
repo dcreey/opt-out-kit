@@ -4,11 +4,12 @@ id: "usa_people_search_com"
 domain: "usa-people-search.com"
 name: "usa-people-search.com"
 bucket: "direct"
-tier: "C"
+tier: "B"
 automation: "guided"
-confidence: "medium"
-opt_out_url: "https://www.usa-people-search.com/privacy"
-signals: [mail_option, phone_verify]
+confidence: "high"
+opt_out_url: "https://www.usa-people-search.com/removal"
+opt_out_form: {"page": "https://www.usa-people-search.com/removal", "method": "post", "action": "https://www.usa-people-search.com/removal", "fields": [{"type": "select", "name": "user-type", "label": "I am:"}, {"type": "text", "name": "subject-firstname", "label": "Subject First Name*"}, {"type": "text", "name": "subject-middlename", "label": "Subject Middle Name"}, {"type": "text", "name": "subject-lastname", "label": "Subject Last Name*"}, {"type": "email", "name": "subject-email", "label": "Subject Email*"}, {"type": "text", "name": "agent-firstname", "label": "Agent First Name*"}, {"type": "text", "name": "agent-lastname", "label": "Agent Last Name*"}, {"type": "email", "name": "agent-email", "label": "Agent Email*"}, {"type": "checkbox", "name": "agreement", "label": "I authorize USA People Search to send communications relatin"}], "hops": 2}
+signals: [captcha_recaptcha, email_input, email_only_wording, name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:
   status: "blocked"

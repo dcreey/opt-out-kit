@@ -4,11 +4,13 @@ id: "searchusapeople_com"
 domain: "searchusapeople.com"
 name: "searchusapeople.com"
 bucket: "indirect"
-tier: null
-automation: "unknown"
-confidence: "low"
-opt_out_url: "https://www.searchusapeople.com/data-removal-request/"
-signals: [name_input]
+tier: "C"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.searchusapeople.com/cpra-privacy/"
+family: "infotracer_com"
+family_parent: "infotracer.com"
+signals: [id_required, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "calibrated"

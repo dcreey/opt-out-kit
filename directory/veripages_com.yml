@@ -6,9 +6,9 @@ name: "veripages.com"
 bucket: "direct"
 tier: null
 automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+confidence: "low"
+opt_out_url: "https://veripages.com/"
+signals: [name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "no_search"

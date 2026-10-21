@@ -7,10 +7,10 @@ bucket: "indirect"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-opt_out_url: "https://www.dobsearch.com/privacy-policy/"
+opt_out_url: "https://www.dobsearch.com/"
 family: "beenverified_com"
 family_parent: "beenverified.com"
-signals: [email_input, email_only_wording, phone_input]
+signals: [email_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

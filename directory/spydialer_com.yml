@@ -4,11 +4,12 @@ id: "spydialer_com"
 domain: "spydialer.com"
 name: "spydialer.com"
 bucket: "direct"
-tier: "C"
+tier: "B"
 automation: "guided"
-confidence: "medium"
-opt_out_url: "https://www.spydialer.com/do-not-sell"
-signals: [phone_verify]
+confidence: "high"
+opt_out_url: "https://www.spydialer.com/consumers/business.aspx"
+opt_out_form: {"page": "https://www.spydialer.com/consumers/business.aspx", "method": "post", "action": "https://www.spydialer.com/consumers/business.aspx", "fields": [{"type": "text", "name": "ctl00$contentplaceholder1$businessnametextbox", "label": "ctl00$contentplaceholder1$businessnametextbox"}, {"type": "text", "name": "ctl00$contentplaceholder1$phonetextbox", "label": "ctl00$contentplaceholder1$phonetextbox"}], "hops": 2}
+signals: [captcha_recaptcha, opt_out_form_found, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

@@ -6,9 +6,9 @@ name: "top4backgroundchecks.com"
 bucket: "indirect"
 tier: null
 automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+confidence: "low"
+opt_out_url: "https://www.top4backgroundchecks.com/"
+signals: [name_input]
 profiled: "2026-10-21"
 search_check:
   status: "blocked"

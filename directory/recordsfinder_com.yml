@@ -8,9 +8,12 @@ tier: "B"
 automation: "guided"
 confidence: "high"
 opt_out_url: "https://recordsfinder.com/do-not-sell-share-my-personal-information/"
-opt_out_form: {"page": "https://recordsfinder.com/do-not-sell-share-my-personal-information/", "method": "post", "action": "https://members.recordsfinder.com/removeMyData/", "fields": [{"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[fname]", "label": "First Name *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[lname]", "label": "Last Name *"}, {"type": "select", "name": "infopay_core_components_optouts_dataremovalservicemodel[state]", "label": "State *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[city]", "label": "City"}], "hops": 2}
+opt_out_form: {"page": "https://recordsfinder.com/do-not-sell-share-my-personal-information/", "method": "post", "action": "https://members.recordsfinder.com/removeMyData/", "fields": [{"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[fname]", "label": "First Name *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[lname]", "label": "Last Name *"}, {"type": "select", "name": "infopay_core_components_optouts_dataremovalservicemodel[state]", "label": "State *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[city]", "label": "City"}], "hops": 1}
 signals: [captcha_turnstile, email_contact, name_input, opt_out_form_found, search_first]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
+live_check:
+  checked: "2026-10-21"
+  blockers: []

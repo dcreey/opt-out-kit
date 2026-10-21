@@ -4,11 +4,11 @@ id: "verifyrecords_com"
 domain: "verifyrecords.com"
 name: "verifyrecords.com"
 bucket: "direct"
-tier: null
-automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+tier: "D"
+automation: "guided"
+confidence: "low"
+opt_out_url: "https://verifyrecords.com/"
+signals: [email_contact, email_only_wording, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

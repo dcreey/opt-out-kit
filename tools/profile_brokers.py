@@ -92,29 +92,52 @@ class Fetcher:
         rp = self.robots.get(host)
         if rp is None:
             rp = urllib.robotparser.RobotFileParser()
-            try:
-                req = urllib.request.Request(f"https://{host}/robots.txt", headers={"User-Agent": UA})
-                with urllib.request.urlopen(req, timeout=15) as r:
-                    rp.parse(r.read(400_000).decode("utf-8", "replace").splitlines())
-            except Exception:
-                rp.parse([])  # no readable robots.txt: nothing is disallowed
+            st, _, body = self.get(f"https://{host}/robots.txt")
+            if st is not None and st < 400: rp.parse(body[:400_000].splitlines())
+            elif st is None or st >= 500: rp.parse(["User-agent: *", "Disallow: /"])   # cannot tell: stay out (RFC 9309)
+            else: rp.parse([])                                                          # no robots.txt: nothing is disallowed
             self.robots[host] = rp
         return rp.can_fetch(UA, url)
 
-    def get(self, url, method="GET", data=None):
-        """Returns (status, final_url, text) or (None, url, '') on failure. Never raises. `data` is a form-encoded body for POST."""
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml",
-                                                       **({"Content-Type": "application/x-www-form-urlencoded"} if data else {})},
-                                         data=data.encode() if data else None, method=method)
-            with urllib.request.urlopen(req, timeout=20) as r:
-                return r.status, r.geturl(), r.read(1_500_000).decode("utf-8", "replace")
-        except urllib.error.HTTPError as e:
-            try: body = e.read(400_000).decode("utf-8", "replace")
-            except Exception: body = ""
-            return e.code, url, body
-        except Exception:
-            return None, url, ""
+    RETRY_STATUSES = {408, 425, 429, 500, 502, 503, 504}
+    MAX_TRIES = 4
+
+    @staticmethod
+    def backoff(attempt, retry_after=None):
+        """Seconds to wait before try number `attempt` (1-based): honors Retry-After, else 2, 4, 8 s plus jitter, capped at 60."""
+        import random
+        if retry_after is not None: return min(60.0, max(1.0, retry_after))
+        return min(60.0, 2.0 ** attempt + random.uniform(0, 1))
+
+    @staticmethod
+    def retry_after(headers):
+        v = headers.get("Retry-After") if headers else None
+        try: return float(v)
+        except (TypeError, ValueError): return None
+
+    def get(self, url, method="GET", data=None, sleep=time.sleep):
+        """Returns (status, final_url, text) or (None, url, '') on failure. Never raises. `data` is a form-encoded body for POST.
+        Transient trouble (timeouts, connection resets, 429 and 5xx) is retried with exponential backoff and jitter, honoring
+        Retry-After, so one flaky moment does not turn a working site into "unreachable". A real 4xx is final."""
+        last = (None, url, "")
+        for attempt in range(1, self.MAX_TRIES + 1):
+            wait = None
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml",
+                                                           **({"Content-Type": "application/x-www-form-urlencoded"} if data else {})},
+                                             data=data.encode() if data else None, method=method)
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    return r.status, r.geturl(), r.read(1_500_000).decode("utf-8", "replace")
+            except urllib.error.HTTPError as e:
+                try: body = e.read(400_000).decode("utf-8", "replace")
+                except Exception: body = ""
+                last = (e.code, url, body)
+                if e.code not in self.RETRY_STATUSES: return last
+                wait = self.retry_after(e.headers)
+            except Exception:
+                last = (None, url, "")
+            if attempt < self.MAX_TRIES: sleep(self.backoff(attempt, wait))
+        return last
 
 
 def parse(html):
@@ -411,8 +434,8 @@ def main():
         kept = ""
         if os.path.exists(target):
             old = open(target).read()
-            i = old.find("\nsearch_check:\n")
-            if i != -1: kept = old[i:]          # profile_search.py owns this block; never drop it
+            marks = [i for i in (old.find("\nsearch_check:\n"), old.find("\nlive_check:\n")) if i != -1]
+            if marks: kept = old[min(marks):]   # profile_search.py owns search_check, tools/apply_live_check.py owns live_check; never drop them
         open(target, "w").write(to_yaml(r).rstrip("\n") + ("\n" + kept.lstrip("\n") if kept else "\n"))
 
     # report

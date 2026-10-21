@@ -4,11 +4,11 @@ id: "publicrecords_searchsystems_net"
 domain: "publicrecords.searchsystems.net"
 name: "publicrecords.searchsystems.net"
 bucket: "indirect"
-tier: "D"
-automation: "guided"
+tier: null
+automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.searchsystems.net/privacy"
-signals: [email_only_wording]
+opt_out_url: "https://www.searchsystems.net/"
+signals: [name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

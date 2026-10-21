@@ -126,6 +126,19 @@ final class AppModel: ObservableObject {
     var autoSettings: AutoSettings { household.autoSettings }
 
     /// The person's answer to the first-run question, or a later change in Settings.
+    /// Whether the account owner allowed "I am this person" boxes to be ticked for them. Never applies to family profiles.
+    var confirmsOwnIdentity: Bool { household.people.contains { $0.relationship == .me && $0.confirmsOwnIdentity } }
+    /// How this site gets opted out for the selected person, including what real page loads and past sends have shown.
+    func method(for entry: DirectoryEntry) -> MethodVerdict {
+        let challenged = progress.optOutAttempts[entry.id]?.last?.outcome == "challenged"
+        return OptOutMethods.classify(resolved(entry), confirmingIdentity: confirmingIdentityForSelected, challengedBefore: challenged)
+    }
+    var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
+
+    func setConfirmsOwnIdentity(_ on: Bool) {
+        for p in household.people where p.relationship == .me { var q = p; q.confirmsOwnIdentity = on; update(q) }
+    }
+
     func setAuto(scan: Bool, optOut: Bool) {
         household.updateAuto { a in
             if scan || optOut { a.turnOnBoth(now: a.decidedAt ?? Date()) }

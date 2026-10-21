@@ -4,11 +4,11 @@ id: "arrestwarrant_org"
 domain: "arrestwarrant.org"
 name: "arrestwarrant.org"
 bucket: "direct"
-tier: null
-automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+tier: "D"
+automation: "guided"
+confidence: "low"
+opt_out_url: "https://arrestwarrant.org/"
+signals: [email_contact, email_only_wording, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

@@ -8,9 +8,12 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.thisnation.com/remove-my-info/"
-opt_out_form: {"page": "https://www.thisnation.com/remove-my-info/", "method": "get", "action": "https://www.thisnation.com/remove-my-info/", "fields": [{"type": "text", "name": "_r_1sq_-name", "label": "Full Name"}, {"type": "text", "name": "_r_bsq_", "label": "State"}, {"type": "text", "name": "_r_1sq_-city", "label": "City"}], "hops": 2}
+opt_out_form: {"page": "https://www.thisnation.com/remove-my-info/", "method": "get", "action": "https://www.thisnation.com/remove-my-info/", "fields": [{"type": "text", "name": "_r_1sq_-name", "label": "Full Name"}, {"type": "text", "name": "_r_bsq_", "label": "State"}, {"type": "text", "name": "_r_1sq_-city", "label": "City"}], "hops": 1}
 signals: [name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
+live_check:
+  checked: "2026-10-21"
+  blockers: []

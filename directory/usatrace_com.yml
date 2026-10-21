@@ -4,11 +4,11 @@ id: "usatrace_com"
 domain: "usatrace.com"
 name: "usatrace.com"
 bucket: "direct"
-tier: "C"
+tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.usatrace.com/privacy-policy/"
-signals: [email_contact, phone_verify]
+opt_out_url: "https://www.usatrace.com/your-privacy/"
+signals: [captcha_recaptcha, email_contact, listing_url_input, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "calibrated"

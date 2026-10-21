@@ -4,11 +4,11 @@ id: "peoplesmart_com"
 domain: "peoplesmart.com"
 name: "peoplesmart.com"
 bucket: "direct"
-tier: null
-automation: "blocked"
-confidence: "n/a"
-opt_out_url: "https://www.peoplesmart.com/optout"
-signals: []
+tier: "A"
+automation: "scriptable"
+confidence: "medium"
+opt_out_url: "https://www.peoplesmart.com/"
+signals: [email_input, email_only_wording, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"

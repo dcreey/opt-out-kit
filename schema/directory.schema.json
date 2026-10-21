@@ -36,6 +36,15 @@
     "family": { "type": "string" },
     "family_parent": { "type": "string" },
     "template": { "type": "string" },
+    "live_check": {
+      "type": "object",
+      "required": ["checked", "blockers"],
+      "additionalProperties": false,
+      "properties": {
+        "checked": { "type": "string" },
+        "blockers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "search_check": {
       "type": "object",
       "required": ["status"],

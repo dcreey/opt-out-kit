@@ -4,11 +4,11 @@ id: "backgroundchecks_org"
 domain: "backgroundchecks.org"
 name: "backgroundchecks.org"
 bucket: "indirect"
-tier: null
-automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+tier: "B"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://backgroundchecks.org/"
+signals: [captcha_recaptcha, name_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

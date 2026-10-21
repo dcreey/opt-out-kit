@@ -6,9 +6,11 @@ name: "affordablebackgroundchecks.com"
 bucket: "indirect"
 tier: null
 automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+confidence: "low"
+opt_out_url: "https://www.affordablebackgroundchecks.com/"
+family: "infotracer_com"
+family_parent: "infotracer.com"
+signals: [name_input]
 profiled: "2026-10-21"
 search_check:
   status: "calibrated"

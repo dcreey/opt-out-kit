@@ -5,11 +5,15 @@ domain: "moneybot5000.com"
 name: "moneybot5000.com"
 bucket: "direct"
 tier: null
-automation: "blocked"
-confidence: "n/a"
-opt_out_url: "https://www.moneybot5000.com/optout"
-signals: []
+automation: "unknown"
+confidence: "low"
+opt_out_url: "https://www.moneybot5000.com/faq/optout/"
+opt_out_form: {"page": "https://www.moneybot5000.com/faq/optout/", "method": "get", "action": "https://www.moneybot5000.com/faq/optout/", "fields": [{"type": "text", "name": "fn", "label": "First name"}, {"type": "text", "name": "ln", "label": "Last name"}, {"type": "select", "name": "state", "label": "state"}], "hops": 2}
+signals: [name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
+live_check:
+  checked: "2026-10-21"
+  blockers: []

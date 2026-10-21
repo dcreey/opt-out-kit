@@ -4,13 +4,11 @@ id: "ownerly_com"
 domain: "ownerly.com"
 name: "ownerly.com"
 bucket: "direct"
-tier: "D"
-automation: "guided"
+tier: null
+automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.beenverified.com/faq/cpra/"
-family: "beenverified_com"
-family_parent: "beenverified.com"
-signals: [email_contact, email_only_wording]
+opt_out_url: "https://www.ownerly.com/"
+signals: []
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

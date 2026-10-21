@@ -1498,3 +1498,162 @@ final class LinkFinderTests: XCTestCase {
         XCTAssertNil(h2.healedLink(for: "x"))
     }
 }
+
+
+final class OptOutMethodTests: XCTestCase {
+    private func entry(signals: [String], form: Bool = true, url: Bool = true, automation: Automation = .guided, fields: [FormField]? = nil) -> DirectoryEntry {
+        let page = URL(string: "https://x.example/optout")!
+        let f = OptOutForm(page: page, method: "post", action: nil,
+                           fields: fields ?? [FormField(type: "text", name: "first", label: "First name"), FormField(type: "text", name: "last", label: "Last name"), FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        return DirectoryEntry(id: "x", domain: "x.example", name: "x.example", bucket: "direct", tier: .B, automation: automation,
+                              optOutURL: url ? page : nil, optOutForm: form ? f : nil, signals: signals)
+    }
+
+    func testAPlainFormIsAutomaticAndABotCheckMakesItSemiAutomated() {
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["email_input"])).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["captcha_recaptcha"])).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["captcha_turnstile"])).method, .semiAutomatic)
+    }
+
+    func testThingsOnlyAPersonCanDoMakeItGuided() {
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["login_required"])).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["id_required"])).method, .guided)
+        let listing = [FormField(type: "text", name: "listing_url", label: "Link to your listing"), FormField(type: "email", name: "email", label: "Email")]
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], fields: listing)).method, .guided)
+    }
+
+    func testAPageWithoutAFormIsGuidedAndNothingFoundIsManual() {
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], form: false)).method, .guided)
+        for a in [Automation.blocked, .needsBrowser, .unreachable, .unknown, .robotsDisallowed] {
+            let v = OptOutMethods.classify(entry(signals: [], form: false, url: false, automation: a))
+            XCTAssertEqual(v.method, .manual, "\(a)")
+            XCTAssertFalse(v.reason.isEmpty)
+        }
+    }
+
+    func testEveryDirectorySiteGetsAMethodAndAReason() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        var counts: [OptOutMethod: Int] = [:]
+        for e in entries {
+            let v = OptOutMethods.classify(e)
+            XCTAssertFalse(v.reason.isEmpty, e.domain)
+            counts[v.method, default: 0] += 1
+        }
+        print("METHODS \(OptOutMethod.allCases.map { "\($0.rawValue)=\(counts[$0] ?? 0)" }.joined(separator: " "))")
+        XCTAssertEqual(counts.values.reduce(0, +), entries.count)
+        XCTAssertGreaterThan(entries.count, 200)
+    }
+}
+
+final class SelfIdentityConfirmationTests: XCTestCase {
+    private let box = "I confirm that I am the person associated with this email address and consent to receive an email from Example. The information I provided is accurate."
+    private func form(_ label: String) -> OptOutForm {
+        OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil, fields: [
+            FormField(type: "email", name: "email", label: "Email *"),
+            FormField(type: "checkbox", name: "confirm", label: label + " *"),
+        ], hops: 1)
+    }
+    private func person(_ rel: Relationship, allowed: Bool = true, minor: Bool = false) -> Person {
+        Person(displayName: "P", relationship: rel, names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"],
+               isMinor: minor, confirmsOwnIdentity: allowed)
+    }
+    private func isSentinel(_ v: FieldValue) -> Bool { v.type == FormFiller.confirmIdentityType }
+
+    func testTheOwnerWhoAllowedItGetsTheBoxTickedAndTheFormIsReady() {
+        let plan = FormFiller.plan(for: form(box), signals: nil, person: person(.me))
+        XCTAssertEqual(plan.verdict, .ready)
+        XCTAssertTrue(plan.values.contains(where: isSentinel))
+    }
+
+    func testFamilyProfilesAreNeverConfirmedEvenIfTheFlagIsSet() {
+        for rel in Relationship.allCases where rel != .me {
+            let plan = FormFiller.plan(for: form(box), signals: nil, person: person(rel))
+            guard case .needsYou(let why) = plan.verdict else { return XCTFail("\(rel) should need the person") }
+            XCTAssertTrue(why.contains("account owner"))
+            XCTAssertFalse(plan.values.contains(where: isSentinel), "\(rel)")
+        }
+    }
+
+    func testTheOwnerWhoDidNotAllowItStillConfirmsThemselves() {
+        XCTAssertEqual({ if case .needsYou = FormFiller.plan(for: form(box), signals: nil, person: person(.me, allowed: false)).verdict { return true } else { return false } }(), true)
+    }
+
+    func testAMinorOwnerProfileIsNeverConfirmed() {
+        if case .needsYou = FormFiller.plan(for: form(box), signals: nil, person: person(.me, minor: true)).verdict {} else { XCTFail("minor") }
+    }
+
+    func testLegalCertificationsAgentStatementsAndTermsAreNeverTicked() {
+        for text in ["I certify under penalty of perjury that I am the person named in this request",
+                     "I am the owner of this email and an authorized agent acting on behalf of the person",
+                     "I confirm that I am the person associated with this email and agree to the terms of service",
+                     "I acknowledge and attest that the information is true"] {
+            XCTAssertFalse(FormFiller.isSelfIdentityBox(text), text)
+            if case .needsYou = FormFiller.plan(for: form(text), signals: nil, person: person(.me)).verdict {} else { XCTFail(text) }
+        }
+    }
+
+    func testThePlainSelfStatementsAreRecognised() {
+        for text in [box, "I confirm I am the person associated with this email address", "I verify that I am the owner of this account"] {
+            XCTAssertTrue(FormFiller.isSelfIdentityBox(text), text)
+        }
+    }
+
+    func testOldProfilesLoadWithItOffAndOnlyTheOwnerCanUseIt() throws {
+        let old = #"{"id":"\#(UUID().uuidString)","displayName":"Me","relationship":"me"}"#
+        let p = try JSONDecoder().decode(Person.self, from: Data(old.utf8))
+        XCTAssertFalse(p.confirmsOwnIdentity); XCTAssertFalse(p.mayConfirmOwnIdentity())
+        XCTAssertFalse(Person(displayName: "Mom", relationship: .parent, confirmsOwnIdentity: true).mayConfirmOwnIdentity())
+        XCTAssertTrue(Person(displayName: "Me", relationship: .me, confirmsOwnIdentity: true).mayConfirmOwnIdentity())
+    }
+
+    func testTheSiteIsAutomaticForTheOwnerWhoAllowedItAndGuidedOtherwise() {
+        let e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+                               optOutURL: URL(string: "https://x.example/optout"), optOutForm: form(box), signals: [])
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(e).method, .guided)
+    }
+}
+
+final class MeasuredMethodTests: XCTestCase {
+    private func entry(_ signals: [String], live: LiveCheck?) -> DirectoryEntry {
+        let page = URL(string: "https://x.example/optout")!
+        let f = OptOutForm(page: page, method: "post", action: nil, fields: [FormField(type: "email", name: "email", label: "Email *")], hops: 1)
+        return DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+                              optOutURL: page, optOutForm: f, liveCheck: live, signals: signals)
+    }
+    private let selfBox = "certify: I confirm that I am the person associated with this email address and consent to receive an email."
+
+    func testACaptchaScriptAloneDoesNotMakeASiteSemiAutomatedOnceItWasMeasured() {
+        let measured = entry(["captcha_recaptcha", "captcha_turnstile"], live: LiveCheck(checked: "2026-10-21", blockers: []))
+        XCTAssertEqual(OptOutMethods.classify(measured).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(["captcha_recaptcha"], live: nil)).method, .semiAutomatic, "unmeasured stays cautious")
+    }
+
+    func testAVisibleCheckOrAHandledBoxMakesItSemiAutomated() {
+        XCTAssertEqual(OptOutMethods.classify(entry([], live: LiveCheck(checked: "d", blockers: ["check: a reCAPTCHA checkbox"]))).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(entry([], live: LiveCheck(checked: "d", blockers: ["terms"]))).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(entry([], live: LiveCheck(checked: "d", blockers: ["certify: I certify under penalty of perjury"])), confirmingIdentity: true).method, .semiAutomatic)
+    }
+
+    func testTheSelfStatementBoxIsAutomaticOnlyForAnOwnerWhoAllowedIt() {
+        let e = entry([], live: LiveCheck(checked: "d", blockers: [selfBox]))
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: false).method, .semiAutomatic, "family profiles and owners who did not allow it")
+    }
+
+    func testASendThatWasChallengedMovesTheSiteToSemiAutomated() {
+        let e = entry([], live: LiveCheck(checked: "d", blockers: []))
+        XCTAssertEqual(OptOutMethods.classify(e, challengedBefore: true).method, .semiAutomatic)
+    }
+
+    func testTheMeasuredDirectoryLoadsAndMostMeasuredFormsAreClear() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        let measured = entries.compactMap { $0.liveCheck }
+        XCTAssertGreaterThan(measured.count, 50)
+        XCTAssertGreaterThan(measured.filter { $0.blockers.isEmpty }.count, measured.count / 2)
+    }
+}

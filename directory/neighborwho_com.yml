@@ -5,9 +5,9 @@ domain: "neighborwho.com"
 name: "neighborwho.com"
 bucket: "direct"
 tier: null
-automation: "blocked"
-confidence: "n/a"
-opt_out_url: "https://www.neighborwho.com/optout"
+automation: "unknown"
+confidence: "low"
+opt_out_url: "https://www.neighborwho.com/"
 signals: []
 profiled: "2026-10-21"
 search_check:

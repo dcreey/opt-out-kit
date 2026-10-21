@@ -2,7 +2,7 @@ import Foundation
 import OptOutKitCore
 
 // Usage: broker-pipeline [--brokers DIR] [--directory DIR] [--report FILE] [--census FILE] [--spacing SECONDS]
-//                        [--person "First Last|City|ST"]
+//                        [--methods-report FILE (needs --directory)] [--person "First Last|City|ST"]
 // Exits 1 when any broker FAILs (a definition is wrong or a page changed). BLOCKED and NEEDS RESEARCH do not fail the run.
 var args = Array(CommandLine.arguments.dropFirst())
 func option(_ name: String) -> String? {
@@ -52,6 +52,12 @@ if let censusFile = option("--census"), let list = try? String(contentsOfFile: c
     for c in Census.Class.allCases {
         report += "| \(c.rawValue) | \(result.values.filter { $0 == c }.count) |\n"
     }
+}
+
+if let path = option("--methods-report"), let dir = option("--directory") {
+    let brokers = (try? Registry.load(directory: brokersDir)) ?? []
+    let entries = (try? Registry.loadDirectory(URL(fileURLWithPath: dir))) ?? []
+    try? OptOutMethods.markdown(brokers: brokers, entries: entries).write(toFile: path, atomically: true, encoding: .utf8)
 }
 
 print(report)

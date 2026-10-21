@@ -4,11 +4,11 @@ id: "californiaarrestrecords_org"
 domain: "californiaarrestrecords.org"
 name: "californiaarrestrecords.org"
 bucket: "indirect"
-tier: null
-automation: "unknown"
-confidence: "none"
-opt_out_url: null
-signals: []
+tier: "B"
+automation: "guided"
+confidence: "medium"
+opt_out_url: "https://www.californiaarrestrecords.org/"
+signals: [captcha_hcaptcha, captcha_recaptcha, email_input, listing_url_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

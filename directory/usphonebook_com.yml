@@ -4,11 +4,11 @@ id: "usphonebook_com"
 domain: "usphonebook.com"
 name: "usphonebook.com"
 bucket: "direct"
-tier: "B"
+tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.usphonebook.com/removal"
-signals: [captcha_recaptcha, email_input, email_only_wording, name_input, phone_input, search_first]
+opt_out_url: "https://www.usphonebook.com/privacy-rights"
+signals: [captcha_recaptcha, email_input, id_required, listing_url_input, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"

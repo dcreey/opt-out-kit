@@ -4,11 +4,13 @@ id: "numberguru_com"
 domain: "numberguru.com"
 name: "numberguru.com"
 bucket: "direct"
-tier: null
-automation: "blocked"
-confidence: "n/a"
-opt_out_url: "https://www.numberguru.com/optout"
-signals: []
+tier: "D"
+automation: "guided"
+confidence: "low"
+opt_out_url: "https://www.beenverified.com/faq/cpra/"
+family: "beenverified_com"
+family_parent: "beenverified.com"
+signals: [email_contact, email_only_wording]
 profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
