@@ -14,6 +14,8 @@ public struct Step: Codable, Equatable, Sendable {
         public var subject: String?
         public var withinMinutes: Int?
 
+        public init(subject: String? = nil, withinMinutes: Int? = nil) { self.subject = subject; self.withinMinutes = withinMinutes }
+
         enum CodingKeys: String, CodingKey { case subject, withinMinutes = "within_minutes" }
     }
 
@@ -23,15 +25,28 @@ public struct Step: Codable, Equatable, Sendable {
     public var searchMatch: String?
     public var waitForEmail: EmailWait?
     public var confirm: Bool?
+    /// How the app can tell the person has finished this step by watching the page, so they do not have to tap Next.
+    public var doneWhen: DoneWhen?
+
+    public struct DoneWhen: Codable, Equatable, Sendable {
+        public var urlContains: String?
+        public var textContains: String?
+        public var urlChanges: Bool?
+        enum CodingKeys: String, CodingKey { case urlContains = "url_contains", textContains = "text_contains", urlChanges = "url_changes" }
+        public init(urlContains: String? = nil, textContains: String? = nil, urlChanges: Bool? = nil) {
+            self.urlContains = urlContains; self.textContains = textContains; self.urlChanges = urlChanges
+        }
+    }
 
     public init(open: URL? = nil, copy: String? = nil, say: String? = nil, searchMatch: String? = nil,
-                waitForEmail: EmailWait? = nil, confirm: Bool? = nil) {
+                waitForEmail: EmailWait? = nil, confirm: Bool? = nil, doneWhen: DoneWhen? = nil) {
         self.open = open; self.copy = copy; self.say = say
-        self.searchMatch = searchMatch; self.waitForEmail = waitForEmail; self.confirm = confirm
+        self.searchMatch = searchMatch; self.waitForEmail = waitForEmail; self.confirm = confirm; self.doneWhen = doneWhen
     }
 
     enum CodingKeys: String, CodingKey {
         case open, copy, say, confirm
+        case doneWhen = "done_when"
         case searchMatch = "search_match"
         case waitForEmail = "wait_for_email"
     }

@@ -124,6 +124,15 @@ def parse(html):
     return p
 
 
+NOT_FOUND = re.compile(r"page (can.?t|cannot|could not) be found|page not found|not found|doesn.?t exist|does not exist|error 404|404 error|\\b404\\b|oops", re.I)
+
+
+def is_error_page(status, page, text):
+    """An error page can still carry a search box, which is not an opt-out form. Skip it."""
+    if status is not None and status >= 400: return True
+    return bool(NOT_FOUND.search((page.title or "") + " " + text[:400]))
+
+
 def is_blocked(status, html):
     low = html.lower()
     return status in (403, 429, 503) or any(m in low for m in HARD_CHALLENGE)
@@ -156,7 +165,7 @@ def score_form(page, idx, base, page_text):
     fields = form_fields(page, idx, base)
     if not fields: return -9
     path = urllib.parse.urlsplit(base).path
-    context = path + " " + (page.title or "") + " " + page_text[:1500]
+    context = (page.title or "") + " " + page_text[:400]       # the page's own heading, not a policy that merely mentions rights
     if path in ("", "/") or not OPT_WORDS.search(context): return -9
     kinds = " ".join(f["type"] + " " + f["name"] + " " + f["label"] for f in fields).lower()
     sc = 2
@@ -167,6 +176,9 @@ def score_form(page, idx, base, page_text):
     if "password" in kinds: sc -= 3
     action = urllib.parse.urljoin(base, form["action"]).lower()
     action_is_removal = bool(OPT_WORDS.search(action))
+    # A form that posts to another company's address is an affiliate or search box, unless that address is a removal portal.
+    here = registrable(urllib.parse.urlsplit(base).netloc); there = registrable(urllib.parse.urlsplit(action).netloc)
+    if there != here and not action_is_removal and not any(n in action for n in PORTALS): return -9
     if action_is_removal: sc += 3          # the form posts to a removal / opt-out address
     elif re.search(r"\bcity\b|\bstate\b|\bage\b|zip", kinds) and not re.search(r"e-?mail|url|link", kinds): sc -= 4
     if len(fields) <= 2 and (re.search(r"search|find|lookup|people", action) or re.search(r"\bq\b|query|search", kinds)) \
@@ -206,6 +218,7 @@ def crawl_for_form(start_url, fetcher, own_registrable, max_pages=6, max_depth=3
             continue
         pg = parse(body)
         text = re.sub(r"\s+", " ", " ".join(pg.text))
+        if is_error_page(st, pg, text): continue
         sig = signals_for(body, pg, fin)
         form = best_form(pg, fin, text)
         rec = {"url": fin, "blocked": False, "sig": sig, "page": pg, "form": form, "trail": trail_of[url], "status": st,
@@ -390,7 +403,13 @@ def main():
             for r in members: r["template"] = "t_" + hashlib.sha1(key.encode()).hexdigest()[:6]
     for r in recs:
         r["id"] = re.sub(r"[^a-z0-9]+", "_", r["domain"].lower()).strip("_"); r["name"] = r["domain"]
-        open(os.path.join(a.out, r["id"] + ".yml"), "w").write(to_yaml(r))
+        target = os.path.join(a.out, r["id"] + ".yml")
+        kept = ""
+        if os.path.exists(target):
+            old = open(target).read()
+            i = old.find("\nsearch_check:\n")
+            if i != -1: kept = old[i:]          # profile_search.py owns this block; never drop it
+        open(target, "w").write(to_yaml(r).rstrip("\n") + ("\n" + kept.lstrip("\n") if kept else "\n"))
 
     # report
     from collections import Counter

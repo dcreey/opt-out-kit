@@ -48,6 +48,15 @@
           "say": { "type": "string" },
           "search_match": { "type": "string" },
           "confirm": { "type": "boolean" },
+          "done_when": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "url_contains": { "type": "string" },
+              "text_contains": { "type": "string" },
+              "url_changes": { "type": "boolean" }
+            }
+          },
           "wait_for_email": {
             "type": "object",
             "additionalProperties": false,

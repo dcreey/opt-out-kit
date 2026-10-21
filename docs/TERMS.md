@@ -4,6 +4,11 @@ Status 2026-10-21: the matching and decision logic is built and tested. **Nothin
 that would do that (the web view clicking the button) is not built, and building it was blocked by this session's permission
 system, so it needs an explicit decision (see "Open decision").
 
+> **Correction (2026-10-21).** The census behind the numbers below counted acceptable-use text in page footers as "prompts". The
+> 45 arrests, warrants and records sites are **not** gated by it; only a prompt with an "I agree" button is. The matching and the
+> decision rule are unchanged and still apply to real prompts, but the "45 gated sites" and paragraph counts describe footer
+> text, so treat them as a measure of how similar those sites' terms are, not of how many are gated.
+
 ## Idea
 
 Some sites put an "I agree to our terms" prompt in front of search results. Instead of a blanket proxy accept, keep a

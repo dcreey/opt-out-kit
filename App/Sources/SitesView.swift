@@ -143,6 +143,7 @@ struct SitesView: View {
                 Text(e.automation.label).font(.caption).foregroundStyle(.secondary)
                 let n = Directory.familySize(of: e, in: model.directory)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
+                if model.activeIssue(for: e.id) != nil { Text("Reported not working").font(.caption).foregroundStyle(.red) }
             }
             Spacer()
             Text(e.tier.map { "Tier \($0.rawValue)?" } ?? "Tier ?").font(.caption2)
@@ -321,9 +322,21 @@ struct DirectoryInfoView: View {
     @EnvironmentObject var model: AppModel
     let entry: DirectoryEntry
     @State private var browserURL: URL?
+    @State private var guide: GuidedRunner?
 
     var body: some View {
         List {
+            if let issue = model.activeIssue(for: entry.id) {
+                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+            }
+            Section {
+                Button {
+                    guide = model.guidedRunner(for: entry)
+                } label: { Label("Opt out with a guide", systemImage: "rectangle.bottomthird.inset.filled") }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("guide-me")
+            }
             Section {
                 Text(entry.automation.label).font(.headline)
                 if let tier = entry.tier {
@@ -374,6 +387,9 @@ struct DirectoryInfoView: View {
         .navigationTitle(entry.domain)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
+        .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in
+            GuidedFlowView(runner: box.runner)
+        }
     }
 }
 

@@ -44,8 +44,8 @@ protocol TermsPolicy: Sendable {
 }
 
 @MainActor
-private final class WebViewSession: NSObject, WKNavigationDelegate {
-    private let webView: WKWebView
+final class WebViewSession: NSObject, WKNavigationDelegate {
+    let webView: WKWebView
     private var status = 200
     private var loadContinuation: CheckedContinuation<Void, Error>?
 
@@ -53,6 +53,13 @@ private final class WebViewSession: NSObject, WKNavigationDelegate {
     static func make() -> WebViewSession { WebViewSession() }
 
     func close() { webView.stopLoading(); webView.removeFromSuperview() }
+
+    /// Hands the web view to a visible screen so a person can use it. It leaves the hidden window it was parked in.
+    func presentable() -> WKWebView {
+        webView.removeFromSuperview()
+        webView.alpha = 1
+        return webView
+    }
 
     private override init() {
         let config = WKWebViewConfiguration()
@@ -108,6 +115,11 @@ private final class WebViewSession: NSObject, WKNavigationDelegate {
         document.querySelectorAll('div,section,form,dialog,[role=dialog]').forEach(function(el){var t=el.innerText||'';
           if(rx.test(t)&&t.length<9000&&(!best||t.length<best.innerText.length))best=el;});
         if(!best)return null;
+        var agree=/^\s*(i agree|i accept|agree|accept)\s*$/i,hasButton=false;
+        for(var up=best,d=0;up&&d<4&&!hasButton;up=up.parentElement,d++){
+          var bs=up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]');
+          for(var i=0;i<bs.length;i++){var t=(bs[i].innerText||bs[i].value||'');if(agree.test(t)){hasButton=true;break;}}}
+        if(!hasButton)return null;   // acceptable-use text in a page footer is not a prompt: nothing to accept
         var host=location.hostname.split('.').slice(-2).join('.'),links=[];
         document.querySelectorAll('a[href]').forEach(function(a){
           if(/terms|acceptable use|privacy/i.test((a.innerText||'')+' '+a.href)&&a.hostname.split('.').slice(-2).join('.')===host)links.push(a.href);});
@@ -248,8 +260,8 @@ struct WebFormSubmitter: FormSubmitter {
     }
 }
 
-@MainActor
-private enum FormRun {
+enum FormRun {
+    @MainActor
     static func run(url: URL?, html: String?, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
         let session = WebViewSession.make()
         defer { session.close() }
@@ -267,6 +279,7 @@ private enum FormRun {
         let filled = await session.fillFields(plan.values)
         if filled == 0 { return .failed("the form's fields were not on the page") }
         if dryRun { return .filledNotSubmitted }
+        if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
 
         guard await session.pressSubmit(for: plan.values) else { return .failed("no submit button found") }
         await session.settlePage(maxWait: maxWait)
@@ -274,7 +287,7 @@ private enum FormRun {
         return Self.classify(await session.visibleText())
     }
 
-    static func classify(_ text: String) -> SubmitOutcome {
+    nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
         let success = t.range(of: "thank you|request (has been )?(received|submitted)|successfully|we have received|has been submitted|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)", options: .regularExpression) != nil
         let needsEmail = t.range(of: "check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|click the link", options: .regularExpression) != nil
@@ -290,6 +303,16 @@ extension WebViewSession {
     func settlePage(maxWait: TimeInterval) async { await settle(maxWait: maxWait) }
     func declineBanner() async -> Bool { await declineConsentBanner() }
     func hasTermsPrompt() async -> Bool { await findTermsGate() != nil }
+
+    /// Brings the bot check into view so the person does not have to hunt for it.
+    func scrollChallengeIntoView() async {
+        let js = #"""
+        (function(){var f=[].slice.call(document.querySelectorAll('iframe')).filter(function(x){
+          return /recaptcha|hcaptcha|challenges\.cloudflare\.com/.test(x.src||'');})[0];
+          if(f){f.scrollIntoView({block:'center',behavior:'instant'});return true;} return false;})();
+        """#
+        _ = try? await webView.evaluateJavaScript(js)
+    }
 
     func pageTitle() async -> String { (try? await webView.evaluateJavaScript("document.title")) as? String ?? "" }
 
@@ -313,6 +336,24 @@ extension WebViewSession {
             if(/challenges\.cloudflare\.com/.test(src)){var t=document.querySelector('input[name="cf-turnstile-response"]'); if(!t||!t.value) return 'a Cloudflare check';}
           }
           return null;})();
+        """#
+        return (try? await webView.evaluateJavaScript(js)) as? String
+    }
+
+    /// The text of an unticked checkbox that asks the person to certify, authorize or acknowledge something. Only they can tick it:
+    /// a certification made for someone by software is not theirs. Nil when there is none.
+    func pendingCertification() async -> String? {
+        let js = #"""
+        (function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|consent|under penalty|on behalf/i,out=null;
+          document.querySelectorAll('input[type=checkbox]').forEach(function(c){
+            if(c.checked||out) return;
+            var t='';
+            if(c.id){var l=document.querySelector('label[for="'+c.id+'"]'); if(l) t=l.innerText;}
+            if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
+            if(!t){var n=c.parentElement; t=n?n.innerText:'';}
+            // "I am an authorized agent submitting on behalf of someone else" is an option for agents, not a requirement for the subject.
+            if(re.test(t)&&!/\bagent\b|on behalf of (someone|another)|representative/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
+          return out;})();
         """#
         return (try? await webView.evaluateJavaScript(js)) as? String
     }

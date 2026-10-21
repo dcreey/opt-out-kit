@@ -1207,3 +1207,168 @@ final class DirectoryEligibilityTests: XCTestCase {
         XCTAssertGreaterThan(entries.count, 100)
     }
 }
+
+
+final class FormFillerRealWorldTests: XCTestCase {
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(city: "Springfield", state: "IL")], emails: ["pat@example.com"])
+    private func form(_ f: [(String, String, String)]) -> OptOutForm {
+        OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil, fields: f.map { FormField(type: $0.0, name: $0.1, label: $0.2) }, hops: 1)
+    }
+
+    func testAMiddleNameFieldIsLeftEmptyNotFilledWithTheFullName() {
+        let plan = FormFiller.plan(for: form([("text", "subject_fn", "First Name"), ("text", "subject_mn", "Middle Name"),
+                                              ("text", "subject_ln", "Last Name"), ("text", "subject_email", "Subject Email Address")]), signals: nil, person: pat)
+        XCTAssertEqual(plan.verdict, .ready)
+        XCTAssertNil(plan.values.first { $0.name == "subject_mn" }, "the middle name field must stay empty")
+        XCTAssertEqual(plan.values.first { $0.name == "subject_fn" }?.candidates, ["Pat"])
+        XCTAssertEqual(plan.values.first { $0.name == "subject_ln" }?.candidates, ["Example"])
+    }
+
+    func testAFormThatNeedsTheLinkToYourListingIsLeftToYou() {
+        let plan = FormFiller.plan(for: form([("url", "url", "Enter URL here"), ("email", "email", "Enter email address here")]), signals: nil, person: pat)
+        guard case .needsYou(let why) = plan.verdict else { return XCTFail("expected needsYou, got \(plan.verdict)") }
+        XCTAssertTrue(why.contains("link to your listing"))
+    }
+}
+
+final class GuidedFlowTests: XCTestCase {
+    private let u1 = URL(string: "https://x.example/start")!, u2 = URL(string: "https://x.example/confirm")!
+    private func plan(_ steps: [GuidedStep], email: Bool = false) -> GuidedPlan {
+        GuidedPlan(siteID: "x", siteName: "x.example", steps: steps, addsEmailStepAfterSend: email)
+    }
+
+    func testShowsStepNOfMAndAdvancesWhenTheFlowSeesTheStepDone() {
+        var f = GuidedFlow(plan: plan([
+            GuidedStep(id: 0, title: "Open", action: .openPage(u1), rule: .pageLoaded),
+            GuidedStep(id: 1, title: "Submit the form", action: .instruction, rule: .urlContains("confirm")),
+            GuidedStep(id: 2, title: "Done", action: .confirm),
+        ]))
+        XCTAssertEqual(f.progressLabel, "Step 1 of 3")
+        XCTAssertEqual(f.apply(.pageLoaded(u1)), 0)
+        XCTAssertEqual(f.progressLabel, "Step 2 of 3")
+        XCTAssertNil(f.apply(.url(u1)), "the address has not reached the confirmation page yet")
+        XCTAssertEqual(f.apply(.url(u2)), 1, "navigating to the confirmation page finished the step by itself")
+        XCTAssertTrue(f.autoCompleted.contains(1))
+        XCTAssertEqual(f.progressLabel, "Step 3 of 3")
+    }
+
+    func testAStepWithNoRuleOnlyMovesOnWhenTheNextButtonIsTapped() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "Do a thing", action: .instruction), GuidedStep(id: 1, title: "Then this", action: .instruction)]))
+        XCTAssertFalse(f.current!.isAutomatic)
+        XCTAssertNil(f.apply(.url(u2)), "page changes mean nothing for a manual step")
+        XCTAssertNil(f.apply(.text("anything")))
+        XCTAssertEqual(f.apply(.nextTapped), 0)
+        XCTAssertFalse(f.autoCompleted.contains(0), "it was finished by the person, not detected")
+        XCTAssertEqual(f.current?.id, 1)
+    }
+
+    func testNextAlwaysWorksEvenOnAnAutomaticStepSoThePersonIsNeverStuck() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "Open", action: .openPage(u1), rule: .pageLoaded), GuidedStep(id: 1, title: "Next", action: .confirm)]))
+        XCTAssertEqual(f.apply(.nextTapped), 0)
+        XCTAssertEqual(f.current?.id, 1)
+    }
+
+    func testAnyNavigationRuleFiresOnlyOnAChangeFromWhereTheStepStarted() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "Open", action: .openPage(u1), rule: .pageLoaded),
+                                       GuidedStep(id: 1, title: "Enter your email and continue", action: .instruction, rule: .urlChanged),
+                                       GuidedStep(id: 2, title: "End", action: .confirm)]))
+        f.apply(.pageLoaded(u1))
+        XCTAssertNil(f.apply(.url(u1)), "same address: not done")
+        XCTAssertEqual(f.apply(.url(u2)), 1)
+    }
+
+    func testTextRuleMatchesWithoutCaringAboutCase() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "Submit", action: .instruction, rule: .textContains("check your email")), GuidedStep(id: 1, title: "End", action: .confirm)]))
+        XCTAssertNil(f.apply(.text("Please wait")))
+        XCTAssertEqual(f.apply(.text("Thanks! CHECK YOUR EMAIL for a link.")), 0)
+    }
+
+    func testBackReopensTheLastStep() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "A", action: .instruction), GuidedStep(id: 1, title: "B", action: .instruction)]))
+        f.apply(.nextTapped); XCTAssertEqual(f.progressLabel, "Step 2 of 2")
+        f.apply(.backTapped)
+        XCTAssertEqual(f.progressLabel, "Step 1 of 2")
+        XCTAssertFalse(f.completed.contains(0))
+        f.apply(.backTapped); XCTAssertEqual(f.index, 0, "cannot go back past the start")
+    }
+
+    func testTheFlowFinishesAndStopsReportingProgress() {
+        var f = GuidedFlow(plan: plan([GuidedStep(id: 0, title: "Only", action: .instruction)]))
+        f.apply(.nextTapped)
+        XCTAssertTrue(f.isFinished); XCTAssertNil(f.progressLabel); XCTAssertNil(f.current)
+        XCTAssertNil(f.apply(.nextTapped))
+    }
+
+    func testAConfirmationEmailStepIsAddedOnlyWhenSendingSaysOneIsNeeded() {
+        let steps = [GuidedStep(id: 0, title: "We send it", action: .send, rule: .formSent)]
+        var withEmail = GuidedFlow(plan: plan(steps, email: true))
+        XCTAssertEqual(withEmail.total, 1)
+        withEmail.apply(.formSent(awaitingEmail: true))
+        XCTAssertEqual(withEmail.total, 2, "the total grows to include the email step")
+        XCTAssertEqual(withEmail.progressLabel, "Step 2 of 2")
+        var without = GuidedFlow(plan: plan(steps, email: true))
+        without.apply(.formSent(awaitingEmail: false))
+        XCTAssertEqual(without.total, 1)
+        XCTAssertTrue(without.isFinished)
+    }
+
+    func testABrokerFlowBecomesAGuideWithCopyStepsAndAutoRulesFromDoneWhen() {
+        let b = Broker(id: "pc", name: "PeopleConnect", tier: .C, covers: nil, signals: nil, fields: nil, steps: [
+            Step(open: URL(string: "https://suppression.example/login")!),
+            Step(copy: "email"),
+            Step(say: "Enter your email and tap Continue.", doneWhen: .init(urlContains: "verify")),
+            Step(waitForEmail: .init(subject: "Confirm your email address", withinMinutes: 15)),
+            Step(say: "Check the birthdate.", confirm: true),
+        ], recheckDays: 30, verified: nil)
+        let p = GuidedPlanner.plan(for: b)
+        XCTAssertEqual(p.steps.count, 5)
+        XCTAssertEqual(p.steps[0].rule, .pageLoaded)
+        XCTAssertEqual(p.steps[1].action, .copy(field: "email")); XCTAssertEqual(p.steps[1].rule, .copied)
+        XCTAssertEqual(p.steps[2].rule, .urlContains("verify"), "the contributor's done_when becomes an automatic rule")
+        XCTAssertNil(p.steps[3].rule, "we cannot read the inbox, so the person says when the link is clicked")
+        XCTAssertTrue(p.steps[3].detail!.contains("15 minutes") && p.steps[3].detail!.contains("Confirm your email address"))
+        XCTAssertEqual(p.steps[4].action, .confirm)
+    }
+
+    func testADirectorySiteWithAFormGetsFillClearSendSteps() {
+        let form = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil, fields: [FormField(type: "email", name: "e", label: "Email")], hops: 1)
+        let e = DirectoryEntry(id: "x", domain: "x.example", name: "x.example", bucket: "direct", tier: .B, automation: .guided, optOutForm: form)
+        let p = GuidedPlanner.plan(for: e)
+        XCTAssertEqual(p.steps.map(\.action), [.openPage(form.page), .autofill, .clearBlockers, .send])
+        XCTAssertTrue(p.addsEmailStepAfterSend)
+        let plain = DirectoryEntry(id: "y", domain: "y.example", name: "y.example", bucket: "direct", tier: .C, automation: .guided)
+        XCTAssertEqual(GuidedPlanner.plan(for: plain).steps.count, 4, "no form found: manual steps, with a stated total")
+    }
+
+    func testReportedProblemsHideASiteForAWhileThenReturn() {
+        var p = OptOutKitCore.Progress()
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        p.reportIssue(.brokenLink, site: "x", on: t0)
+        XCTAssertEqual(p.activeIssue(for: "x", now: t0 + 5 * 86_400)?.kind, .brokenLink)
+        XCTAssertNil(p.activeIssue(for: "x", now: t0 + 31 * 86_400), "a month later it is worth trying again")
+        XCTAssertNil(p.activeIssue(for: "other", now: t0))
+        let form = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil, fields: [FormField(type: "email", name: "e", label: "Email")], hops: 1)
+        let e = DirectoryEntry(id: "x", domain: "x.example", name: "x.example", bucket: "direct", tier: .B, automation: .guided, optOutForm: form)
+        let person = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"])
+        let pre = AutoOptOut.precheck(entry: e, person: person, progress: p, now: t0 + day(5))
+        guard case .needsYou(let why)? = pre.result else { return XCTFail("a reported site must not be sent to") }
+        XCTAssertTrue(why.contains("not working"))
+        XCTAssertNil(AutoOptOut.precheck(entry: e, person: person, progress: p, now: t0 + day(31)).result)
+    }
+
+    private func day(_ n: Double) -> TimeInterval { n * 86_400 }
+
+    func testBrokerYAMLCanDeclareHowAStepIsDone() throws {
+        let b = try Registry.decode(yaml: """
+        id: t
+        name: T
+        tier: C
+        steps:
+          - say: Enter your email and continue.
+            done_when: { url_contains: verify }
+        recheck_days: 30
+        """)
+        XCTAssertEqual(b.steps[0].doneWhen?.urlContains, "verify")
+    }
+}

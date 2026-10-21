@@ -59,6 +59,7 @@ struct AutoProtectionView: View {
 /// What the automatic runs did for the selected person.
 struct AutoActivityView: View {
     @EnvironmentObject var model: AppModel
+    @State private var runner: AssistedRunner?
 
     private var rows: [AppModel.AutoOptOutRow] { model.selectedPerson.flatMap { model.optOutRun[$0.id] } ?? [] }
 
@@ -69,6 +70,14 @@ struct AutoActivityView: View {
                     runLine("Last scan", model.autoSettings.lastScan)
                     runLine("Last opt-out run", model.autoSettings.lastOptOut)
                     if let busy = model.autoBusy { Label(busy == "scan" ? "Scanning…" : "Sending requests…", systemImage: "hourglass") }
+                    let ready = model.assistedItems(for: person)
+                    Button("Solve checks and send (\(ready.count) sites)", systemImage: "hand.point.up.left.fill") {
+                        runner = AssistedRunner(items: ready, driver: model.makeAssistedDriver()) { entry, result in
+                            model.recordAssisted(entry, result, for: person)
+                        }
+                    }
+                    .disabled(ready.isEmpty)
+                    .accessibilityIdentifier("assisted-start")
                     Button("Preview: fill the forms, send nothing", systemImage: "eye") {
                         Task { await model.runAutoOptOut(for: person, dryRun: true) }
                     }.accessibilityIdentifier("auto-preview")
@@ -91,6 +100,9 @@ struct AutoActivityView: View {
             }
         }
         .navigationTitle("Automatic activity")
+        .fullScreenCover(item: Binding(get: { runner.map(RunnerBox.init) }, set: { if $0 == nil { runner = nil } })) { box in
+            AssistedOptOutView(runner: box.runner)
+        }
     }
 
     private func runLine(_ title: String, _ date: Date?) -> some View {
@@ -119,4 +131,9 @@ struct AutoActivityView: View {
             }
         }
     }
+}
+
+private struct RunnerBox: Identifiable {
+    let runner: AssistedRunner
+    var id: ObjectIdentifier { ObjectIdentifier(runner) }
 }

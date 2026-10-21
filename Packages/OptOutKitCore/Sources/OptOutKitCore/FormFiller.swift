@@ -18,6 +18,8 @@ public struct FillPlan: Equatable, Sendable {
     }
     public var values: [FieldValue]
     public var verdict: Verdict
+
+    public init(values: [FieldValue], verdict: Verdict) { self.values = values; self.verdict = verdict }
 }
 
 public enum FormFiller {
@@ -63,6 +65,13 @@ public enum FormFiller {
             }
             if key.contains("agent") || key.contains("on behalf") || key.contains("customer id") || key.contains("account number") {
                 if required { needsYou = needsYou ?? "This form asks for something only you can supply (\"\(field.display)\")." }
+                continue
+            }
+            // Middle names and suffixes are optional and the profile does not hold them: leave them empty, never reuse another name.
+            if key.range(of: "\\b(middle|mn|mi|suffix)\\b|middle.?name|middle.?initial", options: .regularExpression) != nil { continue }
+            // A link to the person's own listing has to come from them: the form cannot succeed without it.
+            if key.range(of: "\\burl\\b|listing|profile.?link|\\blink\\b", options: .regularExpression) != nil, field.type != "email" {
+                needsYou = needsYou ?? "This form needs the link to your listing on the site, which you find there first."
                 continue
             }
             if field.type == "email" || key.contains("e-mail") || key.contains("email") { put([person.emails.first], "email address") }

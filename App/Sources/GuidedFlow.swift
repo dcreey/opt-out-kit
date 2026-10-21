@@ -1,0 +1,262 @@
+import SwiftUI
+import WebKit
+import OptOutKitCore
+
+// MARK: The page a guided flow drives
+
+/// What the guided runner needs from a browser page. The real one wraps the web view; tests script it.
+@MainActor
+protocol GuidedPage: AnyObject {
+    var webView: WKWebView? { get }
+    func load(_ url: URL) async
+    func currentURL() -> URL?
+    func visibleText() async -> String
+    func fill(_ values: [FieldValue]) async -> Int
+    func blockers() async -> [AssistedBlocker]
+    func send(_ values: [FieldValue]) async -> SubmitOutcome
+    func close()
+}
+
+@MainActor
+final class WebGuidedPage: GuidedPage {
+    private let session = WebViewSession.make()
+    private var shown: WKWebView?
+
+    var webView: WKWebView? { shown ?? { shown = session.presentable(); return shown }() }
+
+    func load(_ url: URL) async {
+        try? await session.load(URLRequest(url: url))
+        await session.settlePage(maxWait: 6)
+        _ = await session.declineBanner()
+    }
+
+    func currentURL() -> URL? { session.webView.url }
+    func visibleText() async -> String { await session.visibleText() }
+    func fill(_ values: [FieldValue]) async -> Int { await session.fillFields(values) }
+
+    func blockers() async -> [AssistedBlocker] {
+        var out: [AssistedBlocker] = []
+        if await session.hasTermsPrompt() { out.append(.terms) }
+        if let text = await session.pendingCertification() { out.append(.certify(text)) }
+        if let why = await session.visibleChallenge() { out.append(.check(why)) }
+        return out
+    }
+
+    func send(_ values: [FieldValue]) async -> SubmitOutcome {
+        guard await session.pressSubmit(for: values) else { return .failed("no submit button found") }
+        await session.settlePage(maxWait: 20)
+        if let why = await session.visibleChallenge() { return .challenged(why) }
+        return FormRun.classify(await session.visibleText())
+    }
+
+    func close() { session.close() }
+}
+
+@MainActor
+protocol GuidedPageMaker { func make() -> GuidedPage }
+
+struct WebGuidedPageMaker: GuidedPageMaker { @MainActor func make() -> GuidedPage { WebGuidedPage() } }
+
+// MARK: The runner
+
+/// Drives one guided opt-out: shows the current step, watches the page for signs the person finished it, does the parts the app
+/// can do (copy a value, fill the form, press submit once the person has cleared the checks), and always leaves a Next button.
+@MainActor
+final class GuidedRunner: ObservableObject {
+    enum Ending: Equatable { case finished, cancelled, reported(IssueKind) }
+
+    @Published private(set) var flow: GuidedFlow
+    @Published private(set) var status: String?
+    @Published private(set) var ending: Ending?
+    @Published private(set) var webView: WKWebView?
+
+    let siteName: String
+    private let page: GuidedPage
+    private let fillValues: [FieldValue]
+    private let person: Person
+    private let onStepCompleted: (Int) -> Void
+    private let onSent: (AutoOptOutResult) -> Void
+    private let onIssue: (IssueKind) -> Void
+    private var lastURL: URL?
+    private var filledFor: URL?
+    private var started = false
+    var pollInterval: TimeInterval = 1
+
+    init(plan: GuidedPlan, resumeAt: Int = 0, person: Person, fillValues: [FieldValue] = [], page: GuidedPage,
+         onStepCompleted: @escaping (Int) -> Void = { _ in }, onSent: @escaping (AutoOptOutResult) -> Void = { _ in },
+         onIssue: @escaping (IssueKind) -> Void = { _ in }) {
+        var f = GuidedFlow(plan: plan)
+        if resumeAt > 0 { f.resume(at: resumeAt) }
+        self.flow = f; self.siteName = plan.siteName; self.person = person; self.fillValues = fillValues
+        self.page = page; self.onStepCompleted = onStepCompleted; self.onSent = onSent; self.onIssue = onIssue
+        self.webView = page.webView
+    }
+
+    // The person's buttons
+
+    func next() { apply(.nextTapped); status = nil }
+    func back() { apply(.backTapped); status = nil }
+    func cancel() { finish(.cancelled) }
+    func report(_ kind: IssueKind) { onIssue(kind); finish(.reported(kind)) }
+
+    /// Copies the current step's value for the person to paste. The clipboard clears itself after a minute.
+    func copyCurrent() {
+        guard case .copy(let field)? = flow.current?.action else { return }
+        guard let value = person.value(for: field) else {
+            status = "Your \(Describe.field(field).lowercased()) is not on your profile yet. Add it later, or tap Next step."
+            return
+        }
+        UIPasteboard.general.setItems([[UIPasteboard.typeAutomatic: value]], options: [.expirationDate: Date().addingTimeInterval(60)])
+        status = "Copied. Paste it into the form. It clears in a minute."
+        apply(.copied)
+    }
+
+    // The loop
+
+    func run() async {
+        guard !started else { return }
+        started = true
+        if case .openPage(let url)? = flow.current?.action { await page.load(url) }
+        else if let url = firstURL { await page.load(url) }
+        webView = page.webView
+        lastURL = page.currentURL()
+        apply(.pageLoaded(lastURL))
+        while ending == nil, !flow.isFinished {
+            try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
+            guard ending == nil else { break }
+            await tick()
+        }
+        if flow.isFinished, ending == nil { finish(.finished) }
+    }
+
+    private var firstURL: URL? {
+        for step in flow.plan.steps { if case .openPage(let u) = step.action { return u } }
+        return nil
+    }
+
+    private func tick() async {
+        let url = page.currentURL()
+        if url != lastURL { lastURL = url; filledFor = nil; apply(.url(url)) }
+        guard let step = flow.current else { return }
+        apply(.text(await page.visibleText()))
+        guard flow.current?.id == step.id else { return }
+
+        switch step.action {
+        case .autofill:
+            if filledFor != url {
+                if await page.fill(fillValues) > 0 { filledFor = url; status = "Your details are filled in."; apply(.formFilled) }
+                else { status = "Could not find the form's fields on this page. Fill it in yourself, then tap Next step." }
+            }
+        case .clearBlockers:
+            if filledFor != url { _ = await page.fill(fillValues); filledFor = url }       // a page reload can clear the fields
+            let blockers = await page.blockers()
+            if blockers.isEmpty { apply(.blockersCleared) } else { status = describe(blockers) }
+        case .send:
+            _ = await page.fill(fillValues)
+            switch await page.send(fillValues) {
+            case .submitted(let email):
+                onSent(.submitted(awaitingEmail: email)); status = email ? "Sent. Check your email for a link." : "Sent."
+                apply(.formSent(awaitingEmail: email))
+            case .challenged(let why): status = "The site wants another check: \(why). Solve it and we will send again."
+            case .rejected(let why), .failed(let why):
+                status = "We could not confirm it was sent (\(why)). Finish it yourself in the page, then tap Next step."
+            case .filledNotSubmitted: break
+            }
+        default: break
+        }
+    }
+
+    private func describe(_ blockers: [AssistedBlocker]) -> String {
+        if blockers.contains(.terms) { return "Read and accept this site's terms yourself, then solve the check." }
+        if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { return "Tick the confirmation box yourself if it is true, then solve the check." }
+        return "Solve the check in the page. We will send it after."
+    }
+
+    private func apply(_ event: GuidedEvent) {
+        let before = flow.current?.id
+        if let done = flow.apply(event) {
+            onStepCompleted(done)
+            if flow.autoCompleted.contains(done) { status = "Step \(done + 1) done: we saw you finish it." }
+        }
+        if flow.isFinished, ending == nil, before != nil { finish(.finished) }
+    }
+
+    private func finish(_ e: Ending) {
+        guard ending == nil else { return }
+        ending = e
+        page.close()
+    }
+}
+
+// MARK: Screen: browser on top, our panel in the bottom quarter
+
+struct GuidedFlowView: View {
+    @StateObject var runner: GuidedRunner
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                Group {
+                    if let web = runner.webView { WebViewHost(webView: web) }
+                    else { ProgressView("Loading…").frame(maxWidth: .infinity, maxHeight: .infinity) }
+                }
+                .frame(height: geo.size.height * 0.75)
+                .accessibilityIdentifier("guided-browser")
+                Divider()
+                GuidedPanel(runner: runner, bottomInset: geo.safeAreaInsets.bottom)
+                    .frame(height: geo.size.height * 0.25)
+            }
+        }
+        .ignoresSafeArea()
+        .task { await runner.run() }
+        .onChange(of: runner.ending) { _, e in if e != nil { dismiss() } }
+    }
+}
+
+/// The bottom quarter: the step, how far along, and the person's controls.
+struct GuidedPanel: View {
+    @ObservedObject var runner: GuidedRunner
+    /// Keeps the buttons clear of the home indicator while the panel itself still reaches the bottom edge.
+    var bottomInset: CGFloat = 0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Button("Cancel") { runner.cancel() }.font(.footnote).accessibilityIdentifier("guided-cancel")
+                Spacer()
+                Text(runner.flow.progressLabel ?? "All done").font(.caption.bold()).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("guided-progress")
+                Spacer()
+                Menu {
+                    ForEach(IssueKind.allCases, id: \.self) { kind in
+                        Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
+                    }
+                } label: { Label("Not working", systemImage: "exclamationmark.bubble").font(.footnote) }
+                    .accessibilityIdentifier("guided-not-working")
+            }
+            ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
+            if let step = runner.flow.current {
+                Text(step.title).font(.subheadline.bold()).lineLimit(3).accessibilityIdentifier("guided-step-title")
+                if let detail = step.detail { Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(2) }
+            }
+            if let status = runner.status {
+                Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).lineLimit(2)
+                    .accessibilityIdentifier("guided-status")
+            }
+            Spacer(minLength: 0)
+            HStack {
+                if runner.flow.index > 0 { Button("Back") { runner.back() }.accessibilityIdentifier("guided-back") }
+                if case .copy? = runner.flow.current?.action {
+                    Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }
+                        .buttonStyle(.bordered).accessibilityIdentifier("guided-copy")
+                }
+                Spacer()
+                Button(runner.flow.index + 1 >= runner.flow.total ? "Finish" : "Next step") { runner.next() }
+                    .buttonStyle(.borderedProminent).accessibilityIdentifier("guided-next")
+            }
+        }
+        .padding(.horizontal, 16).padding(.top, 10).padding(.bottom, 6 + bottomInset)
+        .background(.bar)
+    }
+}

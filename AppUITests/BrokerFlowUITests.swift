@@ -19,11 +19,9 @@ final class BrokerFlowUITests: XCTestCase {
         // Count cards from the "Step N of M" label on the first card.
         let first = app.buttons["done-0"]
         XCTAssertTrue(first.waitForExistence(timeout: 5))
-        var total = 0
-        while app.buttons["done-\(total)"].exists || app.staticTexts["Step \(total + 1) of \(totalGuess(app))"].exists {
-            total += 1
-            if total > 30 { break }
-        }
+        // The step count is printed on the first card ("Step 1 of N"). Counting buttons on screen undercounts, because the list
+        // only renders the cards that are visible.
+        let total = totalGuess(app)
         XCTAssertGreaterThan(total, 0)
 
         // A later step must stay locked until earlier ones are done.
@@ -31,7 +29,8 @@ final class BrokerFlowUITests: XCTestCase {
 
         for i in 0..<total {
             let button = app.buttons["done-\(i)"]
-            if !button.isHittable { app.swipeUp() }
+            var scrolls = 0
+            while !button.isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }     // the screen is taller now, so scroll until it can be tapped
             XCTAssertTrue(button.isEnabled, "step \(i + 1) of \(id) should be unlocked")
             button.tap()
         }

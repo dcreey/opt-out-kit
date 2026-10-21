@@ -5,6 +5,9 @@ sdarrests.org (the same network of about 44 "arrests / warrants / records" sites
 notice CourtRecords.us shows. Other sites in a group can differ. This is a summary, not legal advice. The same text is shown in
 the app before anyone allows it to accept terms (`App/Sources/TermsSummary.swift`); keep the two in step.
 
+> Note: on the arrests, warrants and records network this acceptable-use text is printed in each page's footer. It is not a prompt
+> the visitor must accept (corrected 2026-10-21). CourtRecords.us does show an "I agree" prompt.
+
 ## The arrests, warrants and records network (about 44 sites)
 
 - **Visiting is agreeing.** You are bound just by using the site, and again by tapping "I agree".

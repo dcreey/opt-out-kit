@@ -6,9 +6,23 @@ struct BrokerDetailView: View {
     @EnvironmentObject var model: AppModel
     let broker: Broker
     @State private var browserURL: URL?
+    @State private var guide: GuidedRunner?
 
     var body: some View {
         List {
+            if let issue = model.activeIssue(for: broker.id) {
+                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+            }
+            if !model.progress.isDone(broker.id) {
+                Button {
+                    guide = model.guidedRunner(for: broker)
+                } label: {
+                    Label("Guide me through it", systemImage: "rectangle.bottomthird.inset.filled")
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("guide-me")
+            }
             if !broker.isVerified {
                 Text("This flow has not been verified by a real run yet. Steps may be out of date.")
                     .font(.footnote).foregroundStyle(.orange)
@@ -23,6 +37,9 @@ struct BrokerDetailView: View {
         .navigationTitle(broker.name)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
+        .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in
+            GuidedFlowView(runner: box.runner)
+        }
     }
 
     private func card(_ index: Int, _ step: Step) -> some View {
@@ -56,4 +73,10 @@ struct SafariView: UIViewControllerRepresentable {
     let url: URL
     func makeUIViewController(context: Context) -> SFSafariViewController { SFSafariViewController(url: url) }
     func updateUIViewController(_ controller: SFSafariViewController, context: Context) {}
+}
+
+/// Lets a runner be presented as a full-screen cover.
+struct GuideBox: Identifiable {
+    let runner: GuidedRunner
+    var id: ObjectIdentifier { ObjectIdentifier(runner) }
 }

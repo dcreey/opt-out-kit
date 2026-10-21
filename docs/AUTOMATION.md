@@ -8,7 +8,7 @@ anything by this feature, and no real person's details were used.
 | Job | When | What it does |
 |---|---|---|
 | **Scan** | Daily | Searches the sites that can be checked automatically (14 today) for each family member who may be searched. Read-only. |
-| **Opt-out** | Weekly | For each directory site where we found the real opt-out form (119 of 214), fills it from the person's profile and sends it, one site at a time. |
+| **Opt-out** | Weekly | For each directory site where we found the real opt-out form (102 of 214), fills it from the person's profile and sends it, one site at a time. |
 
 Both are off until the person answers a first-run question (last page of the walkthrough, or a banner on the Queue tab if they
 skipped it). The page has both switches on by default and says exactly what will be sent. Either can be turned off in
@@ -29,18 +29,34 @@ About, and every run is listed under "Automatic activity". "Preview" fills every
 
 ## What to expect (measured, not hoped)
 
-For a **complete** profile the field mapper can match **92 of the 119** found forms. That overstates what will be sent:
+For a **complete** profile the field mapper can match **86 of the 102** found forms. That overstates what will be sent:
 
-- **85 of those 92 pages carry a bot-check widget.** Whether it is invisible (passes for a real browser) or a puzzle is only
+- **85 of those 86 pages carry a bot-check widget.** Whether it is invisible (passes for a real browser) or a puzzle is only
   known when the page loads. Puzzles stop the run.
 - Many "ready" forms are the first step of a longer flow (the CourtRecords.us family asks for name, state and city, then
   needs you to pick the record and pass a check). Submitting only starts it; with no success message it is reported as
   "no confirmation", not as sent.
-- 27 of the 119 are left to the person outright (21 ask for something we do not have, 2 need a login, 1 needs a certification, 3 other).
+- 16 of the 102 are left to the person outright (13 ask for something we do not have, 2 need a login, 1 needs a certification).
+- The form filler never reuses a name for a middle-name field, and a form that needs the link to your own listing (Spokeo) is left to you.
 - Some sites email a confirmation link. The click is the person's; the activity list marks those as "sent, confirm the email".
 
 So the real number of requests that go all the way out unattended will be much smaller than 119, and the app says which sites
 need the person. It does **not** solve CAPTCHAs; that is a design rule, not a gap to close.
+
+## Solve and send, and the guided screen
+
+For forms behind a bot check the app does everything except the check. **Solve and send** loads each site's real form in a visible
+browser and fills it in. It scrolls the check into view and waits. The person solves it (and accepts any terms or ticks any
+certification box themselves). The app then sends the form, reads the confirmation and moves on, with the next site already
+loading. A check, terms prompt or certification box is detected on the live page, never assumed. Checked on real pages with a
+made-up profile and no sending: SmartBackgroundChecks and Spokeo show a reCAPTCHA checkbox, SmartBackgroundChecks also a
+certification box, and coloradoarrests.org has no blocker.
+
+**Guided flows** (hand-written broker steps, or a directory site) open full screen: the browser takes the top three quarters and
+the app's panel the bottom quarter, showing "Step N of M", the current step, and Cancel, Back, Next step and Not working. Where it
+can, the app finishes a step by itself when it sees the page load, a copy, or a navigation (`done_when:` in a broker file); steps it
+cannot detect, such as clicking an emailed link, use the Next button. "Not working" records why (broken link, needs a login,
+payment, ID or phone call, site blocked me, other) and leaves that site alone for 30 days.
 
 ## Background running (unverified)
 

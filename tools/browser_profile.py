@@ -26,6 +26,19 @@ CHALLENGE = re.compile("|".join(map(re.escape, P.HARD_CHALLENGE)), re.I)
 REJECT = ["Reject All", "REJECT ALL", "Reject all", "Decline", "Deny", "Only necessary", "No thanks"]
 
 
+# A terms gate is a prompt with an "I agree" button beside the terms text. Acceptable-use text in a page footer is not one.
+GATE_JS = """(re) => { const rx = new RegExp(re, 'i'); let best = null;
+  for (const el of document.querySelectorAll('div,section,form,dialog,[role=dialog]')) {
+    const t = el.innerText || ''; if (!rx.test(t) || t.length > 9000) continue;
+    if (!best || t.length < best.innerText.length) best = el; }
+  if (!best) return false;
+  const agree = /^\\s*(i agree|i accept|agree|accept)\\s*$/i;
+  for (let up = best, d = 0; up && d < 4; up = up.parentElement, d++) {
+    for (const b of up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]')) {
+      if (agree.test(b.innerText || b.value || '')) return true; } }
+  return false; }"""
+
+
 async def settle(page, max_s=12):
     last, stable = -1, 0
     for _ in range(max_s * 2):
@@ -66,7 +79,7 @@ async def run_search(ctx, req, first, last):
         if await decline_banner(page): await settle(page, 5)
         text = re.sub(r"[ \\t]+", " ", await page.inner_text("body")) + "\n" + (await page.title())
         if CHALLENGE.search(text): return text, "blocked"
-        if GATE.search(text): return text, "gate"
+        if GATE.search(text) and await page.evaluate(GATE_JS, GATE.pattern): return text, "gate"
         return text, "ok"
     except Exception as e:
         return str(e)[:100], "error"
@@ -108,7 +121,7 @@ def load_entries(d, only, limit):
     out = []
     for f in sorted(glob.glob(os.path.join(d, "*.yml"))):
         s = open(f).read()
-        if not re.search(r'^  status: "(undifferentiated|needs_browser)"', s, re.M): continue
+        if not re.search(r'^  status: "(undifferentiated|needs_browser|terms_gate)"', s, re.M): continue
         m = re.search(r"^  candidate: (.*)$", s, re.M)
         if not m: continue
         dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)

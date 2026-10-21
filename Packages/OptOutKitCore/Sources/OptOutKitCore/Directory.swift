@@ -127,6 +127,16 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var signals: [String]?
     public var profiled: String?
 
+    public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
+                confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil,
+                signals: [String]? = nil, profiled: String? = nil) {
+        self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
+        self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck
+        self.signals = signals; self.profiled = profiled
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
         case searchCheck = "search_check"

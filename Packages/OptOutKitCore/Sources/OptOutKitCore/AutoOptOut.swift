@@ -64,6 +64,9 @@ public struct AutoOptOut: Sendable {
     public static func precheck(entry: DirectoryEntry, person: Person, progress: Progress, now: Date,
                                 minInterval: TimeInterval = defaultMinInterval) -> (result: AutoOptOutResult?, plan: FillPlan?) {
         guard let form = entry.optOutForm else { return (.needsYou("No opt-out form found for this site yet."), nil) }
+        if let issue = progress.activeIssue(for: entry.id, now: now) {
+            return (.needsYou("You reported this site as not working (\(issue.kind.label.lowercased()))."), nil)
+        }
         if let last = progress.optOutAttempts[entry.id]?.filter(\.wasSubmitted).map(\.date).max(), now.timeIntervalSince(last) < minInterval {
             return (.tooSoon(until: last.addingTimeInterval(minInterval)), nil)
         }

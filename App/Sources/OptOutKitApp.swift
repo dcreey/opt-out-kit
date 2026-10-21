@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 import OptOutKitCore
 
 @main
@@ -159,6 +160,72 @@ final class AppModel: ObservableObject {
         save()
         if !dryRun { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
+    }
+
+    /// Sites the person can finish with one tap each: their form is found, their details are on the profile, and nothing was sent
+    /// in the last week. The app fills and sends each one once the person has solved its check.
+    func assistedItems(for person: Person, now: Date = Date()) -> [AssistedRunner.Item] {
+        let progress = household.progress(for: person.id)
+        return directory.compactMap { entry -> AssistedRunner.Item? in
+            guard let form = entry.optOutForm else { return nil }
+            let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now)
+            guard pre.result == nil, let plan = pre.plan else { return nil }
+            return AssistedRunner.Item(entry: entry, form: form, plan: plan)
+        }
+    }
+
+    func makeAssistedDriver() -> AssistedDriver {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeAssistedDriver() }
+        #endif
+        return WebAssistedDriver()
+    }
+
+    /// The person reported a problem with a site (broken link, gated by something else, blocked them). Queues leave it alone for a month.
+    func reportIssue(_ kind: IssueKind, site: String) {
+        household.mutateProgress(for: selectedID) { $0.reportIssue(kind, site: site) }
+        save()
+    }
+
+    func activeIssue(for site: String) -> SiteIssue? { progress.activeIssue(for: site) }
+
+    func makeGuidedPageMaker() -> GuidedPageMaker {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uitest-fake-guided") { return FakeGuidedPageMaker() }
+        #endif
+        return WebGuidedPageMaker()
+    }
+
+    /// A guided runner for a hand-written broker flow, resuming at the first step not yet done.
+    func guidedRunner(for broker: Broker) -> GuidedRunner? {
+        guard let person = selectedPerson else { return nil }
+        let plan = GuidedPlanner.plan(for: broker)
+        let done = (0..<broker.steps.count).first { !progress.isStepDone(broker.id, $0) } ?? 0
+        return GuidedRunner(plan: plan, resumeAt: done, person: person, page: makeGuidedPageMaker().make(),
+                            onStepCompleted: { [weak self] i in self?.complete(broker, step: i) },
+                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: broker.id) })
+    }
+
+    /// A guided runner for a directory site: the app fills and sends the form, the person clears what only they can.
+    func guidedRunner(for entry: DirectoryEntry) -> GuidedRunner? {
+        guard let person = selectedPerson else { return nil }
+        let plan = GuidedPlanner.plan(for: entry)
+        let values: [FieldValue] = entry.optOutForm.map { FormFiller.plan(for: $0, signals: entry.signals, person: person).values } ?? []
+        return GuidedRunner(plan: plan, person: person, fillValues: values, page: makeGuidedPageMaker().make(),
+                            onSent: { [weak self] result in self?.recordAssisted(entry, result, for: person) },
+                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: entry.id) })
+    }
+
+    /// A result from the Solve-and-send screen: remembered like any other automatic attempt.
+    func recordAssisted(_ entry: DirectoryEntry, _ result: AutoOptOutResult, for person: Person) {
+        household.mutateProgress(for: person.id) { p in
+            if let attempt = AutoOptOut.attempt(for: result, now: Date()) { p.recordOptOutAttempt(attempt, site: entry.id) }
+        }
+        var rows = optOutRun[person.id] ?? []
+        rows.removeAll { $0.id == entry.id }
+        rows.append(AutoOptOutRow(id: entry.id, domain: entry.domain, result: result))
+        optOutRun[person.id] = rows
+        save()
     }
 
     /// Runs whatever is due: the daily scan and the weekly opt-out, for everyone in the family. Does nothing until the person has said yes.
@@ -343,5 +410,47 @@ struct FakeSubmitter: FormSubmitter {
         if dryRun { return .filledNotSubmitted }
         return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a bot check")
     }
+}
+#endif
+
+
+#if DEBUG
+/// UI tests use this so the Solve-and-send screen never loads a real site: each page shows a check for two polls, then sends.
+@MainActor
+struct FakeAssistedDriver: AssistedDriver {
+    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { FakeAssistedPage() }
+}
+
+@MainActor
+final class FakeAssistedPage: AssistedPage {
+    private var polls = 0
+    var webView: WKWebView? { nil }
+    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
+    func refill() async {}
+    func send() async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+    func close() {}
+}
+#endif
+
+
+#if DEBUG
+/// UI tests use this so guided flows never load a real site: a real web view shows a local page, and the checks are scripted.
+@MainActor
+struct FakeGuidedPageMaker: GuidedPageMaker { func make() -> GuidedPage { FakeGuidedPage() } }
+
+@MainActor
+final class FakeGuidedPage: GuidedPage {
+    private let view = WKWebView(frame: .zero)
+    private var polls = 0
+    var webView: WKWebView? { view }
+    func load(_ url: URL) async {
+        view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Fake opt-out page</h1><p>\(url.host ?? "site")</p><form><input placeholder='Email'><br><br><button>Submit</button></form></body></html>", baseURL: nil)
+    }
+    func currentURL() -> URL? { URL(string: "https://fake.example/page") }
+    func visibleText() async -> String { "Fake opt-out page" }
+    func fill(_ values: [FieldValue]) async -> Int { values.count }
+    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
+    func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: true) }
+    func close() {}
 }
 #endif

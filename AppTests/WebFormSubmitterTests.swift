@@ -73,6 +73,26 @@ final class WebFormSubmitterTests: XCTestCase {
         XCTAssertTrue(why.contains("terms"))
     }
 
+    func testAcceptableUseTextInAPageFooterIsNotATermsPrompt() async {
+        // Many sites repeat their acceptable-use text at the bottom of every page. With no "I agree" button there is nothing to accept.
+        let footer = "<div id=\"footer\">ACCEPTABLE USE POLICY AND TERMS. You must follow these rules when using this site and must not misuse the records you find.</div>"
+        let outcome = await WebFormSubmitter(maxWait: 8).submit(html: page(extra: footer), plan: plan(fields), dryRun: false)
+        XCTAssertEqual(outcome, .submitted(awaitingEmail: true), "a footer is not a blocker")
+    }
+
+    func testAnUntickedCertificationBoxStopsTheRunAndIsNeverTickedForTheirOwner() async {
+        let cert = "<label><input type=\"checkbox\" name=\"certify\"> I authorize you to contact me and I certify that I am the subject of this request.</label>"
+        let outcome = await WebFormSubmitter(maxWait: 6).submit(html: page(extra: cert), plan: plan(fields), dryRun: false)
+        guard case .challenged(let why) = outcome else { return XCTFail("expected challenged, got \(outcome)") }
+        XCTAssertTrue(why.contains("certification"))
+    }
+
+    func testAnOptionalAgentBoxIsNotABlockerForSomeoneSubmittingForThemselves() async {
+        let agent = "<label><input type=\"checkbox\" name=\"agent\"> I am an authorized agent submitting this request on behalf of someone else.</label>"
+        let outcome = await WebFormSubmitter(maxWait: 8).submit(html: page(extra: agent), plan: plan(fields), dryRun: false)
+        XCTAssertEqual(outcome, .submitted(awaitingEmail: true), "the agent box stays unticked and does not stop the form")
+    }
+
     func testNoSuccessMessageMeansNothingIsClaimed() async {
         let silent = page(message: "Okay.")
         let outcome = await WebFormSubmitter(maxWait: 8).submit(html: silent, plan: plan(fields), dryRun: false)

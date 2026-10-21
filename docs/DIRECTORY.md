@@ -88,9 +88,19 @@ headless Chromium (Playwright, installed in git-ignored `.tools-venv` and `.tool
 banners, never accepts terms, never tries to pass a bot check, and records one of: `calibrated` (with `needs_browser: true`),
 `terms_gate`, `blocked` or `undifferentiated`.
 
-Result on 2026-10-21 for the 108 sites tried: **0 calibrated, 44 behind a terms prompt, 64 still not distinguishable.** The two
-big families (CourtRecords.us and the arrests sites) put an "I agree to our terms" prompt in front of results, so they
-are guided-only until there is an explicit, reviewed consent flow (see docs/SIGNALS.md and the roadmap notes).
+Result on 2026-10-21 for the 108 sites tried: **0 calibrated, 64 still not distinguishable** (the first pass also reported 44 as
+"behind a terms prompt"; see the correction below).
+
+**Correction (2026-10-21).** An earlier version of this tool and of the app treated acceptable-use text as a terms prompt. The
+arrests, warrants and records network prints that text in the footer of every page, so 45 sites were wrongly labelled
+`terms_gate`. A real prompt has an "I agree" button beside the text; the detector now requires one (in the tool and in the app).
+Re-tested with the fix: **0 of the 45 are gated**, all 45 are plain `undifferentiated`, and the `terms_gate` status is kept for
+sites that really have a prompt (CourtRecords.us shows one on its home page).
+
+The same lesson applies to opt-out forms: guessed paths such as `/optout` often return a "page not found" screen that still has a
+search box, and privacy-policy pages can embed affiliate search boxes. The profiler now skips error pages, takes the page's
+context from its title and opening text only, and rejects forms that post to another company unless the address is a removal portal.
+That cut the found forms from 119 to 102.
 
 ## Quick checks (the guided fallback)
 
