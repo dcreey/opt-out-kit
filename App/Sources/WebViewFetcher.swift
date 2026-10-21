@@ -49,6 +49,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     private var status = 200
     private var loadContinuation: CheckedContinuation<Void, Error>?
 
+    /// The HTTP status of the last page the web view loaded.
+    var httpStatus: Int { status }
+
     /// For form runs, which drive the session step by step instead of through `run`.
     static func make() -> WebViewSession { WebViewSession() }
 
@@ -261,6 +264,9 @@ struct WebFormSubmitter: FormSubmitter {
 }
 
 enum FormRun {
+    /// The failure text for a page that is gone, so callers can tell a moved link from other failures and try to heal it.
+    static let pageGone = "the page was gone (not found)"
+
     @MainActor
     static func run(url: URL?, html: String?, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
         let session = WebViewSession.make()
@@ -273,6 +279,7 @@ enum FormRun {
         await session.settlePage(maxWait: 10)
         _ = await session.declineBanner()
 
+        if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
         if let why = await session.visibleChallenge() { return .challenged(why) }
 
@@ -301,6 +308,13 @@ enum FormRun {
 
 extension WebViewSession {
     func settlePage(maxWait: TimeInterval) async { await settle(maxWait: maxWait) }
+
+    /// True when the page just loaded is an error page, which means the recorded link has moved or died.
+    func pageLooksMissing() async -> Bool {
+        let text = await visibleText()
+        return LinkRules.isErrorPage(PageSnapshot(url: webView.url ?? URL(string: "https://invalid.example")!, status: httpStatus,
+                                                  title: String(text.prefix(120)), text: text))
+    }
     func declineBanner() async -> Bool { await declineConsentBanner() }
     func hasTermsPrompt() async -> Bool { await findTermsGate() != nil }
 
@@ -402,5 +416,72 @@ extension WebViewSession {
     private static func jsLiteral(_ s: String) -> String {
         guard let d = try? JSONSerialization.data(withJSONObject: [s]), let j = String(data: d, encoding: .utf8) else { return "\"\"" }
         return String(j.dropFirst().dropLast())
+    }
+}
+
+// MARK: Reading a page's links and forms, for finding a moved opt-out page
+
+/// Describes a page from its live DOM, so pages built by JavaScript can be read too. Used by the link finder to heal moved links.
+struct WebPageInspector: PageInspector {
+    var maxWait: TimeInterval = 8
+
+    func snapshot(_ url: URL) async -> PageSnapshot? {
+        guard url.scheme == "https" else { return nil }
+        return await WebInspection.run(url: url, html: nil, maxWait: maxWait)
+    }
+
+    /// Test hook: describe HTML the test supplies.
+    func snapshot(html: String, url: URL) async -> PageSnapshot? {
+        await WebInspection.run(url: url, html: html, maxWait: maxWait)
+    }
+}
+
+@MainActor
+private enum WebInspection {
+    static func run(url: URL, html: String?, maxWait: TimeInterval) async -> PageSnapshot? {
+        let session = WebViewSession.make()
+        defer { session.close() }
+        do {
+            if let html { try await session.loadHTML(html) } else { try await session.load(URLRequest(url: url)) }
+        } catch { return nil }
+        await session.settlePage(maxWait: maxWait)
+        _ = await session.declineBanner()
+        return await session.describePage(fallbackURL: url)
+    }
+}
+
+extension WebViewSession {
+    /// The title, visible text, links and forms of the current page.
+    func describePage(fallbackURL: URL) async -> PageSnapshot? {
+        let js = #"""
+        (function(){
+          function abs(h){try{return new URL(h,location.href).href}catch(e){return null}}
+          var links=[].slice.call(document.querySelectorAll('a[href]')).map(function(a){return {href:abs(a.getAttribute('href')),text:(a.innerText||'').trim().slice(0,120)};}).filter(function(l){return l.href;});
+          var forms=[].slice.call(document.forms).map(function(f){
+            var fields=[],hasSubmit=!!f.querySelector('button,input[type=submit]');
+            [].slice.call(f.elements).forEach(function(el){
+              var t=(el.type||el.tagName||'').toLowerCase();
+              if(['hidden','submit','button','image','reset','fieldset','object','output'].indexOf(t)>=0) return;
+              var label=''; if(el.id){var l=document.querySelector('label[for="'+el.id+'"]'); if(l) label=l.innerText;}
+              if(!label) label=el.placeholder||el.getAttribute('aria-label')||el.name||'';
+              fields.push({type:t==='select-one'?'select':t,name:el.name||el.id||'',label:String(label).replace(/\s+/g,' ').trim().slice(0,60)});});
+            var a=f.getAttribute('action');
+            return {action:a?abs(a):location.href,method:(f.method||'get').toLowerCase(),fields:fields,hasSubmit:hasSubmit};});
+          return JSON.stringify({url:location.href,title:document.title||'',text:(document.body?document.body.innerText:'').slice(0,4000),links:links.slice(0,300),forms:forms});
+        })();
+        """#
+        guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8),
+              let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        let links = (o["links"] as? [[String: Any]] ?? []).compactMap { l -> LinkSnapshot? in
+            guard let h = (l["href"] as? String).flatMap(URL.init(string:)) else { return nil }
+            return LinkSnapshot(href: h, text: l["text"] as? String ?? "")
+        }
+        let forms = (o["forms"] as? [[String: Any]] ?? []).map { f -> FormSnapshot in
+            let fields = (f["fields"] as? [[String: Any]] ?? []).map { FormField(type: $0["type"] as? String ?? "text", name: $0["name"] as? String ?? "", label: $0["label"] as? String ?? "") }
+            return FormSnapshot(action: (f["action"] as? String).flatMap(URL.init(string:)), method: f["method"] as? String ?? "get",
+                                fields: fields, hasSubmit: f["hasSubmit"] as? Bool ?? false)
+        }
+        return PageSnapshot(url: (o["url"] as? String).flatMap(URL.init(string:)) ?? fallbackURL, status: httpStatus,
+                            title: o["title"] as? String ?? "", text: o["text"] as? String ?? "", links: links, forms: forms)
     }
 }

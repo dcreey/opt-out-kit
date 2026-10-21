@@ -77,6 +77,9 @@ final class GuidedRunner: ObservableObject {
     private let onStepCompleted: (Int) -> Void
     private let onSent: (AutoOptOutResult) -> Void
     private let onIssue: (IssueKind) -> Void
+    /// Looks for the site's current opt-out page when the recorded one is gone. Nil means healing is not available.
+    private let healer: (() async -> URL?)?
+    private var triedHealing = false
     private var lastURL: URL?
     private var filledFor: URL?
     private var started = false
@@ -84,11 +87,11 @@ final class GuidedRunner: ObservableObject {
 
     init(plan: GuidedPlan, resumeAt: Int = 0, person: Person, fillValues: [FieldValue] = [], page: GuidedPage,
          onStepCompleted: @escaping (Int) -> Void = { _ in }, onSent: @escaping (AutoOptOutResult) -> Void = { _ in },
-         onIssue: @escaping (IssueKind) -> Void = { _ in }) {
+         onIssue: @escaping (IssueKind) -> Void = { _ in }, healer: (() async -> URL?)? = nil) {
         var f = GuidedFlow(plan: plan)
         if resumeAt > 0 { f.resume(at: resumeAt) }
         self.flow = f; self.siteName = plan.siteName; self.person = person; self.fillValues = fillValues
-        self.page = page; self.onStepCompleted = onStepCompleted; self.onSent = onSent; self.onIssue = onIssue
+        self.page = page; self.onStepCompleted = onStepCompleted; self.onSent = onSent; self.onIssue = onIssue; self.healer = healer
         self.webView = page.webView
     }
 
@@ -97,7 +100,37 @@ final class GuidedRunner: ObservableObject {
     func next() { apply(.nextTapped); status = nil }
     func back() { apply(.backTapped); status = nil }
     func cancel() { finish(.cancelled) }
-    func report(_ kind: IssueKind) { onIssue(kind); finish(.reported(kind)) }
+    func report(_ kind: IssueKind) {
+        // A broken link is worth one automatic attempt at finding where the page moved before giving up on the site.
+        if kind == .brokenLink, healer != nil, !triedHealing {
+            Task { if await healAndReload() { return }; onIssue(kind); finish(.reported(kind)) }
+            return
+        }
+        onIssue(kind); finish(.reported(kind))
+    }
+
+    /// Crawls the site for its current opt-out page and reloads it. Returns true if a new page was found and loaded.
+    @discardableResult
+    private func healAndReload() async -> Bool {
+        triedHealing = true
+        status = "This link looks broken. Looking for the new page…"
+        guard let healer, let url = await healer() else {
+            status = "The opt-out page has moved and we could not find the new one. You will need to find it yourself on the site; the steps below still apply."
+            return false
+        }
+        await page.load(url)
+        lastURL = page.currentURL(); filledFor = nil
+        status = "The page had moved. We found the new one and loaded it."
+        apply(.pageLoaded(lastURL))
+        return true
+    }
+
+    /// Whether the page just loaded is an error page (the link is gone).
+    private func looksBroken() async -> Bool {
+        let text = await page.visibleText()
+        return LinkRules.isErrorPage(PageSnapshot(url: page.currentURL() ?? URL(string: "https://invalid.example")!, status: nil,
+                                                  title: String(text.prefix(120)), text: text))
+    }
 
     /// Copies the current step's value for the person to paste. The clipboard clears itself after a minute.
     func copyCurrent() {
@@ -120,7 +153,8 @@ final class GuidedRunner: ObservableObject {
         else if let url = firstURL { await page.load(url) }
         webView = page.webView
         lastURL = page.currentURL()
-        apply(.pageLoaded(lastURL))
+        if healer != nil, await looksBroken() { _ = await healAndReload() }      // heal a moved link before the person sees an error
+        else { apply(.pageLoaded(lastURL)) }
         while ending == nil, !flow.isFinished {
             try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
             guard ending == nil else { break }

@@ -200,16 +200,18 @@ def crawl_for_form(start_url, fetcher, own_registrable, max_pages=6, max_depth=3
     """Follow the most promising privacy / opt-out links, up to three hops, until a real form turns up.
     Returns (best_record, trail, blocked_seen). best_record is the page with the form, else the richest page seen."""
     import heapq
-    queue = [(0, 0, start_url)]; seen = {start_url}; trail_of = {start_url: [start_url]}
+    queue = [(0, 0, start_url)]; trail_of = {start_url: [start_url]}
+    best_pri = {start_url: 0}; fetched_urls = set()
     base = urllib.parse.urlsplit(start_url)
     for g in GUESS_PATHS:       # common opt-out addresses, tried after the links the site itself offers
         u = f"{base.scheme}://{base.netloc}{g}"
-        if u not in seen: seen.add(u); trail_of[u] = [start_url, u]; queue.append((-1, 1, u))
+        if u not in best_pri: best_pri[u] = -1; trail_of[u] = [start_url, u]; queue.append((1, 1, u))
     import heapq; heapq.heapify(queue)
-    fetched = 0; best = None; blocked_seen = False; tick = 1
+    fetched = 0; best = None; blocked_seen = False
     while queue and fetched < max_pages:
         _, depth, url = heapq.heappop(queue)
-        if not fetcher.allowed(url): continue
+        if url in fetched_urls or not fetcher.allowed(url): continue
+        fetched_urls.add(url)
         st, fin, body = fetcher.get(url); fetched += 1; time.sleep(1)
         if st is None or st >= 400 and not body: continue
         if is_blocked(st, body):
@@ -229,13 +231,15 @@ def crawl_for_form(start_url, fetcher, own_registrable, max_pages=6, max_depth=3
         for href, t in pg.links:
             if href.startswith(("mailto:", "javascript:", "tel:", "#")): continue
             nxt = urllib.parse.urljoin(fin, href).split("#")[0]
-            if not nxt.startswith("http") or nxt in seen: continue
+            if not nxt.startswith("http") or nxt in fetched_urls: continue
             sc = link_score(href, t)
             host_reg = registrable(urllib.parse.urlsplit(nxt).netloc)
             if sc <= 0 or (host_reg != own_registrable and sc < 8): continue   # leave the site only for a strong opt-out link
             if any(n in nxt for n in NOT_A_FAMILY): continue
-            seen.add(nxt); trail_of[nxt] = trail_of[url] + [nxt]
-            heapq.heappush(queue, (-sc, depth + 1, nxt)); tick += 1
+            # a real link to an address we only meant to guess upgrades the guess instead of being ignored as a duplicate
+            if best_pri.get(nxt, -999) >= sc: continue
+            best_pri[nxt] = sc; trail_of[nxt] = trail_of[url] + [nxt]
+            heapq.heappush(queue, (-sc, depth + 1, nxt))
     return best, (best or {}).get("trail", [start_url]), blocked_seen
 
 

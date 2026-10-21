@@ -65,9 +65,13 @@ final class DirectoryUITests: XCTestCase {
         let row = app.buttons["dir-texascourtrecords_us"]
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         row.tap()
-        XCTAssertTrue(app.staticTexts["Shared opt-out"].waitForExistence(timeout: 5))
+        let shared = app.staticTexts["Shared opt-out"]
+        for _ in 0..<4 where !shared.exists { app.swipeUp() }
+        XCTAssertTrue(shared.waitForExistence(timeout: 5))
         // The real form the profiler found: it posts to the shared members host.
-        XCTAssertTrue(app.staticTexts["Submits to members.courtrecords.us"].waitForExistence(timeout: 5))
+        let submits = app.staticTexts["Submits to members.courtrecords.us"]
+        for _ in 0..<4 where !submits.exists { app.swipeUp() }
+        XCTAssertTrue(submits.waitForExistence(timeout: 5))
     }
 }
 

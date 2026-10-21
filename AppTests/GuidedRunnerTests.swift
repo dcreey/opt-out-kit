@@ -183,3 +183,93 @@ final class GuidedRunnerTests: XCTestCase {
         XCTAssertTrue(log.sent.isEmpty, "nothing was recorded as sent")
     }
 }
+
+@MainActor
+final class GuidedHealingTests: XCTestCase {
+    /// A page that shows an error until the runner loads the healed address.
+    private final class MovedPage: GuidedPage {
+        var url: URL? = URL(string: "https://x.example/optout")
+        var broken = true
+        private(set) var loaded: [URL] = []
+        var webView: WKWebView? { nil }
+        func load(_ u: URL) async { loaded.append(u); url = u }
+        func currentURL() -> URL? { url }
+        func visibleText() async -> String { broken && url?.path == "/optout" ? "Page not found\nOops! That page can't be found." : "Request Portal. Opt out here." }
+        func fill(_ values: [FieldValue]) async -> Int { 1 }
+        func blockers() async -> [AssistedBlocker] { [] }
+        func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+        func close() {}
+    }
+
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")])
+    private func plan() -> GuidedPlan {
+        let form = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil,
+                              fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        return GuidedPlanner.plan(for: DirectoryEntry(id: "x", domain: "x.example", name: "x.example", bucket: "direct", tier: .B, automation: .guided, optOutForm: form))
+    }
+
+    func testABrokenPageIsHealedBeforeThePersonSeesAnError() async {
+        let page = MovedPage()
+        var healCalls = 0
+        let r = GuidedRunner(plan: plan(), person: pat, page: page, healer: { healCalls += 1; return URL(string: "https://x.example/request-portal/") })
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertEqual(healCalls, 1)
+        XCTAssertEqual(page.loaded.last?.path, "/request-portal", "the new page was loaded")
+        XCTAssertGreaterThan(r.flow.index, 0, "and the open step counted as done")
+        r.cancel(); await task.value
+    }
+
+    func testWhenTheLinkIsDeadAndNothingNewIsFoundThePersonIsToldToFindItThemselves() async {
+        let page = MovedPage()
+        let r = GuidedRunner(plan: plan(), person: pat, page: page, healer: { nil })
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertTrue(r.status?.contains("find it yourself") == true, r.status ?? "nil")
+        XCTAssertNil(r.ending, "the guide stays open so they can look around the site")
+        r.cancel(); await task.value
+    }
+
+    func testAWorkingLinkIsNotHealed() async {
+        let page = MovedPage(); page.broken = false
+        var calls = 0
+        let r = GuidedRunner(plan: plan(), person: pat, page: page, healer: { calls += 1; return nil })
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(calls, 0)
+        r.cancel(); await task.value
+    }
+
+    func testReportingABrokenLinkTriesToHealFirstThenReportsIfItCannot() async {
+        let page = MovedPage()
+        page.url = URL(string: "https://x.example/other")        // not an error page, so only the person's report triggers healing
+        var reported: [IssueKind] = []
+        let r = GuidedRunner(plan: plan(), person: pat, page: page, onIssue: { reported.append($0) }, healer: { nil })
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try? await Task.sleep(nanoseconds: 60_000_000)
+        r.report(.brokenLink)
+        await task.value
+        XCTAssertEqual(reported, [.brokenLink], "nothing newer was found, so the report stands")
+        XCTAssertEqual(r.ending, .reported(.brokenLink))
+    }
+
+    func testReportingABrokenLinkThatCanBeHealedKeepsTheGuideGoing() async {
+        let page = MovedPage(); page.broken = false
+        page.url = URL(string: "https://x.example/other")
+        var reported: [IssueKind] = []
+        let r = GuidedRunner(plan: plan(), person: pat, page: page, onIssue: { reported.append($0) }, healer: { URL(string: "https://x.example/request-portal") })
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try? await Task.sleep(nanoseconds: 60_000_000)
+        r.report(.brokenLink)
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertTrue(reported.isEmpty, "it found a newer page, so the site is not reported")
+        XCTAssertNotEqual(r.ending, .reported(.brokenLink))
+        XCTAssertEqual(page.loaded.last?.path, "/request-portal")
+        r.cancel(); await task.value
+    }
+}

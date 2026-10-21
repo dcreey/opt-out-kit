@@ -152,14 +152,17 @@ public struct HouseholdSettings: Codable, Equatable, Sendable {
     public var termsApproval: TermsApproval?
     public var consentLog: [ConsentLogEntry] = []
     public var auto = AutoSettings()
+    /// Opt-out links the app found for itself after a recorded one broke. Per site, kept on this device only.
+    public var healedLinks: [String: HealedLink] = [:]
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto }
+    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto, healedLinks }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         termsApproval = try c.decodeIfPresent(TermsApproval.self, forKey: .termsApproval)
         consentLog = try c.decodeIfPresent([ConsentLogEntry].self, forKey: .consentLog) ?? []
         auto = try c.decodeIfPresent(AutoSettings.self, forKey: .auto) ?? AutoSettings()
+        healedLinks = try c.decodeIfPresent([String: HealedLink].self, forKey: .healedLinks) ?? [:]
     }
 }
 

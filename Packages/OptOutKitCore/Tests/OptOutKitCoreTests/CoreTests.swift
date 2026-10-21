@@ -1372,3 +1372,129 @@ final class GuidedFlowTests: XCTestCase {
         XCTAssertEqual(b.steps[0].doneWhen?.urlContains, "verify")
     }
 }
+
+final class LinkFinderTests: XCTestCase {
+    private func u(_ s: String) -> URL { URL(string: s)! }
+    private func link(_ href: String, _ text: String) -> LinkSnapshot { LinkSnapshot(href: u(href), text: text) }
+    private func f(_ type: String, _ name: String, _ label: String = "") -> FormField { FormField(type: type, name: name, label: label) }
+
+    private struct Site: PageInspector {
+        var pages: [String: PageSnapshot]
+        let log = VisitLog()
+        func snapshot(_ url: URL) async -> PageSnapshot? {
+            log.urls.append(url.absoluteString)
+            return pages[url.absoluteString] ?? PageSnapshot(url: url, status: 404, title: "Page not found", text: "Sorry, nothing here.")
+        }
+    }
+    private final class VisitLog: @unchecked Sendable { var urls: [String] = [] }
+
+    private let portalForm = FormSnapshot(action: URL(string: "https://x.example/request-portal/")!, method: "post",
+                                          fields: [FormField(type: "text", name: "first", label: "First"), FormField(type: "email", name: "email", label: "Email")], hasSubmit: true)
+
+    // MARK: judging pages
+
+    func testErrorPagesAreRecognisedByStatusAndByWording() {
+        XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 404)))
+        XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, title: "Oops! That page can't be found.")))
+        XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, text: "Error 404. Sorry, the page you are looking for doesn't exist.")))
+        XCTAssertFalse(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, title: "Request Portal", text: "Welcome to the privacy request portal.")))
+    }
+
+    func testAnOptOutLinkOutranksAPrivacyLink() {
+        XCTAssertGreaterThan(LinkRules.score(href: "/optout", text: "Opt out of sale"), LinkRules.score(href: "/privacy", text: "Privacy"))
+        XCTAssertEqual(LinkRules.score(href: "/blog", text: "News"), 0)
+        XCTAssertGreaterThanOrEqual(LinkRules.score(href: "/do-not-sell", text: "Do Not Sell My Info"), 8)
+    }
+
+    func testARealPortalFormIsAcceptedOnAnOptOutPage() {
+        let page = PageSnapshot(url: u("https://x.example/request-portal/"), title: "Request Portal", text: "Welcome to the Privacy Request Portal. Right to Opt Out and Right to Delete.", forms: [portalForm])
+        XCTAssertGreaterThanOrEqual(LinkRules.bestForm(on: page)?.score ?? 0, 3)
+    }
+
+    func testASearchBoxOnAnErrorStylePageIsNotAnOptOutForm() {
+        let search = FormSnapshot(action: u("https://x.example/search"), method: "get", fields: [f("email", "emailaddress", "Enter an Email Address")], hasSubmit: true)
+        let page = PageSnapshot(url: u("https://x.example/optout"), status: 200, title: "Oops! That page can't be found.", text: "It looks like nothing was found. Maybe try searching?", forms: [search])
+        XCTAssertNil(LinkRules.bestForm(on: page), "a soft-404 shows a search box, which is not an opt-out form")
+    }
+
+    func testAnAffiliateBoxOnAPrivacyPolicyIsRejected() {
+        let affiliate = FormSnapshot(action: u("https://htrk1.beenverified.com/aff_c"), method: "get", fields: [f("text", "emailaddress", "Enter an Email Address")], hasSubmit: true)
+        let page = PageSnapshot(url: u("https://x.example/privacy-policy/"), title: "Privacy Policy", text: "Privacy policy. You can opt out of marketing emails at any time.", forms: [affiliate])
+        XCTAssertNil(LinkRules.bestForm(on: page), "a form that posts to another company is not this site's opt-out form")
+    }
+
+    func testAFormThatPostsToARemovalPortalOnAnotherDomainIsAccepted() {
+        let removal = FormSnapshot(action: u("https://members.vendor.example/removeMyData/"), method: "post",
+                                   fields: [f("text", "fname", "First Name"), f("text", "lname", "Last Name"), f("select", "state", "State"), f("text", "city", "City")], hasSubmit: true)
+        let page = PageSnapshot(url: u("https://x.example/do-not-sell-share-my-personal-information/"), title: "Do Not Sell Or Share My Personal Information", text: "Do not sell my information.", forms: [removal])
+        XCTAssertNotNil(LinkRules.bestForm(on: page))
+    }
+
+    func testTheHomePageNeverCountsEvenWithAnEmailBox() {
+        let page = PageSnapshot(url: u("https://x.example/"), title: "Opt out of everything", text: "Opt out", forms: [portalForm])
+        XCTAssertNil(LinkRules.bestForm(on: page))
+    }
+
+    // MARK: healing a moved link by crawling
+
+    func testHealsABrokenLinkByFollowingHomeToPrivacyToThePortal() async {
+        let site = Site(pages: [
+            "https://x.example/": PageSnapshot(url: u("https://x.example/"), title: "X", text: "Welcome", links: [link("https://x.example/privacy-rights", "Your Privacy Rights"), link("https://x.example/blog", "Blog")]),
+            "https://x.example/privacy-rights": PageSnapshot(url: u("https://x.example/privacy-rights"), title: "Privacy Rights", text: "Your privacy rights. Right to opt out.", links: [link("https://x.example/request-portal/", "Privacy Request Portal")]),
+            "https://x.example/request-portal/": PageSnapshot(url: u("https://x.example/request-portal/"), title: "Request Portal", text: "Privacy Request Portal. Right to opt out and delete.", forms: [portalForm]),
+        ])
+        let result = await OptOutLinkFinder(inspector: site).find(from: u("https://x.example/"))
+        XCTAssertEqual(result.form?.page.absoluteString, "https://x.example/request-portal/")
+        XCTAssertEqual(result.form?.fields.map(\.name), ["first", "email"])
+        XCTAssertNil(result.reason)
+        XCTAssertEqual(result.form?.hops, 2, "home, then privacy rights, then the portal")
+        XCTAssertLessThanOrEqual(result.visited.count, 3, "it followed the real links, not blind guesses")
+    }
+
+    func testFollowsTheBestLinkFirstAndSkipsUselessOnes() async {
+        let site = Site(pages: [
+            "https://x.example/": PageSnapshot(url: u("https://x.example/"), title: "X", text: "Hi", links: [link("https://x.example/blog", "Blog"), link("https://x.example/optout-center", "Opt out center")]),
+            "https://x.example/optout-center": PageSnapshot(url: u("https://x.example/optout-center"), title: "Opt out center", text: "Opt out here.", forms: [portalForm]),
+        ])
+        let result = await OptOutLinkFinder(inspector: site).find(from: u("https://x.example/"))
+        XCTAssertNotNil(result.form)
+        XCTAssertFalse(site.log.urls.contains("https://x.example/blog"), "the blog link scored zero and was never visited")
+    }
+
+    func testStopsAtThePageLimitAndSaysWhyNothingWasFound() async {
+        let site = Site(pages: ["https://x.example/": PageSnapshot(url: u("https://x.example/"), title: "X", text: "Hi")])
+        let result = await OptOutLinkFinder(inspector: site, maxPages: 3).find(from: u("https://x.example/"))
+        XCTAssertNil(result.form)
+        XCTAssertLessThanOrEqual(result.visited.count, 3)
+        XCTAssertNotNil(result.reason)
+    }
+
+    func testDoesNotWanderOffToUnrelatedSitesOrSocialLinks() async {
+        let site = Site(pages: ["https://x.example/": PageSnapshot(url: u("https://x.example/"), title: "X", text: "Hi", links: [
+            link("https://www.linkedin.com/legal/privacy-policy", "Privacy"), link("https://other.example/privacy", "Privacy policy"),
+        ])])
+        _ = await OptOutLinkFinder(inspector: site, maxPages: 12).find(from: u("https://x.example/"))
+        XCTAssertFalse(site.log.urls.contains { $0.contains("linkedin") })
+        XCTAssertFalse(site.log.urls.contains { $0.contains("other.example") }, "a weak link to another company is not followed")
+    }
+
+    func testAStrongOptOutLinkToAnotherDomainIsFollowedForSharedPortals() async {
+        let site = Site(pages: [
+            "https://x.example/": PageSnapshot(url: u("https://x.example/"), title: "X", text: "Hi", links: [link("https://parent.example/do-not-sell-my-info", "Do Not Sell My Info")]),
+            "https://parent.example/do-not-sell-my-info": PageSnapshot(url: u("https://parent.example/do-not-sell-my-info"), title: "Do Not Sell", text: "Do not sell my information.",
+                forms: [FormSnapshot(action: u("https://parent.example/optout/submit"), method: "post", fields: [f("email", "email", "Email")], hasSubmit: true)]),
+        ])
+        let result = await OptOutLinkFinder(inspector: site).find(from: u("https://x.example/"))
+        XCTAssertEqual(result.form?.page.host, "parent.example")
+    }
+
+    func testHealedLinksAreStoredOnTheDeviceAndSurviveEncoding() throws {
+        var h = Household()
+        let form = OptOutForm(page: u("https://x.example/request-portal/"), method: "post", action: nil, fields: [f("email", "email")], hops: 2)
+        h.saveHealedLink(HealedLink(siteID: "x", form: form))
+        let back = try JSONDecoder().decode(Household.self, from: JSONEncoder().encode(h))
+        XCTAssertEqual(back.healedLink(for: "x")?.form.page.absoluteString, "https://x.example/request-portal/")
+        var h2 = back; h2.forgetHealedLink("x")
+        XCTAssertNil(h2.healedLink(for: "x"))
+    }
+}

@@ -15,13 +15,9 @@ struct BrokerDetailView: View {
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             if !model.progress.isDone(broker.id) {
-                Button {
+                GuideButton(title: "Guide me through it", subtitle: "Full-screen browser, one step at a time") {
                     guide = model.guidedRunner(for: broker)
-                } label: {
-                    Label("Guide me through it", systemImage: "rectangle.bottomthird.inset.filled")
                 }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("guide-me")
             }
             if !broker.isVerified {
                 Text("This flow has not been verified by a real run yet. Steps may be out of date.")

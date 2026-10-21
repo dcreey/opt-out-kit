@@ -76,3 +76,56 @@ final class GuidedFlowUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["reported-issue"].waitForExistence(timeout: 5), "the site now shows it was reported")
     }
 }
+
+final class SiteViewLayoutUITests: XCTestCase {
+    private func scrollToBottom(_ app: XCUIApplication) {
+        for _ in 0..<8 { app.swipeUp() }
+    }
+
+    func testABrokerSiteViewLeadsWithTheGuideAndEndsWithTheSiteLink() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 10))
+        app.buttons["site-peopleconnect"].tap()
+        let guide = app.buttons["guide-me"]
+        XCTAssertTrue(guide.waitForExistence(timeout: 5))
+        let screen = app.windows.firstMatch.frame
+        XCTAssertLessThan(guide.frame.minY, screen.height * 0.4, "the guide is front and center, at the top")
+        XCTAssertGreaterThan(guide.frame.width, screen.width * 0.7, "and it is big")
+        let a = XCTAttachment(screenshot: app.screenshot()); a.name = "9-site-view-guide-first"; a.lifetime = .keepAlways; add(a)
+        scrollToBottom(app)
+        let link = app.buttons["site-link"]
+        XCTAssertTrue(link.waitForExistence(timeout: 3), "the site link is at the bottom")
+        XCTAssertFalse(guide.isHittable, "the guide is far above it")
+    }
+
+    func testADirectorySiteViewLeadsWithTheGuideAndEndsWithTheSiteLink() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5)); search.tap(); search.typeText("texascourtrecords")
+        let row = app.buttons["dir-texascourtrecords_us"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        let guide = app.buttons["guide-me"]
+        XCTAssertTrue(guide.waitForExistence(timeout: 5))
+        XCTAssertLessThan(guide.frame.minY, app.windows.firstMatch.frame.height * 0.4)
+        scrollToBottom(app)
+        XCTAssertTrue(app.buttons["site-link"].waitForExistence(timeout: 3))
+        XCTAssertFalse(guide.isHittable)
+    }
+
+    func testTheGuideOpensFromTheSiteView() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        app.buttons["site-peopleconnect"].tap()
+        app.buttons["guide-me"].tap()
+        XCTAssertTrue(app.staticTexts["guided-progress"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["guided-cancel"].exists)
+    }
+}

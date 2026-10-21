@@ -58,6 +58,17 @@ can, the app finishes a step by itself when it sees the page load, a copy, or a 
 cannot detect, such as clicking an emailed link, use the Next button. "Not working" records why (broken link, needs a login,
 payment, ID or phone call, site blocked me, other) and leaves that site alone for 30 days.
 
+## Moved links heal themselves
+
+- **In the app.** Before a guide runs, the page it opens is checked. If it is an error page the app crawls the site (home page,
+  then the most promising privacy and opt-out links, at most 6 pages and 3 hops) for the real opt-out form, saves the new link on
+  the phone, and loads it. If nothing is found the guide says so: the person has to find the page on the site themselves.
+  "Report: link broken" and the weekly opt-out (a page that is gone is searched again and the site retried once) do the same.
+  The site page has "Find the current opt-out page" and "Go back to the recorded link". No personal data is used for the search.
+- **In the pipeline.** `.github/workflows/profile.yml` runs weekly: it re-profiles all 214 directory sites, then
+  `tools/check_links.py` checks every hand-written broker link and every generated form page, crawls for a replacement when one
+  is broken, and writes `pipeline/link-health.md`. The job fails if a hand-written broker link is lost and no new one is found.
+
 ## Background running (unverified)
 
 Two background tasks are registered (`dev.optoutkit.app.scan` daily, `.optout` weekly) and the app also runs anything due

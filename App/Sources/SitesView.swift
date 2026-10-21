@@ -175,12 +175,24 @@ struct BrokerInfoView: View {
     let broker: Broker
     @State private var openFlow = false
     @State private var scans: [UUID: ScanState] = [:]
+    @State private var guide: GuidedRunner?
+    @State private var siteLink: URL?
+    @State private var healing = false
 
     enum ScanState: Equatable { case running, done(CheckOutcome) }
 
     var body: some View {
         let summary = model.household.summary(for: broker)
         List {
+            Section {
+                GuideButton(title: "Guide me through it", subtitle: "\(broker.steps.count) steps, in a full-screen browser") {
+                    guide = model.guidedRunner(for: broker)
+                }
+            }
+            if let issue = model.activeIssue(for: broker.id) {
+                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+            }
             Section {
                 Label(summary.label, systemImage: summary.symbol).foregroundStyle(summary.color)
                     .accessibilityIdentifier("site-summary")
@@ -244,10 +256,23 @@ struct BrokerInfoView: View {
                     Text("\(i + 1). \(step.title)")
                 }
             }
+
+            // The site's own link goes last: the guide above is the way in.
+            if let url = model.effectiveURL(for: broker) {
+                Section("Site link") {
+                    Button("Open in Safari", systemImage: "safari") { siteLink = url }.accessibilityIdentifier("site-link")
+                    Text(url.absoluteString).font(.caption).foregroundStyle(.secondary)
+                    HealControls(siteID: broker.id, looking: $healing, find: { await model.healLink(for: broker) != nil })
+                }
+            }
         }
         .navigationTitle(broker.name)
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $openFlow) { BrokerDetailView(broker: broker) }
+        .sheet(item: $siteLink) { SafariView(url: $0).ignoresSafeArea() }
+        .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in
+            GuidedFlowView(runner: box.runner)
+        }
     }
 
     /// "Does this site have my data?" Read-only: searches the site and reports, nothing is saved or sent beyond the search.
@@ -323,19 +348,19 @@ struct DirectoryInfoView: View {
     let entry: DirectoryEntry
     @State private var browserURL: URL?
     @State private var guide: GuidedRunner?
+    @State private var healing = false
 
     var body: some View {
         List {
+            Section {
+                GuideButton(title: "Opt out with a guide", subtitle: entry.optOutForm != nil
+                            ? "We fill in the form; you clear the check" : "We take you to the page and walk you through it") {
+                    guide = model.guidedRunner(for: entry)
+                }
+            }
             if let issue = model.activeIssue(for: entry.id) {
                 Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
-            }
-            Section {
-                Button {
-                    guide = model.guidedRunner(for: entry)
-                } label: { Label("Opt out with a guide", systemImage: "rectangle.bottomthird.inset.filled") }
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityIdentifier("guide-me")
             }
             Section {
                 Text(entry.automation.label).font(.headline)
@@ -368,12 +393,6 @@ struct DirectoryInfoView: View {
                     Label(check.statusLabel, systemImage: check.status == .calibrated ? "checkmark.seal" : "questionmark.circle")
                 }
             }
-            if let url = entry.optOutURL {
-                Section("Its opt-out page") {
-                    Button("Open in Safari", systemImage: "safari") { browserURL = url }
-                    Text(url.absoluteString).font(.caption).foregroundStyle(.secondary)
-                }
-            }
             if let signals = entry.signals, !signals.isEmpty {
                 Section("What we noticed") {
                     ForEach(signals, id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") }
@@ -382,6 +401,14 @@ struct DirectoryInfoView: View {
             Section("Source") {
                 Text(entry.bucket == "direct" ? "Listed as directly supported by an opt-out service." : "Listed as a mirror of another site.")
                 if let d = entry.profiled { Text("Profiled \(d)").font(.footnote).foregroundStyle(.secondary) }
+            }
+            // The site's own link goes last: the guide above is the way in.
+            if let url = model.effectiveURL(for: entry) {
+                Section("Site link") {
+                    Button("Open in Safari", systemImage: "safari") { browserURL = url }.accessibilityIdentifier("site-link")
+                    Text(url.absoluteString).font(.caption).foregroundStyle(.secondary)
+                    HealControls(siteID: entry.id, looking: $healing, find: { await model.healLink(for: entry) != nil })
+                }
             }
         }
         .navigationTitle(entry.domain)
@@ -530,5 +557,58 @@ struct QuickCheckView: View {
             Label(title, systemImage: symbol).foregroundStyle(color)
         }
         .accessibilityIdentifier({ switch result { case .removed: return "answer-clean"; case .paywalled: return "answer-paywalled"; default: return "answer-listed" } }())
+    }
+}
+
+/// The way into any site: big, full width, and always the first thing on the page.
+struct GuideButton: View {
+    let title: String
+    let subtitle: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Label(title, systemImage: "rectangle.bottomthird.inset.filled").font(.title3.bold())
+                Text(subtitle).font(.footnote)
+            }
+            .frame(maxWidth: .infinity).padding(.vertical, 10)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .accessibilityIdentifier("guide-me")
+    }
+}
+
+/// "Find the current opt-out page": the app crawls the site for it and remembers what it finds on this device. Also shows when a
+/// link was healed and lets the person go back to the recorded one.
+struct HealControls: View {
+    @EnvironmentObject var model: AppModel
+    let siteID: String
+    @Binding var looking: Bool
+    let find: () async -> Bool
+    @State private var message: String?
+
+    var body: some View {
+        if let healed = model.healedLink(for: siteID) {
+            Label("This site's opt-out page had moved. We found the new one on \(healed.foundAt.formatted(date: .abbreviated, time: .omitted)).",
+                  systemImage: "wand.and.stars").font(.footnote).foregroundStyle(.green).accessibilityIdentifier("healed-note")
+            Button("Go back to the recorded link", role: .destructive) { model.forgetHealedLink(siteID) }
+        }
+        Button {
+            looking = true
+            Task {
+                let found = await find()
+                message = found ? "Found it." : "No newer opt-out page was found."
+                looking = false
+            }
+        } label: {
+            Label(looking ? "Looking…" : "Find the current opt-out page", systemImage: "magnifyingglass")
+        }
+        .disabled(looking)
+        .accessibilityIdentifier("find-current-page")
+        if let message { Text(message).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("heal-message") }
     }
 }

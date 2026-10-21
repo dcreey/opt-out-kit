@@ -145,11 +145,23 @@ final class AppModel: ObservableObject {
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
-    func runAutoOptOut(for person: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil) async {
+    func runAutoOptOut(for person: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         guard storageProblem == nil else { return }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil ? 2 : 0)
         let now = Date()
-        let results = await engine.run(entries: directory, person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun)
+        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun)
+        // A page that has gone is usually a moved link: look for the new one and try that site again, once.
+        if !dryRun {
+            let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
+            var retry: [DirectoryEntry] = []
+            for (entry, _) in gone {
+                if let original = directory.first(where: { $0.id == entry.id }), await healLink(for: original, inspector: inspector) != nil { retry.append(resolved(original)) }
+            }
+            if !retry.isEmpty {
+                let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false)
+                for (entry, result) in again { if let i = results.firstIndex(where: { $0.0.id == entry.id }) { results[i] = (entry, result) } }
+            }
+        }
         household.mutateProgress(for: person.id) { p in
             for (entry, result) in results {
                 if let attempt = AutoOptOut.attempt(for: result, now: now) { p.recordOptOutAttempt(attempt, site: entry.id) }
@@ -166,7 +178,7 @@ final class AppModel: ObservableObject {
     /// in the last week. The app fills and sends each one once the person has solved its check.
     func assistedItems(for person: Person, now: Date = Date()) -> [AssistedRunner.Item] {
         let progress = household.progress(for: person.id)
-        return directory.compactMap { entry -> AssistedRunner.Item? in
+        return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
             guard let form = entry.optOutForm else { return nil }
             let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now)
             guard pre.result == nil, let plan = pre.plan else { return nil }
@@ -189,6 +201,54 @@ final class AppModel: ObservableObject {
 
     func activeIssue(for site: String) -> SiteIssue? { progress.activeIssue(for: site) }
 
+    // MARK: Healing moved links
+
+    /// The directory entry with any link the app healed on this device swapped in, so every flow uses the working address.
+    func resolved(_ entry: DirectoryEntry) -> DirectoryEntry {
+        guard let healed = household.healedLink(for: entry.id) else { return entry }
+        var e = entry; e.optOutForm = healed.form; e.optOutURL = healed.form.page
+        return e
+    }
+
+    func healedLink(for siteID: String) -> HealedLink? { household.healedLink(for: siteID) }
+
+    /// The address to use for a site's opt-out page: a link the app healed on this device, else the recorded one.
+    func effectiveURL(for entry: DirectoryEntry) -> URL? { household.healedLink(for: entry.id)?.form.page ?? entry.optOutForm?.page ?? entry.optOutURL }
+    func effectiveURL(for broker: Broker) -> URL? { household.healedLink(for: broker.id)?.form.page ?? broker.steps.compactMap(\.open).first }
+
+    func makeInspector() -> PageInspector {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-uitest-fake-heal") { return FakeInspector() }
+        if args.contains("-uitest-fake-guided") { return NothingInspector() }      // UI tests never crawl real sites
+        #endif
+        return WebPageInspector()
+    }
+
+    /// Looks for a site's current opt-out form by crawling from its home page, and remembers it on this device. Sends nothing
+    /// anywhere and uses no personal data. Returns the new link, or nil if none was found.
+    @discardableResult
+    func healLink(siteID: String, domain: String, inspector: PageInspector? = nil) async -> HealedLink? {
+        guard let home = URL(string: "https://\(domain)/") else { return nil }
+        let result = await OptOutLinkFinder(inspector: inspector ?? makeInspector()).find(from: home)
+        guard let form = result.form else { return nil }
+        let link = HealedLink(siteID: siteID, form: form)
+        household.saveHealedLink(link)
+        save()
+        return link
+    }
+
+    func healLink(for entry: DirectoryEntry, inspector: PageInspector? = nil) async -> HealedLink? {
+        await healLink(siteID: entry.id, domain: entry.domain, inspector: inspector)
+    }
+
+    func healLink(for broker: Broker, inspector: PageInspector? = nil) async -> HealedLink? {
+        guard let host = broker.steps.compactMap(\.open).first?.host else { return nil }
+        return await healLink(siteID: broker.id, domain: host.hasPrefix("www.") ? String(host.dropFirst(4)) : host, inspector: inspector)
+    }
+
+    func forgetHealedLink(_ siteID: String) { household.forgetHealedLink(siteID); save() }
+
     func makeGuidedPageMaker() -> GuidedPageMaker {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-guided") { return FakeGuidedPageMaker() }
@@ -199,21 +259,27 @@ final class AppModel: ObservableObject {
     /// A guided runner for a hand-written broker flow, resuming at the first step not yet done.
     func guidedRunner(for broker: Broker) -> GuidedRunner? {
         guard let person = selectedPerson else { return nil }
-        let plan = GuidedPlanner.plan(for: broker)
+        var plan = GuidedPlanner.plan(for: broker)
+        if let healed = household.healedLink(for: broker.id), let first = plan.steps.firstIndex(where: { if case .openPage = $0.action { return true } else { return false } }) {
+            plan.steps[first].action = .openPage(healed.form.page)         // the first page moved: use where it went
+        }
         let done = (0..<broker.steps.count).first { !progress.isStepDone(broker.id, $0) } ?? 0
         return GuidedRunner(plan: plan, resumeAt: done, person: person, page: makeGuidedPageMaker().make(),
                             onStepCompleted: { [weak self] i in self?.complete(broker, step: i) },
-                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: broker.id) })
+                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: broker.id) },
+                            healer: { [weak self] in await self?.healLink(for: broker)?.form.page })
     }
 
     /// A guided runner for a directory site: the app fills and sends the form, the person clears what only they can.
-    func guidedRunner(for entry: DirectoryEntry) -> GuidedRunner? {
+    func guidedRunner(for original: DirectoryEntry) -> GuidedRunner? {
         guard let person = selectedPerson else { return nil }
+        let entry = resolved(original)
         let plan = GuidedPlanner.plan(for: entry)
         let values: [FieldValue] = entry.optOutForm.map { FormFiller.plan(for: $0, signals: entry.signals, person: person).values } ?? []
         return GuidedRunner(plan: plan, person: person, fillValues: values, page: makeGuidedPageMaker().make(),
                             onSent: { [weak self] result in self?.recordAssisted(entry, result, for: person) },
-                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: entry.id) })
+                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: entry.id) },
+                            healer: { [weak self] in await self?.healLink(for: original)?.form.page })
     }
 
     /// A result from the Solve-and-send screen: remembered like any other automatic attempt.
@@ -452,5 +518,25 @@ final class FakeGuidedPage: GuidedPage {
     func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
     func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: true) }
     func close() {}
+}
+#endif
+
+
+#if DEBUG
+/// UI tests use this so healing never crawls a real site: the home page links to a privacy page that links to a request portal.
+struct NothingInspector: PageInspector { func snapshot(_ url: URL) async -> PageSnapshot? { nil } }
+
+struct FakeInspector: PageInspector {
+    func snapshot(_ url: URL) async -> PageSnapshot? {
+        let base = "https://\(url.host ?? "fake.example")"
+        switch url.path {
+        case "", "/": return PageSnapshot(url: url, title: "Fake site", text: "Welcome", links: [LinkSnapshot(href: URL(string: base + "/privacy-rights")!, text: "Your Privacy Rights")])
+        case "/privacy-rights": return PageSnapshot(url: url, title: "Privacy Rights", text: "Your privacy rights. Right to opt out.", links: [LinkSnapshot(href: URL(string: base + "/request-portal/")!, text: "Privacy Request Portal")])
+        case "/request-portal/":
+            return PageSnapshot(url: url, title: "Request Portal", text: "Privacy Request Portal. Right to opt out and delete.",
+                                forms: [FormSnapshot(action: url, method: "post", fields: [FormField(type: "text", name: "first", label: "First"), FormField(type: "email", name: "email", label: "Email")], hasSubmit: true)])
+        default: return PageSnapshot(url: url, status: 404, title: "Page not found", text: "Nothing here.")
+        }
+    }
 }
 #endif
