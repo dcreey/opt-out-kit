@@ -19,7 +19,7 @@ public struct CheckRunner: Sendable {
     /// Submitted opt-outs whose next check time has passed. Brokers with no `recheck:` block are skipped.
     public static func due(in household: Household, brokers: [Broker], now: Date = Date()) -> [DueCheck] {
         var result: [DueCheck] = []
-        for person in household.people {
+        for person in household.people where person.canBeSearched(on: now) {
             let progress = household.progress(for: person.id)
             for broker in brokers where broker.recheck != nil {
                 if let when = progress.nextCheck(for: broker), when <= now {

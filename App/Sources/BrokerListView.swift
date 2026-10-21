@@ -66,7 +66,7 @@ struct BrokerListView: View {
                 Button("Add") { editing = model.addPerson(named: newName); newName = "" }
                 Button("Cancel", role: .cancel) { newName = "" }
             } message: {
-                Text("Only add people who asked you to, or whom you have authority to act for. Their details stay on this phone. Relatives and friends are just more people here.")
+                Text("Family members only: someone who asked you to, or a child you are the parent or guardian of. Their details stay on this phone. Mark children as under 18 so the app never searches for them.")
             }
             .navigationDestination(for: Broker.self) { BrokerDetailView(broker: $0) }
         }

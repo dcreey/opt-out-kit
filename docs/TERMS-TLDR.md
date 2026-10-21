@@ -39,4 +39,4 @@ the app before anyone allows it to accept terms (`App/Sources/TermsSummary.swift
 - The main commitment is the indemnity clause, which already applies to anyone who visits.
 - None of the three terms pages read bans automated access, but the app accepts only when no paragraph does (automation-flagged paragraphs are never accepted).
 - Results are unproven, so a listing found there is a lead, not proof.
-- **Gap to close:** these terms exclude minors, public officials and celebrities. The app should not scan or accept for a person marked as a minor; a "minor" or "public figure" flag on profiles is not built yet.
+- **Minors and public figures:** these terms exclude them. Profiles have an "Under 18" switch (also set by a birthdate under 18) and a "Public figure" switch, both off by default. For flagged profiles the app never scans, re-checks or accepts terms; opt-out forms still work.

@@ -24,7 +24,7 @@ Ask once, store only on the phone. Collect what brokers match on, because a miss
 | Field | Why | Notes |
 |---|---|---|
 | Names | Matching; brokers list "Bob" and "Robert" separately | An unlimited list, each tagged legal, previous legal, maiden, nickname or other |
-| Relationship | Links the person to the owner | Dropdown: parent, sister, cousin, friend and so on; not shown for the owner |
+| Relationship | Links the person to the owner | Dropdown of family relationships (parent, child, sibling, spouse, cousin, other family and so on); no friends; not shown for the owner |
 | Current and previous addresses | Matching; most brokers key on address | City, state and years lived; full street only if the user adds it |
 | Emails | Confirmation links | Offer alias addresses for brokers that allow one opt-out per email |
 | Phones | Some matching, phone-code steps | Optional |
@@ -36,13 +36,13 @@ queue.
 Rules: every field optional except a name; each broker receives only the fields its YAML lists; a "What this site
 will receive" screen shows them before anything is sent.
 
-## Friends and family: many people, one app
+## Family: many people, one app
 
-The app runs opt-outs for a household, not only for the owner. Each person has their own profile (above) and their own
+The app runs opt-outs for a family, not only for the owner (family only for now; no friends). Each person has their own profile (above) and their own
 progress, queue position, re-check dates and rewards. A person menu on the main screen switches between them.
 
-- **Adding someone:** name first; the rest can be filled in with them later. The app says plainly: only add people who
-  asked you to or whom you have authority to act for.
+- **Adding someone:** name first; the rest can be filled in with them later. The app says plainly: family members only, someone who asked you to or a child you are the parent or guardian of.
+- **Minors and public figures:** each profile has an "Under 18" and a "Public figure" switch (both off by default; a birthdate under 18 also counts). Several sites' terms forbid searching for minors, public officials and celebrities, so the app never scans, re-checks or accepts terms for these profiles. Opt-out requests still work.
 - **Their emails, not yours:** confirmation links and "one opt-out per email" brokers need the person's own address
   (or an alias). The profile warns when two people share one.
 - **Run order:** "Next best step" works down one person's queue; a "Run for everyone" view lists the next step per

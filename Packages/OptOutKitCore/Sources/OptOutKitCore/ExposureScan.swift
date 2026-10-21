@@ -26,6 +26,7 @@ public struct ExposureScan: Sendable {
     /// after every site with (done, total).
     public func run(_ entries: [DirectoryEntry], for person: Person, concurrency: Int = 4,
                     progress: (@Sendable (Int, Int) -> Void)? = nil) async -> [ScanResult] {
+        guard person.canBeSearched() else { return [] }
         let targets = Self.scannable(entries)
         let rechecker = Rechecker(fetcher: fetcher, browserFetcher: browserFetcher)
         var results: [ScanResult] = []

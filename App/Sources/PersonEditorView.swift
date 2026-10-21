@@ -32,6 +32,7 @@ struct PersonEditorView: View {
                 }
             }
             namesSection
+            safetySection
             addressSection
             StringListSection(title: "Emails", hint: "Used for confirmation links. Use this person's own address.",
                               addLabel: "Add email", items: $person.emails, keyboard: .emailAddress)
@@ -62,6 +63,22 @@ struct PersonEditorView: View {
         .onChange(of: person) { _, new in model.update(new) }
         .confirmationDialog("Delete \(person.displayName)?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
+        }
+    }
+
+    /// Minors and public figures are never searched (several sites' terms forbid it). Both default to off.
+    private var safetySection: some View {
+        Section {
+            Toggle("Under 18", isOn: $person.isMinor).accessibilityIdentifier("flag-minor")
+            Toggle("Public figure (official or celebrity)", isOn: $person.isPublicFigure).accessibilityIdentifier("flag-public-figure")
+            if !person.isMinor, person.isMinorNow() {
+                Label("The birthdate says under 18, so this profile is treated as a minor.", systemImage: "exclamationmark.triangle")
+                    .font(.footnote).foregroundStyle(.orange)
+            }
+        } header: {
+            Text("Searching")
+        } footer: {
+            Text("Several people-search sites' terms don't allow searching for minors, public officials or celebrities. For these profiles Opt-Out Kit won't search sites or accept terms; opt-out forms still work.")
         }
     }
 

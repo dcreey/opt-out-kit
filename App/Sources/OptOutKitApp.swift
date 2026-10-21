@@ -108,6 +108,13 @@ final class AppModel: ObservableObject {
 
     var score: Score { Score.compute(progress, brokers: brokers) }
 
+    /// Why searching is off for the selected person, or nil when it is allowed. Minors and public figures are never searched.
+    var searchBlockedReason: String? {
+        guard let p = selectedPerson, !p.canBeSearched() else { return nil }
+        let why = p.isPublicFigure ? "a public figure" : "under 18"
+        return "Searches are off for \(p.displayName) (\(why)). Several sites' terms don't allow searching for minors, public officials or celebrities. Opt-out requests still work."
+    }
+
     // MARK: Terms on the person's behalf (off unless reviewed paragraphs exist AND the person approved this list version)
 
     var termsApproval: TermsApproval? { household.termsApproval }
@@ -136,6 +143,7 @@ final class AppModel: ObservableObject {
 
     /// Directory sites the person can look at themselves, skipping any they looked at in the last 30 days.
     var quickCheckQueue: [DirectoryEntry] {
+        guard searchBlockedReason == nil else { return [] }
         let cutoff = Date().addingTimeInterval(-30 * 86_400)
         return unguidedSites
             .filter { $0.needsManualCheck && $0.automation != .unreachable }
@@ -151,7 +159,7 @@ final class AppModel: ObservableObject {
 
     /// Searches every directory site that can be checked automatically for one person. Read-only.
     func scanExposure(for person: Person, fetcher: PageFetcher? = nil) async {
-        guard scanProgress == nil else { return }
+        guard scanProgress == nil, person.canBeSearched() else { return }
         let total = ExposureScan.scannable(directory).count
         scanProgress = (0, total)
         defer { scanProgress = nil }
@@ -197,7 +205,7 @@ final class AppModel: ObservableObject {
     }
 
     @discardableResult
-    func addPerson(named name: String, relationship: Relationship = .friend) -> Person? {
+    func addPerson(named name: String, relationship: Relationship = .otherFamily) -> Person? {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return nil }
         let person = Person(displayName: trimmed, relationship: relationship,

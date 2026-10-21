@@ -141,14 +141,14 @@ final class PersonTests: XCTestCase {
     }
 
     func testRelationshipOptionsIncludeTheFamilyTypes() {
-        for r: Relationship in [.parent, .sibling, .cousin, .friend] { XCTAssertTrue(Relationship.allCases.contains(r)) }
+        for r: Relationship in [.parent, .sibling, .cousin, .otherFamily] { XCTAssertTrue(Relationship.allCases.contains(r)) }
         XCTAssertEqual(Relationship.me.label, "Me")
         XCTAssertEqual(Relationship.auntUncle.label, "Aunt or uncle")
     }
 
     func testNoGenderSpecificDuplicates() {
         let labels = Relationship.allCases.map(\.rawValue)
-        for banned in ["mother", "father", "sister", "brother", "son", "daughter"] {
+        for banned in ["mother", "father", "sister", "brother", "son", "daughter", "friend", "other"] {
             XCTAssertFalse(labels.contains(banned), "\(banned) duplicates a neutral option")
         }
     }
@@ -904,5 +904,84 @@ final class TermsGateReportingTests: XCTestCase {
         let person = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
         let r = await Rechecker(fetcher: FakeFetcher(fallback: page)).check(spec: spec, for: person)
         XCTAssertEqual(r, .inconclusive(.termsGate))
+    }
+}
+
+
+final class SafetyFlagTests: XCTestCase {
+    private let day: TimeInterval = 86_400
+    private func born(yearsAgo: Int, daysOffset: Int = 0) -> String {
+        let d = Calendar.current.date(byAdding: .year, value: -yearsAgo, to: Date())!.addingTimeInterval(Double(daysOffset) * 86_400)
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: d)
+        return String(format: "%04d-%02d-%02d", c.year!, c.month!, c.day!)
+    }
+
+    func testFamilyOnlyAndOldFriendsReadBackAsOtherFamily() throws {
+        XCTAssertFalse(Relationship.allCases.map(\.rawValue).contains("friend"))
+        XCTAssertEqual(try JSONDecoder().decode(Relationship.self, from: Data("\"friend\"".utf8)), .otherFamily)
+        XCTAssertEqual(try JSONDecoder().decode(Relationship.self, from: Data("\"other\"".utf8)), .otherFamily)
+        XCTAssertEqual(try JSONDecoder().decode(Relationship.self, from: Data("\"parent\"".utf8)), .parent)
+    }
+
+    func testBothFlagsDefaultToNoAndAnAdultCanBeSearched() {
+        let p = Person(displayName: "P")
+        XCTAssertFalse(p.isMinor)
+        XCTAssertFalse(p.isPublicFigure)
+        XCTAssertTrue(p.canBeSearched())
+    }
+
+    func testEitherFlagStopsSearching() {
+        XCTAssertFalse(Person(displayName: "K", isMinor: true).canBeSearched())
+        XCTAssertFalse(Person(displayName: "F", isPublicFigure: true).canBeSearched())
+    }
+
+    func testABirthdateUnderEighteenCountsAsAMinorEvenWithTheFlagOff() {
+        var p = Person(displayName: "K")
+        p.birthdate = born(yearsAgo: 12)
+        XCTAssertTrue(p.isMinorNow())
+        XCTAssertFalse(p.canBeSearched())
+        p.birthdate = born(yearsAgo: 18, daysOffset: -2)      // turned 18 two days ago
+        XCTAssertFalse(p.isMinorNow())
+        p.birthdate = born(yearsAgo: 18, daysOffset: 2)       // turns 18 in two days
+        XCTAssertTrue(p.isMinorNow())
+        p.birthdate = "not a date"
+        XCTAssertFalse(p.isMinorNow())
+    }
+
+    func testProfilesSavedBeforeTheFlagsExistStillLoadWithBothOff() throws {
+        let id = UUID().uuidString
+        let json = #"{"id":"\#(id)","displayName":"Old","relationship":"friend","names":[],"addresses":[],"emails":[],"phones":[]}"#
+        let p = try JSONDecoder().decode(Person.self, from: Data(json.utf8))
+        XCTAssertEqual(p.relationship, .otherFamily)
+        XCTAssertFalse(p.isMinor); XCTAssertFalse(p.isPublicFigure)
+    }
+
+    func testRechecksAndScansNeverRunForAMinorOrPublicFigure() async {
+        let spec = Recheck(searchURL: "https://b.example/{first}-{last}", validPage: ["directory"], noResults: ["no result"], ignoreLocation: true)
+        let fetcher = FakeFetcher(fallback: FetchedPage(status: 200, text: "Directory: Pat Example is here"))
+        for person in [Person(displayName: "K", names: [NameEntry(kind: .legal, name: "Pat Example")], isMinor: true),
+                       Person(displayName: "F", names: [NameEntry(kind: .legal, name: "Pat Example")], isPublicFigure: true)] {
+            let r = await Rechecker(fetcher: fetcher).check(spec: spec, for: person)
+            XCTAssertEqual(r, .inconclusive(.notSearchable))
+            let entry = DirectoryEntry(id: "b_example", domain: "b.example", name: "b.example", bucket: "direct", tier: .B, automation: .guided,
+                                       confidence: nil, optOutURL: nil, optOutForm: nil, family: nil, familyParent: nil, template: nil,
+                                       searchCheck: SearchCheck(status: .calibrated, searchURL: spec.searchURL, validPage: ["directory"], noResults: ["no result"], ignoreLocation: true),
+                                       signals: nil, profiled: nil)
+            let scan = await ExposureScan(fetcher: fetcher, perHostSpacing: 0).run([entry], for: person)
+            XCTAssertTrue(scan.isEmpty, "no site may be searched for \(person.displayName)")
+        }
+    }
+
+    func testAutomaticRechecksSkipFlaggedPeopleButNotOthers() {
+        let broker = Broker(id: "b", name: "B", tier: .A, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30,
+                            verified: nil, processingDays: 3,
+                            recheck: Recheck(searchURL: "https://b.example/{first}-{last}", validPage: ["d"], ignoreLocation: true))
+        var h = Household()
+        let adult = Person(displayName: "A"), kid = Person(displayName: "K", isMinor: true)
+        h.add(adult); h.add(kid)
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        for p in [adult, kid] { h.mutateProgress(for: p.id) { $0.complete(broker, step: 0, now: t0) } }
+        let due = CheckRunner.due(in: h, brokers: [broker], now: t0 + 5 * day)
+        XCTAssertEqual(due.map(\.person.displayName), ["A"], "the opt-out is submitted for both, but only the adult is searched")
     }
 }

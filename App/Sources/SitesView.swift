@@ -59,15 +59,21 @@ struct SitesView: View {
                     Button { showQuick = true } label: {
                         Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
                     }
+                    .disabled(model.searchBlockedReason != nil)
                     .accessibilityIdentifier("quick-checks")
                 } footer: {
                     Text("Look a site up yourself in 20 seconds and tell us what you see. Each look earns points.")
                 }
                 Section {
                     Button { showScan = true } label: {
-                        Label("Scan where \(model.selectedPerson?.displayName ?? "I") appear", systemImage: "dot.radiowaves.left.and.right")
+                        Label("Scan for \(model.selectedPerson?.displayName ?? "my") listings", systemImage: "dot.radiowaves.left.and.right")
                     }
+                    .disabled(model.searchBlockedReason != nil)
                     .accessibilityIdentifier("scan-exposure")
+                    if let reason = model.searchBlockedReason {
+                        Label(reason, systemImage: "hand.raised").font(.footnote).foregroundStyle(.orange)
+                            .accessibilityIdentifier("search-blocked")
+                    }
                 } footer: {
                     Text("Searches \(ExposureScan.scannable(model.directory).count) sites that can be checked automatically. Nothing is submitted.")
                 }

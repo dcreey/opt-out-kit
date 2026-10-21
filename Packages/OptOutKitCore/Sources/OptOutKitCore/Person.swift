@@ -13,18 +13,25 @@ public struct Address: Codable, Equatable, Sendable {
     }
 }
 
-/// How a person relates to the owner of the phone. Shown as a dropdown in the profile editor.
+/// How a person relates to the owner of the phone. Family only, for now. Shown as a dropdown in the profile editor.
 public enum Relationship: String, Codable, CaseIterable, Sendable {
     case me, parent, child, sibling, spouse, partner, grandparent, grandchild
-    case auntUncle, nieceNephew, cousin, friend, other
+    case auntUncle, nieceNephew, cousin, otherFamily
 
     public var label: String {
         switch self {
         case .me: return "Me"
         case .auntUncle: return "Aunt or uncle"
         case .nieceNephew: return "Niece or nephew"
+        case .otherFamily: return "Other family"
         default: return rawValue.capitalized
         }
+    }
+
+    /// Anything saved before the list was narrowed to family (friend, other, ...) reads back as "Other family".
+    public init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = Relationship(rawValue: raw) ?? .otherFamily
     }
 }
 
@@ -53,7 +60,7 @@ public struct NameEntry: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-/// Someone the app runs opt-outs for: the user, or a friend or family member who asked them to.
+/// Someone the app runs opt-outs for: the user, or a family member who asked them to.
 /// Relatives are simply other people in the household, linked by `relationship`.
 public struct Person: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
@@ -64,13 +71,58 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
     public var emails: [String]
     public var phones: [String]
     public var birthdate: String?
+    /// Under 18. Several sites' terms forbid searching for minors, so these profiles are never searched (see `canBeSearched`).
+    public var isMinor: Bool
+    /// A public official or celebrity. The same terms forbid searching for them. Defaults to no.
+    public var isPublicFigure: Bool
 
-    public init(id: UUID = UUID(), displayName: String, relationship: Relationship = .other,
+    public init(id: UUID = UUID(), displayName: String, relationship: Relationship = .otherFamily,
                 names: [NameEntry] = [NameEntry(kind: .legal)], addresses: [Address] = [],
-                emails: [String] = [], phones: [String] = [], birthdate: String? = nil) {
+                emails: [String] = [], phones: [String] = [], birthdate: String? = nil,
+                isMinor: Bool = false, isPublicFigure: Bool = false) {
         self.id = id; self.displayName = displayName; self.relationship = relationship
         self.names = names; self.addresses = addresses; self.emails = emails
         self.phones = phones; self.birthdate = birthdate
+        self.isMinor = isMinor; self.isPublicFigure = isPublicFigure
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, displayName, relationship, names, addresses, emails, phones, birthdate, isMinor, isPublicFigure
+    }
+
+    /// Profiles saved before the safety flags existed load with both off.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        displayName = try c.decode(String.self, forKey: .displayName)
+        relationship = try c.decode(Relationship.self, forKey: .relationship)
+        names = try c.decodeIfPresent([NameEntry].self, forKey: .names) ?? [NameEntry(kind: .legal)]
+        addresses = try c.decodeIfPresent([Address].self, forKey: .addresses) ?? []
+        emails = try c.decodeIfPresent([String].self, forKey: .emails) ?? []
+        phones = try c.decodeIfPresent([String].self, forKey: .phones) ?? []
+        birthdate = try c.decodeIfPresent(String.self, forKey: .birthdate)
+        isMinor = try c.decodeIfPresent(Bool.self, forKey: .isMinor) ?? false
+        isPublicFigure = try c.decodeIfPresent(Bool.self, forKey: .isPublicFigure) ?? false
+    }
+
+    /// Age in whole years from a "YYYY-MM-DD" birthdate, or nil when there is none or it cannot be read.
+    public func age(on date: Date = Date(), calendar: Calendar = .current) -> Int? {
+        guard let birthdate else { return nil }
+        let parts = birthdate.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3, let born = calendar.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2])) else { return nil }
+        return calendar.dateComponents([.year], from: born, to: date).year
+    }
+
+    /// The flag, or a birthdate that says under 18. Either one counts.
+    public func isMinorNow(on date: Date = Date(), calendar: Calendar = .current) -> Bool {
+        isMinor || (age(on: date, calendar: calendar).map { $0 < 18 } ?? false)
+    }
+
+    /// Whether the app may search sites for this person (scans, automatic re-checks, quick checks) or accept terms for them.
+    /// The terms of the sites we meet most often forbid searching for minors, public officials and celebrities.
+    /// Opt-out forms are not searches, so those still work for everyone.
+    public func canBeSearched(on date: Date = Date(), calendar: Calendar = .current) -> Bool {
+        !isMinorNow(on: date, calendar: calendar) && !isPublicFigure
     }
 
     /// The first legal name, which most broker forms ask for.

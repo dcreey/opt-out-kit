@@ -67,7 +67,7 @@ public enum CheckResult: String, Codable, Equatable, Sendable {
 }
 
 public enum InconclusiveReason: String, Equatable, Sendable {
-    case blocked, unrecognizedPage, network, noRecheckSpec, missingProfileData, needsBrowser, termsGate
+    case blocked, unrecognizedPage, network, noRecheckSpec, missingProfileData, needsBrowser, termsGate, notSearchable
 }
 
 public struct CheckOutcome: Equatable, Sendable {
@@ -105,6 +105,8 @@ public struct Rechecker: Sendable {
 
     /// Checks one person against a spec on its own, for directory sites that have no hand-written broker flow.
     public func check(spec: Recheck, for person: Person) async -> CheckOutcome {
+        // Defence in depth: whatever called us, a minor or public figure is never searched.
+        guard person.canBeSearched() else { return .inconclusive(.notSearchable) }
         let source: PageFetcher
         if spec.needsBrowser == true {
             guard let browserFetcher else { return .inconclusive(.needsBrowser) }

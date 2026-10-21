@@ -15,6 +15,8 @@ final class ProfileEditorUITests: XCTestCase {
                       || app.otherElements["privacy-note"].waitForExistence(timeout: 1))
         app.buttons["add-name"].tap()
         XCTAssertTrue(app.textFields["name-1"].waitForExistence(timeout: 3), "can add more than one name")
+        var scrolls = 0
+        while !app.buttons["add-address"].isHittable && scrolls < 10 { app.swipeUp(); scrolls += 1 }   // the editor is taller now
         app.buttons["add-address"].tap()
         XCTAssertTrue(app.textFields["City"].waitForExistence(timeout: 3))
     }
@@ -32,9 +34,10 @@ final class ProfileEditorUITests: XCTestCase {
         let dropdown = app.buttons["field-relationship"]
         XCTAssertTrue(dropdown.waitForExistence(timeout: 5))
         dropdown.tap()
-        for option in ["Parent", "Child", "Sibling", "Cousin", "Friend"] {
+        for option in ["Parent", "Child", "Sibling", "Cousin", "Other family"] {
             XCTAssertTrue(app.buttons[option].waitForExistence(timeout: 3), "\(option) missing from relationship list")
         }
+        XCTAssertFalse(app.buttons["Friend"].exists, "family only: there is no Friend option")
         app.buttons["Parent"].tap()
         XCTAssertTrue(app.buttons["field-relationship"].label.contains("Parent"))
         app.buttons["Done"].tap()
