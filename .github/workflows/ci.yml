@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install check-jsonschema
       - run: check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml
+      - run: check-jsonschema --schemafile schema/directory.schema.json directory/*.yml
 
   core:
     name: Core package tests

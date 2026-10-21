@@ -106,3 +106,73 @@ final class OnboardingTests: XCTestCase {
         XCTAssertEqual(model(defaults, catalog: v2).pending, .whatsNew([v2[1]]))
     }
 }
+
+private struct StubFetcher: PageFetcher {
+    var page: FetchedPage
+    func fetch(_ url: URL) async throws -> FetchedPage { page }
+}
+
+@MainActor
+final class CheckWiringTests: XCTestCase {
+    func testDueChecksRunAndVerifyThroughTheModel() async throws {
+        let model = makeModel()
+        let spokeo = try XCTUnwrap(model.brokers.first { $0.id == "spokeo" })
+        var me = try XCTUnwrap(model.selectedPerson)
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.addresses = [Address(city: "Springfield", state: "IL")]
+        model.update(me)
+        for i in spokeo.steps.indices { model.complete(spokeo, step: i) }
+        XCTAssertEqual(model.household.summary(for: spokeo), .submitted)
+
+        let gone = StubFetcher(page: FetchedPage(status: 404, text: "Did not match any results Spokeo"))
+        let day: TimeInterval = 86_400
+        await model.runDueChecks(fetcher: gone, now: Date() + 4 * day)
+        XCTAssertEqual(model.household.summary(for: spokeo), .submitted, "one check is not enough")
+        await model.runDueChecks(fetcher: gone, now: Date() + 7 * day)
+        XCTAssertEqual(model.household.summary(for: spokeo), .complete)
+    }
+}
+
+@MainActor
+final class DirectoryModelTests: XCTestCase {
+    func testBundledDirectoryLoadsAndHidesGuidedSites() {
+        let model = makeModel()
+        XCTAssertGreaterThanOrEqual(model.directory.count, 200)
+        XCTAssertFalse(model.unguidedSites.contains { $0.domain == "spokeo.com" }, "Spokeo already has a guided flow")
+        XCTAssertTrue(model.unguidedSites.count < model.directory.count)
+    }
+}
+
+@MainActor
+final class WebViewFetcherTests: XCTestCase {
+    /// The point of the web view: a page that fills in its results with JavaScript after a "loading" screen.
+    func testWaitsForScriptToFillInResults() async throws {
+        let html = """
+        <html><head><title>Directory</title></head><body><div id="r">Loading...</div>
+        <script>setTimeout(function(){document.getElementById('r').innerText='Search results: Pat Example, Springfield';}, 1500);</script>
+        </body></html>
+        """
+        let page = try await WebViewFetcher().render(html: html)
+        XCTAssertTrue(page.text.contains("Search results: Pat Example"), "got: \(page.text)")
+        XCTAssertFalse(page.text.contains("Loading..."))
+    }
+
+    func testPlainStaticPageReturnsItsText() async throws {
+        let page = try await WebViewFetcher().render(html: "<html><body>No results found</body></html>")
+        XCTAssertTrue(page.text.contains("No results found"))
+    }
+
+    func testRechecksThroughTheWebViewFetcherLikeAnyOtherFetcher() async throws {
+        // A spec checked against a page that only has its content after script runs: a plain fetcher would see "Loading...".
+        struct ScriptedPage: PageFetcher {
+            func fetch(_ url: URL) async throws -> FetchedPage {
+                try await WebViewFetcher().render(html: "<body>Directory <span id=a>Loading...</span><script>setTimeout(()=>a.innerText='No result for this name',800)</script></body>")
+            }
+        }
+        let broker = Broker(id: "b", name: "B", tier: .B, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil,
+                            recheck: Recheck(searchURL: "https://b.example/{first}-{last}", validPage: ["directory"], noResults: ["no result"], ignoreLocation: true))
+        let pat = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
+        let outcome = await Rechecker(fetcher: ScriptedPage()).check(broker, for: pat)
+        XCTAssertEqual(outcome, .removed)
+    }
+}

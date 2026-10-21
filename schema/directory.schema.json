@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Opt-Out Kit directory entry (generated)",
+  "type": "object",
+  "required": ["id", "domain", "name", "bucket", "automation"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "domain": { "type": "string", "minLength": 3 },
+    "name": { "type": "string" },
+    "bucket": { "enum": ["direct", "indirect"] },
+    "tier": { "enum": ["A", "B", "C", "D", null] },
+    "automation": { "enum": ["scriptable", "guided", "needs_browser", "blocked", "robots_disallowed", "unreachable", "unknown"] },
+    "confidence": { "type": "string" },
+    "opt_out_url": { "type": ["string", "null"] },
+    "opt_out_form": {
+      "type": "object",
+      "required": ["page", "method", "fields", "hops"],
+      "additionalProperties": false,
+      "properties": {
+        "page": { "type": "string" },
+        "method": { "type": "string" },
+        "action": { "type": "string" },
+        "hops": { "type": "integer", "minimum": 0 },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "name", "label"],
+            "additionalProperties": false,
+            "properties": { "type": { "type": "string" }, "name": { "type": "string" }, "label": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "family": { "type": "string" },
+    "family_parent": { "type": "string" },
+    "template": { "type": "string" },
+    "search_check": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["calibrated", "blocked", "robots_disallowed", "undifferentiated", "needs_post", "needs_browser", "no_search", "terms_gate"] },
+        "search_url": { "type": "string" },
+        "valid_page": { "type": "array", "items": { "type": "string" } },
+        "no_results": { "type": "array", "items": { "type": "string" } },
+        "ignore_location": { "type": "boolean" },
+        "method": { "enum": ["GET", "POST"] },
+        "needs_browser": { "type": "boolean" },
+        "candidate": {
+          "type": "object",
+          "required": ["method", "url"],
+          "additionalProperties": false,
+          "properties": { "method": { "enum": ["GET", "POST"] }, "url": { "type": "string" }, "body": { "type": ["string", "null"] } }
+        },
+        "body": { "type": "string" },
+        "calibration": { "type": "object" },
+        "checked": { "type": "string" }
+      }
+    },
+    "signals": { "type": "array", "items": { "type": "string" } },
+    "profiled": { "type": "string" }
+  }
+}

@@ -59,18 +59,24 @@ public struct Broker: Codable, Equatable, Identifiable, Sendable {
     public var fields: [String]?
     public var steps: [Step]
     public var recheckDays: Int
+    /// Days the site needs before an opt-out takes effect; the first check waits this long.
+    public var processingDays: Int?
+    /// How to check, with no user input, whether the person is still listed.
+    public var recheck: Recheck?
     /// ISO date of the last real run; nil until a human has verified the flow.
     public var verified: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, tier, covers, signals, fields, steps, verified
+        case id, name, tier, covers, signals, fields, steps, verified, recheck
         case recheckDays = "recheck_days"
+        case processingDays = "processing_days"
     }
 
     public init(id: String, name: String, tier: Tier, covers: [String]?, signals: [String]?, fields: [String]?,
-                steps: [Step], recheckDays: Int, verified: String?) {
+                steps: [Step], recheckDays: Int, verified: String?, processingDays: Int? = nil, recheck: Recheck? = nil) {
         self.id = id; self.name = name; self.tier = tier; self.covers = covers; self.signals = signals
         self.fields = fields; self.steps = steps; self.recheckDays = recheckDays; self.verified = verified
+        self.processingDays = processingDays; self.recheck = recheck
     }
 
     public var isVerified: Bool { verified != nil }

@@ -55,7 +55,11 @@ public struct HouseholdStore {
     public func save(_ household: Household) throws {
         let sealed = try SealedStore.seal(JSONEncoder().encode(household), key: keys.key())
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])
+        #if os(iOS)
+        try sealed.write(to: url, options: [.atomic, .completeFileProtection])   // iOS data protection: unreadable while locked
+        #else
+        try sealed.write(to: url, options: [.atomic])   // macOS (tests, tools) has no per-file data protection
+        #endif
     }
 
     public func erase() throws {

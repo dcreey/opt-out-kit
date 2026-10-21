@@ -96,11 +96,27 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
 }
 
 /// Everyone on this device and each person's own progress. Persisted as one JSON blob by the platform store.
+public struct HouseholdSettings: Codable, Equatable, Sendable {
+    public var termsApproval: TermsApproval?
+    public var consentLog: [ConsentLogEntry] = []
+    public init() {}
+}
+
 public struct Household: Codable, Equatable, Sendable {
     public private(set) var people: [Person] = []
     public private(set) var progress: [UUID: Progress] = [:]
+    var settings = HouseholdSettings()
 
     public init() {}
+
+    enum CodingKeys: String, CodingKey { case people, progress, settings }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        people = try c.decodeIfPresent([Person].self, forKey: .people) ?? []
+        progress = try c.decodeIfPresent([UUID: Progress].self, forKey: .progress) ?? [:]
+        settings = try c.decodeIfPresent(HouseholdSettings.self, forKey: .settings) ?? HouseholdSettings()
+    }
 
     public mutating func add(_ person: Person) {
         guard !people.contains(where: { $0.id == person.id }) else { return }

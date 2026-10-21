@@ -4,10 +4,14 @@ import PackageDescription
 let package = Package(
     name: "OptOutKitCore",
     platforms: [.iOS(.v17), .macOS(.v14)],
-    products: [.library(name: "OptOutKitCore", targets: ["OptOutKitCore"])],
+    products: [
+        .library(name: "OptOutKitCore", targets: ["OptOutKitCore"]),
+        .executable(name: "broker-pipeline", targets: ["broker-pipeline"]),
+    ],
     dependencies: [.package(url: "https://github.com/jpsim/Yams.git", from: "5.1.0")],
     targets: [
         .target(name: "OptOutKitCore", dependencies: ["Yams"]),
+        .executableTarget(name: "broker-pipeline", dependencies: ["OptOutKitCore"]),
         .testTarget(name: "OptOutKitCoreTests", dependencies: ["OptOutKitCore"]),
     ]
 )

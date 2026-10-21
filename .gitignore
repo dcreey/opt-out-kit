@@ -5,3 +5,10 @@ DerivedData/
 xcuserdata/
 *.xcodeproj
 Package.resolved
+App/Info.plist
+.profile-cache/
+.search-cache/
+.tools-venv/
+.tools-browsers/
+.terms-cache/
+.terms-review/

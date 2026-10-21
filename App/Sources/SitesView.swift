@@ -7,7 +7,9 @@ extension StatusSummary {
         case .notStarted: return "circle"
         case .inProgress: return "circle.dotted"
         case .partial: return "circle.lefthalf.filled"
+        case .submitted: return "clock.badge.checkmark"
         case .complete: return "checkmark.circle.fill"
+        case .relisted: return "exclamationmark.arrow.circlepath"
         }
     }
     var color: Color {
@@ -15,7 +17,9 @@ extension StatusSummary {
         case .notStarted: return .secondary
         case .inProgress: return .orange
         case .partial: return .yellow
+        case .submitted: return .blue
         case .complete: return .green
+        case .relisted: return .red
         }
     }
 }
@@ -25,6 +29,8 @@ struct SitesView: View {
     @EnvironmentObject var model: AppModel
     @State private var search = ""
     @State private var filter = Filter.all
+    @State private var showScan = false
+    @State private var showQuick = false
 
     enum Filter: String, CaseIterable, Identifiable {
         case all = "All", todo = "To do", done = "Opted out"
@@ -36,8 +42,8 @@ struct SitesView: View {
             let s = model.household.summary(for: broker)
             switch filter {
             case .all: break
-            case .todo: if s == .complete { return false }
-            case .done: if s != .complete { return false }
+            case .todo: if s.isFinished { return false }
+            case .done: if !s.isFinished { return false }
             }
             guard !search.isEmpty else { return true }
             let q = search.lowercased()
@@ -49,16 +55,45 @@ struct SitesView: View {
         NavigationStack {
             List {
                 Section {
+                    scoreCard
+                    Button { showQuick = true } label: {
+                        Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
+                    }
+                    .accessibilityIdentifier("quick-checks")
+                } footer: {
+                    Text("Look a site up yourself in 20 seconds and tell us what you see. Each look earns points.")
+                }
+                Section {
+                    Button { showScan = true } label: {
+                        Label("Scan where \(model.selectedPerson?.displayName ?? "I") appear", systemImage: "dot.radiowaves.left.and.right")
+                    }
+                    .accessibilityIdentifier("scan-exposure")
+                } footer: {
+                    Text("Searches \(ExposureScan.scannable(model.directory).count) sites that can be checked automatically. Nothing is submitted.")
+                }
+                Section {
                     Picker("Filter", selection: $filter) {
                         ForEach(Filter.allCases) { Text($0.rawValue).tag($0) }
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("sites-filter")
                 }
-                Section("\(shown.count) of \(model.brokers.count) sites") {
+                Section("\(shown.count) guided sites") {
                     ForEach(shown) { broker in
                         NavigationLink(value: broker) { row(broker) }
                             .accessibilityIdentifier("site-\(broker.id)")
+                    }
+                }
+                if filter != .done {
+                    Section {
+                        ForEach(shownDirectory.prefix(300)) { entry in
+                            NavigationLink(value: entry) { directoryRow(entry) }
+                                .accessibilityIdentifier("dir-\(entry.id)")
+                        }
+                    } header: {
+                        Text("\(shownDirectory.count) more sites")
+                    } footer: {
+                        Text("Found automatically. We haven't written step-by-step guidance for these yet, so the tier is a guess from the page.")
                     }
                 }
             }
@@ -66,6 +101,46 @@ struct SitesView: View {
             .navigationTitle("Sites")
             .searchable(text: $search, prompt: "Search by name or web address")
             .navigationDestination(for: Broker.self) { BrokerInfoView(broker: $0) }
+            .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
+            .sheet(isPresented: $showScan) { ExposureView() }
+            .sheet(isPresented: $showQuick) { QuickCheckView() }
+        }
+    }
+
+    private var scoreCard: some View {
+        let score = model.score
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(score.level.name).font(.headline)
+                Spacer()
+                Text("\(score.points) pts").font(.headline).foregroundStyle(.tint)
+                    .accessibilityIdentifier("score-points")
+            }
+            if let next = score.nextLevelAt {
+                ProgressView(value: Double(score.points - score.level.from), total: Double(next - score.level.from))
+                Text("\(next - score.points) points to the next level").font(.caption).foregroundStyle(.secondary)
+            } else {
+                Text("Top level").font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var shownDirectory: [DirectoryEntry] {
+        let q = search.lowercased()
+        return model.unguidedSites.filter { q.isEmpty || $0.domain.lowercased().contains(q) }
+    }
+
+    private func directoryRow(_ e: DirectoryEntry) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(e.domain).font(.headline)
+                Text(e.automation.label).font(.caption).foregroundStyle(.secondary)
+                let n = Directory.familySize(of: e, in: model.directory)
+                if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
+            }
+            Spacer()
+            Text(e.tier.map { "Tier \($0.rawValue)?" } ?? "Tier ?").font(.caption2)
+                .padding(.horizontal, 6).padding(.vertical, 2).background(.quaternary, in: Capsule())
         }
     }
 
@@ -92,6 +167,9 @@ struct BrokerInfoView: View {
     @EnvironmentObject var model: AppModel
     let broker: Broker
     @State private var openFlow = false
+    @State private var scans: [UUID: ScanState] = [:]
+
+    enum ScanState: Equatable { case running, done(CheckOutcome) }
 
     var body: some View {
         let summary = model.household.summary(for: broker)
@@ -117,6 +195,9 @@ struct BrokerInfoView: View {
                         Spacer()
                         Button(buttonTitle(item.status)) { model.select(item.person.id); openFlow = true }
                             .buttonStyle(.bordered)
+                    }
+                    if broker.recheck != nil {
+                        scanRow(item.person)
                     }
                 }
             }
@@ -162,12 +243,58 @@ struct BrokerInfoView: View {
         .navigationDestination(isPresented: $openFlow) { BrokerDetailView(broker: broker) }
     }
 
+    /// "Does this site have my data?" Read-only: searches the site and reports, nothing is saved or sent beyond the search.
+    private func scanRow(_ person: Person) -> some View {
+        HStack {
+            Button("Check for \(person.displayName)'s listing", systemImage: "magnifyingglass") {
+                scans[person.id] = .running
+                Task { scans[person.id] = .done(await model.scan(broker, for: person)) }
+            }
+            .font(.footnote)
+            .disabled(scans[person.id] == .running)
+            .accessibilityIdentifier("scan-\(person.id.uuidString)")
+            Spacer()
+            switch scans[person.id] {
+            case .none: EmptyView()
+            case .running: ProgressView()
+            case .done(let outcome):
+                Text(scanText(outcome)).font(.footnote.bold()).foregroundStyle(scanColor(outcome))
+                    .accessibilityIdentifier("scan-result")
+            }
+        }
+    }
+
+    private func scanText(_ o: CheckOutcome) -> String {
+        switch o.result {
+        case .stillListed: return "Listing found"
+        case .removed: return "No listing found"
+        case .inconclusive:
+            switch o.reason {
+            case .blocked: return "Can't tell: site blocked the check"
+            case .unrecognizedPage: return "Can't tell: page looked different"
+            case .network: return "Can't tell: no connection"
+            case .missingProfileData: return "Add a full name and city first"
+            default: return "Can't tell"
+            }
+        }
+    }
+
+    private func scanColor(_ o: CheckOutcome) -> Color {
+        switch o.result {
+        case .stillListed: return .red
+        case .removed: return .green
+        case .inconclusive: return .orange
+        }
+    }
+
     private func describe(_ status: PersonStatus) -> String {
         switch status {
         case .notStarted: return "Not started"
         case .inProgress(let d, let n): return "In progress: \(d) of \(n) steps"
         case .done(let on, let due):
-            return "Opted out \(on.formatted(date: .abbreviated, time: .omitted)); re-check \(due.formatted(date: .abbreviated, time: .omitted))"
+            return "Submitted \(on.formatted(date: .abbreviated, time: .omitted)); checking from \(due.formatted(date: .abbreviated, time: .omitted))"
+        case .verified(let since): return "Verified removed \(since.formatted(date: .abbreviated, time: .omitted))"
+        case .relisted(let on): return "Listed again \(on.formatted(date: .abbreviated, time: .omitted))"
         }
     }
 
@@ -175,7 +302,209 @@ struct BrokerInfoView: View {
         switch status {
         case .notStarted: return "Start"
         case .inProgress: return "Continue"
-        case .done: return "View"
+        case .done, .verified: return "View"
+        case .relisted: return "Redo"
         }
+    }
+}
+
+
+/// A site we found automatically: what we know, what we are guessing, and a link to its own opt-out page.
+struct DirectoryInfoView: View {
+    @EnvironmentObject var model: AppModel
+    let entry: DirectoryEntry
+    @State private var browserURL: URL?
+
+    var body: some View {
+        List {
+            Section {
+                Text(entry.automation.label).font(.headline)
+                if let tier = entry.tier {
+                    Text("Provisional tier \(tier.rawValue): \(Describe.tier(tier))").font(.footnote)
+                }
+                Text("This is a guess from the shape of the site's opt-out page (\(entry.confidence ?? "unknown") confidence). It becomes a guided flow once someone walks it for real.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            let n = Directory.familySize(of: entry, in: model.directory)
+            if let parent = entry.familyParent, n > 1 {
+                Section("Shared opt-out") {
+                    Text("\(n) sites send their opt-outs to \(parent), so one request may clear them all. Not yet confirmed by a real run.")
+                }
+            }
+            if let form = entry.optOutForm {
+                Section {
+                    ForEach(Array(form.fields.enumerated()), id: \.offset) { _, f in
+                        Label(f.display, systemImage: f.type == "email" ? "envelope" : "text.cursor")
+                    }
+                    if let host = form.action?.host { Text("Submits to \(host)").font(.footnote).foregroundStyle(.secondary) }
+                } header: {
+                    Text("The opt-out form")
+                } footer: {
+                    Text("Found automatically by following links from the home page (\(form.hops) hop\(form.hops == 1 ? "" : "s")). Nothing here has been submitted.")
+                }
+            }
+            if let check = entry.searchCheck {
+                Section("Checking if you're listed") {
+                    Label(check.statusLabel, systemImage: check.status == .calibrated ? "checkmark.seal" : "questionmark.circle")
+                }
+            }
+            if let url = entry.optOutURL {
+                Section("Its opt-out page") {
+                    Button("Open in Safari", systemImage: "safari") { browserURL = url }
+                    Text(url.absoluteString).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            if let signals = entry.signals, !signals.isEmpty {
+                Section("What we noticed") {
+                    ForEach(signals, id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") }
+                }
+            }
+            Section("Source") {
+                Text(entry.bucket == "direct" ? "Listed as directly supported by an opt-out service." : "Listed as a mirror of another site.")
+                if let d = entry.profiled { Text("Profiled \(d)").font(.footnote).foregroundStyle(.secondary) }
+            }
+        }
+        .navigationTitle(entry.domain)
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
+    }
+}
+
+
+/// "Where am I listed?": runs the scan for the selected person and groups what it found.
+struct ExposureView: View {
+    @EnvironmentObject var model: AppModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var confirmed = false
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if let person = model.selectedPerson {
+                    let results = model.exposure[person.id]
+                    if let progress = model.scanProgress {
+                        Section {
+                            ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
+                            Text("Checked \(progress.done) of \(progress.total) sites").font(.footnote)
+                        }
+                    } else if let results {
+                        summary(results)
+                        group("Listed", .stillListed, results, color: .red)
+                        group("Not found", .removed, results, color: .green)
+                        group("Could not tell", .inconclusive, results, color: .orange)
+                    } else {
+                        Section {
+                            Text("This searches each site for \(person.displayName) the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.")
+                            Button("Scan \(ExposureScan.scannable(model.directory).count) sites", systemImage: "play.fill") {
+                                Task { await model.scanExposure(for: person) }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .accessibilityIdentifier("start-scan")
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Where you're listed")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+
+    private func summary(_ results: [ScanResult]) -> some View {
+        let listed = results.filter { $0.outcome.result == .stillListed }.count
+        return Section {
+            Text("Found a listing on \(listed) of \(results.count) sites checked.").font(.headline)
+                .accessibilityIdentifier("scan-summary")
+        }
+    }
+
+    @ViewBuilder
+    private func group(_ title: String, _ result: CheckResult, _ all: [ScanResult], color: Color) -> some View {
+        let rows = all.filter { $0.outcome.result == result }
+        if !rows.isEmpty {
+            Section("\(title) (\(rows.count))") {
+                ForEach(rows) { r in
+                    NavigationLink {
+                        DirectoryInfoView(entry: r.entry)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            Text(r.entry.domain)
+                            if result == .inconclusive {
+                                Text(reason(r.outcome.reason)).font(.caption).foregroundStyle(color)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func reason(_ r: InconclusiveReason?) -> String {
+        switch r {
+        case .blocked: return "The site blocked the check"
+        case .unrecognizedPage: return "The page looked different than expected"
+        case .network: return "No connection"
+        case .missingProfileData: return "Add a full name (and city) to this profile"
+        case .needsBrowser: return "Needs a browser check"
+        case .termsGate: return "Behind terms you must accept yourself"
+        default: return "Could not tell"
+        }
+    }
+}
+
+
+/// One site at a time: open its search, look for yourself, tell us. Points come from looking, not from the answer.
+struct QuickCheckView: View {
+    @EnvironmentObject var model: AppModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var skipped = Set<String>()
+    @State private var browserURL: URL?
+    @State private var lastEarned: Int?
+
+    private var current: DirectoryEntry? { model.quickCheckQueue.first { !skipped.contains($0.id) } }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack {
+                        Text(model.score.level.name).font(.headline)
+                        Spacer()
+                        Text("\(model.score.points) pts").bold().accessibilityIdentifier("quick-points")
+                    }
+                    if let lastEarned {
+                        Label("+\(lastEarned) points", systemImage: "sparkles").foregroundStyle(.green)
+                            .accessibilityIdentifier("earned")
+                    }
+                }
+                if let site = current, let person = model.selectedPerson {
+                    Section {
+                        Text(site.domain).font(.title3.bold())
+                        Text("Open the site, search for \(person.displayName), and see if a listing comes up.")
+                        Button("Open \(site.domain)", systemImage: "safari") { browserURL = site.lookupURL(for: person) }
+                            .buttonStyle(.bordered)
+                    }
+                    Section("What did you see?") {
+                        answer("I'm listed here", .stillListed, +3, site, "exclamationmark.triangle", .red)
+                        answer("Not found", .removed, +5, site, "checkmark.circle", .green)
+                        Button("Skip this one") { skipped.insert(site.id); lastEarned = nil }
+                            .accessibilityIdentifier("answer-skip")
+                    }
+                } else {
+                    Section { Text("You're all caught up. Check back later: listings come back.") }
+                }
+            }
+            .navigationTitle("Quick checks")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
+        }
+    }
+
+    private func answer(_ title: String, _ result: CheckResult, _ points: Int, _ site: DirectoryEntry, _ symbol: String, _ color: Color) -> some View {
+        Button { model.recordSelfCheck(result, site: site); lastEarned = points } label: {
+            Label(title, systemImage: symbol).foregroundStyle(color)
+        }
+        .accessibilityIdentifier(result == .removed ? "answer-clean" : "answer-listed")
     }
 }

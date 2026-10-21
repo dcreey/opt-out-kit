@@ -1,0 +1,38 @@
+name: Broker pipeline
+
+# Read-only dry run of every broker definition against the live web, plus a reachability census.
+# Nothing is submitted and no personal data is used: calibration searches a made-up name and "John Smith".
+#   PASS            pages load and the check separates the two names
+#   FAIL            a page changed or a definition is wrong: fix it (this fails the job)
+#   BLOCKED         the site refuses this runner (GitHub's addresses are often blocked; not a failure)
+#   NEEDS RESEARCH  the broker has no `recheck:` block yet
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["brokers/**", "schema/**", "Packages/OptOutKitCore/Sources/**"]
+
+jobs:
+  pipeline:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the pipeline
+        working-directory: Packages/OptOutKitCore
+        run: |
+          swift run -c release broker-pipeline \
+            --brokers ../../brokers \
+            --directory ../../directory \
+            --census ../../pipeline/census-sites.txt \
+            --report "$RUNNER_TEMP/pipeline-report.md"
+      - name: Publish the report
+        if: always()
+        run: |
+          cat "$RUNNER_TEMP/pipeline-report.md" >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-report
+          path: ${{ runner.temp }}/pipeline-report.md

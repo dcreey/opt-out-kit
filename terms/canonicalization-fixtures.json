@@ -1,0 +1,32 @@
+[
+  {
+    "domain": "alabamaarrests.org",
+    "input": "Welcome to Alabama Arrests (www.alabamaarrests.org). Copyright ©2011-2026 alabamaarrests.org. All rights reserved.",
+    "canonical": "welcome to {site} ({domain}). copyright {year}-{year} {domain}. all rights reserved.",
+    "hash": "68a14acaba4c806e"
+  },
+  {
+    "domain": "ctarrests.org",
+    "input": "CT Arrests lists records in Connecticut. Visit ctarrests.org/terms — it’s our “terms”.",
+    "canonical": "{site} lists records in {state}. visit {domain}/terms - it's our \"terms\".",
+    "hash": "0cb373c39bf7b919"
+  },
+  {
+    "domain": "texascourtrecords.us",
+    "input": "TexasCourtRecords.us is not a consumer reporting agency. Texas Court Records may be incomplete.",
+    "canonical": "{domain} is not a consumer reporting agency. {state} court records may be incomplete.",
+    "hash": "6c9407aa76baf761"
+  },
+  {
+    "domain": "usrecords.net",
+    "input": "By clicking \"I Agree\" you consent to our Terms (c) 2025.   Extra   spaces\n\nand lines.",
+    "canonical": "by clicking \"i agree\" you consent to our terms {year}. extra spaces and lines.",
+    "hash": "d2145c774abf934d"
+  },
+  {
+    "domain": "example.com",
+    "input": "New York and North Carolina and Oregon are states; in 1989 and 2040 are not years we replace.",
+    "canonical": "{state} and {state} and {state} are states; in 1989 and 2040 are not years we replace.",
+    "hash": "197c1188c0d394a3"
+  }
+]

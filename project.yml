@@ -19,14 +19,25 @@ targets:
       - path: brokers
         type: folder
         buildPhase: resources
+      - path: directory
+        type: folder
+        buildPhase: resources
+      - path: terms
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: OptOutKitCore
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: "Opt-Out Kit"
+        UILaunchScreen: {}
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_CFBundleDisplayName: "Opt-Out Kit"
+        GENERATE_INFOPLIST_FILE: NO
   OptOutKitTests:
     type: bundle.unit-test
     platform: iOS

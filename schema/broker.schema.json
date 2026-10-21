@@ -13,6 +13,29 @@
     "fields": { "type": "array", "items": { "type": "string" } },
     "recheck_days": { "type": "integer", "minimum": 1 },
     "verified": { "type": ["string", "null"] },
+    "processing_days": { "type": "integer", "minimum": 0 },
+    "recheck": {
+      "type": "object",
+      "required": ["search_url", "valid_page"],
+      "additionalProperties": false,
+      "properties": {
+        "search_url": { "type": "string" },
+        "valid_page": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "no_results": { "type": "array", "items": { "type": "string" } },
+        "needs_browser": { "type": "boolean" },
+        "ignore_location": { "type": "boolean" },
+        "calibration": {
+          "type": "object",
+          "required": ["listed_name"],
+          "additionalProperties": false,
+          "properties": {
+            "listed_name": { "type": "string" },
+            "city": { "type": "string" },
+            "state": { "type": "string" }
+          }
+        }
+      }
+    },
     "steps": {
       "type": "array",
       "minItems": 1,

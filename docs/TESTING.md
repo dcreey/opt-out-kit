@@ -14,3 +14,21 @@ TODO: mock broker site for UI flow tests, fake inbox for `wait_for_email`, live-
 
 Build locally: `brew install xcodegen && xcodegen generate`, then open `OptOutKit.xcodeproj`
 (generated, git-ignored).
+
+## Broker pipeline (live, read-only)
+
+`broker-pipeline` dry-runs every `brokers/*.yml` against the live web and reports PASS, FAIL, BLOCKED or NEEDS RESEARCH
+(see `.github/workflows/pipeline.yml`, weekly and on broker changes). For each broker it loads every step page and,
+when the broker has a `recheck:` block, searches a made-up name (must read as removed) and a known common name
+(must read as still listed). That pair is how it tells a working check from a silently broken one.
+
+It also runs a reachability census over `pipeline/census-sites.txt`, to size how many sites a plain request can reach.
+
+```bash
+cd Packages/OptOutKitCore
+swift run broker-pipeline --brokers ../../brokers --census ../../pipeline/census-sites.txt
+# Optional local scan of a real person, never for CI or commits:
+swift run broker-pipeline --brokers ../../brokers --person "First Last|City|ST"
+```
+
+To bring a site into the pipeline, add a `recheck:` block with a `calibration:` name to its YAML.
