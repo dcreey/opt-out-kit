@@ -20,8 +20,8 @@ def first_open(path):
 
 def directory_form_page(path):
     text = open(path).read()
-    m = re.search(r"^opt_out_form:\s*\n\s+page:\s*(\S+)", text, re.M)
-    return m.group(1).strip("\"'") if m else None
+    m = re.search(r'^opt_out_form: \{"page": "([^"]+)"', text, re.M)
+    return m.group(1) if m else None
 
 
 def healthy(fetcher, url):
