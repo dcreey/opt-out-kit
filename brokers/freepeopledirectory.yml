@@ -5,7 +5,13 @@ signals: [search_first]
 fields: [full_name]
 steps:
   - open: https://www.freepeopledirectory.com
-  - say: "PLACEHOLDER: the site is sponsored by Spokeo; find its removal route (the design suggests it follows Spokeo's opt-out)."
+  - say: "Search for yourself and copy the address of your listing. Its footer \"Do Not Sell My Info\" link goes to Spokeo, which runs the opt-out."
+    confirm: true
+  - open: https://www.spokeo.com/optout
+  - say: "Paste your listing's address and enter your email. Solve the check if one appears."
+  - wait_for_email:
+      within_minutes: 60
+  - say: "Open the confirmation link from the email."
     confirm: true
 recheck_days: 120
 processing_days: 3
@@ -17,4 +23,5 @@ recheck:
   no_results: ["No Result for"]
   ignore_location: true
   calibration: { listed_name: "John Smith" }
+# Route checked 2026-10-21: the site's 'Do Not Sell My Info' link goes to spokeo.com/privacy/control, which leads to spokeo.com/optout.
 verified: null
