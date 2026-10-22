@@ -3,10 +3,11 @@ name: Refresh directory
 # Re-profiles every site (and checks every hand-written broker link) in pipeline/census-sites.txt (polite, robots.txt honored, about 1 request per second per site)
 # and opens a pull request when the generated directory/ files change. Nothing is merged automatically: a person
 # reviews the diff, which is how a changed opt-out page gets noticed.
+# DISABLED for now: runs only when started by hand from the Actions tab. Original triggers are kept below, commented out.
 on:
-  schedule:
-    - cron: "0 13 * * 1"   # weekly, Mondays
   workflow_dispatch:
+  # schedule:
+  #   - cron: "0 13 * * 1"   # weekly, Mondays
 
 permissions:
   contents: write

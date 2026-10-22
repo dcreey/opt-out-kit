@@ -6,13 +6,14 @@ name: Broker pipeline
 #   FAIL            a page changed or a definition is wrong: fix it (this fails the job)
 #   BLOCKED         the site refuses this runner (GitHub's addresses are often blocked; not a failure)
 #   NEEDS RESEARCH  the broker has no `recheck:` block yet
+# DISABLED for now: runs only when started by hand from the Actions tab. Original triggers are kept below, commented out.
 on:
-  schedule:
-    - cron: "0 14 * * 1"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ["brokers/**", "schema/**", "Packages/OptOutKitCore/Sources/**"]
+  # schedule:
+  #   - cron: "0 14 * * 1"
+  # push:
+  #   branches: [main]
+  #   paths: ["brokers/**", "schema/**", "Packages/OptOutKitCore/Sources/**"]
 
 jobs:
   pipeline:

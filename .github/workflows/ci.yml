@@ -1,9 +1,11 @@
 name: CI
 
+# DISABLED for now: runs only when started by hand from the Actions tab. Original triggers are kept below, commented out.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  # pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
