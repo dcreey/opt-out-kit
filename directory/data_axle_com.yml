@@ -13,3 +13,6 @@ template: "t_e6d55b"
 registered_in: [CA, OR, TX]
 signals: [email_input, listing_url_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: ["certify: By submitting, I understand that I may be required to verify my identity to complete this request, and I authorize Data Axle to contact me i"]

@@ -13,7 +13,7 @@ final class PlatformAppTests: XCTestCase {
     private func setUp(_ m: AppModel, state: String?) -> Person {
         var me = m.people.first { $0.relationship == .me }!
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: state ?? "")]
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: state ?? "", zip: "62701")]
         m.update(me)
         m.setContactEmail("pat@example.com")
         return me
@@ -34,7 +34,7 @@ final class PlatformAppTests: XCTestCase {
         _ = setUp(m, state: "CA")
         XCTAssertEqual(m.platformQueue.map(\.id), ["ca-drop"])
         var mum = try XCTUnwrap(m.addPerson(named: "Mum", relationship: .parent))
-        mum.addresses = [Address(street: "2 Oak St", city: "Chicago", state: "IL")]
+        mum.addresses = [Address(street: "2 Oak St", city: "Chicago", state: "IL", zip: "62701")]
         m.update(mum); m.select(mum.id)
         XCTAssertTrue(m.platformQueue.isEmpty, "Mum lives in Illinois, whatever the owner's address says")
     }
@@ -93,7 +93,7 @@ final class HandledOnceTests: XCTestCase {
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: state)]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: state, zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         return (m, me)
     }
@@ -198,7 +198,7 @@ final class ProfileGateAppTests: XCTestCase {
         XCTAssertTrue(m.assistedItems(for: m.selectedPerson!).isEmpty)
         var me = m.people.first { $0.relationship == .me }!
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL")]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         m.profileGateFinished(completed: true)
         XCTAssertEqual(ran, 1, "carries on with what the person was doing")
@@ -223,7 +223,7 @@ final class AutomaticRunAppTests: XCTestCase {
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL")]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         final class Seen: FormSubmitter, @unchecked Sendable {
             func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
@@ -248,6 +248,20 @@ final class AutomaticRunAppTests: XCTestCase {
             m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: outcome, detail: "x"), site: entry.id)
             XCTAssertEqual(m.method(for: entry).method, expected, outcome)
         }
+    }
+}
+
+final class RunReportTests: XCTestCase {
+    private func row(_ id: String, _ r: AutoOptOutResult) -> AppModel.AutoOptOutRow { .init(id: id, domain: "\(id).com", result: r) }
+
+    func testAnAllSentRunIsAllSucceededAndAMixedOneListsWhatNeedsThePerson() {
+        let ok = RunReport(person: "Me", rows: [row("a", .submitted(awaitingEmail: false)), row("b", .submitted(awaitingEmail: true)), row("c", .tooSoon(until: Date()))])
+        XCTAssertTrue(ok.allSucceeded); XCTAssertEqual(ok.sent, 2); XCTAssertEqual(ok.attempted, 2, "a site skipped as recently sent was not tried")
+        let mixed = RunReport(person: "Me", rows: [row("a", .submitted(awaitingEmail: false)), row("b", .failed("no confirmation")), row("c", .challenged("bot check")), row("d", .skippedNotListed)])
+        XCTAssertFalse(mixed.allSucceeded)
+        XCTAssertEqual(mixed.attempted, 3); XCTAssertEqual(mixed.sent, 1)
+        XCTAssertEqual(mixed.needYou.map(\.id), ["b", "c"])
+        XCTAssertFalse(RunReport(person: "Me", rows: []).allSucceeded, "nothing tried is not a success")
     }
 }
 
@@ -289,7 +303,7 @@ final class StateRulesAppTests: XCTestCase {
         m.setOwnerState("TX")
         XCTAssertEqual(m.ownerStateCode, "TX")
         var me = try XCTUnwrap(m.selectedPerson)
-        me.addresses = [Address(street: "1 A St", city: "Salem", state: "Oregon")]
+        me.addresses = [Address(street: "1 A St", city: "Salem", state: "Oregon", zip: "62701")]
         m.update(me)
         XCTAssertEqual(m.ownerStateCode, "OR", "a full state name in the address is understood")
     }

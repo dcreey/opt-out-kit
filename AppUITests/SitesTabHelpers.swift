@@ -14,7 +14,7 @@ extension XCUIApplication {
     /// With the profile editor open: fills the required details (legal name, current address and, for the owner, the email)
     /// with a made-up person. Pass `email: nil` for a relative's profile, which has no email field.
     func fillRequiredProfile(first: String = "Pat", last: String = "Example", street: String = "1 Main St", city: String = "Springfield",
-                             state: String = "IL", email: String? = "pat@example.com") {
+                             state: String = "IL", zip: String = "62701", email: String? = "pat@example.com") {
         func type(_ id: String, _ text: String) {
             let f = textFields[id]
             var tries = 0
@@ -24,7 +24,7 @@ extension XCUIApplication {
             f.tap(); f.typeText(text)
         }
         type("legal-first", first); type("legal-last", last)
-        type("current-street", street); type("current-city", city); type("current-state", state)
+        type("current-street", street); type("current-city", city); type("current-state", state); type("current-zip", zip)
         if let email { type("contact-email", email) }
     }
 }

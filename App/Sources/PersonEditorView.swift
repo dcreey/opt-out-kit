@@ -142,6 +142,13 @@ struct PersonEditorView: View {
                 TextField("City", text: currentAddress(\.city, default: "")).accessibilityIdentifier("current-city")
                 TextField("State", text: currentAddress(\.state, default: "")).frame(maxWidth: 70).accessibilityIdentifier("current-state")
             }
+            TextField("ZIP code", text: Binding(
+                get: { person.addresses.first?.zip ?? "" },
+                set: { v in
+                    if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
+                    person.addresses[0].zip = v.isEmpty ? nil : v
+                }))
+                .keyboardType(.numbersAndPunctuation).textContentType(.postalCode).accessibilityIdentifier("current-zip")
             if person.relationship == .me { emailRows }
             let missing = person.missingRequiredDetails + (person.relationship == .me && model.formEmail == nil ? [L10n.noun("Email address")] : [])
             if !missing.isEmpty {
@@ -210,6 +217,10 @@ struct PersonEditorView: View {
                             TextField("City", text: $person.addresses[i].city)
                             TextField("State", text: $person.addresses[i].state).frame(maxWidth: 70)
                         }
+                        TextField("ZIP code", text: Binding(
+                            get: { person.addresses[i].zip ?? "" },
+                            set: { person.addresses[i].zip = $0.isEmpty ? nil : $0 }))
+                            .keyboardType(.numbersAndPunctuation).textContentType(.postalCode)
                         HStack {
                             TextField("From year", value: $person.addresses[i].fromYear, format: .number.grouping(.never))
                             TextField("To year", value: $person.addresses[i].toYear, format: .number.grouping(.never))

@@ -32,7 +32,7 @@ public struct MethodVerdict: Equatable, Sendable {
 public enum OptOutMethods {
     /// A person with every detail a form could ask for, so the answer does not depend on who is using the app.
     private static func complete(confirmingIdentity: Bool) -> Person { Person(displayName: "Complete", relationship: confirmingIdentity ? .me : .otherFamily, names: [NameEntry(kind: .legal, name: "Pat Example")],
-                                         addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL")],
+                                         addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")],
                                          emails: ["pat@example.com"], phones: ["555-0100"], birthdate: "1980-01-01", confirmsOwnIdentity: confirmingIdentity) }
 
     /// `confirmingIdentity` is true for the account owner when they have allowed "I am this person" boxes to be ticked for them.

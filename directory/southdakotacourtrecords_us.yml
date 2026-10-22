@@ -18,5 +18,5 @@ search_check:
   candidate: {"method": "POST", "url": "https://southdakotacourtrecords.us/search/loading/", "body": "firstName={first}&lastName={last}&city={city}&state={state}"}
   checked: "2026-10-21"
 live_check:
-  checked: "2026-10-21"
+  checked: "2026-10-22"
   blockers: []

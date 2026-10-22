@@ -16,5 +16,5 @@ search_check:
   candidate: {"method": "POST", "url": "https://infotracer.com/loading/?ltid=home&mercSubId=home-name&type=name&searchTab=name", "body": "smartSpeedLoader=0&firstname={first}&lastname={last}&city={city}&state={state}"}
   checked: "2026-10-21"
 live_check:
-  checked: "2026-10-21"
+  checked: "2026-10-22"
   blockers: []

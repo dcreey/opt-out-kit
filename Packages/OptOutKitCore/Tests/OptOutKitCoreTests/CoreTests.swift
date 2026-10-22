@@ -1770,23 +1770,29 @@ final class ListingFlowTests: XCTestCase {
 final class RequiredDetailsTests: XCTestCase {
     func testAProfileNeedsALegalFirstAndLastNameAndACurrentAddress() {
         var p = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat")])
-        XCTAssertEqual(p.missingRequiredDetails, ["legal last name", "current street address", "current city", "current state"])
+        XCTAssertEqual(p.missingRequiredDetails, ["legal last name", "current street address", "current city", "current state", "current zip code"])
         XCTAssertFalse(p.isComplete)
         p.names = [NameEntry(kind: .legal, name: "Pat Example")]
         p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL")]
+        XCTAssertEqual(p.missingRequiredDetails, ["current zip code"], "a ZIP code is required too")
+        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         XCTAssertTrue(p.isComplete); XCTAssertEqual(p.missingRequiredDetails, [])
+        p.addresses.append(Address(street: "1 Old Rd", city: "Peoria", state: "IL"))
+        XCTAssertEqual(p.missingRequiredDetails, ["zip code for a previous address"], "a previous address that was started needs its ZIP too")
+        p.addresses[1].zip = "61602"
+        XCTAssertTrue(p.isComplete)
     }
 
     func testANicknameOrAPreviousAddressDoesNotMakeAProfileComplete() {
         let p = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: ""), NameEntry(kind: .nickname, name: "Patty Example")],
-                       addresses: [Address(city: "", state: ""), Address(street: "1 Old Rd", city: "Springfield", state: "IL")])
+                       addresses: [Address(city: "", state: ""), Address(street: "1 Old Rd", city: "Springfield", state: "IL", zip: "62701")])
         XCTAssertTrue(p.missingRequiredDetails.contains("legal first name"))
         XCTAssertTrue(p.missingRequiredDetails.contains("current street address"), "only the first address is the current one")
     }
 
     func testBlankSpacesDoNotCount() {
-        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "  ", city: " ", state: "IL")])
-        XCTAssertEqual(p.missingRequiredDetails, ["current street address", "current city"])
+        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "  ", city: " ", state: "IL", zip: " ")])
+        XCTAssertEqual(p.missingRequiredDetails, ["current street address", "current city", "current zip code"])
     }
 }
 
@@ -2233,5 +2239,33 @@ final class PlanTests: XCTestCase {
         XCTAssertEqual(queue.flatMap(\.tasks).count, steps.flatMap(\.tasks).count)
         XCTAssertEqual(queue.first?.rank, .localOfficial)
         XCTAssertEqual(queue.map(\.rank), queue.map(\.rank).sorted())
+    }
+}
+
+final class RequestAcknowledgementTests: XCTestCase {
+    func testTheDataAxleFamilyNoteAboutVerifyingIdentityCountsAsTheOwnersOwnBox() {
+        let note = "By submitting, I understand that I may be required to verify my identity to complete this request, and I authorize Data Axle to contact me if needed."
+        XCTAssertTrue(FormFiller.isSelfIdentityBox(note))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox("I agree to the terms of use and I authorize you to contact me about offers."))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox("I may be required to verify my identity and I authorize you to contact me and share my data with third parties."))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox("I agree to ROQAD emailing me the newsletter."))
+    }
+}
+
+final class MeasuredAutomaticTests: XCTestCase {
+    func testDataAxleIsFullyAutomaticForTheOwnerBecauseItOnlyNotesThatItMayVerifyIdentity() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        for domain in ["data-axle.com", "donorbase.com", "exactdata.com", "usadata.com"] {
+            let e = try XCTUnwrap(entries.first { $0.domain == domain }, domain)
+            XCTAssertNotNil(e.liveCheck, "\(domain) was loaded on a real page")
+            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic, domain)
+            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: false).method, .semiAutomatic, "family profiles still do it themselves: \(domain)")
+        }
+        // Sites with a visible bot check stay semi-automated.
+        let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }
+        XCTAssertFalse(withCheck.isEmpty)
+        for e in withCheck { XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, e.domain) }
     }
 }

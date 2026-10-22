@@ -173,8 +173,8 @@ final class AssistedRunnerTests: XCTestCase {
         var me = try XCTUnwrap(m.selectedPerson)
         XCTAssertTrue(m.assistedItems(for: me).isEmpty, "with no name or email there is nothing to fill in")
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
-        me.addresses = [Address(city: "Springfield", state: "IL")]
-        m.update(me)
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
         let queue = m.assistedItems(for: me)
         XCTAssertGreaterThan(queue.count, 50)
         // once a site is recorded as sent it leaves the queue for a week
@@ -189,7 +189,7 @@ final class AssistedRunnerTests: XCTestCase {
 @MainActor
 final class WebAssistedDriverTests: XCTestCase {
     private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
-                            addresses: [Address(city: "Springfield", state: "IL")], emails: ["pat@example.com"])
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
 
     private func page(removeAfterMs: Int, blocker: String) -> String {
         """

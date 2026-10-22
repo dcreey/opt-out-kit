@@ -44,7 +44,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = try XCTUnwrap(model.selectedPerson)
         me.names = [NameEntry(kind: .legal, name: "John Smith")]
-        me.addresses = [Address(street: "1 Main St", city: "Chicago", state: "IL")]
+        me.addresses = [Address(street: "1 Main St", city: "Chicago", state: "IL", zip: "62701")]
         XCTAssertTrue(me.isComplete)
         model.update(me)
         model.setContactEmail("pat@gmail.com")          // forms get pat+optoutkit@gmail.com

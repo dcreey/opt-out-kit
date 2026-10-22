@@ -12,3 +12,6 @@ opt_out_form: {"page": "https://instantdata.atdata.com/optout", "method": "post"
 registered_in: [CA, OR, TX]
 signals: [email_input, mail_option, name_input, opt_out_form_found, search_first]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: []

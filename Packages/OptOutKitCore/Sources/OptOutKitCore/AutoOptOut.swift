@@ -145,6 +145,10 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var optOutEnabled = false
     public var lastScan: Date?
     public var lastOptOut: Date?
+    /// What the last opt-out run did, so the result can still be seen after the app is closed.
+    public var lastAttempted: Int?          // sites it actually tried
+    public var lastSent: Int?
+    public var lastNeedYou: Int?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
     public static let optOutEvery: TimeInterval = 7 * 86_400      // weekly

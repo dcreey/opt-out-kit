@@ -22,7 +22,7 @@ final class ContactEmailAppTests: XCTestCase {
         var p = m.people.first { $0.relationship == .me }!
         if let relationship { p = m.addPerson(named: name, relationship: relationship)! }
         p.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL")]
+        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(p)
         return p
     }

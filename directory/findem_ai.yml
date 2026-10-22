@@ -12,3 +12,6 @@ opt_out_form: {"page": "https://www.findem.ai/privacy-rights", "method": "post",
 registered_in: [CA]
 signals: [email_input, listing_url_input, name_input, opt_out_form_found]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: []

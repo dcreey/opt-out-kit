@@ -17,5 +17,5 @@ search_check:
   candidate: {"method": "GET", "url": "https://www.georgiaarrests.org/Results?fname={first}&lname={last}&stage=1&rType=Warrant&state={state}&city={city}", "body": null}
   checked: "2026-10-21"
 live_check:
-  checked: "2026-10-21"
+  checked: "2026-10-22"
   blockers: []

@@ -38,7 +38,7 @@ final class PeopleTests: XCTestCase {
         let first = makeModel(url: url, keys: keys)
         var me = try XCTUnwrap(first.selectedPerson)
         me.names = [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .nickname, name: "Pat")]
-        me.addresses = [Address(city: "Springfield", state: "IL", fromYear: 2015)]
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701", fromYear: 2015)]
         first.update(me)
 
         let second = makeModel(url: url, keys: keys)
@@ -119,7 +119,7 @@ final class CheckWiringTests: XCTestCase {
         let spokeo = try XCTUnwrap(model.brokers.first { $0.id == "spokeo" })
         var me = try XCTUnwrap(model.selectedPerson)
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]
-        me.addresses = [Address(city: "Springfield", state: "IL")]
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         model.update(me)
         for i in spokeo.steps.indices { model.complete(spokeo, step: i) }
         XCTAssertEqual(model.household.summary(for: spokeo), .submitted)

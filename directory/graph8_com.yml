@@ -14,3 +14,6 @@ family_parent: "trustsuperset.com"
 registered_in: [OR, TX]
 signals: [email_input, opt_out_form_found]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: []

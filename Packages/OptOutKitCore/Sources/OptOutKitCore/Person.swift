@@ -4,11 +4,13 @@ public struct Address: Codable, Equatable, Sendable {
     public var street: String?
     public var city: String
     public var state: String
+    /// ZIP or postal code. Required for the current address, since forms and listings match on it.
+    public var zip: String?
     public var fromYear: Int?
     public var toYear: Int?
 
-    public init(street: String? = nil, city: String, state: String, fromYear: Int? = nil, toYear: Int? = nil) {
-        self.street = street; self.city = city; self.state = state
+    public init(street: String? = nil, city: String, state: String, zip: String? = nil, fromYear: Int? = nil, toYear: Int? = nil) {
+        self.street = street; self.city = city; self.state = state; self.zip = zip
         self.fromYear = fromYear; self.toYear = toYear
     }
 }
@@ -154,6 +156,12 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         if (a?.street ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current street address")) }
         if (a?.city ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current city")) }
         if (a?.state ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current state")) }
+        if (a?.zip ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current ZIP code")) }
+        // A previous address that has been started needs its ZIP code too.
+        for (i, p) in addresses.enumerated() where i > 0 {
+            let started = [p.street ?? "", p.city, p.state].contains { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            if started, (p.zip ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("ZIP code for a previous address")); break }
+        }
         return out
     }
 

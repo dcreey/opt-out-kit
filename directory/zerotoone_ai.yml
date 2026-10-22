@@ -12,3 +12,6 @@ opt_out_form: {"page": "https://www.zerotoone.ai/do-not-sell-my-personal-informa
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, name_input, opt_out_form_found]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: ["check: a reCAPTCHA checkbox"]

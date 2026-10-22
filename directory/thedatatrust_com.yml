@@ -12,3 +12,6 @@ opt_out_form: {"page": "https://thedatatrust.com/your-privacy-choices/", "method
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, opt_out_form_found, portal_osano]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: []

@@ -90,7 +90,8 @@ final class LinkHealingTests: XCTestCase {
         let m = model()
         var me = try XCTUnwrap(m.selectedPerson)
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
-        m.update(me)
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
         let submitter = GoneThenFine()
         await m.runAutoOptOut(for: me, automaticOnly: false, submitter: submitter, inspector: AnySite())
         XCTAssertFalse(submitter.calls.pages.isEmpty)

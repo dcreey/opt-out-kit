@@ -727,5 +727,14 @@
  "Skipped or sent recently (%lld)": "Omitidos o enviados hace poco (%lld)",
  "The app tried this site automatically and it did not go through, so you do it with a guide.": "La app probó este sitio automáticamente y no funcionó, así que lo haces con una guía.",
  "Working in the background": "Trabajando en segundo plano",
- "Working…": "Trabajando…"
+ "Working…": "Trabajando…",
+ "%lld need you. They moved to your queue as semi-automated or guided tasks.": "%lld te necesitan. Pasaron a tu cola como tareas semiautomáticas o guiadas.",
+ "%lld of %lld sites went through": "%lld de %lld sitios se completaron",
+ "All %lld sites went through": "Los %lld sitios se completaron",
+ "Current ZIP code": "Código postal actual",
+ "Last run: %lld of %lld went through, %lld need you": "Última ejecución: %lld de %lld se completaron, %lld te necesitan",
+ "Last run: all %lld sites went through": "Última ejecución: los %lld sitios se completaron",
+ "Nothing more to do for these. Some sites email a link to confirm; that tap is yours.": "Nada más que hacer con estos. Algunos sitios envían un enlace de confirmación por correo; ese toque es tuyo.",
+ "ZIP code": "Código postal",
+ "ZIP code for a previous address": "Código postal de una dirección anterior"
 }

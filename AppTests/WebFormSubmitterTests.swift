@@ -7,7 +7,7 @@ import OptOutKitCore
 @MainActor
 final class WebFormSubmitterTests: XCTestCase {
     private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
-                            addresses: [Address(city: "Springfield", state: "IL")], emails: ["pat@example.com"])
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
 
     private func plan(_ fields: [(String, String, String)]) -> FillPlan {
         let form = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil,

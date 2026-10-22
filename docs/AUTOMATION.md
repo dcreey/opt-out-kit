@@ -7,9 +7,13 @@ anything by this feature, and no real person's details were used.
 
 A site is automatic only when its form was loaded on a real page and nothing blocked it. If a person might have to solve anything (a bot check, a terms prompt, a confirmation box), it is semi-automated. A site whose form has never been loaded is also semi-automated until a real load shows it is clear, and a site where an automatic send was stopped by a check moves to semi-automated by itself. The owner's own plain "I am this person" box is ticked automatically (never for family profiles).
 
+## Measured on real pages (2026-10-22)
+
+All 172 forms the app can fill in were loaded on a real page in the simulator with a made-up profile, filled in, and closed without sending anything: 143 had nothing blocking them, 19 showed a visible bot check, 9 a confirmation box and 1 both. These are written to each site's `live_check`. A check that only appears after sending cannot be seen this way; if a send is ever stopped by one, that site moves to semi-automated on its own. Data Axle's family of sites (data-axle.com, donorbase.com, exactdata.com, usadata.com) only has a note that the broker may verify identity and may contact the person about the request; for the account owner that is treated like the plain "I am this person" box, so those sites are automatic for the owner and still semi-automated for family profiles.
+
 ## Nothing runs without a profile
 
-Every way of opting someone out (the automatic run, the assisted run, guides, scans) first needs the person's legal name, current address and the household email. If any is missing the app shows a "Before we opt anyone out" sheet, asks for them, prompts for previous addresses (as many as the person can remember; optional) and then carries on with what they were doing.
+Every way of opting someone out (the automatic run, the assisted run, guides, scans) first needs the person's legal name, current address (with ZIP code) and the household email. If any is missing the app shows a "Before we opt anyone out" sheet, asks for them, prompts for previous addresses (as many as the person can remember; optional) and then carries on with what they were doing.
 
 ## One site, one group
 

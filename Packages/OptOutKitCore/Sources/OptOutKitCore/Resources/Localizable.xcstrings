@@ -1542,6 +1542,29 @@
     }
    }
   },
+  "Current ZIP code": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal actuel"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal actual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aktuelle Postleitzahl"
+     }
+    }
+   }
+  },
   "Current city": {
    "extractionState": "manual",
    "localizations": {
@@ -6552,6 +6575,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Aufsichtsbehörde ist %@. Sie können sich dort beschweren, wenn ein Unternehmen eine Anfrage ignoriert."
+     }
+    }
+   }
+  },
+  "ZIP code for a previous address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal d’une adresse précédente"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal de una dirección anterior"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Postleitzahl einer früheren Adresse"
      }
     }
    }

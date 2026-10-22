@@ -12,3 +12,6 @@ opt_out_form: {"page": "https://mediawallah.com/donotsell/", "method": "post", "
 registered_in: [CA, OR]
 signals: [email_input, opt_out_form_found, portal_onetrust]
 profiled: "2026-10-22"
+live_check:
+  checked: "2026-10-22"
+  blockers: []

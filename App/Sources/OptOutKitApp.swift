@@ -50,6 +50,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var autoBusy: String?
     /// While the weekly opt-out is running: how many sites it has been through, of how many.
     @Published private(set) var autoProgress: (done: Int, total: Int)?
+    /// Set when an opt-out run finishes, so the result is shown right away: all sent, or which sites need the person.
+    @Published var runReport: RunReport?
     /// Latest "where am I listed" scan per person. Kept in memory only: it is a snapshot, not a record.
     @Published private(set) var exposure: [UUID: [ScanResult]] = [:]
     @Published private(set) var scanProgress: (done: Int, total: Int)?
@@ -502,7 +504,14 @@ final class AppModel: ObservableObject {
             }
         }
         optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
-        if !dryRun { household.updateAuto { $0.lastOptOut = now } }
+        if !dryRun {
+            let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [])
+            household.updateAuto {
+                $0.lastOptOut = now
+                $0.lastAttempted = report.attempted; $0.lastSent = report.sent; $0.lastNeedYou = report.needYou.count
+            }
+            if report.attempted > 0 { runReport = report }
+        }
         save()
         if !dryRun { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }

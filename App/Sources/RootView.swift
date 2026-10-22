@@ -12,6 +12,7 @@ struct RootView: View {
             AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
         }
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
+        .sheet(item: $model.runReport) { report in RunReportSheet(report: report) { model.runReport = nil } }
         .fullScreenCover(isPresented: Binding(
             get: { model.pending == .walkthrough },
             set: { _ in })) {

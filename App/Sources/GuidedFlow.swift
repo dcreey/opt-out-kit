@@ -250,7 +250,7 @@ struct GuidedFlowView: View {
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
-                GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.28)
+                GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.18)
                 // The site's own page sits below the guide, clearly a different thing.
                 Group {
                     if let web = runner.webView { WebViewHost(webView: web) }
@@ -266,50 +266,53 @@ struct GuidedFlowView: View {
     }
 }
 
-/// The guide: a coloured band naming Opt-Out Kit and the guide, then the current step in full (it scrolls if it is long), then the
-/// controls. It is on top, away from the home indicator, and framed so it cannot be mistaken for part of the site below.
+/// The guide, kept small: a slim coloured band that names Opt-Out Kit and the step (its content sits below the status bar and the
+/// camera cut-out), the current step in full (scrolling if it is long), and the controls. It is on top, away from the home
+/// indicator, and framed so it cannot be mistaken for part of the site below.
 struct GuidedPanel: View {
     @ObservedObject var runner: GuidedRunner
     private var nextTitle: String {
         if case .pickListing? = runner.flow.current?.action { return Loc.t("This is my listing") }
         return runner.flow.index + 1 >= runner.flow.total ? Loc.t("Finish") : Loc.t("Next step")
     }
+    /// The top safe area (status bar, and the Dynamic Island or notch where there is one): the band's colour runs behind it, the band's
+    /// content starts below it.
     var topInset: CGFloat = 0
-    var maxStepHeight: CGFloat = 220
+    var maxStepHeight: CGFloat = 140
 
     var body: some View {
         VStack(spacing: 0) {
-            // Coloured margin with the app's name.
-            HStack {
+            HStack(spacing: 8) {
                 Button("Cancel") { runner.cancel() }.font(.footnote.bold()).foregroundStyle(.white).accessibilityIdentifier("guided-cancel")
-                Spacer()
-                Label("Opt-Out Kit · Guide", systemImage: "shield.lefthalf.filled").font(.footnote.bold()).foregroundStyle(.white)
+                Spacer(minLength: 4)
+                Label("Opt-Out Kit · Guide", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.white).lineLimit(1)
                     .accessibilityIdentifier("guided-banner")
-                Spacer()
+                Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
+                    .accessibilityIdentifier("guided-progress")
+                Spacer(minLength: 4)
                 Menu {
                     ForEach(IssueKind.allCases, id: \.self) { kind in
                         Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
                     }
-                } label: { Label("Not working", systemImage: "exclamationmark.bubble").font(.footnote.bold()).foregroundStyle(.white) }
+                } label: { Label("Not working", systemImage: "exclamationmark.bubble").labelStyle(.iconOnly).font(.body).foregroundStyle(.white) }
+                    .accessibilityLabel(Loc.t("Not working"))
                     .accessibilityIdentifier("guided-not-working")
             }
-            .padding(.horizontal, 16).padding(.top, topInset + 4).padding(.bottom, 8)
+            .padding(.horizontal, 12).padding(.top, topInset + 2).padding(.bottom, 6)
             .background(Color.accentColor)
 
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.secondary)
-                        .accessibilityIdentifier("guided-progress")
-                    ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
-                }
+            ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
+                .progressViewStyle(.linear).tint(Color.accentColor).scaleEffect(x: 1, y: 0.6)
+
+            VStack(alignment: .leading, spacing: 6) {
                 if let step = runner.flow.current {
                     // The whole instruction is shown; a long one scrolls instead of being cut off with an ellipsis.
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(step.title).font(.headline).fixedSize(horizontal: false, vertical: true)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(step.title).font(.subheadline.bold()).fixedSize(horizontal: false, vertical: true)
                                 .accessibilityIdentifier("guided-step-title")
                             if let detail = step.detail {
-                                Text(detail).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                                Text(detail).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -317,24 +320,24 @@ struct GuidedPanel: View {
                     .frame(maxHeight: maxStepHeight)
                 }
                 if let status = runner.status {
-                    Label(status, systemImage: "checkmark.circle").font(.footnote).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
+                    Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("guided-status")
                 }
-                HStack {
-                    if runner.flow.index > 0 { Button("Back") { runner.back() }.buttonStyle(.bordered).accessibilityIdentifier("guided-back") }
+                HStack(spacing: 8) {
+                    if runner.flow.index > 0 { Button("Back") { runner.back() }.buttonStyle(.bordered).controlSize(.small).accessibilityIdentifier("guided-back") }
                     if case .copy? = runner.flow.current?.action {
                         Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }
-                            .buttonStyle(.bordered).accessibilityIdentifier("guided-copy")
+                            .buttonStyle(.bordered).controlSize(.small).accessibilityIdentifier("guided-copy")
                     }
                     Spacer()
                     Button(nextTitle) { runner.next() }
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("guided-next")
+                        .buttonStyle(.borderedProminent).controlSize(.small).accessibilityIdentifier("guided-next")
                 }
             }
-            .padding(.horizontal, 16).padding(.vertical, 10)
+            .padding(.horizontal, 12).padding(.vertical, 8)
             .background(Color(.secondarySystemBackground))
 
-            Rectangle().fill(Color.accentColor).frame(height: 4)
+            Rectangle().fill(Color.accentColor).frame(height: 3)
         }
     }
 }

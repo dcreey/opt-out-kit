@@ -43,8 +43,14 @@ public enum FormFiller {
     static let selfIdentity = try! NSRegularExpression(pattern: "\\bi (confirm|verify|am)\\b.{0,60}\\b(person|owner|me)\\b.{0,40}(email|e-mail|address|account|request|record)", options: .caseInsensitive)
     static let notSelfIdentity = try! NSRegularExpression(pattern: "penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal", options: .caseInsensitive)
 
+    /// "I understand I may be required to verify my identity, and I authorize <the broker> to contact me": a note about the person's own
+    /// request, not a term, a consent to marketing or a sale. Data Axle's family of sites uses it. Same owner-only rule.
+    static let requestAcknowledgement = try! NSRegularExpression(pattern: "may be required to verify my identity.{0,200}authori[sz]e .{0,60} to contact me", options: .caseInsensitive)
+    static let notAcknowledgement = try! NSRegularExpression(pattern: "terms|privacy policy|\\bsell|market|newsletter|advertis|share my|third part", options: .caseInsensitive)
+
     public static func isSelfIdentityBox(_ text: String) -> Bool {
         let r = NSRange(text.startIndex..., in: text)
+        if requestAcknowledgement.firstMatch(in: text, range: r) != nil && notAcknowledgement.firstMatch(in: text, range: r) == nil { return true }
         return selfIdentity.firstMatch(in: text, range: r) != nil && notSelfIdentity.firstMatch(in: text, range: r) == nil
     }
 
@@ -119,7 +125,7 @@ public enum FormFiller {
             else if has("state|province|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
                 put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
-            else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([], L10n.noun("Zip code")) }
+            else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }
             else if has("phone|t[ée]l[ée]phone|tel[ée]fono|telefon|handy") || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
             else if has("birth|dob|naissance|nacimiento|geburt") { put([person.birthdate], L10n.noun("Birthdate")) }
             else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }

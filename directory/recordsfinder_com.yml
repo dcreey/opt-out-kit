@@ -16,5 +16,5 @@ search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
 live_check:
-  checked: "2026-10-21"
+  checked: "2026-10-22"
   blockers: []

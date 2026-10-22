@@ -43,6 +43,7 @@ struct BrokerListView: View {
                         .accessibilityIdentifier("home-auto-working")
                     }
                 }
+                if model.autoSettings.lastAttempted != nil { Section { LastRunRow() } }
                 let queue = model.queue
                 let tasks = queue.flatMap(\.tasks)
                 let done = tasks.filter { model.isDone($0) }.count
@@ -115,6 +116,7 @@ struct BrokerListView: View {
             }
             .sheet(isPresented: $showAuto) { AutoProtectionView() }
             .navigationDestination(for: Broker.self) { BrokerDetailView(broker: $0) }
+            .navigationDestination(for: String.self) { if $0 == "auto-activity" { AutoActivityView() } }
             .planDestinations()
         }
     }
