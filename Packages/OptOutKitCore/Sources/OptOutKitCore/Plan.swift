@@ -13,8 +13,13 @@ public struct PlanTask: Identifiable, Equatable, Sendable {
     /// Every site domain this one task handles, its own first. A shared request lists them all, so no site is counted twice.
     public var domains: [String]
     public var reason: String
+    /// How this task gets done; nil for an official service, which is its own kind of thing.
+    public var method: OptOutMethod?
     /// Two-letter codes of the states whose broker registry lists any of these sites.
     public var registeredIn: Set<String>
+    public init(kind: Kind, title: String, domains: [String], reason: String, method: OptOutMethod?, registeredIn: Set<String>) {
+        self.kind = kind; self.title = title; self.domains = domains; self.reason = reason; self.method = method; self.registeredIn = registeredIn
+    }
     public var id: String {
         switch kind { case .platform(let i): return "platform-\(i)"; case .flow(let i): return "flow-\(i)"; case .site(let i): return "site-\(i)"; case .automatic: return "automatic" }
     }
@@ -50,7 +55,7 @@ public enum OptOutPlan {
             guard !unique.isEmpty else { continue }
             claimed.formUnion(unique)
             let task = PlanTask(kind: .platform(p.id), title: p.shortName, domains: unique,
-                                reason: L10n.f("One free request to %@ reaches all of these.", p.shortName), registeredIn: states(unique))
+                                reason: L10n.f("One free request to %@ reaches all of these.", p.shortName), method: nil, registeredIn: states(unique))
             steps.append(PlanStep(kind: .platform(p.id), title: p.shortName,
                                   explanation: L10n.f("%@ sends your deletion request to every broker registered in %@. Do this first: it handles these sites in one go.", p.shortName, p.jurisdiction),
                                   tasks: [task]))
@@ -65,7 +70,7 @@ public enum OptOutPlan {
             guard !unique.isEmpty || own == nil else { continue }
             claimed.formUnion(unique)
             let v = classifyBroker(b)
-            byMethod[v.method, default: []].append(PlanTask(kind: .flow(b.id), title: b.name, domains: unique.isEmpty ? [b.id] : unique, reason: v.reason, registeredIn: states(unique)))
+            byMethod[v.method, default: []].append(PlanTask(kind: .flow(b.id), title: b.name, domains: unique.isEmpty ? [b.id] : unique, reason: v.reason, method: v.method, registeredIn: states(unique)))
         }
         // Sites that share one opt-out (the same family, the same form template or the same opt-out page) are one task, filed under
         // the most automated way any of them can be done. Sites are linked through any of these, so a chain still ends up as one.
@@ -85,12 +90,12 @@ public enum OptOutPlan {
             let domains = [lead.domain] + members.map(\.domain).filter { $0 != lead.domain }.sorted()
             claimed.formUnion(domains)
             byMethod[best.1.method, default: []].append(PlanTask(kind: .site(lead.id), title: lead.domain, domains: domains,
-                                                                   reason: L10n.f("One opt-out request handles all %@ sites that share this process.", domains.count), registeredIn: states(domains)))
+                                                                   reason: L10n.f("One opt-out request handles all %@ sites that share this process.", domains.count), method: best.1.method, registeredIn: states(domains)))
         }
         for e in entries where !claimed.contains(e.domain) {
             claimed.insert(e.domain)
             let v = classifyEntry(e)
-            byMethod[v.method, default: []].append(PlanTask(kind: .site(e.id), title: e.domain, domains: [e.domain], reason: v.reason, registeredIn: Set(e.registeredIn ?? [])))
+            byMethod[v.method, default: []].append(PlanTask(kind: .site(e.id), title: e.domain, domains: [e.domain], reason: v.reason, method: v.method, registeredIn: Set(e.registeredIn ?? [])))
         }
         for m in order {
             guard var tasks = byMethod[m], !tasks.isEmpty else { continue }
@@ -99,7 +104,7 @@ public enum OptOutPlan {
                 let domains = tasks.flatMap(\.domains)
                 tasks = [PlanTask(kind: .automatic, title: L10n.t("Let the app do these for you"), domains: domains,
                                   reason: L10n.f("One run fills in and sends all %@ opt-out forms. You only handle a check or an email link if a site asks.", domains.count),
-                                  registeredIn: states(domains))]
+                                  method: .automatic, registeredIn: states(domains))]
             }
             steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation, tasks: tasks.sorted { $0.title.lowercased() < $1.title.lowercased() }))
         }
@@ -110,4 +115,81 @@ public enum OptOutPlan {
 public extension PlanTask {
     /// Whether any site this task handles is on the broker registry of one of these states.
     func isRegistered(in places: Set<String>) -> Bool { !registeredIn.isDisjoint(with: places) }
+}
+
+
+/// Where a task sits in the ranked queue. Lower comes first. "Local" is a place the person lives or has lived; "country" is any broker
+/// registered in their country (so far only US states publish registries); everything else is global. Guided and manual tasks are both
+/// "manual" here: the person does the steps.
+public enum PlanRank: Int, CaseIterable, Comparable, Identifiable, Sendable {
+    case localOfficial = 1, ourAutomatic, localSemi, countrySemi, localManualBig, globalSemi, localManualRest, globalManual
+    public var id: Int { rawValue }
+    public static func < (a: PlanRank, b: PlanRank) -> Bool { a.rawValue < b.rawValue }
+    /// A shared manual task has to handle at least this many sites to jump ahead of the global semi-automated ones.
+    public static let bigTaskSites = 10
+
+    public var title: String {
+        switch self {
+        case .localOfficial: return L10n.t("Your place's official removal service")
+        case .ourAutomatic: return L10n.t("Done for you by the app")
+        case .localSemi: return L10n.t("Semi-automated, registered where you live")
+        case .countrySemi: return L10n.t("Semi-automated, registered in your country")
+        case .localManualBig: return L10n.t("Big manual tasks where you live or in your country")
+        case .globalSemi: return L10n.t("Semi-automated, anywhere")
+        case .localManualRest: return L10n.t("Other manual tasks where you live or in your country")
+        case .globalManual: return L10n.t("Remaining manual tasks, anywhere")
+        }
+    }
+    public var explanation: String {
+        switch self {
+        case .localOfficial: return L10n.t("One free request that your state or country already runs, reaching every broker registered there. Do this first.")
+        case .ourAutomatic: return L10n.t("Forms the app fills in and sends by itself in one run.")
+        case .localSemi: return L10n.t("The app fills in the form; you only solve the check. These brokers are registered where you live, so the law backs your request.")
+        case .countrySemi: return L10n.t("The same, for brokers registered somewhere in your country.")
+        case .localManualBig: return L10n.t("You do the steps, but each task handles 10 or more sites, so the effort pays off.")
+        case .globalSemi: return L10n.t("The app fills in the form; you solve the check. These brokers are not registered near you, but they may still list you.")
+        case .localManualRest: return L10n.t("Smaller manual tasks for brokers registered where you live or in your country.")
+        case .globalManual: return L10n.t("Everything left: manual tasks for brokers registered elsewhere. Do these last.")
+        }
+    }
+}
+
+public struct QueueBand: Identifiable, Equatable, Sendable {
+    public var rank: PlanRank
+    public var tasks: [PlanTask]
+    public var id: Int { rank.rawValue }
+    public var siteCount: Int { tasks.reduce(0) { $0 + $1.siteCount } }
+}
+
+public extension OptOutPlan {
+    /// The rank of one task. `local` are the person's states (where they live and have lived); `countryHasRegistries` says whether a
+    /// broker registered in some state counts as being in their country.
+    static func rank(of task: PlanTask, local: Set<String>, countryHasRegistries: Bool) -> PlanRank {
+        let isLocal = task.isRegistered(in: local)
+        let inCountry = isLocal || (countryHasRegistries && !task.registeredIn.isEmpty)
+        switch task.kind {
+        case .platform: return .localOfficial
+        case .automatic: return .ourAutomatic
+        default: break
+        }
+        if task.method == .automatic { return .ourAutomatic }
+        if task.method == .semiAutomatic { return isLocal ? .localSemi : inCountry ? .countrySemi : .globalSemi }
+        guard inCountry else { return .globalManual }
+        return task.siteCount >= PlanRank.bigTaskSites ? .localManualBig : .localManualRest
+    }
+
+    /// Every task in one ranked queue, grouped into bands. Inside a band, tasks near the person come first, then bigger tasks.
+    static func queue(_ steps: [PlanStep], local: Set<String>, countryHasRegistries: Bool) -> [QueueBand] {
+        let tasks = steps.flatMap(\.tasks)
+        let ranked = tasks.map { ($0, rank(of: $0, local: local, countryHasRegistries: countryHasRegistries)) }
+        return PlanRank.allCases.compactMap { r in
+            let inBand = ranked.filter { $0.1 == r }.map(\.0).sorted { a, b in
+                let la = a.isRegistered(in: local), lb = b.isRegistered(in: local)
+                if la != lb { return la }
+                if a.siteCount != b.siteCount { return a.siteCount > b.siteCount }
+                return a.title.lowercased() < b.title.lowercased()
+            }
+            return inBand.isEmpty ? nil : QueueBand(rank: r, tasks: inBand)
+        }
+    }
 }

@@ -28,35 +28,8 @@ extension StatusSummary {
 struct SitesView: View {
     @EnvironmentObject var model: AppModel
     @State private var search = ""
-    @State private var filter = Filter.all
     @State private var showScan = false
     @State private var showQuick = false
-
-    enum Filter: String, CaseIterable, Identifiable {
-        case all = "All", todo = "To do", done = "Opted out"
-        var id: String { rawValue }
-        var title: String { Loc.t(rawValue) }
-    }
-
-    private func matches(_ broker: Broker) -> Bool {
-        guard !search.isEmpty else { return true }
-        let q = search.lowercased()
-        return broker.name.lowercased().contains(q) || (broker.covers ?? []).contains { $0.lowercased().contains(q) }
-    }
-
-    private var shown: [Broker] {
-        model.queueBrokers.filter { broker in
-            let s = model.household.summary(for: broker)
-            switch filter {
-            case .all: break
-            case .todo: if s.isFinished { return false }
-            case .done: if !s.isFinished { return false }
-            }
-            guard !search.isEmpty else { return true }
-            let q = search.lowercased()
-            return broker.name.lowercased().contains(q) || (broker.covers ?? []).contains { $0.lowercased().contains(q) }
-        }
-    }
 
     var body: some View {
         NavigationStack {
@@ -69,20 +42,13 @@ struct SitesView: View {
                             .accessibilityIdentifier("sites-search")
                         if !search.isEmpty { Button { search = "" } label: { Image(systemName: "xmark.circle.fill") }.buttonStyle(.plain).foregroundStyle(.secondary) }
                     }
-                    Picker("Filter", selection: $filter) {
-                        ForEach(Filter.allCases) { Text($0.title).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("sites-filter")
-                    PlaceScopePicker()
                 } footer: {
-                    Text("Tracking \(model.totalSites) sites. Each is listed once, in the first step below that handles it. A request that handles several sites is one task that names them all.")
+                    Text("Tracking \(model.totalSites) sites. Each is listed once, in ranked order: your official service first, then what the app does for you, then semi-automated and manual tasks, nearest first. A request that handles several sites is one task that names them all.")
                         .accessibilityIdentifier("sites-total")
                 }
-                let steps = model.plan
-                let places = model.placeCodes(for: model.placeScope)
-                ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-                    let tasks = PlaceSort.ordered(step.tasks.filter { visible($0) }, places: places)
+                let queue = model.queue
+                ForEach(queue) { band in
+                    let tasks = band.tasks.filter { visible($0) }
                     if !tasks.isEmpty {
                         Section {
                             ForEach(tasks) { task in
@@ -90,17 +56,17 @@ struct SitesView: View {
                             }
                         } header: {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Step \(index + 1): \(step.title)").font(.subheadline.bold()).textCase(nil)
-                                    .accessibilityIdentifier("step-\(step.id)")
-                                Text(tasks.count == step.tasks.count ? stepSummary(step) : Loc.f("Showing %lld of %lld tasks", tasks.count, step.tasks.count))
+                                Text("\(band.rank.rawValue). \(band.rank.title)").font(.subheadline.bold()).textCase(nil)
+                                    .accessibilityIdentifier("band-\(band.rank.rawValue)")
+                                Text(tasks.count == band.tasks.count ? bandSummary(band) : Loc.f("Showing %lld of %lld tasks", tasks.count, band.tasks.count))
                                     .font(.caption).textCase(nil)
                             }
                         } footer: {
-                            Text(step.explanation)
+                            Text(band.rank.explanation)
                         }
                     }
                 }
-                if !search.isEmpty, !steps.contains(where: { $0.tasks.contains { visible($0) } }) {
+                if !search.isEmpty, !queue.contains(where: { $0.tasks.contains { visible($0) } }) {
                     Section { Text("No site matches that search.").foregroundStyle(.secondary) }
                 }
                 Section {
@@ -155,19 +121,9 @@ struct SitesView: View {
 
     /// Whether a task passes the search and the to-do filter. A shared task matches on any site it handles.
     private func visible(_ task: PlanTask) -> Bool {
-        switch filter {
-        case .all: break
-        case .todo: if model.isDone(task) { return false }
-        case .done: if !model.isDone(task) { return false }
-        }
         let q = search.trimmingCharacters(in: .whitespaces).lowercased()
         guard !q.isEmpty else { return true }
         return task.title.lowercased().contains(q) || task.domains.contains { $0.lowercased().contains(q) }
-    }
-
-    private func shownDirectory(_ method: OptOutMethod) -> [DirectoryEntry] {
-        let q = search.lowercased()
-        return model.workSites.filter { (q.isEmpty || $0.domain.lowercased().contains(q)) && model.method(for: $0).method == method }
     }
 
     private func directoryRow(_ e: DirectoryEntry) -> some View {

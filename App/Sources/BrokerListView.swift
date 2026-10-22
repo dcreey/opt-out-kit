@@ -31,8 +31,8 @@ struct BrokerListView: View {
                         Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
                     }
                 }
-                let steps = model.plan
-                let tasks = steps.flatMap(\.tasks)
+                let queue = model.queue
+                let tasks = queue.flatMap(\.tasks)
                 let done = tasks.filter { model.isDone($0) }.count
                 Section {
                     ProgressView(value: tasks.isEmpty ? 0 : Double(done) / Double(tasks.count)) {
@@ -40,16 +40,20 @@ struct BrokerListView: View {
                     }
                     .accessibilityIdentifier("completion")
                 } footer: {
-                    Text("\(steps.reduce(0) { $0 + $1.siteCount }) sites, handled in \(steps.count) steps and \(tasks.count) tasks. Work from the top: each step is the quickest way to cover the most sites.")
+                    Text("\(queue.reduce(0) { $0 + $1.siteCount }) sites in \(tasks.count) tasks, ranked: work from the top and each task is the best use of your time that is left.")
                 }
+                let next = tasks.filter { !model.isDone($0) }.prefix(5)
                 Section {
-                    ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
-                        NavigationLink(value: step.id) { PlanStepHeader(number: index + 1, step: step) }
-                            .accessibilityIdentifier(step.id)
+                    ForEach(Array(next)) { task in
+                        NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("next-\(task.id)")
                     }
-                } header: {
-                    Text("Your plan")
-                }
+                } header: { Text("Do these next") }
+                Section {
+                    ForEach(queue) { band in
+                        NavigationLink(value: band.rank.rawValue) { QueueBandHeader(band: band) }
+                            .accessibilityIdentifier("band-\(band.rank.rawValue)")
+                    }
+                } header: { Text("The whole queue, in order") }
             }
             .accessibilityIdentifier("broker-list")
             .navigationTitle("Opt-Out Kit")

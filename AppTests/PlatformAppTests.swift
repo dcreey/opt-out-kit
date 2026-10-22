@@ -140,19 +140,21 @@ final class HandledOnceTests: XCTestCase {
         if case .method = il.plan.first?.kind {} else { XCTFail("someone outside California starts with our own steps") }
     }
 
-    func testThePlaceChoiceOnlyReordersAndMarks() {
+    func testTheQueueIsRankedByWhereThePersonLivesAndHasLivedAndHidesNothing() {
         let (m, _) = model(state: "TX")
-        m.placeScope = .all
-        XCTAssertTrue(m.placeCodes(for: .all).isEmpty)
-        XCTAssertEqual(m.placeCodes(for: .mine), ["TX"])
+        XCTAssertEqual(m.localStates, ["TX"])
         var me = m.people.first { $0.relationship == .me }!
         me.addresses.append(Address(street: nil, city: "Portland", state: "OR"))
         m.update(me)
-        XCTAssertEqual(m.placeCodes(for: .visited), ["TX", "OR"])
-        let tasks = m.plan.flatMap(\.tasks)
-        let ordered = PlaceSort.ordered(tasks, places: ["TX"])
-        XCTAssertEqual(ordered.count, tasks.count, "nothing is hidden")
-        XCTAssertTrue(ordered.first?.isRegistered(in: ["TX"]) ?? false)
+        XCTAssertEqual(m.localStates, ["TX", "OR"])
+        XCTAssertTrue(m.countryHasRegistries)
+        let queue = m.queue
+        XCTAssertEqual(queue.map(\.rank), queue.map(\.rank).sorted())
+        XCTAssertEqual(queue.first?.rank, .ourAutomatic, "no official service in Texas, so the app's own run leads")
+        XCTAssertEqual(queue.flatMap(\.tasks).count, m.plan.flatMap(\.tasks).count, "nothing is hidden")
+        let (ca, _) = model(state: "CA")
+        XCTAssertEqual(ca.queue.first?.rank, .localOfficial)
+        XCTAssertEqual(ca.queue.dropFirst().first?.rank, .ourAutomatic)
     }
 
     func testNothingIsGroupedForSomeoneWhoCannotUseThePlatform() {

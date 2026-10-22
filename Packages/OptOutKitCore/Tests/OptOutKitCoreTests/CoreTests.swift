@@ -2186,4 +2186,36 @@ final class PlanTests: XCTestCase {
         XCTAssertEqual(tasks.filter { $0.domains.contains("freepeopledirectory.com") }.count, 1)
         XCTAssertLessThan(tasks.count, steps.reduce(0) { $0 + $1.siteCount }, "fewer tasks than sites")
     }
+
+    private func task(_ id: String, _ method: OptOutMethod?, sites: Int = 1, states: Set<String> = [], kind: PlanTask.Kind? = nil) -> PlanTask {
+        PlanTask(kind: kind ?? .site(id), title: id, domains: (0..<sites).map { "\(id)\($0).com" }, reason: "", method: method, registeredIn: states)
+    }
+
+    func testTheQueueRanksTasksInTheOrderTheUserAsked() {
+        let tasks = [
+            task("global-manual", .manual), task("local-manual-small", .guided, sites: 2, states: ["TX"]), task("global-semi", .semiAutomatic),
+            task("local-manual-big", .guided, sites: 12, states: ["TX"]), task("country-semi", .semiAutomatic, states: ["OH"]),
+            task("local-semi", .semiAutomatic, states: ["TX"]), task("auto", .automatic, sites: 40, kind: .automatic),
+            task("drop", nil, sites: 600, kind: .platform("ca-drop")), task("country-manual-big", .manual, sites: 11, states: ["OH"]),
+        ]
+        let steps = [PlanStep(kind: .method(.guided), title: "", explanation: "", tasks: tasks)]
+        let queue = OptOutPlan.queue(steps, local: ["TX"], countryHasRegistries: true)
+        XCTAssertEqual(queue.flatMap { $0.tasks.map(\.title) },
+                       ["drop", "auto", "local-semi", "country-semi", "local-manual-big", "country-manual-big", "global-semi", "local-manual-small", "global-manual"])
+        XCTAssertEqual(queue.map(\.rank), [.localOfficial, .ourAutomatic, .localSemi, .countrySemi, .localManualBig, .globalSemi, .localManualRest, .globalManual])
+    }
+
+    func testOutsideACountryWithRegistriesNothingIsLocalOrCountryLevel() {
+        let steps = [PlanStep(kind: .method(.guided), title: "", explanation: "", tasks: [task("a", .semiAutomatic, states: ["TX"]), task("b", .guided, sites: 20, states: ["TX"])])]
+        let queue = OptOutPlan.queue(steps, local: [], countryHasRegistries: false)
+        XCTAssertEqual(queue.map(\.rank), [.globalSemi, .globalManual])
+    }
+
+    func testEveryTaskIsInExactlyOneBandOfTheRealQueue() throws {
+        let (steps, _) = try plan(withPlatforms: true)
+        let queue = OptOutPlan.queue(steps, local: ["CA"], countryHasRegistries: true)
+        XCTAssertEqual(queue.flatMap(\.tasks).count, steps.flatMap(\.tasks).count)
+        XCTAssertEqual(queue.first?.rank, .localOfficial)
+        XCTAssertEqual(queue.map(\.rank), queue.map(\.rank).sorted())
+    }
 }

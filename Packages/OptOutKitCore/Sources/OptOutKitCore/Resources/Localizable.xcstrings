@@ -1059,6 +1059,29 @@
     }
    }
   },
+  "Big manual tasks where you live or in your country": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Grosses tâches manuelles chez vous ou dans votre pays"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tareas manuales grandes donde vives o en tu país"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Große manuelle Aufgaben bei Ihnen oder in Ihrem Land"
+     }
+    }
+   }
+  },
   "Birthdate": {
    "extractionState": "manual",
    "localizations": {
@@ -1680,6 +1703,29 @@
     }
    }
   },
+  "Done for you by the app": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fait pour vous par l’app"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hecho por ti por la app"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Von der App für Sie erledigt"
+     }
+    }
+   }
+  },
   "Email address": {
    "extractionState": "manual",
    "localizations": {
@@ -1745,6 +1791,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Europäische Union"
+     }
+    }
+   }
+  },
+  "Everything left: manual tasks for brokers registered elsewhere. Do these last.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tout le reste : tâches manuelles pour des courtiers enregistrés ailleurs. À faire en dernier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todo lo demás: tareas manuales para intermediarios registrados en otros lugares. Hazlas al final."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alles Übrige: manuelle Aufgaben für anderswo registrierte Händler. Zuletzt erledigen."
      }
     }
    }
@@ -1883,6 +1952,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Formular wird per JavaScript aufgebaut"
+     }
+    }
+   }
+  },
+  "Forms the app fills in and sends by itself in one run.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formulaires que l’app remplit et envoie seule en une exécution."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formularios que la app rellena y envía sola en una ejecución."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formulare, die die App in einem Durchlauf selbst ausfüllt und sendet."
      }
     }
    }
@@ -3589,6 +3681,29 @@
     }
    }
   },
+  "One free request that your state or country already runs, reaching every broker registered there. Do this first.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une demande gratuite que votre État ou pays gère déjà, qui atteint chaque courtier enregistré. À faire en premier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una solicitud gratuita que tu estado o país ya gestiona y que llega a cada intermediario registrado. Hazla primero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine kostenlose Anfrage, die Ihr Bundesstaat oder Land bereits betreibt und die jeden dort registrierten Händler erreicht. Zuerst erledigen."
+     }
+    }
+   }
+  },
   "One free request to %@ reaches all of these.": {
    "extractionState": "manual",
    "localizations": {
@@ -3934,6 +4049,29 @@
     }
    }
   },
+  "Other manual tasks where you live or in your country": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autres tâches manuelles chez vous ou dans votre pays"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Otras tareas manuales donde vives o en tu país"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weitere manuelle Aufgaben bei Ihnen oder in Ihrem Land"
+     }
+    }
+   }
+  },
   "Page is built by JavaScript": {
    "extractionState": "manual",
    "localizations": {
@@ -4141,6 +4279,29 @@
     }
    }
   },
+  "Remaining manual tasks, anywhere": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tâches manuelles restantes, partout"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tareas manuales restantes, en cualquier lugar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verbleibende manuelle Aufgaben, überall"
+     }
+    }
+   }
+  },
   "Results are behind terms you must accept yourself": {
    "extractionState": "manual",
    "localizations": {
@@ -4229,6 +4390,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Suchergebnisse lassen sich nicht unterscheiden"
+     }
+    }
+   }
+  },
+  "Semi-automated, anywhere": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semi-automatisé, partout"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semiautomático, en cualquier lugar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatisch, überall"
+     }
+    }
+   }
+  },
+  "Semi-automated, registered in your country": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semi-automatisé, enregistré dans votre pays"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semiautomático, registrado en tu país"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatisch, in Ihrem Land registriert"
+     }
+    }
+   }
+  },
+  "Semi-automated, registered where you live": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semi-automatisé, enregistré là où vous vivez"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semiautomático, registrado donde vives"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatisch, dort registriert, wo Sie wohnen"
      }
     }
    }
@@ -4413,6 +4643,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Übersprungen: dort nicht gelistet"
+     }
+    }
+   }
+  },
+  "Smaller manual tasks for brokers registered where you live or in your country.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tâches manuelles plus petites pour des courtiers enregistrés chez vous ou dans votre pays."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tareas manuales más pequeñas para intermediarios registrados donde vives o en tu país."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kleinere manuelle Aufgaben für Händler, die bei Ihnen oder in Ihrem Land registriert sind."
      }
     }
    }
@@ -4808,6 +5061,52 @@
     }
    }
   },
+  "The app fills in the form; you only solve the check. These brokers are registered where you live, so the law backs your request.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’app remplit le formulaire ; vous ne résolvez que la vérification. Ces courtiers sont enregistrés là où vous vivez, la loi soutient donc votre demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app rellena el formulario; tú solo resuelves la verificación. Estos intermediarios están registrados donde vives, así que la ley respalda tu solicitud."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App füllt das Formular aus; Sie lösen nur die Prüfung. Diese Händler sind dort registriert, wo Sie wohnen, das Gesetz stützt Ihre Anfrage."
+     }
+    }
+   }
+  },
+  "The app fills in the form; you solve the check. These brokers are not registered near you, but they may still list you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’app remplit le formulaire ; vous résolvez la vérification. Ces courtiers ne sont pas enregistrés près de chez vous, mais peuvent quand même vous lister."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app rellena el formulario; tú resuelves la verificación. Estos intermediarios no están registrados cerca de ti, pero aun así pueden listarte."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App füllt das Formular aus; Sie lösen die Prüfung. Diese Händler sind nicht in Ihrer Nähe registriert, können Sie aber dennoch führen."
+     }
+    }
+   }
+  },
   "The app fills in the site's form and sends it on its own.": {
    "extractionState": "manual",
    "localizations": {
@@ -4942,6 +5241,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Seite oder der Link ist defekt"
+     }
+    }
+   }
+  },
+  "The same, for brokers registered somewhere in your country.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La même chose, pour les courtiers enregistrés quelque part dans votre pays."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo mismo, para intermediarios registrados en algún lugar de tu país."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dasselbe für Händler, die irgendwo in Ihrem Land registriert sind."
      }
     }
    }
@@ -6004,6 +6326,29 @@
     }
    }
   },
+  "You do the steps, but each task handles 10 or more sites, so the effort pays off.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous faites les étapes, mais chaque tâche couvre 10 sites ou plus : l’effort est rentable."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Haces los pasos, pero cada tarea cubre 10 o más sitios, así que el esfuerzo compensa."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie machen die Schritte, aber jede Aufgabe erledigt 10 oder mehr Seiten, der Aufwand lohnt sich."
+     }
+    }
+   }
+  },
   "You find your listing first": {
    "extractionState": "manual",
    "localizations": {
@@ -6115,6 +6460,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre E-Mail-Adresse und die Adresse Ihres Eintrags."
+     }
+    }
+   }
+  },
+  "Your place's official removal service": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le service officiel de suppression de votre lieu"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El servicio oficial de eliminación de tu lugar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Der offizielle Löschdienst Ihres Ortes"
      }
     }
    }

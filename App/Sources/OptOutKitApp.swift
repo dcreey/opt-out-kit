@@ -248,28 +248,19 @@ final class AppModel: ObservableObject {
 
     // MARK: The plan
 
-    /// Which places' brokers to put first. Nothing is ever hidden: someone who lives here may still be listed by a broker registered
-    /// elsewhere, or have lived or travelled elsewhere.
-    enum PlaceScope: String, CaseIterable, Identifiable {
-        case all, mine, visited
-        var id: String { rawValue }
-    }
-    private static let placeKey = "placeScope"
-    var placeScope: PlaceScope {
-        get { PlaceScope(rawValue: defaults.string(forKey: Self.placeKey) ?? "") ?? .all }
-        set { objectWillChange.send(); defaults.set(newValue.rawValue, forKey: Self.placeKey) }
-    }
-
-    /// Two-letter codes of the US states the scope names for the selected person: where they live, or also where they have lived.
-    func placeCodes(for scope: PlaceScope) -> Set<String> {
-        guard scope != .all else { return [] }
+    /// Two-letter codes of the US states that count as local for the selected person: where they live and where they have lived.
+    var localStates: Set<String> {
         var out = Set<String>()
         if let code = ownerStateCode { out.insert(code) }
-        if scope == .visited, let person = selectedPerson {
-            for a in person.addresses { if let c = USStates.code(for: a.state) ?? (a.state.count == 2 ? a.state.uppercased() : nil) { out.insert(c) } }
-        }
+        for a in selectedPerson?.addresses ?? [] { if let c = USStates.code(for: a.state) ?? (a.state.count == 2 ? a.state.uppercased() : nil) { out.insert(c) } }
         return out
     }
+
+    /// Whether brokers registered in some state count as being in the person's country (only US states publish registries so far).
+    var countryHasRegistries: Bool { (ownerCountry ?? "US") == "US" }
+
+    /// The ranked queue: official service, then the app's own automatic run, then semi-automated, then manual, nearest first.
+    var queue: [QueueBand] { OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries) }
 
     /// The ordered steps for the selected person: their official removal service first, then ours, each site once.
     var plan: [PlanStep] {
