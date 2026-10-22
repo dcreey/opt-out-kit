@@ -1653,6 +1653,12 @@ final class MeasuredMethodTests: XCTestCase {
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: false).method, .semiAutomatic, "family profiles and owners who did not allow it")
     }
 
+    func testASendThatFailedOrWasRefusedMovesTheSiteToAGuide() {
+        let e = entry([], live: LiveCheck(checked: "d", blockers: []))
+        XCTAssertEqual(OptOutMethods.classify(e).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(e, failedBefore: true).method, .guided)
+    }
+
     func testASendThatWasChallengedMovesTheSiteToSemiAutomated() {
         let e = entry([], live: LiveCheck(checked: "d", blockers: []))
         XCTAssertEqual(OptOutMethods.classify(e, challengedBefore: true).method, .semiAutomatic)

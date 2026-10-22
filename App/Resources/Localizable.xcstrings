@@ -553,6 +553,52 @@
     }
    }
   },
+  "%lld of %lld sites. We will only ask you about the ones that need you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites sur %lld. Nous ne vous demanderons que pour ceux qui ont besoin de vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld de %lld sitios. Solo te preguntaremos por los que te necesitan."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld Seiten. Wir fragen Sie nur bei denen, die Sie brauchen."
+     }
+    }
+   }
+  },
+  "%lld of %lld sites. You can leave this screen.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites sur %lld. Vous pouvez quitter cet écran."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld de %lld sitios. Puedes salir de esta pantalla."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld Seiten. Sie können diesen Bildschirm verlassen."
+     }
+    }
+   }
+  },
   "%lld points to the next level": {
    "extractionState": "manual",
    "localizations": {
@@ -5682,6 +5728,29 @@
     }
    }
   },
+  "It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle remplit et envoie chaque formulaire en arrière-plan, sans ouvrir de site. On ne vous sollicite que si un site n’aboutit pas ; il passe alors en semi-automatisé ou guidé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellena y envía cada formulario en segundo plano, sin abrir ningún sitio. Solo se te consulta si un sitio no se completa, y entonces pasa a semiautomático o guiado."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie füllt jedes Formular im Hintergrund aus und sendet es, ohne eine Webseite zu öffnen. Sie werden nur gefragt, wenn eine Seite nicht durchgeht; sie wird dann halbautomatisch oder geführt."
+     }
+    }
+   }
+  },
   "It is not a consumer reporting agency. You agree not to use what you find for credit, insurance, employment or tenant decisions.": {
    "extractionState": "manual",
    "localizations": {
@@ -5954,6 +6023,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Letzter Opt-out-Lauf"
+     }
+    }
+   }
+  },
+  "Last run: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernière exécution : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Última ejecución: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Letzter Durchlauf: %@"
      }
     }
    }
@@ -6345,6 +6437,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nennt eine E-Mail-Adresse für Anfragen"
+     }
+    }
+   }
+  },
+  "Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chargé le %@ : rien ne bloque le formulaire. Si une vérification apparaît un jour à l’envoi, ce site passe en semi-automatisé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cargado el %@: nada bloquea el formulario. Si alguna vez aparece una verificación al enviar, este sitio pasa a semiautomático."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geladen am %@: Nichts blockiert das Formular. Erscheint beim Senden doch eine Prüfung, wird diese Seite halbautomatisch."
      }
     }
    }
@@ -7219,6 +7334,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Braucht Sie"
+     }
+    }
+   }
+  },
+  "Needs you (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À vous de jouer (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Te necesitan (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht Sie (%lld)"
      }
     }
    }
@@ -9063,6 +9201,29 @@
     }
    }
   },
+  "Opting you out in the background": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Désinscription en arrière-plan"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dándote de baja en segundo plano"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Austragung im Hintergrund"
+     }
+    }
+   }
+  },
   "Oregon": {
    "extractionState": "manual",
    "localizations": {
@@ -10213,6 +10374,29 @@
     }
    }
   },
+  "Run now": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lancer maintenant"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ejecutar ahora"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jetzt starten"
+     }
+    }
+   }
+  },
   "Scan %lld sites": {
    "extractionState": "manual",
    "localizations": {
@@ -10788,6 +10972,29 @@
     }
    }
   },
+  "Sent (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyés (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviados (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet (%lld)"
+     }
+    }
+   }
+  },
   "Sent only to sites whose definition asks for it.": {
    "extractionState": "manual",
    "localizations": {
@@ -11313,6 +11520,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Übersprungen oder kürzlich gesendet"
+     }
+    }
+   }
+  },
+  "Skipped or sent recently (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ignorés ou envoyés récemment (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitidos o enviados hace poco (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Übersprungen oder kürzlich gesendet (%lld)"
      }
     }
    }
@@ -14721,6 +14951,29 @@
     }
    }
   },
+  "We have not loaded this form on a real page yet, so a check might appear. You solve it if one does.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n’avons pas encore chargé ce formulaire sur une vraie page : une vérification peut apparaître. Vous la résolvez le cas échéant."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no hemos cargado este formulario en una página real, así que puede aparecer una verificación. La resuelves tú si ocurre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben dieses Formular noch nicht auf einer echten Seite geladen, eine Prüfung könnte erscheinen. Sie lösen sie, falls ja."
+     }
+    }
+   }
+  },
   "We need the current address and legal name because every broker form asks for them. Previous addresses are optional but they find more listings.": {
    "extractionState": "manual",
    "localizations": {
@@ -15361,6 +15614,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine Website durchgehen"
+     }
+    }
+   }
+  },
+  "Working in the background": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Travail en arrière-plan"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trabajando en segundo plano"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arbeitet im Hintergrund"
+     }
+    }
+   }
+  },
+  "Working…": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cours…"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trabajando…"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Läuft…"
      }
     }
    }

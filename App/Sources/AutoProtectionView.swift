@@ -56,50 +56,78 @@ struct AutoProtectionView: View {
     }
 }
 
-/// What the automatic runs did for the selected person.
+/// The automatic opt-out: one button, working in the background. It only asks the person about the sites that did not go through,
+/// and those move to semi-automated or guided.
 struct AutoActivityView: View {
     @EnvironmentObject var model: AppModel
-    @State private var runner: AssistedRunner?
     /// The sites a plan task says this run handles, listed at the bottom when it is opened from the plan.
     var handles: [String] = []
 
     private var rows: [AppModel.AutoOptOutRow] { model.selectedPerson.flatMap { model.optOutRun[$0.id] } ?? [] }
+    private var busy: Bool { model.autoBusy == "optout" }
+
+    private func isSent(_ r: AppModel.AutoOptOutRow) -> Bool { if case .submitted = r.result { return true } else { return false } }
+    /// The ones the person has to do something about.
+    private func needsPerson(_ r: AppModel.AutoOptOutRow) -> Bool {
+        switch r.result { case .challenged, .needsYou, .needsData, .rejected, .failed: return true; default: return false }
+    }
 
     var body: some View {
         List {
             if let person = model.selectedPerson {
                 Section {
-                    runLine(Loc.t("Last scan"), model.autoSettings.lastScan)
-                    runLine(Loc.t("Last opt-out run"), model.autoSettings.lastOptOut)
-                    if let busy = model.autoBusy { Label(busy == "scan" ? "Scanning…" : Loc.t("Sending requests…"), systemImage: "hourglass") }
-                    let ready = model.assistedItems(for: person)
-                    Button("Solve checks and send (\(ready.count) sites)", systemImage: "hand.point.up.left.fill") {
-                        model.requireProfile {
-                            runner = AssistedRunner(items: ready, driver: model.makeAssistedDriver()) { entry, result in
-                                model.recordAssisted(entry, result, for: person)
+                    if busy {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Working in the background", systemImage: "hourglass").font(.headline)
+                            if let p = model.autoProgress {
+                                ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                                Text("\(p.done) of \(p.total) sites. You can leave this screen.").font(.footnote).foregroundStyle(.secondary)
+                            } else {
+                                ProgressView()
+                            }
+                        }
+                        .accessibilityIdentifier("auto-working")
+                    }
+                    Button { model.runAutomaticNow() } label: {
+                        Label(busy ? Loc.t("Working…") : Loc.t("Run now"), systemImage: "bolt.fill").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent).controlSize(.large)
+                    .disabled(busy)
+                    .accessibilityIdentifier("auto-run-now")
+                    if let last = model.autoSettings.lastOptOut {
+                        Text("Last run: \(Loc.date(last, time: true))").font(.footnote).foregroundStyle(.secondary)
+                    }
+                } header: { Text(person.displayName) } footer: {
+                    Text("It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.")
+                }
+                if !rows.isEmpty {
+                    let sent = rows.filter(isSent).count
+                    let attention = rows.filter(needsPerson)
+                    Section {
+                        Text("Sent \(sent) of \(rows.count) sites. \(attention.count) need you.").font(.headline).accessibilityIdentifier("auto-summary")
+                    }
+                    if !attention.isEmpty {
+                        Section("Needs you (\(attention.count))") {
+                            ForEach(attention) { r in
+                                if let entry = model.directory.first(where: { $0.id == r.id }) {
+                                    NavigationLink(value: entry) { attentionRow(r) }
+                                } else { attentionRow(r) }
                             }
                         }
                     }
-                    .disabled(ready.isEmpty && model.isReady(person))
-                    .accessibilityIdentifier("assisted-start")
-                    Button("Preview: fill the forms, send nothing", systemImage: "eye") {
-                        model.requireProfile { Task { await model.runAutoOptOut(for: person, dryRun: true) } }
-                    }.accessibilityIdentifier("auto-preview")
-                    Button("Send opt-out requests now", systemImage: "paperplane.fill") {
-                        model.requireProfile { Task { await model.runAutoOptOut(for: person) } }
-                    }.accessibilityIdentifier("auto-run-now")
-                } header: { Text(person.displayName) }
-                if rows.isEmpty {
+                    DisclosureGroup("Sent (\(sent))") {
+                        ForEach(rows.filter(isSent)) { r in Text(r.domain).font(.footnote) }
+                    }
+                    let other = rows.filter { !isSent($0) && !needsPerson($0) }
+                    if !other.isEmpty {
+                        DisclosureGroup("Skipped or sent recently (\(other.count))") {
+                            ForEach(other) { r in
+                                VStack(alignment: .leading, spacing: 2) { Text(r.domain).font(.footnote); Text(r.result.label).font(.caption).foregroundStyle(.secondary) }
+                            }
+                        }
+                    }
+                } else if !busy {
                     Section { Text("Nothing has run yet for \(person.displayName).").font(.footnote).foregroundStyle(.secondary) }
-                } else {
-                    summary
-                    group("Sent", rows.filter { if case .submitted = $0.result { return true } else { return false } }, tint: .green)
-                    group(Loc.t("Stopped by a bot check or terms prompt"), rows.filter { if case .challenged = $0.result { return true } else { return false } }, tint: .orange)
-                    group(Loc.t("Needs you"), rows.filter { if case .needsYou = $0.result { return true } else { return false } }, tint: .orange)
-                    group(Loc.t("Add details to your profile"), rows.filter { if case .needsData = $0.result { return true } else { return false } }, tint: .blue)
-                    group(Loc.t("Ready (preview only)"), rows.filter { $0.result == .dryRunReady }, tint: .blue)
-                    group(Loc.t("Skipped or sent recently"), rows.filter { switch $0.result { case .skippedNotListed, .tooSoon: return true; default: return false } }, tint: .secondary)
-                    group(Loc.t("The site refused or showed no confirmation"), rows.filter { switch $0.result { case .rejected, .failed: return true; default: return false } }, tint: .red)
                 }
             }
             if !handles.isEmpty {
@@ -108,41 +136,14 @@ struct AutoActivityView: View {
                 }
             }
         }
-        .navigationTitle("Automatic activity")
-        .fullScreenCover(item: Binding(get: { runner.map(RunnerBox.init) }, set: { if $0 == nil { runner = nil } })) { box in
-            AssistedOptOutView(runner: box.runner)
+        .navigationTitle("Automatic opt-out")
+        .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
+    }
+
+    private func attentionRow(_ r: AppModel.AutoOptOutRow) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(r.domain)
+            Text(r.result.label).font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
         }
     }
-
-    private func runLine(_ title: String, _ date: Date?) -> some View {
-        HStack { Text(title); Spacer(); Text(date.map { Loc.date($0, time: true) } ?? Loc.t("Not yet")).foregroundStyle(.secondary) }
-            .font(.footnote)
-    }
-
-    private var summary: some View {
-        let sent = rows.filter { if case .submitted = $0.result { return true } else { return false } }.count
-        let needsYou = rows.filter { switch $0.result { case .needsYou, .challenged, .needsData: return true; default: return false } }.count
-        return Section {
-            Text("Sent \(sent) of \(rows.count) sites. \(needsYou) need you.").font(.headline).accessibilityIdentifier("auto-summary")
-        }
-    }
-
-    @ViewBuilder
-    private func group(_ title: String, _ items: [AppModel.AutoOptOutRow], tint: Color) -> some View {
-        if !items.isEmpty {
-            Section("\(title) (\(items.count))") {
-                ForEach(items) { r in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(r.domain)
-                        Text(r.result.label).font(.caption).foregroundStyle(tint)
-                    }
-                }
-            }
-        }
-    }
-}
-
-private struct RunnerBox: Identifiable {
-    let runner: AssistedRunner
-    var id: ObjectIdentifier { ObjectIdentifier(runner) }
 }

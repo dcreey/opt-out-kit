@@ -715,5 +715,17 @@
  "Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.": "Las búsquedas son diarias y las solicitudes semanales, con la app abierta o cuando iOS lo permite en segundo plano. Nunca resuelve un CAPTCHA ni acepta términos sin tu aprobación aparte. Cuando te das de baja a ti, marca una casilla simple que dice que eres la persona de la solicitud. Los perfiles familiares siempre se lo piden a la propia persona.",
  "We have not loaded this form on a real page yet, so a check might appear. You solve it if one does.": "Aún no hemos cargado este formulario en una página real, así que puede aparecer una verificación. La resuelves tú si ocurre.",
  "We need the current address and legal name because every broker form asks for them. Previous addresses are optional but they find more listings.": "Necesitamos la dirección actual y el nombre legal porque todos los formularios los piden. Las direcciones anteriores son opcionales, pero encuentran más listados.",
- "Your details are in. Add your previous addresses below, as many as you can, then continue.": "Tus datos están. Añade abajo tus direcciones anteriores, todas las que puedas, y continúa."
+ "Your details are in. Add your previous addresses below, as many as you can, then continue.": "Tus datos están. Añade abajo tus direcciones anteriores, todas las que puedas, y continúa.",
+ "%lld of %lld sites. We will only ask you about the ones that need you.": "%lld de %lld sitios. Solo te preguntaremos por los que te necesitan.",
+ "%lld of %lld sites. You can leave this screen.": "%lld de %lld sitios. Puedes salir de esta pantalla.",
+ "It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.": "Rellena y envía cada formulario en segundo plano, sin abrir ningún sitio. Solo se te consulta si un sitio no se completa, y entonces pasa a semiautomático o guiado.",
+ "Last run: %@": "Última ejecución: %@",
+ "Needs you (%lld)": "Te necesitan (%lld)",
+ "Opting you out in the background": "Dándote de baja en segundo plano",
+ "Run now": "Ejecutar ahora",
+ "Sent (%lld)": "Enviados (%lld)",
+ "Skipped or sent recently (%lld)": "Omitidos o enviados hace poco (%lld)",
+ "The app tried this site automatically and it did not go through, so you do it with a guide.": "La app probó este sitio automáticamente y no funcionó, así que lo haces con una guía.",
+ "Working in the background": "Trabajando en segundo plano",
+ "Working…": "Trabajando…"
 }

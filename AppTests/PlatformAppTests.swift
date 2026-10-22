@@ -217,6 +217,20 @@ final class ProfileGateAppTests: XCTestCase {
 }
 
 @MainActor
+final class AutomaticRunAppTests: XCTestCase {
+    func testASiteThatFailedAutomaticallyMovesToAGuideAndACheckToSemiAutomated() {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        guard let entry = m.directory.first(where: { m.method(for: $0).method == .automatic }) else { return XCTFail("no automatic site") }
+        for (outcome, expected) in [("failed", OptOutMethod.guided), ("rejected", .guided), ("challenged", .semiAutomatic)] {
+            m.resetProgressForTesting()
+            m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: outcome, detail: "x"), site: entry.id)
+            XCTAssertEqual(m.method(for: entry).method, expected, outcome)
+        }
+    }
+}
+
+@MainActor
 final class CoachGuideAppTests: XCTestCase {
     func testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn() {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),

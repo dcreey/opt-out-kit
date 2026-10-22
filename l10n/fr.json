@@ -715,5 +715,17 @@
  "Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.": "Les recherches ont lieu chaque jour et les demandes chaque semaine, app ouverte ou quand iOS l’autorise en arrière-plan. Elle ne résout jamais de CAPTCHA et n’accepte jamais de conditions sans votre accord distinct. Quand vous vous désinscrivez, elle coche une simple case indiquant que vous êtes la personne concernée. Les profils de la famille demandent toujours à la personne elle-même.",
  "We have not loaded this form on a real page yet, so a check might appear. You solve it if one does.": "Nous n’avons pas encore chargé ce formulaire sur une vraie page : une vérification peut apparaître. Vous la résolvez le cas échéant.",
  "We need the current address and legal name because every broker form asks for them. Previous addresses are optional but they find more listings.": "Nous avons besoin de l’adresse actuelle et du nom légal, car chaque formulaire les demande. Les adresses précédentes sont facultatives mais trouvent plus de fiches.",
- "Your details are in. Add your previous addresses below, as many as you can, then continue.": "Vos informations sont saisies. Ajoutez ci-dessous vos adresses précédentes, autant que possible, puis continuez."
+ "Your details are in. Add your previous addresses below, as many as you can, then continue.": "Vos informations sont saisies. Ajoutez ci-dessous vos adresses précédentes, autant que possible, puis continuez.",
+ "%lld of %lld sites. We will only ask you about the ones that need you.": "%lld sites sur %lld. Nous ne vous demanderons que pour ceux qui ont besoin de vous.",
+ "%lld of %lld sites. You can leave this screen.": "%lld sites sur %lld. Vous pouvez quitter cet écran.",
+ "It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.": "Elle remplit et envoie chaque formulaire en arrière-plan, sans ouvrir de site. On ne vous sollicite que si un site n’aboutit pas ; il passe alors en semi-automatisé ou guidé.",
+ "Last run: %@": "Dernière exécution : %@",
+ "Needs you (%lld)": "À vous de jouer (%lld)",
+ "Opting you out in the background": "Désinscription en arrière-plan",
+ "Run now": "Lancer maintenant",
+ "Sent (%lld)": "Envoyés (%lld)",
+ "Skipped or sent recently (%lld)": "Ignorés ou envoyés récemment (%lld)",
+ "The app tried this site automatically and it did not go through, so you do it with a guide.": "L’app a essayé ce site automatiquement sans succès : vous le faites avec un guide.",
+ "Working in the background": "Travail en arrière-plan",
+ "Working…": "En cours…"
 }

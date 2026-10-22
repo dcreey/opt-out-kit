@@ -5130,6 +5130,29 @@
     }
    }
   },
+  "The app tried this site automatically and it did not go through, so you do it with a guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’app a essayé ce site automatiquement sans succès : vous le faites avec un guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app probó este sitio automáticamente y no funcionó, así que lo haces con una guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App hat diese Seite automatisch versucht, es ging nicht durch, also machen Sie sie mit einer Anleitung."
+     }
+    }
+   }
+  },
   "The email link expires quickly": {
    "extractionState": "manual",
    "localizations": {

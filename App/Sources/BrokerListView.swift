@@ -31,6 +31,18 @@ struct BrokerListView: View {
                         Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
                     }
                 }
+                if model.autoBusy == "optout" {
+                    Section {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Opting you out in the background", systemImage: "bolt.fill").font(.headline)
+                            if let p = model.autoProgress {
+                                ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                                Text("\(p.done) of \(p.total) sites. We will only ask you about the ones that need you.").font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("home-auto-working")
+                    }
+                }
                 let queue = model.queue
                 let tasks = queue.flatMap(\.tasks)
                 let done = tasks.filter { model.isDone($0) }.count

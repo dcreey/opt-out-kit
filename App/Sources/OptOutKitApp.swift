@@ -48,6 +48,8 @@ final class AppModel: ObservableObject {
     /// Last automatic opt-out run per person, in memory. What was actually sent is also saved in each person's progress.
     @Published private(set) var optOutRun: [UUID: [AutoOptOutRow]] = [:]
     @Published private(set) var autoBusy: String?
+    /// While the weekly opt-out is running: how many sites it has been through, of how many.
+    @Published private(set) var autoProgress: (done: Int, total: Int)?
     /// Latest "where am I listed" scan per person. Kept in memory only: it is a snapshot, not a record.
     @Published private(set) var exposure: [UUID: [ScanResult]] = [:]
     @Published private(set) var scanProgress: (done: Int, total: Int)?
@@ -419,8 +421,10 @@ final class AppModel: ObservableObject {
     /// Whether the account owner allowed "I am this person" boxes to be ticked for them. Never applies to family profiles.
     /// How this site gets opted out for the selected person, including what real page loads and past sends have shown.
     func method(for entry: DirectoryEntry) -> MethodVerdict {
-        let challenged = progress.optOutAttempts[entry.id]?.last?.outcome == "challenged"
-        return OptOutMethods.classify(resolved(entry), confirmingIdentity: confirmingIdentityForSelected, challengedBefore: challenged)
+        // What the last automatic try showed: a check moves the site to semi-automated, a failure or refusal to a guide.
+        let last = progress.optOutAttempts[entry.id]?.last?.outcome
+        return OptOutMethods.classify(resolved(entry), confirmingIdentity: confirmingIdentityForSelected, challengedBefore: last == "challenged",
+                                      failedBefore: last == "failed" || last == "rejected")
     }
     var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
 
@@ -456,9 +460,13 @@ final class AppModel: ObservableObject {
     func runAutoOptOut(for original: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
         guard storageProblem == nil, isReady(original) else { return }
+        let ownsBusy = autoBusy == nil && !dryRun
+        if ownsBusy { autoBusy = "optout" }
+        defer { if ownsBusy { autoBusy = nil; autoProgress = nil } }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
-        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now))
+        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
+                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } })
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -481,6 +489,19 @@ final class AppModel: ObservableObject {
         save()
         if !dryRun { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
+    }
+
+    #if DEBUG
+    func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
+    func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
+    #endif
+
+    /// The one way to run the automatic opt-out by hand: it works in the background and only reports the sites that need the person.
+    func runAutomaticNow() {
+        requireProfile { [self] in
+            guard autoBusy == nil, let person = selectedPerson else { return }
+            Task { await runAutoOptOut(for: person) }
+        }
     }
 
     /// Sites the person can finish with one tap each: their form is found, their details are on the profile, and nothing was sent

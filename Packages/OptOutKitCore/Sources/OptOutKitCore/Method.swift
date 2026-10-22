@@ -36,7 +36,7 @@ public enum OptOutMethods {
                                          emails: ["pat@example.com"], phones: ["555-0100"], birthdate: "1980-01-01", confirmsOwnIdentity: confirmingIdentity) }
 
     /// `confirmingIdentity` is true for the account owner when they have allowed "I am this person" boxes to be ticked for them.
-    public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false) -> MethodVerdict {
+    public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false, failedBefore: Bool = false) -> MethodVerdict {
         let signals = e.signals ?? []
         guard let form = e.optOutForm else {
             if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page but could not read a form on it, so we take you there.")) }
@@ -58,6 +58,9 @@ public enum OptOutMethods {
         case .ready:
             if listing != nil {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We search the site for you; you tap your own listing and clear the check, and we fill in and send the rest."))
+            }
+            if failedBefore {
+                return MethodVerdict(method: .guided, reason: L10n.t("The app tried this site automatically and it did not go through, so you do it with a guide."))
             }
             if challengedBefore {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("A recent automatic send was stopped by a check on the site, so you solve it."))

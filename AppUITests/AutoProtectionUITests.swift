@@ -66,8 +66,8 @@ final class AutoProtectionUITests: XCTestCase {
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
-        XCTAssertTrue(app.buttons["auto-preview"].waitForExistence(timeout: 5))
-        app.buttons["auto-preview"].tap()
+        XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 5), "one button runs everything")
+        app.buttons["auto-run-now"].tap()
         XCTAssertTrue(app.staticTexts["auto-summary"].waitForExistence(timeout: 60))
         shot(app, "3-activity-after-preview")
     }
@@ -86,31 +86,5 @@ final class AutoProtectionUITests: XCTestCase {
         app.buttons["answer-paywalled"].tap()
         XCTAssertTrue(app.staticTexts["earned"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["2 pts"].waitForExistence(timeout: 3))
-    }
-}
-
-final class SolveAndSendUITests: XCTestCase {
-    func testTheSolveAndSendScreenWalksThroughSitesAndAsksOnlyForTheCheck() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-submit"]
-        app.launch()
-        app.buttons["profile-button"].tap()
-        app.fillRequiredProfile()
-        app.buttons["Done"].tap()
-
-        app.tabBars.buttons["About"].tap()
-        var scrolls = 0
-        while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
-        app.buttons["auto-activity"].tap()
-        let start = app.buttons["assisted-start"]
-        XCTAssertTrue(start.waitForExistence(timeout: 5))
-        XCTAssertTrue(start.isEnabled, "with a name and email there are sites to solve and send")
-        start.tap()
-
-        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["assisted-instruction"].exists)
-        let a = XCTAttachment(screenshot: app.screenshot()); a.name = "5-solve-and-send"; a.lifetime = .keepAlways; add(a)
-        app.buttons["assisted-skip"].tap()
-        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 10), "on to the next site")
     }
 }
