@@ -16,7 +16,7 @@ struct BrokerDetailView: View {
             }
             if !model.progress.isDone(broker.id) {
                 GuideButton(title: Loc.t("Guide me through it"), subtitle: Loc.t("Full-screen browser, one step at a time")) {
-                    guide = model.guidedRunner(for: broker)
+                    model.requireProfile { guide = model.guidedRunner(for: broker) }
                 }
             }
             if !broker.isVerified {

@@ -74,17 +74,19 @@ struct AutoActivityView: View {
                     if let busy = model.autoBusy { Label(busy == "scan" ? "Scanning…" : Loc.t("Sending requests…"), systemImage: "hourglass") }
                     let ready = model.assistedItems(for: person)
                     Button("Solve checks and send (\(ready.count) sites)", systemImage: "hand.point.up.left.fill") {
-                        runner = AssistedRunner(items: ready, driver: model.makeAssistedDriver()) { entry, result in
-                            model.recordAssisted(entry, result, for: person)
+                        model.requireProfile {
+                            runner = AssistedRunner(items: ready, driver: model.makeAssistedDriver()) { entry, result in
+                                model.recordAssisted(entry, result, for: person)
+                            }
                         }
                     }
-                    .disabled(ready.isEmpty)
+                    .disabled(ready.isEmpty && model.isReady(person))
                     .accessibilityIdentifier("assisted-start")
                     Button("Preview: fill the forms, send nothing", systemImage: "eye") {
-                        Task { await model.runAutoOptOut(for: person, dryRun: true) }
+                        model.requireProfile { Task { await model.runAutoOptOut(for: person, dryRun: true) } }
                     }.accessibilityIdentifier("auto-preview")
                     Button("Send opt-out requests now", systemImage: "paperplane.fill") {
-                        Task { await model.runAutoOptOut(for: person) }
+                        model.requireProfile { Task { await model.runAutoOptOut(for: person) } }
                     }.accessibilityIdentifier("auto-run-now")
                 } header: { Text(person.displayName) }
                 if rows.isEmpty {

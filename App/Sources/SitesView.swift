@@ -71,7 +71,7 @@ struct SitesView: View {
                 }
                 Section {
                     scoreCard
-                    Button { showQuick = true } label: {
+                    Button { model.requireProfile { showQuick = true } } label: {
                         Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
                     }
                     .disabled(model.searchBlockedReason != nil)
@@ -80,7 +80,7 @@ struct SitesView: View {
                     Text("Look a site up yourself in 20 seconds and tell us what you see. Each look earns points.")
                 }
                 Section {
-                    Button { showScan = true } label: {
+                    Button { model.requireProfile { showScan = true } } label: {
                         Label("Scan for \(model.selectedPerson?.displayName ?? "my") listings", systemImage: "dot.radiowaves.left.and.right")
                     }
                     .disabled(model.searchBlockedReason != nil)
@@ -96,6 +96,7 @@ struct SitesView: View {
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
             .planDestinations()
+            .keyboardDone()
             .coach(.sites)
             .sheet(isPresented: $showScan) { ExposureView() }
             .sheet(isPresented: $showQuick) { QuickCheckView() }
@@ -131,7 +132,7 @@ struct SitesView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(e.domain).font(.headline)
-                Text(model.method(for: e).reason).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                Text(model.method(for: e).reason).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 let n = Directory.familySize(of: e, in: model.directory)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
                 if let note = platformNote(for: e) { Text(note).font(.caption).foregroundStyle(.teal) }
@@ -191,7 +192,7 @@ struct BrokerInfoView: View {
             Section {
                 GuideButton(title: Loc.t("Guide me through it"), subtitle: OptOutMethods.classify(broker, in: model.directory).method == .semiAutomatic
                             ? Loc.t("We search for you; you tap your listing and clear the check") : "\(broker.steps.count) steps, in a full-screen browser") {
-                    guide = model.guidedRunner(for: broker)
+                    model.requireProfile { guide = model.guidedRunner(for: broker) }
                 }
             }
             if let issue = model.activeIssue(for: broker.id) {
@@ -374,7 +375,7 @@ struct DirectoryInfoView: View {
         List {
             Section {
                 GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
-                    guide = model.guidedRunner(for: entry)
+                    model.requireProfile { guide = model.guidedRunner(for: entry) }
                 }
             }
             if !alsoHandles.isEmpty {

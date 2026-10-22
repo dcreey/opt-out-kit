@@ -11,6 +11,7 @@ struct RootView: View {
             SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }.tag(1)
             AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
         }
+        .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
         .onChange(of: tab) { _, _ in Keyboard.hide() }
         .keyboardDone()
         .fullScreenCover(isPresented: Binding(

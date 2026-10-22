@@ -3,6 +3,14 @@
 Status 2026-10-21. Built and tested in the simulator against **local test pages and fakes only**. No real site has been sent
 anything by this feature, and no real person's details were used.
 
+## What counts as automatic
+
+A site is automatic only when its form was loaded on a real page and nothing blocked it. If a person might have to solve anything (a bot check, a terms prompt, a confirmation box), it is semi-automated. A site whose form has never been loaded is also semi-automated until a real load shows it is clear, and a site where an automatic send was stopped by a check moves to semi-automated by itself. The owner's own plain "I am this person" box is ticked automatically (never for family profiles).
+
+## Nothing runs without a profile
+
+Every way of opting someone out (the automatic run, the assisted run, guides, scans) first needs the person's legal name, current address and the household email. If any is missing the app shows a "Before we opt anyone out" sheet, asks for them, prompts for previous addresses (as many as the person can remember; optional) and then carries on with what they were doing.
+
 ## One site, one group
 
 Groups run in this order: an official removal service for the person's state or country (California DROP today), then our automatic opt-out, semi-automated, guided and manual. A site is listed in the first group that handles it and in no later one; two official services never list the same site. The same order decides what the weekly run skips.

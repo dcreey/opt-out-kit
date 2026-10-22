@@ -43,7 +43,7 @@ struct PlanTaskRow: View {
                 Text(task.title).font(.headline)
                 if task.kind == .automatic { Text(Loc.f("%lld sites in one run", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 else if task.isShared { Text(Loc.f("One request handles %lld sites", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
-                Text(task.reason).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                Text(task.reason).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 if !places.isEmpty, task.isRegistered(in: places) {
                     Label(Loc.f("Registered where you live: %@", task.registeredIn.intersection(places).sorted().joined(separator: ", ")), systemImage: "mappin.circle.fill")
                         .font(.caption).foregroundStyle(.teal)
@@ -52,6 +52,7 @@ struct PlanTaskRow: View {
             Spacer()
         }
         .accessibilityElement(children: .combine)
+        .simultaneousGesture(TapGesture().onEnded { Keyboard.hide() })      // opening a task puts the keyboard away
     }
 }
 

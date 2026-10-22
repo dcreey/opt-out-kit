@@ -553,29 +553,6 @@
     }
    }
   },
-  "A plain form we can fill in and send, with no bot check seen.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Un formulaire simple que nous pouvons remplir et envoyer, sans vérification anti-robot repérée."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Un formulario sencillo que podemos rellenar y enviar, sin verificación anti-bots a la vista."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ein einfaches Formular, das wir ausfüllen und senden können, ohne erkennbare Bot-Prüfung."
-     }
-    }
-   }
-  },
   "A recent automatic send was stopped by a check on the site, so you solve it.": {
    "extractionState": "manual",
    "localizations": {
@@ -2669,25 +2646,25 @@
     }
    }
   },
-  "Loaded %@: nothing blocks the form. If the site adds a check when sending, we stop and ask you.": {
+  "Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Chargé le %@ : rien ne bloque le formulaire. Si le site ajoute une vérification à l'envoi, nous nous arrêtons et vous demandons."
+      "value": "Chargé le %@ : rien ne bloque le formulaire. Si une vérification apparaît un jour à l’envoi, ce site passe en semi-automatisé."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cargado el %@: nada bloquea el formulario. Si el sitio añade una verificación al enviar, nos detenemos y te preguntamos."
+      "value": "Cargado el %@: nada bloquea el formulario. Si alguna vez aparece una verificación al enviar, este sitio pasa a semiautomático."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Am %@ geladen: Nichts blockiert das Formular. Fügt die Website beim Senden eine Prüfung hinzu, halten wir an und fragen Sie."
+      "value": "Geladen am %@: Nichts blockiert das Formular. Erscheint beim Senden doch eine Prüfung, wird diese Seite halbautomatisch."
      }
     }
    }
@@ -6023,6 +6000,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir gehen über das Register eines einzelnen Landes hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (bisher US-Bundesstaaten), mit weiteren bekannten Brokern – insgesamt %@ Websites. Viele sind US-Unternehmen, die das Recht Ihres Landes womöglich nicht beachten müssen, doch die meisten nehmen Opt-out-Anfragen von jedem an, und diese App sendet sie ihnen."
+     }
+    }
+   }
+  },
+  "We have not loaded this form on a real page yet, so a check might appear. You solve it if one does.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n’avons pas encore chargé ce formulaire sur une vraie page : une vérification peut apparaître. Vous la résolvez le cas échéant."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no hemos cargado este formulario en una página real, así que puede aparecer una verificación. La resuelves tú si ocurre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben dieses Formular noch nicht auf einer echten Seite geladen, eine Prüfung könnte erscheinen. Sie lösen sie, falls ja."
      }
     }
    }

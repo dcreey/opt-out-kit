@@ -32,15 +32,15 @@ final class IdentityConfirmationTests: XCTestCase {
         return try XCTUnwrap(state)
     }
 
-    func testOnlyThePlainSelfStatementIsTickedForTheOwnerWhoAllowedIt() async throws {
+    func testOnlyThePlainSelfStatementIsTickedForTheOwner() async throws {
         let me = Person(displayName: "Me", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"], confirmsOwnIdentity: true)
         let state = try await ticked(me)
         XCTAssertEqual(state, "true|false|false|false")
     }
 
-    func testNothingIsTickedForAFamilyProfileOrAnOwnerWhoDidNotAllowIt() async throws {
+    func testNothingIsTickedForAFamilyProfile() async throws {
         for person in [Person(displayName: "Mom", relationship: .parent, names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"], confirmsOwnIdentity: true),
-                       Person(displayName: "Me", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"], confirmsOwnIdentity: false)] {
+                       Person(displayName: "Dad", relationship: .parent, names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"])] {
             // These plans are not "ready" when the form lists the box, but this page's form description omits it, as a real profile may:
             // the live page must still be left untouched.
             let plan = FormFiller.plan(for: form(), signals: nil, person: person)
@@ -55,14 +55,11 @@ final class IdentityConfirmationTests: XCTestCase {
         }
     }
 
-    func testTheModelOnlyEverSetsItOnTheOwnerProfile() throws {
+    func testTheOwnerNeedsNoSettingAndFamilyNeverGetsIt() {
         let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         _ = model.addPerson(named: "Mom", relationship: .parent)
-        model.setConfirmsOwnIdentity(true)
-        XCTAssertTrue(model.confirmsOwnIdentity)
-        XCTAssertTrue(model.household.people.filter { $0.relationship != .me }.allSatisfy { !$0.confirmsOwnIdentity })
-        model.setConfirmsOwnIdentity(false)
-        XCTAssertFalse(model.confirmsOwnIdentity)
+        XCTAssertTrue(model.household.people.first { $0.relationship == .me }!.mayConfirmOwnIdentity())
+        XCTAssertFalse(model.household.people.first { $0.displayName == "Mom" }!.mayConfirmOwnIdentity())
     }
 }

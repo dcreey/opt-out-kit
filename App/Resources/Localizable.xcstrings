@@ -1427,6 +1427,29 @@
     }
    }
   },
+  "Add a person first.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajoutez d’abord une personne."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Primero añade a una persona."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fügen Sie zuerst eine Person hinzu."
+     }
+    }
+   }
+  },
   "Add details to your profile": {
    "extractionState": "manual",
    "localizations": {
@@ -1469,6 +1492,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Fügen Sie alle weiteren Namen hinzu, unter denen Sie gelistet waren: Spitznamen, frühere rechtliche Namen, Geburtsnamen, Schreibvarianten. Angehörige fügen Sie als eigene Person hinzu."
+     }
+    }
+   }
+  },
+  "Add more addresses": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajouter des adresses"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Añadir más direcciones"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weitere Adressen hinzufügen"
      }
     }
    }
@@ -1561,6 +1607,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Frühere Adresse hinzufügen"
+     }
+    }
+   }
+  },
+  "Add previous addresses?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajouter d’anciennes adresses ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Añadir direcciones anteriores?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Frühere Adressen hinzufügen?"
      }
     }
    }
@@ -2255,6 +2324,29 @@
     }
    }
   },
+  "Before we opt anyone out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Avant de désinscrire quelqu’un"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Antes de dar de baja a nadie"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bevor wir jemanden austragen"
+     }
+    }
+   }
+  },
   "Behind terms you must accept yourself": {
    "extractionState": "manual",
    "localizations": {
@@ -2412,6 +2504,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Brokers keep old addresses on file. The more places you have lived, the more listings we can find and remove. Scroll down to Previous addresses and add as many as you can remember.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les courtiers gardent d’anciennes adresses. Plus vous avez habité d’endroits, plus nous trouvons et supprimons de fiches. Faites défiler jusqu’à Adresses précédentes et ajoutez-en autant que possible."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los intermediarios guardan direcciones antiguas. Cuantos más lugares hayas habitado, más listados podemos encontrar y eliminar. Desplázate hasta Direcciones anteriores y añade todas las que recuerdes."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datenhändler speichern alte Adressen. Je mehr Orte Sie kennen, desto mehr Einträge finden und entfernen wir. Scrollen Sie zu „Frühere Adressen“ und fügen Sie so viele hinzu, wie Sie wissen."
      }
     }
    }
@@ -3125,6 +3240,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Connecticut"
+     }
+    }
+   }
+  },
+  "Continue": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weiter"
+     }
+    }
+   }
+  },
+  "Continue without them": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuer sans elles"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuar sin ellas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ohne sie fortfahren"
      }
     }
    }
@@ -10121,6 +10282,29 @@
     }
    }
   },
+  "Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les recherches ont lieu chaque jour et les demandes chaque semaine, app ouverte ou quand iOS l’autorise en arrière-plan. Elle ne résout jamais de CAPTCHA et n’accepte jamais de conditions sans votre accord distinct. Quand vous vous désinscrivez, elle coche une simple case indiquant que vous êtes la personne concernée. Les profils de la famille demandent toujours à la personne elle-même."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las búsquedas son diarias y las solicitudes semanales, con la app abierta o cuando iOS lo permite en segundo plano. Nunca resuelve un CAPTCHA ni acepta términos sin tu aprobación aparte. Cuando te das de baja a ti, marca una casilla simple que dice que eres la persona de la solicitud. Los perfiles familiares siempre se lo piden a la propia persona."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Suchläufe laufen täglich, Anfragen wöchentlich, bei geöffneter App oder wenn iOS es im Hintergrund erlaubt. Sie löst nie ein CAPTCHA und akzeptiert nie Bedingungen ohne Ihre gesonderte Zustimmung. Tragen Sie sich selbst aus, setzt sie ein einfaches Häkchen, dass Sie die betroffene Person sind. Familienprofile fragen immer die Person selbst."
+     }
+    }
+   }
+  },
   "Scroll to the bottom to continue.": {
    "extractionState": "manual",
    "localizations": {
@@ -14537,6 +14721,29 @@
     }
    }
   },
+  "We need the current address and legal name because every broker form asks for them. Previous addresses are optional but they find more listings.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons besoin de l’adresse actuelle et du nom légal, car chaque formulaire les demande. Les adresses précédentes sont facultatives mais trouvent plus de fiches."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesitamos la dirección actual y el nombre legal porque todos los formularios los piden. Las direcciones anteriores son opcionales, pero encuentran más listados."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir brauchen die aktuelle Adresse und den rechtlichen Namen, weil jedes Formular sie verlangt. Frühere Adressen sind optional, finden aber mehr Einträge."
+     }
+    }
+   }
+  },
   "We open the site; you find its opt-out link": {
    "extractionState": "manual",
    "localizations": {
@@ -15890,6 +16097,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Angaben sind eingetragen. Diese Website verlangt, dass Sie ihre Bedingungen akzeptieren: Lesen Sie sie und akzeptieren Sie selbst, und bestehen Sie dann die Prüfung. Danach senden wir es."
+     }
+    }
+   }
+  },
+  "Your details are in. Add your previous addresses below, as many as you can, then continue.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont saisies. Ajoutez ci-dessous vos adresses précédentes, autant que possible, puis continuez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están. Añade abajo tus direcciones anteriores, todas las que puedas, y continúa."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind eingetragen. Fügen Sie unten Ihre früheren Adressen hinzu, so viele Sie können, und fahren Sie fort."
      }
     }
    }

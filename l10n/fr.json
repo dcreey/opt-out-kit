@@ -703,5 +703,17 @@
  "The guide stays at the top of the screen and the site's own page sits below it.": "Le guide reste en haut de l’écran et la page du site se trouve en dessous.",
  "We find and remove your data for you": "Nous trouvons et supprimons vos données pour vous",
  "You handle bot checks, phone codes and ID steps yourself. If a page is broken, tap Not working.": "Vous gérez vous-même les vérifications anti-robot, codes téléphoniques et pièces d’identité. Si une page est cassée, touchez Ne fonctionne pas.",
- "You solve the bot check, and pick your own listing if the site asks. We never do that for you.": "Vous résolvez la vérification anti-robot et choisissez votre propre fiche si le site le demande. Nous ne le faisons jamais à votre place."
+ "You solve the bot check, and pick your own listing if the site asks. We never do that for you.": "Vous résolvez la vérification anti-robot et choisissez votre propre fiche si le site le demande. Nous ne le faisons jamais à votre place.",
+ "Add a person first.": "Ajoutez d’abord une personne.",
+ "Add more addresses": "Ajouter des adresses",
+ "Add previous addresses?": "Ajouter d’anciennes adresses ?",
+ "Before we opt anyone out": "Avant de désinscrire quelqu’un",
+ "Brokers keep old addresses on file. The more places you have lived, the more listings we can find and remove. Scroll down to Previous addresses and add as many as you can remember.": "Les courtiers gardent d’anciennes adresses. Plus vous avez habité d’endroits, plus nous trouvons et supprimons de fiches. Faites défiler jusqu’à Adresses précédentes et ajoutez-en autant que possible.",
+ "Continue": "Continuer",
+ "Continue without them": "Continuer sans elles",
+ "Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.": "Chargé le %@ : rien ne bloque le formulaire. Si une vérification apparaît un jour à l’envoi, ce site passe en semi-automatisé.",
+ "Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.": "Les recherches ont lieu chaque jour et les demandes chaque semaine, app ouverte ou quand iOS l’autorise en arrière-plan. Elle ne résout jamais de CAPTCHA et n’accepte jamais de conditions sans votre accord distinct. Quand vous vous désinscrivez, elle coche une simple case indiquant que vous êtes la personne concernée. Les profils de la famille demandent toujours à la personne elle-même.",
+ "We have not loaded this form on a real page yet, so a check might appear. You solve it if one does.": "Nous n’avons pas encore chargé ce formulaire sur une vraie page : une vérification peut apparaître. Vous la résolvez le cas échéant.",
+ "We need the current address and legal name because every broker form asks for them. Previous addresses are optional but they find more listings.": "Nous avons besoin de l’adresse actuelle et du nom légal, car chaque formulaire les demande. Les adresses précédentes sont facultatives mais trouvent plus de fiches.",
+ "Your details are in. Add your previous addresses below, as many as you can, then continue.": "Vos informations sont saisies. Ajoutez ci-dessous vos adresses précédentes, autant que possible, puis continuez."
 }

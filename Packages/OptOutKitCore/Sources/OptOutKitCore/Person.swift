@@ -82,8 +82,8 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
     public var isMinor: Bool
     /// A public official or celebrity. The same terms forbid searching for them. Defaults to no.
     public var isPublicFigure: Bool
-    /// Lets the app tick a plain "I confirm I am this person" box on an opt-out form. Honored only for the account owner
-    /// (`relationship == .me`), never for family profiles: see `mayConfirmOwnIdentity`.
+    /// Kept so older saved profiles still load. The owner's plain "I am this person" box is now always ticked for them (see
+    /// `mayConfirmOwnIdentity`), so this value no longer changes anything.
     public var confirmsOwnIdentity: Bool
 
     public init(id: UUID = UUID(), displayName: String, relationship: Relationship = .otherFamily,
@@ -118,7 +118,7 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
 
     /// Whether the app may tick "I am this person" for this profile: only the account owner, only after they allowed it, never a minor.
     public func mayConfirmOwnIdentity(on date: Date = Date()) -> Bool {
-        relationship == .me && confirmsOwnIdentity && !isMinorNow(on: date)
+        relationship == .me && !isMinorNow(on: date)
     }
 
     /// Age in whole years from a "YYYY-MM-DD" birthdate, or nil when there is none or it cannot be read.

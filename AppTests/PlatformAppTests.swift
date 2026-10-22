@@ -182,6 +182,41 @@ final class HandledOnceTests: XCTestCase {
 }
 
 @MainActor
+final class ProfileGateAppTests: XCTestCase {
+    private func model() -> AppModel {
+        AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                 defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+    }
+
+    func testNothingRunsUntilTheCurrentAddressIsInThenItRunsOnItsOwn() {
+        let m = model()
+        var ran = 0
+        m.requireProfile { ran += 1 }
+        XCTAssertEqual(ran, 0, "no name, address or email yet")
+        XCTAssertTrue(m.showProfileGate)
+        XCTAssertNil(m.guidedRunner(for: m.brokers[0]))
+        XCTAssertTrue(m.assistedItems(for: m.selectedPerson!).isEmpty)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        m.profileGateFinished(completed: true)
+        XCTAssertEqual(ran, 1, "carries on with what the person was doing")
+        XCTAssertFalse(m.showProfileGate)
+        m.requireProfile { ran += 1 }
+        XCTAssertEqual(ran, 2, "once complete there is no gate")
+    }
+
+    func testCancellingTheGateRunsNothing() {
+        let m = model()
+        var ran = false
+        m.requireProfile { ran = true }
+        m.profileGateFinished(completed: false)
+        XCTAssertFalse(ran); XCTAssertFalse(m.showProfileGate)
+    }
+}
+
+@MainActor
 final class CoachGuideAppTests: XCTestCase {
     func testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn() {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),

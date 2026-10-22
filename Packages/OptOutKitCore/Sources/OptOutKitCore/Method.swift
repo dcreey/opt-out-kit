@@ -63,11 +63,12 @@ public enum OptOutMethods {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("A recent automatic send was stopped by a check on the site, so you solve it."))
             }
             guard let live = e.liveCheck else {
-                // Never measured on a real page: a captcha script on the page is only a hint, so stay cautious.
+                // Never loaded on a real page, so we cannot promise nothing will ask for a check. Anything a person might have to
+                // solve is not fully automated: it is semi-automated until a real load shows the form is clear.
                 if signals.contains(where: { $0.hasPrefix("captcha_") }) {
                     return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The page mentions a bot check and we have not loaded it to see whether one appears."))
                 }
-                return MethodVerdict(method: .automatic, reason: L10n.t("A plain form we can fill in and send, with no bot check seen."))
+                return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We have not loaded this form on a real page yet, so a check might appear. You solve it if one does."))
             }
             // Measured: what really blocked the form when the page was loaded.
             for blocker in live.blockers {
@@ -75,7 +76,7 @@ public enum OptOutMethods {
                 let what = blocker.hasPrefix("check") ? "a bot check" : blocker.hasPrefix("terms") ? "a terms prompt" : "a confirmation box"
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.f("We fill in and send the form; the page shows %@ that you handle.", what))
             }
-            return MethodVerdict(method: .automatic, reason: L10n.f("Loaded %@: nothing blocks the form. If the site adds a check when sending, we stop and ask you.", live.checked))
+            return MethodVerdict(method: .automatic, reason: L10n.f("Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.", live.checked))
         }
     }
 

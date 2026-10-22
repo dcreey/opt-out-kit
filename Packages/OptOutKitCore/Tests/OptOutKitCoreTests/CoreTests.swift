@@ -1509,8 +1509,17 @@ final class OptOutMethodTests: XCTestCase {
                               optOutURL: url ? page : nil, optOutForm: form ? f : nil, signals: signals)
     }
 
+    func testOnlyAFormLoadedOnARealPageWithNothingBlockingItIsAutomatic() {
+        var measured = entry(signals: ["email_input"])
+        measured.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
+        XCTAssertEqual(OptOutMethods.classify(measured).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["email_input"])).method, .semiAutomatic,
+                       "never loaded: a check might appear, and anything a person might have to solve is not fully automated")
+        measured.liveCheck = LiveCheck(checked: "2026-10-22", blockers: ["check:recaptcha"])
+        XCTAssertEqual(OptOutMethods.classify(measured).method, .semiAutomatic)
+    }
+
     func testAPlainFormIsAutomaticAndABotCheckMakesItSemiAutomated() {
-        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["email_input"])).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(entry(signals: ["captcha_recaptcha"])).method, .semiAutomatic)
         XCTAssertEqual(OptOutMethods.classify(entry(signals: ["captcha_turnstile"])).method, .semiAutomatic)
     }
@@ -1576,8 +1585,8 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         }
     }
 
-    func testTheOwnerWhoDidNotAllowItStillConfirmsThemselves() {
-        XCTAssertEqual({ if case .needsYou = FormFiller.plan(for: form(box), signals: nil, person: person(.me, allowed: false)).verdict { return true } else { return false } }(), true)
+    func testTheOwnerIsConfirmedWhateverAnOldSavedSettingSays() {
+        XCTAssertEqual(FormFiller.plan(for: form(box), signals: nil, person: person(.me, allowed: false)).verdict, .ready)
     }
 
     func testAMinorOwnerProfileIsNeverConfirmed() {
@@ -1600,17 +1609,18 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         }
     }
 
-    func testOldProfilesLoadWithItOffAndOnlyTheOwnerCanUseIt() throws {
+    func testOldProfilesLoadAndOnlyTheOwnerGetsTheirBoxTicked() throws {
         let old = #"{"id":"\#(UUID().uuidString)","displayName":"Me","relationship":"me"}"#
         let p = try JSONDecoder().decode(Person.self, from: Data(old.utf8))
-        XCTAssertFalse(p.confirmsOwnIdentity); XCTAssertFalse(p.mayConfirmOwnIdentity())
+        XCTAssertTrue(p.mayConfirmOwnIdentity(), "the owner needs no setting: their own box is always ticked")
         XCTAssertFalse(Person(displayName: "Mom", relationship: .parent, confirmsOwnIdentity: true).mayConfirmOwnIdentity())
-        XCTAssertTrue(Person(displayName: "Me", relationship: .me, confirmsOwnIdentity: true).mayConfirmOwnIdentity())
+        XCTAssertTrue(Person(displayName: "Me", relationship: .me).mayConfirmOwnIdentity())
     }
 
     func testTheSiteIsAutomaticForTheOwnerWhoAllowedItAndGuidedOtherwise() {
-        let e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+        var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
                                optOutURL: URL(string: "https://x.example/optout"), optOutForm: form(box), signals: [])
+        e.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(e).method, .guided)
     }

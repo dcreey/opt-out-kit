@@ -237,7 +237,7 @@ struct AssistedOptOutView: View {
                     }
                     ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1)))
                     Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).accessibilityIdentifier("assisted-site")
-                    Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).lineLimit(3)
+                    Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("assisted-instruction")
                     Spacer(minLength: 0)
                     HStack {

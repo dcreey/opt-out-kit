@@ -7,7 +7,7 @@ struct OptOutKitApp: App {
     @StateObject private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
-    init() {}
+    init() { Keyboard.install() }
 
     var body: some Scene {
         WindowGroup {
@@ -26,19 +26,19 @@ struct OptOutKitApp: App {
 /// The household is one encrypted file on the device; the key lives in the Keychain (KeychainKey.swift).
 @MainActor
 final class AppModel: ObservableObject {
-    @Published private(set) var brokers: [Broker] = []
+    @Published private(set) var brokers: [Broker] = [] { didSet { planCache = nil } }
     /// Every profiled site, including those with no hand-written flow yet.
-    @Published private(set) var directory: [DirectoryEntry] = []
+    @Published private(set) var directory: [DirectoryEntry] = [] { didSet { planCache = nil } }
     /// Government and industry services that send one request to many brokers at once (California DROP). See docs/PLATFORMS.md.
-    @Published private(set) var platforms: [Platform] = []
+    @Published private(set) var platforms: [Platform] = [] { didSet { planCache = nil } }
     /// What each state requires of data brokers and gives its residents, and the counts from the registries we pull.
     @Published private(set) var jurisdictions: [Jurisdiction] = []
     @Published private(set) var registrySummary: RegistrySummary?
     /// Paragraphs of terms text a person has (or has not yet) reviewed. Ships with none reviewed, so nothing is ever accepted
     /// for anyone until a reviewer marks paragraphs and the person turns this on. See docs/TERMS.md.
     @Published private(set) var termsLibrary: TermsLibrary?
-    @Published private(set) var household = Household()
-    @Published private(set) var selectedID: UUID
+    @Published private(set) var household = Household() { didSet { planCache = nil } }
+    @Published private(set) var selectedID: UUID { didSet { planCache = nil } }
     @Published var loadError: String?
     /// Set when saved data exists but cannot be opened. Saving is paused so it is never overwritten by accident.
     @Published private(set) var storageProblem: String?
@@ -70,6 +70,7 @@ final class AppModel: ObservableObject {
         guard Self.languages.contains(where: { $0.code == code }) else { return }
         language = code
         L10n.language = code; Loc.language = code
+        planCache = nil
         defaults.set(code, forKey: Self.languageKey)
     }
 
@@ -271,14 +272,24 @@ final class AppModel: ObservableObject {
     var countryHasRegistries: Bool { (ownerCountry ?? "US") == "US" }
 
     /// The ranked queue: official service, then the app's own automatic run, then semi-automated, then manual, nearest first.
-    var queue: [QueueBand] { OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries) }
+    var queue: [QueueBand] { builtPlan().queue }
+
+    /// The plan and its ranked queue are built from every site, so they are kept until something they depend on changes (the profile,
+    /// progress, language or data). Rebuilding them on every redraw made typing in the search box lag.
+    private var planCache: (plan: [PlanStep], queue: [QueueBand])?
+
+    private func builtPlan() -> (plan: [PlanStep], queue: [QueueBand]) {
+        if let planCache { return planCache }
+        let eligible: [Platform] = selectedPerson.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
+        let plan = OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
+                                    classifyEntry: { method(for: $0) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
+        let built = (plan, OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries))
+        planCache = built
+        return built
+    }
 
     /// The ordered steps for the selected person: their official removal service first, then ours, each site once.
-    var plan: [PlanStep] {
-        let eligible: [Platform] = selectedPerson.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
-        return OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
-                                classifyEntry: { method(for: $0) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
-    }
+    var plan: [PlanStep] { builtPlan().plan }
 
     /// Whether the selected person has already done what this task asks.
     func isDone(_ task: PlanTask) -> Bool {
@@ -362,6 +373,27 @@ final class AppModel: ObservableObject {
         return p.missingRequiredDetails + (household.formEmail == nil ? [L10n.noun("Email address")] : [])
     }
 
+    // MARK: Profile gate: nothing runs until the person's current address is in
+
+    /// True while the "finish your profile" sheet is showing.
+    @Published var showProfileGate = false
+    private var afterProfile: (() -> Void)?
+
+    /// Runs `action` if the selected person has their legal name, current address and the household email; otherwise asks for them
+    /// first (and prompts for previous addresses) and runs `action` once they are in. Every way of opting someone out goes through this.
+    func requireProfile(_ action: @escaping () -> Void) {
+        if let p = selectedPerson, isReady(p) { action(); return }
+        afterProfile = action
+        showProfileGate = true
+    }
+
+    /// The gate was finished: close it and carry on with what the person was doing.
+    func profileGateFinished(completed: Bool) {
+        showProfileGate = false
+        let next = afterProfile; afterProfile = nil
+        if completed { next?() }
+    }
+
     /// Why nothing automatic runs for the selected person yet: a profile without its legal name and current address.
     var incompleteReason: String? {
         let missing = missingForSelected
@@ -385,7 +417,6 @@ final class AppModel: ObservableObject {
 
     /// The person's answer to the first-run question, or a later change in Settings.
     /// Whether the account owner allowed "I am this person" boxes to be ticked for them. Never applies to family profiles.
-    var confirmsOwnIdentity: Bool { household.people.contains { $0.relationship == .me && $0.confirmsOwnIdentity } }
     /// How this site gets opted out for the selected person, including what real page loads and past sends have shown.
     func method(for entry: DirectoryEntry) -> MethodVerdict {
         let challenged = progress.optOutAttempts[entry.id]?.last?.outcome == "challenged"
@@ -393,9 +424,6 @@ final class AppModel: ObservableObject {
     }
     var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
 
-    func setConfirmsOwnIdentity(_ on: Bool) {
-        for p in household.people where p.relationship == .me { var q = p; q.confirmsOwnIdentity = on; update(q) }
-    }
 
     func setAuto(scan: Bool, optOut: Bool) {
         household.updateAuto { a in
@@ -427,7 +455,7 @@ final class AppModel: ObservableObject {
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
     func runAutoOptOut(for original: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
-        guard storageProblem == nil else { return }
+        guard storageProblem == nil, isReady(original) else { return }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now))
@@ -458,6 +486,7 @@ final class AppModel: ObservableObject {
     /// Sites the person can finish with one tap each: their form is found, their details are on the profile, and nothing was sent
     /// in the last week. The app fills and sends each one once the person has solved its check.
     func assistedItems(for original: Person, now: Date = Date()) -> [AssistedRunner.Item] {
+        guard isReady(original) else { return [] }
         let person = formPerson(original)
         let progress = household.progress(for: person.id)
         let holdMap = holds(for: original, now: now)
@@ -547,7 +576,8 @@ final class AppModel: ObservableObject {
 
     /// A guided runner for a hand-written broker flow, resuming at the first step not yet done.
     func guidedRunner(for broker: Broker) -> GuidedRunner? {
-        guard let person = selectedPerson.map(formPerson) else { return nil }
+        guard let selected = selectedPerson, isReady(selected) else { return nil }
+        let person = formPerson(selected)
         if let listing = listingRunner(for: broker, person: person) { return listing }
         var plan = GuidedPlanner.plan(for: broker)
         if let healed = household.healedLink(for: broker.id), let first = plan.steps.firstIndex(where: { if case .openPage = $0.action { return true } else { return false } }) {
@@ -582,7 +612,8 @@ final class AppModel: ObservableObject {
 
     /// A guided runner for a directory site: the app fills and sends the form, the person clears what only they can.
     func guidedRunner(for original: DirectoryEntry) -> GuidedRunner? {
-        guard let person = selectedPerson.map(formPerson) else { return nil }
+        guard let selected = selectedPerson, isReady(selected) else { return nil }
+        let person = formPerson(selected)
         let entry = resolved(original)
         let plan: GuidedPlan
         if let form = entry.optOutForm, FormFiller.needsListing(form), let search = entry.listingSearchURL(for: person) {
