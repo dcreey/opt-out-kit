@@ -14,7 +14,8 @@ struct ProfileGateView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 0) {
+                banner
                 if let person {
                     PersonEditorView(person: person)
                         .id(person.id)
@@ -22,7 +23,7 @@ struct ProfileGateView: View {
                     Text("Add a person first.")
                 }
             }
-            .safeAreaInset(edge: .top) { banner }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Not now") { model.profileGateFinished(completed: false) }.accessibilityIdentifier("profile-gate-cancel")
