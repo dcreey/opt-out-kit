@@ -105,7 +105,10 @@ final class AppModel: ObservableObject {
         self.defaults = defaults
         self.catalog = catalog
         let args = ProcessInfo.processInfo.arguments
-        if args.contains("-uitest-reset") { defaults.removeObject(forKey: Self.languageKey) }
+        if args.contains("-uitest-reset") {
+            defaults.removeObject(forKey: Self.languageKey)
+            for id in CoachGuide.allIDs { defaults.set(!args.contains("-uitest-coach"), forKey: "coach.\(id)") }
+        }
         let initial = Self.initialLanguage(defaults)
         language = initial; L10n.language = initial; Loc.language = initial
         if args.contains("-uitest-reset") {
@@ -245,6 +248,14 @@ final class AppModel: ObservableObject {
 
     /// Every site we track, each shown once in the Sites list (some as part of another site's request).
     var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count }
+
+    // MARK: First-visit guides
+
+    /// Short "how this works" guides shown once, the first time a person reaches a kind of screen. UI tests start with them already
+    /// seen unless they pass `-uitest-coach`.
+    func shouldCoach(_ id: String) -> Bool { !defaults.bool(forKey: "coach.\(id)") }
+    func didCoach(_ id: String) { defaults.set(true, forKey: "coach.\(id)") }
+    func resetCoaching() { for id in CoachGuide.allIDs { defaults.removeObject(forKey: "coach.\(id)") } }
 
     // MARK: The plan
 

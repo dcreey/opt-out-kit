@@ -4095,6 +4095,29 @@
     }
    }
   },
+  "Every day it checks the sites it can for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque jour, elle vérifie pour vous les sites qu’elle peut"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada día revisa por ti los sitios que puede"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Täglich prüft sie für Sie die Seiten, die sie prüfen kann"
+     }
+    }
+   }
+  },
   "Every day, it checks the sites it can for your name.": {
    "extractionState": "manual",
    "localizations": {
@@ -4137,6 +4160,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Alle Seiten bleiben in der Liste. Das rückt nur Datenhändler nach oben und markiert sie, die dort registriert sind, wo Sie wohnen oder gewohnt haben, denn jeder Händler irgendwo kann Sie führen."
+     }
+    }
+   }
+  },
+  "Every week it fills in and sends opt-out forms by itself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque semaine, elle remplit et envoie seule les formulaires d’opposition"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada semana rellena y envía sola los formularios de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Woche füllt sie Opt-out-Formulare selbst aus und sendet sie"
      }
     }
    }
@@ -4367,6 +4413,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Finden Sie Ihren Eintrag"
+     }
+    }
+   }
+  },
+  "Finish": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fertig"
      }
     }
    }
@@ -4762,6 +4831,29 @@
     }
    }
   },
+  "Got it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Compris"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entendido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verstanden"
+     }
+    }
+   }
+  },
   "Grandchild": {
    "extractionState": "manual",
    "localizations": {
@@ -4946,6 +5038,52 @@
     }
    }
   },
+  "How a manual task works": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comment fonctionne une tâche manuelle"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cómo funciona una tarea manual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "So funktioniert eine manuelle Aufgabe"
+     }
+    }
+   }
+  },
+  "How a semi-automated task works": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comment fonctionne une tâche semi-automatisée"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cómo funciona una tarea semiautomática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "So funktioniert eine halbautomatische Aufgabe"
+     }
+    }
+   }
+  },
   "How it works": {
    "extractionState": "manual",
    "localizations": {
@@ -4965,6 +5103,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "So funktioniert es"
+     }
+    }
+   }
+  },
+  "How your queue works": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comment fonctionne votre file"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cómo funciona tu cola"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "So funktioniert Ihre Warteschlange"
      }
     }
    }
@@ -5471,6 +5632,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Es heißt, man könne nicht bestätigen, dass die Informationen richtig oder vollständig sind."
+     }
+    }
+   }
+  },
+  "It shows one step at a time. Tap Copy to copy your details, paste them into the site, then tap Next step.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle montre une étape à la fois. Touchez Copier pour copier vos informations, collez-les sur le site, puis touchez Étape suivante."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Muestra un paso a la vez. Toca Copiar para copiar tus datos, pégalos en el sitio y toca Siguiente paso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es zeigt jeweils einen Schritt. Tippen Sie auf Kopieren, fügen Sie Ihre Angaben auf der Seite ein und tippen Sie dann auf Nächster Schritt."
+     }
+    }
+   }
+  },
+  "It tells you the few steps that need you: bot checks, email links, ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle vous signale les rares étapes qui vous concernent : vérifications anti-robot, liens e-mail, pièce d’identité"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Te avisa de los pocos pasos que te necesitan: verificaciones anti-bot, enlaces de correo, identificación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie zeigt Ihnen die wenigen Schritte, die Sie brauchen: Bot-Prüfungen, E-Mail-Links, Ausweis"
      }
     }
    }
@@ -8097,6 +8304,29 @@
     }
    }
   },
+  "One task can handle many sites. A site is never listed twice.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une tâche peut couvrir de nombreux sites. Un site n’apparaît jamais deux fois."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una tarea puede cubrir muchos sitios. Un sitio nunca aparece dos veces."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Aufgabe kann viele Seiten erledigen. Keine Seite steht zweimal da."
+     }
+    }
+   }
+  },
   "Only family members you added are included, and minors and public figures are never searched (opt-out requests still go out for them).": {
    "extractionState": "manual",
    "localizations": {
@@ -8576,6 +8806,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Opt-Out Kit drückt nur dann für Sie auf „Ich stimme zu“, wenn jeder Absatz der Bedingungen einer Website auf einer von einer Person geprüften Liste steht."
+     }
+    }
+   }
+  },
+  "Opt-Out Kit scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit recherche votre nom chez les courtiers de données et envoie seul des demandes de suppression, sur autant de sites que possible. Vous n’intervenez que là où un site exige une personne."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit busca tu nombre en intermediarios de datos y envía solicitudes de baja por sí solo, en tantos sitios como puede. Solo intervienes donde un sitio necesita a una persona."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit sucht Ihren Namen bei Datenhändlern und sendet Opt-out-Anfragen selbstständig, auf so vielen Webseiten wie möglich. Sie greifen nur ein, wo eine Seite einen Menschen braucht."
+     }
+    }
+   }
+  },
+  "Opt-Out Kit · Guide": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit · Guide"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit · Guía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-Out Kit · Anleitung"
      }
     }
    }
@@ -9891,6 +10167,29 @@
     }
    }
   },
+  "Search any site by name or web address to find its task.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recherchez un site par nom ou adresse web pour trouver sa tâche."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Busca un sitio por nombre o dirección web para encontrar su tarea."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Suchen Sie eine Seite nach Name oder Webadresse, um ihre Aufgabe zu finden."
+     }
+    }
+   }
+  },
   "Search by name or web address": {
    "extractionState": "manual",
    "localizations": {
@@ -11087,6 +11386,29 @@
     }
    }
   },
+  "Some sites email you a link to confirm. That tap is yours too.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites vous envoient un lien de confirmation par e-mail. Ce clic vous revient aussi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios te envían un enlace de confirmación por correo. Ese toque también es tuyo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Seiten senden Ihnen einen Bestätigungslink per E-Mail. Auch dieser Tipp ist Ihre."
+     }
+    }
+   }
+  },
   "Some sources say businesses in %@ must honor universal opt-out signals such as Global Privacy Control. Turning it on in your browser costs nothing.": {
    "extractionState": "manual",
    "localizations": {
@@ -11754,6 +12076,29 @@
     }
    }
   },
+  "Tap a task to see exactly what it will do before you start.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez une tâche pour voir précisément ce qu’elle fera avant de commencer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca una tarea para ver exactamente qué hará antes de empezar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tippen Sie auf eine Aufgabe, um vor dem Start genau zu sehen, was sie tut."
+     }
+    }
+   }
+  },
   "Tapping \"I agree\" means you accept its Terms of Service and Privacy Policy. Only a preliminary people search is free; full records need an account or purchase.": {
    "extractionState": "manual",
    "localizations": {
@@ -11773,6 +12118,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Auf „Ich stimme zu“ zu tippen heißt, dass Sie ihre Nutzungsbedingungen und Datenschutzerklärung akzeptieren. Nur eine vorläufige Personensuche ist kostenlos; vollständige Einträge brauchen ein Konto oder einen Kauf."
+     }
+    }
+   }
+  },
+  "Tasks are ranked: your official removal service first, then what the app does for you, then the rest, nearest first.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les tâches sont classées : d’abord votre service officiel, puis ce que fait l’app, puis le reste, les plus proches d’abord."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las tareas están ordenadas: primero tu servicio oficial, luego lo que hace la app, luego el resto, las más cercanas primero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Aufgaben sind nach Rang geordnet: zuerst Ihr offizieller Dienst, dann was die App erledigt, dann der Rest, nahe zuerst."
      }
     }
    }
@@ -11961,6 +12329,29 @@
     }
    }
   },
+  "The app fills in the site's form with only the details it asks for.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’app remplit le formulaire du site avec seulement les informations demandées."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app rellena el formulario del sitio solo con los datos que pide."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App füllt das Formular der Seite nur mit den verlangten Angaben aus."
+     }
+    }
+   }
+  },
   "The app never submits anything for you": {
    "extractionState": "manual",
    "localizations": {
@@ -12118,6 +12509,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Formular verlangt %@, was wir nicht haben."
+     }
+    }
+   }
+  },
+  "The guide stays at the top of the screen and the site's own page sits below it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le guide reste en haut de l’écran et la page du site se trouve en dessous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La guía queda en la parte superior de la pantalla y la página del sitio debajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Anleitung bleibt oben auf dem Bildschirm, die Seite der Webseite darunter."
      }
     }
    }
@@ -14054,6 +14468,29 @@
     }
    }
   },
+  "We find and remove your data for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous trouvons et supprimons vos données pour vous"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encontramos y eliminamos tus datos por ti"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir finden und entfernen Ihre Daten für Sie"
+     }
+    }
+   }
+  },
   "We found the opt-out page but could not read a form on it, so we take you there.": {
    "extractionState": "manual",
    "localizations": {
@@ -15020,6 +15457,29 @@
     }
    }
   },
+  "You handle bot checks, phone codes and ID steps yourself. If a page is broken, tap Not working.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous gérez vous-même les vérifications anti-robot, codes téléphoniques et pièces d’identité. Si une page est cassée, touchez Ne fonctionne pas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tú te encargas de las verificaciones anti-bot, los códigos de teléfono y la identificación. Si una página falla, toca No funciona."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bot-Prüfungen, Telefoncodes und Ausweisschritte erledigen Sie selbst. Ist eine Seite defekt, tippen Sie auf Funktioniert nicht."
+     }
+    }
+   }
+  },
   "You may not search for public officials, minors or celebrities. If someone you add to Opt-Out Kit is one of those, do not scan or accept for them.": {
    "extractionState": "manual",
    "localizations": {
@@ -15200,6 +15660,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "CAPTCHA, Telefoncode und Ausweisschritte erledigen Sie selbst"
+     }
+    }
+   }
+  },
+  "You solve the bot check, and pick your own listing if the site asks. We never do that for you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous résolvez la vérification anti-robot et choisissez votre propre fiche si le site le demande. Nous ne le faisons jamais à votre place."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tú resuelves la verificación anti-bot y eliges tu propio listado si el sitio lo pide. Nunca lo hacemos por ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie lösen die Bot-Prüfung und wählen Ihren eigenen Eintrag, falls die Seite das verlangt. Das tun wir nie für Sie."
      }
     }
    }

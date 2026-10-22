@@ -3,17 +3,20 @@ import OptOutKitCore
 
 struct RootView: View {
     @EnvironmentObject var model: AppModel
+    @State private var tab = 0
 
     var body: some View {
-        TabView {
-            BrokerListView().tabItem { Label("Queue", systemImage: "list.bullet") }
-            SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }
-            AboutView().tabItem { Label("About", systemImage: "info.circle") }
+        TabView(selection: $tab) {
+            BrokerListView().tabItem { Label("Queue", systemImage: "list.bullet") }.tag(0)
+            SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }.tag(1)
+            AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
         }
+        .onChange(of: tab) { _, _ in Keyboard.hide() }
+        .keyboardDone()
         .fullScreenCover(isPresented: Binding(
             get: { model.pending == .walkthrough },
             set: { _ in })) {
-            OnboardingView(onDecide: { scan, optOut in model.setAuto(scan: scan, optOut: optOut) }) { model.finishAnnouncements() }
+            OnboardingView(onDecide: { scan, optOut in model.setAuto(scan: scan, optOut: optOut) }) { model.finishAnnouncements() }.keyboardDone()
         }
         .sheet(isPresented: Binding(
             get: { if case .whatsNew = model.pending { return true } else { return false } },

@@ -15,20 +15,22 @@ final class GuidedFlowUITests: XCTestCase {
         let a = XCTAttachment(screenshot: app.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
-    func testThePanelSitsInTheBottomQuarterAndShowsTheStepAndTheTotal() {
+    func testTheGuideSitsOnTopInAColouredFrameAndShowsTheWholeStep() {
         let app = XCUIApplication()
         openGuide(app)
         let progress = app.staticTexts["guided-progress"]
         XCTAssertTrue(progress.waitForExistence(timeout: 10))
         XCTAssertTrue(progress.label.contains("of 6"), "the total number of steps is shown: \(progress.label)")
         let screen = app.windows.firstMatch.frame
+        XCTAssertTrue(app.staticTexts["guided-banner"].exists, "a coloured band names Opt-Out Kit and the guide")
         let next = app.buttons["guided-next"]
-        XCTAssertGreaterThan(next.frame.minY, screen.height * 0.74, "the app's controls live in the bottom quarter")
-        XCTAssertGreaterThan(next.frame.maxY, screen.height * 0.9, "and the panel reaches the bottom of the screen, with no gap")
+        XCTAssertLessThan(next.frame.maxY, screen.height * 0.6, "the guide and its buttons are on top, nothing is cut off at the bottom")
+        let title = app.staticTexts["guided-step-title"]
+        XCTAssertTrue(title.exists)
+        XCTAssertFalse(title.label.hasSuffix("…") || title.label.hasSuffix("..."), "the instruction is shown in full")
         let browser = app.webViews.firstMatch
         XCTAssertTrue(browser.waitForExistence(timeout: 5))
-        XCTAssertLessThanOrEqual(browser.frame.maxY, screen.height * 0.76, "the browser fills the top three quarters")
-        XCTAssertGreaterThan(browser.frame.height, screen.height * 0.6, "and takes most of the screen")
+        XCTAssertGreaterThanOrEqual(browser.frame.minY, next.frame.maxY - 1, "the site's page is below the guide")
         shot(app, "6-guided-panel")
     }
 

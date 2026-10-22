@@ -182,6 +182,25 @@ final class HandledOnceTests: XCTestCase {
 }
 
 @MainActor
+final class CoachGuideAppTests: XCTestCase {
+    func testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn() {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        XCTAssertTrue(m.shouldCoach("sites"))
+        m.didCoach("sites")
+        XCTAssertFalse(m.shouldCoach("sites"))
+        XCTAssertTrue(m.shouldCoach("semi"), "each kind of screen has its own guide")
+        m.resetCoaching()
+        XCTAssertTrue(m.shouldCoach("sites"))
+        XCTAssertNil(CoachGuide.forMethod(.automatic))
+        XCTAssertEqual(CoachGuide.forMethod(.semiAutomatic)?.id, "semi")
+        XCTAssertEqual(CoachGuide.forMethod(.guided)?.id, "manual")
+        XCTAssertEqual(CoachGuide.forMethod(.manual)?.id, "manual")
+        XCTAssertTrue(Set(CoachGuide.allIDs).isSuperset(of: ["sites", "semi", "manual"]))
+    }
+}
+
+@MainActor
 final class StateRulesAppTests: XCTestCase {
     func testTheAppShipsEveryStateAndCountsFromTheRegistries() throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),

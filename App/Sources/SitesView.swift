@@ -96,6 +96,7 @@ struct SitesView: View {
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
             .planDestinations()
+            .coach(.sites)
             .sheet(isPresented: $showScan) { ExposureView() }
             .sheet(isPresented: $showQuick) { QuickCheckView() }
         }
@@ -274,6 +275,7 @@ struct BrokerInfoView: View {
             }
         }
         .navigationTitle(broker.name)
+        .coach(CoachGuide.forMethod(OptOutMethods.classify(broker, in: model.directory).method))
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $openFlow) { BrokerDetailView(broker: broker) }
         .sheet(item: $siteLink) { SafariView(url: $0).ignoresSafeArea() }
@@ -448,6 +450,7 @@ struct DirectoryInfoView: View {
             }
         }
         .navigationTitle(entry.domain)
+        .coach(CoachGuide.forMethod(model.method(for: entry).method))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
         .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in

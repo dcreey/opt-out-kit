@@ -26,21 +26,15 @@ struct OnboardingView: View {
     private var rulesRead: Bool { placeKey == nil || placeRead == placeKey }
 
     private let pages: [Page] = [
-        Page(id: 0, symbol: "person.crop.circle.badge.minus", title: Loc.t("Take your data back"),
-             body: Loc.t("Data brokers sell your name, address and relatives. Opt-Out Kit walks you through removing you, and anyone you add, from them."),
-             bullets: [Loc.t("Pick a site from your queue"), Loc.t("Follow the steps in your own browser"), Loc.t("Come back later to check you stayed removed")]),
+        Page(id: 0, symbol: "bolt.shield", title: Loc.t("We find and remove your data for you"),
+             body: Loc.t("Opt-Out Kit scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person."),
+             bullets: [Loc.t("Every day it checks the sites it can for you"), Loc.t("Every week it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: bot checks, email links, ID")]),
         Page(id: 1, symbol: "lock.shield", title: Loc.t("Your data stays on this phone"),
              body: Loc.t("There is no Opt-Out Kit server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
              bullets: [Loc.t("Open source: anyone can audit the code"), Loc.t("Lost phone with no backup means lost data; a normal iPhone backup carries it"), Loc.t("Each site sees only the details its form needs")]),
         Page(id: 2, symbol: "person.2", title: Loc.t("Set up people once"),
              body: Loc.t("Tap Profile to enter your legal name and current address (both required), plus any other names and past addresses. Add family members as extra people with the account switcher."),
              bullets: [Loc.t("Nicknames and old names find more listings"), Loc.t("Each person has their own progress"), Loc.t("Family only. Add someone who asked you to, or a child you are the parent or guardian of")]),
-        Page(id: 3, symbol: "list.number", title: Loc.t("Work through a site"),
-             body: Loc.t("Open a site to see its step cards. Tap Open in Safari, copy your details, do the step, then tap Mark done. Later steps unlock as you go."),
-             bullets: [Loc.t("You solve any CAPTCHA, phone code or ID step yourself"), Loc.t("The app never submits anything for you"), Loc.t("Some sites clear several brands at once")]),
-        Page(id: 4, symbol: "checkmark.seal", title: Loc.t("Track every site"),
-             body: Loc.t("The Sites tab lists every broker with its status for each person: not started, in progress, partial or opted out. Brokers re-list people, so plan to re-check; reminders are coming."),
-             bullets: [Loc.t("Search sites by name or web address"), Loc.t("Tap a site to see what it will receive"), Loc.t("Partial means some of your people are done")]),
     ]
 
     var body: some View {
@@ -123,6 +117,7 @@ struct OnboardingView: View {
                 .tag(pages.count + 3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            .onChange(of: index) { _, _ in emailFocused = false; Keyboard.hide() }
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {

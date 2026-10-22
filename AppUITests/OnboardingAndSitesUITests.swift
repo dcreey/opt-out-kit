@@ -6,7 +6,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
         app.buttons["onboarding-done"].tap()
         XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 5), "the ranked queue is visible after the walkthrough")
@@ -17,7 +17,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
         app.buttons["onboarding-next"].tap()
@@ -55,7 +55,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
         app.buttons["onboarding-next"].tap()
@@ -88,7 +88,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
         app.buttons["onboarding-next"].tap()

@@ -9,7 +9,7 @@ final class AutoProtectionUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        for _ in 0..<5 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
         let scan = app.switches["auto-scan-toggle"], opt = app.switches["auto-optout-toggle"]
         XCTAssertTrue(scan.waitForExistence(timeout: 5))
@@ -30,7 +30,7 @@ final class AutoProtectionUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
         for id in ["auto-scan-toggle", "auto-optout-toggle"] {
             let t = app.switches[id]; XCTAssertTrue(t.waitForExistence(timeout: 5))

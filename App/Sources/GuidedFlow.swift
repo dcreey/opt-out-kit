@@ -241,7 +241,7 @@ final class GuidedRunner: ObservableObject {
     }
 }
 
-// MARK: Screen: browser on top, our panel in the bottom quarter
+// MARK: Screen: our guide on top in a coloured frame, the site's page below it
 
 struct GuidedFlowView: View {
     @StateObject var runner: GuidedRunner
@@ -250,70 +250,91 @@ struct GuidedFlowView: View {
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
+                GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.28)
+                // The site's own page sits below the guide, clearly a different thing.
                 Group {
                     if let web = runner.webView { WebViewHost(webView: web) }
                     else { ProgressView("Loading…").frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }
-                .frame(height: geo.size.height * 0.75)
+                .frame(maxHeight: .infinity)
                 .accessibilityIdentifier("guided-browser")
-                Divider()
-                GuidedPanel(runner: runner, bottomInset: geo.safeAreaInsets.bottom)
-                    .frame(height: geo.size.height * 0.25)
             }
         }
-        .ignoresSafeArea()
+        .ignoresSafeArea(edges: .top)
         .task { await runner.run() }
         .onChange(of: runner.ending) { _, e in if e != nil { dismiss() } }
     }
 }
 
-/// The bottom quarter: the step, how far along, and the person's controls.
+/// The guide: a coloured band naming Opt-Out Kit and the guide, then the current step in full (it scrolls if it is long), then the
+/// controls. It is on top, away from the home indicator, and framed so it cannot be mistaken for part of the site below.
 struct GuidedPanel: View {
     @ObservedObject var runner: GuidedRunner
     private var nextTitle: String {
         if case .pickListing? = runner.flow.current?.action { return Loc.t("This is my listing") }
-        return runner.flow.index + 1 >= runner.flow.total ? "Finish" : Loc.t("Next step")
+        return runner.flow.index + 1 >= runner.flow.total ? Loc.t("Finish") : Loc.t("Next step")
     }
-    /// Keeps the buttons clear of the home indicator while the panel itself still reaches the bottom edge.
-    var bottomInset: CGFloat = 0
+    var topInset: CGFloat = 0
+    var maxStepHeight: CGFloat = 220
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(spacing: 0) {
+            // Coloured margin with the app's name.
             HStack {
-                Button("Cancel") { runner.cancel() }.font(.footnote).accessibilityIdentifier("guided-cancel")
+                Button("Cancel") { runner.cancel() }.font(.footnote.bold()).foregroundStyle(.white).accessibilityIdentifier("guided-cancel")
                 Spacer()
-                Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.secondary)
-                    .accessibilityIdentifier("guided-progress")
+                Label("Opt-Out Kit · Guide", systemImage: "shield.lefthalf.filled").font(.footnote.bold()).foregroundStyle(.white)
+                    .accessibilityIdentifier("guided-banner")
                 Spacer()
                 Menu {
                     ForEach(IssueKind.allCases, id: \.self) { kind in
                         Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
                     }
-                } label: { Label("Not working", systemImage: "exclamationmark.bubble").font(.footnote) }
+                } label: { Label("Not working", systemImage: "exclamationmark.bubble").font(.footnote.bold()).foregroundStyle(.white) }
                     .accessibilityIdentifier("guided-not-working")
             }
-            ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
-            if let step = runner.flow.current {
-                Text(step.title).font(.subheadline.bold()).lineLimit(3).accessibilityIdentifier("guided-step-title")
-                if let detail = step.detail { Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(2) }
-            }
-            if let status = runner.status {
-                Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).lineLimit(2)
-                    .accessibilityIdentifier("guided-status")
-            }
-            Spacer(minLength: 0)
-            HStack {
-                if runner.flow.index > 0 { Button("Back") { runner.back() }.accessibilityIdentifier("guided-back") }
-                if case .copy? = runner.flow.current?.action {
-                    Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }
-                        .buttonStyle(.bordered).accessibilityIdentifier("guided-copy")
+            .padding(.horizontal, 16).padding(.top, topInset + 4).padding(.bottom, 8)
+            .background(Color.accentColor)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.secondary)
+                        .accessibilityIdentifier("guided-progress")
+                    ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
                 }
-                Spacer()
-                Button(nextTitle) { runner.next() }
-                    .buttonStyle(.borderedProminent).accessibilityIdentifier("guided-next")
+                if let step = runner.flow.current {
+                    // The whole instruction is shown; a long one scrolls instead of being cut off with an ellipsis.
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(step.title).font(.headline).fixedSize(horizontal: false, vertical: true)
+                                .accessibilityIdentifier("guided-step-title")
+                            if let detail = step.detail {
+                                Text(detail).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxHeight: maxStepHeight)
+                }
+                if let status = runner.status {
+                    Label(status, systemImage: "checkmark.circle").font(.footnote).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("guided-status")
+                }
+                HStack {
+                    if runner.flow.index > 0 { Button("Back") { runner.back() }.buttonStyle(.bordered).accessibilityIdentifier("guided-back") }
+                    if case .copy? = runner.flow.current?.action {
+                        Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }
+                            .buttonStyle(.bordered).accessibilityIdentifier("guided-copy")
+                    }
+                    Spacer()
+                    Button(nextTitle) { runner.next() }
+                        .buttonStyle(.borderedProminent).accessibilityIdentifier("guided-next")
+                }
             }
+            .padding(.horizontal, 16).padding(.vertical, 10)
+            .background(Color(.secondarySystemBackground))
+
+            Rectangle().fill(Color.accentColor).frame(height: 4)
         }
-        .padding(.horizontal, 16).padding(.top, 10).padding(.bottom, 6 + bottomInset)
-        .background(.bar)
     }
 }
