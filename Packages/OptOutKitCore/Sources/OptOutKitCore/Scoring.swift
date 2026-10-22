@@ -13,10 +13,10 @@ public struct Score: Equatable, Sendable {
         public var from: Int
     }
 
-    public static let levels = [
-        Level(name: "Exposed", from: 0), Level(name: "Covering Tracks", from: 25), Level(name: "Low Profile", from: 75),
-        Level(name: "Ghost", from: 150), Level(name: "Off the Grid", from: 300),
-    ]
+    public static var levels: [Level] { [
+        Level(name: L10n.t("Exposed"), from: 0), Level(name: L10n.t("Covering Tracks"), from: 25), Level(name: L10n.t("Low Profile"), from: 75),
+        Level(name: L10n.t("Ghost"), from: 150), Level(name: L10n.t("Off the Grid"), from: 300),
+    ] }
 
     /// 10 for an automatically verified opt-out, 5 for each site the person looked at and found clean, 3 for each time
     /// they honestly report a listing (it is how the list gets finished), 2 for reporting results behind payment,

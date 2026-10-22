@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "acxiom_com"
 domain: "acxiom.com"
-name: "acxiom.com"
+name: "Acxiom LLC"
 bucket: "direct"
 tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.acxiom.com/optout/"
+registered_in: [CA, OR, TX]
 signals: [email_contact, mail_option]
 profiled: "2026-10-21"
 search_check:

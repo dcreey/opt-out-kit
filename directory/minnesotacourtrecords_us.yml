@@ -6,7 +6,7 @@ name: "minnesotacourtrecords.us"
 bucket: "direct"
 tier: "B"
 automation: "guided"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://courtrecords.us/do-not-sell-share-my-personal-information/"
 opt_out_form: {"page": "https://courtrecords.us/do-not-sell-share-my-personal-information/", "method": "post", "action": "https://members.courtrecords.us/removeMyData/", "fields": [{"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[fname]", "label": "First Name *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[lname]", "label": "Last Name *"}, {"type": "select", "name": "infopay_core_components_optouts_dataremovalservicemodel[state]", "label": "State *"}, {"type": "text", "name": "infopay_core_components_optouts_dataremovalservicemodel[city]", "label": "City"}], "hops": 1}
 family: "courtrecords_us"

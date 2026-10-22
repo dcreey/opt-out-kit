@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "truepeoplesearch_com"
 domain: "truepeoplesearch.com"
-name: "truepeoplesearch.com"
+name: "Free Data Services, LLC"
 bucket: "direct"
 tier: null
 automation: "blocked"
 confidence: "n/a"
 opt_out_url: null
+registered_in: [CA, OR, TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-21"
 search_check:

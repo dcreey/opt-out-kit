@@ -18,6 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Pull every state's broker registry (Texas needs a headless browser), join them and add new sites to the census
+        run: |
+          pip install playwright && playwright install --with-deps chromium
+          python3 tools/registries.py fetch
+          python3 tools/registries.py merge --add-sites
+      - name: Flag state-law facts nobody has reviewed in six months
+        run: python3 tools/check_jurisdictions.py
       - run: python3 tools/profile_brokers.py --refresh --workers 6
       - name: Check every recorded opt-out link, crawl for new ones when broken (fails if a hand-written broker link is lost)
         run: python3 tools/check_links.py --workers 6
@@ -30,4 +37,7 @@ jobs:
           body: "Automated re-profile of the directory. Review changes to tiers, opt-out URLs and families before merging."
           add-paths: |
             directory/
-            pipeline/link-health.md
+            platforms/
+            registries/
+            pipeline/
+

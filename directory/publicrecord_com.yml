@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "publicrecord_com"
 domain: "publicrecord.com"
-name: "publicrecord.com"
+name: "PublicRecordCom, LLC"
 bucket: "direct"
 tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://validate.perfdrive.com/?ssa=735ff0ff-4e01-4cae-aa6f-596c90b561dc&ssb=25134292738&ssc=https%3A%2F%2Fpublicrecord.com%2F&ssi=c1408967-dqge-4532-ae4a-5e26b8eeddb8&ssk=botmanager_support@radware.com&ssm=47239178116561810109686598112413&ssn=3f381b765cae390a713f3a8a2cf8ee23ab26a228b273-ec67-42b4-bd52c6&sso=51a6ab0a-ca40a50d52ef528567013bf3a36a98002343a98e5aa268d0&ssp=66265417691792648780179267964142715&ssq=63361590932852811299309328343961802429957&ssr=MTY4LjkxLjIzNi4yMjE=&sst=OptOutKit-Profiler/1.0%20(open%20source;%20polite,%20robots.txt%20honored)&ssu=&ssv=&ssw=&ssx=eyJ1em14IjoiN2ZjMDAwODVjODEzZjktZGQ4ZS00MWJkLWFlZTgtNjg5YmU5OWYyYmU3MS0xNzkyNjA5MzI4NjM2MC0wMGEzYzY4MTQ3MmJiMGMwMGQ2MTAiLCJfX3V6bWYiOiI3ZjkwMDBhMjI4YjI3My1lYzY3LTQyYjQtYmIwYS1jYTQwYTUwZDUyZWYxLTE3OTI2MDkzMjg2MzYwLTAwMjIzMjk1YTI4Y2JmNTgzNWQxMCIsInJkIjoicHVibGljcmVjb3JkLmNvbSJ9"
+registered_in: [CA]
 signals: [captcha_hcaptcha, captcha_recaptcha]
 profiled: "2026-10-21"
 search_check:

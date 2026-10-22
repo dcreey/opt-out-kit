@@ -65,3 +65,12 @@ step this session's permission system refused. Before anyone builds it:
 
 Until then, terms-gated sites stay guided (the person accepts the terms themselves) and show "Results are behind terms
 you must accept yourself".
+
+## Languages
+
+The list is never translated. Each paragraph carries the language it is written in (`lang:`), the census can read a site in French,
+Spanish or German when the site offers it (`tools/terms_census.py --lang fr`), and a site with no translation keeps its original. A
+reviewer reads a paragraph in its own language. The risk-word flags that mark automation, payment, arbitration and indemnity wording
+are searched in all four languages. See `docs/LOCALIZATION.md`. A first run on six brokers (CourtRecords.us, Whitepages, Spokeo,
+BeenVerified, MyLife, PeopleFinders) found no French, Spanish or German terms on 4 to 5 of the 6 each time, which is what US brokers'
+sites usually offer: the logic works, and the data is mostly English.

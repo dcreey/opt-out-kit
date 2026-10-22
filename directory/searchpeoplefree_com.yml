@@ -6,7 +6,7 @@ name: "searchpeoplefree.com"
 bucket: "direct"
 tier: "B"
 automation: "guided"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://www.searchpeoplefree.com/opt-out"
 opt_out_form: {"page": "https://www.searchpeoplefree.com/opt-out", "method": "get", "action": "https://www.searchpeoplefree.com/opt-out", "fields": [{"type": "input", "name": "o_first", "label": "First Name..."}, {"type": "input", "name": "o_middle", "label": "Middle Name..."}, {"type": "input", "name": "o_last", "label": "Last Name..."}, {"type": "email", "name": "o_email", "label": "Email..."}, {"type": "checkbox", "name": "o_terms", "label": "o_terms"}], "hops": 1}
 signals: [captcha_turnstile, email_input, name_input, opt_out_form_found]

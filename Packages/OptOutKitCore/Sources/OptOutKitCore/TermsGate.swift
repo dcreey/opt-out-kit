@@ -11,11 +11,16 @@ public struct TermsParagraph: Codable, Equatable, Sendable {
     public var prefix: String
     public var reviewed: Bool
     public var verdict: String?     // "ok" or "exclude"
+    /// The language the paragraph is written in ("en", "fr", "es", "de"). The list keeps each site's own wording and never
+    /// translates it; a person reviewing a paragraph reads it in this language. Nil means English (older entries).
+    public var lang: String?
 
-    public init(hash: String, sites: Int, kinds: [String], flags: [String], prefix: String, reviewed: Bool, verdict: String?) {
+    public init(hash: String, sites: Int, kinds: [String], flags: [String], prefix: String, reviewed: Bool, verdict: String?, lang: String? = nil) {
         self.hash = hash; self.sites = sites; self.kinds = kinds; self.flags = flags
-        self.prefix = prefix; self.reviewed = reviewed; self.verdict = verdict
+        self.prefix = prefix; self.reviewed = reviewed; self.verdict = verdict; self.lang = lang
     }
+
+    public var language: String { lang ?? "en" }
 
     public var approvedByReviewer: Bool { reviewed && verdict == "ok" }
     /// Wording that bans or implies automated access can never be accepted by the app, whatever a reviewer says,
@@ -26,6 +31,17 @@ public struct TermsParagraph: Codable, Equatable, Sendable {
 public struct TermsLibrary: Codable, Equatable, Sendable {
     public var version: Int
     public var paragraphs: [TermsParagraph]
+
+    /// How many paragraphs the list holds in each language, and how many of those a person has reviewed.
+    public var languages: [String: (total: Int, reviewed: Int)] {
+        var out: [String: (total: Int, reviewed: Int)] = [:]
+        for p in paragraphs {
+            var e = out[p.language] ?? (0, 0)
+            e.total += 1; if p.approvedByReviewer { e.reviewed += 1 }
+            out[p.language] = e
+        }
+        return out
+    }
 
     public init(version: Int, paragraphs: [TermsParagraph]) { self.version = version; self.paragraphs = paragraphs }
 

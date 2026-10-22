@@ -131,7 +131,7 @@ final class AssistedRunnerTests: XCTestCase {
         let driver = ScriptedDriver(["a.example": slow, "b.example": ScriptedPage()])
         let r = runner(["a.example", "b.example"], driver, Sink())
         let task = Task { @MainActor in await r.run() }
-        try? await Task.sleep(nanoseconds: 15_000_000)
+        for _ in 0..<50 where driver.prepared.count < 2 { try? await Task.sleep(nanoseconds: 10_000_000) }
         XCTAssertEqual(driver.prepared, ["a.example", "b.example"], "b was already loading before a finished")
         XCTAssertEqual(r.current?.entry.domain, "a.example")
         await task.value

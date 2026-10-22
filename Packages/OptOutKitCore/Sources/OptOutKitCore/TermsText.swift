@@ -14,6 +14,8 @@ public enum TermsText {
         "nebraska", "nevada", "new hampshire", "new jersey", "new mexico", "new york", "north carolina", "north dakota",
         "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina", "south dakota", "tennessee", "texas",
         "utah", "vermont", "virginia", "washington", "west virginia", "wisconsin", "wyoming"]
+    /// State names in French, Spanish and German text (same list as tools/terms_canon.py).
+    static let localizedStates = ["californie", "caroline du nord", "caroline du sud", "dakota du nord", "dakota du sud", "virginie-occidentale", "virginie", "floride", "géorgie", "hawaï", "louisiane", "pennsylvanie", "nouveau-mexique", "nouveau-hampshire", "rhode island", "carolina del norte", "carolina del sur", "dakota del norte", "dakota del sur", "virginia occidental", "nueva york", "nueva jersey", "nuevo méxico", "nuevo hampshire", "luisiana", "hawái", "misisipi", "misuri", "oregón", "míchigan", "pensilvania", "kalifornien", "nordkarolina", "südkarolina", "norddakota", "süddakota", "westvirginia"]
     static let suffixes = ["courtrecords", "arrestwarrants", "warrantroundup", "arrests", "arrest", "warrants", "records", "residentdatabase"]
     public static let minWords = 12
 
@@ -43,11 +45,11 @@ public enum TermsText {
 
     public static func canonical(_ paragraph: String, domain: String) -> String {
         var t = normalize(paragraph)
-        t = t.replacingOccurrences(of: "\\b(?:www\\.)?[a-z0-9][a-z0-9-]*\\.(?:org|com|net|us|gov|edu|io|info)\\b",
+        t = t.replacingOccurrences(of: "\\b(?:www\\.)?[a-z0-9][a-z0-9-]*\\.(?:org|com|net|us|gov|edu|io|info|fr|es|de|ca|uk|mx|eu|ch|at|be|nl|it)\\b",
                                    with: "{domain}", options: .regularExpression)
         let (names, prefix) = siteTokens(domain)
         for n in names { t = t.replacingOccurrences(of: n, with: "{site}") }
-        for st in states.sorted(by: { ($0.count, $0) > ($1.count, $1) }) { t = t.replacingOccurrences(of: st, with: "{state}") }
+        for st in (states + localizedStates).sorted(by: { ($0.count, $0) > ($1.count, $1) }) { t = t.replacingOccurrences(of: st, with: "{state}") }
         if let prefix, prefix.count <= 3 {
             t = t.replacingOccurrences(of: "\\b\(NSRegularExpression.escapedPattern(for: prefix))\\b", with: "{state}", options: .regularExpression)
         }

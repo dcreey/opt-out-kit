@@ -1,0 +1,6078 @@
+{
+ "sourceLanguage": "en",
+ "strings": {
+  "%@ does not run a data broker registry, so there is no official list of brokers to pull.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ n'a pas de registre des courtiers en données : il n'existe donc pas de liste officielle de courtiers à récupérer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ no tiene un registro de corredores de datos, así que no hay una lista oficial de corredores que descargar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ führt kein Register für Datenbroker, es gibt also keine offizielle Brokerliste, die wir übernehmen könnten."
+     }
+    }
+   }
+  },
+  "%@ does not run a data broker registry. Our list still comes from the registries other states publish.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ n'exige pas que les courtiers en données s'enregistrent. Notre liste provient tout de même des registres publiés par d'autres États."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ no tiene un registro de corredores de datos. Nuestra lista sigue saliendo de los registros que publican otros estados."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ führt kein Register für Datenbroker. Unsere Liste stammt trotzdem aus den Registern anderer Bundesstaaten."
+     }
+    }
+   }
+  },
+  "%@ has a data protection law: %@ (in effect since %@).": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ a une loi sur la protection des données : %@ (en vigueur depuis le %@)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ tiene una ley de protección de datos: %@ (en vigor desde el %@)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ hat ein Datenschutzgesetz: %@ (in Kraft seit %@)."
+     }
+    }
+   }
+  },
+  "%@ has a data protection law: %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ a une loi sur la protection des données : %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ tiene una ley de protección de datos: %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ hat ein Datenschutzgesetz: %@."
+     }
+    }
+   }
+  },
+  "%@ has an automatic opt-out for all of these registries (%@). We integrate with this process to simplify it: we walk you through the one request, then leave those brokers' own forms alone for a while.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ propose un retrait automatique auprès de tous ces registres (%@). Nous nous intégrons à ce processus pour le simplifier : nous vous guidons pour la demande unique, puis nous laissons de côté, pendant un temps, les formulaires propres à ces courtiers."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ tiene una baja automática para todos estos registros (%@). Nos integramos con este proceso para simplificarlo: te guiamos en la solicitud única y después dejamos en paz, durante un tiempo, los formularios propios de esos corredores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ bietet einen automatischen Opt-out für alle diese Register (%@). Wir binden diesen Ablauf ein, um ihn zu vereinfachen: Wir führen Sie durch den einen Antrag und lassen die eigenen Formulare dieser Broker danach eine Weile in Ruhe."
+     }
+    }
+   }
+  },
+  "%@ has no comprehensive privacy law, so no state law makes brokers honor you. Most still accept opt-out requests from anyone, and that is what this app sends.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ n'a pas de loi générale sur la vie privée : aucune loi de l'État n'oblige donc les courtiers à vous écouter. La plupart acceptent quand même les demandes de désinscription de n'importe qui, et c'est ce que cette appli envoie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ no tiene una ley general de privacidad, así que ninguna ley estatal obliga a los corredores a atenderte. Aun así, la mayoría acepta solicitudes de baja de cualquier persona, y eso es lo que envía esta app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ hat kein allgemeines Datenschutzgesetz, daher verpflichtet kein Landesgesetz die Broker, Ihnen nachzukommen. Die meisten nehmen Opt-out-Anfragen trotzdem von jedem an – und genau das sendet diese App."
+     }
+    }
+   }
+  },
+  "%@ has passed a data protection law, %@, which takes effect %@. Until then, organizations there are not required to honor it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ a adopté une loi sur la protection des données, %@, qui entre en vigueur le %@. D'ici là, les organisations n'y sont pas tenues de la respecter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ ha aprobado una ley de protección de datos, %@, que entra en vigor el %@. Hasta entonces, las organizaciones no están obligadas a respetarla."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ hat ein Datenschutzgesetz verabschiedet, %@, das am %@ in Kraft tritt. Bis dahin müssen Organisationen es nicht beachten."
+     }
+    }
+   }
+  },
+  "%@ is building one request that reaches every registered broker. We will add it when it opens.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ prépare une demande unique qui atteint tous les courtiers enregistrés. Nous l'ajouterons dès son ouverture."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ está preparando una solicitud única que llega a todos los corredores registrados. La añadiremos cuando se abra."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ baut einen einzigen Antrag auf, der alle registrierten Broker erreicht. Wir fügen ihn hinzu, sobald er startet."
+     }
+    }
+   }
+  },
+  "%@ is setting up a data broker registry. We will pull it as soon as it opens.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ met en place un registre des courtiers en données. Nous le consulterons dès son ouverture."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ está creando un registro de corredores de datos. Lo consultaremos en cuanto se abra."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ richtet ein Register für Datenbroker ein. Wir übernehmen es, sobald es öffnet."
+     }
+    }
+   }
+  },
+  "%@ requires data brokers to register themselves. We pull this registry (%@ brokers) and add every broker on it to our list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que les courtiers en données s'enregistrent. Nous récupérons ce registre (%@ courtiers) et ajoutons chaque courtier à notre liste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que los corredores de datos se registren. Descargamos este registro (%@ corredores) y añadimos cada corredor a nuestra lista."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ verlangt, dass sich Datenbroker registrieren. Wir laden dieses Register (%@ Broker) und nehmen jeden Broker darin in unsere Liste auf."
+     }
+    }
+   }
+  },
+  "%@ requires data brokers to register themselves. We pull this registry and add every broker on it to our list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que les courtiers en données s'enregistrent. Nous récupérons ce registre et ajoutons chaque courtier à notre liste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que los corredores de datos se registren. Descargamos este registro y añadimos cada corredor a nuestra lista."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ verlangt, dass sich Datenbroker registrieren. Wir laden dieses Register und nehmen jeden Broker darin in unsere Liste auf."
+     }
+    }
+   }
+  },
+  "%@ requires organizations to register with %@, but that lists organizations in general, not data brokers, so we do not pull it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que les organisations s'enregistrent auprès de %@, mais ce registre liste des organisations en général, pas des courtiers en données ; nous ne le récupérons donc pas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que las organizaciones se registren ante %@, pero eso lista organizaciones en general, no corredores de datos, así que no lo descargamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ verlangt, dass sich Organisationen bei %@ registrieren, doch das listet Organisationen allgemein, nicht Datenbroker, daher übernehmen wir es nicht."
+     }
+    }
+   }
+  },
+  "%@ requires some data brokers to register with %@. We do not pull that registry yet.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que certains courtiers en données s'enregistrent auprès de %@. Nous ne récupérons pas encore ce registre."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ exige que algunos corredores de datos se registren ante %@. Aún no descargamos ese registro."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ verlangt, dass sich manche Datenbroker bei %@ registrieren. Dieses Register übernehmen wir noch nicht."
+     }
+    }
+   }
+  },
+  "%@'s privacy law, the %@ (in effect since %@), gives residents the right to delete their data and to opt out of its sale.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La loi sur la vie privée de %@, la %@ (en vigueur depuis le %@), donne aux résidents le droit de faire effacer leurs données et de s'opposer à leur vente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La ley de privacidad de %@, la %@ (en vigor desde %@), da a los residentes derecho a borrar sus datos y a oponerse a su venta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Datenschutzgesetz von %@, der %@ (in Kraft seit %@), gibt Einwohnern das Recht, ihre Daten löschen zu lassen und dem Verkauf zu widersprechen."
+     }
+    }
+   }
+  },
+  "%@'s privacy law, the %@ (takes effect %@), gives residents the right to delete their data and to opt out of its sale. Until then, brokers are not required to honor it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La loi sur la vie privée de %@, la %@ (entre en vigueur le %@), donnera aux résidents le droit de faire effacer leurs données et de s'opposer à leur vente. D'ici là, les courtiers ne sont pas tenus de la respecter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La ley de privacidad de %@, la %@ (entra en vigor el %@), dará a los residentes derecho a borrar sus datos y a oponerse a su venta. Hasta entonces, los corredores no están obligados a respetarla."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Datenschutzgesetz von %@, der %@ (tritt am %@ in Kraft), gibt Einwohnern das Recht, ihre Daten löschen zu lassen und dem Verkauf zu widersprechen. Bis dahin müssen Broker es nicht beachten."
+     }
+    }
+   }
+  },
+  "A bot check (Cloudflare Turnstile)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (Cloudflare Turnstile)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (Cloudflare Turnstile)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (Cloudflare Turnstile)"
+     }
+    }
+   }
+  },
+  "A bot check (DataDome)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (DataDome)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (DataDome)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (DataDome)"
+     }
+    }
+   }
+  },
+  "A bot check (PerimeterX)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (PerimeterX)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (PerimeterX)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (PerimeterX)"
+     }
+    }
+   }
+  },
+  "A bot check (hCaptcha)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (hCaptcha)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (hCaptcha)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (hCaptcha)"
+     }
+    }
+   }
+  },
+  "A bot check (reCAPTCHA)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (reCAPTCHA)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (reCAPTCHA)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (reCAPTCHA)"
+     }
+    }
+   }
+  },
+  "A form plus a CAPTCHA that you solve": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulaire avec un CAPTCHA que vous résolvez"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulario con un CAPTCHA que tú resuelves"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Formular mit einem CAPTCHA, das Sie lösen"
+     }
+    }
+   }
+  },
+  "A guided walkthrough with a phone, ID or account step": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un parcours guidé avec une étape par téléphone, pièce d'identité ou compte"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un recorrido guiado con un paso por teléfono, identificación o cuenta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine geführte Anleitung mit einem Schritt per Telefon, Ausweis oder Konto"
+     }
+    }
+   }
+  },
+  "A hand-written walkthrough with %@ steps.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un parcours rédigé à la main en %@ étapes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un recorrido redactado a mano con %@ pasos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine von Hand geschriebene Anleitung mit %@ Schritten."
+     }
+    }
+   }
+  },
+  "A plain form we can fill in and send, with no bot check seen.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulaire simple que nous pouvons remplir et envoyer, sans vérification anti-robot repérée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulario sencillo que podemos rellenar y enviar, sin verificación anti-bots a la vista."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein einfaches Formular, das wir ausfüllen und senden können, ohne erkennbare Bot-Prüfung."
+     }
+    }
+   }
+  },
+  "A recent automatic send was stopped by a check on the site, so you solve it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un envoi automatique récent a été arrêté par une vérification du site : c'est à vous de la résoudre."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un envío automático reciente se detuvo por una verificación del sitio, así que la resuelves tú."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein kürzlicher automatischer Versand wurde von einer Prüfung der Website gestoppt – die lösen Sie selbst."
+     }
+    }
+   }
+  },
+  "A simple form and an email link": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulaire simple et un lien par e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un formulario sencillo y un enlace por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein einfaches Formular und ein E-Mail-Link"
+     }
+    }
+   }
+  },
+  "Add a family member's address and their state's rules apply to them. Brokers outside those states usually still accept opt-out requests, and that is what this app sends.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajoutez l'adresse d'un proche et les règles de son État s'appliqueront à lui. Les courtiers situés hors de ces États acceptent généralement quand même les demandes de désinscription, et c'est ce que cette appli envoie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Añade la dirección de un familiar y se le aplicarán las reglas de su estado. Los corredores de otros estados suelen aceptar igualmente solicitudes de baja, y eso es lo que envía esta app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fügen Sie die Adresse eines Familienmitglieds hinzu, dann gelten für diese Person die Regeln ihres Bundesstaats. Broker außerhalb dieser Staaten nehmen Opt-out-Anfragen meist trotzdem an – und genau das sendet diese App."
+     }
+    }
+   }
+  },
+  "Add your %@ to your profile": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajoutez votre %@ à votre profil"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Añade tu %@ a tu perfil"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ergänzen Sie Ihr(e) %@ in Ihrem Profil"
+     }
+    }
+   }
+  },
+  "Address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dirección"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse"
+     }
+    }
+   }
+  },
+  "Alabama": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alabama"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alabama"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alabama"
+     }
+    }
+   }
+  },
+  "Alaska": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alaska"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alaska"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alaska"
+     }
+    }
+   }
+  },
+  "Applies to processing from 2026-04-01.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "S'applique au traitement à partir du 01/04/2026."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se aplica al tratamiento a partir del 01/04/2026."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gilt für Verarbeitungen ab dem 01.04.2026."
+     }
+    }
+   }
+  },
+  "Arizona": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arizona"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arizona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arizona"
+     }
+    }
+   }
+  },
+  "Arkansas": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arkansas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arkansas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arkansas"
+     }
+    }
+   }
+  },
+  "As a member of the EU/EEA, the GDPR applies in %@ directly. The national law beside it is the %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comme membre de l'UE/EEE, le RGPD s'applique directement en %@. La loi nationale qui l'accompagne est : %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Como miembro de la UE/EEE, el RGPD se aplica directamente en %@. La ley nacional que lo acompaña es: %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als Mitglied der EU/des EWR gilt die DSGVO in %@ unmittelbar. Das nationale Gesetz daneben ist: %@."
+     }
+    }
+   }
+  },
+  "Asks bots not to search it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande aux robots de ne pas le consulter"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide a los bots que no lo consulten"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bittet Bots, es nicht abzufragen"
+     }
+    }
+   }
+  },
+  "Asks bots not to visit": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande aux robots de ne pas le visiter"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide a los bots que no lo visiten"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bittet Bots, die Seite nicht zu besuchen"
+     }
+    }
+   }
+  },
+  "Asks for a phone number": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande un numéro de téléphone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide un número de teléfono"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fragt nach einer Telefonnummer"
+     }
+    }
+   }
+  },
+  "Asks for the link to your listing": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande le lien vers votre fiche"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide el enlace a tu ficha"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fragt nach dem Link zu Ihrem Eintrag"
+     }
+    }
+   }
+  },
+  "Asks for your email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande votre e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide tu correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fragt nach Ihrer E-Mail-Adresse"
+     }
+    }
+   }
+  },
+  "Asks for your name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande votre nom"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide tu nombre"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fragt nach Ihrem Namen"
+     }
+    }
+   }
+  },
+  "Asks you to upload a file": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Demande d'envoyer un fichier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pide que subas un archivo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verlangt einen Datei-Upload"
+     }
+    }
+   }
+  },
+  "Aunt or uncle": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oncle ou tante"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tío o tía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Onkel oder Tante"
+     }
+    }
+   }
+  },
+  "Automatic opt-out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retrait automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Baja automática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Automatischer Opt-out"
+     }
+    }
+   }
+  },
+  "Being considered, not law yet: %@. %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À l’étude, pas encore une loi : %@. %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En estudio, aún no es ley: %@. %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Prüfung, noch kein Gesetz: %@. %@"
+     }
+    }
+   }
+  },
+  "Birthdate": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Date de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fecha de nacimiento"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geburtsdatum"
+     }
+    }
+   }
+  },
+  "Blocks automated checks": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloque les vérifications automatiques"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloquea las comprobaciones automáticas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Blockiert automatische Prüfungen"
+     }
+    }
+   }
+  },
+  "Blocks automated requests": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloque les requêtes automatiques"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloquea las solicitudes automáticas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Businesses in %@ must honor a universal opt-out signal such as Global Privacy Control. Turning it on in your browser helps on every site you visit.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les entreprises de %@ doivent respecter un signal universel de refus tel que Global Privacy Control. L'activer dans votre navigateur aide sur chaque site que vous visitez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las empresas de %@ deben respetar una señal universal de exclusión como Global Privacy Control. Activarla en tu navegador ayuda en todos los sitios que visites."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen in %@ müssen ein universelles Opt-out-Signal wie Global Privacy Control beachten. Wenn Sie es im Browser aktivieren, hilft das auf jeder Website, die Sie besuchen."
+     }
+    }
+   }
+  },
+  "California": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Californie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "California"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kalifornien"
+     }
+    }
+   }
+  },
+  "Can be checked automatically": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Peut être vérifié automatiquement"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se puede comprobar automáticamente"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kann automatisch geprüft werden"
+     }
+    }
+   }
+  },
+  "Child": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enfant"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hijo/a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kind"
+     }
+    }
+   }
+  },
+  "City": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ville"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ciudad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Stadt"
+     }
+    }
+   }
+  },
+  "Clear the check": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passer la vérification"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Superar la verificación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prüfung bestehen"
+     }
+    }
+   }
+  },
+  "Colorado": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Colorado"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Colorado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Colorado"
+     }
+    }
+   }
+  },
+  "Confirm": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirmer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirmar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bestätigen"
+     }
+    }
+   }
+  },
+  "Confirm the email they send you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirmez l'e-mail qu'ils vous envoient"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirma el correo que te envían"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bestätigen Sie die E-Mail, die man Ihnen schickt"
+     }
+    }
+   }
+  },
+  "Confirm the email they send you, if they send one": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirmez l'e-mail qu'ils vous envoient, s'ils en envoient un"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirma el correo que te envían, si te envían uno"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bestätigen Sie die E-Mail, die man Ihnen ggf. schickt"
+     }
+    }
+   }
+  },
+  "Confirm the email they sent you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirmez l'e-mail qu'ils vous ont envoyé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Confirma el correo que te enviaron"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bestätigen Sie die E-Mail, die man Ihnen geschickt hat"
+     }
+    }
+   }
+  },
+  "Connecticut": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Connecticut"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Connecticut"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Connecticut"
+     }
+    }
+   }
+  },
+  "Copy your %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiez votre %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copia tu %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kopieren Sie Ihr(e) %@"
+     }
+    }
+   }
+  },
+  "Could be scripted": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pourrait être automatisé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Podría automatizarse"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Könnte automatisiert werden"
+     }
+    }
+   }
+  },
+  "Cousin": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cousin/cousine"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Primo/a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cousin/Cousine"
+     }
+    }
+   }
+  },
+  "Covered by %@ until %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Couvert par %@ jusqu'au %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cubierto por %@ hasta el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abgedeckt von %@ bis %@"
+     }
+    }
+   }
+  },
+  "Covered by %@: its one request handles this site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Couvert par %@ : sa demande unique prend en charge ce site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cubierto por %@: su única solicitud se ocupa de este sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abgedeckt durch %@: dessen eine Anfrage erledigt diese Seite"
+     }
+    }
+   }
+  },
+  "Covering Tracks": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sur la piste"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Borrando huellas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Spuren verwischen"
+     }
+    }
+   }
+  },
+  "Current city": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ville actuelle"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ciudad actual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aktuelle Stadt"
+     }
+    }
+   }
+  },
+  "Current state": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "État actuel"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estado actual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aktueller Bundesstaat"
+     }
+    }
+   }
+  },
+  "Current street address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse actuelle (rue)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Calle de la dirección actual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aktuelle Straße"
+     }
+    }
+   }
+  },
+  "Delaware": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Delaware"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Delaware"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Delaware"
+     }
+    }
+   }
+  },
+  "Did not respond": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "N'a pas répondu"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No respondió"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hat nicht geantwortet"
+     }
+    }
+   }
+  },
+  "District of Columbia": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "District de Columbia"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Distrito de Columbia"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "District of Columbia"
+     }
+    }
+   }
+  },
+  "Email address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dirección de correo electrónico"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail-Adresse"
+     }
+    }
+   }
+  },
+  "Email or letter only": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Par e-mail ou courrier seulement"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo por correo electrónico o carta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nur per E-Mail oder Brief"
+     }
+    }
+   }
+  },
+  "European Union": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Union européenne"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unión Europea"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Europäische Union"
+     }
+    }
+   }
+  },
+  "Exposed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exposé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Expuesto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exponiert"
+     }
+    }
+   }
+  },
+  "Find the opt-out or privacy request form and fill it in": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trouvez le formulaire de retrait ou de demande de confidentialité et remplissez-le"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encuentra el formulario de baja o de solicitud de privacidad y rellénalo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Finden Sie das Opt-out- oder Datenschutzformular und füllen Sie es aus"
+     }
+    }
+   }
+  },
+  "Find your listing": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trouvez votre fiche"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encuentra tu ficha"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Finden Sie Ihren Eintrag"
+     }
+    }
+   }
+  },
+  "First name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prénom"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombre"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vorname"
+     }
+    }
+   }
+  },
+  "Florida": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Floride"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Florida"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Florida"
+     }
+    }
+   }
+  },
+  "Form is built by JavaScript": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire est construit par JavaScript"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario se construye con JavaScript"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Formular wird per JavaScript aufgebaut"
+     }
+    }
+   }
+  },
+  "Full name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nom complet"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombre completo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vollständiger Name"
+     }
+    }
+   }
+  },
+  "General Data Protection Regulation (EU) 2016/679": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Règlement général sur la protection des données (UE) 2016/679"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reglamento General de Protección de Datos (UE) 2016/679"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datenschutz-Grundverordnung (EU) 2016/679"
+     }
+    }
+   }
+  },
+  "Georgia": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Géorgie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Georgia"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Georgia"
+     }
+    }
+   }
+  },
+  "Ghost": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fantôme"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fantasma"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geist"
+     }
+    }
+   }
+  },
+  "Grandchild": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Petit-enfant"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nieto/a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enkelkind"
+     }
+    }
+   }
+  },
+  "Grandparent": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Grand-parent"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abuelo/a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Großelternteil"
+     }
+    }
+   }
+  },
+  "Guided walkthrough": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parcours guidé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recorrido guiado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geführte Anleitung"
+     }
+    }
+   }
+  },
+  "Guided, you do the steps": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Guidé : vous faites les étapes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Guiado: tú haces los pasos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geführt: Sie erledigen die Schritte"
+     }
+    }
+   }
+  },
+  "Hawaii": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hawaï"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hawái"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hawaii"
+     }
+    }
+   }
+  },
+  "Idaho": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Idaho"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Idaho"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Idaho"
+     }
+    }
+   }
+  },
+  "Illinois": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Illinois"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Illinois"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Illinois"
+     }
+    }
+   }
+  },
+  "In %@, brokers must register publicly and say how to opt out, and the %@ lets residents demand deletion and opt out of the sale of their data. Businesses there must also honor a universal opt-out signal such as Global Privacy Control.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, les courtiers doivent s'enregistrer publiquement et indiquer comment se désinscrire, et la %@ permet aux résidents d'exiger l'effacement et de s'opposer à la vente de leurs données. Les entreprises y doivent aussi respecter un signal universel de refus comme Global Privacy Control."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, los corredores deben registrarse públicamente e indicar cómo darse de baja, y la %@ permite a los residentes exigir el borrado y oponerse a la venta de sus datos. Allí las empresas también deben respetar una señal universal de exclusión como Global Privacy Control."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In %@ müssen sich Broker öffentlich registrieren und angeben, wie man widerspricht, und der %@ erlaubt Einwohnern, Löschung zu verlangen und dem Verkauf ihrer Daten zu widersprechen. Unternehmen dort müssen außerdem ein universelles Opt-out-Signal wie Global Privacy Control beachten."
+     }
+    }
+   }
+  },
+  "In %@, one free request through %@ reaches all %@ registered data brokers, and they are legally required to process it. There you would file once instead of once per site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, une seule demande gratuite via %@ atteint les %@ courtiers en données enregistrés, qui sont légalement tenus de la traiter. Vous déposez une demande une fois, au lieu d'une par site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, una sola solicitud gratuita a través de %@ llega a los %@ corredores de datos registrados, que están obligados legalmente a tramitarla. Allí presentarías una vez en lugar de una por sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In %@ erreicht ein einziger kostenloser Antrag über %@ alle %@ registrierten Datenbroker, die ihn gesetzlich bearbeiten müssen. Sie stellen ihn einmal, statt einmal pro Website."
+     }
+    }
+   }
+  },
+  "In %@, one free request through %@ reaches every registered data broker, and they are legally required to process it. There you would file once instead of once per site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, une seule demande gratuite via %@ atteint tous les courtiers en données enregistrés, qui sont légalement tenus de la traiter. Vous déposez une demande une fois, au lieu d'une par site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, una sola solicitud gratuita a través de %@ llega a todos los corredores de datos registrados, que están obligados legalmente a tramitarla. Allí presentarías una vez en lugar de una por sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In %@ erreicht ein einziger kostenloser Antrag über %@ alle registrierten Datenbroker, die ihn gesetzlich bearbeiten müssen. Sie stellen ihn einmal, statt einmal pro Website."
+     }
+    }
+   }
+  },
+  "In %@, the %@ gives residents a legal right to delete their data and opt out of its sale. Businesses there are required to respond to a verified request.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, la %@ donne aux résidents le droit légal de faire effacer leurs données et de s'opposer à leur vente. Les entreprises y sont tenues de répondre à une demande vérifiée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En %@, la %@ da a los residentes el derecho legal a borrar sus datos y a oponerse a su venta. Allí las empresas están obligadas a responder a una solicitud verificada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In %@ gibt der %@ Einwohnern das gesetzliche Recht, ihre Daten löschen zu lassen und dem Verkauf zu widersprechen. Unternehmen dort müssen auf einen verifizierten Antrag reagieren."
+     }
+    }
+   }
+  },
+  "In Quebec, businesses that build credit-style files on people must register with %@. %@ has no general data broker registry.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Au Québec, les entreprises qui constituent des dossiers de type crédit sur les personnes doivent s'enregistrer auprès de %@. %@ n'a pas de registre général des courtiers en données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En Quebec, las empresas que elaboran expedientes de tipo crediticio sobre personas deben registrarse ante %@. %@ no tiene un registro general de corredores de datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Québec müssen Unternehmen, die kreditähnliche Akten über Personen anlegen, sich bei %@ registrieren. %@ hat kein allgemeines Register für Datenbroker."
+     }
+    }
+   }
+  },
+  "In progress": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cours"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En curso"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Bearbeitung"
+     }
+    }
+   }
+  },
+  "Indiana": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indiana"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indiana"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indiana"
+     }
+    }
+   }
+  },
+  "Iowa": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Iowa"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Iowa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Iowa"
+     }
+    }
+   }
+  },
+  "It applies only to very large platforms, so it rarely reaches data brokers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle ne s'applique qu'à de très grandes plateformes ; elle touche donc rarement les courtiers en données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo se aplica a plataformas muy grandes, así que rara vez alcanza a los corredores de datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es gilt nur für sehr große Plattformen und erreicht Datenbroker daher selten."
+     }
+    }
+   }
+  },
+  "It needs something else (login, payment, ID or a phone call)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il faut autre chose (connexion, paiement, pièce d'identité ou appel téléphonique)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesita algo más (inicio de sesión, pago, identificación o una llamada)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es braucht etwas anderes (Login, Zahlung, Ausweis oder einen Anruf)"
+     }
+    }
+   }
+  },
+  "Kansas": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kansas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kansas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kansas"
+     }
+    }
+   }
+  },
+  "Kentucky": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kentucky"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kentucky"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kentucky"
+     }
+    }
+   }
+  },
+  "Last name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nom de famille"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apellido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nachname"
+     }
+    }
+   }
+  },
+  "Legal first name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prénom légal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombre legal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechtlicher Vorname"
+     }
+    }
+   }
+  },
+  "Legal last name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nom de famille légal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apellido legal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechtlicher Nachname"
+     }
+    }
+   }
+  },
+  "Legal name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nom légal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombre legal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechtlicher Name"
+     }
+    }
+   }
+  },
+  "Listed again": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Réapparu"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apareces de nuevo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erneut gelistet"
+     }
+    }
+   }
+  },
+  "Lists an email address for requests": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indique une adresse e-mail pour les demandes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indica una dirección de correo para las solicitudes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nennt eine E-Mail-Adresse für Anfragen"
+     }
+    }
+   }
+  },
+  "Loaded %@: nothing blocks the form. If the site adds a check when sending, we stop and ask you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chargé le %@ : rien ne bloque le formulaire. Si le site ajoute une vérification à l'envoi, nous nous arrêtons et vous demandons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cargado el %@: nada bloquea el formulario. Si el sitio añade una verificación al enviar, nos detenemos y te preguntamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Am %@ geladen: Nichts blockiert das Formular. Fügt die Website beim Senden eine Prüfung hinzu, halten wir an und fragen Sie."
+     }
+    }
+   }
+  },
+  "Look for an email titled \"%@\". ": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cherchez un e-mail intitulé « %@ ». "
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Busca un correo titulado «%@». "
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Suchen Sie nach einer E-Mail mit dem Betreff „%@“. "
+     }
+    }
+   }
+  },
+  "Looked at %@ page(s) and found no opt-out form.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ page(s) consultée(s), aucun formulaire de retrait trouvé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se revisaron %@ página(s) y no se encontró ningún formulario de baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ Seite(n) angesehen, kein Opt-out-Formular gefunden."
+     }
+    }
+   }
+  },
+  "Louisiana": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Louisiane"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Luisiana"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Louisiana"
+     }
+    }
+   }
+  },
+  "Low Profile": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Profil bas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Perfil bajo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unauffällig"
+     }
+    }
+   }
+  },
+  "Maiden name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nom de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apellido de soltera"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geburtsname"
+     }
+    }
+   }
+  },
+  "Maine": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maine"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maine"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maine"
+     }
+    }
+   }
+  },
+  "Manual, you find the page": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manuel : vous trouvez la page"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manual: tú encuentras la página"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manuell: Sie finden die Seite selbst"
+     }
+    }
+   }
+  },
+  "Maryland": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maryland"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maryland"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Maryland"
+     }
+    }
+   }
+  },
+  "Massachusetts": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Massachusetts"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Massachusetts"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Massachusetts"
+     }
+    }
+   }
+  },
+  "May ask for ID or notarization": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Peut demander une pièce d'identité ou une notarisation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puede pedir identificación o notarización"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kann Ausweis oder Beglaubigung verlangen"
+     }
+    }
+   }
+  },
+  "May verify by phone call or text": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Peut vérifier par appel ou SMS"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puede verificar por llamada o mensaje"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kann per Anruf oder SMS prüfen"
+     }
+    }
+   }
+  },
+  "Me": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moi"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Yo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ich"
+     }
+    }
+   }
+  },
+  "Mentions creating an account": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mentionne la création d'un compte"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menciona crear una cuenta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erwähnt das Anlegen eines Kontos"
+     }
+    }
+   }
+  },
+  "Mentions mailing a request": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mentionne l'envoi d'une demande par courrier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menciona enviar una solicitud por correo postal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erwähnt das Senden eines Antrags per Post"
+     }
+    }
+   }
+  },
+  "Michigan": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Michigan"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Míchigan"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Michigan"
+     }
+    }
+   }
+  },
+  "Minnesota": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Minnesota"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Minnesota"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Minnesota"
+     }
+    }
+   }
+  },
+  "Mississippi": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mississippi"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Misisipi"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mississippi"
+     }
+    }
+   }
+  },
+  "Missouri": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Missouri"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Misuri"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Missouri"
+     }
+    }
+   }
+  },
+  "Montana": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Montana"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Montana"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Montana"
+     }
+    }
+   }
+  },
+  "Moving through the legislature, not law yet: %@. %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cours d’examen au parlement, pas encore une loi : %@. %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En trámite legislativo, aún no es ley: %@. %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Im Gesetzgebungsverfahren, noch kein Gesetz: %@. %@"
+     }
+    }
+   }
+  },
+  "Nebraska": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nebraska"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nebraska"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nebraska"
+     }
+    }
+   }
+  },
+  "Needs a form submission to search": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nécessite l'envoi d'un formulaire pour chercher"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesita enviar un formulario para buscar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht zum Suchen ein abgeschicktes Formular"
+     }
+    }
+   }
+  },
+  "Needs a phone code or call": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nécessite un code ou un appel téléphonique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesita un código o una llamada telefónica"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht einen Telefoncode oder Anruf"
+     }
+    }
+   }
+  },
+  "Needs a real browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nécessite un vrai navigateur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesita un navegador real"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht einen echten Browser"
+     }
+    }
+   }
+  },
+  "Needs an account login": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nécessite une connexion à un compte"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Necesita iniciar sesión en una cuenta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht ein Konto-Login"
+     }
+    }
+   }
+  },
+  "Needs you: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Besoin de vous : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Te necesita: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Braucht Sie: %@"
+     }
+    }
+   }
+  },
+  "Nevada": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nevada"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nevada"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nevada"
+     }
+    }
+   }
+  },
+  "New Hampshire": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New Hampshire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nuevo Hampshire"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New Hampshire"
+     }
+    }
+   }
+  },
+  "New Jersey": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New Jersey"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nueva Jersey"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New Jersey"
+     }
+    }
+   }
+  },
+  "New Mexico": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nouveau-Mexique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nuevo México"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New Mexico"
+     }
+    }
+   }
+  },
+  "New York": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New York"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nueva York"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "New York"
+     }
+    }
+   }
+  },
+  "Nickname": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Surnom"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apodo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Spitzname"
+     }
+    }
+   }
+  },
+  "Niece or nephew": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Neveu ou nièce"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sobrino o sobrina"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Neffe oder Nichte"
+     }
+    }
+   }
+  },
+  "No confirmation: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucune confirmation : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin confirmación: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine Bestätigung: %@"
+     }
+    }
+   }
+  },
+  "No opt-out form found for this site yet.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun formulaire de retrait trouvé pour ce site pour l'instant."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no se ha encontrado un formulario de baja para este sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für diese Website wurde noch kein Opt-out-Formular gefunden."
+     }
+    }
+   }
+  },
+  "No simple name search found": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucune recherche simple par nom trouvée"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No se encontró una búsqueda sencilla por nombre"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine einfache Namenssuche gefunden"
+     }
+    }
+   }
+  },
+  "North Carolina": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Caroline du Nord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Carolina del Norte"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "North Carolina"
+     }
+    }
+   }
+  },
+  "North Dakota": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dakota du Nord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dakota del Norte"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "North Dakota"
+     }
+    }
+   }
+  },
+  "Not started": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas commencé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin empezar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht begonnen"
+     }
+    }
+   }
+  },
+  "Not yet understood": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas encore compris"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no entendido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch nicht verstanden"
+     }
+    }
+   }
+  },
+  "Off the Grid": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hors réseau"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fuera de la red"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unsichtbar"
+     }
+    }
+   }
+  },
+  "Ohio": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ohio"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ohio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ohio"
+     }
+    }
+   }
+  },
+  "Oklahoma": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oklahoma"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oklahoma"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oklahoma"
+     }
+    }
+   }
+  },
+  "Only the fields this form asks for.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seulement les champs que ce formulaire demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo los campos que pide este formulario."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nur die Felder, die dieses Formular verlangt."
+     }
+    }
+   }
+  },
+  "Open %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ öffnen"
+     }
+    }
+   }
+  },
+  "Open the email and click its link. We cannot read your inbox.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez l'e-mail et cliquez sur son lien. Nous ne pouvons pas lire votre boîte de réception."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre el correo y haz clic en su enlace. No podemos leer tu bandeja de entrada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die E-Mail und klicken Sie auf den Link. Wir können Ihr Postfach nicht lesen."
+     }
+    }
+   }
+  },
+  "Open the message and click its link.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez le message et cliquez sur son lien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre el mensaje y haz clic en su enlace."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die Nachricht und klicken Sie auf den Link."
+     }
+    }
+   }
+  },
+  "Open the message and click its link. We cannot read your inbox.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez le message et cliquez sur son lien. Nous ne pouvons pas lire votre boîte de réception."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre el mensaje y haz clic en su enlace. No podemos leer tu bandeja de entrada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die Nachricht und klicken Sie auf den Link. Wir können Ihr Postfach nicht lesen."
+     }
+    }
+   }
+  },
+  "Open the opt-out page": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir la page de retrait"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir la página de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-Seite öffnen"
+     }
+    }
+   }
+  },
+  "Open the site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir le site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir el sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Website öffnen"
+     }
+    }
+   }
+  },
+  "Open the site's opt-out page": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir la page de retrait du site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir la página de baja del sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-Seite der Website öffnen"
+     }
+    }
+   }
+  },
+  "Open your own listing": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir votre propre fiche"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre tu propia ficha"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eigenen Eintrag öffnen"
+     }
+    }
+   }
+  },
+  "Oregon": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oregon"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oregón"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oregon"
+     }
+    }
+   }
+  },
+  "Other / spelling variant": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autre / variante d'orthographe"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Otro / variante de ortografía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sonstiges / Schreibvariante"
+     }
+    }
+   }
+  },
+  "Other family": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autre membre de la famille"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Otro familiar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sonstige Familie"
+     }
+    }
+   }
+  },
+  "Page is built by JavaScript": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page est construite par JavaScript"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La página se construye con JavaScript"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite wird per JavaScript aufgebaut"
+     }
+    }
+   }
+  },
+  "Parent": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parent"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Padre o madre"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elternteil"
+     }
+    }
+   }
+  },
+  "Partial: %@ of %@ profiles opted out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Partiel : %@ profils sur %@ retirés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parcial: %@ de %@ perfiles dados de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Teilweise: %@ von %@ Profilen abgemeldet"
+     }
+    }
+   }
+  },
+  "Partner": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Conjoint(e) / partenaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pareja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Partner/in"
+     }
+    }
+   }
+  },
+  "Passed but not in effect yet (takes effect %@): %@. %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adoptée mais pas encore en vigueur (entre en vigueur le %@) : %@. %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aprobada pero aún no en vigor (entra en vigor el %@): %@. %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beschlossen, aber noch nicht in Kraft (tritt am %@ in Kraft): %@. %@"
+     }
+    }
+   }
+  },
+  "Pennsylvania": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pennsylvanie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pensilvania"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pennsylvania"
+     }
+    }
+   }
+  },
+  "Phone number": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Numéro de téléphone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Número de teléfono"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Telefonnummer"
+     }
+    }
+   }
+  },
+  "Previous legal name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ancien nom légal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombre legal anterior"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Früherer rechtlicher Name"
+     }
+    }
+   }
+  },
+  "Ready (dry run, nothing sent)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prêt (essai à blanc, rien d'envoyé)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Listo (prueba en seco, no se envió nada)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bereit (Probelauf, nichts gesendet)"
+     }
+    }
+   }
+  },
+  "Results are behind terms you must accept yourself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les résultats sont derrière des conditions que vous devez accepter vous-même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los resultados están tras términos que debes aceptar tú"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ergebnisse stehen hinter Bedingungen, die Sie selbst akzeptieren müssen"
+     }
+    }
+   }
+  },
+  "Rhode Island": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rhode Island"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rhode Island"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rhode Island"
+     }
+    }
+   }
+  },
+  "Search needs a real browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La recherche nécessite un vrai navigateur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La búsqueda necesita un navegador real"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Suche braucht einen echten Browser"
+     }
+    }
+   }
+  },
+  "Search results can't be told apart": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les résultats de recherche ne se distinguent pas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los resultados de búsqueda no se distinguen"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Suchergebnisse lassen sich nicht unterscheiden"
+     }
+    }
+   }
+  },
+  "Semi-automated, with prompts for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semi-automatique, avec des invites pour vous"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semiautomático, con avisos para ti"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatisch, mit Aufforderungen an Sie"
+     }
+    }
+   }
+  },
+  "Sends you a confirmation email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous envoie un e-mail de confirmation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Te envía un correo de confirmación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schickt Ihnen eine Bestätigungs-E-Mail"
+     }
+    }
+   }
+  },
+  "Sent": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet"
+     }
+    }
+   }
+  },
+  "Sent recently": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé récemment"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado hace poco"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kürzlich gesendet"
+     }
+    }
+   }
+  },
+  "Sent; confirm the email they sent you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé ; confirmez l'e-mail qu'ils vous ont envoyé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado; confirma el correo que te enviaron"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet; bestätigen Sie die E-Mail, die man Ihnen geschickt hat"
+     }
+    }
+   }
+  },
+  "Shows a bot check before anything else": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Affiche une vérification anti-robot avant tout"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Muestra una verificación anti-bots antes que nada"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zeigt als Erstes eine Bot-Prüfung"
+     }
+    }
+   }
+  },
+  "Sibling": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Frère ou sœur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hermano/a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geschwister"
+     }
+    }
+   }
+  },
+  "Skipped: not listed there": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ignoré : pas répertorié là-bas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitido: no apareces allí"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Übersprungen: dort nicht gelistet"
+     }
+    }
+   }
+  },
+  "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passez la vérification anti-robot, cochez toute case de confirmation et acceptez vous-même les conditions si on vous le demande. Nous attendons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Supera la verificación anti-bots, marca cualquier casilla de confirmación y acepta tú los términos si te lo piden. Esperamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bestehen Sie die Bot-Prüfung, haken Sie jedes Bestätigungskästchen an und akzeptieren Sie Bedingungen selbst, wenn danach gefragt wird. Wir warten."
+     }
+    }
+   }
+  },
+  "Some places go further than %@. Here is what stronger rules look like, so you know what to expect and what a family member living there would get:": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains endroits vont plus loin que %@. Voici à quoi ressemblent des règles plus strictes, pour savoir à quoi vous attendre et ce que obtiendrait un proche qui y vit :"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos lugares van más allá que %@. Así son unas reglas más fuertes, para que sepas qué esperar y qué obtendría un familiar que viva allí:"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Orte gehen weiter als %@. So sehen stärkere Regeln aus, damit Sie wissen, was Sie erwartet und was ein dort lebendes Familienmitglied bekäme:"
+     }
+    }
+   }
+  },
+  "Some sources say businesses in %@ must honor universal opt-out signals such as Global Privacy Control. Turning it on in your browser costs nothing.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Selon certaines sources, les entreprises de %@ doivent respecter les signaux universels de refus comme Global Privacy Control. L'activer dans votre navigateur ne coûte rien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Según algunas fuentes, las empresas de %@ deben respetar señales universales de exclusión como Global Privacy Control. Activarla en tu navegador no cuesta nada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einigen Quellen zufolge müssen Unternehmen in %@ universelle Opt-out-Signale wie Global Privacy Control beachten. Es im Browser zu aktivieren kostet nichts."
+     }
+    }
+   }
+  },
+  "Something else is wrong": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autre chose ne va pas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algo más va mal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Etwas anderes stimmt nicht"
+     }
+    }
+   }
+  },
+  "South Carolina": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Caroline du Sud"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Carolina del Sur"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "South Carolina"
+     }
+    }
+   }
+  },
+  "South Dakota": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dakota du Sud"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dakota del Sur"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "South Dakota"
+     }
+    }
+   }
+  },
+  "Spouse": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Conjoint(e)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cónyuge"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ehepartner/in"
+     }
+    }
+   }
+  },
+  "State": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "État"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bundesstaat"
+     }
+    }
+   }
+  },
+  "Step %@ of %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape %@ sur %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso %@ de %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt %@ von %@"
+     }
+    }
+   }
+  },
+  "Stopped: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arrêté : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Detenido: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gestoppt: %@"
+     }
+    }
+   }
+  },
+  "Street address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse (rue)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dirección (calle)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Straße"
+     }
+    }
+   }
+  },
+  "Submit it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le soumettre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviarlo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Absenden"
+     }
+    }
+   }
+  },
+  "Submitted, verifying": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé, en cours de vérification"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado, verificando"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet, wird geprüft"
+     }
+    }
+   }
+  },
+  "Tap Copy, then paste it into the form. It is cleared from the clipboard after a minute.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez Copier, puis collez dans le formulaire. Le presse-papiers est vidé au bout d'une minute."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca Copiar y pégalo en el formulario. Se borra del portapapeles tras un minuto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tippen Sie auf Kopieren und fügen Sie es ins Formular ein. Nach einer Minute wird es aus der Zwischenablage gelöscht."
+     }
+    }
+   }
+  },
+  "Tennessee": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tennessee"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tennessee"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tennessee"
+     }
+    }
+   }
+  },
+  "Texas": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Texas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Texas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Texas"
+     }
+    }
+   }
+  },
+  "The app fills in the form and sends it. You solve the bot check (and confirm an email if the site sends one).": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'appli remplit le formulaire et l'envoie. Vous passez la vérification anti-robot (et confirmez un e-mail si le site en envoie un)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app rellena el formulario y lo envía. Tú superas la verificación anti-bots (y confirmas un correo si el sitio envía uno)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App füllt das Formular aus und sendet es. Sie bestehen die Bot-Prüfung (und bestätigen eine E-Mail, falls die Website eine schickt)."
+     }
+    }
+   }
+  },
+  "The app fills in the site's form and sends it on its own.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'appli remplit le formulaire du site et l'envoie toute seule."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app rellena el formulario del sitio y lo envía por sí sola."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App füllt das Formular der Website aus und sendet es von selbst."
+     }
+    }
+   }
+  },
+  "The app opens the right page and walks you through each step. Some steps need things only you can do.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'appli ouvre la bonne page et vous guide à chaque étape. Certaines étapes exigent des choses que vous seul pouvez faire."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La app abre la página correcta y te guía en cada paso. Algunos pasos requieren cosas que solo tú puedes hacer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App öffnet die richtige Seite und führt Sie durch jeden Schritt. Manche Schritte verlangen Dinge, die nur Sie tun können."
+     }
+    }
+   }
+  },
+  "The email link expires quickly": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le lien de l'e-mail expire vite"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El enlace del correo caduca pronto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Der Link in der E-Mail läuft schnell ab"
+     }
+    }
+   }
+  },
+  "The form asks for %@, which we do not hold.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire demande %@, que nous n'avons pas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario pide %@, que no tenemos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Formular verlangt %@, was wir nicht haben."
+     }
+    }
+   }
+  },
+  "The page mentions a bot check and we have not loaded it to see whether one appears.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page mentionne une vérification anti-robot et nous ne l'avons pas chargée pour voir si elle apparaît."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La página menciona una verificación anti-bots y no la hemos cargado para ver si aparece."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite erwähnt eine Bot-Prüfung, und wir haben sie nicht geladen, um zu sehen, ob eine erscheint."
+     }
+    }
+   }
+  },
+  "The page or link is broken": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page ou le lien est cassé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La página o el enlace está roto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite oder der Link ist defekt"
+     }
+    }
+   }
+  },
+  "The site asks bots not to visit, so we left it alone.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site demande aux robots de ne pas le visiter : nous l'avons laissé de côté."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio pide a los bots que no lo visiten, así que lo dejamos en paz."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website bittet Bots, sie nicht zu besuchen, daher haben wir sie in Ruhe gelassen."
+     }
+    }
+   }
+  },
+  "The site blocked me": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site m'a bloqué"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio me bloqueó"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat mich blockiert"
+     }
+    }
+   }
+  },
+  "The site did not respond when we looked.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site n'a pas répondu quand nous avons regardé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio no respondió cuando miramos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat bei unserer Prüfung nicht geantwortet."
+     }
+    }
+   }
+  },
+  "The site did not respond.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site n'a pas répondu."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio no respondió."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat nicht geantwortet."
+     }
+    }
+   }
+  },
+  "The site is built so that we could not read it to find the opt-out page.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site est construit de telle sorte que nous n'avons pas pu le lire pour trouver la page de retrait."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio está construido de forma que no pudimos leerlo para encontrar la página de baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website ist so aufgebaut, dass wir sie nicht lesen konnten, um die Opt-out-Seite zu finden."
+     }
+    }
+   }
+  },
+  "The site refused: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site a refusé : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio rechazó: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat abgelehnt: %@"
+     }
+    }
+   }
+  },
+  "The site refuses automated visits, so we could not find its opt-out page.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site refuse les visites automatisées : nous n'avons donc pas pu trouver sa page de retrait."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio rechaza las visitas automatizadas, así que no pudimos encontrar su página de baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website lehnt automatisierte Besuche ab, daher konnten wir ihre Opt-out-Seite nicht finden."
+     }
+    }
+   }
+  },
+  "Then we look for the site's confirmation.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ensuite, nous cherchons la confirmation du site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Después buscamos la confirmación del sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Danach suchen wir die Bestätigung der Website."
+     }
+    }
+   }
+  },
+  "This form asks for something only you can supply (\"%@\").": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande quelque chose que vous seul pouvez fournir (« %@»)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide algo que solo tú puedes dar («%@»)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt etwas, das nur Sie liefern können („%@“)."
+     }
+    }
+   }
+  },
+  "This form asks for something we do not have (\"%@\").": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande quelque chose que nous n'avons pas (« %@»)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide algo que no tenemos («%@»)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt etwas, das wir nicht haben („%@“)."
+     }
+    }
+   }
+  },
+  "This form asks the person to confirm \"I am this person\" (\"%@\"). The app only does that for the account owner, and only if they allowed it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande à la personne de confirmer « Je suis cette personne » (« %@»). L'appli ne le fait que pour le titulaire du compte, et seulement s'il l'a autorisé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide a la persona confirmar «Soy esta persona» («%@»). La app solo lo hace para el titular de la cuenta, y solo si lo permitió."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt von der Person die Bestätigung „Ich bin diese Person“ („%@“). Die App tut das nur für den Kontoinhaber und nur, wenn er es erlaubt hat."
+     }
+    }
+   }
+  },
+  "This form asks you to confirm or certify something yourself (\"%@\").": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire vous demande de confirmer ou d'attester quelque chose vous-même (« %@»)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario te pide confirmar o certificar algo tú mismo («%@»)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt, dass Sie selbst etwas bestätigen oder versichern („%@“)."
+     }
+    }
+   }
+  },
+  "This form needs the link to your listing on the site, which you find there first.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire exige le lien vers votre fiche sur le site, que vous trouvez d'abord là-bas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario necesita el enlace a tu ficha en el sitio, que primero encuentras allí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular braucht den Link zu Ihrem Eintrag auf der Website, den Sie zuerst dort finden."
+     }
+    }
+   }
+  },
+  "This law gives no general right to have your data deleted. You can usually withdraw your consent.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette loi ne donne aucun droit général de faire effacer vos données. Vous pouvez généralement retirer votre consentement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta ley no da un derecho general a borrar tus datos. Normalmente puedes retirar tu consentimiento."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Gesetz gibt kein allgemeines Recht auf Löschung Ihrer Daten. Sie können in der Regel Ihre Einwilligung widerrufen."
+     }
+    }
+   }
+  },
+  "This site %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce site %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este sitio %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Website %@."
+     }
+    }
+   }
+  },
+  "Uses a privacy-request portal": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Utilise un portail de demandes de confidentialité"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Usa un portal de solicitudes de privacidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nutzt ein Portal für Datenschutzanfragen"
+     }
+    }
+   }
+  },
+  "Utah": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Utah"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Utah"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Utah"
+     }
+    }
+   }
+  },
+  "Verified removed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retrait vérifié"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Baja verificada"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entfernung bestätigt"
+     }
+    }
+   }
+  },
+  "Vermont": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vermont"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vermont"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vermont"
+     }
+    }
+   }
+  },
+  "Virginia": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Virginie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Virginia"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Virginia"
+     }
+    }
+   }
+  },
+  "Wait for the confirmation email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Attendre l'e-mail de confirmation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esperar el correo de confirmación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auf die Bestätigungs-E-Mail warten"
+     }
+    }
+   }
+  },
+  "Washington": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Washington"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Washington"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Washington"
+     }
+    }
+   }
+  },
+  "We also go beyond your state's registry: our list combines every registry we can read (%@) with other known brokers, %@ sites in all, whichever state or country they registered in.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous allons aussi au-delà du registre de votre État : notre liste combine tous les registres que nous pouvons lire (%@) avec d'autres courtiers connus, %@ sites au total, quel que soit l'État ou le pays où ils sont enregistrés."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "También vamos más allá del registro de tu estado: nuestra lista combina todos los registros que podemos leer (%@) con otros corredores conocidos, %@ sitios en total, en cualquier estado o país donde estén registrados."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir gehen auch über das Register Ihres Bundesstaats hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (%@), mit weiteren bekannten Brokern – insgesamt %@ Websites, egal in welchem Bundesstaat oder Land sie registriert sind."
+     }
+    }
+   }
+  },
+  "We could not confirm a general right to have your data deleted under this law, so a deletion request may be refused.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas pu confirmer de droit général à l'effacement de vos données dans cette loi : une demande d'effacement peut donc être refusée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No pudimos confirmar un derecho general a borrar tus datos en esta ley, así que una solicitud de borrado puede ser rechazada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir konnten in diesem Gesetz kein allgemeines Recht auf Löschung Ihrer Daten bestätigen, daher kann ein Löschantrag abgelehnt werden."
+     }
+    }
+   }
+  },
+  "We could not find an opt-out page on this site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas trouvé de page de retrait sur ce site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No encontramos una página de baja en este sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben auf dieser Website keine Opt-out-Seite gefunden."
+     }
+    }
+   }
+  },
+  "We could not find the form automatically.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas trouvé le formulaire automatiquement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No encontramos el formulario automáticamente."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben das Formular nicht automatisch gefunden."
+     }
+    }
+   }
+  },
+  "We could not match any of this form's fields to your profile.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pu faire correspondre aucun champ de ce formulaire à votre profil."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No pudimos asociar ningún campo de este formulario con tu perfil."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir konnten kein Feld dieses Formulars Ihrem Profil zuordnen."
+     }
+    }
+   }
+  },
+  "We could not read this site's opt-out page. Look for its privacy or \"do not sell\" link and follow it yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas pu lire la page de retrait de ce site. Cherchez son lien de confidentialité ou « ne pas vendre » et suivez-le vous-même."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No pudimos leer la página de baja de este sitio. Busca su enlace de privacidad o «no vender» y síguelo tú."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir konnten die Opt-out-Seite dieser Website nicht lesen. Suchen Sie ihren Datenschutz- oder „Nicht verkaufen“-Link und folgen Sie ihm selbst."
+     }
+    }
+   }
+  },
+  "We do not have %@'s data protection rules yet. Most brokers still accept opt-out requests from anyone, and that is what this app sends.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas encore les règles de protection des données de %@. La plupart des courtiers acceptent quand même les demandes de désinscription de n'importe qui, et c'est ce que cette appli envoie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no tenemos las reglas de protección de datos de %@. La mayoría de los corredores acepta solicitudes de baja de cualquier persona, y eso es lo que envía esta app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben die Datenschutzregeln von %@ noch nicht. Die meisten Broker nehmen Opt-out-Anfragen trotzdem von jedem an – und genau das sendet diese App."
+     }
+    }
+   }
+  },
+  "We fill in and send the form; the page shows %@ that you handle.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous remplissons et envoyons le formulaire ; la page affiche %@ dont vous vous occupez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenamos y enviamos el formulario; la página muestra %@ de la que te encargas tú."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir füllen das Formular aus und senden es; die Seite zeigt %@, um das Sie sich kümmern."
+     }
+    }
+   }
+  },
+  "We fill in your details": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous remplissons vos informations"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenamos tus datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir tragen Ihre Angaben ein"
+     }
+    }
+   }
+  },
+  "We found the opt-out page but could not read a form on it, so we take you there.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons trouvé la page de retrait mais n'avons pas pu y lire de formulaire : nous vous y emmenons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encontramos la página de baja pero no pudimos leer un formulario en ella, así que te llevamos allí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben die Opt-out-Seite gefunden, konnten dort aber kein Formular lesen, daher bringen wir Sie hin."
+     }
+    }
+   }
+  },
+  "We go beyond any one country's registry: our list combines every registry we can read (US states so far) with other known brokers, %@ sites in all. Many of them are US companies that may not have to follow your country's law, but most accept opt-out requests from anyone and this app sends them.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous allons au-delà du registre d'un seul pays : notre liste combine tous les registres que nous pouvons lire (les États américains pour l'instant) avec d'autres courtiers connus, %@ sites au total. Beaucoup sont des entreprises américaines qui ne sont peut-être pas tenues de respecter la loi de votre pays, mais la plupart acceptent les demandes de désinscription de n'importe qui, et cette appli les leur envoie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vamos más allá del registro de un solo país: nuestra lista combina todos los registros que podemos leer (por ahora, los estados de EE. UU.) con otros corredores conocidos, %@ sitios en total. Muchos son empresas estadounidenses que quizá no tengan que cumplir la ley de tu país, pero la mayoría acepta solicitudes de baja de cualquier persona, y esta app se las envía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir gehen über das Register eines einzelnen Landes hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (bisher US-Bundesstaaten), mit weiteren bekannten Brokern – insgesamt %@ Websites. Viele sind US-Unternehmen, die das Recht Ihres Landes womöglich nicht beachten müssen, doch die meisten nehmen Opt-out-Anfragen von jedem an, und diese App sendet sie ihnen."
+     }
+    }
+   }
+  },
+  "We search the site for you; you tap your own listing and clear the check, and we fill in and send the rest.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous cherchons sur le site pour vous ; vous touchez votre propre fiche et passez la vérification, et nous remplissons et envoyons le reste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscamos en el sitio por ti; tú tocas tu propia ficha y superas la verificación, y nosotros rellenamos y enviamos el resto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir suchen auf der Website für Sie; Sie tippen Ihren eigenen Eintrag an und bestehen die Prüfung, und wir füllen den Rest aus und senden ihn."
+     }
+    }
+   }
+  },
+  "We searched %@ for you by name. Tap the result that is you, then tap \"This is my listing\". You never need to buy a report: the opt-out only needs the address of that page. If none is you, tap Not working.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons cherché %@ pour vous par nom. Touchez le résultat qui est vous, puis « C'est ma fiche ». Vous n'avez jamais besoin d'acheter un rapport : le retrait n'exige que l'adresse de cette page. Si aucun ne vous correspond, touchez Ça ne marche pas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscamos a %@ por ti por nombre. Toca el resultado que eres tú y luego «Esta es mi ficha». Nunca necesitas comprar un informe: la baja solo necesita la dirección de esa página. Si ninguno eres tú, toca No funciona."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben %@ für Sie nach Namen durchsucht. Tippen Sie auf das Ergebnis, das Sie sind, und dann auf „Das ist mein Eintrag“. Sie müssen nie einen Bericht kaufen: Für den Opt-out genügt die Adresse dieser Seite. Ist keines davon Sie, tippen Sie auf Funktioniert nicht."
+     }
+    }
+   }
+  },
+  "We send it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous l'envoyons"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo enviamos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir senden es"
+     }
+    }
+   }
+  },
+  "West Virginia": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Virginie-Occidentale"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Virginia Occidental"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "West Virginia"
+     }
+    }
+   }
+  },
+  "Wisconsin": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wisconsin"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wisconsin"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wisconsin"
+     }
+    }
+   }
+  },
+  "Works only in a real browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fonctionne seulement dans un vrai navigateur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo funciona en un navegador real"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Funktioniert nur in einem echten Browser"
+     }
+    }
+   }
+  },
+  "Wyoming": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wyoming"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wyoming"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wyoming"
+     }
+    }
+   }
+  },
+  "You can ask organizations to delete or correct your data in some circumstances, but it is not an absolute right.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez demander aux organisations d'effacer ou de corriger vos données dans certains cas, mais ce n'est pas un droit absolu."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes pedir a las organizaciones que borren o corrijan tus datos en algunas circunstancias, pero no es un derecho absoluto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können Organisationen in manchen Fällen bitten, Ihre Daten zu löschen oder zu berichtigen, aber es ist kein absolutes Recht."
+     }
+    }
+   }
+  },
+  "You can ask organizations to delete your personal data. The usual exceptions apply, such as a legal duty to keep it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez demander aux organisations d'effacer vos données personnelles. Les exceptions habituelles s'appliquent, comme une obligation légale de les conserver."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes pedir a las organizaciones que borren tus datos personales. Se aplican las excepciones habituales, como un deber legal de conservarlos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können Organisationen bitten, Ihre personenbezogenen Daten zu löschen. Die üblichen Ausnahmen gelten, etwa eine gesetzliche Aufbewahrungspflicht."
+     }
+    }
+   }
+  },
+  "You can object to some uses of your data, including direct marketing.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez vous opposer à certains usages de vos données, y compris la prospection commerciale."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes oponerte a algunos usos de tus datos, incluido el marketing directo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können einigen Verwendungen Ihrer Daten widersprechen, auch der Direktwerbung."
+     }
+    }
+   }
+  },
+  "You can object to the use of your data, and an objection to direct marketing is absolute.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez vous opposer à l'utilisation de vos données, et l'opposition à la prospection commerciale est absolue."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes oponerte al uso de tus datos, y la oposición al marketing directo es absoluta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können der Verwendung Ihrer Daten widersprechen, und der Widerspruch gegen Direktwerbung ist absolut."
+     }
+    }
+   }
+  },
+  "You can opt out of direct marketing at any time.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez refuser la prospection commerciale à tout moment."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes darte de baja del marketing directo en cualquier momento."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können der Direktwerbung jederzeit widersprechen."
+     }
+    }
+   }
+  },
+  "You can withdraw your consent, and opt out of direct marketing in some cases.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez retirer votre consentement et, dans certains cas, refuser la prospection commerciale."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes retirar tu consentimiento y, en algunos casos, darte de baja del marketing directo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können Ihre Einwilligung widerrufen und in manchen Fällen der Direktwerbung widersprechen."
+     }
+    }
+   }
+  },
+  "You find your listing first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous trouvez d'abord votre fiche"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Primero encuentras tu ficha"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie finden zuerst Ihren Eintrag"
+     }
+    }
+   }
+  },
+  "You must submit it yourself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous devez le soumettre vous-même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Debes enviarlo tú mismo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie müssen es selbst absenden"
+     }
+    }
+   }
+  },
+  "You reported this site as not working (%@).": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez signalé que ce site ne fonctionne pas (%@)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marcaste este sitio como que no funciona (%@)."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben diese Website als nicht funktionierend gemeldet (%@)."
+     }
+    }
+   }
+  },
+  "You solve a CAPTCHA": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous passez un CAPTCHA"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tú resuelves un CAPTCHA"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie lösen ein CAPTCHA"
+     }
+    }
+   }
+  },
+  "Your email and the address of your listing.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre e-mail et l'adresse de votre fiche."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu correo y la dirección de tu ficha."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre E-Mail-Adresse und die Adresse Ihres Eintrags."
+     }
+    }
+   }
+  },
+  "Your regulator is %@ (%@). You can complain to it if a company ignores a request.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre autorité de contrôle est %@ (%@). Vous pouvez vous plaindre auprès d'elle si une entreprise ignore une demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu autoridad de control es %@ (%@). Puedes presentarle una queja si una empresa ignora una solicitud."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Aufsichtsbehörde ist %@ (%@). Sie können sich dort beschweren, wenn ein Unternehmen eine Anfrage ignoriert."
+     }
+    }
+   }
+  },
+  "Your regulator is %@. You can complain to it if a company ignores a request.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre autorité de contrôle est %@. Vous pouvez vous plaindre auprès d'elle si une entreprise ignore une demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu autoridad de control es %@. Puedes presentarle una queja si una empresa ignora una solicitud."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Aufsichtsbehörde ist %@. Sie können sich dort beschweren, wenn ein Unternehmen eine Anfrage ignoriert."
+     }
+    }
+   }
+  },
+  "Zip code": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Postleitzahl"
+     }
+    }
+   }
+  }
+ },
+ "version": "1.0"
+}

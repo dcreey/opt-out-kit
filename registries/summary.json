@@ -1,0 +1,26 @@
+{
+ "generated": "2026-10-22",
+ "known_sites": 673,
+ "unresolved": 19,
+ "jurisdictions": {
+  "CA": {
+   "count": 603,
+   "source": "https://cppa.ca.gov/data_broker_registry/registry.csv",
+   "fetched": "2026-10-22",
+   "with_website": 603
+  },
+  "OR": {
+   "count": 392,
+   "source": "https://www4.cbs.state.or.us/exs/all/mylicsearch/",
+   "fetched": "2026-10-22",
+   "with_website": 0
+  },
+  "TX": {
+   "count": 456,
+   "source": "https://texas-sos.appianportalsgov.com/data-broker-registry",
+   "fetched": "2026-10-22",
+   "with_website": 456
+  }
+ },
+ "in_several": 423
+}

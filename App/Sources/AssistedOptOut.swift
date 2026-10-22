@@ -264,7 +264,7 @@ struct AssistedOptOutView: View {
                 ForEach(runner.items) { item in
                     VStack(alignment: .leading) {
                         Text(item.entry.domain)
-                        Text(runner.results[item.id]?.label ?? "Not reached").font(.caption).foregroundStyle(.secondary)
+                        Text(runner.results[item.id]?.label ?? Loc.t("Not reached")).font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -273,14 +273,14 @@ struct AssistedOptOutView: View {
 
     private var instruction: String {
         switch runner.phase {
-        case .loading: return "Loading the form and filling in your details…"
-        case .waitingForTerms: return "Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after."
-        case .waitingForCertification: return "Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after."
-        case .waitingForCheck: return "Your details are filled in. Solve the check below and we will send it."
+        case .loading: return Loc.t("Loading the form and filling in your details…")
+        case .waitingForTerms: return Loc.t("Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after.")
+        case .waitingForCertification: return Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
+        case .waitingForCheck: return Loc.t("Your details are filled in. Solve the check below and we will send it.")
         case .sending: return "Sending…"
-        case .sent(let email): return email ? "Sent. Check your email for a link to confirm." : "Sent."
-        case .needsMore(let why): return "Sent, but the site did not confirm (\(why)). It may need one more step from you here. Tap Next site when you are done."
-        case .timedOut: return "Timed out waiting for the check."
+        case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : "Sent."
+        case .needsMore(let why): return Loc.f("Sent, but the site did not confirm (%@). It may need one more step from you here. Tap Next site when you are done.", why)
+        case .timedOut: return Loc.t("Timed out waiting for the check.")
         }
     }
 

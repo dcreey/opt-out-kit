@@ -6,6 +6,12 @@ struct BrokerListView: View {
     @State private var addingPerson = false
     @State private var newName = ""
     @State private var editing: Person?
+
+    /// The editor can close only when the profile has its required details (and, for the owner, the household email).
+    private func editorComplete(_ person: Person) -> Bool {
+        guard let current = model.people.first(where: { $0.id == person.id }) else { return true }
+        return current.isComplete && (current.relationship != .me || model.formEmail != nil)
+    }
     @State private var showAuto = false
 
     var body: some View {
@@ -26,15 +32,34 @@ struct BrokerListView: View {
                     }
                 }
                 Section {
-                    ProgressView(value: model.progress.completion(in: model.brokers)) {
-                        Text("Finished \(Int(model.progress.completion(in: model.brokers) * 100))%")
+                    ProgressView(value: model.progress.completion(in: model.queueBrokers)) {
+                        Text("Finished \(Int(model.progress.completion(in: model.queueBrokers) * 100))%")
                     }
                     .accessibilityIdentifier("completion")
                 }
-                Section("Your queue") {
-                    ForEach(model.brokers) { broker in
+                if !model.platformQueue.isEmpty {
+                    Section {
+                        ForEach(model.platformQueue) { broker in
+                            NavigationLink(value: broker) { platformRow(broker) }
+                                .accessibilityIdentifier("platform-\(broker.id)")
+                        }
+                    } header: {
+                        Text("One request for many sites")
+                    } footer: {
+                        Text("A free state service that sends your deletion request to every broker registered there. Doing it first saves doing many of the sites below by hand.")
+                    }
+                }
+                Section {
+                    ForEach(model.queueBrokers) { broker in
                         NavigationLink(value: broker) { row(broker) }
                             .accessibilityIdentifier("broker-\(broker.id)")
+                    }
+                } header: {
+                    Text("Your queue")
+                } footer: {
+                    if let handled = model.platformGroups.first, handled.brokers.count > 0 {
+                        Text("\(handled.brokers.count) more are handled by \(handled.platform.shortName), so they are not listed here again. See the Sites tab.")
+                            .accessibilityIdentifier("queue-handled-note")
                     }
                 }
             }
@@ -43,7 +68,15 @@ struct BrokerListView: View {
             .sheet(item: $editing) { person in
                 NavigationStack {
                     PersonEditorView(person: person)
-                        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { editing = nil } } }
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                // A profile needs its legal name and current address before the editor can be closed.
+                                Button("Done") { editing = nil }
+                                    .disabled(!(editorComplete(person)))
+                                    .accessibilityIdentifier("editor-done")
+                            }
+                        }
+                        .interactiveDismissDisabled(!(editorComplete(person)))
                 }
             }
             .toolbar {
@@ -69,7 +102,7 @@ struct BrokerListView: View {
                     .accessibilityIdentifier("account-switcher")
                 }
             }
-            .alert("Add a person", isPresented: $addingPerson) {
+            .alert(Loc.t("Add a person"), isPresented: $addingPerson) {
                 TextField("Name", text: $newName)
                 Button("Add") { editing = model.addPerson(named: newName); newName = "" }
                 Button("Cancel", role: .cancel) { newName = "" }
@@ -81,11 +114,24 @@ struct BrokerListView: View {
         }
     }
 
+    private func platformRow(_ broker: Broker) -> some View {
+        let platform = model.platform(forWalkthrough: broker.id)
+        return HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(platform?.shortName ?? broker.name).font(.headline)
+                Text("Reaches \(platform?.registered ?? 0) registered brokers, \(broker.covers?.count ?? 0) of the sites in this app")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            if model.progress.isDone(broker.id) { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+        }
+    }
+
     private func row(_ broker: Broker) -> some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(broker.name).font(.headline)
-                Text(broker.isVerified ? "Guided" : "Guided · unverified")
+                Text(broker.isVerified ? "Guided" : Loc.t("Guided · unverified"))
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()

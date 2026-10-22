@@ -1,0 +1,2474 @@
+{
+ "covered": {
+  "01advertising.com": {
+   "broker": "01Advertising Inc.",
+   "match": "domain"
+  },
+  "33across.com": {
+   "broker": "33Across, Inc.",
+   "match": "domain"
+  },
+  "33mileradius.com": {
+   "broker": "33 Mile Radius LLC",
+   "match": "domain"
+  },
+  "5x5data.com": {
+   "broker": "5x5 US, LLC",
+   "match": "domain"
+  },
+  "6sense.com": {
+   "broker": "6sense Insights, Inc.",
+   "match": "domain"
+  },
+  "abovedata.io": {
+   "broker": "Above Data, Inc.",
+   "match": "domain"
+  },
+  "acculeads.com": {
+   "broker": "Accudata Integrated Marketing, LLC",
+   "match": "domain"
+  },
+  "accurateappend.com": {
+   "broker": "Accurate Append Inc.",
+   "match": "domain"
+  },
+  "achcoop.com": {
+   "broker": "ACH, Address Clearing House",
+   "match": "domain"
+  },
+  "acronymix.com": {
+   "broker": "Acronymix LLC",
+   "match": "domain"
+  },
+  "activimpact.ai": {
+   "broker": "ActivImpact, LLC",
+   "match": "domain"
+  },
+  "acxiom.com": {
+   "broker": "Acxiom LLC",
+   "match": "domain"
+  },
+  "adagio.io": {
+   "broker": "Onfocus SAS",
+   "match": "domain"
+  },
+  "adept-id.com": {
+   "broker": "AdeptID, Inc.",
+   "match": "domain"
+  },
+  "adprime.com": {
+   "broker": "Adprime Media LLC",
+   "match": "domain"
+  },
+  "adsquare.com": {
+   "broker": "adsquare GmbH",
+   "match": "domain"
+  },
+  "adstradata.com": {
+   "broker": "Adstra LLC",
+   "match": "domain"
+  },
+  "adswizz.com": {
+   "broker": "AdsWizz, Inc.",
+   "match": "domain"
+  },
+  "adttribution.com": {
+   "broker": "Adttribution Inc",
+   "match": "domain"
+  },
+  "advancedbackgroundchecks.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "affinity.co": {
+   "broker": "Project Affinity, Inc.",
+   "match": "domain"
+  },
+  "affinity.solutions": {
+   "broker": "Affinity Solutions Inc.",
+   "match": "domain"
+  },
+  "affinityanswers.com": {
+   "broker": "Affinity Answers Corporation",
+   "match": "domain"
+  },
+  "agedleadstore.com": {
+   "broker": "NEXT WAVE MARKETING STRATEGIES, INC",
+   "match": "domain"
+  },
+  "aggknowledge.ai": {
+   "broker": "AggKnowledge Inc.",
+   "match": "domain"
+  },
+  "agile-ed.com": {
+   "broker": "Agile Education Marketing, LLC",
+   "match": "domain"
+  },
+  "agrmarketingsolutions.com": {
+   "broker": "AGR Marketing Solutions LLC",
+   "match": "domain"
+  },
+  "aidentified.com": {
+   "broker": "Aidentified, Inc.",
+   "match": "domain"
+  },
+  "alescodata.com": {
+   "broker": "The Alesco Group LLC",
+   "match": "domain"
+  },
+  "alikeaudience.com": {
+   "broker": "AlikeAudience Inc",
+   "match": "domain"
+  },
+  "allantgroup.com": {
+   "broker": "Allant Group, LLC",
+   "match": "domain"
+  },
+  "alliantinsight.com": {
+   "broker": "Alliant Cooperative Data Solutions LLC",
+   "match": "domain"
+  },
+  "allwebleads.com": {
+   "broker": "AWL Holdings, LLC",
+   "match": "domain"
+  },
+  "alphonso.tv": {
+   "broker": "Alphonso Inc.",
+   "match": "domain"
+  },
+  "altairdata.com": {
+   "broker": "Altair Data Resources, Inc",
+   "match": "domain"
+  },
+  "altrata.com": {
+   "broker": "Altrata, Inc.",
+   "match": "domain"
+  },
+  "amplemarket.com": {
+   "broker": "Tagis Inc",
+   "match": "domain"
+  },
+  "analytics-iq.com": {
+   "broker": "AnalyticsIQ Inc",
+   "match": "domain"
+  },
+  "analyticsiq.com": {
+   "broker": "Analyticsiq Inc",
+   "match": "name"
+  },
+  "anchorcomputer.com": {
+   "broker": "Anchor Computer Inc.",
+   "match": "domain"
+  },
+  "aniline.ai": {
+   "broker": "Aniline, Inc.",
+   "match": "domain"
+  },
+  "anteriad.com": {
+   "broker": "Anteriad, LLC",
+   "match": "domain"
+  },
+  "apollo.io": {
+   "broker": "Zenleads, Inc.",
+   "match": "domain"
+  },
+  "apollointeractive.com": {
+   "broker": "Apollo Interactive, LLC",
+   "match": "domain"
+  },
+  "applovin.com": {
+   "broker": "AppLovin Corporation",
+   "match": "domain"
+  },
+  "appscience.ai": {
+   "broker": "App Science, Inc",
+   "match": "domain"
+  },
+  "arccorp.com": {
+   "broker": "Airlines Reporting Corporation",
+   "match": "domain"
+  },
+  "aristotle.com": {
+   "broker": "Aristotle International, Inc.",
+   "match": "domain"
+  },
+  "astoriacompany.com": {
+   "broker": "Astoria Company",
+   "match": "domain"
+  },
+  "atdata.com": {
+   "broker": "AtData, LLC",
+   "match": "domain"
+  },
+  "attribits.com": {
+   "broker": "Attribits",
+   "match": "domain"
+  },
+  "audienceacuity.com": {
+   "broker": "Audience Acuity LLC",
+   "match": "domain"
+  },
+  "audiencemix.net": {
+   "broker": "Audience Mix LLC",
+   "match": "domain"
+  },
+  "audigent.com": {
+   "broker": "Predictive Pop, Inc.",
+   "match": "domain"
+  },
+  "autoweb.com": {
+   "broker": "AutoWeb, Inc.",
+   "match": "domain"
+  },
+  "aviato.co": {
+   "broker": "Bachmanity, Inc.",
+   "match": "domain"
+  },
+  "azerion.com": {
+   "broker": "Azerion US Inc.",
+   "match": "domain"
+  },
+  "azira.com": {
+   "broker": "Azira, LLC",
+   "match": "domain"
+  },
+  "babelstreet.com": {
+   "broker": "Babel Street, Inc.",
+   "match": "domain"
+  },
+  "backgroundcheckers.net": {
+   "broker": "Private Records LLC",
+   "match": "domain"
+  },
+  "batchleads.io": {
+   "broker": "EquiMine Inc.",
+   "match": "domain"
+  },
+  "bbdirect.com": {
+   "broker": "BB Direct Inc",
+   "match": "domain"
+  },
+  "bdex.com": {
+   "broker": "BDEX, LLC",
+   "match": "domain"
+  },
+  "bdo.com": {
+   "broker": "BDO GCI, LLC",
+   "match": "domain"
+  },
+  "becausal.com": {
+   "broker": "BECAUSAL, INC.",
+   "match": "domain"
+  },
+  "beenverified.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "beeswax.com": {
+   "broker": "Beeswax",
+   "match": "domain"
+  },
+  "belardiwong.com": {
+   "broker": "Belardi Ostroy, ALC, LLC",
+   "match": "domain"
+  },
+  "benutech.com": {
+   "broker": "Voxtur Data Services",
+   "match": "domain"
+  },
+  "bestpickreports.com": {
+   "broker": "Best Pick Reports, LLC",
+   "match": "domain"
+  },
+  "big-village.com": {
+   "broker": "BV Insights LLC",
+   "match": "domain"
+  },
+  "bigdbm.com": {
+   "broker": "BIGDBM",
+   "match": "domain"
+  },
+  "biointelli.com": {
+   "broker": "Biointelli Corporation",
+   "match": "domain"
+  },
+  "biscred.com": {
+   "broker": "Biscred",
+   "match": "domain"
+  },
+  "blackbaud.com": {
+   "broker": "Blackbaud, Inc",
+   "match": "domain"
+  },
+  "blackpearl.com": {
+   "broker": "Black Pearl Group Limited",
+   "match": "domain"
+  },
+  "blis.com": {
+   "broker": "Blis Global Ltd",
+   "match": "domain"
+  },
+  "blueaction.io": {
+   "broker": "Blue Action Inc.",
+   "match": "domain"
+  },
+  "bluefireleads.com": {
+   "broker": "Solar Connect, LLC",
+   "match": "domain"
+  },
+  "blueprintaudiences.com": {
+   "broker": "Blueprint Audiences",
+   "match": "domain"
+  },
+  "boam.ai": {
+   "broker": "Gigabite Inc",
+   "match": "domain"
+  },
+  "bombora.com": {
+   "broker": "Bombora, Inc.",
+   "match": "domain"
+  },
+  "bookyourdata.com": {
+   "broker": "A Direct Marketing Inc",
+   "match": "domain"
+  },
+  "brandwatch.com": {
+   "broker": "Crimson Hexagon",
+   "match": "domain"
+  },
+  "bridg.com": {
+   "broker": "Bridg, a division of Cardlytics, Inc.",
+   "match": "domain"
+  },
+  "brooksim.com": {
+   "broker": "Brooks Integrated Marketing, LLC",
+   "match": "domain"
+  },
+  "buildertrend.com": {
+   "broker": "Buildertrend Solutions, Inc.",
+   "match": "domain"
+  },
+  "bumper.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "buxtonco.com": {
+   "broker": "Buxton Company, LLC",
+   "match": "domain"
+  },
+  "buyerlink.co": {
+   "broker": "Buyerlink Inc.",
+   "match": "domain"
+  },
+  "cadent.com": {
+   "broker": "Cadent LLC",
+   "match": "name"
+  },
+  "cadent.tv": {
+   "broker": "Cadent LLC",
+   "match": "domain"
+  },
+  "californiacourtrecords.us": {
+   "broker": "Intermedia Ventures, LLC",
+   "match": "domain"
+  },
+  "campaigner.com": {
+   "broker": "J2 Global Canada Inc.",
+   "match": "domain"
+  },
+  "candl.app": {
+   "broker": "Baron App, Inc.",
+   "match": "domain"
+  },
+  "captifytechnologies.com": {
+   "broker": "Captify Technologies",
+   "match": "domain"
+  },
+  "captiv8.io": {
+   "broker": "Captiv8 Inc.",
+   "match": "domain"
+  },
+  "carneydirect.com": {
+   "broker": "Guidestar Direct, Corp.",
+   "match": "domain"
+  },
+  "cashmereai.com": {
+   "broker": "Pludo Inc",
+   "match": "domain"
+  },
+  "catalina.com": {
+   "broker": "Catalina Marketing Corporation",
+   "match": "domain"
+  },
+  "catalist.us": {
+   "broker": "Catalist LLC",
+   "match": "domain"
+  },
+  "cbinsights.com": {
+   "broker": "CB Information Services, Inc.",
+   "match": "domain"
+  },
+  "cdkglobal.com": {
+   "broker": "CDK Global, LLC",
+   "match": "domain"
+  },
+  "censia.com": {
+   "broker": "Censia, Inc.",
+   "match": "domain"
+  },
+  "checkpeople.com": {
+   "broker": "CHECKPEOPLE, LLC",
+   "match": "domain"
+  },
+  "checksecrets.com": {
+   "broker": "Truth Now LLC",
+   "match": "domain"
+  },
+  "choreograph.com": {
+   "broker": "Choreograph LLC",
+   "match": "domain"
+  },
+  "cinqdi.com": {
+   "broker": "MV Digital Group, LLC",
+   "match": "domain"
+  },
+  "circana.com": {
+   "broker": "Circana, LLC",
+   "match": "domain"
+  },
+  "cision.com": {
+   "broker": "Cision",
+   "match": "domain"
+  },
+  "citydata.ai": {
+   "broker": "CITYDATA Inc.",
+   "match": "domain"
+  },
+  "civisanalytics.com": {
+   "broker": "Civis Analytics, Inc.",
+   "match": "domain"
+  },
+  "claritas.com": {
+   "broker": "Claritas LLC",
+   "match": "domain"
+  },
+  "clarivate.com": {
+   "broker": "DR Decision Resources, LLC",
+   "match": "domain"
+  },
+  "clay.com": {
+   "broker": "Clay Labs, Inc.",
+   "match": "domain"
+  },
+  "clearcompany.com": {
+   "broker": "ClearCompany, LLC",
+   "match": "domain"
+  },
+  "clearview.ai": {
+   "broker": "Clearview AI, Inc.",
+   "match": "domain"
+  },
+  "clickagy.com": {
+   "broker": "Clickagy LLC",
+   "match": "domain"
+  },
+  "clientcommand.com": {
+   "broker": "Summit Resources, LLC",
+   "match": "domain"
+  },
+  "coasttechnology.com": {
+   "broker": "Coast Technology, LLC",
+   "match": "domain"
+  },
+  "cognism.com": {
+   "broker": "Cognism",
+   "match": "domain"
+  },
+  "collectivedata.io": {
+   "broker": "Collective Data Solutions, LLC",
+   "match": "domain"
+  },
+  "commercesignals.com": {
+   "broker": "Commerce Signals, Inc.",
+   "match": "domain"
+  },
+  "complementics.com": {
+   "broker": "eContext.ai LLC",
+   "match": "domain"
+  },
+  "completemailinglists.com": {
+   "broker": "Complete Mailing Lists LLC",
+   "match": "domain"
+  },
+  "completemedicallists.com": {
+   "broker": "Complete Medical Lists, Inc.",
+   "match": "domain"
+  },
+  "comscore.com": {
+   "broker": "Comscore, Inc",
+   "match": "domain"
+  },
+  "connectedinvestors.com": {
+   "broker": "Connected Investors, LLC",
+   "match": "domain"
+  },
+  "connectionholdings.com": {
+   "broker": "Connection Holdings",
+   "match": "domain"
+  },
+  "consumercanvas.net": {
+   "broker": "Consumer Canvas, LLC",
+   "match": "domain"
+  },
+  "contactout.com": {
+   "broker": "ContactOut Limited",
+   "match": "domain"
+  },
+  "convergemarketing.com": {
+   "broker": "Converge Marketing LLC",
+   "match": "domain"
+  },
+  "convex.com": {
+   "broker": "Convex Labs LLC",
+   "match": "domain"
+  },
+  "costar.com": {
+   "broker": "CoStar Realty Information, Inc.",
+   "match": "domain"
+  },
+  "courtcasefinder.com": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "courtrecords.us": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "coxautoinc.com": {
+   "broker": "Cox Automotive, Inc.",
+   "match": "domain"
+  },
+  "criteo.com": {
+   "broker": "Criteo Corp.",
+   "match": "domain"
+  },
+  "crosspixel.net": {
+   "broker": "Cross Pixel Media, Inc.",
+   "match": "domain"
+  },
+  "crunchbase.com": {
+   "broker": "Crunchbase, Inc.",
+   "match": "domain"
+  },
+  "cuebiq.com": {
+   "broker": "Cuebiq Group, LLC",
+   "match": "domain"
+  },
+  "cybba.com": {
+   "broker": "Cybba Inc.",
+   "match": "domain"
+  },
+  "cyberbackgroundchecks.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "data-axle.com": {
+   "broker": "Data Axle Inc.",
+   "match": "domain"
+  },
+  "datadecisionsgroup.com": {
+   "broker": "Data Decisions Group",
+   "match": "domain"
+  },
+  "datadelivers.com": {
+   "broker": "DataDelivers, LLC",
+   "match": "domain"
+  },
+  "datadesk.io": {
+   "broker": "Datadesk Inc.",
+   "match": "domain"
+  },
+  "datafy.com": {
+   "broker": "Datafy, LLC",
+   "match": "domain"
+  },
+  "datalane.com": {
+   "broker": "Task Genie, Inc.",
+   "match": "domain"
+  },
+  "datalinedata.com": {
+   "broker": "Dataline, Inc.",
+   "match": "domain"
+  },
+  "datamangroup.com": {
+   "broker": "Dataman Group Inc",
+   "match": "domain"
+  },
+  "datanyze.com": {
+   "broker": "Datanyze LLC",
+   "match": "domain"
+  },
+  "datapartners.com": {
+   "broker": "Data Partners, Inc.",
+   "match": "domain"
+  },
+  "datasys.com": {
+   "broker": "Datasys Group, Inc.",
+   "match": "domain"
+  },
+  "date-detective.app": {
+   "broker": "Date Detective Inc",
+   "match": "domain"
+  },
+  "datonics.com": {
+   "broker": "Datonics LLC",
+   "match": "domain"
+  },
+  "dealersocket.com": {
+   "broker": "DealerSocket, LLC (US)",
+   "match": "domain"
+  },
+  "dealerx.com": {
+   "broker": "DealerX Partners LLC",
+   "match": "domain"
+  },
+  "dealmachine.com": {
+   "broker": "DealMachine Operations Inc.",
+   "match": "domain"
+  },
+  "decide.co": {
+   "broker": "Decide Technologies Inc.",
+   "match": "domain"
+  },
+  "decisionlinks.com": {
+   "broker": "DecisionLinks LLC",
+   "match": "domain"
+  },
+  "deeprootanalytics.com": {
+   "broker": "Deep Root Analytics, LLC",
+   "match": "domain"
+  },
+  "deepsync.com": {
+   "broker": "Accudata Integrated Marketing, LLC",
+   "match": "domain"
+  },
+  "definitivehc.com": {
+   "broker": "Populi LLC",
+   "match": "domain"
+  },
+  "deloitte.com": {
+   "broker": "Deloitte Consulting LLP",
+   "match": "domain"
+  },
+  "demandbase.com": {
+   "broker": "Demandbase, Inc.",
+   "match": "domain"
+  },
+  "demandscience.com": {
+   "broker": "Demand Science US, LLC",
+   "match": "domain"
+  },
+  "dice.com": {
+   "broker": "Dice Career Solutions, Inc.",
+   "match": "domain"
+  },
+  "digitalmediasolutions.com": {
+   "broker": "Digital Media Solutions, LLC",
+   "match": "domain"
+  },
+  "digitalvikingmedia.com": {
+   "broker": "Digital Viking Media Inc",
+   "match": "domain"
+  },
+  "disconetwork.com": {
+   "broker": "Disco Technology Inc",
+   "match": "domain"
+  },
+  "disqus.com": {
+   "broker": "Disqus",
+   "match": "domain"
+  },
+  "dnb.com": {
+   "broker": "Dun and Bradstreet Inc.",
+   "match": "domain"
+  },
+  "donorbase.com": {
+   "broker": "DonorBase, Inc.",
+   "match": "domain"
+  },
+  "donorbureau.com": {
+   "broker": "DonorBureau LLC",
+   "match": "domain"
+  },
+  "draup.com": {
+   "broker": "Draup, Inc.",
+   "match": "domain"
+  },
+  "dresdendirect.com": {
+   "broker": "Dresden Direct inc.",
+   "match": "domain"
+  },
+  "dspolitical.com": {
+   "broker": "DSPolitical, LLC",
+   "match": "domain"
+  },
+  "dstillery.com": {
+   "broker": "Dstillery, Inc.",
+   "match": "domain"
+  },
+  "dtn.com": {
+   "broker": "DTN, LLC",
+   "match": "domain"
+  },
+  "eab.com": {
+   "broker": "EAB Global, Inc.",
+   "match": "domain"
+  },
+  "edvisors.com": {
+   "broker": "Edvisors Network, Inc.",
+   "match": "domain"
+  },
+  "elocal.com": {
+   "broker": "eLocal USA, LLC",
+   "match": "domain"
+  },
+  "eltoro.com": {
+   "broker": "El Toro.com, LLC",
+   "match": "domain"
+  },
+  "endgame.io": {
+   "broker": "Endgame Labs, Inc.",
+   "match": "domain"
+  },
+  "enformion.com": {
+   "broker": "Enformion, LLC",
+   "match": "domain"
+  },
+  "enigma.com": {
+   "broker": "Enigma Technologies, Inc.",
+   "match": "domain"
+  },
+  "enlyft.com": {
+   "broker": "Enlyft Inc.",
+   "match": "domain"
+  },
+  "enrichlayer.com": {
+   "broker": "Vertical Int, Inc.",
+   "match": "domain"
+  },
+  "epsilon.com": {
+   "broker": "Epsilon Data Management, LLC",
+   "match": "domain"
+  },
+  "equifax.com": {
+   "broker": "Austin Consolidated Holdings, Inc.",
+   "match": "domain"
+  },
+  "erepublic.com": {
+   "broker": "e.Republic, LLC",
+   "match": "domain"
+  },
+  "everleads.com": {
+   "broker": "ListsOnline.com, Inc.",
+   "match": "domain"
+  },
+  "evertrue.com": {
+   "broker": "EverView HoldCo, Inc",
+   "match": "domain"
+  },
+  "evorra.com": {
+   "broker": "Evorra Ltd",
+   "match": "domain"
+  },
+  "evs7.com": {
+   "broker": "Electronic Voice Services, Inc.",
+   "match": "domain"
+  },
+  "exa.ai": {
+   "broker": "Exa Labs Inc.",
+   "match": "domain"
+  },
+  "exactcustomer.com": {
+   "broker": "Exact Opco, LLC",
+   "match": "domain"
+  },
+  "exactdata.com": {
+   "broker": "Consumerbase, LLC",
+   "match": "domain"
+  },
+  "exactmatchmarketing.com": {
+   "broker": "Exact Match Marketing Inc",
+   "match": "domain"
+  },
+  "exlservice.com": {
+   "broker": "ExlService.com, LLC",
+   "match": "domain"
+  },
+  "experian.com": {
+   "broker": "Experian Information Solutions, Inc",
+   "match": "domain"
+  },
+  "experience.com": {
+   "broker": "BuyersRoad, Inc",
+   "match": "domain"
+  },
+  "exploreatlas.io": {
+   "broker": "Hunt Club Inc",
+   "match": "domain"
+  },
+  "explorium.ai": {
+   "broker": "Explorium Inc.",
+   "match": "domain"
+  },
+  "eyeota.com": {
+   "broker": "Eyeota Pte Ltd",
+   "match": "domain"
+  },
+  "familytreenow.com": {
+   "broker": "Family Tree Now, LLC",
+   "match": "domain"
+  },
+  "famousbirthdays.com": {
+   "broker": "Famous Birthdays LLC",
+   "match": "domain"
+  },
+  "faraday.ai": {
+   "broker": "Faraday, Inc.",
+   "match": "domain"
+  },
+  "fastbackgroundcheck.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "fastpeoplesearch.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "fetch.com": {
+   "broker": "Fetch Rewards, LLC",
+   "match": "domain"
+  },
+  "fi-navigator.com": {
+   "broker": "FI Navigator Corporation",
+   "match": "domain"
+  },
+  "fideo.ai": {
+   "broker": "Fideo Intelligence, Inc.",
+   "match": "domain"
+  },
+  "fifty.io": {
+   "broker": "Fifty Technology Ltd",
+   "match": "domain"
+  },
+  "findem.ai": {
+   "broker": "Findem, Inc.",
+   "match": "domain"
+  },
+  "finsum.com": {
+   "broker": "AdvisorTarget, LLC",
+   "match": "domain"
+  },
+  "finthrive.com": {
+   "broker": "TSG Holdco, LLC",
+   "match": "domain"
+  },
+  "firstdirectmarketing.com": {
+   "broker": "First Direct, Inc.",
+   "match": "domain"
+  },
+  "firstorion.com": {
+   "broker": "First Orion Corp",
+   "match": "domain"
+  },
+  "fivestarrated.com": {
+   "broker": "Home Contractors Review, LLC",
+   "match": "domain"
+  },
+  "focus-usa.com": {
+   "broker": "Focus USA, Inc.",
+   "match": "domain"
+  },
+  "fogdatascience.com": {
+   "broker": "Fog Data science LLC",
+   "match": "domain"
+  },
+  "forager.ai": {
+   "broker": "Forager.ai, LLC",
+   "match": "domain"
+  },
+  "forddirect.com": {
+   "broker": "DealerDirect LLC",
+   "match": "domain"
+  },
+  "fourcornerhome.com": {
+   "broker": "Four Corner Media Corp",
+   "match": "domain"
+  },
+  "fourleafdata.com": {
+   "broker": "Fourleaf LLC",
+   "match": "domain"
+  },
+  "foursquare.com": {
+   "broker": "Foursquare Labs, Inc.",
+   "match": "domain"
+  },
+  "fourthwall.tv": {
+   "broker": "FourthWall Media, Inc.",
+   "match": "domain"
+  },
+  "fraiser.org": {
+   "broker": "Fraiser LLC",
+   "match": "domain"
+  },
+  "freepeopledirectory.com": {
+   "broker": "Spokeo, Inc.",
+   "match": "domain"
+  },
+  "freepeoplesearch.com": {
+   "broker": "FREEPEOPLESEARCH.COM, LLC",
+   "match": "domain"
+  },
+  "freephonetracer.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "freewheel.com": {
+   "broker": "FreeWheel Media Inc",
+   "match": "domain"
+  },
+  "fullcontact.com": {
+   "broker": "J2 Martech Corp",
+   "match": "domain"
+  },
+  "fusable.com": {
+   "broker": "Randall-Reilly, LLC",
+   "match": "domain"
+  },
+  "fushiamedia.com": {
+   "broker": "Fushia Media, LLC",
+   "match": "domain"
+  },
+  "fusion92.com": {
+   "broker": "Virtual Marketing LLC",
+   "match": "domain"
+  },
+  "getelevar.com": {
+   "broker": "Elevar, LLC",
+   "match": "domain"
+  },
+  "getliminal.com": {
+   "broker": "Nachal Inc.",
+   "match": "domain"
+  },
+  "getrev.ai": {
+   "broker": "LeadCrunch",
+   "match": "domain"
+  },
+  "giantpartners.com": {
+   "broker": "Giant Partners, Inc.",
+   "match": "domain"
+  },
+  "gm.com": {
+   "broker": "General Motors LLC",
+   "match": "domain"
+  },
+  "grassrootsanalytics.com": {
+   "broker": "Grassroots Analytics",
+   "match": "domain"
+  },
+  "grayhairsoftware.com": {
+   "broker": "GrayHair Software LLC",
+   "match": "domain"
+  },
+  "graze.social": {
+   "broker": "Graze Social PBC",
+   "match": "domain"
+  },
+  "greatlakeslists.com": {
+   "broker": "Great Lakes List, Inc.",
+   "match": "domain"
+  },
+  "greenwich.com": {
+   "broker": "Crisil Irvena US LLC",
+   "match": "domain"
+  },
+  "groundtruth.com": {
+   "broker": "xAd, Inc.",
+   "match": "domain"
+  },
+  "growbots.com": {
+   "broker": "Bushwick Growbots LLC",
+   "match": "domain"
+  },
+  "growinglibraries.com": {
+   "broker": "Growing Libraries, LLC",
+   "match": "domain"
+  },
+  "growthcode.io": {
+   "broker": "GrowthCode, LLC",
+   "match": "domain"
+  },
+  "gsdsi.com": {
+   "broker": "Global Source Data Solutions Inc",
+   "match": "domain"
+  },
+  "h1.co": {
+   "broker": "H1 Insights, Inc.",
+   "match": "domain"
+  },
+  "health-union.com": {
+   "broker": "Health Union, LLC",
+   "match": "domain"
+  },
+  "healthcare.com": {
+   "broker": "Healthcare Inc",
+   "match": "domain"
+  },
+  "healthlinkdimensions.com": {
+   "broker": "HealthLink Dimensions",
+   "match": "domain"
+  },
+  "healthwisedata.com": {
+   "broker": "HealthWise Data",
+   "match": "domain"
+  },
+  "heartbeat.ai": {
+   "broker": "Heartbeat.AI Inc",
+   "match": "domain"
+  },
+  "helixcampaigns.com": {
+   "broker": "Helix Campaigns LLC",
+   "match": "domain"
+  },
+  "hightouch.com": {
+   "broker": "Carry Technologies Inc.",
+   "match": "domain"
+  },
+  "hireez.com": {
+   "broker": "HireTeamMate, Inc.",
+   "match": "domain"
+  },
+  "hubspot.com": {
+   "broker": "HubSpot, Inc.",
+   "match": "domain"
+  },
+  "hunter.io": {
+   "broker": "Hunter Web Services, Inc",
+   "match": "domain"
+  },
+  "i-360.com": {
+   "broker": "i360, LLC",
+   "match": "domain"
+  },
+  "id5.io": {
+   "broker": "ID5 Technology Ltd",
+   "match": "domain"
+  },
+  "idatabasesolutions.com": {
+   "broker": "Innovative Database Solutions, Inc.",
+   "match": "domain"
+  },
+  "ididata.com": {
+   "broker": "Interactive Data, LLC",
+   "match": "domain"
+  },
+  "idmap.ai": {
+   "broker": "IDMAP Inc",
+   "match": "domain"
+  },
+  "ileads.com": {
+   "broker": "iLeads.com, LLC",
+   "match": "domain"
+  },
+  "illumin.com": {
+   "broker": "illumin Inc.",
+   "match": "domain"
+  },
+  "inboundinsight.com": {
+   "broker": "Inbound Insight, LLC",
+   "match": "domain"
+  },
+  "indexexchange.com": {
+   "broker": "Index Exchange Inc.",
+   "match": "domain"
+  },
+  "infillion.com": {
+   "broker": "PaeDae, Inc.",
+   "match": "domain"
+  },
+  "infopay.com": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "informa.com": {
+   "broker": "Informa Group Limited",
+   "match": "domain"
+  },
+  "informatechtarget.com": {
+   "broker": "TechTarget, Inc",
+   "match": "domain"
+  },
+  "information.com": {
+   "broker": "INFORMATION.COM, LLC",
+   "match": "domain"
+  },
+  "infotracer.com": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "infutor.com": {
+   "broker": "Lead Intelligence Inc.",
+   "match": "domain"
+  },
+  "inmar.com": {
+   "broker": "Inmar Brand Solutions, Inc.",
+   "match": "domain"
+  },
+  "inmarket.com": {
+   "broker": "InMarket Media, LLC",
+   "match": "domain"
+  },
+  "instantcheckmate.com": {
+   "broker": "Instant Checkmate LLC",
+   "match": "domain"
+  },
+  "instantly.ai": {
+   "broker": "Foo Monk, LLC",
+   "match": "domain"
+  },
+  "intalytics.com": {
+   "broker": "Intalytics, Inc.",
+   "match": "domain"
+  },
+  "intelius.com": {
+   "broker": "Intelius, LLC",
+   "match": "domain"
+  },
+  "intentiq.com": {
+   "broker": "Intent IQ LLC",
+   "match": "domain"
+  },
+  "intentsify.io": {
+   "broker": "Intentsify, LLC",
+   "match": "domain"
+  },
+  "internetbrands.com": {
+   "broker": "MH Sub I, LLC",
+   "match": "domain"
+  },
+  "ipapi.co": {
+   "broker": "Kloudend, Inc.",
+   "match": "domain"
+  },
+  "iqviadigital.com": {
+   "broker": "IQVIA Digital Inc.",
+   "match": "domain"
+  },
+  "irys.us": {
+   "broker": "Irys, Inc",
+   "match": "domain"
+  },
+  "ispot.tv": {
+   "broker": "iSpot.tv, Inc.",
+   "match": "domain"
+  },
+  "issgovernance.com": {
+   "broker": "Institutional Shareholder Services Inc.",
+   "match": "domain"
+  },
+  "issmarketintelligence.com": {
+   "broker": "Asset International, Inc.",
+   "match": "domain"
+  },
+  "jdmlistservices.com": {
+   "broker": "JDM LIST SERVICES",
+   "match": "domain"
+  },
+  "jdpower.com": {
+   "broker": "Autodata Solutions, Inc.",
+   "match": "domain"
+  },
+  "jmr-media.com": {
+   "broker": "JMR Media Consulting, Inc.",
+   "match": "domain"
+  },
+  "juicebox.ai": {
+   "broker": "Juicebox App, Inc.",
+   "match": "domain"
+  },
+  "jungroup.com": {
+   "broker": "Jun Group Productions, LLC",
+   "match": "domain"
+  },
+  "jwx.com": {
+   "broker": "Connatix Native Exchange Inc.",
+   "match": "domain"
+  },
+  "kargo.com": {
+   "broker": "Kargo Global LLC",
+   "match": "domain"
+  },
+  "kbsynergy.com": {
+   "broker": "KB Synergy Inc",
+   "match": "domain"
+  },
+  "keymarketingadvantage.com": {
+   "broker": "Key Marketing Advantage",
+   "match": "domain"
+  },
+  "keywordconnects.com": {
+   "broker": "Keyword Connects LLC",
+   "match": "domain"
+  },
+  "kidslivesafe.com": {
+   "broker": "Scalable Commerce LLC",
+   "match": "domain"
+  },
+  "kindsight.io": {
+   "broker": "iWave Information Systems",
+   "match": "domain"
+  },
+  "kindskiptracing.com": {
+   "broker": "Kind Skiptracing, Inc",
+   "match": "domain"
+  },
+  "knowertech.com": {
+   "broker": "Rainbarrel USA LLC",
+   "match": "domain"
+  },
+  "koddi.com": {
+   "broker": "Koddi, Inc",
+   "match": "domain"
+  },
+  "komodohealth.com": {
+   "broker": "Komodo Health, Inc.",
+   "match": "domain"
+  },
+  "kontextdata.com": {
+   "broker": "Kontext Data",
+   "match": "domain"
+  },
+  "l2-data.com": {
+   "broker": "Labels & Lists, Inc",
+   "match": "domain"
+  },
+  "lead-enhance.com": {
+   "broker": "LEAD ENHANCE LLC",
+   "match": "domain"
+  },
+  "lead411.com": {
+   "broker": "Lead411 Corporation",
+   "match": "domain"
+  },
+  "leadfeeder.com": {
+   "broker": "Dealfront Finland Oy",
+   "match": "domain"
+  },
+  "leadiq.com": {
+   "broker": "LeadIQ, Inc",
+   "match": "domain"
+  },
+  "leadmemedia.com": {
+   "broker": "Lead Me Media LLC",
+   "match": "domain"
+  },
+  "leadpost.com": {
+   "broker": "LeadPost LLC",
+   "match": "domain"
+  },
+  "leadspace.com": {
+   "broker": "Leadspace Inc",
+   "match": "domain"
+  },
+  "learnmore.com": {
+   "broker": "LearnMore, LLC",
+   "match": "domain"
+  },
+  "leidosiq.com": {
+   "broker": "Leidos Digital Solutions, Inc.",
+   "match": "domain"
+  },
+  "lexisnexis.com": {
+   "broker": "LexisNexis Risk Solutions FL Inc.",
+   "match": "domain"
+  },
+  "liftbasedata.com": {
+   "broker": "Blue Hill Marketing Solutions, Inc",
+   "match": "domain"
+  },
+  "liftengine.com": {
+   "broker": "Blue Hill Marketing Solutions, Inc",
+   "match": "domain"
+  },
+  "lightboxre.com": {
+   "broker": "LightBox Parent, L.P.",
+   "match": "domain"
+  },
+  "lightcast.io": {
+   "broker": "Lightcast, LLC",
+   "match": "domain"
+  },
+  "lionsharemarketing.com": {
+   "broker": "LionShare Marketing, Inc",
+   "match": "domain"
+  },
+  "listkit.io": {
+   "broker": "ListKit LLC",
+   "match": "domain"
+  },
+  "livedatatechnologies.com": {
+   "broker": "Live Data Technologies, Inc.",
+   "match": "domain"
+  },
+  "liveintent.com": {
+   "broker": "LiveIntent",
+   "match": "domain"
+  },
+  "liveramp.com": {
+   "broker": "LiveRamp Holdings, Inc.",
+   "match": "domain"
+  },
+  "lizdev.com": {
+   "broker": "LizDev,Inc",
+   "match": "domain"
+  },
+  "lob.com": {
+   "broker": "Lob.com, Inc.",
+   "match": "domain"
+  },
+  "lookify.io": {
+   "broker": "Lookify.io",
+   "match": "domain"
+  },
+  "loopme.com": {
+   "broker": "Chartboost, LLC",
+   "match": "domain"
+  },
+  "lsmapps.com": {
+   "broker": "L.S Mobile Apps Holdings LTD",
+   "match": "domain"
+  },
+  "lusha.com": {
+   "broker": "Lusha Systems, Inc",
+   "match": "domain"
+  },
+  "m1-data.com": {
+   "broker": "M1 Data & Analytics, LLC",
+   "match": "domain"
+  },
+  "madhive.com": {
+   "broker": "Madhive, Inc.",
+   "match": "domain"
+  },
+  "magnite.com": {
+   "broker": "Magnite Inc",
+   "match": "domain"
+  },
+  "mailinglists.com": {
+   "broker": "Infinite Media Concepts, Inc.",
+   "match": "domain"
+  },
+  "malvernmedia.com": {
+   "broker": "Malvern Media Inc.",
+   "match": "domain"
+  },
+  "marketingarchitects.com": {
+   "broker": "Marketing Architects, Inc.",
+   "match": "domain"
+  },
+  "marketops.com": {
+   "broker": "MarketOps LLC",
+   "match": "domain"
+  },
+  "marriott.com": {
+   "broker": "Marriott International, Inc.",
+   "match": "domain"
+  },
+  "matchbookdata.com": {
+   "broker": "Matchbook Data, LLC",
+   "match": "domain"
+  },
+  "maxmind.com": {
+   "broker": "MaxMind, Inc.",
+   "match": "domain"
+  },
+  "media.net": {
+   "broker": "Media.net Advertising FZ, LLC",
+   "match": "domain"
+  },
+  "mediawallah.com": {
+   "broker": "MediaWallah Inc",
+   "match": "domain"
+  },
+  "medprosystems.com": {
+   "broker": "MedPro Systems, LLC",
+   "match": "domain"
+  },
+  "meettie.com": {
+   "broker": "Revenue Roll Inc.",
+   "match": "domain"
+  },
+  "melissa.com": {
+   "broker": "Melissa Data Corporation",
+   "match": "domain"
+  },
+  "meltwater.com": {
+   "broker": "Meltwater News US, Inc.",
+   "match": "domain"
+  },
+  "merkle.com": {
+   "broker": "Merkle Inc.",
+   "match": "domain"
+  },
+  "messagedigital.com": {
+   "broker": "Message Digital LLC",
+   "match": "domain"
+  },
+  "milestonemarketingsolutions.com": {
+   "broker": "Milestone Marketing Solutions",
+   "match": "domain"
+  },
+  "minerva.io": {
+   "broker": "Minerva BI Inc",
+   "match": "domain"
+  },
+  "missionwired.com": {
+   "broker": "Anne Lewis Strategies LLC",
+   "match": "domain"
+  },
+  "mobiityglobal.com": {
+   "broker": "R.L. Polk & Co.",
+   "match": "domain"
+  },
+  "mobilefuse.com": {
+   "broker": "MobileFuse LLC",
+   "match": "domain"
+  },
+  "mobilewalla.com": {
+   "broker": "Mobilewalla, Inc.",
+   "match": "domain"
+  },
+  "mobilityglobal.com": {
+   "broker": "R.L. Polk & Co.",
+   "match": "domain"
+  },
+  "modfxlabs.com": {
+   "broker": "ModFx Labs Pvt Ltd",
+   "match": "domain"
+  },
+  "modigie.com": {
+   "broker": "Modigie Inc",
+   "match": "domain"
+  },
+  "moneybot5000.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "monitorbase.com": {
+   "broker": "Ownco, LLC",
+   "match": "domain"
+  },
+  "monocl.com": {
+   "broker": "Monocl AB",
+   "match": "domain"
+  },
+  "moodys.com": {
+   "broker": "Moody's Corporation",
+   "match": "domain"
+  },
+  "mrss.com": {
+   "broker": "M&R Strategic Services, Inc.",
+   "match": "domain"
+  },
+  "mugshotlook.com": {
+   "broker": "Infomatics LLC",
+   "match": "domain"
+  },
+  "multimedialists.com": {
+   "broker": "MULTIMEDIA LISTS, INC.",
+   "match": "domain"
+  },
+  "mylife.com": {
+   "broker": "Insightbridge LLC",
+   "match": "domain"
+  },
+  "n-focus.com": {
+   "broker": "NFocus Consulting, Inc.",
+   "match": "domain"
+  },
+  "narvar.com": {
+   "broker": "Narvar, Inc",
+   "match": "domain"
+  },
+  "nationalopinioninstitute.com": {
+   "broker": "National Opinion Institute, LLC",
+   "match": "domain"
+  },
+  "neighborwho.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "neptuneops.com": {
+   "broker": "Neptune Ops LLC",
+   "match": "domain"
+  },
+  "netwisedata.com": {
+   "broker": "NetWise Data, LLC",
+   "match": "domain"
+  },
+  "networx.com": {
+   "broker": "Networx Systems Inc.",
+   "match": "domain"
+  },
+  "newmexicodatainsights.com": {
+   "broker": "New Mexico Data Insights",
+   "match": "domain"
+  },
+  "nextroll.com": {
+   "broker": "NextRoll, Inc.",
+   "match": "domain"
+  },
+  "nexxen.com": {
+   "broker": "Nexxen Inc",
+   "match": "domain"
+  },
+  "nielsen.com": {
+   "broker": "eXelate, Inc.",
+   "match": "domain"
+  },
+  "nordicdataresources.com": {
+   "broker": "Nordic Data Resources AS",
+   "match": "domain"
+  },
+  "numberguru.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "numlookup.com": {
+   "broker": "NumLookup LLC.",
+   "match": "domain"
+  },
+  "nuwber.com": {
+   "broker": "Nuwber Inc",
+   "match": "domain"
+  },
+  "oan.pl": {
+   "broker": "Online Advertising Network sp. z o.o.",
+   "match": "domain"
+  },
+  "ocean.io": {
+   "broker": "Ocean Global Inc",
+   "match": "domain"
+  },
+  "ogury.com": {
+   "broker": "Ogury Ltd",
+   "match": "domain"
+  },
+  "omginc.xyz": {
+   "broker": "Online Media Group Inc.",
+   "match": "domain"
+  },
+  "onaudience.com": {
+   "broker": "ONAUDIENCE LTD",
+   "match": "domain"
+  },
+  "onspotdata.com": {
+   "broker": "Mobile Technology Corporation",
+   "match": "domain"
+  },
+  "opensend.com": {
+   "broker": "Opensend Inc",
+   "match": "domain"
+  },
+  "openx.com": {
+   "broker": "OpenX Technologies, Inc.",
+   "match": "domain"
+  },
+  "optable.co": {
+   "broker": "Optable Technologies US Inc.",
+   "match": "domain"
+  },
+  "outbrain.com": {
+   "broker": "Teads Holding Co",
+   "match": "domain"
+  },
+  "outlogic.io": {
+   "broker": "Outlogic, LLC",
+   "match": "domain"
+  },
+  "outwardmedia.com": {
+   "broker": "Outward Media Inc.",
+   "match": "domain"
+  },
+  "ownerly.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "pacificeast.com": {
+   "broker": "Pacific East Research Inc",
+   "match": "domain"
+  },
+  "paramountdirectmarketing.com": {
+   "broker": "Paramount Lists, Inc.",
+   "match": "domain"
+  },
+  "path2response.com": {
+   "broker": "Path2Response, LLC",
+   "match": "domain"
+  },
+  "paynetonline.com": {
+   "broker": "Knowledge Works, Inc.",
+   "match": "domain"
+  },
+  "penlink.com": {
+   "broker": "Pen-Link, Ltd.",
+   "match": "domain"
+  },
+  "peopledatalabs.com": {
+   "broker": "People Data Labs",
+   "match": "domain"
+  },
+  "peoplefinders.com": {
+   "broker": "Peoplefinders, LLC",
+   "match": "domain"
+  },
+  "peoplefindersdaas.com": {
+   "broker": "PeoplefindersDaaS",
+   "match": "domain"
+  },
+  "peoplelooker.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "peoplesearch123.com": {
+   "broker": "Private Records LLC",
+   "match": "domain"
+  },
+  "peoplesearcher.com": {
+   "broker": "The People Searchers LLC",
+   "match": "domain"
+  },
+  "peoplesearchnow.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "peoplesearchusa.org": {
+   "broker": "Truth Now LLC",
+   "match": "domain"
+  },
+  "peoplesmart.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "peoplewhiz.com": {
+   "broker": "Peoplewhiz, Inc",
+   "match": "domain"
+  },
+  "perion.com": {
+   "broker": "Hivestack Technologies Inc.",
+   "match": "domain"
+  },
+  "persistent.id": {
+   "broker": "Command Precision Inc.",
+   "match": "domain"
+  },
+  "personsearchers.com": {
+   "broker": "Private Records LLC",
+   "match": "domain"
+  },
+  "pipl.com": {
+   "broker": "Pipl, Inc.",
+   "match": "domain"
+  },
+  "pitchbook.com": {
+   "broker": "PitchBook Data Inc",
+   "match": "domain"
+  },
+  "placeexchange.com": {
+   "broker": "Place Exchange, Inc.",
+   "match": "domain"
+  },
+  "plug-industries.com": {
+   "broker": "Plug Chargers LLC",
+   "match": "domain"
+  },
+  "plungedigital.com": {
+   "broker": "Plunge, LLC",
+   "match": "domain"
+  },
+  "pmg.com": {
+   "broker": "PMG Worldwide, LLC",
+   "match": "domain"
+  },
+  "podscribe.com": {
+   "broker": "Podible Inc",
+   "match": "domain"
+  },
+  "popacta.com": {
+   "broker": "Pop Acta Media, LLC",
+   "match": "domain"
+  },
+  "porchgroupmedia.com": {
+   "broker": "Datamentors LLC",
+   "match": "domain"
+  },
+  "possiblenow.com": {
+   "broker": "PossibleNOW, Inc.",
+   "match": "domain"
+  },
+  "postie.com": {
+   "broker": "Postie, Inc",
+   "match": "domain"
+  },
+  "postpilot.com": {
+   "broker": "PostPilot, Inc.",
+   "match": "domain"
+  },
+  "precisely.com": {
+   "broker": "PlaceIQ, Inc.",
+   "match": "domain"
+  },
+  "predactiv.com": {
+   "broker": "Predactiv",
+   "match": "domain"
+  },
+  "preqin.com": {
+   "broker": "Preqin Ltd",
+   "match": "domain"
+  },
+  "privaterecords.net": {
+   "broker": "Private Records LLC",
+   "match": "domain"
+  },
+  "privatereports.com": {
+   "broker": "Infomatics LLC",
+   "match": "domain"
+  },
+  "privco.com": {
+   "broker": "PrivCo Holding Inc",
+   "match": "domain"
+  },
+  "propensity.com": {
+   "broker": "Addapptation, Inc.",
+   "match": "domain"
+  },
+  "propertyradar.com": {
+   "broker": "PropertyRadar, Inc.",
+   "match": "domain"
+  },
+  "propertyreach.com": {
+   "broker": "Property Reach, L.P.",
+   "match": "domain"
+  },
+  "prospectbase.com": {
+   "broker": "ProspectBase UK Limited",
+   "match": "domain"
+  },
+  "proxima.ai": {
+   "broker": "Innovation Brands Corp",
+   "match": "domain"
+  },
+  "publicdatacheck.com": {
+   "broker": "National Data Analytics, LLC",
+   "match": "domain"
+  },
+  "publicinfoservices.com": {
+   "broker": "Information Data Resources, LLC",
+   "match": "domain"
+  },
+  "publicrecord.com": {
+   "broker": "PublicRecordCom, LLC",
+   "match": "domain"
+  },
+  "publicrecordreports.com": {
+   "broker": "Digital Safety Products, LLC",
+   "match": "domain"
+  },
+  "publicsearcher.com": {
+   "broker": "Infomatics LLC",
+   "match": "domain"
+  },
+  "pubmatic.com": {
+   "broker": "PubMatic Inc.",
+   "match": "domain"
+  },
+  "pulsepoint.com": {
+   "broker": "PulsePoint, Inc.",
+   "match": "domain"
+  },
+  "quad.com": {
+   "broker": "Quad Graphics, Inc.",
+   "match": "domain"
+  },
+  "quadrant.io": {
+   "broker": "Quadrant Global Pte. Ltd.",
+   "match": "domain"
+  },
+  "qualfon.com": {
+   "broker": "Qualfon",
+   "match": "domain"
+  },
+  "quickpublicrecords.com": {
+   "broker": "Scalable Commerce LLC",
+   "match": "domain"
+  },
+  "quorum.inc": {
+   "broker": "Quorum Data, Inc",
+   "match": "domain"
+  },
+  "rampedup.io": {
+   "broker": "RampedUp",
+   "match": "domain"
+  },
+  "rayinsights.com": {
+   "broker": "Ray CDP, Inc.",
+   "match": "domain"
+  },
+  "realeflow.com": {
+   "broker": "Realeflow LLC",
+   "match": "domain"
+  },
+  "realintent.co": {
+   "broker": "REAL INTENT INC",
+   "match": "domain"
+  },
+  "realsourcedata.com": {
+   "broker": "RealSource, Inc",
+   "match": "domain"
+  },
+  "recordsfinder.com": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "recruitbot.com": {
+   "broker": "RecruitBot",
+   "match": "domain"
+  },
+  "redidata.com": {
+   "broker": "Redi-Data Inc",
+   "match": "domain"
+  },
+  "redmob.io": {
+   "broker": "Redmob LLC",
+   "match": "domain"
+  },
+  "reklaimyours.com": {
+   "broker": "Reklaim Ltd.",
+   "match": "domain"
+  },
+  "relpro.com": {
+   "broker": "RelPro, Inc.",
+   "match": "domain"
+  },
+  "remodeling.com": {
+   "broker": "Remodeling.com, LLC",
+   "match": "domain"
+  },
+  "resonate.com": {
+   "broker": "Resonate",
+   "match": "domain"
+  },
+  "responseamerica.net": {
+   "broker": "Response America, Inc.",
+   "match": "domain"
+  },
+  "retention.com": {
+   "broker": "GETEMAILS LLC",
+   "match": "domain"
+  },
+  "revcontent.com": {
+   "broker": "RevContent, LLC",
+   "match": "domain"
+  },
+  "revealmobile.com": {
+   "broker": "Reveal Mobile, Inc.",
+   "match": "domain"
+  },
+  "reveliolabs.com": {
+   "broker": "Revelio Labs, Inc.",
+   "match": "domain"
+  },
+  "revenuebase.ai": {
+   "broker": "RevenueBase, Inc",
+   "match": "domain"
+  },
+  "reversephone.com": {
+   "broker": "BeenVerified, LLC and its subsidiaries and affiliates",
+   "match": "domain"
+  },
+  "revoptimal.com": {
+   "broker": "RevOptimal, LLC",
+   "match": "domain"
+  },
+  "rgrmarketing.com": {
+   "broker": "ReallyGreatRate, Inc",
+   "match": "domain"
+  },
+  "richmediallc.com": {
+   "broker": "Rich Media LLC",
+   "match": "domain"
+  },
+  "ripple-fx.com": {
+   "broker": "Ripple Effect Strategies",
+   "match": "domain"
+  },
+  "rocketreach.co": {
+   "broker": "RocketReach LLC",
+   "match": "domain"
+  },
+  "roq.ad": {
+   "broker": "Roq.ad Inc.",
+   "match": "domain"
+  },
+  "rorpartners.com": {
+   "broker": "ROR Partners, LLC",
+   "match": "domain"
+  },
+  "roundsky.com": {
+   "broker": "Round Sky, Inc.",
+   "match": "domain"
+  },
+  "rrd.com": {
+   "broker": "Valassis Communications, Inc.",
+   "match": "domain"
+  },
+  "rushmorelabs.com": {
+   "broker": "Rushmore Labs, LLC",
+   "match": "domain"
+  },
+  "sabioctv.com": {
+   "broker": "Sabio Inc",
+   "match": "domain"
+  },
+  "salesintel.io": {
+   "broker": "SalesIntel Research, Inc.",
+   "match": "domain"
+  },
+  "salutarydata.com": {
+   "broker": "Salutary Data LLC.",
+   "match": "domain"
+  },
+  "samba.tv": {
+   "broker": "Samba TV, Inc.",
+   "match": "domain"
+  },
+  "sbfe.org": {
+   "broker": "SBFE, LLC",
+   "match": "domain"
+  },
+  "scileads.com": {
+   "broker": "SciLeads Ltd",
+   "match": "domain"
+  },
+  "sealedrecords.net": {
+   "broker": "Truth Now LLC",
+   "match": "domain"
+  },
+  "seamless.ai": {
+   "broker": "Seamless Contacts, Inc.",
+   "match": "domain"
+  },
+  "searchpeoplefree.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "searchpublicrecords.com": {
+   "broker": "Civil Data Research, LLC",
+   "match": "domain"
+  },
+  "secretinfo.org": {
+   "broker": "The People Searchers LLC",
+   "match": "domain"
+  },
+  "seekout.com": {
+   "broker": "ZipStorm, Inc.",
+   "match": "domain"
+  },
+  "semantiqhealth.com": {
+   "broker": "SEMANTIQ INC",
+   "match": "domain"
+  },
+  "semasio.com": {
+   "broker": "Semasio GmbH",
+   "match": "domain"
+  },
+  "semcasting.com": {
+   "broker": "Semcasting, Inc.",
+   "match": "domain"
+  },
+  "sg360.com": {
+   "broker": "The Segerdahl LLC",
+   "match": "domain"
+  },
+  "sharelocalmedia.com": {
+   "broker": "Share Local Media, Inc.",
+   "match": "domain"
+  },
+  "sharethrough.com": {
+   "broker": "Sharethrough",
+   "match": "domain"
+  },
+  "sheerid.com": {
+   "broker": "SheerID, Inc.",
+   "match": "domain"
+  },
+  "similarweb.com": {
+   "broker": "Similarweb Ltd.",
+   "match": "domain"
+  },
+  "simiocloud.com": {
+   "broker": "Simio Cloud, LLC",
+   "match": "domain"
+  },
+  "siteimpact.com": {
+   "broker": "Site Impact LLC",
+   "match": "domain"
+  },
+  "skydeo.com": {
+   "broker": "Skydeo Inc.",
+   "match": "domain"
+  },
+  "slashdotmedia.com": {
+   "broker": "Slashdot Media, LLC",
+   "match": "domain"
+  },
+  "smartbackgroundchecks.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "smarte.pro": {
+   "broker": "SMARTe Inc",
+   "match": "domain"
+  },
+  "smartmove.us": {
+   "broker": "CTAM LeadShare Corp.",
+   "match": "domain"
+  },
+  "sms-inc.com": {
+   "broker": "Specialists Marketing Services, Inc.",
+   "match": "domain"
+  },
+  "snov.io": {
+   "broker": "Snovio Inc",
+   "match": "domain"
+  },
+  "socialcatfish.com": {
+   "broker": "Social Catfish, LLC",
+   "match": "domain"
+  },
+  "socialgist.ai": {
+   "broker": "Effyis, Inc.",
+   "match": "domain"
+  },
+  "sojern.com": {
+   "broker": "Sojern, Inc",
+   "match": "domain"
+  },
+  "sourcepathdigital.com": {
+   "broker": "Source Path Digital",
+   "match": "domain"
+  },
+  "sovrn.com": {
+   "broker": "Sovrn, Inc.",
+   "match": "domain"
+  },
+  "speedeondata.com": {
+   "broker": "Speedeon Data LLC",
+   "match": "domain"
+  },
+  "spglobal.com": {
+   "broker": "R.L. Polk & Co.",
+   "match": "domain"
+  },
+  "spokeo.com": {
+   "broker": "Spokeo, Inc.",
+   "match": "domain"
+  },
+  "sportsilab.com": {
+   "broker": "Sports Innovation Lab, inc.",
+   "match": "domain"
+  },
+  "sproutsocial.com": {
+   "broker": "Sprout Social, Inc.",
+   "match": "domain"
+  },
+  "spycloud.com": {
+   "broker": "SpyCloud Inc.",
+   "match": "domain"
+  },
+  "spydialer.com": {
+   "broker": "Spy Labs AdCo, LLC",
+   "match": "domain"
+  },
+  "spyfly.com": {
+   "broker": "Digital Safety Products, LLC",
+   "match": "domain"
+  },
+  "stackadapt.com": {
+   "broker": "StackAdapt Inc.",
+   "match": "domain"
+  },
+  "statara.com": {
+   "broker": "Statara Solutions LLC",
+   "match": "domain"
+  },
+  "staterecords.org": {
+   "broker": "InfoPay, Inc",
+   "match": "domain"
+  },
+  "statsocial.com": {
+   "broker": "StatSocial",
+   "match": "domain"
+  },
+  "steppingblocks.com": {
+   "broker": "Steppingblocks, Inc.",
+   "match": "domain"
+  },
+  "sterling.ai": {
+   "broker": "Sterling Data Company LLC",
+   "match": "domain"
+  },
+  "stirista.com": {
+   "broker": "Stirista, LLC",
+   "match": "domain"
+  },
+  "strategicdataintelligence.com": {
+   "broker": "Strategic Data Intelligence, LLC",
+   "match": "domain"
+  },
+  "subgraph.tech": {
+   "broker": "Subgraph, Inc",
+   "match": "domain"
+  },
+  "supplier.io": {
+   "broker": "Qurium Solutions, Inc.",
+   "match": "domain"
+  },
+  "swoop.com": {
+   "broker": "Swoop.com Inc",
+   "match": "domain"
+  },
+  "swordfish.ai": {
+   "broker": "Swordfish AI Inc",
+   "match": "domain"
+  },
+  "t-mobile.com": {
+   "broker": "T-Mobile USA, Inc.",
+   "match": "domain"
+  },
+  "taboola.com": {
+   "broker": "Taboola, Inc.",
+   "match": "domain"
+  },
+  "targetsmart.com": {
+   "broker": "TargetSmart Communications LLC",
+   "match": "domain"
+  },
+  "tauxbe.com": {
+   "broker": "Tauxbe Data Inc.",
+   "match": "domain"
+  },
+  "teads.com": {
+   "broker": "Teads Inc",
+   "match": "domain"
+  },
+  "telephonelists.biz": {
+   "broker": "Electronic Voice Services, Inc.",
+   "match": "domain"
+  },
+  "telesign.com": {
+   "broker": "Telesign Corporation",
+   "match": "domain"
+  },
+  "thatsthem.com": {
+   "broker": "Spokeo, Inc.",
+   "match": "domain"
+  },
+  "thebridgecorp.com": {
+   "broker": "OWMN, LTD.",
+   "match": "domain"
+  },
+  "thedatagroup.com": {
+   "broker": "The Data Group, LLC",
+   "match": "domain"
+  },
+  "thedatatrust.com": {
+   "broker": "DT Client Services, LLC",
+   "match": "domain"
+  },
+  "theorg.com": {
+   "broker": "Orgio, Inc.",
+   "match": "domain"
+  },
+  "theswarm.com": {
+   "broker": "Swarm Holdings, Inc.",
+   "match": "domain"
+  },
+  "theworknumber.com": {
+   "broker": "Equifax Workforce Solutions LLC",
+   "match": "domain"
+  },
+  "thinkdatagroup.com": {
+   "broker": "Think Data Group Inc",
+   "match": "domain"
+  },
+  "thomsonreuters.com": {
+   "broker": "West Publishing Corp",
+   "match": "domain"
+  },
+  "tl1mkt.com": {
+   "broker": "THE LINEA 1 MKT SL",
+   "match": "domain"
+  },
+  "traackr.com": {
+   "broker": "Traackr, Inc.",
+   "match": "domain"
+  },
+  "transunion.com": {
+   "broker": "Datalink Services, Inc",
+   "match": "domain"
+  },
+  "trestleiq.com": {
+   "broker": "Trestle Solutions, Inc.",
+   "match": "domain"
+  },
+  "triplelift.com": {
+   "broker": "TripleLift, Inc.",
+   "match": "domain"
+  },
+  "trueblueanalytics.org": {
+   "broker": "True Blue Analytics LLC",
+   "match": "domain"
+  },
+  "truedata.co": {
+   "broker": "TrueData Solutions, Inc.",
+   "match": "domain"
+  },
+  "truepeoplesearch.com": {
+   "broker": "Free Data Services, LLC",
+   "match": "domain"
+  },
+  "trustandwill.com": {
+   "broker": "Huge Legal Technology Company, Inc",
+   "match": "domain"
+  },
+  "truthed.com": {
+   "broker": "Truthed, Inc",
+   "match": "domain"
+  },
+  "truthfinder.com": {
+   "broker": "TruthFinder, LLC",
+   "match": "domain"
+  },
+  "truthrecord.org": {
+   "broker": "We Inform LLC",
+   "match": "domain"
+  },
+  "tunnldata.com": {
+   "broker": "Tunnl, LLC",
+   "match": "domain"
+  },
+  "unacast.com": {
+   "broker": "Unacast, Inc.",
+   "match": "domain"
+  },
+  "unearthcampaigns.com": {
+   "broker": "Unearth Campaigns LLC",
+   "match": "domain"
+  },
+  "unmask.com": {
+   "broker": "UNMASK, LLC",
+   "match": "domain"
+  },
+  "upcell.io": {
+   "broker": "upcell, LLC",
+   "match": "domain"
+  },
+  "uplead.com": {
+   "broker": "Uplead LLC",
+   "match": "domain"
+  },
+  "upscapital.com": {
+   "broker": "UPS Capital Corporation",
+   "match": "domain"
+  },
+  "urbanscience.com": {
+   "broker": "Urban Science Applications, Inc.",
+   "match": "domain"
+  },
+  "us.com": {
+   "broker": "Integrated Direct Marketing, LLC",
+   "match": "domain"
+  },
+  "usa-people-search.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "usadata.com": {
+   "broker": "USADATA, Inc",
+   "match": "domain"
+  },
+  "usdatacorporation.com": {
+   "broker": "US Data Corporation",
+   "match": "domain"
+  },
+  "usmarketinggrp.com": {
+   "broker": "BH Marketing Group LLC",
+   "match": "domain"
+  },
+  "uspeoplesearch.com": {
+   "broker": "USPeopleSearch.com, LLC",
+   "match": "domain"
+  },
+  "usphonebook.com": {
+   "broker": "Mississippi Tornado Alley, LLC",
+   "match": "domain"
+  },
+  "ussearch.com": {
+   "broker": "Intelius, LLC",
+   "match": "domain"
+  },
+  "vector.co": {
+   "broker": "GetVector, Inc.",
+   "match": "domain"
+  },
+  "veeva.com": {
+   "broker": "Veeva Systems Inc.",
+   "match": "domain"
+  },
+  "vendelux.com": {
+   "broker": "Vendelux, Inc.",
+   "match": "domain"
+  },
+  "venntel.com": {
+   "broker": "Venntel, Inc.",
+   "match": "domain"
+  },
+  "ventiveiq.com": {
+   "broker": "VentiveIQ LLC",
+   "match": "domain"
+  },
+  "veraset.com": {
+   "broker": "Veraset, LLC",
+   "match": "domain"
+  },
+  "versium.com": {
+   "broker": "Versar Data Solutions Inc",
+   "match": "domain"
+  },
+  "vi.co": {
+   "broker": "Vi Technologies, Inc.",
+   "match": "domain"
+  },
+  "viantinc.com": {
+   "broker": "Viant US LLC",
+   "match": "domain"
+  },
+  "videoamp.com": {
+   "broker": "VideoAmp, Inc.",
+   "match": "domain"
+  },
+  "visitiq.io": {
+   "broker": "VisitIQ LLC",
+   "match": "domain"
+  },
+  "vistarmedia.com": {
+   "broker": "Vistar Media Inc.",
+   "match": "domain"
+  },
+  "visualvisitor.com": {
+   "broker": "Visual Visitor L.L.C.",
+   "match": "domain"
+  },
+  "vizio.com": {
+   "broker": "VIZIO Services, LLC",
+   "match": "domain"
+  },
+  "vrtcal.com": {
+   "broker": "VRTCAL Markets Inc.",
+   "match": "domain"
+  },
+  "warmly.ai": {
+   "broker": "Warmly, Inc.",
+   "match": "domain"
+  },
+  "wealthfeed.com": {
+   "broker": "WealthFeed, Inc.",
+   "match": "domain"
+  },
+  "webbula.com": {
+   "broker": "Webbula, LLC",
+   "match": "domain"
+  },
+  "weinform.org": {
+   "broker": "We Inform LLC",
+   "match": "domain"
+  },
+  "whitepages.com": {
+   "broker": "Whitepages, Inc",
+   "match": "domain"
+  },
+  "wiland.com": {
+   "broker": "Wiland, Inc.",
+   "match": "domain"
+  },
+  "windfall.com": {
+   "broker": "Windfall Data, Inc.",
+   "match": "domain"
+  },
+  "winrdata.com": {
+   "broker": "WINR Data Pty Ltd",
+   "match": "domain"
+  },
+  "wiza.com": {
+   "broker": "Wiza, Inc.",
+   "match": "domain"
+  },
+  "wunderkind.co": {
+   "broker": "Wunderkind Corporation",
+   "match": "domain"
+  },
+  "wurl.com": {
+   "broker": "WURL, LLC",
+   "match": "domain"
+  },
+  "www360mediadirect.com": {
+   "broker": "Subdirect LLC",
+   "match": "domain"
+  },
+  "xcelerated.com": {
+   "broker": "Xcelerated Data LLC",
+   "match": "domain"
+  },
+  "yieldmo.com": {
+   "broker": "Yieldmo, Inc.",
+   "match": "domain"
+  },
+  "yobi.ai": {
+   "broker": "Yobi Ventures, Inc.",
+   "match": "domain"
+  },
+  "zerotoone.ai": {
+   "broker": "ZeroToOne.AI Inc.",
+   "match": "domain"
+  },
+  "zetaglobal.com": {
+   "broker": "Zeta Global",
+   "match": "domain"
+  },
+  "ziffdavis.com": {
+   "broker": "Ziff Davis LLC",
+   "match": "domain"
+  },
+  "zoominfo.com": {
+   "broker": "ZoomInfo Technologies, LLC",
+   "match": "domain"
+  },
+  "zs.com": {
+   "broker": "ZS Associates, Inc.",
+   "match": "domain"
+  }
+ },
+ "fetched": "2026-10-22",
+ "registered": 603
+}

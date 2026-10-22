@@ -1,6 +1,6 @@
 # Broker directory: how sites get profiled
 
-`directory/*.yml` has one generated entry per site in `pipeline/census-sites.txt` (214 today, from the EasyOptOuts
+`directory/*.yml` has one generated entry per site in `pipeline/census-sites.txt` (856 today: EasyOptOuts' 214 plus 642 more added from the state broker registries, see `docs/JURISDICTIONS.md`; the first 214 came from the EasyOptOuts
 list). Entries are provisional guesses written by a tool, not hand-written flows. Real flows live in `brokers/`.
 
 ## The repeatable process
@@ -41,10 +41,10 @@ with the reason; regenerate it with `broker-pipeline --directory directory --met
 
 | Group | Meaning | Sites (2026-10-21) |
 |---|---|---|
-| Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 82 (83 for an owner who allows "I am this person" boxes) |
-| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 4 |
-| Guided, you do the steps | The page is found but needs something only you can do (login, ID), or has no readable form, or is a hand-written walkthrough | 103 |
-| Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 25 |
+| Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 121 (82 loaded and measured clear, 39 not yet measured but with no bot-check script) |
+| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 51 |
+| Guided, you do the steps | The page is found but needs something only you can do (login, ID), or has no readable form, or is a hand-written walkthrough | 612 |
+| Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 69 |
 
 **Measured, not guessed.** A reCAPTCHA or Turnstile script on a page is only a hint: most are invisible. So
 `AppTests/LiveAssistedPreviewTests` loads every fillable form with a made-up profile and sends nothing, and

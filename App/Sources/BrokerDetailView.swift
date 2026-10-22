@@ -15,7 +15,7 @@ struct BrokerDetailView: View {
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             if !model.progress.isDone(broker.id) {
-                GuideButton(title: "Guide me through it", subtitle: "Full-screen browser, one step at a time") {
+                GuideButton(title: Loc.t("Guide me through it"), subtitle: Loc.t("Full-screen browser, one step at a time")) {
                     guide = model.guidedRunner(for: broker)
                 }
             }
@@ -53,7 +53,7 @@ struct BrokerDetailView: View {
                     Text("Vault value: \(copy)").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button(done ? "Done" : "Mark done") { model.complete(broker, step: index) }
+                Button(done ? "Done" : Loc.t("Mark done")) { model.complete(broker, step: index) }
                     .buttonStyle(.borderedProminent)
                     .disabled(done || !unlocked)
                     .accessibilityIdentifier("done-\(index)")

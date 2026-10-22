@@ -102,7 +102,7 @@ final class GuidedRunner: ObservableObject {
         let before = flow.index
         apply(.nextTapped); status = nil
         if case .pickListing? = flow.plan.steps.indices.contains(before) ? flow.plan.steps[before].action : nil {
-            if flow.index == before { status = "Open your own listing in the page first, then tap \"This is my listing\"." }
+            if flow.index == before { status = Loc.t("Open your own listing in the page first, then tap \"This is my listing\".") }
             else if let listing = flow.chosenListing {
                 // The form's address field now has something to hold: the listing the person picked.
                 fillValues += flow.plan.listingFields.map { FieldValue(name: $0, type: "url", candidates: [listing.absoluteString], label: "") }
@@ -124,14 +124,14 @@ final class GuidedRunner: ObservableObject {
     @discardableResult
     private func healAndReload() async -> Bool {
         triedHealing = true
-        status = "This link looks broken. Looking for the new page…"
+        status = Loc.t("This link looks broken. Looking for the new page…")
         guard let healer, let url = await healer() else {
-            status = "The opt-out page has moved and we could not find the new one. You will need to find it yourself on the site; the steps below still apply."
+            status = Loc.t("The opt-out page has moved and we could not find the new one. You will need to find it yourself on the site; the steps below still apply.")
             return false
         }
         await page.load(url)
         lastURL = page.currentURL(); filledFor = nil
-        status = "The page had moved. We found the new one and loaded it."
+        status = Loc.t("The page had moved. We found the new one and loaded it.")
         apply(.pageLoaded(lastURL))
         return true
     }
@@ -147,11 +147,11 @@ final class GuidedRunner: ObservableObject {
     func copyCurrent() {
         guard case .copy(let field)? = flow.current?.action else { return }
         guard let value = person.value(for: field) else {
-            status = "Your \(Describe.field(field).lowercased()) is not on your profile yet. Add it later, or tap Next step."
+            status = Loc.f("Your %@ is not on your profile yet. Add it later, or tap Next step.", Describe.field(field).lowercased())
             return
         }
         UIPasteboard.general.setItems([[UIPasteboard.typeAutomatic: value]], options: [.expirationDate: Date().addingTimeInterval(60)])
-        status = "Copied. Paste it into the form. It clears in a minute."
+        status = Loc.t("Copied. Paste it into the form. It clears in a minute.")
         apply(.copied)
     }
 
@@ -197,8 +197,8 @@ final class GuidedRunner: ObservableObject {
             }
         case .autofill:
             if filledFor != url {
-                if await page.fill(fillValues) > 0 { filledFor = url; status = "Your details are filled in."; apply(.formFilled) }
-                else { status = "Could not find the form's fields on this page. Fill it in yourself, then tap Next step." }
+                if await page.fill(fillValues) > 0 { filledFor = url; status = Loc.t("Your details are filled in."); apply(.formFilled) }
+                else { status = Loc.t("Could not find the form's fields on this page. Fill it in yourself, then tap Next step.") }
             }
         case .clearBlockers:
             if filledFor != url { _ = await page.fill(fillValues); filledFor = url }       // a page reload can clear the fields
@@ -208,11 +208,11 @@ final class GuidedRunner: ObservableObject {
             _ = await page.fill(fillValues)
             switch await page.send(fillValues) {
             case .submitted(let email):
-                onSent(.submitted(awaitingEmail: email)); status = email ? "Sent. Check your email for a link." : "Sent."
+                onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
-            case .challenged(let why): status = "The site wants another check: \(why). Solve it and we will send again."
+            case .challenged(let why): status = Loc.f("The site wants another check: %@. Solve it and we will send again.", why)
             case .rejected(let why), .failed(let why):
-                status = "We could not confirm it was sent (\(why)). Finish it yourself in the page, then tap Next step."
+                status = Loc.f("We could not confirm it was sent (%@). Finish it yourself in the page, then tap Next step.", why)
             case .filledNotSubmitted: break
             }
         default: break
@@ -220,16 +220,16 @@ final class GuidedRunner: ObservableObject {
     }
 
     private func describe(_ blockers: [AssistedBlocker]) -> String {
-        if blockers.contains(.terms) { return "Read and accept this site's terms yourself, then solve the check." }
-        if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { return "Tick the confirmation box yourself if it is true, then solve the check." }
-        return "Solve the check in the page. We will send it after."
+        if blockers.contains(.terms) { return Loc.t("Read and accept this site's terms yourself, then solve the check.") }
+        if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { return Loc.t("Tick the confirmation box yourself if it is true, then solve the check.") }
+        return Loc.t("Solve the check in the page. We will send it after.")
     }
 
     private func apply(_ event: GuidedEvent) {
         let before = flow.current?.id
         if let done = flow.apply(event) {
             onStepCompleted(done)
-            if flow.autoCompleted.contains(done) { status = "Step \(done + 1) done: we saw you finish it." }
+            if flow.autoCompleted.contains(done) { status = Loc.f("Step %@ done: we saw you finish it.", done + 1) }
         }
         if flow.isFinished, ending == nil, before != nil { finish(.finished) }
     }
@@ -271,8 +271,8 @@ struct GuidedFlowView: View {
 struct GuidedPanel: View {
     @ObservedObject var runner: GuidedRunner
     private var nextTitle: String {
-        if case .pickListing? = runner.flow.current?.action { return "This is my listing" }
-        return runner.flow.index + 1 >= runner.flow.total ? "Finish" : "Next step"
+        if case .pickListing? = runner.flow.current?.action { return Loc.t("This is my listing") }
+        return runner.flow.index + 1 >= runner.flow.total ? "Finish" : Loc.t("Next step")
     }
     /// Keeps the buttons clear of the home indicator while the panel itself still reaches the bottom edge.
     var bottomInset: CGFloat = 0
@@ -282,7 +282,7 @@ struct GuidedPanel: View {
             HStack {
                 Button("Cancel") { runner.cancel() }.font(.footnote).accessibilityIdentifier("guided-cancel")
                 Spacer()
-                Text(runner.flow.progressLabel ?? "All done").font(.caption.bold()).foregroundStyle(.secondary)
+                Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.secondary)
                     .accessibilityIdentifier("guided-progress")
                 Spacer()
                 Menu {

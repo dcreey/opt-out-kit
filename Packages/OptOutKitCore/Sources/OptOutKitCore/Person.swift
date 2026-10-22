@@ -20,11 +20,18 @@ public enum Relationship: String, Codable, CaseIterable, Sendable {
 
     public var label: String {
         switch self {
-        case .me: return "Me"
-        case .auntUncle: return "Aunt or uncle"
-        case .nieceNephew: return "Niece or nephew"
-        case .otherFamily: return "Other family"
-        default: return rawValue.capitalized
+        case .me: return L10n.t("Me")
+        case .auntUncle: return L10n.t("Aunt or uncle")
+        case .nieceNephew: return L10n.t("Niece or nephew")
+        case .otherFamily: return L10n.t("Other family")
+        case .parent: return L10n.t("Parent")
+        case .child: return L10n.t("Child")
+        case .sibling: return L10n.t("Sibling")
+        case .spouse: return L10n.t("Spouse")
+        case .partner: return L10n.t("Partner")
+        case .grandparent: return L10n.t("Grandparent")
+        case .grandchild: return L10n.t("Grandchild")
+        case .cousin: return L10n.t("Cousin")
         }
     }
 
@@ -40,11 +47,11 @@ public enum NameKind: String, Codable, CaseIterable, Sendable {
 
     public var label: String {
         switch self {
-        case .legal: return "Legal name"
-        case .previousLegal: return "Previous legal name"
-        case .maiden: return "Maiden name"
-        case .nickname: return "Nickname"
-        case .alias: return "Other / spelling variant"
+        case .legal: return L10n.t("Legal name")
+        case .previousLegal: return L10n.t("Previous legal name")
+        case .maiden: return L10n.t("Maiden name")
+        case .nickname: return L10n.t("Nickname")
+        case .alias: return L10n.t("Other / spelling variant")
         }
     }
 }
@@ -134,8 +141,39 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         !isMinorNow(on: date, calendar: calendar) && !isPublicFigure
     }
 
+    /// The current address: the first one. Previous addresses follow it.
+    public var currentAddress: Address? { addresses.first }
+
+    /// What is still missing from the details every profile needs: a legal first and last name, and a current street, city and state.
+    /// Empty when the profile is complete.
+    public var missingRequiredDetails: [String] {
+        var out: [String] = []
+        if legalFirst.isEmpty { out.append(L10n.noun("Legal first name")) }
+        if legalLast.isEmpty { out.append(L10n.noun("Legal last name")) }
+        let a = currentAddress
+        if (a?.street ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current street address")) }
+        if (a?.city ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current city")) }
+        if (a?.state ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current state")) }
+        return out
+    }
+
+    public var isComplete: Bool { missingRequiredDetails.isEmpty }
+
     /// The first legal name, which most broker forms ask for.
     public var legalName: String { names.first { $0.kind == .legal && !$0.name.isEmpty }?.name ?? "" }
+
+    /// The legal name as separate parts: the first word, the last word, and anything between them as the middle name.
+    public var legalFirst: String { legalName.split(separator: " ").first.map(String.init) ?? "" }
+    public var legalLast: String { legalName.split(separator: " ").count > 1 ? legalName.split(separator: " ").last.map(String.init) ?? "" : "" }
+    public var legalMiddle: String {
+        let w = legalName.split(separator: " ").map(String.init)
+        return w.count > 2 ? w[1..<(w.count - 1)].joined(separator: " ") : ""
+    }
+
+    /// Joins the parts back into the stored legal name; the middle name is optional.
+    public static func composeLegalName(first: String, middle: String, last: String) -> String {
+        [first, middle, last].map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }.joined(separator: " ")
+    }
 
     /// Every non-empty name, for matching listings under any of them.
     public var allNames: [String] { names.map(\.name).filter { !$0.isEmpty } }
@@ -163,15 +201,68 @@ public struct HouseholdSettings: Codable, Equatable, Sendable {
     public var auto = AutoSettings()
     /// Opt-out links the app found for itself after a recorded one broke. Per site, kept on this device only.
     public var healedLinks: [String: HealedLink] = [:]
+    /// The one email address put on every opt-out form and deletion request, for everyone in the household (see `ContactEmail`).
+    public var contactEmail: String?
+    /// The state the account owner chose in the walkthrough ("CA"). Only used until their profile has a current address, which then decides.
+    public var ownerState: String?
+    /// The country the account owner chose ("US", "FR", or "OTHER" for one the app has no rules for yet).
+    public var ownerCountry: String?
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto, healedLinks }
+    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto, healedLinks, contactEmail, ownerState, ownerCountry }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         termsApproval = try c.decodeIfPresent(TermsApproval.self, forKey: .termsApproval)
         consentLog = try c.decodeIfPresent([ConsentLogEntry].self, forKey: .consentLog) ?? []
         auto = try c.decodeIfPresent(AutoSettings.self, forKey: .auto) ?? AutoSettings()
         healedLinks = try c.decodeIfPresent([String: HealedLink].self, forKey: .healedLinks) ?? [:]
+        contactEmail = try c.decodeIfPresent(String.self, forKey: .contactEmail)
+        ownerState = try c.decodeIfPresent(String.self, forKey: .ownerState)
+        ownerCountry = try c.decodeIfPresent(String.self, forKey: .ownerCountry)
+    }
+}
+
+/// The single address used on every form. Gmail addresses get `+optoutkit` before the `@`, so every reply from an opt-out is easy
+/// to find and filter; mail still lands in the normal inbox.
+public enum ContactEmail {
+    public static let tag = "+optoutkit"
+
+    /// A plain check that this looks like an address: something, an `@`, a domain with a dot. Not a promise it exists.
+    public static func isValid(_ email: String) -> Bool {
+        let t = email.trimmingCharacters(in: .whitespaces)
+        let parts = t.split(separator: "@", omittingEmptySubsequences: false)
+        guard parts.count == 2, !parts[0].isEmpty, !t.contains(" ") else { return false }
+        let domain = parts[1]
+        return domain.contains(".") && !domain.hasPrefix(".") && !domain.hasSuffix(".")
+    }
+
+    public static func isGmail(_ email: String) -> Bool {
+        let domain = email.split(separator: "@").last.map { $0.lowercased() } ?? ""
+        return domain == "gmail.com" || domain == "googlemail.com"
+    }
+
+    /// What goes into forms: the address as typed, or for Gmail the same address with `+optoutkit` before the `@`.
+    public static func forForms(_ email: String) -> String {
+        let t = email.trimmingCharacters(in: .whitespaces)
+        guard isGmail(t), let at = t.lastIndex(of: "@") else { return t }
+        let local = t[..<at]
+        if local.lowercased().hasSuffix(tag) { return t }
+        return local + tag + t[at...]
+    }
+}
+
+public extension Household {
+    var contactEmail: String? { settings.contactEmail }
+    /// The address used on forms (with the Gmail tag), or nil until one has been given.
+    var formEmail: String? { settings.contactEmail.flatMap { ContactEmail.isValid($0) ? ContactEmail.forForms($0) : nil } }
+    var ownerState: String? { settings.ownerState }
+    mutating func setOwnerState(_ code: String?) { settings.ownerState = code }
+    var ownerCountry: String? { settings.ownerCountry }
+    /// Choosing a country other than the US clears the state, which only the US has.
+    mutating func setOwnerCountry(_ code: String?) { settings.ownerCountry = code; if code != nil, code != "US" { settings.ownerState = nil } }
+    mutating func setContactEmail(_ email: String?) {
+        let t = email?.trimmingCharacters(in: .whitespaces)
+        settings.contactEmail = (t?.isEmpty ?? true) ? nil : t
     }
 }
 

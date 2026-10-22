@@ -2,14 +2,15 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "publicdatacheck_com"
 domain: "publicdatacheck.com"
-name: "publicdatacheck.com"
+name: "National Data Analytics, LLC"
 bucket: "direct"
 tier: "B"
 automation: "guided"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://www.publicdatacheck.com/help-center/privacy-requests"
 opt_out_form: {"page": "https://www.publicdatacheck.com/help-center/privacy-requests", "method": "post", "action": "https://www.publicdatacheck.com/help-center/privacy-requests?", "fields": [{"type": "select", "name": "requesttype", "label": "Request Type*"}, {"type": "text", "name": "customerid", "label": "Customer ID"}, {"type": "text", "name": "firstname", "label": "First Name*"}, {"type": "text", "name": "o4dd819765b2bf7aa", "label": "Last Name*"}, {"type": "text", "name": "city", "label": "City*"}, {"type": "select", "name": "states", "label": "State*"}, {"type": "text", "name": "zip", "label": "ZIP*"}, {"type": "select", "name": "age", "label": "Age*"}, {"type": "email", "name": "email", "label": "Confirmation Email*"}], "hops": 1}
 template: "t_c00e45"
+registered_in: [CA]
 signals: [captcha_turnstile, email_input, name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:

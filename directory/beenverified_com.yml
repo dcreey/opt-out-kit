@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "beenverified_com"
 domain: "beenverified.com"
-name: "beenverified.com"
+name: "BeenVerified, LLC and its subsidiaries and affiliates"
 bucket: "direct"
 tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.beenverified.com/"
+registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, email_input, email_only_wording, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:

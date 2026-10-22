@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "pipl_com"
 domain: "pipl.com"
-name: "pipl.com"
+name: "Pipl, Inc."
 bucket: "direct"
 tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://pipl.com/personal-information-removal-request"
+registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_input, listing_url_input, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:

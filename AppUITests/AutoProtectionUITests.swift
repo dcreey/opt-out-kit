@@ -10,6 +10,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         for _ in 0..<5 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.buttons["onboarding-next"].tap() }
+        app.enterOnboardingEmail()
         let scan = app.switches["auto-scan-toggle"], opt = app.switches["auto-optout-toggle"]
         XCTAssertTrue(scan.waitForExistence(timeout: 5))
         XCTAssertEqual(scan.value as? String, "1", "daily scan starts on")
@@ -19,7 +20,7 @@ final class AutoProtectionUITests: XCTestCase {
 
         app.tabBars.buttons["About"].tap()
         let s2 = app.switches["settings-scan-toggle"]
-        XCTAssertTrue(s2.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.scrollUntilExists(s2))
         XCTAssertEqual(s2.value as? String, "1")
         XCTAssertEqual(app.switches["settings-optout-toggle"].value as? String, "1")
         shot(app, "2-settings-both-on")
@@ -30,6 +31,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
         for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
+        app.enterOnboardingEmail()
         for id in ["auto-scan-toggle", "auto-optout-toggle"] {
             let t = app.switches[id]; XCTAssertTrue(t.waitForExistence(timeout: 5))
             t.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
@@ -38,6 +40,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.buttons["onboarding-done"].tap()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
         app.tabBars.buttons["About"].tap()
+        XCTAssertTrue(app.scrollUntilExists(app.switches["settings-scan-toggle"]))
         XCTAssertEqual(app.switches["settings-scan-toggle"].value as? String, "0")
     }
 
@@ -57,7 +60,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.launch()
         // Give the owner a name and email so forms can be filled.
         app.buttons["profile-button"].tap()
-        let name = app.textFields["name-0"]; XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Pat Example")
+        app.fillRequiredProfile()
         app.buttons["Done"].tap()
         app.tabBars.buttons["About"].tap()
         var scrolls = 0
@@ -73,6 +76,9 @@ final class AutoProtectionUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
+        app.buttons["profile-button"].tap()
+        app.fillRequiredProfile()                     // searching needs the profile's legal name, address and the household email
+        app.buttons["editor-done"].tap()
         app.tabBars.buttons["Sites"].tap()
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-paywalled"].waitForExistence(timeout: 5))
@@ -89,16 +95,11 @@ final class SolveAndSendUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-fake-submit"]
         app.launch()
         app.buttons["profile-button"].tap()
-        let name = app.textFields["name-0"]; XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Pat Example")
-        // email so the forms can be filled
-        var scrolls = 0
-        while !app.buttons["Add email"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
-        app.buttons["Add email"].tap()
-        let email = app.textFields["Emails"].firstMatch; XCTAssertTrue(email.waitForExistence(timeout: 3)); email.tap(); email.typeText("pat@example.com")
+        app.fillRequiredProfile()
         app.buttons["Done"].tap()
 
         app.tabBars.buttons["About"].tap()
-        scrolls = 0
+        var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
         let start = app.buttons["assisted-start"]

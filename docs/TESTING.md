@@ -32,3 +32,14 @@ swift run broker-pipeline --brokers ../../brokers --person "First Last|City|ST"
 ```
 
 To bring a site into the pipeline, add a `recheck:` block with a `calibration:` name to its YAML.
+
+## Translations, registries and the pipeline's own tools
+
+```bash
+python3 -m unittest discover -s tools/tests
+```
+
+Covers the crawler's retries and backoff, registry parsing and joining (California CSV, Texas rows, Oregon's names-only file), the
+terms census's language detection and alternate-page discovery, and that every string is translated with matching placeholders and
+the shipped catalogs are current. The core package tests cover state and country facts, the rules text in every language, and the
+multilingual link and form patterns. The UI tests launch the app in French and switch language from the walkthrough.

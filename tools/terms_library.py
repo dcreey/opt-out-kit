@@ -14,15 +14,24 @@ it and set `reviewed: true` and `verdict: ok`. Re-running keeps existing verdict
 import argparse, collections, datetime, glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import terms_canon as T
+import terms_lang as TL
 
+# Risk wording in each language we read (en, fr, es, de). A paragraph in any of them can be flagged; a person who reads the
+# original language still has to review it before anything is accepted.
 FLAGS = {
-    "automation": r"automat|robot|scrap|crawl|spider|\bbots?\b|data.?mining|harvest|software to access",
-    "payment": r"\$\s?\d|\bfees?\b|\bcharge|billing|subscription|renew|credit card|payment|refund",
-    "arbitration": r"arbitrat|class.?action|waive.{0,40}jury|jury trial",
-    "permissible_use": r"fcra|permissible purpose|consumer report|employment|tenant|insurance|eligibility|credit",
-    "restricted_people": r"minor|under 18|public official|celebrit|law enforcement|stalk|harass",
-    "indemnity": r"indemnif|hold harmless",
-    "data_sharing": r"third.?part(y|ies)|affiliates|advertis|sell|share (your|personal)",
+    "automation": r"automat|robot|scrap|crawl|spider|\bbots?\b|data.?mining|harvest|software to access"
+                  r"|moissonn|extraction de donn|logiciel d'acc|rastre|extracci[oó]n|miner[ií]a de datos|crawler|auslesen|datenextraktion|automatisiert",
+    "payment": r"\$\s?\d|\bfees?\b|\bcharge|billing|subscription|renew|credit card|payment|refund"
+               r"|€\s?\d|\d\s?€|frais|abonnement|facturation|carte de cr[eé]dit|paiement|remboursement"
+               r"|tarifa|suscripci[oó]n|facturaci[oó]n|tarjeta de cr[eé]dito|reembolso|geb[uü]hr|abonnement|kreditkarte|zahlung|erstattung|kostenpflichtig",
+    "arbitration": r"arbitrat|class.?action|waive.{0,40}jury|jury trial|arbitrage|action collective|arbitraje|acci[oó]n colectiva|schiedsverfahren|sammelklage",
+    "permissible_use": r"fcra|permissible purpose|consumer report|employment|tenant|insurance|eligibility|credit"
+                       r"|assurance|emploi|locataire|seguro|empleo|inquilino|versicherung|arbeitgeber|mieter|bonit[aä]t",
+    "restricted_people": r"minor|under 18|public official|celebrit|law enforcement|stalk|harass"
+                         r"|mineur|personnalit[eé] publique|harc[eè]lement|menor|figura p[uú]blica|acoso|minderj[aä]hrig|stalking|bel[aä]stigung",
+    "indemnity": r"indemnif|hold harmless|indemnis|garantir contre|indemniz|eximir|freistellung|schadlos",
+    "data_sharing": r"third.?part(y|ies)|affiliates|advertis|sell|share (your|personal)"
+                    r"|tiers|affili[eé]s|publicit[eé]|vend|partag|terceros|afiliad|publicidad|dritte|werbung|verkauf|weitergabe",
 }
 HIGH_RISK = {"automation", "payment", "arbitration", "indemnity"}
 
@@ -49,14 +58,16 @@ def main():
     ap.add_argument("--review-dir", default=".terms-review")
     a = ap.parse_args()
     paras = {}                      # hash -> {"canon": ..., "sites": set, "kinds": set}
+    # English is cached at <site>/*.txt, another language at <site>/<lang>/*.txt. The language of each paragraph is read from its
+    # words, not trusted from the folder, so a site that answered a French request in English is counted as English.
     for d in sorted(os.listdir(a.cache)):
-        for f in glob.glob(f"{a.cache}/{d}/*.txt"):
+        for f in glob.glob(f"{a.cache}/{d}/*.txt") + glob.glob(f"{a.cache}/{d}/??/*.txt"):
             t = open(f).read()
-            kind = "prompt" if os.path.basename(f).startswith("prompt") else ("privacy" if "privacy" in t.split("\n", 1)[0].lower() else "terms")
+            kind = "prompt" if os.path.basename(f).startswith("prompt") else ("privacy" if re.search(r"privacy|confidentialit|privacidad|datenschutz", t.split("\n", 1)[0].lower()) else "terms")
             body = t.split("\n", 1)[1] if t.startswith("URL:") else t
             for p in T.substantial(body):
                 c = T.canonical(p, d); h = T.paragraph_hash(c)
-                e = paras.setdefault(h, {"canon": c, "sites": set(), "kinds": set()})
+                e = paras.setdefault(h, {"canon": c, "sites": set(), "kinds": set(), "lang": TL.detect_lang(p) or "en"})
                 e["sites"].add(d); e["kinds"].add(kind)
     keep = load_existing(a.out)
     ordered = sorted(paras.items(), key=lambda kv: (-len(kv[1]["sites"]), kv[0]))
@@ -70,7 +81,7 @@ def main():
         fl = flags_for(e["canon"])
         prefix = " ".join(e["canon"].split()[:8])
         lines += [f"  - hash: {h}", f"    sites: {len(e['sites'])}", f"    kinds: [{', '.join(sorted(e['kinds']))}]",
-                  f"    flags: [{', '.join(fl)}]", f"    prefix: {json.dumps(prefix)}",
+                  f"    lang: {e['lang']}", f"    flags: [{', '.join(fl)}]", f"    prefix: {json.dumps(prefix)}",
                   f"    reviewed: {prev.get('reviewed', 'false')}", f"    verdict: {prev.get('verdict', 'null')}"]
         sheet.write(f"[{h}] sites={len(e['sites'])} kinds={sorted(e['kinds'])} flags={fl}\n{e['canon']}\n\n")
     sheet.close()

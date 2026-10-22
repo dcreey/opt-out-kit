@@ -7,8 +7,17 @@ struct PersonEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var person: Person
     @State private var confirmDelete = false
+    // The three parts of the legal name are edited separately; the stored name is them joined (see `Person.composeLegalName`).
+    @State private var first: String
+    @State private var middle: String
+    @State private var last: String
 
-    init(person: Person) { _person = State(initialValue: person) }
+    init(person: Person) {
+        _person = State(initialValue: person)
+        _first = State(initialValue: person.legalFirst)
+        _middle = State(initialValue: person.legalMiddle)
+        _last = State(initialValue: person.legalLast)
+    }
 
     var body: some View {
         Form {
@@ -31,16 +40,18 @@ struct PersonEditorView: View {
                     .accessibilityIdentifier("field-relationship")
                 }
             }
-            namesSection
+            requiredSection
             safetySection
-            addressSection
-            StringListSection(title: "Emails", hint: "Used for confirmation links. Use this person's own address.",
-                              addLabel: "Add email", items: $person.emails, keyboard: .emailAddress)
-            if !sharedEmailsForPerson.isEmpty {
-                Text("Also used by someone else: \(sharedEmailsForPerson.sorted().joined(separator: ", ")). Some sites allow one opt-out per email.")
-                    .font(.footnote).foregroundStyle(.orange)
+            otherNamesSection
+            previousAddressesSection
+            if person.relationship != .me {
+                Section("Email") {
+                    Text(model.formEmail.map { Loc.f("Opt-out forms for %@ use your address, %@. Replies come to you.", person.displayName, $0) }
+                         ?? Loc.t("Opt-out forms use the email address on your own profile. Add it there first."))
+                        .font(.footnote)
+                }
             }
-            StringListSection(title: "Phones", hint: "Optional", addLabel: "Add phone",
+            StringListSection(title: "Phones", hint: "Optional", addLabel: Loc.t("Add phone"),
                               items: $person.phones, keyboard: .phonePad)
             Section("Birthdate") {
                 TextField("YYYY-MM-DD (optional)", text: Binding(
@@ -61,7 +72,7 @@ struct PersonEditorView: View {
         .navigationTitle(person.displayName.isEmpty ? "Profile" : person.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: person) { _, new in model.update(new) }
-        .confirmationDialog("Delete \(person.displayName)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+        .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
         }
     }
@@ -86,52 +97,138 @@ struct PersonEditorView: View {
         model.sharedEmails.intersection(Set(person.emails.map { $0.lowercased() }))
     }
 
-    private var namesSection: some View {
+    // MARK: Required details
+
+    /// Index of the legal name entry, creating it first if the profile has none (older profiles may not).
+    private func legalIndex() -> Int {
+        if let i = person.names.firstIndex(where: { $0.kind == .legal }) { return i }
+        person.names.insert(NameEntry(kind: .legal), at: 0)
+        return 0
+    }
+
+    /// One part of the legal name. A middle name is kept out of the stored name until there is a last name, so it is never mistaken for one.
+    private func legalBinding(_ get: @escaping () -> String, _ set: @escaping (String) -> Void) -> Binding<String> {
+        Binding(get: get, set: { new in
+            set(new)
+            person.names[legalIndex()].name = Person.composeLegalName(first: first, middle: last.trimmingCharacters(in: .whitespaces).isEmpty ? "" : middle, last: last)
+        })
+    }
+
+    private func currentAddress<T>(_ keyPath: WritableKeyPath<Address, T>, default value: T) -> Binding<T> {
+        Binding(get: { person.addresses.first?[keyPath: keyPath] ?? value },
+                set: { new in
+                    if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
+                    person.addresses[0][keyPath: keyPath] = new
+                })
+    }
+
+    /// Every profile needs a legal name and a current address: sites match on them, and a form cannot be filled without them.
+    private var requiredSection: some View {
         Section {
-            ForEach($person.names.indices, id: \.self) { i in
-                VStack(alignment: .leading) {
-                    Picker("Type", selection: $person.names[i].kind) {
-                        ForEach(NameKind.allCases, id: \.self) { Text($0.label).tag($0) }
-                    }
-                    .pickerStyle(.menu)
-                    TextField("Name", text: $person.names[i].name)
-                        .accessibilityIdentifier("name-\(i)")
-                }
+            TextField("Legal first name", text: legalBinding({ first }, { first = $0 }))
+                .textContentType(.givenName).accessibilityIdentifier("legal-first")
+            TextField("Legal middle name (optional)", text: legalBinding({ middle }, { middle = $0 }))
+                .textContentType(.middleName).accessibilityIdentifier("legal-middle")
+            TextField("Legal last name", text: legalBinding({ last }, { last = $0 }))
+                .textContentType(.familyName).accessibilityIdentifier("legal-last")
+            TextField("Street", text: Binding(
+                get: { person.addresses.first?.street ?? "" },
+                set: { v in
+                    if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
+                    person.addresses[0].street = v.isEmpty ? nil : v
+                }))
+                .accessibilityIdentifier("current-street")
+            HStack {
+                TextField("City", text: currentAddress(\.city, default: "")).accessibilityIdentifier("current-city")
+                TextField("State", text: currentAddress(\.state, default: "")).frame(maxWidth: 70).accessibilityIdentifier("current-state")
             }
-            .onDelete { person.names.remove(atOffsets: $0) }
-            Button("Add name", systemImage: "plus") { person.names.append(NameEntry(kind: .nickname)) }
-                .accessibilityIdentifier("add-name")
+            if person.relationship == .me { emailRows }
+            let missing = person.missingRequiredDetails + (person.relationship == .me && model.formEmail == nil ? [L10n.noun("Email address")] : [])
+            if !missing.isEmpty {
+                Label("Still needed: \(missing.joined(separator: ", ")).", systemImage: "exclamationmark.circle")
+                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("missing-details")
+            }
         } header: {
-            Text("Names")
+            Text("Required: legal name and current address")
         } footer: {
-            Text("Add every name you have been listed under: nicknames, previous legal names, maiden names, spelling variants. Add a relative by adding them as a person.")
+            Text("Sites find and remove records by legal name and address, so every profile needs both. Only the fields a site's form asks for are ever sent.")
         }
     }
 
-    private var addressSection: some View {
+    /// The household's one email, asked for on the owner's profile. It goes on every form for everyone.
+    @ViewBuilder private var emailRows: some View {
+        TextField("Your email address", text: Binding(get: { model.contactEmail }, set: { model.setContactEmail($0) }))
+            .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
+            .textContentType(.emailAddress).accessibilityIdentifier("contact-email")
+        if let tagged = model.formEmail, tagged != model.contactEmail.trimmingCharacters(in: .whitespaces) {
+            Label("On forms we use \(tagged)", systemImage: "envelope.badge")
+                .font(.footnote).accessibilityIdentifier("tagged-email")
+        }
+        Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
+    }
+
+    // MARK: Other names and previous addresses
+
+    private var otherNamesSection: some View {
         Section {
-            ForEach($person.addresses.indices, id: \.self) { i in
-                VStack(alignment: .leading) {
-                    TextField("Street (optional)", text: Binding(
-                        get: { person.addresses[i].street ?? "" },
-                        set: { person.addresses[i].street = $0.isEmpty ? nil : $0 }))
-                    HStack {
-                        TextField("City", text: $person.addresses[i].city)
-                        TextField("State", text: $person.addresses[i].state).frame(maxWidth: 70)
+            ForEach(person.names.indices, id: \.self) { i in
+                if person.names[i].kind != .legal {
+                    VStack(alignment: .leading) {
+                        Picker("Type", selection: $person.names[i].kind) {
+                            ForEach(NameKind.allCases.filter { $0 != .legal }, id: \.self) { Text($0.label).tag($0) }
+                        }
+                        .pickerStyle(.menu)
+                        TextField("Name", text: $person.names[i].name)
+                            .accessibilityIdentifier("name-\(i)")
                     }
-                    HStack {
-                        TextField("From year", value: $person.addresses[i].fromYear, format: .number.grouping(.never))
-                        TextField("To year", value: $person.addresses[i].toYear, format: .number.grouping(.never))
-                    }.keyboardType(.numberPad)
                 }
             }
-            .onDelete { person.addresses.remove(atOffsets: $0) }
-            Button("Add address", systemImage: "plus") { person.addresses.append(Address(city: "", state: "")) }
-                .accessibilityIdentifier("add-address")
+            .onDelete { offsets in
+                for i in offsets.sorted(by: >) where person.names.indices.contains(i) && person.names[i].kind != .legal { person.names.remove(at: i) }
+            }
+            Button("Add name", systemImage: "plus") {
+                _ = legalIndex()
+                person.names.append(NameEntry(kind: .nickname))
+            }
+            .accessibilityIdentifier("add-name")
         } header: {
-            Text("Addresses")
+            Text("Other names")
         } footer: {
-            Text("Current first, then previous. City and state are enough; add a street only if you want it sent.")
+            Text("Add every other name you have been listed under: nicknames, previous legal names, maiden names, spelling variants. Add a relative by adding them as a person.")
+        }
+    }
+
+    private var previousAddressesSection: some View {
+        Section {
+            ForEach(person.addresses.indices, id: \.self) { i in
+                if i > 0 {
+                    VStack(alignment: .leading) {
+                        TextField("Street (optional)", text: Binding(
+                            get: { person.addresses[i].street ?? "" },
+                            set: { person.addresses[i].street = $0.isEmpty ? nil : $0 }))
+                        HStack {
+                            TextField("City", text: $person.addresses[i].city)
+                            TextField("State", text: $person.addresses[i].state).frame(maxWidth: 70)
+                        }
+                        HStack {
+                            TextField("From year", value: $person.addresses[i].fromYear, format: .number.grouping(.never))
+                            TextField("To year", value: $person.addresses[i].toYear, format: .number.grouping(.never))
+                        }.keyboardType(.numberPad)
+                    }
+                }
+            }
+            .onDelete { offsets in
+                for i in offsets.sorted(by: >) where i > 0 && person.addresses.indices.contains(i) { person.addresses.remove(at: i) }
+            }
+            Button("Add previous address", systemImage: "plus") {
+                if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
+                person.addresses.append(Address(city: "", state: ""))
+            }
+            .accessibilityIdentifier("add-address")
+        } header: {
+            Text("Previous addresses")
+        } footer: {
+            Text("Most recent first. City and state are enough; add a street only if you want it sent.")
         }
     }
 }
@@ -157,4 +254,9 @@ struct StringListSection: View {
             Text(hint)
         }
     }
+}
+
+/// The same words wherever the app asks for the email, so what it does with it is always said the same way.
+enum EmailExplainer {
+    static let text = Loc.t("We put this one address on every opt-out form and data-deletion request, for you and everyone you add. For Gmail we add +optoutkit before the @ (you@gmail.com becomes you+optoutkit@gmail.com). Mail still arrives in your normal inbox, and you can search or filter for +optoutkit to find every reply.")
 }

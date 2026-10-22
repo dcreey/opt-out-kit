@@ -3,10 +3,14 @@
 Status 2026-10-21. Built and tested in the simulator against **local test pages and fakes only**. No real site has been sent
 anything by this feature, and no real person's details were used.
 
+## One site, one group
+
+Groups run in this order: an official removal service for the person's state or country (California DROP today), then our automatic opt-out, semi-automated, guided and manual. A site is listed in the first group that handles it and in no later one; two official services never list the same site. The same order decides what the weekly run skips.
+
 ## How sites are grouped
 
-The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (82 sites), **Semi-automated, with
-prompts for you** (4), **Guided, you do the steps** (103, including the hand-written walkthroughs) and **Manual, you find the page** (25).
+The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (121 of 853 sites), **Semi-automated, with
+prompts for you** (51), **Guided, you do the steps** (612, including the hand-written walkthroughs) and **Manual, you find the page** (69).
 The groups come from a real page load of each form with a made-up profile (nothing sent), not from captcha scripts on the page.
 See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was placed and why.
 
@@ -15,11 +19,64 @@ See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was 
 | Job | When | What it does |
 |---|---|---|
 | **Scan** | Daily | Searches the sites that can be checked automatically (14 today) for each family member who may be searched. Read-only. |
-| **Opt-out** | Weekly | For each directory site where we found the real opt-out form (109 of 214), fills it from the person's profile and sends it, one site at a time. |
+| **Opt-out** | Weekly | For each directory site where we found the real opt-out form (270 of 856), fills it from the person's profile and sends it, one site at a time. |
 
 Both are off until the person answers a first-run question (last page of the walkthrough, or a banner on the Queue tab if they
 skipped it). The page has both switches on by default and says exactly what will be sent. Either can be turned off in
 About, and every run is listed under "Automatic activity". "Preview" fills every form and sends nothing.
+
+## Required profile details
+
+Every profile needs a **legal first name and legal last name** (a middle name is optional) and a **current street address, city
+and state**, in their own required fields with no "type" to pick. Other names (nicknames, maiden names) and previous addresses are
+listed separately below. The owner's profile also needs the **household email**. The editor cannot be closed while anything is
+missing, and the daily scan and weekly opt-out skip a profile until it is complete.
+
+## California DROP
+
+California residents get a one-request-for-many-sites walkthrough, and the sites it reaches are skipped for 90 days after they submit
+it. See `docs/PLATFORMS.md`.
+
+## One email for every form
+
+The first-run walkthrough has a required "Your email address" page (Next and Start stay disabled until it looks like an address;
+Skip goes to that page instead of leaving). That one address is put on every opt-out form and every data-deletion request, for the
+owner and for every family profile; a family member's own address is not used. It can be changed on the owner's profile.
+
+For Gmail (`gmail.com` and `googlemail.com`) the app adds `+optoutkit` before the `@`: `you@gmail.com` becomes
+`you+optoutkit@gmail.com`. Mail still arrives in the normal inbox, and searching for `+optoutkit` finds every reply from an opt-out.
+An address that already ends in `+optoutkit` is not tagged twice, an existing tag such as `+news` is kept, and other providers are
+left alone. The walkthrough and the profile editor say all of this in the same words and show the tagged address that will be used.
+
+## Spokeo without paying
+
+Spokeo's opt-out form only needs the web address of your listing, and the app gets that without buying anything: searching Spokeo
+by **name** (`spokeo.com/First-Last`) lists people with links like `spokeo.com/First-Last/State/City/p123456789`, and that link is
+what the form wants. Searching by email, phone or address instead leads to a payment page. The links are not guessable (the trailing
+`p…` number is opaque), so the app takes them from the results rather than building them. Spokeo's own form also says a payment-page
+address (`spokeo.com/purchase?q=…`) is accepted, so a person who lands on a payment page can still use that address. The walkthrough
+says "You never need to buy a report". Verified on the real site on 2026-10-22 (below).
+
+Other published guides say the same: [Cloaked](https://help.cloaked.app/hc/en-us/articles/34297441672084-Removing-Your-Data-From-Spokeo),
+[DeleteMe](https://joindeleteme.com/help/kb/how-to-remove-yourself-from-spokeo/) and [Incogni](https://blog.incogni.com/spokeo-opt-out/).
+
+## Existing walkthroughs we can lean on
+
+- **EasyOptOuts' list** is already the source of our directory (now 856 sites: EasyOptOuts' 214 plus every broker in the state registries).
+- **[Big Ass Data Broker Opt-Out List](https://github.com/yaelwrites/Big-Ass-Data-Broker-Opt-Out-List)** is the best volunteer-maintained
+  guide. It is licensed CC BY-NC-SA (non-commercial, attribution, share-alike), so we cite it and cross-check our flows against it
+  rather than copying its text into this repository.
+- **California DROP** ([privacy.ca.gov/drop](https://privacy.ca.gov/drop/)): since January 2026 a California resident can send one
+  deletion request to every registered broker, and brokers have had to process requests since August 2026. It needs state identity
+  verification, so the app links to it (About, "Also worth doing") instead of automating it.
+
+## Spokeo, end to end (checked 2026-10-22, nothing sent)
+
+On the simulator, against the real site, with a made-up profile (common name, example.com email): the guide searched Spokeo for the
+name (`spokeo.com/John-Smith`), a listing was picked from the results and "This is my listing" captured its address, the opt-out
+form opened with that address and the email filled in, and the guide stopped at Spokeo's "I'm not a robot" reCAPTCHA. The page's
+send was replaced by one that cannot send, and it was never reached. Screenshots: `docs/screens/spokeo-e2e/`. Reproduce with
+`TEST_RUNNER_OPTOUT_LIVE=1` and `LiveSpokeoFlowTests`.
 
 ## Rules the opt-out keeps (tested)
 
@@ -75,7 +132,7 @@ payment, ID or phone call, site blocked me, other) and leaves that site alone fo
   the phone, and loads it. If nothing is found the guide says so: the person has to find the page on the site themselves.
   "Report: link broken" and the weekly opt-out (a page that is gone is searched again and the site retried once) do the same.
   The site page has "Find the current opt-out page" and "Go back to the recorded link". No personal data is used for the search.
-- **In the pipeline.** `.github/workflows/profile.yml` runs weekly: it re-profiles all 214 directory sites, then
+- **In the pipeline.** `.github/workflows/profile.yml` runs weekly: it re-profiles all 856 directory sites, then
   `tools/check_links.py` checks every hand-written broker link and every generated form page, crawls for a replacement when one
   is broken, and writes `pipeline/link-health.md`. The job fails if a hand-written broker link is lost and no new one is found.
 

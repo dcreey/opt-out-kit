@@ -35,10 +35,17 @@ struct SitesView: View {
     enum Filter: String, CaseIterable, Identifiable {
         case all = "All", todo = "To do", done = "Opted out"
         var id: String { rawValue }
+        var title: String { Loc.t(rawValue) }
+    }
+
+    private func matches(_ broker: Broker) -> Bool {
+        guard !search.isEmpty else { return true }
+        let q = search.lowercased()
+        return broker.name.lowercased().contains(q) || (broker.covers ?? []).contains { $0.lowercased().contains(q) }
     }
 
     private var shown: [Broker] {
-        model.brokers.filter { broker in
+        model.queueBrokers.filter { broker in
             let s = model.household.summary(for: broker)
             switch filter {
             case .all: break
@@ -78,15 +85,37 @@ struct SitesView: View {
                     Text("Searches \(ExposureScan.scannable(model.directory).count) sites that can be checked automatically. Nothing is submitted.")
                 }
                 Section {
+                    Text("Tracking \(model.totalSites) sites. Each is listed once, in the first group below that handles it.")
+                        .font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("sites-total")
                     Picker("Filter", selection: $filter) {
-                        ForEach(Filter.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(Filter.allCases) { Text($0.title).tag($0) }
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("sites-filter")
                 }
+                // Groups run in order: official platform requests, then ours (automatic, semi-automated, guided, manual). A site is in the first one only.
+                ForEach(model.platformGroups) { group in
+                    let flows = group.brokers.filter { matches($0) }
+                    let entries = group.entries.filter { search.isEmpty || $0.domain.lowercased().contains(search.lowercased()) }
+                    if !flows.isEmpty || !entries.isEmpty {
+                        Section {
+                            ForEach(flows) { broker in
+                                NavigationLink(value: broker) { row(broker) }.accessibilityIdentifier("site-\(broker.id)")
+                            }
+                            ForEach(entries) { entry in
+                                NavigationLink(value: entry) { directoryRow(entry) }.accessibilityIdentifier("dir-\(entry.id)")
+                            }
+                        } header: {
+                            Text("Handled by \(group.platform.shortName) (\(flows.count + entries.count) sites)")
+                                .accessibilityIdentifier("platform-group-\(group.platform.id)")
+                        } footer: {
+                            Text("One \(group.platform.shortName) request reaches these, so they are not separate work. Tap one to see its details.")
+                        }
+                    }
+                }
                 ForEach(OptOutMethod.allCases, id: \.self) { method in
                     let entries = shownDirectory(method)
-                    let brokers = method == .guided ? shown : []
+                    let brokers = shown.filter { model.method(for: $0) == method }
                     if !entries.isEmpty || !brokers.isEmpty {
                         Section {
                             ForEach(brokers) { broker in
@@ -94,7 +123,7 @@ struct SitesView: View {
                                     .accessibilityIdentifier("site-\(broker.id)")
                             }
                             if filter != .done {
-                                ForEach(entries.prefix(300)) { entry in
+                                ForEach(entries) { entry in
                                     NavigationLink(value: entry) { directoryRow(entry) }
                                         .accessibilityIdentifier("dir-\(entry.id)")
                                 }
@@ -110,7 +139,7 @@ struct SitesView: View {
             }
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
-            .searchable(text: $search, prompt: "Search by name or web address")
+            .searchable(text: $search, prompt: Loc.t("Search by name or web address"))
             .navigationDestination(for: Broker.self) { BrokerInfoView(broker: $0) }
             .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
             .sheet(isPresented: $showScan) { ExposureView() }
@@ -138,7 +167,7 @@ struct SitesView: View {
 
     private func shownDirectory(_ method: OptOutMethod) -> [DirectoryEntry] {
         let q = search.lowercased()
-        return model.unguidedSites.filter { (q.isEmpty || $0.domain.lowercased().contains(q)) && model.method(for: $0).method == method }
+        return model.workSites.filter { (q.isEmpty || $0.domain.lowercased().contains(q)) && model.method(for: $0).method == method }
     }
 
     private func directoryRow(_ e: DirectoryEntry) -> some View {
@@ -148,10 +177,24 @@ struct SitesView: View {
                 Text(model.method(for: e).reason).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 let n = Directory.familySize(of: e, in: model.directory)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
+                if let note = platformNote(for: e) { Text(note).font(.caption).foregroundStyle(.teal) }
                 if model.activeIssue(for: e.id) != nil { Text("Reported not working").font(.caption).foregroundStyle(.red) }
             }
             Spacer()
         }
+    }
+
+    /// "Covered by California DROP until Jan 20" once the person has submitted it, else a hint that one request would cover this site.
+    private func platformNote(for entry: DirectoryEntry) -> String? {
+        guard let cover = model.platformCover(for: entry) else { return nil }
+        let likely = cover.coverage.match == .name
+        if let until = cover.until, until > Date() {
+            return likely ? Loc.f("Probably covered by %@ until %@", cover.platform.shortName, Loc.date(until))
+                          : Loc.f("Covered by %@ until %@", cover.platform.shortName, Loc.date(until))
+        }
+        guard cover.until == nil else { return nil }
+        return likely ? Loc.f("Probably also covered by %@: one request reaches this site", cover.platform.shortName)
+                      : Loc.f("Also covered by %@: one request reaches this site", cover.platform.shortName)
     }
 
     private func row(_ broker: Broker) -> some View {
@@ -163,6 +206,9 @@ struct SitesView: View {
                 Text(summary.label).font(.caption).foregroundStyle(summary.color)
                 if let covers = broker.covers, !covers.isEmpty {
                     Text("Clears \(covers.count) sites").font(.caption).foregroundStyle(.secondary)
+                }
+                if let e = Directory.entry(for: broker, in: model.directory), let note = platformNote(for: e) {
+                    Text(note).font(.caption).foregroundStyle(.teal)
                 }
             }
             Spacer()
@@ -186,8 +232,8 @@ struct BrokerInfoView: View {
         let summary = model.household.summary(for: broker)
         List {
             Section {
-                GuideButton(title: "Guide me through it", subtitle: OptOutMethods.classify(broker, in: model.directory).method == .semiAutomatic
-                            ? "We search for you; you tap your listing and clear the check" : "\(broker.steps.count) steps, in a full-screen browser") {
+                GuideButton(title: Loc.t("Guide me through it"), subtitle: OptOutMethods.classify(broker, in: model.directory).method == .semiAutomatic
+                            ? Loc.t("We search for you; you tap your listing and clear the check") : "\(broker.steps.count) steps, in a full-screen browser") {
                     guide = model.guidedRunner(for: broker)
                 }
             }
@@ -303,16 +349,16 @@ struct BrokerInfoView: View {
 
     private func scanText(_ o: CheckOutcome) -> String {
         switch o.result {
-        case .stillListed: return "Listing found"
-        case .removed: return "No listing found"
-        case .paywalled: return "Results are behind payment"
+        case .stillListed: return Loc.t("Listing found")
+        case .removed: return Loc.t("No listing found")
+        case .paywalled: return Loc.t("Results are behind payment")
         case .inconclusive:
             switch o.reason {
-            case .blocked: return "Can't tell: site blocked the check"
-            case .unrecognizedPage: return "Can't tell: page looked different"
-            case .network: return "Can't tell: no connection"
-            case .missingProfileData: return "Add a full name and city first"
-            default: return "Can't tell"
+            case .blocked: return Loc.t("Can't tell: site blocked the check")
+            case .unrecognizedPage: return Loc.t("Can't tell: page looked different")
+            case .network: return Loc.t("Can't tell: no connection")
+            case .missingProfileData: return Loc.t("Add a full name and city first")
+            default: return Loc.t("Can't tell")
             }
         }
     }
@@ -327,12 +373,12 @@ struct BrokerInfoView: View {
 
     private func describe(_ status: PersonStatus) -> String {
         switch status {
-        case .notStarted: return "Not started"
-        case .inProgress(let d, let n): return "In progress: \(d) of \(n) steps"
+        case .notStarted: return Loc.t("Not started")
+        case .inProgress(let d, let n): return Loc.f("In progress: %@ of %@ steps", d, n)
         case .done(let on, let due):
-            return "Submitted \(on.formatted(date: .abbreviated, time: .omitted)); checking from \(due.formatted(date: .abbreviated, time: .omitted))"
-        case .verified(let since): return "Verified removed \(since.formatted(date: .abbreviated, time: .omitted))"
-        case .relisted(let on): return "Listed again \(on.formatted(date: .abbreviated, time: .omitted))"
+            return Loc.f("Submitted %@; checking from %@", Loc.date(on), Loc.date(due))
+        case .verified(let since): return Loc.f("Verified removed %@", Loc.date(since))
+        case .relisted(let on): return Loc.f("Listed again %@", Loc.date(on))
         }
     }
 
@@ -357,17 +403,17 @@ struct DirectoryInfoView: View {
     private var resolvedEntry: DirectoryEntry { model.resolved(entry) }
     private var subtitle: String {
         switch model.method(for: entry).method {
-        case .automatic: return "We fill in the form and send it"
-        case .semiAutomatic: return "We fill in the form; you clear the check"
-        case .guided: return "We take you to the page and walk you through it"
-        case .manual: return "We open the site; you find its opt-out link"
+        case .automatic: return Loc.t("We fill in the form and send it")
+        case .semiAutomatic: return Loc.t("We fill in the form; you clear the check")
+        case .guided: return Loc.t("We take you to the page and walk you through it")
+        case .manual: return Loc.t("We open the site; you find its opt-out link")
         }
     }
 
     var body: some View {
         List {
             Section {
-                GuideButton(title: "Opt out with a guide", subtitle: subtitle) {
+                GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
                     guide = model.guidedRunner(for: entry)
                 }
             }
@@ -380,6 +426,20 @@ struct DirectoryInfoView: View {
                 Text(verdict.method.title).font(.headline).accessibilityIdentifier("method-title")
                 Text(verdict.reason).font(.footnote)
                 Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
+            }
+            if let cover = model.platformCover(for: entry) {
+                Section("\(cover.platform.shortName)") {
+                    Text(cover.coverage.match == .name
+                         ? "\(cover.coverage.broker) is probably this site's company on the \(cover.platform.jurisdiction) broker registry."
+                         : "\(cover.coverage.broker) is on the \(cover.platform.jurisdiction) broker registry.")
+                    if let until = cover.until {
+                        Text("You submitted it. We leave this site's own form alone until \(Loc.date(until)), then check whether you are still listed.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    } else {
+                        Text("One \(cover.platform.shortName) request reaches this site along with the rest. It is in your queue on the first tab.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
+                }.accessibilityIdentifier("platform-cover")
             }
             let n = Directory.familySize(of: entry, in: model.directory)
             if let parent = entry.familyParent, n > 1 {
@@ -410,7 +470,9 @@ struct DirectoryInfoView: View {
                 }
             }
             Section("Source") {
-                Text(entry.bucket == "direct" ? "Listed as directly supported by an opt-out service." : "Listed as a mirror of another site.")
+                Text(entry.bucket == "direct" ? Loc.t("Listed as directly supported by an opt-out service.")
+                     : entry.bucket == "registry" ? Loc.t("Registered as a data broker in California.")
+                     : Loc.t("Listed as a mirror of another site."))
                 if let d = entry.profiled { Text("Profiled \(d)").font(.footnote).foregroundStyle(.secondary) }
             }
             // The site's own link goes last: the guide above is the way in.
@@ -451,8 +513,8 @@ struct ExposureView: View {
                     } else if let results = results.map(rolledUp) {
                         summary(results)
                         group("Listed", .stillListed, results, color: .red)
-                        group("Not found", .removed, results, color: .green)
-                        group("Could not tell", .inconclusive, results, color: .orange)
+                        group(Loc.t("Not found"), .removed, results, color: .green)
+                        group(Loc.t("Could not tell"), .inconclusive, results, color: .orange)
                     } else {
                         Section {
                             Text("This searches each site for \(person.displayName) the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.")
@@ -518,13 +580,13 @@ struct ExposureView: View {
 
     private func reason(_ r: InconclusiveReason?) -> String {
         switch r {
-        case .blocked: return "The site blocked the check"
-        case .unrecognizedPage: return "The page looked different than expected"
-        case .network: return "No connection"
-        case .missingProfileData: return "Add a full name (and city) to this profile"
-        case .needsBrowser: return "Needs a browser check"
-        case .termsGate: return "Behind terms you must accept yourself"
-        default: return "Could not tell"
+        case .blocked: return Loc.t("The site blocked the check")
+        case .unrecognizedPage: return Loc.t("The page looked different than expected")
+        case .network: return Loc.t("No connection")
+        case .missingProfileData: return Loc.t("Add a full name (and city) to this profile")
+        case .needsBrowser: return Loc.t("Needs a browser check")
+        case .termsGate: return Loc.t("Behind terms you must accept yourself")
+        default: return Loc.t("Could not tell")
         }
     }
 }
@@ -562,9 +624,9 @@ struct QuickCheckView: View {
                             .buttonStyle(.bordered)
                     }
                     Section("What did you see?") {
-                        answer("I'm listed here", .stillListed, +3, site, "exclamationmark.triangle", .red)
-                        answer("Not found", .removed, +5, site, "checkmark.circle", .green)
-                        answer("Blocked by payment", .paywalled, +2, site, "creditcard", .orange)
+                        answer(Loc.t("I'm listed here"), .stillListed, +3, site, "exclamationmark.triangle", .red)
+                        answer(Loc.t("Not found"), .removed, +5, site, "checkmark.circle", .green)
+                        answer(Loc.t("Blocked by payment"), .paywalled, +2, site, "creditcard", .orange)
                         Button("Skip this one") { skipped.insert(site.id); lastEarned = nil }
                             .accessibilityIdentifier("answer-skip")
                     }
@@ -620,7 +682,7 @@ struct HealControls: View {
 
     var body: some View {
         if let healed = model.healedLink(for: siteID) {
-            Label("This site's opt-out page had moved. We found the new one on \(healed.foundAt.formatted(date: .abbreviated, time: .omitted)).",
+            Label("This site's opt-out page had moved. We found the new one on \(Loc.date(healed.foundAt)).",
                   systemImage: "wand.and.stars").font(.footnote).foregroundStyle(.green).accessibilityIdentifier("healed-note")
             Button("Go back to the recorded link", role: .destructive) { model.forgetHealedLink(siteID) }
         }
@@ -628,11 +690,11 @@ struct HealControls: View {
             looking = true
             Task {
                 let found = await find()
-                message = found ? "Found it." : "No newer opt-out page was found."
+                message = found ? Loc.t("Found it.") : Loc.t("No newer opt-out page was found.")
                 looking = false
             }
         } label: {
-            Label(looking ? "Looking…" : "Find the current opt-out page", systemImage: "magnifyingglass")
+            Label(looking ? "Looking…" : Loc.t("Find the current opt-out page"), systemImage: "magnifyingglass")
         }
         .disabled(looking)
         .accessibilityIdentifier("find-current-page")

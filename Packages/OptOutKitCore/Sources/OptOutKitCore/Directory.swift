@@ -13,13 +13,13 @@ public enum Automation: String, Codable, Sendable {
 
     public var label: String {
         switch self {
-        case .scriptable: return "Could be scripted"
-        case .guided: return "Guided walkthrough"
-        case .needsBrowser: return "Needs a real browser"
-        case .blocked: return "Blocks automated requests"
-        case .robotsDisallowed: return "Asks bots not to visit"
-        case .unreachable: return "Did not respond"
-        case .unknown: return "Not yet understood"
+        case .scriptable: return L10n.t("Could be scripted")
+        case .guided: return L10n.t("Guided walkthrough")
+        case .needsBrowser: return L10n.t("Needs a real browser")
+        case .blocked: return L10n.t("Blocks automated requests")
+        case .robotsDisallowed: return L10n.t("Asks bots not to visit")
+        case .unreachable: return L10n.t("Did not respond")
+        case .unknown: return L10n.t("Not yet understood")
         }
     }
 }
@@ -106,14 +106,14 @@ public struct SearchCheck: Codable, Equatable, Hashable, Sendable {
 
     public var statusLabel: String {
         switch status {
-        case .calibrated: return "Can be checked automatically"
-        case .blocked: return "Blocks automated checks"
-        case .robotsDisallowed: return "Asks bots not to search it"
-        case .undifferentiated: return "Search results can't be told apart"
-        case .needsPost: return "Needs a form submission to search"
-        case .needsBrowser: return "Search needs a real browser"
-        case .termsGate: return "Results are behind terms you must accept yourself"
-        case .noSearch: return "No simple name search found"
+        case .calibrated: return L10n.t("Can be checked automatically")
+        case .blocked: return L10n.t("Blocks automated checks")
+        case .robotsDisallowed: return L10n.t("Asks bots not to search it")
+        case .undifferentiated: return L10n.t("Search results can't be told apart")
+        case .needsPost: return L10n.t("Needs a form submission to search")
+        case .needsBrowser: return L10n.t("Search needs a real browser")
+        case .termsGate: return L10n.t("Results are behind terms you must accept yourself")
+        case .noSearch: return L10n.t("No simple name search found")
         }
     }
 }
@@ -160,22 +160,23 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var template: String?        // sites running the same opt-out form: one flow, one request per site
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
     public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
+    public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
     public var signals: [String]?
     public var profiled: String?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
-        case searchCheck = "search_check", liveCheck = "live_check"
+        case searchCheck = "search_check", liveCheck = "live_check", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

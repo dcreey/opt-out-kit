@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "thomsonreuters_com"
 domain: "thomsonreuters.com"
-name: "thomsonreuters.com"
+name: "West Publishing Corp"
 bucket: "direct"
 tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://thenai.org/how-to-opt-out/how-to-exercise-your-privacy-choices/"
+registered_in: [CA, OR, TX]
 signals: [email_contact, phone_verify]
 profiled: "2026-10-21"
 search_check:

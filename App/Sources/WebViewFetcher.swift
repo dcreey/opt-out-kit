@@ -108,7 +108,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
 
     // MARK: Terms prompts
 
-    private static let gatePattern = #"acceptable use policy|by clicking [“"']?i agree|i agree.{0,120}(terms|policy)|accept (the )?terms|you must agree"#
+    private static let gatePattern = #"acceptable use policy|by clicking [“"']?i agree|i agree.{0,120}(terms|policy)|accept (the )?terms|you must agree|j'accepte.{0,120}(conditions|politique)|accepter les conditions|acepto.{0,120}(términos|condiciones|política)|aceptar los términos|ich stimme.{0,120}(bedingungen|datenschutz)|nutzungsbedingungen akzeptieren"#
 
     /// The prompt text (the smallest element that holds the gate wording) and the same-site terms and privacy pages it links
     /// to. Nothing is clicked here.
@@ -118,14 +118,14 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         document.querySelectorAll('div,section,form,dialog,[role=dialog]').forEach(function(el){var t=el.innerText||'';
           if(rx.test(t)&&t.length<9000&&(!best||t.length<best.innerText.length))best=el;});
         if(!best)return null;
-        var agree=/^\s*(i agree|i accept|agree|accept)\s*$/i,hasButton=false;
+        var agree=/^\s*(i agree|i accept|agree|accept|j'accepte|accepter|tout accepter|acepto|aceptar|ich stimme zu|zustimmen|akzeptieren)\s*$/i,hasButton=false;
         for(var up=best,d=0;up&&d<4&&!hasButton;up=up.parentElement,d++){
           var bs=up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]');
           for(var i=0;i<bs.length;i++){var t=(bs[i].innerText||bs[i].value||'');if(agree.test(t)){hasButton=true;break;}}}
         if(!hasButton)return null;   // acceptable-use text in a page footer is not a prompt: nothing to accept
         var host=location.hostname.split('.').slice(-2).join('.'),links=[];
         document.querySelectorAll('a[href]').forEach(function(a){
-          if(/terms|acceptable use|privacy/i.test((a.innerText||'')+' '+a.href)&&a.hostname.split('.').slice(-2).join('.')===host)links.push(a.href);});
+          if(/terms|acceptable use|privacy|conditions|confidentialit|mentions l[ée]gales|t[ée]rminos|condiciones|privacidad|nutzungsbedingungen|datenschutz|agb/i.test((a.innerText||'')+' '+a.href)&&a.hostname.split('.').slice(-2).join('.')===host)links.push(a.href);});
         return JSON.stringify({prompt:best.innerText,links:links.slice(0,4)});})(\#(Self.jsString(Self.gatePattern)));
         """#
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String,
@@ -143,7 +143,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         (function(re){var rx=new RegExp(re,'i'),el=null;
         document.querySelectorAll('div,section,form,dialog,[role=dialog]').forEach(function(e){var t=e.innerText||'';
           if(rx.test(t)&&t.length<9000&&(!el||t.length<el.innerText.length))el=e;});
-        var agree=/^\s*(i agree|i accept|agree|accept)\s*$/i;
+        var agree=/^\s*(i agree|i accept|agree|accept|j'accepte|accepter|tout accepter|acepto|aceptar|ich stimme zu|zustimmen|akzeptieren)\s*$/i;
         for(var up=el,d=0;up&&d<4;up=up.parentElement,d++){
           var bs=up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]');
           for(var i=0;i<bs.length;i++){var t=(bs[i].innerText||bs[i].value||'');if(agree.test(t)){bs[i].click();return true;}}}
@@ -156,7 +156,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     /// ("Reject all", "Decline") and never "Accept". Returns true if a button was clicked.
     private func declineConsentBanner() async -> Bool {
         let js = """
-        (function(){var re=/^\\s*(reject all|reject|decline|deny|no thanks|only necessary|necessary only)\\s*$/i;
+        (function(){var re=/^\\s*(reject all|reject|decline|deny|no thanks|only necessary|necessary only|tout refuser|refuser|continuer sans accepter|rechazar todo|rechazar|solo necesarias|alle ablehnen|ablehnen|nur notwendige)\\s*$/i;
         var els=document.querySelectorAll('button,a,div,span,[role=button],input[type=button]');
         for(var i=0;i<els.length;i++){var t=(els[i].innerText||els[i].value||'').trim();
         if(re.test(t)){els[i].click();return true;}}return false;})();
@@ -167,6 +167,11 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     // MARK: Loading
 
     func load(_ request: URLRequest) async throws {
+        // Ask for the site in the language the person chose, so a site that has its terms and forms in that language shows them.
+        var request = request
+        if request.value(forHTTPHeaderField: "Accept-Language") == nil {
+            request.setValue("\(Loc.language),en;q=0.5", forHTTPHeaderField: "Accept-Language")
+        }
         try await wait { self.webView.load(request) }
     }
 
@@ -339,7 +344,7 @@ extension WebViewSession {
         let js = #"""
         (function(){
           var text=(document.body?document.body.innerText:'').toLowerCase();
-          if(/verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification/.test(text)) return 'a bot check';
+          if(/verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
           var frames=document.querySelectorAll('iframe');
           for(var i=0;i<frames.length;i++){var f=frames[i],src=f.src||'',r=f.getBoundingClientRect();
             if(r.width<40||r.height<40) continue;
@@ -358,7 +363,7 @@ extension WebViewSession {
     /// a certification made for someone by software is not theirs. Nil when there is none.
     func pendingCertification() async -> String? {
         let js = #"""
-        (function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|consent|under penalty|on behalf/i,out=null;
+        (function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|consent|under penalty|on behalf|je certifie|j'atteste|je reconnais|j'accepte|consentement|certifico|atesto|reconozco|acepto|consentimiento|ich best[äa]tige|ich versichere|einwilligung|zustimmung|ich stimme/i,out=null;
           document.querySelectorAll('input[type=checkbox]').forEach(function(c){
             if(c.checked||out) return;
             var t='';
@@ -366,7 +371,7 @@ extension WebViewSession {
             if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
             if(!t){var n=c.parentElement; t=n?n.innerText:'';}
             // "I am an authorized agent submitting on behalf of someone else" is an option for agents, not a requirement for the subject.
-            if(re.test(t)&&!/\bagent\b|on behalf of (someone|another)|representative/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
+            if(re.test(t)&&!/\bagent\b|on behalf of (someone|another)|representative|mandataire|repr[ée]sentant|au nom d|agente|representante|en nombre de|bevollm[äa]chtigt|im namen/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
           return out;})();
         """#
         return (try? await webView.evaluateJavaScript(js)) as? String

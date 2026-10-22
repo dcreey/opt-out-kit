@@ -2,13 +2,14 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "spokeo_com"
 domain: "spokeo.com"
-name: "spokeo.com"
+name: "Spokeo, Inc."
 bucket: "direct"
 tier: "B"
 automation: "guided"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://www.spokeo.com/optout"
 opt_out_form: {"page": "https://www.spokeo.com/optout", "method": "get", "action": "https://www.spokeo.com/optout", "fields": [{"type": "url", "name": "url", "label": "Enter URL here"}, {"type": "email", "name": "email", "label": "Enter email address here"}], "hops": 1}
+registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, listing_url_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:

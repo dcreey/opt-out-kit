@@ -28,5 +28,23 @@
     "input": "New York and North Carolina and Oregon are states; in 1989 and 2040 are not years we replace.",
     "canonical": "{state} and {state} and {state} are states; in 1989 and 2040 are not years we replace.",
     "hash": "197c1188c0d394a3"
+  },
+  {
+    "domain": "example.fr",
+    "input": "En Californie et en Caroline du Nord, vous acceptez les conditions de example.fr (c) 2025. Visitez www.example.fr/conditions pour plus d’informations.",
+    "canonical": "en {state} et en {state}, vous acceptez les conditions de {domain} {year}. visitez {domain}/conditions pour plus d'informations.",
+    "hash": "91e0affc1b2ec4dc"
+  },
+  {
+    "domain": "ejemplo.es",
+    "input": "En Nueva York y en Carolina del Sur, usted acepta los términos de ejemplo.es en 2026; más información en ejemplo.es/privacidad.",
+    "canonical": "en {state} y en {state}, usted acepta los términos de {domain} en {year}; más información en {domain}/privacidad.",
+    "hash": "2c78b9385b8c8c71"
+  },
+  {
+    "domain": "beispiel.de",
+    "input": "In Kalifornien und Nordkarolina gelten die Nutzungsbedingungen von beispiel.de – Stand 2024. Mehr unter www.beispiel.de/datenschutz.",
+    "canonical": "in {state} und {state} gelten die nutzungsbedingungen von {domain} - stand {year}. mehr unter {domain}/datenschutz.",
+    "hash": "83df5e35b68b52cb"
   }
 ]

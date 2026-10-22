@@ -10,7 +10,7 @@ enum AppInfo {
 /// an update with no new entry shows nothing. A fresh install gets the full walkthrough instead.
 enum AnnouncementCatalog {
     static let all: [Announcement] = [
-        Announcement(id: 1, title: "Welcome to Opt-Out Kit",
-                     body: "Walk through each data broker, one step at a time."),
+        Announcement(id: 1, title: Loc.t("Welcome to Opt-Out Kit"),
+                     body: Loc.t("Walk through each data broker, one step at a time.")),
     ]
 }

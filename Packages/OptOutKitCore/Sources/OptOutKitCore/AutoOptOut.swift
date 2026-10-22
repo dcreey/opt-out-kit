@@ -13,10 +13,18 @@ public protocol FormSubmitter: Sendable {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome
 }
 
+/// A site already reached by a platform request the person made (California DROP): we leave it alone until `until`.
+public struct PlatformHold: Equatable, Sendable {
+    public var name: String
+    public var until: Date
+    public init(name: String, until: Date) { self.name = name; self.until = until }
+}
+
 public enum AutoOptOutResult: Equatable, Sendable {
     case submitted(awaitingEmail: Bool)
     case dryRunReady
     case skippedNotListed            // a recent look found no listing, so no details were sent
+    case coveredByPlatform(name: String, until: Date)   // a platform request (California DROP) already covers this site; asked again after the hold
     case tooSoon(until: Date)        // already submitted recently
     case needsData([String])
     case needsYou(String)
@@ -26,15 +34,18 @@ public enum AutoOptOutResult: Equatable, Sendable {
 
     public var label: String {
         switch self {
-        case .submitted(let email): return email ? "Sent; confirm the email they sent you" : "Sent"
-        case .dryRunReady: return "Ready (dry run, nothing sent)"
-        case .skippedNotListed: return "Skipped: not listed there"
-        case .tooSoon: return "Sent recently"
-        case .needsData(let what): return "Add your \(what.joined(separator: ", ")) to your profile"
-        case .needsYou(let why): return "Needs you: \(why)"
-        case .challenged(let why): return "Stopped: \(why)"
-        case .rejected(let why): return "The site refused: \(why)"
-        case .failed(let why): return "No confirmation: \(why)"
+        case .submitted(let email): return email ? L10n.t("Sent; confirm the email they sent you") : L10n.t("Sent")
+        case .dryRunReady: return L10n.t("Ready (dry run, nothing sent)")
+        case .skippedNotListed: return L10n.t("Skipped: not listed there")
+        case .coveredByPlatform(let name, let until):
+            if until == .distantFuture { return L10n.f("Covered by %@: its one request handles this site", name) }
+            return L10n.f("Covered by %@ until %@", name, L10n.date(until))
+        case .tooSoon: return L10n.t("Sent recently")
+        case .needsData(let what): return L10n.f("Add your %@ to your profile", what.joined(separator: ", "))
+        case .needsYou(let why): return L10n.f("Needs you: %@", why)
+        case .challenged(let why): return L10n.f("Stopped: %@", why)
+        case .rejected(let why): return L10n.f("The site refused: %@", why)
+        case .failed(let why): return L10n.f("No confirmation: %@", why)
         }
     }
 }
@@ -62,10 +73,11 @@ public struct AutoOptOut: Sendable {
 
     /// Decides what to do for one site without touching the network. Nil means "go ahead and submit" with this plan.
     public static func precheck(entry: DirectoryEntry, person: Person, progress: Progress, now: Date,
-                                minInterval: TimeInterval = defaultMinInterval) -> (result: AutoOptOutResult?, plan: FillPlan?) {
-        guard let form = entry.optOutForm else { return (.needsYou("No opt-out form found for this site yet."), nil) }
+                                minInterval: TimeInterval = defaultMinInterval, hold: PlatformHold? = nil) -> (result: AutoOptOutResult?, plan: FillPlan?) {
+        guard let form = entry.optOutForm else { return (.needsYou(L10n.t("No opt-out form found for this site yet.")), nil) }
+        if let hold, now < hold.until { return (.coveredByPlatform(name: hold.name, until: hold.until), nil) }
         if let issue = progress.activeIssue(for: entry.id, now: now) {
-            return (.needsYou("You reported this site as not working (\(issue.kind.label.lowercased()))."), nil)
+            return (.needsYou(L10n.f("You reported this site as not working (%@).", issue.kind.label.lowercased())), nil)
         }
         if let last = progress.optOutAttempts[entry.id]?.filter(\.wasSubmitted).map(\.date).max(), now.timeIntervalSince(last) < minInterval {
             return (.tooSoon(until: last.addingTimeInterval(minInterval)), nil)
@@ -84,11 +96,11 @@ public struct AutoOptOut: Sendable {
 
     /// Runs the opt-out for every site with a form, one at a time. `dryRun` fills forms but never sends them.
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
-                    progressCallback: (@Sendable (Int, Int) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
+                    holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         let targets = entries.filter { $0.optOutForm != nil }
         var out: [(DirectoryEntry, AutoOptOutResult)] = []
         for (i, entry) in targets.enumerated() {
-            let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval)
+            let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id])
             if let result = pre.result { out.append((entry, result)) }
             else if let plan = pre.plan, let form = entry.optOutForm {
                 let outcome = await submitter.submit(form, plan: plan, dryRun: dryRun)

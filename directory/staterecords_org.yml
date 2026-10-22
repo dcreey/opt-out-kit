@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "staterecords_org"
 domain: "staterecords.org"
-name: "staterecords.org"
+name: "Intermedia Ventures, LLC"
 bucket: "direct"
 tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://staterecords.org/optout"
+registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-21"
 search_check:

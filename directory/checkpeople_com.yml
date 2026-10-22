@@ -2,13 +2,14 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "checkpeople_com"
 domain: "checkpeople.com"
-name: "checkpeople.com"
+name: "CHECKPEOPLE, LLC"
 bucket: "direct"
 tier: "A"
 automation: "scriptable"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://checkpeople.com/opt-out"
 opt_out_form: {"page": "https://checkpeople.com/opt-out", "method": "post", "action": "https://checkpeople.com/opt-out", "fields": [{"type": "email", "name": "requestoremail", "label": "Email"}, {"type": "checkbox", "name": "acknowledge", "label": "acknowledge"}], "hops": 2}
+registered_in: [CA, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]
 profiled: "2026-10-21"
 search_check:

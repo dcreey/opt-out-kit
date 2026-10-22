@@ -20,6 +20,17 @@ struct AboutView: View {
                     Text("Your information never leaves this phone, except to the sites you opt out of. There is no Opt-Out Kit server, no account, no analytics and no tracking.")
                     Text("What you enter is stored encrypted on this phone. If you lose your phone without a backup, it is gone. A normal iPhone backup carries it.")
                 }
+                Section {
+                    if let j = model.ownerJurisdiction {
+                        NavigationLink("Your place: \(j.displayName)") {
+                            ScrollView { VStack(alignment: .leading, spacing: 10) { StateRulesView(jurisdiction: j) }.padding() }.navigationTitle(j.displayName)
+                        }.accessibilityIdentifier("state-rules-link")
+                    } else {
+                        NavigationLink("Choose where you live") { StatePickerView() }.accessibilityIdentifier("state-rules-link")
+                    }
+                } footer: {
+                    Text("Laws about data brokers and your rights, by country and state, and how this app uses them.")
+                }
                 autoSection
                 if let lib = model.termsLibrary {
                     termsSection(lib)
@@ -28,6 +39,14 @@ struct AboutView: View {
                     Text("Anyone can audit exactly what this app does.")
                     Link("View the code on GitHub", destination: AppInfo.repoURL)
                     Text("The repository is private until the pre-release checks finish.").font(.footnote).foregroundStyle(.secondary)
+                }
+                Section {
+                    Link("California residents: one free request to every registered broker", destination: URL(string: "https://privacy.ca.gov/drop/")!)
+                        .accessibilityIdentifier("california-drop")
+                } header: {
+                    Text("Also worth doing")
+                } footer: {
+                    Text("California's DROP, run by the state's privacy agency, sends one deletion request to every broker registered in California. It needs identity verification through the state, which Opt-Out Kit cannot do for you.")
                 }
                 Section("Good to know") {
                     Text("Opt-Out Kit is not affiliated with any data broker and is not legal advice. Broker pages change often, so a step may need updating.")
@@ -66,7 +85,7 @@ extension AboutView {
     fileprivate func termsSection(_ lib: TermsLibrary) -> some View {
         Section {
             if model.termsActive, let approval = model.termsApproval {
-                Label("On, since \(approval.approvedAt.formatted(date: .abbreviated, time: .omitted))", systemImage: "checkmark.shield")
+                Label("On, since \(Loc.date(approval.approvedAt))", systemImage: "checkmark.shield")
                     .accessibilityIdentifier("terms-status")
                 Text("Opt-Out Kit presses \"I agree\" for you only when every paragraph of a site's terms is on a list a person reviewed.")
                     .font(.footnote)
@@ -145,11 +164,23 @@ struct ConsentLogView: View {
             ForEach(Array(model.consentLog.enumerated().reversed()), id: \.offset) { _, e in
                 VStack(alignment: .leading) {
                     Text(e.domain).font(.headline)
-                    Text("\(e.date.formatted(date: .abbreviated, time: .shortened)) · \(e.paragraphs) paragraphs · list \(e.libraryVersion)")
+                    Text("\(Loc.date(e.date, time: true)) · \(e.paragraphs) paragraphs · list \(e.libraryVersion)")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
         }
         .navigationTitle("Acceptance log")
+    }
+}
+
+/// Pick or change where the owner lives (used when there is no address yet).
+struct StatePickerView: View {
+    @EnvironmentObject var model: AppModel
+    var body: some View {
+        List {
+            PlacePicker()
+            Section { VStack(alignment: .leading, spacing: 10) { StateRulesView(jurisdiction: model.ownerJurisdiction, other: model.ownerCountry == "OTHER") } }
+        }
+        .navigationTitle("Where you live")
     }
 }

@@ -1,0 +1,3536 @@
+{
+ "jurisdiction": "OR",
+ "source": "https://www4.cbs.state.or.us/exs/all/mylicsearch/",
+ "fetched": "2026-10-22",
+ "count": 392,
+ "brokers": [
+  {
+   "name": "Above Data Inc",
+   "dba": "Above Data",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00447",
+   "address": "30 Oak Knoll Dr, San Anselmo, CA"
+  },
+  {
+   "name": "Dealmachine Operations Inc",
+   "dba": "DealMachine Operations",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00497",
+   "address": "801 Shelby St, INDIANAPOLIS, IN"
+  },
+  {
+   "name": "Pebblepost Inc",
+   "dba": "PebblePost, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00461",
+   "address": "1178 Broadway, New York, NY"
+  },
+  {
+   "name": "Virtual Marketing Llc",
+   "dba": "Fusion92",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00435",
+   "address": "222 Merchandise Mart plz, Chicago, IL"
+  },
+  {
+   "name": "01Advertising Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00368",
+   "address": "27571 Homestead rd., LAGUNA NIGUEL, CA"
+  },
+  {
+   "name": "33 Mile Radius Llc",
+   "dba": "EverConnect",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00241",
+   "address": "7700 Irvine Center Dr Ste 430, IRVINE, CA"
+  },
+  {
+   "name": "33Across Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00261",
+   "address": "1127 Broadway St NE STE 310, SALEM, OR"
+  },
+  {
+   "name": "5X5 Us Llc",
+   "dba": "5x5 US LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00279",
+   "address": "1800 E 4th Street, Austin, TX"
+  },
+  {
+   "name": "6Sense Insights Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00209",
+   "address": "450 Mission ST, San Francisco, CA"
+  },
+  {
+   "name": "A Direct Marketing Inc",
+   "dba": "Bookyourdata",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00158",
+   "address": "1007 N Orange St, WILMINGTON, DE"
+  },
+  {
+   "name": "Accurate Append Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00387",
+   "address": "1100 BELLEVUE WAY NE, Bellevue, WA"
+  },
+  {
+   "name": "Ach Address Clearing House Llc",
+   "dba": "ACH, Address Clearing House",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00126",
+   "address": "16192 Coastal Highway, Lewes, DE"
+  },
+  {
+   "name": "Acremaps Llc",
+   "dba": "Acres",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00428",
+   "address": "26 W. CENTER ST., FAYETTEVILLE, AR"
+  },
+  {
+   "name": "Acronymix Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00341",
+   "address": "1333 S Ocean Blvd, BOCA RATON, FL"
+  },
+  {
+   "name": "Activimpact Llc",
+   "dba": "ActivImpact",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00260",
+   "address": "6543 s. las vegas blvd., las VEGAS, NV"
+  },
+  {
+   "name": "Acxiom Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00029",
+   "address": "301 EAST DAVE WARD DRIVE, CONWAY, AR"
+  },
+  {
+   "name": "Adept Id Inc",
+   "dba": "AdeptID",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00350",
+   "address": "184 HIGH STREET, Boston, MA"
+  },
+  {
+   "name": "Advertise4Sales Inc",
+   "dba": "4LegalLeads",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00246",
+   "address": "8172 Old Tramway Dr, Melbourne, FL"
+  },
+  {
+   "name": "Affinity Answers Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00226",
+   "address": "12708 Riata Vista circle, Austin, TX"
+  },
+  {
+   "name": "Aggknowledge Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00475",
+   "address": "271A 22nd Street, Brooklyn, NY"
+  },
+  {
+   "name": "Agile Education Marketing",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00432",
+   "address": "700 N colorado Blvd #309, Denver, CO"
+  },
+  {
+   "name": "Aidentified Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00287",
+   "address": "33 Bradford St, Concord, MA"
+  },
+  {
+   "name": "Alikeaudience Inc",
+   "dba": "AlikeAudience",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00465",
+   "address": "440 N WOLFE RD, Sunnyvale, CA"
+  },
+  {
+   "name": "All Good Media",
+   "dba": "Attribits",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00248",
+   "address": "780 Commercial St SE Ste 100, SALEM, OR"
+  },
+  {
+   "name": "Alliant Cooperative Data Solutions Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00076",
+   "address": "301 Fields Ln, Brewster, NY"
+  },
+  {
+   "name": "Altair Data Resources Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00280",
+   "address": "1749 Mallory Lane, Brentwood, TN"
+  },
+  {
+   "name": "Altrata Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00330",
+   "address": "1270 Avenue of the Americas Ste 1100, New York, NY"
+  },
+  {
+   "name": "American Spirit Data Soultions Llc",
+   "dba": "Aspire North",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00273",
+   "address": "7490 Golden Triangle Drive, Eden Prairie, MN"
+  },
+  {
+   "name": "Analyticsiq Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00096",
+   "address": "6 Concourse Pkwy, Atlanta, GA"
+  },
+  {
+   "name": "Anchor Computer Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00081",
+   "address": "1300 Walt Whitman Rd Suite 103,, Melville, NY"
+  },
+  {
+   "name": "Anteriad Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00122",
+   "address": "441 Lexington Avenue, New York, NY"
+  },
+  {
+   "name": "Apollo Interactive Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00296",
+   "address": "139 Illinois St, El Segundo, CA"
+  },
+  {
+   "name": "Applovin Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00491",
+   "address": "1100 PAGE MILL RD, PALO ALTO, CA"
+  },
+  {
+   "name": "Aristotle International Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00103",
+   "address": "205 Pennsylvania Ave., SE, Washington, DC"
+  },
+  {
+   "name": "Atdata Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00162",
+   "address": "770 Legacy Pl Fl 2, Dedham, MA"
+  },
+  {
+   "name": "Audience Acuity Inc",
+   "dba": "Audience Acuity",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00176",
+   "address": "10845 Griffith Peak Dr, Las Vegas, NV"
+  },
+  {
+   "name": "Audience Mix Llc",
+   "dba": "AudienceMix",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00393",
+   "address": "2232 DELL RANGE BLVD SUITE 245, Cheyenne, WY"
+  },
+  {
+   "name": "Austin Consolidated Holdings Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00115",
+   "address": "1550 Peachtree Street, NW, Atlanta, GA"
+  },
+  {
+   "name": "Autoweb Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00391",
+   "address": "1820 BONANZA STREET, WALNUT CREEK, CA"
+  },
+  {
+   "name": "Awl Holdings Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00369",
+   "address": "9004 ANDERSON MILL RD UNIT A, AUSTIN, TX"
+  },
+  {
+   "name": "Azira Llc",
+   "dba": "Azira LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00134",
+   "address": "80 S Lake  ave, PASADENA, CA"
+  },
+  {
+   "name": "Babel Street Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00427",
+   "address": "1900 Reston Metro Plaza, RESTON, VA"
+  },
+  {
+   "name": "Bachmanity Inc",
+   "dba": "Aviato",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00396",
+   "address": "12165 WOODS BAY PL, Carmel, IN"
+  },
+  {
+   "name": "Bdex Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00349",
+   "address": "1127 Broadway St NE STE 310, SALEM, OR"
+  },
+  {
+   "name": "Been Verified Llc",
+   "dba": "www.beenverified.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00068",
+   "address": "48 West 38th Street, New York, NY"
+  },
+  {
+   "name": "Bh Marketing Group Llc",
+   "dba": "US Marketing Group",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00236",
+   "address": "3639 Harbor Blvd, Ventura, CA"
+  },
+  {
+   "name": "Black Pearl Group Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00129",
+   "address": "Wellington"
+  },
+  {
+   "name": "Blackbaud Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00034",
+   "address": "65 Fairchild St., Charleston, SC"
+  },
+  {
+   "name": "Blis Usa, Inc.",
+   "dba": "Blis",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00301",
+   "address": "12920 SE 38th St, bellevue, WA"
+  },
+  {
+   "name": "Blue Hill Marketing Solutions",
+   "dba": "LiftEngine",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00398",
+   "address": "1 Blue Hill plaza ste 1509, Pearl River, NY"
+  },
+  {
+   "name": "Blueprint Audiences Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00464",
+   "address": "237 Sleepy Hollow Road, Briarcliff Manor, NY"
+  },
+  {
+   "name": "Brooks Integrated Marketing Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00380",
+   "address": "3333 Renaissance Blvd, BONITA SPRINGS, FL"
+  },
+  {
+   "name": "Buildertrend Solutions Inc",
+   "dba": "Buildertrend",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00039",
+   "address": "11818 I St, Omaha, NE"
+  },
+  {
+   "name": "Businessentitysearch.Com Llc",
+   "dba": "Business Registry",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00489",
+   "address": "1905 N Market st, Tampa, FL"
+  },
+  {
+   "name": "Buxton Company Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00365",
+   "address": "2651 S Polaris drive, Fort Worth, TX"
+  },
+  {
+   "name": "Buxton Company Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00370",
+   "address": "2651 S Polaris drive, fort worth, TX"
+  },
+  {
+   "name": "Buyerlink Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00392",
+   "address": "1820 BONANZA STREET, WALNUT CREEK, CA"
+  },
+  {
+   "name": "Cardlytics Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00270",
+   "address": "675 PONCE DE LEON AVE, Atlanta, GA"
+  },
+  {
+   "name": "Carry Technologies Inc",
+   "dba": "Hightouch",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00133",
+   "address": "550 California St, SAN FRANCISCO, CA"
+  },
+  {
+   "name": "Catalina Marketing Corporation",
+   "dba": "Catalina Marketing",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00299",
+   "address": "200 Carillon Parkway, saint petersburg, FL"
+  },
+  {
+   "name": "Catalist Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00124",
+   "address": "1310 L ST NW Ste 500, Washington, DC"
+  },
+  {
+   "name": "Cdk Global Llc",
+   "dba": "CDK Global",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00322",
+   "address": "11809 Domain Drive, Austin, TX"
+  },
+  {
+   "name": "Choreograph Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00041",
+   "address": "175 Greenwich Street, NEW york, NY"
+  },
+  {
+   "name": "Circana Llc",
+   "dba": "Circana, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00431",
+   "address": "203 N LaSalle St, Chicago, IL"
+  },
+  {
+   "name": "Cision Us Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00190",
+   "address": "300 S Riverside Plaza, CHICAGO, IL"
+  },
+  {
+   "name": "Civic Element Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00454",
+   "address": "2153 Wealthy St., GRAND RAPIDS, MI"
+  },
+  {
+   "name": "Civis Analytics Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00188",
+   "address": "200 W Monroe Street, Chicago, IL"
+  },
+  {
+   "name": "Claritas Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00443",
+   "address": "8044 Montgomery Road, Cincinnati, OH"
+  },
+  {
+   "name": "Clarivate Analytics (Us)",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00441",
+   "address": "789 East Eisenhower Parkway, ANN ARBOR, MI"
+  },
+  {
+   "name": "Clay Labs Llc",
+   "dba": "Clay",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00202",
+   "address": "111 W 19th St, New York, NY"
+  },
+  {
+   "name": "Clearcompany Llc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00231",
+   "address": "75 Park street, Lewiston, ME"
+  },
+  {
+   "name": "Clickagy Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00097",
+   "address": "330 W Columbia Way, Vancouver, WA"
+  },
+  {
+   "name": "Cognism Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00252",
+   "address": "33 arch street, Boston, MA"
+  },
+  {
+   "name": "Collective Data Solutions Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00230",
+   "address": "301 Cedar St, Sandpoint, ID"
+  },
+  {
+   "name": "Collectors Datastore Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00399",
+   "address": "223 W Erie, Chicago, IL"
+  },
+  {
+   "name": "Command Precision Inc",
+   "dba": "Persistent.id",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00339",
+   "address": "240 Devonshire Street, Boston, MA"
+  },
+  {
+   "name": "Commerce Signals Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00416",
+   "address": "555 W Adams Street, Chicago, IL"
+  },
+  {
+   "name": "Common Room Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00492",
+   "address": "55 Almaden BLVD FL 6, SAN JOSE, CA"
+  },
+  {
+   "name": "Compact Information Systems LLC",
+   "dba": "ASL Marketing",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00022",
+   "address": "6720 108TH AVE NE STE 200, kirkland, WA"
+  },
+  {
+   "name": "Compact Information Systems LLC",
+   "dba": "Deep Sync",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00023",
+   "address": "6720 108TH AVE NE STE 200, kirkland, WA"
+  },
+  {
+   "name": "Compact Information Systems LLC",
+   "dba": "HomeData",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00024",
+   "address": "6720 108TH AVE NE STE 200, KIRKLAND, WA"
+  },
+  {
+   "name": "Compact Information Systems LLC",
+   "dba": "AccuData Integrated Marketing",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00021",
+   "address": "6720 108TH AVENUE, KIRKLAND, WA"
+  },
+  {
+   "name": "Complete Mailing Lists Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00319",
+   "address": "190 East Post Rd, White Plains, NY"
+  },
+  {
+   "name": "Complete Medical Lists Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00326",
+   "address": "758 Main St, Franconia, NH"
+  },
+  {
+   "name": "Connatix Native Exchange Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00425",
+   "address": "530 7th Ave, NY, NY"
+  },
+  {
+   "name": "Connected Investors LLC",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00054",
+   "address": "30005 Ladyface Court, Agoura Hills, CA"
+  },
+  {
+   "name": "Consumer Canvas Llc",
+   "dba": "CONSUMER CANVAS",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00328",
+   "address": "200 W jackson blvd, chicago, IL"
+  },
+  {
+   "name": "Convex Labs Llc",
+   "dba": "Convex Labs",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00288",
+   "address": "800 n. brand blvd, suite 100, gLENDALE, CA"
+  },
+  {
+   "name": "Cox Automotive Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00471",
+   "address": "6205-A PeacHTREE DUNWOODY ROAD, atlanta, GA"
+  },
+  {
+   "name": "Crimson Hexagon Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00312",
+   "address": "300 S Riverside Plaza, Chicago, IL"
+  },
+  {
+   "name": "Crunchbase Inc",
+   "dba": "Crunchbase",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00009",
+   "address": "564 Market Street, San Francisco, CA"
+  },
+  {
+   "name": "Ctam Leadshare Corp",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00094",
+   "address": "700 12th St NW STE 700, WASHINGTON, DC"
+  },
+  {
+   "name": "Cuebiq Group Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00125",
+   "address": "1460 Broadway, New York, NY"
+  },
+  {
+   "name": "Customer Asset Consulting Group Inc",
+   "dba": "DataDelivers",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00211",
+   "address": "100 West Hillcrest Blvd., Ste. 406, SCHAUMBURG, IL"
+  },
+  {
+   "name": "Cybba Inc",
+   "dba": "Cybba",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00407",
+   "address": "374 congress st, BOSTON, MA"
+  },
+  {
+   "name": "Data Axle Inc",
+   "dba": "Data Axle, Donorbase, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00087",
+   "address": "1001 North Fort Crook RD, BELLEVUE, NE"
+  },
+  {
+   "name": "Data Decisions Group Llc",
+   "dba": "Data Decisions Group",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00306",
+   "address": "123 W Franklin Street, Chapel Hill, NC"
+  },
+  {
+   "name": "Data Partners Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00095",
+   "address": "12857 Banyan Creek Dr, Fort Myers, FL"
+  },
+  {
+   "name": "Data To Win Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00487",
+   "address": "21515 Vanowen St, CANOGA PARK, CA"
+  },
+  {
+   "name": "Datafy Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00382",
+   "address": "5974 Fashion point drive, OGDEN, UT"
+  },
+  {
+   "name": "Dataline Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00099",
+   "address": "506 Carnegie Center Dr, Princeton, NJ"
+  },
+  {
+   "name": "Datamentors Llc",
+   "dba": "Porch Group Media",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00092",
+   "address": "2319 OAK MYRTLE LN, Wesley Chapel, FL"
+  },
+  {
+   "name": "Datanyze Llc",
+   "dba": "Datanyze LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00098",
+   "address": "330 W Columbia Way, Vancouver, WA"
+  },
+  {
+   "name": "Datarate Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00486",
+   "address": "2810 N Church St, Wilmington, DE"
+  },
+  {
+   "name": "Datasys Group Inc",
+   "dba": "Datasys",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00277",
+   "address": "750 Park of Commerce Drive, BOCA RATON, FL"
+  },
+  {
+   "name": "Date Detective Inc",
+   "dba": "Date Detective",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00337",
+   "address": "8 The Green #7381, Dover, DE"
+  },
+  {
+   "name": "Datonics Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00237",
+   "address": "3718 northern blvd #404, long island city, NY"
+  },
+  {
+   "name": "Db Sub, Llc",
+   "dba": "DB SUB, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00421",
+   "address": "8383 Seneca Turnpike, Suite 3, New Hartford, NY"
+  },
+  {
+   "name": "Dealerdirect Llc",
+   "dba": "FordDirect",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00010",
+   "address": "4 Parklane Blvd., Dearborn, MI"
+  },
+  {
+   "name": "Decide Technologies Inc",
+   "dba": "Decide",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00106",
+   "address": "1314 Washington Ave, Saint Louis, MO"
+  },
+  {
+   "name": "Decisionlinks Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00327",
+   "address": "823 Congress Ave, Ste 300, Austin, TX"
+  },
+  {
+   "name": "Definitive Healthcare Llc",
+   "dba": "Populi, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00026",
+   "address": "492 Old Connecticut Path, FRAMINGHAM, MA"
+  },
+  {
+   "name": "Deloitte Consulting LLP",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00011",
+   "address": "30 Rockefeller Plaza, new york, NY"
+  },
+  {
+   "name": "Deloitte Financial Advisory Services LLP",
+   "dba": "Deloitte Financial Advisory Services LLP",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00093",
+   "address": "30 Rockefeller Plaza, new york, NY"
+  },
+  {
+   "name": "Demand Science Us Llc",
+   "dba": "Demand Science US, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00355",
+   "address": "222 Rosewood Drive, Danvers, MA"
+  },
+  {
+   "name": "Demandbase Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00213",
+   "address": "222 2ND ST, SAN FRANCISCO, CA"
+  },
+  {
+   "name": "Dice Career Solutions Inc",
+   "dba": "Dice.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00476",
+   "address": "5745 RACCOON RIVER DR STE 200, WEST DES MOINES, IA"
+  },
+  {
+   "name": "Digital Media Solutions",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00175",
+   "address": "3665 East Bay Dr., Suite 204-431, LARGO, FL"
+  },
+  {
+   "name": "Digital Viking Media Inc",
+   "dba": "Digital Viking Media Inc",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00060",
+   "address": "13681 Newport Ave, Tustin, CA"
+  },
+  {
+   "name": "Disco Technology Inc",
+   "dba": "Disco Technology Inc",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00318",
+   "address": "2261 Market Street, San Francisco, CA"
+  },
+  {
+   "name": "Dr/Decision Resources, Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00442",
+   "address": "789 E. EISENHOWER PARKWAY, ANN ARBOR, MI"
+  },
+  {
+   "name": "Dtn Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00143",
+   "address": "2131 Lindau Lane, Bloomington, MN"
+  },
+  {
+   "name": "Dun & Bradstreet Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00042",
+   "address": "5335 Gate Parkway, Jacksonville, FL"
+  },
+  {
+   "name": "Eab Global Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00262",
+   "address": "2445 M ST NW, WASHINGTON, DC"
+  },
+  {
+   "name": "Economic Modeling Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00233",
+   "address": "232 N Almon st, Moscow, ID"
+  },
+  {
+   "name": "Econtext.Ai Limited",
+   "dba": "Complementics",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00376",
+   "address": "116 West Hubbard Street, Chicago, IL"
+  },
+  {
+   "name": "Edvisors Network Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00044",
+   "address": "350 S. Rampart Blvd., Las Vegas, NV"
+  },
+  {
+   "name": "Effyis Inc",
+   "dba": "Socialgist",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00394",
+   "address": "1050 Wilshire Drive, Troy, MI"
+  },
+  {
+   "name": "El TORO.COM LLC",
+   "dba": "El Toro.com LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00311",
+   "address": "552 E Market Street, Louisville, KY"
+  },
+  {
+   "name": "Electronic Voice Services Inc",
+   "dba": "Electronic Voice Services, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00192",
+   "address": "13601 PRESTON ROAD, DALLAS, TX"
+  },
+  {
+   "name": "Emerges.Com Incorporated",
+   "dba": "eMerges.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00334",
+   "address": "212 Prince George St., Annapolis, MD"
+  },
+  {
+   "name": "Enformion Llc",
+   "dba": "Tracers.com; Enformion; Endato.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00065",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Epsilon Data Management Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00064",
+   "address": "6021 Connection Dr, IRVING, TX"
+  },
+  {
+   "name": "Equifax Information Services Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00120",
+   "address": "1550 Peachtree Street, NW, Atlanta, GA"
+  },
+  {
+   "name": "Erepublic Llc",
+   "dba": "e.Republic LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00152",
+   "address": "100 Blue Ravine Road, Suite 100, folsom, CA"
+  },
+  {
+   "name": "Exa Labs Inc",
+   "dba": "Exa",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00440",
+   "address": "430 Shotwell Street, San Francisco, CA"
+  },
+  {
+   "name": "Exact Opco Llc",
+   "dba": "Exact Opco, LLC (dba Exact Customer)",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00172",
+   "address": "552 7th ave Suite 401, NEW YORK, NY"
+  },
+  {
+   "name": "Exelate Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00315",
+   "address": "675 Avenue of the Americas, New York, NY"
+  },
+  {
+   "name": "Experian Health Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00018",
+   "address": "475 Anton Blvd BUILDING D, Costa Mesa, CA"
+  },
+  {
+   "name": "Experian Information Solutions Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00017",
+   "address": "475 Anton Blvd BUILDING D, Costa Mesa, CA"
+  },
+  {
+   "name": "Experian Marketing Solutions Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00016",
+   "address": "475 anton blvd building d, costa mesa, CA"
+  },
+  {
+   "name": "Explorium Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00257",
+   "address": "850 Main St., Redwood city, CA"
+  },
+  {
+   "name": "Facteus, Inc.",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00457",
+   "address": "6650 SW redwood lane, portland, OR"
+  },
+  {
+   "name": "Family Tree Now Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00325",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Family Tree Now Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00325",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Faraday Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00340",
+   "address": "PO Box 17, Waterbury center, VT"
+  },
+  {
+   "name": "Fi Navigator Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00474",
+   "address": "50 Glenlake Pkwy NE, ATLANTA, GA"
+  },
+  {
+   "name": "Fideo Intelligence Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00110",
+   "address": "1580 N. Logan St., Denver, CO"
+  },
+  {
+   "name": "Finthrive Healthcare Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00224",
+   "address": "7950 Legacy Drive, Plano, TX"
+  },
+  {
+   "name": "Firmable Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00477",
+   "address": "535 Mission Street, San Francisco, CA"
+  },
+  {
+   "name": "First Direct Inc",
+   "dba": "FIRST DIRECT",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00309",
+   "address": "1508 J F Kennedy Dr, Bellevue, NE"
+  },
+  {
+   "name": "First Movers Advantage Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00272",
+   "address": "2995 55th St #19197, Boulder, CO"
+  },
+  {
+   "name": "First Orion Corp",
+   "dba": "FIRST ORION CORP",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00059",
+   "address": "520 Main Street, Suite 400, North Little Rock, AR"
+  },
+  {
+   "name": "Focus Usa",
+   "dba": "Focus USA",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00187",
+   "address": "2355 State St Ste 101, SALEM, OR"
+  },
+  {
+   "name": "Foo Monk Llc",
+   "dba": "Instantly.ai",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00244",
+   "address": "2355 State St, SALEM, OR"
+  },
+  {
+   "name": "Forager.Ai Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00321",
+   "address": "5441 S MACADAM AVE STE N, PORTLAND, OR"
+  },
+  {
+   "name": "Fourleaf Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00249",
+   "address": "5441 S Macadam Ave St N, PORTLAND, OR"
+  },
+  {
+   "name": "Foursquare Labs Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00020",
+   "address": "1160 Battery St, San FRAncisco, CA"
+  },
+  {
+   "name": "Fraiser Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00084",
+   "address": "200 Spectrum Center Drive, Irvine, CA"
+  },
+  {
+   "name": "Free Data Services Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00324",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Fullenrich Corp",
+   "dba": "FullEnrich Corp",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00482",
+   "address": "1550 Bryant Street, San Francisco, CA"
+  },
+  {
+   "name": "Fusable",
+   "dba": "Fusable",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00371",
+   "address": "1460 Northbank Pkwy Suite 200, Tuscaloosa, AL"
+  },
+  {
+   "name": "Gather Analytics Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00450",
+   "address": "200 Broadway, New York, NY"
+  },
+  {
+   "name": "General Motors Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00356",
+   "address": "300 Renissance Center, DETROIT, MI"
+  },
+  {
+   "name": "Getemails Llc",
+   "dba": "Retention.com, RB2B",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00238",
+   "address": "1401 LAVACA ST, austin, TX"
+  },
+  {
+   "name": "Giant Partners Inc",
+   "dba": "List Giant",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00137",
+   "address": "1461 Lawrence Drive, 2nd Fl, Newbury Park, CA"
+  },
+  {
+   "name": "Gigabite Inc",
+   "dba": "Boam AI",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00420",
+   "address": "252 NW 29th St, Miami-FL, FL"
+  },
+  {
+   "name": "Global Source Data Solutions Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00413",
+   "address": "3410 Galt Ocean Drive, FORT LAUDERDALE, FL"
+  },
+  {
+   "name": "Graph8 Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00484",
+   "address": "360 NW 27th St, MIAMI, FL"
+  },
+  {
+   "name": "Grassroots Analytics Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00232",
+   "address": "806 7th St NW, Washington, DC"
+  },
+  {
+   "name": "Graze Social Pbc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00372",
+   "address": "2562 NE 48th Ave, Portland, OR"
+  },
+  {
+   "name": "Great Lakes List Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00284",
+   "address": "3411 Peach St, Erie, PA"
+  },
+  {
+   "name": "Growthcode Llc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00466",
+   "address": "47 East 88th Street 8B, new york, NY"
+  },
+  {
+   "name": "Guidestar Direct Corp",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00154",
+   "address": "10 Hughes Suite A201, Irvine, CA"
+  },
+  {
+   "name": "Healthlink Dimensions Llc",
+   "dba": "HealthLink Dimensions, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00282",
+   "address": "1001 Summit Blvd NE, Atlanta, GA"
+  },
+  {
+   "name": "HealthWise Data LLC",
+   "dba": "HealthWise Data",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00012",
+   "address": "300 Colonial Center Pkwy, Roswell, GA"
+  },
+  {
+   "name": "Heartbeat.Ai Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00105",
+   "address": "8 THE GREEN, DOVER, DE"
+  },
+  {
+   "name": "Helix Campaigns Llc",
+   "dba": "Helix Campaigns LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00383",
+   "address": "1 Logan Circle nw, Washington, DC"
+  },
+  {
+   "name": "Hireteammate Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00153",
+   "address": "2513 E CHARLESTON RD, Mountain View, CA"
+  },
+  {
+   "name": "I360 Llc",
+   "dba": "I360, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00138",
+   "address": "2300 Clarendon Blvd, Arlington, VA"
+  },
+  {
+   "name": "Idmap Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00426",
+   "address": "8 THE GRN, DOVER, DE"
+  },
+  {
+   "name": "Infillion Inc",
+   "dba": "Infillion Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00456",
+   "address": "853 BROADWAY FL 21, new york, NY"
+  },
+  {
+   "name": "Infinite Media Concepts Incorporates",
+   "dba": "Mailinglists.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00397",
+   "address": "190 East Post Rd, White plains, NY"
+  },
+  {
+   "name": "Infomatics Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00214",
+   "address": "720 14th Street, Sacramento, CA"
+  },
+  {
+   "name": "Infopay Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00308",
+   "address": "227 Lewis Wharf, Boston, MA"
+  },
+  {
+   "name": "Inmar Brand Solutions Inc",
+   "dba": "Inmar Brand Solutions, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00429",
+   "address": "1 West Fourth Street, Winston-salem, NC"
+  },
+  {
+   "name": "Innovation Brands Corp",
+   "dba": "DojoMojo",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00406",
+   "address": "100 crosby st, new york, NY"
+  },
+  {
+   "name": "Innovative Data Services Inc",
+   "dba": "Specialists Marketing Solutions",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00480",
+   "address": "1300 Walt Whitman Road, Melville, NY"
+  },
+  {
+   "name": "Instant Checkmate Llc",
+   "dba": "InstantCheckmate.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00070",
+   "address": "2261 Market Street, San Francisco, CA"
+  },
+  {
+   "name": "Institutional Shareholder Services",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00336",
+   "address": "702 King Farm Blvd, Rockville, MD"
+  },
+  {
+   "name": "Intelius Llc",
+   "dba": "Intelius, US Search & US Search Pro",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00071",
+   "address": "2261 Market Street, San Francisco, CA"
+  },
+  {
+   "name": "Intent Iq Llc",
+   "dba": "Intent IQ LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00278",
+   "address": "3718 Northern Blvd #404, Long Island City, NY"
+  },
+  {
+   "name": "Intentsify Llc",
+   "dba": "Intentsify, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00333",
+   "address": "1 UNIVERSITY aVE, Westwood, MA"
+  },
+  {
+   "name": "Interactive Data Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00045",
+   "address": "2650 N MILITARY TRAIL, BOCA RATON, FL"
+  },
+  {
+   "name": "Iqvia Digital Inc.",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00415",
+   "address": "100 IMS DRIVE, PARSIPPANY, NJ"
+  },
+  {
+   "name": "Irys Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00395",
+   "address": "244 5th avenue, New york, NY"
+  },
+  {
+   "name": "Ispot.Tv",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00451",
+   "address": "3180 139th Ave SE, Bellevue, WA"
+  },
+  {
+   "name": "Ixi Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00118",
+   "address": "1550 Peachtree Street, NW, Atlanta, GA"
+  },
+  {
+   "name": "J2 Global Canada Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00255",
+   "address": "Ottawa K1z 8P4"
+  },
+  {
+   "name": "J2 Martech Corp",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00254",
+   "address": "360 Park Ave South, Floor 17, New York, NY"
+  },
+  {
+   "name": "Jd Power A Corporation Of Delaware",
+   "dba": "J.D. Power",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00050",
+   "address": "320 E. Big Beaver Rd, Troy, MI"
+  },
+  {
+   "name": "Jdm List Services Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00331",
+   "address": "1400 5TH AVENUE, New York, NY"
+  },
+  {
+   "name": "Jmr Media Consulting Inc",
+   "dba": "JMR Media",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00243",
+   "address": "8212 NW 120th Way, Parkland, FL"
+  },
+  {
+   "name": "Juicebox App",
+   "dba": "Juicebox App, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00377",
+   "address": "77 federal street, San Francisco, CA"
+  },
+  {
+   "name": "Key Marketing Advantage Llc",
+   "dba": "Key Marketing Advantage, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00346",
+   "address": "7 Edmond Road, Newtown, CT"
+  },
+  {
+   "name": "Keyword Connects Llc",
+   "dba": "EverConnect",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00242",
+   "address": "7700 IRVINE CENTER DR STE 430, SAN DIEGO, CA"
+  },
+  {
+   "name": "Kloudend Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00195",
+   "address": "5441 S MACADAM AVE, STE N,, PORTLAND, OR"
+  },
+  {
+   "name": "Knowledge Works Inc",
+   "dba": "PayNet",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00119",
+   "address": "1550 Peachtree St, NW, Atlanta, GA"
+  },
+  {
+   "name": "Komodo Health Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00291",
+   "address": "257 PARK AVENUE SOUTH, new york, NY"
+  },
+  {
+   "name": "Labels & Lists Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00150",
+   "address": "18912 N CREEk PKWY, BOTHELL, WA"
+  },
+  {
+   "name": "Lead Intelligence Inc",
+   "dba": "Verisk Marketing Solutions",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00013",
+   "address": "545 WASHINGTON BLVD LAW DEPT, JERSEY CITY, NJ"
+  },
+  {
+   "name": "Lead Me Media Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00256",
+   "address": "851 N Federal Hwy, Boca Raton, FL"
+  },
+  {
+   "name": "Lead411 Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00107",
+   "address": "730 Evergreen Avenue, Boulder, CO"
+  },
+  {
+   "name": "Leadiq Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00165",
+   "address": "820 Soverign Way, REDWOOD CITY, CA"
+  },
+  {
+   "name": "Leadpost Llc",
+   "dba": "LeadPost LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00183",
+   "address": "555 Washington Ave, SAINT LOUIS, MO"
+  },
+  {
+   "name": "Leadspace Inc",
+   "dba": "Leadspace",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00147",
+   "address": "530 Lytton Avenue, Palo Alto, CA"
+  },
+  {
+   "name": "Leverage Digital Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00478",
+   "address": "1763 Columbia Rd NW, Washington, DC"
+  },
+  {
+   "name": "Lexisnexis Risk Solutions Fl Inc",
+   "dba": "LexisNexis Risk Solutions",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00019",
+   "address": "1000 Alderman Drive, Alpharetta, GA"
+  },
+  {
+   "name": "Lightbox Parent Lp",
+   "dba": "LightBox Parent, L.P.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00362",
+   "address": "6 Armstrong Road, #4, Shelton, CT"
+  },
+  {
+   "name": "Lionshare Marketing Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00317",
+   "address": "7830 Barton St, Lenexa, KS"
+  },
+  {
+   "name": "Listkit Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00351",
+   "address": "8 THE GREEN #12710, DOVER, DE"
+  },
+  {
+   "name": "Live Data Technologies Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00400",
+   "address": "15 W Figueroa St, Santa Barbara, CA"
+  },
+  {
+   "name": "Liveramp Holdings Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00072",
+   "address": "225 BUSH STREET, SAN FRANCISCO, CA"
+  },
+  {
+   "name": "Lob.Com Inc.",
+   "dba": "Lob.com, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00361",
+   "address": "2261 market street, ste 5668, san francisco, CA"
+  },
+  {
+   "name": "Lookify Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00193",
+   "address": "7185 SW Sandburg ST, PORTLAND, OR"
+  },
+  {
+   "name": "Loopme Ltd",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00347",
+   "address": "853 BROADWAY 6TH FLOOR, New York, NY"
+  },
+  {
+   "name": "Lp Brokering Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00473",
+   "address": "4040 Fairfax Dr Ste 500, Arlington, VA"
+  },
+  {
+   "name": "Lusha Systems Inc.",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00036",
+   "address": "800 Boylston Street, Suite 1410, Boston, MA"
+  },
+  {
+   "name": "M & R Strategic Services Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00073",
+   "address": "1328 Florida Ave NW Lobby   1, WASHINGTON, DC"
+  },
+  {
+   "name": "Magnite Inc",
+   "dba": "Magnite",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00220",
+   "address": "1250 Broadway, New York, NY"
+  },
+  {
+   "name": "Matchbook Data Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00182",
+   "address": "6525 The Corners Parkway, Peachtree Corners, GA"
+  },
+  {
+   "name": "Maxmind Inc",
+   "dba": "MaxMind, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00151",
+   "address": "5305 RIVER RD N STE B, KEIZER, OR"
+  },
+  {
+   "name": "Media Resource Group Llc",
+   "dba": "Media Resource Group LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00338",
+   "address": "1727 persimmon dr, Naples, FL"
+  },
+  {
+   "name": "Mediawallah Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00156",
+   "address": "605 Geddes St, WILMINGTON, DE"
+  },
+  {
+   "name": "Medpro Systems",
+   "dba": "MedPro Systems LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00354",
+   "address": "100 Stierli ct., MOUNT ARLINGTON, NJ"
+  },
+  {
+   "name": "Melissa Data Corporatoin",
+   "dba": "Melissa",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00111",
+   "address": "22382 Avenida Empresa, Rancho Santa Margarita, CA"
+  },
+  {
+   "name": "Merkle Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00032",
+   "address": "7001 Columbia Gateway Drive, Columbia, MD"
+  },
+  {
+   "name": "Message Digital Llc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00302",
+   "address": "2054 University Ave STE 600, Berkeley, CA"
+  },
+  {
+   "name": "Milestone Marketing Solutions",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00229",
+   "address": "844 Waterbury falls dr, O FALLON, MO"
+  },
+  {
+   "name": "Minerva Bi Inc",
+   "dba": "Minerva",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00028",
+   "address": "300 kent ave, brooklyn, NY"
+  },
+  {
+   "name": "Mississippi Tornado Alley Llc",
+   "dba": "FastPplSearch, USPhonebook, SearchPeopleFree, USA-People-Sea",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00320",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Mobile Technology Corporation",
+   "dba": "OnSpot Data",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00412",
+   "address": "7193 S Poplar St, CENTENNIAL, CO"
+  },
+  {
+   "name": "Mobilefuse Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00449",
+   "address": "10 Joss Way, Millington, NJ"
+  },
+  {
+   "name": "Mobilewalla Inc",
+   "dba": "Mobilewalla",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00177",
+   "address": "5170 Peachtree Road, Chamblee, GA"
+  },
+  {
+   "name": "Monevo Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00275",
+   "address": "555 W Adams Street, Chicago, IL"
+  },
+  {
+   "name": "Moodys Analytics Inc",
+   "dba": "Moody's Analytics, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00218",
+   "address": "7 World Trade Center, NEW YORK, NY"
+  },
+  {
+   "name": "Multimedia Lists Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00342",
+   "address": "3407 Commerce Street, Alpharetta, GA, GA"
+  },
+  {
+   "name": "Mv Digital Group Llc",
+   "dba": "CinqDI",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00438",
+   "address": "One World Trade Center, New York, NY"
+  },
+  {
+   "name": "Nachal Inc",
+   "dba": "Liminal and iFish Digital and Lead Lure",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00434",
+   "address": "5660 Strand ct, naples, FL"
+  },
+  {
+   "name": "Narvar Inc",
+   "dba": "Narvar",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00234",
+   "address": "3 EAST THIRD AVENUE, san mateo, CA"
+  },
+  {
+   "name": "National Opinion Institute",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00409",
+   "address": "4111 E 37th St N, WICHITA, KS"
+  },
+  {
+   "name": "Neptune Ops Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00433",
+   "address": "3290 Sweet Dr, Lafayette, CA"
+  },
+  {
+   "name": "Neustar Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00031",
+   "address": "55 W Adams St, CHICAGO, IL"
+  },
+  {
+   "name": "Nexxa Group Inc",
+   "dba": "NA",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00206",
+   "address": "15841 Portofino Springs Blvd, Fort Myers, FL"
+  },
+  {
+   "name": "Nexxen Inc",
+   "dba": "Nexxen, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00359",
+   "address": "100 Redwood Shores Pkwy, REDWOOD CITY, CA"
+  },
+  {
+   "name": "Nfocus Consulting Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00113",
+   "address": "1594 Hubbard Drive, Lancaster, OH"
+  },
+  {
+   "name": "Numlookup Llc",
+   "dba": "NumLookup.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00446",
+   "address": "869 Somerset Drive Northwest, Atlanta, GA"
+  },
+  {
+   "name": "Nuwber Inc",
+   "dba": "NO",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00037",
+   "address": "5441 S Macadam Ave, PORTLAND, OR"
+  },
+  {
+   "name": "Opensend Inc",
+   "dba": "Opensend",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00444",
+   "address": "2620 Regatta DR Suite 102, LAS VEGAS, NV"
+  },
+  {
+   "name": "Optable Technologies Us Inc",
+   "dba": "Optable",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00389",
+   "address": ""
+  },
+  {
+   "name": "Orgio Inc",
+   "dba": "The Org",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00159",
+   "address": "Level 22, NEW YORK, NY"
+  },
+  {
+   "name": "Outlogic Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00181",
+   "address": "6525 The Corners Pkwy Ste 520, PEACHTREE CORNERS, GA"
+  },
+  {
+   "name": "Outward Media Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00445",
+   "address": "9229 West Sunset Blvd, Wst Hollywood, CA"
+  },
+  {
+   "name": "Owmn Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00448",
+   "address": "140 E Ridgewood ave, Paramus, NJ"
+  },
+  {
+   "name": "Ownco Llc",
+   "dba": "MonitorBase",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00423",
+   "address": "6925 Union Park Center, Suite 445, Cottonwood Heights, UT"
+  },
+  {
+   "name": "Pacific East Research Inc",
+   "dba": "PacificEast",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00184",
+   "address": "8625 SW Cascade Ave, Beaverton, OR"
+  },
+  {
+   "name": "Paramount Lists Inc",
+   "dba": "Paramount Lists, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00285",
+   "address": "3411 Peach St, Erie, PA"
+  },
+  {
+   "name": "Path2Response Llc",
+   "dba": "Path2Response",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00046",
+   "address": "390 Interlocken Crescent, Broomfield, CO"
+  },
+  {
+   "name": "Peekyou Llc",
+   "dba": "PeekYou LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00266",
+   "address": "44715 Prentice Dr, Dulles, VA"
+  },
+  {
+   "name": "Pen-Link Ltd",
+   "dba": "Pen-Link, Ltd.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00439",
+   "address": "3400 Plantation Dr, Lincoln, NE"
+  },
+  {
+   "name": "People Data Labs Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00066",
+   "address": "156 5th Ave Ste 1200, New York, NY"
+  },
+  {
+   "name": "Peoplefinders Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00061",
+   "address": "1915 21st St, SACRAMENTO, CA"
+  },
+  {
+   "name": "Pipl Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00169",
+   "address": "510 S CLEARWATER LOOP SUITE 100, Post Falls, ID"
+  },
+  {
+   "name": "Placeiq Inc",
+   "dba": "PlaceIQ",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00343",
+   "address": "1700 District Ave #300, Burlington, MA"
+  },
+  {
+   "name": "Plug Industries",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00402",
+   "address": "4515 N Santa Fe Ave, Oklahoma City, TX"
+  },
+  {
+   "name": "Plunge, Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00437",
+   "address": "5441 S MACADAM AVE STE N, PORTLAND, OR"
+  },
+  {
+   "name": "Possiblenow Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00329",
+   "address": "4400 River green pkwy, duluth, GA"
+  },
+  {
+   "name": "Postie Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00173",
+   "address": "3267 Bee caves rd, Austin, TX"
+  },
+  {
+   "name": "Postpilot Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00335",
+   "address": "110 Commercial Rd. Ste C, Spartanburg, SC"
+  },
+  {
+   "name": "Precisely Software Incorporated",
+   "dba": "Precisely",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00167",
+   "address": "1700 District Ave #300, Burlington, MA"
+  },
+  {
+   "name": "Preqin Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00313",
+   "address": "50 Hudson Yards, New york, NY"
+  },
+  {
+   "name": "Private Records Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00212",
+   "address": "2894 Remington Green LN, TALLAHASSEE, FL"
+  },
+  {
+   "name": "Project Affinity Inc",
+   "dba": "Affinity",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00363",
+   "address": "492 Cambridge street, SAN FRANCISCO, CA"
+  },
+  {
+   "name": "Property Reach L.P.",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00063",
+   "address": "1915 21ST ST, SACRAMENTO, CA"
+  },
+  {
+   "name": "PropertyRadar Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00049",
+   "address": "12242 Business Park Drive, Truckee, CA"
+  },
+  {
+   "name": "Publicnsa Llc Dba Bigdbm",
+   "dba": "BIGDBM",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00148",
+   "address": "9499 Collins Ave, Surfside, FL"
+  },
+  {
+   "name": "Pubmatic Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00168",
+   "address": "601 Marshall street, REDWOOD CITY, CA"
+  },
+  {
+   "name": "Quad/Graphics Inc",
+   "dba": "Quad",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00310",
+   "address": "N61 W23044 Harry's Way, Sussex, WI"
+  },
+  {
+   "name": "Quorum Data Inc",
+   "dba": "Quorum Data, Inc",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00472",
+   "address": "50 Lakeside Ave, Burlington, VT"
+  },
+  {
+   "name": "R L Polk  Co",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00455",
+   "address": "26533 Evergreen Rd, SOUTHFIELD, MI"
+  },
+  {
+   "name": "Rainbarrel Usa Llc",
+   "dba": "RainBarrel",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00469",
+   "address": "225 W 34 st, New york, NY"
+  },
+  {
+   "name": "Rampedup",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00344",
+   "address": "5441 S Macadam AVE, PORTLAND, OR"
+  },
+  {
+   "name": "Realeflow Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00247",
+   "address": "150 pearl road, brunswick, OH"
+  },
+  {
+   "name": "Redi-Data Inc",
+   "dba": "Redi-Data Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00245",
+   "address": "107 Little falls rd, Fairfield, NJ"
+  },
+  {
+   "name": "Redmob Llc",
+   "dba": "Redmob",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00300",
+   "address": "dubai"
+  },
+  {
+   "name": "Reklaim Ltd",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00323",
+   "address": "5441 S Macadam Ave, portland, OR"
+  },
+  {
+   "name": "Relpro Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00268",
+   "address": "51 JFK Parkway, SHORT HILLS, NJ"
+  },
+  {
+   "name": "Relx Inc",
+   "dba": "LexisNexis",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00075",
+   "address": "1105 NORTH MARKET ST STE 501, WILMINGTON, DE"
+  },
+  {
+   "name": "Remodeling.Com Llc",
+   "dba": "EverConnect",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00240",
+   "address": "7700 IRVINE CENTER DR STE 430, IRVINE, CA"
+  },
+  {
+   "name": "Response America Data Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00430",
+   "address": "301 union ave, altoona, PA"
+  },
+  {
+   "name": "Reveal Mobile Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00163",
+   "address": "5540 Centerview Dr., RALEIGH, NC"
+  },
+  {
+   "name": "Revoptimal Llc",
+   "dba": "RevOptimal, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00274",
+   "address": "5441 S Macadam AVE  STE N, PORTLAND, OR"
+  },
+  {
+   "name": "Rich Media Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00265",
+   "address": "10191 Sweet Bay Court, POMPANO BEACH, FL"
+  },
+  {
+   "name": "Rocketreach Llc",
+   "dba": "No",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00375",
+   "address": "5441 S Macadam Ave Ste N, PORTLAND, OR"
+  },
+  {
+   "name": "Ror Partners Llc",
+   "dba": "ROR Partners",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00404",
+   "address": "6543 S. Las Vegas Blvd., Las Vegas, NV"
+  },
+  {
+   "name": "Rushmore Labs Llc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00411",
+   "address": "4111 E 37TH ST N, WICHITA, KS"
+  },
+  {
+   "name": "S&P Global Inc",
+   "dba": "R.L.POLK & COMPANY",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00082",
+   "address": "55 Water St, New York, NY"
+  },
+  {
+   "name": "SalesIntel Research, Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00479",
+   "address": "8614 Westwood dr, Vienna, VA"
+  },
+  {
+   "name": "Seamless Contacts Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00130",
+   "address": "6605 LONGSHORE ST, DUBLIN, OH"
+  },
+  {
+   "name": "Semasio Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00145",
+   "address": "118 King Street, San Francisco, CA"
+  },
+  {
+   "name": "Semcasting Inc",
+   "dba": "Semcasting, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00316",
+   "address": "21 HIGH STREET, NORTH ANDOVER, MA"
+  },
+  {
+   "name": "Share Local Media Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00305",
+   "address": "44 Wall Street 23rd FI, Floor 23, NY"
+  },
+  {
+   "name": "Sharethrough Usa Inc",
+   "dba": "Sharethrough",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00378",
+   "address": "1350 Broadway, NEW YORK, NY"
+  },
+  {
+   "name": "Sheerid Inc",
+   "dba": "SheerID",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00100",
+   "address": "1300 SW 5th Avenue, Portland, OR"
+  },
+  {
+   "name": "Simio Cloud Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00078",
+   "address": "10155 Westmoor Dr, Westminster, CO"
+  },
+  {
+   "name": "Snovio Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00047",
+   "address": "65 Wickliffe Dr, Naples, FL"
+  },
+  {
+   "name": "Social Catfish Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00074",
+   "address": "38770 Sky Canyon Dr, Murrieta, CA"
+  },
+  {
+   "name": "Speedeon Data Llc",
+   "dba": "Speedeon Data LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00135",
+   "address": "5875 Landerbrook drive, Cleveland, OH"
+  },
+  {
+   "name": "Spokeo Inc",
+   "dba": "Freepeopledirectory, Thatsthem, peoplewin.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00053",
+   "address": "199 S. Los Robles Ave Ste 711, Pasadena, CA"
+  },
+  {
+   "name": "Spy Labs Adco Llc",
+   "dba": "SpyDialer",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00419",
+   "address": "1915 21st St, Sacramento, CA"
+  },
+  {
+   "name": "Stackadapt Inc",
+   "dba": "StackAdapt Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00289",
+   "address": "Toronto, Ontario M5J 2J1"
+  },
+  {
+   "name": "Statara Solutions Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00102",
+   "address": "501 Silverside Road #316, Wilmington, DE"
+  },
+  {
+   "name": "Steppingblocks Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00178",
+   "address": "3423 Piedmont Road NE, Atlanta, GA"
+  },
+  {
+   "name": "Sterling Data Company Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00314",
+   "address": "5441 S MACADAM AVE, PORTLAND, OR"
+  },
+  {
+   "name": "Stirista",
+   "dba": "Stirista",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00264",
+   "address": "777 E Sonterra Blvd, SAN ANTONIO, TX"
+  },
+  {
+   "name": "Subgraph Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00488",
+   "address": "1044 S Cochran Ave, Los Angeles, CA"
+  },
+  {
+   "name": "Summit Resources Llc",
+   "dba": "Client Command",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00373",
+   "address": "2100 Westshore Dr, CUMMING, GA"
+  },
+  {
+   "name": "Swarm Holdings Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00385",
+   "address": "308 6th Street, Montara, CA"
+  },
+  {
+   "name": "Swipejobs Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00481",
+   "address": "5473 Blair Road, Dallas, TX"
+  },
+  {
+   "name": "Swordfish Ai Inc",
+   "dba": "Swordfish",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00166",
+   "address": "8 The Green, Dover, DE"
+  },
+  {
+   "name": "Sync.Me Ltd.",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00405",
+   "address": "RAMAT GAN, Israel, 525050"
+  },
+  {
+   "name": "T-Mobile Usa Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00180",
+   "address": "12920 SE 38th St, Bellevue, WA"
+  },
+  {
+   "name": "Taboola Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00160",
+   "address": "16 Madison sq west, New York, NY"
+  },
+  {
+   "name": "Tagis Inc",
+   "dba": "Amplemarket",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00422",
+   "address": "2443 Fillmore St 380 3880, San Francisco, CA"
+  },
+  {
+   "name": "Task Genie Inc",
+   "dba": "DataLane",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00146",
+   "address": "82 Nassau St, New York, NY"
+  },
+  {
+   "name": "Techtarget Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00171",
+   "address": "275 Grove Street, AUBURNDALE, MA"
+  },
+  {
+   "name": "The Alesco Group Llc",
+   "dba": "RESPONSE SOLUTIONS GROUP LLC, STAT RESORCE GROUP INC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00108",
+   "address": "4575 Via Royale Su 110, Fort Myers, FL"
+  },
+  {
+   "name": "The People Searchers Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00216",
+   "address": "155 OFFICE PLAZA DRIVE 1ST FLOOR, TALLAHASSEE, FL"
+  },
+  {
+   "name": "The Segerdahl Llc",
+   "dba": "SG360Â°",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00352",
+   "address": "1351 Wheeling Road, Wheeling, IL"
+  },
+  {
+   "name": "Throtle Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00040",
+   "address": "141 W Front Street, Red Bank, NJ"
+  },
+  {
+   "name": "Trans Union Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00030",
+   "address": "555 W Adams St, Chicago, IL"
+  },
+  {
+   "name": "Trending Family Inc",
+   "dba": "Creator Wizard",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00485",
+   "address": "5441 S Macadam Ave Ste R, PORTLAND, OR"
+  },
+  {
+   "name": "Trestle Solutions Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00222",
+   "address": "10515 SE 27TH ST, Beaux Arts, WA"
+  },
+  {
+   "name": "Triple Lift Inc",
+   "dba": "TripleLift, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00408",
+   "address": "53 W 23RD St FL 12, New York, NY"
+  },
+  {
+   "name": "True Blue Analytics Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00271",
+   "address": "2209 West Estes Avenue, Chicago, IL"
+  },
+  {
+   "name": "Truedata Solutions Inc",
+   "dba": "TrueData Solutions, Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00384",
+   "address": "13315 E 112TH ST N, Owasso, OK"
+  },
+  {
+   "name": "Truth Now Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00217",
+   "address": "1401 21ST STREET, Sacramento, CA"
+  },
+  {
+   "name": "Truthfinder Llc",
+   "dba": "TruthFinder",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00069",
+   "address": "2261 Market Street, San Francisco, CA"
+  },
+  {
+   "name": "Tsg Holdco Llc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00225",
+   "address": "7950 Legacy Drive, Plano, TX"
+  },
+  {
+   "name": "Tunnl Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00364",
+   "address": "3100 Clarendon blvd, Arlington, VA"
+  },
+  {
+   "name": "Unacast Inc",
+   "dba": "Unacast",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00436",
+   "address": "44679 Endicott Dr Ste 300, ASHBURN, VA"
+  },
+  {
+   "name": "Unearth Campaigns Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00250",
+   "address": "555 Capitol Mall, Sacramento, CA"
+  },
+  {
+   "name": "Unify Ai Business Corporation",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00458",
+   "address": "353 Sacramento Street, san francisco, CA"
+  },
+  {
+   "name": "Upcell Llc",
+   "dba": "upcell",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00390",
+   "address": "6 Liberty Square, Boston, MA"
+  },
+  {
+   "name": "Uplead Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00267",
+   "address": "340 S Lemon Ave Ste 1022, Walnut, CA"
+  },
+  {
+   "name": "UPS Capital Corporation",
+   "dba": "UPS Capital",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00015",
+   "address": "55 Glenlake Parkway NE, atlanta, GA"
+  },
+  {
+   "name": "Urban Science Applications Inc",
+   "dba": "Urban Science",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00463",
+   "address": "400 Renaissance Center, Detroit, MI"
+  },
+  {
+   "name": "Us Data Corporation",
+   "dba": "US DATA CORPORATION",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00131",
+   "address": "5115 Clareton Dr, AGOURA HILLS, CA"
+  },
+  {
+   "name": "V P Data Llc",
+   "dba": "Valpak Intelligence",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00462",
+   "address": "1 Valpak ave n, Saint. Petersburg, FL"
+  },
+  {
+   "name": "Valassis Communications Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00048",
+   "address": "227 W Monroe, Chicago, IL"
+  },
+  {
+   "name": "Veeva Systems Inc",
+   "dba": "Veeva Systems Inc.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00091",
+   "address": "4280 Hacienda Dr, Pleasanton, CA"
+  },
+  {
+   "name": "Vendelux Inc",
+   "dba": "Vendelux",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00483",
+   "address": "115 W 30th St Suite 600, New York, NY"
+  },
+  {
+   "name": "Venntel Inc",
+   "dba": "Venntel",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00424",
+   "address": "44679 ENDICOTT DR STE 333, Ashburn, VA"
+  },
+  {
+   "name": "Venpath Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00223",
+   "address": "780 Long Beach Blvd, Long Beach, NY"
+  },
+  {
+   "name": "Ventiveiq Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00452",
+   "address": "103 CARNEGIE CENTER, PRINCETON, NJ"
+  },
+  {
+   "name": "Veraset Llc",
+   "dba": "Veraset",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00101",
+   "address": "2810 N Church St, WILMINGTON, DE"
+  },
+  {
+   "name": "Versium Analytics Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00112",
+   "address": "7530 164th Ave NE, Redmond, WA"
+  },
+  {
+   "name": "Victory Waves Co",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00494",
+   "address": "324 Nicoll St, New Haven, CT"
+  },
+  {
+   "name": "Videoamp Inc",
+   "dba": "N/A",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00292",
+   "address": "12121 Bluff Creek Drive, PLAYA VISTA, CA"
+  },
+  {
+   "name": "Vistar Media Inc",
+   "dba": "Vistar Media Ince.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00388",
+   "address": "12920 SE 38th St, BELLEVUE, WA"
+  },
+  {
+   "name": "Visual Visitor Llc",
+   "dba": "VisualVisitor.com",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00348",
+   "address": "7400 Baymeadows Way, JACKSONVILLE, FL"
+  },
+  {
+   "name": "Walla Media Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00453",
+   "address": "4736 Royal Ave Unit #17115, Eugene, OR"
+  },
+  {
+   "name": "Waypoint Metrics Llc",
+   "dba": "Waypoint Metrics, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00470",
+   "address": "1763 COLUMBIA RD NW, WASHINGTON, DC"
+  },
+  {
+   "name": "We Inform Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00215",
+   "address": "7901 4TH ST N  STE 300, SAINT PETERSBURG, FL"
+  },
+  {
+   "name": "Wealthfeed",
+   "dba": "WealthFeed",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00251",
+   "address": "222 N Pacific Coast Hwy, El Segundo, CA"
+  },
+  {
+   "name": "Webbula Llc",
+   "dba": "Webbula, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00191",
+   "address": "6041 Wallace RoaD Extension, Wexford, PA"
+  },
+  {
+   "name": "West Publising Corporation",
+   "dba": "West Publishing Corp",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00259",
+   "address": "2900 Ames Crossing Rd, SAINT PAUL, MN"
+  },
+  {
+   "name": "Whitepages Inc",
+   "dba": "Whitepages",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00132",
+   "address": "2033 6th Ave, Seattle, WA"
+  },
+  {
+   "name": "Wiland Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00189",
+   "address": "7420 East Dry Creek Pkwy, Niwot, CO"
+  },
+  {
+   "name": "Windfall Data Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00142",
+   "address": "595 Pacific Ave, Fl 4, San Francisco, CA"
+  },
+  {
+   "name": "Winr Alchemist Pty Ltd",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00467",
+   "address": "2060, North Sydney, NSW"
+  },
+  {
+   "name": "Winr Data B V",
+   "dba": "WINR Data B.V.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00358",
+   "address": "Amsterdam, Netherlands"
+  },
+  {
+   "name": "Winr Data Pty Ltd",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00468",
+   "address": "2060, NORTH SYDNEY, NSW"
+  },
+  {
+   "name": "Wiza Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00401",
+   "address": "1162 Broadway, New York, NY"
+  },
+  {
+   "name": "Yobi Ventures Inc",
+   "dba": "Yobi AI",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00460",
+   "address": "136 E. 76th Street, New York, NY"
+  },
+  {
+   "name": "Zeetogroup Llc",
+   "dba": "ZeetoGroup, LLC",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00459",
+   "address": "3131 W Bolt St, Fort Worth, TX"
+  },
+  {
+   "name": "Zenleads Inc",
+   "dba": "Apollo.io",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00283",
+   "address": "3500 S Dupont Highway, DOVER, DE"
+  },
+  {
+   "name": "Zeta Global Corp",
+   "dba": "DISQUS INC,  LIVEINTENT INC.",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00205",
+   "address": "3 Park Ave. 33rd floor, New York, NY"
+  },
+  {
+   "name": "Zipstorm Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00210",
+   "address": "1100 112th Ave NE, BELLEVUE, WA"
+  },
+  {
+   "name": "Zoom Communications Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00493",
+   "address": "55 Almaden Boulevard, San Jose, CA"
+  },
+  {
+   "name": "Zoominfo Technologies Llc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00077",
+   "address": "330 W Columbia Way, Vancouver, WA"
+  },
+  {
+   "name": "Zs Associates Inc",
+   "dba": "",
+   "primary": "",
+   "sites": [],
+   "privacy_url": "",
+   "reg_id": "DATA-00258",
+   "address": "222 W Merchandise Mart Plaza, Chicago, IL"
+  }
+ ]
+}

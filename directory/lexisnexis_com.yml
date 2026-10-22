@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "lexisnexis_com"
 domain: "lexisnexis.com"
-name: "lexisnexis.com"
+name: "LexisNexis Risk Solutions FL Inc."
 bucket: "direct"
 tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.lexisnexis.com/en-us/gateway.page"
+registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-21"
 search_check:

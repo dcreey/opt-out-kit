@@ -22,5 +22,7 @@ struct RootView: View {
                 WhatsNewView(items: items) { model.finishAnnouncements() }
             }
         }
+        .environment(\.locale, model.locale)          // SwiftUI literals follow the chosen language
+        .id(model.language)                            // and words built in code are rebuilt when it changes
     }
 }

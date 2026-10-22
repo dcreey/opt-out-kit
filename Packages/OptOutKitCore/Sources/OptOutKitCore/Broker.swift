@@ -54,11 +54,11 @@ public struct Step: Codable, Equatable, Sendable {
     /// Text shown on the step card.
     public var title: String {
         if let say { return say }
-        if open != nil { return "Open the site" }
-        if let copy { return "Copy your \(copy)" }
+        if open != nil { return L10n.t("Open the site") }
+        if let copy { return L10n.f("Copy your %@", copy) }
         if let searchMatch { return searchMatch }
-        if waitForEmail != nil { return "Wait for the confirmation email" }
-        return "Confirm"
+        if waitForEmail != nil { return L10n.t("Wait for the confirmation email") }
+        return L10n.t("Confirm")
     }
 
     /// True when the user must tap Done before the next card unlocks.

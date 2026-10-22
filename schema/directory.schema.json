@@ -8,7 +8,7 @@
     "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
     "domain": { "type": "string", "minLength": 3 },
     "name": { "type": "string" },
-    "bucket": { "enum": ["direct", "indirect"] },
+    "bucket": { "enum": ["direct", "indirect", "registry"] },
     "tier": { "enum": ["A", "B", "C", "D", null] },
     "automation": { "enum": ["scriptable", "guided", "needs_browser", "blocked", "robots_disallowed", "unreachable", "unknown"] },
     "confidence": { "type": "string" },
@@ -36,6 +36,7 @@
     "family": { "type": "string" },
     "family_parent": { "type": "string" },
     "template": { "type": "string" },
+    "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
     "live_check": {
       "type": "object",
       "required": ["checked", "blockers"],

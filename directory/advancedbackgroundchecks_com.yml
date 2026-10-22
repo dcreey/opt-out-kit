@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "advancedbackgroundchecks_com"
 domain: "advancedbackgroundchecks.com"
-name: "advancedbackgroundchecks.com"
+name: "Mississippi Tornado Alley, LLC"
 bucket: "direct"
 tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.advancedbackgroundchecks.com/blog/data-broker-landscape-opt-out-guide"
+registered_in: [CA, OR]
 signals: [phone_verify]
 profiled: "2026-10-21"
 search_check:

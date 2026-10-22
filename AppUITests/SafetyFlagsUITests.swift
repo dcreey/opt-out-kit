@@ -18,6 +18,13 @@ final class SafetyFlagsUITests: XCTestCase {
         app.alerts.buttons["Add"].tap()
     }
 
+    /// Gives the owner the required legal name and current address, which searching needs.
+    private func completeOwner(_ app: XCUIApplication) {
+        app.buttons["profile-button"].tap()
+        app.fillRequiredProfile()
+        app.buttons["Done"].tap()
+    }
+
     /// Scrolls the editor until the element can be tapped.
     private func reveal(_ app: XCUIApplication, _ element: XCUIElement) {
         var tries = 0
@@ -59,6 +66,7 @@ final class SafetyFlagsUITests: XCTestCase {
 
     func testMarkingAChildAsAMinorTurnsSearchingOffForThatProfileOnly() {
         let app = launch()
+        completeOwner(app)
         // The owner can scan (fake network).
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.buttons["scan-exposure"].isEnabled)
@@ -72,6 +80,7 @@ final class SafetyFlagsUITests: XCTestCase {
         flip(app, minor)
         XCTAssertEqual(minor.value as? String, "1")
         screenshot(app, "3-minor-switch-on")
+        app.fillRequiredProfile()
         app.buttons["Done"].tap()
 
         // Sam is selected: searching is off, with a reason.
@@ -98,6 +107,7 @@ final class SafetyFlagsUITests: XCTestCase {
         XCTAssertTrue(figure.waitForExistence(timeout: 5))
         flip(app, figure)
         XCTAssertEqual(figure.value as? String, "1")
+        app.fillRequiredProfile()
         app.buttons["Done"].tap()
         app.terminate()
 

@@ -6,7 +6,7 @@ name: "freepeopledirectory.com"
 bucket: "direct"
 tier: "B"
 automation: "guided"
-confidence: "high"
+confidence: "medium"
 opt_out_url: "https://www.spokeo.com/optout"
 opt_out_form: {"page": "https://www.spokeo.com/optout", "method": "get", "action": "https://www.spokeo.com/optout", "fields": [{"type": "url", "name": "url", "label": "Enter URL here"}, {"type": "email", "name": "email", "label": "Enter email address here"}], "hops": 2}
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, listing_url_input, opt_out_form_found]

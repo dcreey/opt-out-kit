@@ -14,30 +14,45 @@ struct OnboardingView: View {
     /// Called with the person's answers to the automatic-protection page (daily scan, weekly opt-out).
     var onDecide: ((Bool, Bool) -> Void)?
     let onFinish: () -> Void
+    @EnvironmentObject var model: AppModel
     @State private var index = 0
+    /// The place whose rules the person has scrolled to the end of. Choosing a different place asks them to read again.
+    @State private var placeRead: String?
+    @FocusState private var emailFocused: Bool
     @State private var autoScan = true
     @State private var autoOptOut = true
 
+    private var placeKey: String? { model.ownerJurisdiction?.id ?? (model.ownerCountry == "OTHER" ? "other" : nil) }
+    private var rulesRead: Bool { placeKey == nil || placeRead == placeKey }
+
     private let pages: [Page] = [
-        Page(id: 0, symbol: "person.crop.circle.badge.minus", title: "Take your data back",
-             body: "Data brokers sell your name, address and relatives. Opt-Out Kit walks you through removing you, and anyone you add, from them.",
-             bullets: ["Pick a site from your queue", "Follow the steps in your own browser", "Come back later to check you stayed removed"]),
-        Page(id: 1, symbol: "lock.shield", title: "Your data stays on this phone",
-             body: "There is no Opt-Out Kit server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out.",
-             bullets: ["Open source: anyone can audit the code", "Lost phone with no backup means lost data; a normal iPhone backup carries it", "Each site sees only the details its form needs"]),
-        Page(id: 2, symbol: "person.2", title: "Set up people once",
-             body: "Tap Profile to add every name you have been listed under, plus current and past addresses and your emails. Add family members as extra people with the account switcher.",
-             bullets: ["Nicknames and old names find more listings", "Each person has their own progress", "Family only. Add someone who asked you to, or a child you are the parent or guardian of"]),
-        Page(id: 3, symbol: "list.number", title: "Work through a site",
-             body: "Open a site to see its step cards. Tap Open in Safari, copy your details, do the step, then tap Mark done. Later steps unlock as you go.",
-             bullets: ["You solve any CAPTCHA, phone code or ID step yourself", "The app never submits anything for you", "Some sites clear several brands at once"]),
-        Page(id: 4, symbol: "checkmark.seal", title: "Track every site",
-             body: "The Sites tab lists every broker with its status for each person: not started, in progress, partial or opted out. Brokers re-list people, so plan to re-check; reminders are coming.",
-             bullets: ["Search sites by name or web address", "Tap a site to see what it will receive", "Partial means some of your people are done"]),
+        Page(id: 0, symbol: "person.crop.circle.badge.minus", title: Loc.t("Take your data back"),
+             body: Loc.t("Data brokers sell your name, address and relatives. Opt-Out Kit walks you through removing you, and anyone you add, from them."),
+             bullets: [Loc.t("Pick a site from your queue"), Loc.t("Follow the steps in your own browser"), Loc.t("Come back later to check you stayed removed")]),
+        Page(id: 1, symbol: "lock.shield", title: Loc.t("Your data stays on this phone"),
+             body: Loc.t("There is no Opt-Out Kit server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
+             bullets: [Loc.t("Open source: anyone can audit the code"), Loc.t("Lost phone with no backup means lost data; a normal iPhone backup carries it"), Loc.t("Each site sees only the details its form needs")]),
+        Page(id: 2, symbol: "person.2", title: Loc.t("Set up people once"),
+             body: Loc.t("Tap Profile to enter your legal name and current address (both required), plus any other names and past addresses. Add family members as extra people with the account switcher."),
+             bullets: [Loc.t("Nicknames and old names find more listings"), Loc.t("Each person has their own progress"), Loc.t("Family only. Add someone who asked you to, or a child you are the parent or guardian of")]),
+        Page(id: 3, symbol: "list.number", title: Loc.t("Work through a site"),
+             body: Loc.t("Open a site to see its step cards. Tap Open in Safari, copy your details, do the step, then tap Mark done. Later steps unlock as you go."),
+             bullets: [Loc.t("You solve any CAPTCHA, phone code or ID step yourself"), Loc.t("The app never submits anything for you"), Loc.t("Some sites clear several brands at once")]),
+        Page(id: 4, symbol: "checkmark.seal", title: Loc.t("Track every site"),
+             body: Loc.t("The Sites tab lists every broker with its status for each person: not started, in progress, partial or opted out. Brokers re-list people, so plan to re-check; reminders are coming."),
+             bullets: [Loc.t("Search sites by name or web address"), Loc.t("Tap a site to see what it will receive"), Loc.t("Partial means some of your people are done")]),
     ]
 
     var body: some View {
         VStack {
+            HStack {
+                Spacer()
+                Picker("Language", selection: Binding(get: { model.language }, set: { model.setLanguage($0) })) {
+                    ForEach(AppModel.languages, id: \.code) { Text($0.name).tag($0.code) }
+                }
+                .pickerStyle(.menu).accessibilityIdentifier("onboarding-language")
+            }
+            .padding(.horizontal)
             TabView(selection: $index) {
                 ForEach(pages) { page in
                     ScrollView {
@@ -56,6 +71,48 @@ struct OnboardingView: View {
                 }
                 ScrollView {
                     VStack(spacing: 16) {
+                        Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+                        Text("Your email address").font(.title.bold())
+                        Text("Required. This one address goes on every opt-out form and every data-deletion request, for you and your family.")
+                            .multilineTextAlignment(.center)
+                        TextField("you@example.com", text: Binding(get: { model.contactEmail }, set: { model.setContactEmail($0) }))
+                            .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
+                            .textContentType(.emailAddress).textFieldStyle(.roundedBorder).focused($emailFocused)
+                            .accessibilityIdentifier("onboarding-email")
+                        if let tagged = model.formEmail, tagged != model.contactEmail.trimmingCharacters(in: .whitespaces) {
+                            Label("On forms we use \(tagged)", systemImage: "envelope.badge").font(.callout)
+                                .accessibilityIdentifier("onboarding-tagged-email")
+                        }
+                        Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
+                        if model.formEmail == nil {
+                            Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
+                                .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-email-needed")
+                        }
+                    }
+                    .padding(.horizontal, 28)
+                }
+                .tag(pages.count)
+                ScrollView {
+                    // Lazy, so the end marker only appears once the person has scrolled to the bottom.
+                    LazyVStack(spacing: 16) {
+                        Image(systemName: "mappin.and.ellipse").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+                        Text("Where do you live?").font(.title.bold())
+                        Text("Laws about data brokers differ by country and, in the United States, by state. Choose yours and we show what it means for you and what we do about it.")
+                            .multilineTextAlignment(.center)
+                        PlacePicker()
+                        StateRulesView(jurisdiction: model.ownerJurisdiction, other: model.ownerCountry == "OTHER", onReachedEnd: { placeRead = placeKey })
+                        if placeKey != nil, !rulesRead {
+                            Label("Scroll to the bottom to continue.", systemImage: "arrow.down.circle")
+                                .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-state-scroll-hint")
+                        }
+                    }
+                    .padding(.horizontal, 28)
+                }
+                .tag(pages.count + 1)
+                ScrollView { TermsOnboardingPage().padding(.horizontal, 28) }
+                    .tag(pages.count + 2)
+                ScrollView {
+                    VStack(spacing: 16) {
                         Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Automatic protection").font(.title.bold())
                         AutoExplainer()
@@ -63,23 +120,36 @@ struct OnboardingView: View {
                     }
                     .padding(.horizontal, 28)
                 }
-                .tag(pages.count)
+                .tag(pages.count + 3)
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            .tabViewStyle(.page(indexDisplayMode: .never))
+
+            // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
+            HStack(spacing: 8) {
+                ForEach(0..<(pages.count + 4), id: \.self) { i in
+                    Circle().fill(i == index ? Color.accentColor : Color.secondary.opacity(0.35)).frame(width: 8, height: 8)
+                }
+            }
+            .padding(.top, 8)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Page \(index + 1) of \(pages.count + 4)")
+            .accessibilityIdentifier("onboarding-page-dots")
 
             HStack {
-                Button("Skip", action: onFinish).accessibilityIdentifier("onboarding-skip")
+                // The email is required, so Skip goes to it instead of leaving.
+                Button("Skip") { withAnimation { index = max(index, pages.count) } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
-                if index < pages.count {
-                    Button("Next") { withAnimation { index += 1 } }
+                if index < pages.count + 3 {
+                    Button("Next") { emailFocused = false; withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
+                        .disabled((index == pages.count && model.formEmail == nil) || (index == pages.count + 1 && !rulesRead))
                 } else {
-                    Button((autoScan || autoOptOut) ? "Turn on and start" : "Start") {
+                    Button((autoScan || autoOptOut) ? Loc.t("Turn on and start") : "Start") {
                         onDecide?(autoScan, autoOptOut)
                         onFinish()
                     }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
+                    .disabled(model.formEmail == nil || !rulesRead)
                 }
             }
             .padding()
@@ -102,6 +172,128 @@ struct WhatsNewView: View {
             }
             .navigationTitle("What's new")
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", action: onFinish) } }
+        }
+    }
+}
+
+/// What a place's law means for the person and what the app does about it, from the facts in `jurisdictions/`. Its lines are direct
+/// children of whatever stack holds it, so inside a lazy stack the end marker (`onReachedEnd`) only fires once the person has
+/// scrolled to the bottom. Put it in a stack of your own where that does not matter.
+struct StateRulesView: View {
+    @EnvironmentObject var model: AppModel
+    let jurisdiction: Jurisdiction?
+    var other = false
+    var onReachedEnd: (() -> Void)?
+
+    var body: some View {
+        Group {
+            if let j = jurisdiction {
+                ForEach(Array(model.statements(for: j).enumerated()), id: \.offset) { _, line in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label(line.text, systemImage: line.symbol).font(.callout).fixedSize(horizontal: false, vertical: true)
+                        if let url = line.url.flatMap(URL.init(string:)) {
+                            Link("Read it at \(url.host ?? "the source")", destination: url).font(.caption)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                if !j.sourceLinks.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Where we found this").font(.footnote.bold())
+                        ForEach(j.sourceLinks) { link in
+                            Link(destination: URL(string: link.url)!) {
+                                Label("\(link.title) (\(URL(string: link.url)?.host ?? ""))", systemImage: "link").font(.caption)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("state-rules-sources")
+                }
+                Text("Law details last reviewed \(j.reviewed). They change slowly and we re-check them regularly.")
+                    .font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("state-rules-reviewed")
+            } else if other {
+                Label("We do not have your country's rules yet. The opt-out forms in this app work from anywhere a broker accepts requests, and we will add country laws over time.",
+                      systemImage: "globe").font(.callout).frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if let onReachedEnd {
+                Color.clear.frame(height: 1).onAppear(perform: onReachedEnd).accessibilityHidden(true)
+            }
+        }
+    }
+}
+
+/// Country first, then, for the United States, the state.
+struct PlacePicker: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        Picker("Country", selection: Binding<String?>(get: { model.ownerCountry }, set: { model.setOwnerCountry($0) })) {
+            Text("Choose your country").tag(String?.none)
+            ForEach(model.countryOptions, id: \.code) { Text($0.name).tag(String?.some($0.code)) }
+            Text("Another country").tag(String?.some("OTHER"))
+        }
+        .pickerStyle(.menu).accessibilityIdentifier("onboarding-country")
+        if model.ownerCountry == "US" {
+            Picker("Your state", selection: Binding<String?>(get: { model.ownerState }, set: { model.setOwnerState($0) })) {
+                Text("Choose your state").tag(String?.none)
+                ForEach(USStates.all, id: \.code) { Text(L10n.t($0.name)).tag(String?.some($0.code)) }
+            }
+            .pickerStyle(.menu).accessibilityIdentifier("onboarding-state")
+        }
+    }
+}
+
+/// The walkthrough page that asks, in plain words, whether the app may press "I agree" on broker sites' terms prompts. Off unless the
+/// person allows it. It can only be allowed once people have reviewed paragraphs of those terms; until then it says so.
+struct TermsOnboardingPage: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+            Text("Accept site terms for you?").font(.title.bold()).multilineTextAlignment(.center)
+            Text("Some broker sites show an \"I agree to our terms\" prompt before their opt-out form. If you allow it, we press that button for you, but only when every paragraph of the prompt, and of the terms pages it links to, is on a list a person has read and judged acceptable. That keeps more opt-outs hands-free.")
+                .multilineTextAlignment(.center)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("In plain English, what these sites' terms say").font(.headline)
+                ForEach(TermsSummary.sections) { section in
+                    DisclosureGroup(section.title) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(section.bullets, id: \.self) { Text("• " + $0).font(.footnote) }
+                        }
+                    }
+                }
+                Text(TermsSummary.basis).font(.caption2).foregroundStyle(.secondary)
+            }
+            .accessibilityIdentifier("onboarding-terms-tldr")
+            VStack(alignment: .leading, spacing: 6) {
+                Label("Never terms that ban or imply automated access", systemImage: "nosign")
+                Label("Never a paragraph nobody has reviewed, including a changed one", systemImage: "nosign")
+                Label("Every acceptance is logged on this phone, and you can turn it off any time", systemImage: "list.bullet.rectangle")
+            }
+            .font(.footnote)
+            Text("The terms are each site's own words, in the language that site shows you. If a site offers its terms in your language we use that version; if not, the original stays as it is. They are never machine-translated.")
+                .font(.footnote).foregroundStyle(.secondary)
+                .accessibilityIdentifier("onboarding-terms-language")
+            status
+        }
+    }
+
+    @ViewBuilder private var status: some View {
+        if model.termsActive {
+            Label("On. You can turn it off in About.", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                .accessibilityIdentifier("onboarding-terms-status")
+            Button("Turn off", role: .destructive) { model.revokeTerms() }.accessibilityIdentifier("onboarding-terms-off")
+        } else if model.termsReviewedCount > 0 {
+            Text("You are agreeing to those terms through this app. If you would rather read each site's terms yourself, leave this off.")
+                .font(.footnote).foregroundStyle(.secondary)
+            Button("Allow") { model.approveTerms() }.buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-terms-allow")
+            Text("Not now? Just tap Next. Sites that need terms accepted stay in your hands.").font(.footnote).foregroundStyle(.secondary)
+        } else {
+            Label("Not available yet. None of the \(model.termsLibrary?.paragraphs.count ?? 0) terms paragraphs we have collected has been reviewed by a person, so nothing can be accepted for you. Sites that need terms accepted stay in your hands until a reviewed list ships, and we will ask you then.",
+                  systemImage: "hourglass").font(.footnote).foregroundStyle(.secondary)
+                .accessibilityIdentifier("onboarding-terms-status")
         }
     }
 }

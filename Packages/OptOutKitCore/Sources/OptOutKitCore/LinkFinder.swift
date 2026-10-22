@@ -38,15 +38,19 @@ public protocol PageInspector: Sendable {
 // MARK: Judging pages, links and forms (the same rules as tools/profile_brokers.py)
 
 public enum LinkRules {
-    static let optWords = try! NSRegularExpression(pattern: "opt[\\s_-]?out|remov|suppress|delete|do[\\s_-]?not[\\s_-]?sell|privacy (request|rights|choices)|control your", options: .caseInsensitive)
-    static let notFound = try! NSRegularExpression(pattern: "page (can.?t|cannot|could not) be found|page not found|not found|doesn.?t exist|does not exist|error 404|404 error|\\b404\\b|oops", options: .caseInsensitive)
-    static let guessPaths = ["/optout", "/opt-out", "/optout/", "/opt-out/", "/privacy", "/remove", "/removal", "/privacy-rights"]
+    static let optWords = try! NSRegularExpression(pattern: "opt[\\s_-]?out|remov|suppress|delete|do[\\s_-]?not[\\s_-]?sell|privacy (request|rights|choices)|control your|d[ée]sinscri|d[ée]sabonn|opposition|supprim|effac|ne pas vendre|ne vendez pas|vos droits|darse de baja|dar de baja|eliminar|borrar|no vender|derechos de privacidad|oposici[oó]n|exclusi[oó]n|abmeld|widerspr|l[öo]sch|entfern|nicht verkaufen|datenschutzrechte|ihre rechte", options: .caseInsensitive)
+    static let notFound = try! NSRegularExpression(pattern: "page (can.?t|cannot|could not) be found|page not found|not found|doesn.?t exist|does not exist|error 404|404 error|\\b404\\b|oops|page introuvable|page non trouv[ée]e|n.existe pas|erreur 404|p[áa]gina no encontrada|no se encontr[óo]|no existe|seite nicht gefunden|nicht gefunden|existiert nicht|fehler 404", options: .caseInsensitive)
+    static let guessPaths = ["/optout", "/opt-out", "/optout/", "/opt-out/", "/privacy", "/remove", "/removal", "/privacy-rights",
+                             "/desinscription", "/confidentialite", "/privacidad", "/baja", "/datenschutz", "/abmelden", "/widerspruch"]
     static let notAFamily = ["globalprivacycontrol", "linkedin", "bing", "google", "facebook", "twitter", "x.com", "instagram", "youtube", "pinterest",
                              "reddit", "tiktok", "zendesk", "freshdesk", "helpscout", "intercom", "dataprivacyframework", "apple.com", "microsoft",
                              "amazon", "cloudflare", "wordpress", "w3.org", "gstatic", "doubleclick"]
     static let portals = ["trustarc.com", "onetrust.com", "transcend.io", "ketch.com", "datagrail.io", "privacyportal", "osano.com", "securiti.ai"]
     private static let linkWeights: [(String, Int)] = [("opt[\\s_-]?out", 10), ("do[\\s_-]?not[\\s_-]?sell", 8), ("remov", 8), ("suppress", 8),
-        ("delete[\\s_-]?my|data[\\s_-]?delet", 7), ("your[\\s_-]?privacy[\\s_-]?choices|privacy[\\s_-]?rights|privacy[\\s_-]?request", 6), ("privacy", 2)]
+        ("delete[\\s_-]?my|data[\\s_-]?delet", 7), ("your[\\s_-]?privacy[\\s_-]?choices|privacy[\\s_-]?rights|privacy[\\s_-]?request", 6), ("privacy", 2),
+        ("d[ée]sinscri|d[ée]sabonn|darse de baja|dar de baja|abmeld", 10), ("ne pas vendre|no vender|nicht verkaufen", 8), ("supprim|effac|eliminar|borrar|l[öo]sch|entfern", 7),
+        ("vos droits|droits.{0,10}(vie priv|donn)|derechos.{0,12}(privacidad|datos)|datenschutzrechte|ihre rechte|widerspr|opposition|oposici[oó]n", 6),
+        ("confidentialit|privacidad|datenschutz", 2)]
 
     static func matches(_ re: NSRegularExpression, _ s: String) -> Bool {
         re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil
@@ -79,16 +83,16 @@ public enum LinkRules {
         let kinds = form.fields.map { "\($0.type) \($0.name) \($0.label)" }.joined(separator: " ").lowercased()
         func has(_ pattern: String) -> Bool { kinds.range(of: pattern, options: .regularExpression) != nil }
         var sc = 2
-        if has("e-?mail") { sc += 3 }
-        if has("url|link|profile|listing") { sc += 3 }
-        if has("first|last|full.?name|\\bname\\b") { sc += 1 }
+        if has("e-?mail|courriel|correo") { sc += 3 }
+        if has("url|link|profile|listing|\\blien\\b|enlace") { sc += 3 }
+        if has("first|last|full.?name|\\bname\\b|pr[ée]nom|nom de famille|apellido|vorname|nachname|\\bnom\\b|\\bnombre\\b") { sc += 1 }
         if form.hasSubmit { sc += 1 }
         if has("password") { sc -= 3 }
         let action = (form.action ?? page.url).absoluteString.lowercased()
         let removal = matches(optWords, action)
         if registrable(form.action?.host) != registrable(page.url.host), form.action != nil, !removal, !portals.contains(where: { action.contains($0) }) { return -9 }
         if removal { sc += 3 }
-        else if has("\\bcity\\b|\\bstate\\b|\\bage\\b|zip") && !has("e-?mail|url|link") { sc -= 4 }
+        else if has("\\bcity\\b|\\bstate\\b|\\bage\\b|zip|\\bville\\b|ciudad|\\bstadt\\b|code postal|c[óo]digo postal|\\bplz\\b") && !has("e-?mail|courriel|correo|url|link") { sc -= 4 }
         if form.fields.count <= 2, action.range(of: "search|find|lookup|people", options: .regularExpression) != nil || has("\\bq\\b|query|search"),
            !has("e-?mail|url|link") { sc -= 5 }
         return sc
@@ -158,7 +162,7 @@ public struct OptOutLinkFinder: Sendable {
                 queue.append(Candidate(priority: score, depth: next.depth + 1, url: url, trail: next.trail + [url]))
             }
         }
-        return FinderResult(form: nil, visited: visited, reason: visited.isEmpty ? "The site did not respond." : "Looked at \(visited.count) page(s) and found no opt-out form.")
+        return FinderResult(form: nil, visited: visited, reason: visited.isEmpty ? L10n.t("The site did not respond.") : L10n.f("Looked at %@ page(s) and found no opt-out form.", visited.count))
     }
 }
 

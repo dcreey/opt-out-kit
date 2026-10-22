@@ -19,15 +19,8 @@ final class DryRunUITests: XCTestCase {
 
         // 1. Fill in the profile through the real editor.
         app.buttons["profile-button"].tap()
-        let nameField = app.textFields["name-0"]
-        XCTAssertTrue(nameField.waitForExistence(timeout: 10))
-        nameField.tap(); nameField.typeText(name)
-        app.buttons["add-address"].tap()
-        let streetField = app.textFields["Street (optional)"]
-        XCTAssertTrue(streetField.waitForExistence(timeout: 5))
-        if !street.isEmpty { streetField.tap(); streetField.typeText(street) }
-        let cityField = app.textFields["City"]; cityField.tap(); cityField.typeText(city)
-        let stateField = app.textFields["State"]; stateField.tap(); stateField.typeText(state)
+        let parts = name.split(separator: " ").map(String.init)
+        app.fillRequiredProfile(first: parts.first ?? name, last: parts.dropFirst().last ?? "Example", street: street.isEmpty ? "1 Main St" : street, city: city, state: state)
         attach(app, "1-profile")
         app.buttons["Done"].tap()
 

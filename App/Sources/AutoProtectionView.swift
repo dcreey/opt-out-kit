@@ -67,9 +67,9 @@ struct AutoActivityView: View {
         List {
             if let person = model.selectedPerson {
                 Section {
-                    runLine("Last scan", model.autoSettings.lastScan)
-                    runLine("Last opt-out run", model.autoSettings.lastOptOut)
-                    if let busy = model.autoBusy { Label(busy == "scan" ? "Scanning…" : "Sending requests…", systemImage: "hourglass") }
+                    runLine(Loc.t("Last scan"), model.autoSettings.lastScan)
+                    runLine(Loc.t("Last opt-out run"), model.autoSettings.lastOptOut)
+                    if let busy = model.autoBusy { Label(busy == "scan" ? "Scanning…" : Loc.t("Sending requests…"), systemImage: "hourglass") }
                     let ready = model.assistedItems(for: person)
                     Button("Solve checks and send (\(ready.count) sites)", systemImage: "hand.point.up.left.fill") {
                         runner = AssistedRunner(items: ready, driver: model.makeAssistedDriver()) { entry, result in
@@ -90,12 +90,12 @@ struct AutoActivityView: View {
                 } else {
                     summary
                     group("Sent", rows.filter { if case .submitted = $0.result { return true } else { return false } }, tint: .green)
-                    group("Stopped by a bot check or terms prompt", rows.filter { if case .challenged = $0.result { return true } else { return false } }, tint: .orange)
-                    group("Needs you", rows.filter { if case .needsYou = $0.result { return true } else { return false } }, tint: .orange)
-                    group("Add details to your profile", rows.filter { if case .needsData = $0.result { return true } else { return false } }, tint: .blue)
-                    group("Ready (preview only)", rows.filter { $0.result == .dryRunReady }, tint: .blue)
-                    group("Skipped or sent recently", rows.filter { switch $0.result { case .skippedNotListed, .tooSoon: return true; default: return false } }, tint: .secondary)
-                    group("The site refused or showed no confirmation", rows.filter { switch $0.result { case .rejected, .failed: return true; default: return false } }, tint: .red)
+                    group(Loc.t("Stopped by a bot check or terms prompt"), rows.filter { if case .challenged = $0.result { return true } else { return false } }, tint: .orange)
+                    group(Loc.t("Needs you"), rows.filter { if case .needsYou = $0.result { return true } else { return false } }, tint: .orange)
+                    group(Loc.t("Add details to your profile"), rows.filter { if case .needsData = $0.result { return true } else { return false } }, tint: .blue)
+                    group(Loc.t("Ready (preview only)"), rows.filter { $0.result == .dryRunReady }, tint: .blue)
+                    group(Loc.t("Skipped or sent recently"), rows.filter { switch $0.result { case .skippedNotListed, .tooSoon: return true; default: return false } }, tint: .secondary)
+                    group(Loc.t("The site refused or showed no confirmation"), rows.filter { switch $0.result { case .rejected, .failed: return true; default: return false } }, tint: .red)
                 }
             }
         }
@@ -106,7 +106,7 @@ struct AutoActivityView: View {
     }
 
     private func runLine(_ title: String, _ date: Date?) -> some View {
-        HStack { Text(title); Spacer(); Text(date.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "Not yet").foregroundStyle(.secondary) }
+        HStack { Text(title); Spacer(); Text(date.map { Loc.date($0, time: true) } ?? Loc.t("Not yet")).foregroundStyle(.secondary) }
             .font(.footnote)
     }
 

@@ -21,3 +21,15 @@ public enum USStates {
         return names.values.first { $0.caseInsensitiveCompare(t) == .orderedSame }
     }
 }
+
+public extension USStates {
+    /// The two-letter code for a full state name ("California" gives "CA"), or nil.
+    static func code(for name: String) -> String? {
+        let t = name.trimmingCharacters(in: .whitespaces)
+        if t.count == 2, Self.name(for: t) != nil { return t.uppercased() }
+        return all.first { $0.name.caseInsensitiveCompare(t) == .orderedSame }?.code
+    }
+
+    /// Every state and DC, by name, for a picker.
+    static var all: [(code: String, name: String)] { names.map { ($0.key, $0.value) }.sorted { $0.1 < $1.1 } }
+}

@@ -1750,3 +1750,377 @@ final class ListingFlowTests: XCTestCase {
         XCTAssertEqual(OptOutMethods.classify(other, in: [entry()]).method, .guided)
     }
 }
+
+final class RequiredDetailsTests: XCTestCase {
+    func testAProfileNeedsALegalFirstAndLastNameAndACurrentAddress() {
+        var p = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat")])
+        XCTAssertEqual(p.missingRequiredDetails, ["legal last name", "current street address", "current city", "current state"])
+        XCTAssertFalse(p.isComplete)
+        p.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL")]
+        XCTAssertTrue(p.isComplete); XCTAssertEqual(p.missingRequiredDetails, [])
+    }
+
+    func testANicknameOrAPreviousAddressDoesNotMakeAProfileComplete() {
+        let p = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: ""), NameEntry(kind: .nickname, name: "Patty Example")],
+                       addresses: [Address(city: "", state: ""), Address(street: "1 Old Rd", city: "Springfield", state: "IL")])
+        XCTAssertTrue(p.missingRequiredDetails.contains("legal first name"))
+        XCTAssertTrue(p.missingRequiredDetails.contains("current street address"), "only the first address is the current one")
+    }
+
+    func testBlankSpacesDoNotCount() {
+        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "  ", city: " ", state: "IL")])
+        XCTAssertEqual(p.missingRequiredDetails, ["current street address", "current city"])
+    }
+}
+
+
+final class ContactEmailTests: XCTestCase {
+    func testGmailAddressesGetTheTrackingTagBeforeTheAtSign() {
+        XCTAssertEqual(ContactEmail.forForms("pat@gmail.com"), "pat+optoutkit@gmail.com")
+        XCTAssertEqual(ContactEmail.forForms("Pat.Example@GMAIL.com"), "Pat.Example+optoutkit@GMAIL.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@googlemail.com"), "pat+optoutkit@googlemail.com")
+        XCTAssertEqual(ContactEmail.forForms("pat+news@gmail.com"), "pat+news+optoutkit@gmail.com", "always appended, an existing tag is kept")
+        XCTAssertEqual(ContactEmail.forForms("  pat@gmail.com "), "pat+optoutkit@gmail.com")
+    }
+
+    func testTheTagIsNeverAddedTwiceOrToOtherProviders() {
+        XCTAssertEqual(ContactEmail.forForms("pat+optoutkit@gmail.com"), "pat+optoutkit@gmail.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@example.com"), "pat@example.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@icloud.com"), "pat@icloud.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@notgmail.com"), "pat@notgmail.com")
+    }
+
+    func testValidation() {
+        for ok in ["pat@example.com", "a.b+c@sub.example.org"] { XCTAssertTrue(ContactEmail.isValid(ok), ok) }
+        for bad in ["", "pat", "pat@", "@example.com", "pat@example", "pat @example.com", "a@b@c.com", "pat@.com", "pat@example."] { XCTAssertFalse(ContactEmail.isValid(bad), bad) }
+    }
+
+    func testTheHouseholdKeepsOneAddressAndOnlyAValidOneReachesForms() throws {
+        var h = Household()
+        XCTAssertNil(h.formEmail)
+        h.setContactEmail("pat@gmail.com")
+        XCTAssertEqual(h.formEmail, "pat+optoutkit@gmail.com")
+        h.setContactEmail("not an email")
+        XCTAssertNil(h.formEmail, "an invalid address is never put on a form")
+        h.setContactEmail("  ")
+        XCTAssertNil(h.contactEmail)
+        h.setContactEmail("pat@example.com")
+        let again = try JSONDecoder().decode(Household.self, from: JSONEncoder().encode(h))
+        XCTAssertEqual(again.contactEmail, "pat@example.com")
+    }
+
+    func testTheLegalNameSplitsIntoFirstMiddleAndLast() {
+        var p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Q. Example")])
+        XCTAssertEqual([p.legalFirst, p.legalMiddle, p.legalLast], ["Pat", "Q.", "Example"])
+        p.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        XCTAssertEqual([p.legalFirst, p.legalMiddle, p.legalLast], ["Pat", "", "Example"])
+        p.names = [NameEntry(kind: .legal, name: "Pat")]
+        XCTAssertEqual([p.legalFirst, p.legalLast], ["Pat", ""], "a single word is a first name only")
+        XCTAssertEqual(Person.composeLegalName(first: " Pat ", middle: "", last: "Example"), "Pat Example")
+        XCTAssertEqual(Person.composeLegalName(first: "Pat", middle: "Q", last: "Example"), "Pat Q Example")
+    }
+}
+
+final class PlatformTests: XCTestCase {
+    private var root: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+    private func drop() throws -> Platform {
+        try XCTUnwrap(try PlatformLoader.load(directory: root.appendingPathComponent("platforms")).first { $0.id == "ca-drop" })
+    }
+
+    func testTheCaliforniaPlatformLoadsWithItsStepsRegistryAndCoverage() throws {
+        let p = try drop()
+        XCTAssertEqual(p.states, ["CA"]); XCTAssertEqual(p.holdDays, 90); XCTAssertTrue(p.live)
+        XCTAssertGreaterThan(p.registered, 500, "the full registry is known")
+        XCTAssertGreaterThan(p.coverage.count, 500)
+        XCTAssertTrue(p.walkthrough.steps.count >= 5)
+        XCTAssertEqual(p.walkthrough.steps.first?.open?.host, "privacy.ca.gov")
+    }
+
+    func testOurSitesThatAreRegisteredBrokersAreCoveredAndTheRestAreNot() throws {
+        let p = try drop()
+        XCTAssertEqual(p.covers(domain: "spokeo.com")?.match, .domain)
+        XCTAssertNotNil(p.covers(domain: "www.spokeo.com"), "a subdomain of a registered site counts")
+        XCTAssertNotNil(p.covers(domain: "truthfinder.com"))
+        XCTAssertNil(p.covers(domain: "not-a-broker.example"))
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let covered = entries.filter { p.covers(domain: $0.domain) != nil }
+        print("DROP covers \(covered.count) of \(entries.count) directory sites")
+        XCTAssertGreaterThan(covered.count, 500)
+    }
+
+    func testOnlyResidentsOfTheStateCanUseIt() throws {
+        let p = try drop()
+        func person(_ state: String?, _ rel: Relationship = .otherFamily) -> Person {
+            Person(displayName: "P", relationship: rel, addresses: state.map { [Address(street: "1 A St", city: "X", state: $0)] } ?? [])
+        }
+        XCTAssertTrue(p.eligible(person("CA"))); XCTAssertTrue(p.eligible(person("California"))); XCTAssertTrue(p.eligible(person(" ca ")))
+        XCTAssertFalse(p.eligible(person("IL"))); XCTAssertFalse(p.eligible(person("Illinois")))
+        XCTAssertFalse(p.eligible(person(nil)), "no address and no claim")
+        XCTAssertTrue(p.eligible(person(nil, .me), ownerState: "CA"), "the owner chose California")
+        XCTAssertFalse(p.eligible(person(nil, .me), ownerState: "IL"))
+        XCTAssertFalse(p.eligible(person(nil, .parent), ownerState: "CA"), "the walkthrough choice is the owner's only")
+        XCTAssertFalse(p.eligible(person("IL", .me), ownerState: "CA"), "once there is an address, it decides")
+    }
+
+    func testAHeldSiteIsLeftAloneUntilTheHoldEnds() throws {
+        let now = Date()
+        let form = OptOutForm(page: URL(string: "https://x.example/o")!, method: "post", action: nil,
+                              fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        let e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .A, automation: .guided, optOutForm: form)
+        let pat = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"])
+        let p = try drop()
+        let until = p.holdUntil(submitted: now)
+        XCTAssertEqual(until.timeIntervalSince(now), 90 * 86_400, accuracy: 1)
+        let hold = PlatformHold(name: p.name, until: until)
+        let held = AutoOptOut.precheck(entry: e, person: pat, progress: Progress(), now: now, hold: hold)
+        XCTAssertEqual(held.result, .coveredByPlatform(name: p.name, until: until))
+        XCTAssertTrue(held.result?.label.hasPrefix("Covered by") == true)
+        XCTAssertNil(AutoOptOut.precheck(entry: e, person: pat, progress: Progress(), now: until.addingTimeInterval(1), hold: hold).result, "after the hold it is asked directly again")
+        XCTAssertNil(AutoOptOut.precheck(entry: e, person: pat, progress: Progress(), now: now).result, "no hold, no skip")
+    }
+
+    func testTheOwnersStateIsKept() throws {
+        var h = Household()
+        XCTAssertNil(h.ownerState)
+        h.setOwnerState("CA")
+        let again = try JSONDecoder().decode(Household.self, from: JSONEncoder().encode(h))
+        XCTAssertEqual(again.ownerState, "CA")
+    }
+}
+
+final class RegistryCompletenessTests: XCTestCase {
+    private var root: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+    private struct Known: Decodable { struct B: Decodable { var domain: String; var names: [String]; var registeredIn: [String]
+        enum CodingKeys: String, CodingKey { case domain, names, registeredIn = "registered_in" } }; var count: Int; var brokers: [B] }
+
+    func testEveryBrokerRegisteredInAnyStateWeReadIsOnOurList() throws {
+        let file = try JSONDecoder().decode(Known.self, from: Data(contentsOf: root.appendingPathComponent("registries/all-brokers.json")))
+        XCTAssertEqual(file.brokers.count, file.count)
+        XCTAssertGreaterThan(file.brokers.count, 600)
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let ours = Set(entries.map { LinkRules.registrable($0.domain) })
+        let missing = file.brokers.filter { !ours.contains($0.domain) }
+        XCTAssertTrue(missing.isEmpty, "known brokers with no entry: \(missing.prefix(10).map(\.domain)) (\(missing.count) in all)")
+        print("REGISTRY \(file.brokers.count) known broker sites from \(Set(file.brokers.flatMap(\.registeredIn)).sorted()), all on our list (\(entries.count) directory entries)")
+    }
+
+    func testEntriesSayWhichStatesTheyAreRegisteredIn() throws {
+        let file = try JSONDecoder().decode(Known.self, from: Data(contentsOf: root.appendingPathComponent("registries/all-brokers.json")))
+        let byDomain = Dictionary(uniqueKeysWithValues: file.brokers.map { ($0.domain, $0.registeredIn) })
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let wrong = entries.filter { e in byDomain[LinkRules.registrable(e.domain)].map { Set($0) != Set(e.registeredIn ?? []) } ?? false }
+        XCTAssertTrue(wrong.isEmpty, "stale registered_in on \(wrong.prefix(5).map(\.domain)); re-run tools/profile_brokers.py")
+    }
+
+    func testTheCoverageFileReachesEveryCaliforniaRegisteredBroker() throws {
+        let drop = try XCTUnwrap(PlatformLoader.load(directory: root.appendingPathComponent("platforms")).first)
+        let file = try JSONDecoder().decode(Known.self, from: Data(contentsOf: root.appendingPathComponent("registries/all-brokers.json")))
+        let unreached = file.brokers.filter { $0.registeredIn.contains("CA") && drop.covers(domain: $0.domain) == nil }
+        XCTAssertTrue(unreached.isEmpty, "\(unreached.count) California brokers are not reached: \(unreached.prefix(5).map(\.domain))")
+    }
+}
+
+final class MultilingualRulesTests: XCTestCase {
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                             addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL")], emails: ["pat@example.com"])
+    private func form(_ fields: [(String, String, String)]) -> OptOutForm {
+        OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil,
+                   fields: fields.map { FormField(type: $0.0, name: $0.1, label: $0.2) }, hops: 1)
+    }
+    private func names(_ plan: FillPlan) -> [String: String] { Dictionary(uniqueKeysWithValues: plan.values.map { ($0.name, $0.candidates[0]) }) }
+
+    func testOptOutLinksAreRecognisedInFrenchSpanishAndGerman() {
+        for (href, text) in [("/desinscription", "Se désinscrire"), ("/privacidad", "No vender mi información"), ("/datenschutz", "Widerspruch und Löschung"),
+                             ("/vos-droits", "Vos droits en matière de données"), ("/baja", "Darse de baja")] {
+            XCTAssertGreaterThan(LinkRules.score(href: href, text: text), 0, "\(href) \(text)")
+        }
+        XCTAssertEqual(LinkRules.score(href: "/a-propos", text: "À propos de nous"), 0)
+        XCTAssertGreaterThan(LinkRules.guessPaths.filter { ["/desinscription", "/privacidad", "/datenschutz"].contains($0) }.count, 2)
+    }
+
+    func testErrorPagesAreRecognisedInEveryLanguage() {
+        for text in ["Page introuvable", "Erreur 404", "Página no encontrada", "No se encontró la página", "Seite nicht gefunden", "Fehler 404"] {
+            XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: URL(string: "https://x.example/a")!, status: 200, title: text, text: "")), text)
+        }
+        XCTAssertFalse(LinkRules.isErrorPage(PageSnapshot(url: URL(string: "https://x.example/a")!, status: 200, title: "Se désinscrire", text: "Formulaire de désinscription")))
+    }
+
+    func testAFrenchOptOutFormIsRecognisedAsTheRealForm() {
+        let page = PageSnapshot(url: URL(string: "https://x.example/desinscription")!, title: "Se désinscrire", text: "Demande de désinscription. Vos droits sur vos données.",
+                                forms: [FormSnapshot(action: nil, method: "post", fields: [FormField(type: "text", name: "p", label: "Prénom"), FormField(type: "text", name: "n", label: "Nom"),
+                                                                                           FormField(type: "email", name: "c", label: "Courriel")], hasSubmit: true)])
+        XCTAssertNotNil(LinkRules.bestForm(on: page))
+    }
+
+    func testFormsInFrenchSpanishAndGermanAreFilledFromTheProfile() {
+        let fr = FormFiller.plan(for: form([("text", "p", "Prénom *"), ("text", "n", "Nom *"), ("email", "c", "Courriel *"), ("text", "v", "Ville"), ("text", "e", "État"), ("text", "z", "Code postal")]), signals: nil, person: pat)
+        XCTAssertEqual(names(fr), ["p": "Pat", "n": "Example", "c": "pat@example.com", "v": "Springfield", "e": "IL"], "Nom is the family name when there is a Prénom")
+        let es = FormFiller.plan(for: form([("text", "a", "Nombre *"), ("text", "b", "Apellido *"), ("email", "c", "Correo electrónico *"), ("text", "d", "Ciudad"), ("text", "e", "Estado")]), signals: nil, person: pat)
+        XCTAssertEqual(names(es), ["a": "Pat", "b": "Example", "c": "pat@example.com", "d": "Springfield", "e": "IL"], "Nombre is the first name when there is an Apellido")
+        let de = FormFiller.plan(for: form([("text", "a", "Vorname *"), ("text", "b", "Nachname *"), ("email", "c", "E-Mail-Adresse *"), ("text", "d", "Stadt"), ("text", "e", "Bundesland"), ("text", "t", "Telefon")]), signals: nil, person: pat)
+        XCTAssertEqual(names(de), ["a": "Pat", "b": "Example", "c": "pat@example.com", "d": "Springfield", "e": "IL"])
+        let single = FormFiller.plan(for: form([("text", "n", "Nom complet *"), ("email", "c", "Courriel *")]), signals: nil, person: pat)
+        XCTAssertEqual(names(single)["n"], "Pat Example", "a lone Nom is the full name")
+    }
+
+    func testWhatIsMissingIsNamedInTheChosenLanguage() {
+        let noEmail = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
+        L10n.language = "fr"; defer { L10n.language = "en" }
+        let plan = FormFiller.plan(for: form([("email", "c", "Courriel")]), signals: nil, person: noEmail)
+        XCTAssertEqual(plan.verdict, .needsData(["adresse e-mail"]))
+    }
+
+    func testTermsParagraphsRememberTheirLanguageAndTheListCountsPerLanguage() {
+        let lib = TermsLibrary(version: 1, paragraphs: [
+            TermsParagraph(hash: "a", sites: 3, kinds: ["terms"], flags: [], prefix: "x", reviewed: true, verdict: "ok"),
+            TermsParagraph(hash: "b", sites: 1, kinds: ["terms"], flags: [], prefix: "y", reviewed: false, verdict: nil, lang: "fr"),
+            TermsParagraph(hash: "c", sites: 1, kinds: ["terms"], flags: [], prefix: "z", reviewed: true, verdict: "ok", lang: "fr")])
+        XCTAssertEqual(lib.languages["en"]?.total, 1)
+        XCTAssertEqual(lib.languages["fr"]?.total, 2); XCTAssertEqual(lib.languages["fr"]?.reviewed, 1)
+        XCTAssertEqual(lib.paragraphs[0].language, "en")
+    }
+
+    func testTheTermsCanonicalizerAgreesWithPythonOnFrenchSpanishAndGermanText() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        struct Fixture: Decodable { var domain: String; var input: String; var canonical: String; var hash: String }
+        let fixtures = try JSONDecoder().decode([Fixture].self, from: Data(contentsOf: root.appendingPathComponent("terms/canonicalization-fixtures.json")))
+        XCTAssertGreaterThanOrEqual(fixtures.count, 8)
+        for f in fixtures {
+            XCTAssertEqual(TermsText.canonical(f.input, domain: f.domain), f.canonical, f.domain)
+            XCTAssertEqual(TermsText.hash(ofCanonical: f.canonical), f.hash, f.domain)
+        }
+    }
+}
+
+
+final class CountryTests: XCTestCase {
+    private var root: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+    private func everything() throws -> [Jurisdiction] { try JurisdictionLoader.load(directory: root.appendingPathComponent("jurisdictions")) }
+    private func country(_ code: String) throws -> Jurisdiction { try XCTUnwrap(try everything().first { $0.kind == "country" && $0.code == code }) }
+    private var summary: RegistrySummary? { JurisdictionLoader.loadSummary(root.appendingPathComponent("registries/summary.json")) }
+    private func platforms() throws -> [Platform] { try PlatformLoader.load(directory: root.appendingPathComponent("platforms")) }
+    override func tearDown() { L10n.language = "en" }
+
+    func testTheCountriesLoadWithTheEUAndEveryMemberAndAreUniqueByID() throws {
+        let all = try everything()
+        let countries = all.filter { $0.kind == "country" }
+        XCTAssertGreaterThanOrEqual(countries.count, 50)
+        XCTAssertEqual(all.filter { $0.kind == "bloc" }.map(\.code), ["EU"])
+        XCTAssertEqual(Set(all.map(\.id)).count, all.count)
+        let eu = countries.filter { $0.bloc == "eu" }.map(\.code)
+        XCTAssertEqual(eu.count, 27, "all 27 EU members")
+        XCTAssertEqual(countries.filter { $0.bloc == "eea" }.map(\.code).sorted(), ["IS", "LI", "NO"])
+        XCTAssertTrue(countries.allSatisfy { !$0.reviewed.isEmpty && ($0.regulator?.name.isEmpty == false) && ($0.sources?.isEmpty == false) })
+    }
+
+    func testRightsAreRecordedInOneVocabularyForStatesAndCountries() throws {
+        XCTAssertEqual(try country("FR").privacyLaw?.deletionRight, .yes)
+        XCTAssertEqual(try country("SG").privacyLaw?.deletionRight, .no)
+        XCTAssertEqual(try country("HK").privacyLaw?.deletionRight, .unclear)
+        XCTAssertEqual(try country("AU").privacyLaw?.deletionRight, .limited)
+        let ca = try XCTUnwrap(try everything().first { $0.id == "us-ca" })
+        XCTAssertEqual(ca.privacyLaw?.deletionRight, .yes, "a US entry written as true still reads")
+        XCTAssertEqual(try country("IN").privacyLaw?.status, "enacted")
+        XCTAssertEqual(try country("CL").privacyLaw?.effective, "2026-12-01")
+        XCTAssertNil(try country("MX").privacyLaw?.effective, "not clear in the sources, so not guessed")
+    }
+
+    func testOnlyRegistriesOfBrokersCountAsBrokerRegistries() throws {
+        XCTAssertFalse(try country("AR").registryIsLive, "a registry of databases is not a broker registry")
+        XCTAssertFalse(try country("CA").registryIsLive, "Quebec's registers agents, not brokers in general")
+        XCTAssertTrue(try country("IL").registryIsLive)
+    }
+
+    func testAFrenchResidentIsToldTheGDPRAndTheirRegulatorInFrench() throws {
+        L10n.language = "fr"
+        let lines = try country("FR").statements(summary: summary, platforms: platforms(), others: everything()).map(\.text)
+        XCTAssertTrue(lines[0].hasPrefix("France a une loi sur la protection des données : Règlement général sur la protection des données"), lines[0])
+        XCTAssertTrue(lines.contains { $0.contains("Loi Informatique et Libertés") })
+        XCTAssertTrue(lines.contains { $0.contains("cnil.fr") })
+        XCTAssertTrue(lines.contains { $0.contains("absolue") }, "the marketing objection is absolute")
+    }
+
+    func testEachCountryIsToldItsOwnRulesAndStrongPlacesAreOfferedAsExamples() throws {
+        let all = try everything(), ps = try platforms()
+        let sg = try country("SG").statements(summary: summary, platforms: ps, others: all).map(\.text)
+        XCTAssertTrue(sg.contains { $0.contains("no general right to have your data deleted") })
+        XCTAssertTrue(sg.contains { $0.contains("In California, one free request") }, "limited places are shown what stronger rules look like")
+        let hk = try country("HK").statements(summary: summary, platforms: ps, others: all).map(\.text)
+        XCTAssertTrue(hk.contains { $0.contains("could not confirm a general right") })
+        let ca = try country("CA").statements(summary: summary, platforms: ps, others: all).map(\.text)
+        XCTAssertTrue(ca.contains { $0.contains("Quebec") && $0.contains("no general data broker registry") })
+        let ar = try country("AR").statements(summary: summary, platforms: ps, others: all).map(\.text)
+        XCTAssertTrue(ar.contains { $0.contains("not data brokers") })
+    }
+
+    func testCountryNamesComeFromTheSystemInTheChosenLanguage() throws {
+        XCTAssertEqual(try country("DE").displayName, "Germany")
+        L10n.language = "de"; XCTAssertEqual(try country("DE").displayName, "Deutschland")
+        L10n.language = "es"; XCTAssertEqual(try country("DE").displayName, "Alemania")
+        L10n.language = "fr"; XCTAssertEqual(try country("JP").displayName, "Japon")
+    }
+}
+
+final class LawSourcesAndPendingTests: XCTestCase {
+    private var root: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+    private func everything() throws -> [Jurisdiction] { try JurisdictionLoader.load(directory: root.appendingPathComponent("jurisdictions")) }
+    private func place(_ id: String) throws -> Jurisdiction { try XCTUnwrap(try everything().first { $0.id == id }) }
+    override func tearDown() { L10n.language = "en" }
+
+    func testEveryPlaceLinksToTheRealPagesItsFactsCameFrom() throws {
+        for j in try everything() {
+            XCTAssertFalse(j.sourceLinks.isEmpty, "\(j.id) has no source")
+            for l in j.sourceLinks {
+                let u = try XCTUnwrap(URL(string: l.url), "\(j.id): \(l.url)")
+                XCTAssertEqual(u.scheme, "https", "\(j.id): \(l.url)")
+                XCTAssertNotNil(u.host, l.url)
+            }
+        }
+    }
+
+    func testALawThatHasPassedButNotTakenEffectIsSaidSo() throws {
+        let al = try place("us-al")
+        XCTAssertFalse(try XCTUnwrap(al.privacyLaw).isInEffect(on: Jurisdiction.day("2026-10-22")!))
+        XCTAssertTrue(try XCTUnwrap(al.privacyLaw).isInEffect(on: Jurisdiction.day("2027-05-01")!))
+        let text = al.statements(summary: nil, platforms: []).map(\.text).joined(separator: "\n")
+        XCTAssertTrue(text.contains("takes effect"), text)
+    }
+
+    func testLawsBeingConsideredAreShownWithTheirStageAndALink() throws {
+        let ma = try place("us-ma").statements(summary: nil, platforms: [])
+        let line = try XCTUnwrap(ma.first { $0.text.contains("Massachusetts Data Privacy Act") })
+        XCTAssertTrue(line.text.hasPrefix("Moving through the legislature, not law yet"), line.text)
+        XCTAssertEqual(line.url, "https://malegislature.gov/Bills/194/S2619")
+        let il = try place("us-il").statements(summary: nil, platforms: []).filter { $0.text.hasPrefix("Being considered") }
+        XCTAssertEqual(il.count, 2, "a privacy bill and a data broker bill")
+        let ct = try place("us-ct").statements(summary: nil, platforms: []).map(\.text)
+        XCTAssertTrue(ct.contains { $0.hasPrefix("Passed but not in effect yet (takes effect 2027-01-01)") })
+        XCTAssertTrue(try place("country-ca").countryStatements(summary: nil, platforms: [], others: []).contains { $0.text.contains("Bill C-36") })
+    }
+
+    func testAPendingLawDisappearsOnceItTakesEffect() throws {
+        let ct = try place("us-ct")
+        XCTAssertEqual(ct.pendingStatements(now: Jurisdiction.day("2026-10-22")!).count, 1)
+        XCTAssertEqual(ct.pendingStatements(now: Jurisdiction.day("2027-01-02")!).count, 0)
+    }
+
+    func testEveryPendingLawSaysWhenItWasChecked() throws {
+        for j in try everything() { for p in j.pending ?? [] {
+            XCTAssertTrue(["proposed", "advancing", "passed"].contains(p.stage), "\(j.id): \(p.stage)")
+            XCTAssertNotNil(p.asOf, "\(j.id): \(p.name)")
+        } }
+    }
+}

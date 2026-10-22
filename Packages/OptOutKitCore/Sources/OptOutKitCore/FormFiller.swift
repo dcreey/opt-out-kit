@@ -60,7 +60,7 @@ public enum FormFiller {
     /// `listingURL` is the person's own listing, picked by them on the site; without it a form that needs one is left to the person.
     public static func plan(for form: OptOutForm, signals: [String]?, person: Person, listingURL: URL? = nil) -> FillPlan {
         if let hit = (signals ?? []).compactMap({ humanOnlySignals[$0] }).first {
-            return FillPlan(values: [], verdict: .needsYou("This site \(hit)."))
+            return FillPlan(values: [], verdict: .needsYou(L10n.f("This site %@.", hit)))
         }
         let legal = person.legalName
         let parts = legal.split(separator: " ").map(String.init)
@@ -70,6 +70,10 @@ public enum FormFiller {
         var missing: [String] = []
         var needsYou: String?
 
+        // A plain "nom" or "nombre" is the family name or the first name depending on which other fields the form has.
+        let allKeys = form.fields.map { ($0.name + " " + $0.label).lowercased() }
+        let hasPrenom = allKeys.contains { $0.range(of: "pr[ée]nom|first|vorname", options: .regularExpression) != nil }
+        let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         for field in form.fields {
             let key = (field.name + " " + field.label).lowercased()
             let required = field.label.contains("*")
@@ -85,16 +89,16 @@ public enum FormFiller {
                     if isSelfIdentityBox(key), person.mayConfirmOwnIdentity() {
                         // The owner allowed this one plain statement about themselves; the sentinel below ticks it on the live page.
                     } else if isSelfIdentityBox(key) {
-                        needsYou = needsYou ?? "This form asks the person to confirm \"I am this person\" (\"\(field.display)\"). The app only does that for the account owner, and only if they allowed it."
+                        needsYou = needsYou ?? L10n.f("This form asks the person to confirm \"I am this person\" (\"%@\"). The app only does that for the account owner, and only if they allowed it.", field.display)
                     } else {
-                        needsYou = needsYou ?? "This form asks you to confirm or certify something yourself (\"\(field.display)\")."
+                        needsYou = needsYou ?? L10n.f("This form asks you to confirm or certify something yourself (\"%@\").", field.display)
                     }
                 }
                 continue
             default: break
             }
             if key.contains("agent") || key.contains("on behalf") || key.contains("customer id") || key.contains("account number") {
-                if required { needsYou = needsYou ?? "This form asks for something only you can supply (\"\(field.display)\")." }
+                if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }
                 continue
             }
             // Middle names and suffixes are optional and the profile does not hold them: leave them empty, never reuse another name.
@@ -102,26 +106,28 @@ public enum FormFiller {
             // A link to the person's own listing has to come from them: the form cannot succeed without it.
             if isListingField(field) {
                 if let listingURL { values.append(FieldValue(name: field.name, type: field.type, candidates: [listingURL.absoluteString], label: field.label)) }
-                else { needsYou = needsYou ?? "This form needs the link to your listing on the site, which you find there first." }
+                else { needsYou = needsYou ?? L10n.t("This form needs the link to your listing on the site, which you find there first.") }
                 continue
             }
-            if field.type == "email" || key.contains("e-mail") || key.contains("email") { put([person.emails.first], "email address") }
-            else if key.contains("first") || key.contains("fname") || key.contains("given") { put([first], "first name") }
-            else if key.contains("last") || key.contains("lname") || key.contains("surname") || key.contains("family") { put([last], "last name") }
-            else if key.contains("full") || key.range(of: "\\bname\\b", options: .regularExpression) != nil { put([legal], "full name") }
-            else if key.contains("city") { put([address?.city], "city") }
-            else if key.contains("state") || key.contains("province") {
-                put([address?.state, address.flatMap { USStates.name(for: $0.state) }], "state")
+            // Field names and labels in English, French, Spanish and German.
+            func has(_ pattern: String) -> Bool { key.range(of: pattern, options: .regularExpression) != nil }
+            if field.type == "email" || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
+            else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
+            else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }
+            else if has("full|\\bname\\b|\\bnom\\b|\\bnombre\\b") { put([legal], L10n.noun("Full name")) }
+            else if has("city|\\bville\\b|ciudad|\\bstadt\\b|\\bort\\b") { put([address?.city], L10n.noun("City")) }
+            else if has("state|province|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
+                put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
-            else if key.contains("zip") || key.contains("postal") { put([], "zip code") }
-            else if key.contains("phone") || field.type == "tel" { put([person.phones.first], "phone number") }
-            else if key.contains("birth") || key.contains("dob") { put([person.birthdate], "birthdate") }
-            else if key.contains("address") || key.contains("street") { put([address?.street], "street address") }
-            else if required { needsYou = needsYou ?? "This form asks for something we do not have (\"\(field.display)\")." }
+            else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([], L10n.noun("Zip code")) }
+            else if has("phone|t[ée]l[ée]phone|tel[ée]fono|telefon|handy") || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
+            else if has("birth|dob|naissance|nacimiento|geburt") { put([person.birthdate], L10n.noun("Birthdate")) }
+            else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }
+            else if required { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
         }
         if let needsYou { return FillPlan(values: values, verdict: .needsYou(needsYou)) }
         if !missing.isEmpty { return FillPlan(values: values, verdict: .needsData(Array(Set(missing)).sorted())) }
-        if values.isEmpty { return FillPlan(values: [], verdict: .needsYou("We could not match any of this form's fields to your profile.")) }
+        if values.isEmpty { return FillPlan(values: [], verdict: .needsYou(L10n.t("We could not match any of this form's fields to your profile."))) }
         // The account owner allowed "I am this person" boxes to be ticked for them. The page is checked live for such a box;
         // anything else that certifies, attests or accepts terms is left alone. Never added for anyone else's profile.
         if person.mayConfirmOwnIdentity() { values.append(FieldValue(name: "", type: confirmIdentityType, candidates: ["on"], label: "")) }

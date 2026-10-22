@@ -29,6 +29,11 @@ final class AppModel: ObservableObject {
     @Published private(set) var brokers: [Broker] = []
     /// Every profiled site, including those with no hand-written flow yet.
     @Published private(set) var directory: [DirectoryEntry] = []
+    /// Government and industry services that send one request to many brokers at once (California DROP). See docs/PLATFORMS.md.
+    @Published private(set) var platforms: [Platform] = []
+    /// What each state requires of data brokers and gives its residents, and the counts from the registries we pull.
+    @Published private(set) var jurisdictions: [Jurisdiction] = []
+    @Published private(set) var registrySummary: RegistrySummary?
     /// Paragraphs of terms text a person has (or has not yet) reviewed. Ships with none reviewed, so nothing is ever accepted
     /// for anyone until a reviewer marks paragraphs and the person turns this on. See docs/TERMS.md.
     @Published private(set) var termsLibrary: TermsLibrary?
@@ -51,6 +56,31 @@ final class AppModel: ObservableObject {
     private let defaults: UserDefaults
     private let catalog: [Announcement]
     private static let seenKey = "announcement.lastSeen"
+    private static let languageKey = "appLanguage"
+
+    /// The languages the app is translated into, each named in itself.
+    static let languages: [(code: String, name: String)] = [("en", "English"), ("fr", "Français"), ("es", "Español"), ("de", "Deutsch")]
+
+    /// The language shown. It starts as the device's language when the app has it, else English, and the person can change it.
+    @Published private(set) var language = "en"
+
+    var locale: Locale { Locale(identifier: language) }
+
+    func setLanguage(_ code: String) {
+        guard Self.languages.contains(where: { $0.code == code }) else { return }
+        language = code
+        L10n.language = code; Loc.language = code
+        defaults.set(code, forKey: Self.languageKey)
+    }
+
+    private static func initialLanguage(_ defaults: UserDefaults) -> String {
+        if let saved = defaults.string(forKey: languageKey), languages.contains(where: { $0.code == saved }) { return saved }
+        for preferred in Locale.preferredLanguages {
+            let base = String(preferred.split(separator: "-").first ?? "")
+            if languages.contains(where: { $0.code == base }) { return base }
+        }
+        return "en"
+    }
 
     /// Progress for whoever is selected, so the broker views stay person-agnostic.
     var progress: OptOutKitCore.Progress { household.progress(for: selectedID) }
@@ -66,12 +96,18 @@ final class AppModel: ObservableObject {
          brokersDirectory: URL? = Bundle.main.url(forResource: "brokers", withExtension: nil),
          directoryURL: URL? = Bundle.main.url(forResource: "directory", withExtension: nil),
          termsLibraryURL: URL? = Bundle.main.url(forResource: "terms", withExtension: nil)?.appendingPathComponent("library.yml"),
+         platformsURL: URL? = Bundle.main.url(forResource: "platforms", withExtension: nil),
+         jurisdictionsURL: URL? = Bundle.main.url(forResource: "jurisdictions", withExtension: nil),
+         registrySummaryURL: URL? = Bundle.main.url(forResource: "summary", withExtension: "json"),
          defaults: UserDefaults = .standard,
          catalog: [Announcement] = AnnouncementCatalog.all) {
         self.store = store
         self.defaults = defaults
         self.catalog = catalog
         let args = ProcessInfo.processInfo.arguments
+        if args.contains("-uitest-reset") { defaults.removeObject(forKey: Self.languageKey) }
+        let initial = Self.initialLanguage(defaults)
+        language = initial; L10n.language = initial; Loc.language = initial
         if args.contains("-uitest-reset") {
             try? store.erase()
             // UI tests skip the walkthrough unless a test asks for it.
@@ -84,19 +120,22 @@ final class AppModel: ObservableObject {
         do {
             if let saved = try store.load() { loaded = saved }
         } catch {
-            problem = "Your saved profiles could not be opened on this device (\(error)). They are untouched."
+            problem = Loc.f("Your saved profiles could not be opened on this device (%@). They are untouched.", error)
         }
         if loaded.people.isEmpty { loaded.add(Person(displayName: "Me", relationship: .me)) }
         household = loaded
         selectedID = loaded.people[0].id
         storageProblem = problem
         if let directoryURL { directory = (try? Registry.loadDirectory(directoryURL)) ?? [] }
+        if let jurisdictionsURL { jurisdictions = (try? JurisdictionLoader.load(directory: jurisdictionsURL)) ?? [] }
+        if let registrySummaryURL { registrySummary = JurisdictionLoader.loadSummary(registrySummaryURL) }
+        if let platformsURL { platforms = (try? PlatformLoader.load(directory: platformsURL)) ?? [] }
         if let termsLibraryURL { termsLibrary = try? TermsLibrary.load(termsLibraryURL) }
         do {
             guard let brokersDirectory else { throw CocoaError(.fileNoSuchFile) }
             brokers = try Registry.load(directory: brokersDirectory)
         } catch {
-            loadError = "Could not load the broker registry: \(error)"
+            loadError = Loc.f("Could not load the broker registry: %@", error)
         }
     }
 
@@ -112,11 +151,184 @@ final class AppModel: ObservableObject {
 
     var score: Score { Score.compute(progress, brokers: brokers) }
 
+    // MARK: Platforms (California DROP and the like)
+
+    /// Platforms the selected person may use, with the sites each one reaches listed on its walkthrough.
+    var platformQueue: [Broker] {
+        guard let person = selectedPerson else { return [] }
+        return platforms.filter { $0.live && $0.eligible(person, ownerState: household.ownerState) }.map(walkthrough)
+    }
+
+    func walkthrough(_ platform: Platform) -> Broker {
+        var b = platform.walkthrough
+        b.covers = platform.coveredDomains
+        return b
+    }
+
+    func platform(forWalkthrough id: String) -> Platform? { platforms.first { $0.id == id } }
+
+    /// The state the owner chose in the walkthrough (two-letter code), until their profile has a current address.
+    var ownerState: String? { household.ownerState }
+    func setOwnerState(_ code: String?) { household.setOwnerState(code); save() }
+
+    /// The state whose rules apply to the owner: their current address if they have one, else what they chose in the walkthrough.
+    var ownerStateCode: String? {
+        if let me = household.people.first(where: { $0.relationship == .me }), let state = me.currentAddress?.state,
+           let name = USStates.name(for: state), let code = USStates.code(for: name) { return code }
+        return household.ownerState
+    }
+
+    /// A US state's rules, by its two-letter code.
+    func jurisdiction(code: String) -> Jurisdiction? { jurisdictions.first { $0.id == "us-" + code.lowercased() } }
+    func jurisdiction(id: String) -> Jurisdiction? { jurisdictions.first { $0.id == id } }
+
+    // MARK: Where the owner lives
+
+    /// The country the owner chose, else the device's region when the app knows it.
+    var ownerCountry: String? {
+        if let chosen = household.ownerCountry { return chosen }
+        let region = Locale.current.region?.identifier
+        return region.flatMap { r in r == "US" || jurisdictions.contains { $0.kind == "country" && $0.code == r } ? r : nil }
+    }
+
+    func setOwnerCountry(_ code: String?) { household.setOwnerCountry(code); save() }
+
+    /// Every place the app has rules for as a country, by name in the chosen language, plus the United States.
+    var countryOptions: [(code: String, name: String)] {
+        var items = jurisdictions.filter { $0.kind == "country" }.map { (code: $0.code, name: $0.displayName) }
+        items.append((code: "US", name: Locale(identifier: language).localizedString(forRegionCode: "US") ?? "United States"))
+        return items.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+    }
+
+    /// The rules that apply to the owner: their state if they live in the US, else their country, else nothing yet.
+    var ownerJurisdiction: Jurisdiction? {
+        switch ownerCountry {
+        case "US": return ownerStateCode.flatMap { jurisdiction(code: $0) }
+        case .some(let c) where c != "OTHER": return jurisdictions.first { $0.kind == "country" && $0.code == c }
+        default: return nil
+        }
+    }
+
+    /// What the owner's state does for them, in plain words, for the walkthrough and About.
+    func statements(for jurisdiction: Jurisdiction) -> [JurisdictionStatement] {
+        jurisdiction.statements(summary: registrySummary, platforms: platforms, others: jurisdictions)
+    }
+
+    /// The platform that already covers this site for the selected person, and until when asking the site directly is held off.
+    /// `until` is nil while the person has not submitted that platform's request yet.
+    func platformCover(for entry: DirectoryEntry) -> (platform: Platform, coverage: Platform.Coverage, until: Date?)? {
+        guard let person = selectedPerson else { return nil }
+        for p in platforms where p.live && p.eligible(person, ownerState: household.ownerState) {
+            if let c = p.covers(domain: entry.domain) {
+                return (p, c, household.progress(for: person.id).doneAt[p.id].map(p.holdUntil))
+            }
+        }
+        return nil
+    }
+
+    /// A group of sites one platform request handles for the selected person. They are shown once, together, and are not separate work.
+    struct PlatformGroup: Identifiable {
+        let platform: Platform
+        let brokers: [Broker]
+        let entries: [DirectoryEntry]
+        var id: String { platform.id }
+        var count: Int { brokers.count + entries.count }
+    }
+
+    func isHandledByPlatform(_ entry: DirectoryEntry) -> Bool { platformCover(for: entry) != nil }
+
+    /// A hand-written flow is handled when its own site (or any site it clears) is covered.
+    func isHandledByPlatform(_ broker: Broker) -> Bool {
+        if let e = Directory.entry(for: broker, in: directory), isHandledByPlatform(e) { return true }
+        return false
+    }
+
+    /// Every site we track, each shown once in the Sites list (some as part of another site's request).
+    var totalSites: Int { directory.count }
+
+    /// The hand-written flows that are real work for the selected person: not the ones a platform request already handles.
+    var queueBrokers: [Broker] { brokers.filter { !isHandledByPlatform($0) } }
+
+    /// Directory sites that are real work: no hand-written flow, and no platform request handling them.
+    var workSites: [DirectoryEntry] { unguidedSites.filter { !isHandledByPlatform($0) } }
+
+    /// Official one-request platforms come first (a state or country's own removal service), in the order they are loaded. A site
+    /// goes in the first group that handles it and in no later one, so two platforms never list the same site.
+    var platformGroups: [PlatformGroup] {
+        guard let person = selectedPerson else { return [] }
+        var claimed = Set<String>()
+        return platforms.filter { $0.live && $0.eligible(person, ownerState: household.ownerState) }.compactMap { p in
+            let entries = unguidedSites.filter { !claimed.contains($0.domain) && p.covers(domain: $0.domain) != nil }
+            let flows = brokers.filter { b in
+                guard let e = Directory.entry(for: b, in: directory) else { return false }
+                return !claimed.contains(e.domain) && p.covers(domain: e.domain) != nil
+            }
+            claimed.formUnion(entries.map(\.domain))
+            claimed.formUnion(flows.compactMap { Directory.entry(for: $0, in: directory)?.domain })
+            return entries.isEmpty && flows.isEmpty ? nil : PlatformGroup(platform: p, brokers: flows, entries: entries)
+        }
+    }
+
+    /// The method group a hand-written flow belongs to, by the same measured rules as every other site.
+    func method(for broker: Broker) -> OptOutMethod { OptOutMethods.classify(broker, in: directory).method }
+
+    /// Sites to leave alone for this person because a platform request already reaches them, by site id. Before they have submitted it
+    /// the hold has no end (`distantFuture`): the one request comes first, and asking each site as well would be the same work twice.
+    func holds(for person: Person, now: Date = Date()) -> [String: PlatformHold] {
+        var out: [String: PlatformHold] = [:]
+        let progress = household.progress(for: person.id)
+        for p in platforms where p.live && p.eligible(person, ownerState: household.ownerState) {
+            let until: Date
+            if let submitted = progress.doneAt[p.id] {
+                until = p.holdUntil(submitted: submitted)
+                guard now < until else { continue }          // the hold ended: ask the sites directly again
+            } else { until = .distantFuture }
+            for e in directory where p.covers(domain: e.domain) != nil && out[e.id] == nil { out[e.id] = PlatformHold(name: p.shortName, until: until) }
+        }
+        return out
+    }
+
+    // MARK: One email for every form
+
+    /// The address the person gave, as typed. Empty until they have given one.
+    var contactEmail: String { household.contactEmail ?? "" }
+    /// What goes into forms (Gmail addresses carry +optoutkit), or nil until a valid address has been given.
+    var formEmail: String? { household.formEmail }
+
+    func setContactEmail(_ email: String) {
+        household.setContactEmail(email)
+        save()
+    }
+
+    /// The person as forms see them: the household's one email address replaces any per-profile address.
+    func formPerson(_ person: Person) -> Person {
+        guard let email = household.formEmail else { return person }
+        var p = person
+        p.emails = [email]
+        return p
+    }
+
+    /// Whether a profile has everything automatic work needs: legal name, current address and the household's email.
+    func isReady(_ person: Person) -> Bool { person.isComplete && household.formEmail != nil }
+
+    var missingForSelected: [String] {
+        guard let p = selectedPerson else { return [] }
+        return p.missingRequiredDetails + (household.formEmail == nil ? [L10n.noun("Email address")] : [])
+    }
+
+    /// Why nothing automatic runs for the selected person yet: a profile without its legal name and current address.
+    var incompleteReason: String? {
+        let missing = missingForSelected
+        guard let p = selectedPerson, !missing.isEmpty else { return nil }
+        return Loc.f("Add %@'s %@ to start.", p.displayName, missing.joined(separator: ", "))
+    }
+
     /// Why searching is off for the selected person, or nil when it is allowed. Minors and public figures are never searched.
     var searchBlockedReason: String? {
+        if let incomplete = incompleteReason { return incomplete }
         guard let p = selectedPerson, !p.canBeSearched() else { return nil }
         let why = p.isPublicFigure ? "a public figure" : "under 18"
-        return "Searches are off for \(p.displayName) (\(why)). Several sites' terms don't allow searching for minors, public officials or celebrities. Opt-out requests still work."
+        return Loc.f("Searches are off for %@ (%@). Several sites' terms don't allow searching for minors, public officials or celebrities. Opt-out requests still work.", p.displayName, why)
     }
 
     // MARK: Automatic protection: a daily scan and a weekly opt-out, switched on by the person at first use
@@ -150,6 +362,15 @@ final class AppModel: ObservableObject {
         CheckScheduler.scheduleAutomation(autoSettings)
     }
 
+    /// UI tests that fake sending have no site to be polite to, so the pause between sites is skipped.
+    private static var usesFakeSubmitter: Bool {
+        #if DEBUG
+        ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit")
+        #else
+        false
+        #endif
+    }
+
     private func makeSubmitter() -> FormSubmitter {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeSubmitter() }
@@ -158,11 +379,12 @@ final class AppModel: ObservableObject {
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
-    func runAutoOptOut(for person: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
+    func runAutoOptOut(for original: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
+        let person = formPerson(original)
         guard storageProblem == nil else { return }
-        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil ? 2 : 0)
+        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
-        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun)
+        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now))
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -189,11 +411,13 @@ final class AppModel: ObservableObject {
 
     /// Sites the person can finish with one tap each: their form is found, their details are on the profile, and nothing was sent
     /// in the last week. The app fills and sends each one once the person has solved its check.
-    func assistedItems(for person: Person, now: Date = Date()) -> [AssistedRunner.Item] {
+    func assistedItems(for original: Person, now: Date = Date()) -> [AssistedRunner.Item] {
+        let person = formPerson(original)
         let progress = household.progress(for: person.id)
+        let holdMap = holds(for: original, now: now)
         return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
             guard let form = entry.optOutForm else { return nil }
-            let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now)
+            let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now, hold: holdMap[entry.id])
             guard pre.result == nil, let plan = pre.plan else { return nil }
             return AssistedRunner.Item(entry: entry, form: form, plan: plan)
         }
@@ -262,8 +486,14 @@ final class AppModel: ObservableObject {
 
     func forgetHealedLink(_ siteID: String) { household.forgetHealedLink(siteID); save() }
 
+    #if DEBUG
+    /// Lets a test put its own page behind the guide (for example one that can never send).
+    var guidedPageMakerOverride: GuidedPageMaker?
+    #endif
+
     func makeGuidedPageMaker() -> GuidedPageMaker {
         #if DEBUG
+        if let override = guidedPageMakerOverride { return override }
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-guided") { return FakeGuidedPageMaker() }
         #endif
         return WebGuidedPageMaker()
@@ -271,7 +501,7 @@ final class AppModel: ObservableObject {
 
     /// A guided runner for a hand-written broker flow, resuming at the first step not yet done.
     func guidedRunner(for broker: Broker) -> GuidedRunner? {
-        guard let person = selectedPerson else { return nil }
+        guard let person = selectedPerson.map(formPerson) else { return nil }
         if let listing = listingRunner(for: broker, person: person) { return listing }
         var plan = GuidedPlanner.plan(for: broker)
         if let healed = household.healedLink(for: broker.id), let first = plan.steps.firstIndex(where: { if case .openPage = $0.action { return true } else { return false } }) {
@@ -306,7 +536,7 @@ final class AppModel: ObservableObject {
 
     /// A guided runner for a directory site: the app fills and sends the form, the person clears what only they can.
     func guidedRunner(for original: DirectoryEntry) -> GuidedRunner? {
-        guard let person = selectedPerson else { return nil }
+        guard let person = selectedPerson.map(formPerson) else { return nil }
         let entry = resolved(original)
         let plan: GuidedPlan
         if let form = entry.optOutForm, FormFiller.needsListing(form), let search = entry.listingSearchURL(for: person) {
@@ -339,14 +569,14 @@ final class AppModel: ObservableObject {
         let settings = household.autoSettings
         if settings.scanDue(now: now) {
             autoBusy = "scan"
-            for person in people where person.canBeSearched() { await scanExposure(for: person) }
+            for person in people where person.canBeSearched() && isReady(person) { await scanExposure(for: person) }
             household.updateAuto { $0.lastScan = now }
             save()
             autoBusy = nil
         }
         if household.autoSettings.optOutDue(now: now) {
             autoBusy = "optout"
-            for person in people { await runAutoOptOut(for: person) }
+            for person in people where isReady(person) { await runAutoOptOut(for: person) }
             autoBusy = nil
         }
         CheckScheduler.scheduleAutomation(autoSettings)
@@ -382,8 +612,8 @@ final class AppModel: ObservableObject {
     var quickCheckQueue: [DirectoryEntry] {
         guard searchBlockedReason == nil else { return [] }
         let cutoff = Date().addingTimeInterval(-30 * 86_400)
-        return unguidedSites
-            .filter { $0.needsManualCheck && $0.automation != .unreachable }
+        return workSites
+            .filter { $0.needsManualCheck && $0.automation != .unreachable && $0.bucket != "registry" }       // marketing and analytics brokers have nothing to look yourself up on
             .filter { (progress.latestSiteCheck($0.id)?.date ?? .distantPast) < cutoff }
             .sorted { ($0.optOutForm != nil ? 0 : 1, $0.domain) < ($1.optOutForm != nil ? 0 : 1, $1.domain) }
     }
@@ -493,7 +723,7 @@ final class AppModel: ObservableObject {
 
     private func save() {
         guard storageProblem == nil else { return }
-        do { try store.save(household) } catch { storageProblem = "Could not save: \(error)" }
+        do { try store.save(household) } catch { storageProblem = Loc.f("Could not save: %@", error) }
     }
 }
 

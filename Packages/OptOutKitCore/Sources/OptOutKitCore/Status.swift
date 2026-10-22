@@ -28,12 +28,12 @@ public enum StatusSummary: Equatable, Sendable {
 
     public var label: String {
         switch self {
-        case .notStarted: return "Not started"
-        case .inProgress: return "In progress"
-        case .partial(let d, let n): return "Partial: \(d) of \(n) profiles opted out"
-        case .submitted: return "Submitted, verifying"
-        case .complete: return "Verified removed"
-        case .relisted: return "Listed again"
+        case .notStarted: return L10n.t("Not started")
+        case .inProgress: return L10n.t("In progress")
+        case .partial(let d, let n): return L10n.f("Partial: %@ of %@ profiles opted out", d, n)
+        case .submitted: return L10n.t("Submitted, verifying")
+        case .complete: return L10n.t("Verified removed")
+        case .relisted: return L10n.t("Listed again")
         }
     }
 }
@@ -75,56 +75,56 @@ public extension Household {
 public enum Describe {
     public static func tier(_ tier: Tier) -> String {
         switch tier {
-        case .A: return "A simple form and an email link"
-        case .B: return "A form plus a CAPTCHA that you solve"
-        case .C: return "A guided walkthrough with a phone, ID or account step"
-        case .D: return "Email or letter only"
+        case .A: return L10n.t("A simple form and an email link")
+        case .B: return L10n.t("A form plus a CAPTCHA that you solve")
+        case .C: return L10n.t("A guided walkthrough with a phone, ID or account step")
+        case .D: return L10n.t("Email or letter only")
         }
     }
 
-    private static let signals: [String: String] = [
-        "captcha": "You solve a CAPTCHA",
-        "email_link": "Sends you a confirmation email",
-        "time_limited_link": "The email link expires quickly",
-        "phone_verify": "Needs a phone code or call",
-        "app_only": "Works only in a real browser",
-        "third_party_refused": "You must submit it yourself",
-        "search_first": "You find your listing first",
-    ]
+    private static var signals: [String: String] { [
+        "captcha": L10n.t("You solve a CAPTCHA"),
+        "email_link": L10n.t("Sends you a confirmation email"),
+        "time_limited_link": L10n.t("The email link expires quickly"),
+        "phone_verify": L10n.t("Needs a phone code or call"),
+        "app_only": L10n.t("Works only in a real browser"),
+        "third_party_refused": L10n.t("You must submit it yourself"),
+        "search_first": L10n.t("You find your listing first"),
+    ] }
 
-    private static let profiled: [String: String] = [
-        "captcha_turnstile": "A bot check (Cloudflare Turnstile)",
-        "captcha_recaptcha": "A bot check (reCAPTCHA)",
-        "captcha_hcaptcha": "A bot check (hCaptcha)",
-        "captcha_perimeterx": "A bot check (PerimeterX)",
-        "captcha_datadome": "A bot check (DataDome)",
-        "email_input": "Asks for your email",
-        "name_input": "Asks for your name",
-        "listing_url_input": "Asks for the link to your listing",
-        "phone_input": "Asks for a phone number",
-        "phone_verify": "May verify by phone call or text",
-        "id_required": "May ask for ID or notarization",
-        "file_upload": "Asks you to upload a file",
-        "login_required": "Needs an account login",
-        "account_hint": "Mentions creating an account",
-        "mail_option": "Mentions mailing a request",
-        "email_contact": "Lists an email address for requests",
-        "script_rendered_page": "Page is built by JavaScript",
-        "script_rendered_form": "Form is built by JavaScript",
-        "bot_check_on_home": "Shows a bot check before anything else",
-    ]
+    private static var profiled: [String: String] { [
+        "captcha_turnstile": L10n.t("A bot check (Cloudflare Turnstile)"),
+        "captcha_recaptcha": L10n.t("A bot check (reCAPTCHA)"),
+        "captcha_hcaptcha": L10n.t("A bot check (hCaptcha)"),
+        "captcha_perimeterx": L10n.t("A bot check (PerimeterX)"),
+        "captcha_datadome": L10n.t("A bot check (DataDome)"),
+        "email_input": L10n.t("Asks for your email"),
+        "name_input": L10n.t("Asks for your name"),
+        "listing_url_input": L10n.t("Asks for the link to your listing"),
+        "phone_input": L10n.t("Asks for a phone number"),
+        "phone_verify": L10n.t("May verify by phone call or text"),
+        "id_required": L10n.t("May ask for ID or notarization"),
+        "file_upload": L10n.t("Asks you to upload a file"),
+        "login_required": L10n.t("Needs an account login"),
+        "account_hint": L10n.t("Mentions creating an account"),
+        "mail_option": L10n.t("Mentions mailing a request"),
+        "email_contact": L10n.t("Lists an email address for requests"),
+        "script_rendered_page": L10n.t("Page is built by JavaScript"),
+        "script_rendered_form": L10n.t("Form is built by JavaScript"),
+        "bot_check_on_home": L10n.t("Shows a bot check before anything else"),
+    ] }
 
     public static func signal(_ tag: String) -> String {
-        signals[tag] ?? profiled[tag] ?? (tag.hasPrefix("portal_") ? "Uses a privacy-request portal" : tag.replacingOccurrences(of: "_", with: " "))
+        signals[tag] ?? profiled[tag] ?? (tag.hasPrefix("portal_") ? L10n.t("Uses a privacy-request portal") : tag.replacingOccurrences(of: "_", with: " "))
     }
 
     public static func field(_ tag: String) -> String {
         switch tag {
-        case "full_name": return "Full name"
-        case "email": return "Email address"
-        case "phone": return "Phone number"
-        case "birthdate": return "Birthdate"
-        case "address": return "Address"
+        case "full_name": return L10n.t("Full name")
+        case "email": return L10n.t("Email address")
+        case "phone": return L10n.t("Phone number")
+        case "birthdate": return L10n.t("Birthdate")
+        case "address": return L10n.t("Address")
         default: return tag.replacingOccurrences(of: "_", with: " ").capitalized
         }
     }

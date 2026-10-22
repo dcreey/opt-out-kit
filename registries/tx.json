@@ -1,0 +1,4639 @@
+{
+ "jurisdiction": "TX",
+ "source": "https://texas-sos.appianportalsgov.com/data-broker-registry",
+ "fetched": "2026-10-22",
+ "count": 456,
+ "brokers": [
+  {
+   "name": "PHANTOM DATA LLC",
+   "dba": "",
+   "primary": "phantomdata.io",
+   "sites": [
+    "phantomdata.io"
+   ],
+   "privacy_url": "https://app.phantomdata.io/privacy",
+   "reg_id": "20260190"
+  },
+  {
+   "name": "Torus Voter Systems, Inc.",
+   "dba": "",
+   "primary": "torusvotersystems.com",
+   "sites": [
+    "torusvotersystems.com"
+   ],
+   "privacy_url": "https://optout.torusvotersystems.com/",
+   "reg_id": "20260189"
+  },
+  {
+   "name": "The Segerdahl LLC d/b/a sg360°",
+   "dba": "",
+   "primary": "sg360.com",
+   "sites": [
+    "sg360.com",
+    "trustarc.com"
+   ],
+   "privacy_url": "https://submit-irm.trustarc.com/services/validation/7fd92316-e710-4faa-9a3f-12a2f33b0e13",
+   "reg_id": "20260188"
+  },
+  {
+   "name": "Criteo Corp.",
+   "dba": "",
+   "primary": "criteo.com",
+   "sites": [
+    "criteo.com"
+   ],
+   "privacy_url": "https://www.criteo.com/privacy/",
+   "reg_id": "20260187"
+  },
+  {
+   "name": "Tracerfy LLC",
+   "dba": "",
+   "primary": "tracerfy.com",
+   "sites": [
+    "tracerfy.com"
+   ],
+   "privacy_url": "https://www.tracerfy.com/privacy-choices",
+   "reg_id": "20260186"
+  },
+  {
+   "name": "5x5 US, LLC",
+   "dba": "",
+   "primary": "5x5data.com",
+   "sites": [
+    "5x5data.com"
+   ],
+   "privacy_url": "https://5x5data.com/privacy-policy/",
+   "reg_id": "20260185"
+  },
+  {
+   "name": "BLUE DATA, LLC",
+   "dba": "",
+   "primary": "bluedatalead.com",
+   "sites": [
+    "bluedatalead.com"
+   ],
+   "privacy_url": "https://bluedatalead.com/privacy-policy",
+   "reg_id": "20260184"
+  },
+  {
+   "name": "Semasio, Inc.",
+   "dba": "",
+   "primary": "semasio.com",
+   "sites": [
+    "semasio.com"
+   ],
+   "privacy_url": "https://www.semasio.com/legal/privacy-choices",
+   "reg_id": "20260183"
+  },
+  {
+   "name": "DT Client Services LLC",
+   "dba": "",
+   "primary": "thedatatrust.com",
+   "sites": [
+    "thedatatrust.com"
+   ],
+   "privacy_url": "https://thedatatrust.com/privacy-policy/",
+   "reg_id": "20260182"
+  },
+  {
+   "name": "ATMOSPHERIK INC.",
+   "dba": "",
+   "primary": "atmospherik.ai",
+   "sites": [
+    "atmospherik.ai"
+   ],
+   "privacy_url": "atmospherik.ai/privacy-choices",
+   "reg_id": "20260181"
+  },
+  {
+   "name": "My Lead Hawk, LLC",
+   "dba": "",
+   "primary": "meadleybrothers.com",
+   "sites": [
+    "meadleybrothers.com"
+   ],
+   "privacy_url": "https://meadleybrothers.com/privacy#texas",
+   "reg_id": "20260180"
+  },
+  {
+   "name": "Intentsify, LLC",
+   "dba": "",
+   "primary": "intentsify.io",
+   "sites": [
+    "intentsify.io"
+   ],
+   "privacy_url": "https://intentsify.io/privacy-policy/consumer-data-privacy-policy/",
+   "reg_id": "20260179"
+  },
+  {
+   "name": "Catchlight Insights LLC",
+   "dba": "",
+   "primary": "catchlight.ai",
+   "sites": [
+    "catchlight.ai"
+   ],
+   "privacy_url": "https://catchlight.ai/privacy",
+   "reg_id": "20260178"
+  },
+  {
+   "name": "Forian Holdings, LLC",
+   "dba": "",
+   "primary": "forian.com",
+   "sites": [
+    "forian.com"
+   ],
+   "privacy_url": "https://forian.com/privacy-notice/",
+   "reg_id": "20260177"
+  },
+  {
+   "name": "DMS Purchaser, LLC",
+   "dba": "",
+   "primary": "digitalmediasolutions.com",
+   "sites": [
+    "digitalmediasolutions.com",
+    "dmsunsub.io"
+   ],
+   "privacy_url": "dmsunsub.io",
+   "reg_id": "20260176"
+  },
+  {
+   "name": "Zoom Communications, Inc.",
+   "dba": "",
+   "primary": "zoom.com",
+   "sites": [
+    "onetrust.com",
+    "zoom.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/65962359-ef0d-4399-9db4-572d06de08aa/f277f9f7-bfee-4233-815e-80e290139bc2",
+   "reg_id": "20260175"
+  },
+  {
+   "name": "Common Room, Inc.",
+   "dba": "",
+   "primary": "commonroom.io",
+   "sites": [
+    "commonroom.io"
+   ],
+   "privacy_url": "https://app.commonroom.io/remove-my-info",
+   "reg_id": "20260174"
+  },
+  {
+   "name": "Kloudend, Inc.",
+   "dba": "",
+   "primary": "ipapi.co",
+   "sites": [
+    "ipapi.co"
+   ],
+   "privacy_url": "https://ipapi.co/privacy",
+   "reg_id": "20260173"
+  },
+  {
+   "name": "Sovra AI, Inc.",
+   "dba": "",
+   "primary": "sovrainsight.com",
+   "sites": [
+    "sovra.ai",
+    "sovrainsight.com"
+   ],
+   "privacy_url": "https://app.sovra.ai/privacy-policy",
+   "reg_id": "20260172"
+  },
+  {
+   "name": "Sprout Social, Inc.",
+   "dba": "",
+   "primary": "sproutsocial.com",
+   "sites": [
+    "sproutsocial.com"
+   ],
+   "privacy_url": "https://sproutsocial.com/legal/privacy-policy/",
+   "reg_id": "20260171"
+  },
+  {
+   "name": "LEMPIRE (TALKUS)",
+   "dba": "",
+   "primary": "lemlist.com",
+   "sites": [
+    "lemlist.com"
+   ],
+   "privacy_url": "privacy@lemlist.com",
+   "reg_id": "20260170"
+  },
+  {
+   "name": "Skydeo Inc",
+   "dba": "",
+   "primary": "skydeo.com",
+   "sites": [
+    "skydeo.com"
+   ],
+   "privacy_url": "https://skydeo.com/privacy-policy/",
+   "reg_id": "20260169"
+  },
+  {
+   "name": "Greenstein Property Tax LLC",
+   "dba": "",
+   "primary": "atxteaparty.com",
+   "sites": [
+    "atxteaparty.com"
+   ],
+   "privacy_url": "www.atxteaparty.com/privacy",
+   "reg_id": "20260168"
+  },
+  {
+   "name": "Postalytics, Inc.",
+   "dba": "",
+   "primary": "postalytics.com",
+   "sites": [
+    "postalytics.com"
+   ],
+   "privacy_url": "https://www.postalytics.com/legal/privacy-policy/",
+   "reg_id": "20260167"
+  },
+  {
+   "name": "BUSINESSENTITYSEARCH.COM, LLC",
+   "dba": "",
+   "primary": "businessregistry.com",
+   "sites": [
+    "businessregistry.com"
+   ],
+   "privacy_url": "https://businessregistry.com/privacy-policy/",
+   "reg_id": "20260166"
+  },
+  {
+   "name": "AppLovin Corporation",
+   "dba": "",
+   "primary": "applovin.com",
+   "sites": [
+    "applovin.com"
+   ],
+   "privacy_url": "https://legal.applovin.com/multistate-privacy-notice/",
+   "reg_id": "20260165"
+  },
+  {
+   "name": "SuSea, Inc",
+   "dba": "",
+   "primary": "you.com",
+   "sites": [
+    "you.com"
+   ],
+   "privacy_url": "https://you.com/privacy-requests",
+   "reg_id": "20260164"
+  },
+  {
+   "name": "Ziff Davis LLC",
+   "dba": "",
+   "primary": "ziffdavis.com",
+   "sites": [
+    "ziffdavis.com"
+   ],
+   "privacy_url": "https://www.ziffdavis.com/privacy-rights-request",
+   "reg_id": "20260163"
+  },
+  {
+   "name": "Roq.ad Inc.",
+   "dba": "",
+   "primary": "roq.ad",
+   "sites": [
+    "roq.ad"
+   ],
+   "privacy_url": "https://roq.ad/opt-out",
+   "reg_id": "20260162"
+  },
+  {
+   "name": "LogicTree, Inc.",
+   "dba": "",
+   "primary": "data247.com",
+   "sites": [
+    "data247.com"
+   ],
+   "privacy_url": "https://www.data247.com/privacy",
+   "reg_id": "20260161"
+  },
+  {
+   "name": "Victory Waves Co.",
+   "dba": "",
+   "primary": "victorywaves.com",
+   "sites": [
+    "victorywaves.com"
+   ],
+   "privacy_url": "https://www.victorywaves.com/legal/privacy-choices",
+   "reg_id": "20260160"
+  },
+  {
+   "name": "Grassroots Analytics, Inc.",
+   "dba": "",
+   "primary": "grassrootsanalytics.com",
+   "sites": [
+    "grassrootsanalytics.com"
+   ],
+   "privacy_url": "https://www.grassrootsanalytics.com/website-privacypolicy",
+   "reg_id": "20260159"
+  },
+  {
+   "name": "Affinity Answers Corporation",
+   "dba": "",
+   "primary": "affinityanswers.com",
+   "sites": [
+    "affinityanswers.com"
+   ],
+   "privacy_url": "https://www.affinityanswers.com/privacy-policy/",
+   "reg_id": "20260158"
+  },
+  {
+   "name": "Data to Win LLC",
+   "dba": "",
+   "primary": "datatowin.com",
+   "sites": [
+    "datatowin.com"
+   ],
+   "privacy_url": "https://www.datatowin.com/privacy-requests",
+   "reg_id": "20260157"
+  },
+  {
+   "name": "Learnmore, LLC DBA Learnmore.com",
+   "dba": "",
+   "primary": "learnmore.com",
+   "sites": [
+    "learnmore.com"
+   ],
+   "privacy_url": "https://learnmore.com/privacy-policy/",
+   "reg_id": "20260156"
+  },
+  {
+   "name": "Solar Connect LLC",
+   "dba": "",
+   "primary": "bluefireleads.com",
+   "sites": [
+    "bluefireleads.com"
+   ],
+   "privacy_url": "www.bluefireleads.com",
+   "reg_id": "20260155"
+  },
+  {
+   "name": "ZEIL Limited",
+   "dba": "",
+   "primary": "zeil.com",
+   "sites": [
+    "zeil.com"
+   ],
+   "privacy_url": "https://zeil.com/privacy",
+   "reg_id": "20260154"
+  },
+  {
+   "name": "RelPro, Inc.",
+   "dba": "",
+   "primary": "relpro.com",
+   "sites": [
+    "relpro.com"
+   ],
+   "privacy_url": "https://relpro.com/privacy-policy",
+   "reg_id": "20260153"
+  },
+  {
+   "name": "Sojern Inc.",
+   "dba": "",
+   "primary": "sojern.com",
+   "sites": [
+    "sojern.com"
+   ],
+   "privacy_url": "https://www.sojern.com/privacy/u-s-state-privacy-notice#security",
+   "reg_id": "20260152"
+  },
+  {
+   "name": "Graph8 Inc.",
+   "dba": "",
+   "primary": "graph8.com",
+   "sites": [
+    "graph8.com"
+   ],
+   "privacy_url": "https://graph8.com/terms/#privacy-policy",
+   "reg_id": "20260151"
+  },
+  {
+   "name": "DATARATE LLC",
+   "dba": "",
+   "primary": "datarate.ai",
+   "sites": [
+    "datarate.ai"
+   ],
+   "privacy_url": "https://datarate.ai/my-privacy-choicesDE",
+   "reg_id": "20260150"
+  },
+  {
+   "name": "Adprime Media LLC",
+   "dba": "",
+   "primary": "adprime.com",
+   "sites": [
+    "adprime.com"
+   ],
+   "privacy_url": "https://www.adprime.com/privacy-policy",
+   "reg_id": "20260149"
+  },
+  {
+   "name": "Inbound Insight, LLC",
+   "dba": "",
+   "primary": "inboundinsight.com",
+   "sites": [
+    "inboundinsight.com"
+   ],
+   "privacy_url": "https://inboundinsight.com/texas-privacy-policy",
+   "reg_id": "20260148"
+  },
+  {
+   "name": "FullEnrich Corp",
+   "dba": "",
+   "primary": "fullenrich.com",
+   "sites": [
+    "fullenrich.com"
+   ],
+   "privacy_url": "https://fullenrich.com/optout",
+   "reg_id": "20260147"
+  },
+  {
+   "name": "Swipejobs LLC",
+   "dba": "",
+   "primary": "swipejobs.com",
+   "sites": [
+    "swipejobs.com"
+   ],
+   "privacy_url": "https://www.swipejobs.com/privacy-center",
+   "reg_id": "20260146"
+  },
+  {
+   "name": "Leverage Digital LLC",
+   "dba": "",
+   "primary": "leveragedigital.ai",
+   "sites": [
+    "leveragedigital.ai"
+   ],
+   "privacy_url": "https://leveragedigital.ai/privacy-policy/",
+   "reg_id": "20260145"
+  },
+  {
+   "name": "Melissa Data Corporation",
+   "dba": "",
+   "primary": "melissa.com",
+   "sites": [
+    "melissa.com"
+   ],
+   "privacy_url": "https://www.melissa.com/state-law-privacy-notice",
+   "reg_id": "20260144"
+  },
+  {
+   "name": "CoreLogic Solutions, LLC",
+   "dba": "",
+   "primary": "cotality.com",
+   "sites": [
+    "cotality.com"
+   ],
+   "privacy_url": "https://www.cotality.com/legal/privacy-policy",
+   "reg_id": "20260143"
+  },
+  {
+   "name": "LP Brokering LLC",
+   "dba": "",
+   "primary": "lpbrokering.com",
+   "sites": [
+    "lpbrokering.com"
+   ],
+   "privacy_url": "https://privacy.lpbrokering.com/",
+   "reg_id": "20260142"
+  },
+  {
+   "name": "Cadent, LLC",
+   "dba": "",
+   "primary": "cadent.com",
+   "sites": [
+    "cadent.com"
+   ],
+   "privacy_url": "https://www.cadent.com/your-privacy-choices",
+   "reg_id": "20260141"
+  },
+  {
+   "name": "Firmable Inc.",
+   "dba": "",
+   "primary": "firmable.com",
+   "sites": [
+    "firmable.ai",
+    "firmable.com"
+   ],
+   "privacy_url": "https://firmable.ai/privacy-policy",
+   "reg_id": "20260140"
+  },
+  {
+   "name": "Unmask LLC",
+   "dba": "",
+   "primary": "unmask.com",
+   "sites": [
+    "unmask.com"
+   ],
+   "privacy_url": "https://unmask.com/privacy-policy/",
+   "reg_id": "20260139"
+  },
+  {
+   "name": "Information.com LLC",
+   "dba": "",
+   "primary": "information.com",
+   "sites": [
+    "information.com",
+    "slack.com"
+   ],
+   "privacy_url": "https://checkpeople.slack.com/archives/D091EEUN10U/p1784133154145349",
+   "reg_id": "20260138"
+  },
+  {
+   "name": "Checkpeople LLC",
+   "dba": "",
+   "primary": "checkpeople.com",
+   "sites": [
+    "checkpeople.com"
+   ],
+   "privacy_url": "https://checkpeople.com/company/privacy-policy",
+   "reg_id": "20260137"
+  },
+  {
+   "name": "Dice Career Solutions, Inc.",
+   "dba": "",
+   "primary": "dice.com",
+   "sites": [
+    "dice.com"
+   ],
+   "privacy_url": "https://www.dice.com/about/ccpa",
+   "reg_id": "20260136"
+  },
+  {
+   "name": "FI Navigator Corporation",
+   "dba": "",
+   "primary": "fi-navigator.com",
+   "sites": [
+    "fi-navigator.com"
+   ],
+   "privacy_url": "https://www.fi-navigator.com/privacy-policy/",
+   "reg_id": "20260135"
+  },
+  {
+   "name": "DealMachine Operations Inc.",
+   "dba": "",
+   "primary": "dealmachine.com",
+   "sites": [
+    "dealmachine.com"
+   ],
+   "privacy_url": "https://privacyrequest.dealmachine.com/remove",
+   "reg_id": "20260134"
+  },
+  {
+   "name": "Cox Automotive, Inc.",
+   "dba": "",
+   "primary": "coxautoinc.com",
+   "sites": [
+    "autotrader.com",
+    "coxautoinc.com",
+    "fordblueadvantage.com",
+    "kbb.com"
+   ],
+   "privacy_url": "https://www.coxautoinc.com/consumerprivacyrights/",
+   "reg_id": "20260133"
+  },
+  {
+   "name": "Quorum Data, Inc.",
+   "dba": "",
+   "primary": "quorum.inc",
+   "sites": [
+    "quorum.inc",
+    "quorum.live"
+   ],
+   "privacy_url": "https://app.quorum.live/privacy",
+   "reg_id": "20260132"
+  },
+  {
+   "name": "Occulytics Inc.",
+   "dba": "",
+   "primary": "occulytics.com",
+   "sites": [
+    "occulytics.com"
+   ],
+   "privacy_url": "https://www.occulytics.com/dnspd",
+   "reg_id": "20260131"
+  },
+  {
+   "name": "New Mexico Data Insights Inc",
+   "dba": "",
+   "primary": "newmexicodatainsights.com",
+   "sites": [
+    "newmexicodatainsights.com"
+   ],
+   "privacy_url": "https://www.newmexicodatainsights.com/privacy-policy",
+   "reg_id": "20260130"
+  },
+  {
+   "name": "Windfall Data, Inc.",
+   "dba": "",
+   "primary": "windfall.com",
+   "sites": [
+    "datasubject.com",
+    "windfall.com"
+   ],
+   "privacy_url": "https://my.datasubject.com/AkrxLuYOww/60579",
+   "reg_id": "20260129"
+  },
+  {
+   "name": "SalesIntel Research, Inc",
+   "dba": "",
+   "primary": "salesintel.io",
+   "sites": [
+    "salesintel.io"
+   ],
+   "privacy_url": "https://salesintel.io/opt-out/",
+   "reg_id": "20260128"
+  },
+  {
+   "name": "Orgio, Inc.",
+   "dba": "",
+   "primary": "theorg.com",
+   "sites": [
+    "theorg.com"
+   ],
+   "privacy_url": "https://theorg.com/privacy",
+   "reg_id": "20260127"
+  },
+  {
+   "name": "Deimos Signals Pte. Ltd.",
+   "dba": "",
+   "primary": "deimos-signals.com",
+   "sites": [
+    "deimos-signals.com"
+   ],
+   "privacy_url": "https://www.deimos-signals.com/privacy-center",
+   "reg_id": "20260126"
+  },
+  {
+   "name": "Innovative Data Services, Inc.",
+   "dba": "",
+   "primary": "specialistsmarketingsolutions.com",
+   "sites": [
+    "specialistsmarketingsolutions.com"
+   ],
+   "privacy_url": "https://specialistsmarketingsolutions.com/privacy-notice/",
+   "reg_id": "20260125"
+  },
+  {
+   "name": "GROWTHCODE LLC",
+   "dba": "",
+   "primary": "growthcode.io",
+   "sites": [
+    "growthcode.io"
+   ],
+   "privacy_url": "https://www.growthcode.io/do-not-sell",
+   "reg_id": "20260124"
+  },
+  {
+   "name": "Blueprint Audiences LLC",
+   "dba": "",
+   "primary": "blueprintaudiences.com",
+   "sites": [
+    "blueprintaudiences.com"
+   ],
+   "privacy_url": "https://blueprintaudiences.com/privacy-choices",
+   "reg_id": "20260123"
+  },
+  {
+   "name": "Subgraph, Inc.",
+   "dba": "",
+   "primary": "subgraph.tech",
+   "sites": [
+    "subgraph.tech"
+   ],
+   "privacy_url": "https://subgraph.tech/privacy-choices",
+   "reg_id": "20260122"
+  },
+  {
+   "name": "PebblePost, Inc.",
+   "dba": "",
+   "primary": "pebblepost.com",
+   "sites": [
+    "onetrust.com",
+    "pebblepost.com"
+   ],
+   "privacy_url": "https://privacyportal-cdn.onetrust.com/dsarwebform/f3224586-fa40-4b58-822e-e86fec4761ed/39d1f47c-b268-42dc-8009-25d1fd37d305.html",
+   "reg_id": "20260121"
+  },
+  {
+   "name": "DealerX Partners LLC",
+   "dba": "",
+   "primary": "dealerx.com",
+   "sites": [
+    "dealerx.com"
+   ],
+   "privacy_url": "https://dealerx.com/privacy-options/",
+   "reg_id": "20260120"
+  },
+  {
+   "name": "Astoria Company Marketing LLC",
+   "dba": "",
+   "primary": "astoriacompany.com",
+   "sites": [
+    "astoriacompany.com"
+   ],
+   "privacy_url": "https://astoriacompany.com/privacy-policy/",
+   "reg_id": "20260119"
+  },
+  {
+   "name": "WINR Alchemist Pty Ltd",
+   "dba": "",
+   "primary": "winrdata.com",
+   "sites": [
+    "winrdata.com"
+   ],
+   "privacy_url": "https://www.winrdata.com/privacy-policy-us/",
+   "reg_id": "20260118"
+  },
+  {
+   "name": "WINR Data Pty Ltd",
+   "dba": "",
+   "primary": "winrdata.com",
+   "sites": [
+    "winrdata.com"
+   ],
+   "privacy_url": "https://www.winrdata.com/privacy-policy-us/",
+   "reg_id": "20260117"
+  },
+  {
+   "name": "ZeetoGroup, LLC",
+   "dba": "",
+   "primary": "zeeto.io",
+   "sites": [
+    "zeeto.io"
+   ],
+   "privacy_url": "https://www.zeeto.io/consumer-privacy-policy",
+   "reg_id": "20260116"
+  },
+  {
+   "name": "Unify AI Business Corporation",
+   "dba": "",
+   "primary": "unifygtm.com",
+   "sites": [
+    "unifygtm.com"
+   ],
+   "privacy_url": "privacy.unifygtm.com",
+   "reg_id": "20260115"
+  },
+  {
+   "name": "Minerva BI Inc",
+   "dba": "",
+   "primary": "mineva.io",
+   "sites": [
+    "minerva.io",
+    "mineva.io"
+   ],
+   "privacy_url": "preferences.minerva.io",
+   "reg_id": "20260114"
+  },
+  {
+   "name": "AGR Marketing Solutions LLC",
+   "dba": "",
+   "primary": "agrmarketingsolutions.com",
+   "sites": [
+    "agrmarketingsolutions.com"
+   ],
+   "privacy_url": "https://agrmarketingsolutions.com/privacy-policy",
+   "reg_id": "20260113"
+  },
+  {
+   "name": "R.L Polk & Company",
+   "dba": "",
+   "primary": "mobiityglobal.com",
+   "sites": [
+    "mobiityglobal.com",
+    "mobilityglobal.com"
+   ],
+   "privacy_url": "https://www.mobilityglobal.com/en-us/your-privacy-choices",
+   "reg_id": "20260112"
+  },
+  {
+   "name": "Facteus, Inc.",
+   "dba": "",
+   "primary": "facteus.com",
+   "sites": [
+    "facteus.com"
+   ],
+   "privacy_url": "www.facteus.com",
+   "reg_id": "20260111"
+  },
+  {
+   "name": "Tunnl, LLC",
+   "dba": "",
+   "primary": "tunnldata.com",
+   "sites": [
+    "tunnldata.com"
+   ],
+   "privacy_url": "https://privacy.tunnldata.com/",
+   "reg_id": "20260110"
+  },
+  {
+   "name": "Deep Root Analytics, LLC",
+   "dba": "",
+   "primary": "deeprootanalytics.com",
+   "sites": [
+    "deeprootanalytics.com"
+   ],
+   "privacy_url": "https://privacy.deeprootanalytics.com/",
+   "reg_id": "20260109"
+  },
+  {
+   "name": "Multimedia Lists Inc",
+   "dba": "",
+   "primary": "multimedialists.com",
+   "sites": [
+    "multimedialists.com"
+   ],
+   "privacy_url": "multimedialists_ad652b95@inbound.forgetmenaut.com",
+   "reg_id": "20260108"
+  },
+  {
+   "name": "DisplayLogix LLC",
+   "dba": "",
+   "primary": "display-logix.com",
+   "sites": [
+    "display-logix.com",
+    "termly.io"
+   ],
+   "privacy_url": "https://app.termly.io/policy-viewer/policy.html?policyUUID=e1b589c9-c7f6-47c3-a7b4-e57e3c79f883",
+   "reg_id": "20260107"
+  },
+  {
+   "name": "Beacon Territory Group LLC",
+   "dba": "",
+   "primary": "beaconterritory.com",
+   "sites": [
+    "beaconterritory.com"
+   ],
+   "privacy_url": "https://www.beaconterritory.com/texas-privacy-rights/",
+   "reg_id": "20260106"
+  },
+  {
+   "name": "Urban Science Applications, Inc.",
+   "dba": "",
+   "primary": "urbanscience.com",
+   "sites": [
+    "urbanscience.com"
+   ],
+   "privacy_url": "https://www.urbanscience.com/privacy/",
+   "reg_id": "20260105"
+  },
+  {
+   "name": "Nyne.ai Corp",
+   "dba": "",
+   "primary": "nyne.ai",
+   "sites": [
+    "nyne.ai"
+   ],
+   "privacy_url": "https://nyne.ai/privacy-choices/",
+   "reg_id": "20260104"
+  },
+  {
+   "name": "Vendelux, Inc.",
+   "dba": "",
+   "primary": "vendelux.com",
+   "sites": [
+    "vendelux.com"
+   ],
+   "privacy_url": "https://vendelux.com/privacy",
+   "reg_id": "20260103"
+  },
+  {
+   "name": "Teads Holding Co.",
+   "dba": "",
+   "primary": "outbrain.com",
+   "sites": [
+    "outbrain.com"
+   ],
+   "privacy_url": "https://dsr.outbrain.com/recommendations-settings/home/en",
+   "reg_id": "20260102"
+  },
+  {
+   "name": "Teads Inc.",
+   "dba": "",
+   "primary": "teads.com",
+   "sites": [
+    "teads.com"
+   ],
+   "privacy_url": "https://privacy-policy.teads.com/",
+   "reg_id": "20260101"
+  },
+  {
+   "name": "Veraset LLC",
+   "dba": "",
+   "primary": "veraset.com",
+   "sites": [
+    "veraset.com"
+   ],
+   "privacy_url": "https://www.veraset.com/legal/do-not-sell-request",
+   "reg_id": "20260100"
+  },
+  {
+   "name": "Netunim, LLC dba DataShark",
+   "dba": "",
+   "primary": "countshark.net",
+   "sites": [
+    "countshark.net"
+   ],
+   "privacy_url": "http://www.countshark.net/grid_privacy/",
+   "reg_id": "20260099"
+  },
+  {
+   "name": "AlikeAudience, INC.",
+   "dba": "",
+   "primary": "alikeaudience.com",
+   "sites": [
+    "alikeaudience.com"
+   ],
+   "privacy_url": "https://www.alikeaudience.com/privacy-policy/",
+   "reg_id": "20260098"
+  },
+  {
+   "name": "Scout Data Inc.",
+   "dba": "",
+   "primary": "scoutdata.com",
+   "sites": [
+    "scoutdata.com"
+   ],
+   "privacy_url": "https://store.scoutdata.com/privacy-rights",
+   "reg_id": "20260097"
+  },
+  {
+   "name": "Zeta Global Corp.",
+   "dba": "",
+   "primary": "zetaglobal.com",
+   "sites": [
+    "zetaglobal.com"
+   ],
+   "privacy_url": "www.zetaglobal.com/privacy-choices/",
+   "reg_id": "20260096"
+  },
+  {
+   "name": "Dealfront Finland Oy",
+   "dba": "",
+   "primary": "leadfeeder.com",
+   "sites": [
+    "leadfeeder.com"
+   ],
+   "privacy_url": "https://www.leadfeeder.com/privacy/us-privacy-disclosure/",
+   "reg_id": "20260095"
+  },
+  {
+   "name": "Dealfront Group GmbH",
+   "dba": "",
+   "primary": "leadfeeder.com",
+   "sites": [
+    "leadfeeder.com"
+   ],
+   "privacy_url": "https://www.leadfeeder.com/privacy/us-privacy-disclosure/",
+   "reg_id": "20260094"
+  },
+  {
+   "name": "HGOnline, LLC",
+   "dba": "",
+   "primary": "tripwiredata.com",
+   "sites": [
+    "tripwiredata.com"
+   ],
+   "privacy_url": "https://www.tripwiredata.com/texas-data-broker-notice",
+   "reg_id": "20260093"
+  },
+  {
+   "name": "Marriott International, Inc.",
+   "dba": "",
+   "primary": "marriott.com",
+   "sites": [
+    "marriott.com"
+   ],
+   "privacy_url": "https://www.marriott.com/about/privacy.mi",
+   "reg_id": "20260092"
+  },
+  {
+   "name": "Gather Analytics, LLC",
+   "dba": "",
+   "primary": "gatheranalytics.co",
+   "sites": [
+    "gatheranalytics.co"
+   ],
+   "privacy_url": "https://www.gatheranalytics.co/privacy",
+   "reg_id": "20260091"
+  },
+  {
+   "name": "Warmly, Inc.",
+   "dba": "",
+   "primary": "warmly.ai",
+   "sites": [
+    "warmly.ai"
+   ],
+   "privacy_url": "https://www.warmly.ai/p/privacy-policy",
+   "reg_id": "20260090"
+  },
+  {
+   "name": "MobileFuse LLC",
+   "dba": "",
+   "primary": "mobilefuse.com",
+   "sites": [
+    "mobilefuse.com"
+   ],
+   "privacy_url": "https://mobilefuse.com/privacy-policy",
+   "reg_id": "20260089"
+  },
+  {
+   "name": "Vintory, LLC",
+   "dba": "",
+   "primary": "vintory.com",
+   "sites": [
+    "vintory.com"
+   ],
+   "privacy_url": "https://www.vintory.com/privacy-policy/",
+   "reg_id": "20260088"
+  },
+  {
+   "name": "Dataman Group, Inc",
+   "dba": "",
+   "primary": "datamangroup.com",
+   "sites": [
+    "datamangroup.com"
+   ],
+   "privacy_url": "https://www.datamangroup.com/privacy/",
+   "reg_id": "20260087"
+  },
+  {
+   "name": "Aluum LLC d/b/a Gateway Data",
+   "dba": "",
+   "primary": "gatewaydata.io",
+   "sites": [
+    "gatewaydata.io"
+   ],
+   "privacy_url": "https://www.gatewaydata.io/privacy/privacy-policy",
+   "reg_id": "20260086"
+  },
+  {
+   "name": "365DataSolutions, LLC",
+   "dba": "",
+   "primary": "365datasolutions.com",
+   "sites": [
+    "365datasolutions.com"
+   ],
+   "privacy_url": "https://365datasolutions.com/privacy",
+   "reg_id": "20260085"
+  },
+  {
+   "name": "USADATA, Inc.",
+   "dba": "",
+   "primary": "usadata.com",
+   "sites": [
+    "usadata.com"
+   ],
+   "privacy_url": "https://www.usadata.com/privacy-policy",
+   "reg_id": "20260084"
+  },
+  {
+   "name": "Factori Technologies Pte Ltd.",
+   "dba": "",
+   "primary": "factori.ai",
+   "sites": [
+    "factori.ai"
+   ],
+   "privacy_url": "https://factori.ai/privacy-policy/",
+   "reg_id": "20260083"
+  },
+  {
+   "name": "NFocus Consulting Inc",
+   "dba": "",
+   "primary": "n-focus.com",
+   "sites": [
+    "n-focus.com"
+   ],
+   "privacy_url": "https://www.n-focus.com/do-not-sell-or-share-my-personal-information/",
+   "reg_id": "20260082"
+  },
+  {
+   "name": "Propbot LLC",
+   "dba": "",
+   "primary": "propbotusa.com",
+   "sites": [
+    "propbotusa.com"
+   ],
+   "privacy_url": "https://propbotusa.com/consumer-rights",
+   "reg_id": "20260081"
+  },
+  {
+   "name": "JG Media, Inc.",
+   "dba": "",
+   "primary": "communityimpact.com",
+   "sites": [
+    "communityimpact.com"
+   ],
+   "privacy_url": "https://communityimpact.com/consumer-rights",
+   "reg_id": "20260080"
+  },
+  {
+   "name": "Neustar IP Intelligence, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260079"
+  },
+  {
+   "name": "Worldwide Information, LLC",
+   "dba": "",
+   "primary": "worldwideinformation.com",
+   "sites": [
+    "worldwideinformation.com"
+   ],
+   "privacy_url": "https://worldwideinformation.com/privacy-rights/",
+   "reg_id": "20260078"
+  },
+  {
+   "name": "LightBox Parent, L.P.",
+   "dba": "",
+   "primary": "lightboxre.com",
+   "sites": [
+    "lightboxre.com"
+   ],
+   "privacy_url": "https://www.lightboxre.com/lightbox-individual-data-rights-request/",
+   "reg_id": "20260077"
+  },
+  {
+   "name": "Trelize, LLC",
+   "dba": "",
+   "primary": "trelize.com",
+   "sites": [
+    "trelize.com"
+   ],
+   "privacy_url": "https://trelize.com/data-rights",
+   "reg_id": "20260076"
+  },
+  {
+   "name": "Opensend Inc",
+   "dba": "",
+   "primary": "opensend.com",
+   "sites": [
+    "opensend.com"
+   ],
+   "privacy_url": "https://www.opensend.com/privacy-policy",
+   "reg_id": "20260075"
+  },
+  {
+   "name": "Wednesday LLC",
+   "dba": "",
+   "primary": "wednes.day",
+   "sites": [
+    "wednes.day"
+   ],
+   "privacy_url": "https://wednes.day/privacy/texas",
+   "reg_id": "20260074"
+  },
+  {
+   "name": "Pen-Link, Ltd.",
+   "dba": "",
+   "primary": "penlink.com",
+   "sites": [
+    "penlink.com"
+   ],
+   "privacy_url": "https://www.penlink.com/your-privacy-choices/",
+   "reg_id": "20260073"
+  },
+  {
+   "name": "Exact Opco LLC",
+   "dba": "",
+   "primary": "exactcustomer.com",
+   "sites": [
+    "exactcustomer.com"
+   ],
+   "privacy_url": "https://exactcustomer.com/privacy-policy/",
+   "reg_id": "20260072"
+  },
+  {
+   "name": "JJGarrett Holdings LLC dba Community Impact Printing",
+   "dba": "",
+   "primary": "ciprinting.com",
+   "sites": [
+    "ciprinting.com"
+   ],
+   "privacy_url": "https://ciprinting.com/privacy/",
+   "reg_id": "20260071"
+  },
+  {
+   "name": "American Treasury Tax Solutions Inc",
+   "dba": "",
+   "primary": "americantreasurytaxsolutions.com",
+   "sites": [
+    "americantreasurytaxsolutions.com"
+   ],
+   "privacy_url": "https://www.americantreasurytaxsolutions.com/",
+   "reg_id": "20260070"
+  },
+  {
+   "name": "Walla Media, LLC",
+   "dba": "",
+   "primary": "wallamedia.com",
+   "sites": [
+    "consumerdataprotect.com",
+    "wallamedia.com"
+   ],
+   "privacy_url": "consumerdataprotect.com",
+   "reg_id": "20260069"
+  },
+  {
+   "name": "Datalink Services, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260068"
+  },
+  {
+   "name": "TRUSTID, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260067"
+  },
+  {
+   "name": "Drivers History Information Sales, LLC",
+   "dba": "",
+   "primary": "drivershistory.com",
+   "sites": [
+    "drivershistory.com",
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260066"
+  },
+  {
+   "name": "iovation Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260065"
+  },
+  {
+   "name": "TransUnion Interactive, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260064"
+  },
+  {
+   "name": "Commerce Signals, Inc.",
+   "dba": "",
+   "primary": "commercesignals.com",
+   "sites": [
+    "commercesignals.com"
+   ],
+   "privacy_url": "https://www.commercesignals.com/privacy-notice/",
+   "reg_id": "20260063"
+  },
+  {
+   "name": "MarketShare Partners, LLC",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260062"
+  },
+  {
+   "name": "Crimson Hexagon, Inc",
+   "dba": "",
+   "primary": "brandwatch.com",
+   "sites": [
+    "brandwatch.com",
+    "dporganizer.com"
+   ],
+   "privacy_url": "https://portals.dporganizer.com/fa778b0e-817f-4c96-b13d-e2b614470033",
+   "reg_id": "20260061"
+  },
+  {
+   "name": "Cision US Inc",
+   "dba": "",
+   "primary": "cision.com",
+   "sites": [
+    "cision.com",
+    "dporganizer.com"
+   ],
+   "privacy_url": "https://portals.dporganizer.com/fa778b0e-817f-4c96-b13d-e2b614470033",
+   "reg_id": "20260060"
+  },
+  {
+   "name": "LexisNexis Risk Solutions FL Inc.",
+   "dba": "",
+   "primary": "lexisnexis.com",
+   "sites": [
+    "lexisnexis.com"
+   ],
+   "privacy_url": "https://consumer.risk.lexisnexis.com/privacy",
+   "reg_id": "20260059"
+  },
+  {
+   "name": "VISTAVIEW REALTY SERVICES LLC",
+   "dba": "",
+   "primary": "vistaview.ai",
+   "sites": [
+    "vistaview.ai"
+   ],
+   "privacy_url": "www.vistaview.ai/privacy/consumer-rights",
+   "reg_id": "20260058"
+  },
+  {
+   "name": "RecruitBot, Inc.",
+   "dba": "",
+   "primary": "recruitbot.com",
+   "sites": [
+    "recruitbot.com"
+   ],
+   "privacy_url": "www.recruitbot.com/privacy",
+   "reg_id": "20260057"
+  },
+  {
+   "name": "Becausal, Inc",
+   "dba": "",
+   "primary": "becausal.com",
+   "sites": [
+    "becausal.com"
+   ],
+   "privacy_url": "https://www.becausal.com/personal-information",
+   "reg_id": "20260056"
+  },
+  {
+   "name": "Adstra LLC",
+   "dba": "",
+   "primary": "adstradata.com",
+   "sites": [
+    "adstradata.com"
+   ],
+   "privacy_url": "https://www.adstradata.com/privacy-policy/",
+   "reg_id": "20260055"
+  },
+  {
+   "name": "Wiland, INc.",
+   "dba": "",
+   "primary": "wiland.com",
+   "sites": [
+    "wiland.com"
+   ],
+   "privacy_url": "www.wiland.com/privacy-choices",
+   "reg_id": "20260054"
+  },
+  {
+   "name": "Neptune Ops LLC",
+   "dba": "",
+   "primary": "neptuneops.com",
+   "sites": [
+    "neptuneaii.com",
+    "neptuneops.com"
+   ],
+   "privacy_url": "https://neptuneaii.com/legal/privacy-policy",
+   "reg_id": "20260053"
+  },
+  {
+   "name": "Neustar Information Services, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260052"
+  },
+  {
+   "name": "TransUnion Digital LLC",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20260051"
+  },
+  {
+   "name": "JMR Media Consulting, Inc.",
+   "dba": "",
+   "primary": "jmr-media.com",
+   "sites": [
+    "jmr-media.com"
+   ],
+   "privacy_url": "https://jmr-media.com/privacy-notice",
+   "reg_id": "20260050"
+  },
+  {
+   "name": "Revelio Labs, Inc.",
+   "dba": "",
+   "primary": "reveliolabs.com",
+   "sites": [
+    "reveliolabs.com"
+   ],
+   "privacy_url": "www.reveliolabs.com/privacy",
+   "reg_id": "20260049"
+  },
+  {
+   "name": "MV Digital Group, LLC  (DBA CinqDI)",
+   "dba": "",
+   "primary": "cinqdi.com",
+   "sites": [
+    "cinqdi.com"
+   ],
+   "privacy_url": "https://www.cinqdi.com/privacy-policy/#section-rights",
+   "reg_id": "20260048"
+  },
+  {
+   "name": "Accurate Append, Inc.",
+   "dba": "",
+   "primary": "accurateappend.com",
+   "sites": [
+    "accurateappend.com"
+   ],
+   "privacy_url": "https://accurateappend.com/privacy-policy/",
+   "reg_id": "20260047"
+  },
+  {
+   "name": "J.D. Power",
+   "dba": "",
+   "primary": "jdpower.com",
+   "sites": [
+    "jdpower.com"
+   ],
+   "privacy_url": "https://www.jdpower.com/privacy/dsar",
+   "reg_id": "20260046"
+  },
+  {
+   "name": "Place Exchange, Inc.",
+   "dba": "",
+   "primary": "placeexchange.com",
+   "sites": [
+    "placeexchange.com"
+   ],
+   "privacy_url": "https://www.placeexchange.com/do-not-sell-my-information",
+   "reg_id": "20260045"
+  },
+  {
+   "name": "AWL Holdings, LLC",
+   "dba": "",
+   "primary": "awl.com",
+   "sites": [
+    "awl.com",
+    "insurancequotes.com"
+   ],
+   "privacy_url": "https://www.insurancequotes.com/privacy-policy",
+   "reg_id": "20260044"
+  },
+  {
+   "name": "NACHAL INC.",
+   "dba": "",
+   "primary": "getliminal.com",
+   "sites": [
+    "getliminal.com"
+   ],
+   "privacy_url": "https://getliminal.com/privacypolicy",
+   "reg_id": "20260043"
+  },
+  {
+   "name": "Convex Labs LLC",
+   "dba": "",
+   "primary": "convex.com",
+   "sites": [
+    "convex.com"
+   ],
+   "privacy_url": "https://www.convex.com/privacy-policy",
+   "reg_id": "20260042"
+  },
+  {
+   "name": "INTERACTIVE DATA, LLC",
+   "dba": "",
+   "primary": "ididata.com",
+   "sites": [
+    "ididata.com"
+   ],
+   "privacy_url": "https://www.ididata.com/idis-privacy-statement/",
+   "reg_id": "20260041"
+  },
+  {
+   "name": "Pipl, Inc.",
+   "dba": "",
+   "primary": "pipl.com",
+   "sites": [
+    "pipl.com"
+   ],
+   "privacy_url": "https://pipl.com/privacy-center",
+   "reg_id": "20260040"
+  },
+  {
+   "name": "Vi Technologies, Inc.",
+   "dba": "",
+   "primary": "vi.co",
+   "sites": [
+    "vi.co"
+   ],
+   "privacy_url": "https://vi.co/privacy-policy/",
+   "reg_id": "20260039"
+  },
+  {
+   "name": "Connatix Native Exchange Inc.",
+   "dba": "",
+   "primary": "jwx.com",
+   "sites": [
+    "connatix.com",
+    "jwx.com"
+   ],
+   "privacy_url": "https://connatix.com/optout",
+   "reg_id": "20260038"
+  },
+  {
+   "name": "Venntel, Inc.",
+   "dba": "",
+   "primary": "venntel.com",
+   "sites": [
+    "venntel.com"
+   ],
+   "privacy_url": "https://www.venntel.com/privacy-policy",
+   "reg_id": "20260037"
+  },
+  {
+   "name": "Unacast, Inc.",
+   "dba": "",
+   "primary": "unacast.com",
+   "sites": [
+    "unacast.com"
+   ],
+   "privacy_url": "https://www.unacast.com/privacy-policy",
+   "reg_id": "20260036"
+  },
+  {
+   "name": "Institute for Police Conduct",
+   "dba": "",
+   "primary": "policeconduct.org",
+   "sites": [
+    "policeconduct.org"
+   ],
+   "privacy_url": "https://policeconduct.org/legal-notice/privacy",
+   "reg_id": "20260035"
+  },
+  {
+   "name": "Spy Labs AdCo, LLC",
+   "dba": "",
+   "primary": "spydialer.com",
+   "sites": [
+    "spydialer.com"
+   ],
+   "privacy_url": "https://spydialer.com/privacy.aspx",
+   "reg_id": "20260034"
+  },
+  {
+   "name": "SemantIQ Inc",
+   "dba": "",
+   "primary": "semantiqhealth.com",
+   "sites": [
+    "semantiqhealth.com"
+   ],
+   "privacy_url": "https://semantiqhealth.com/privacy-policy",
+   "reg_id": "20260033"
+  },
+  {
+   "name": "Inmar Brand Solutions, Inc.",
+   "dba": "",
+   "primary": "inmar.com",
+   "sites": [
+    "inmar.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal-cdn.onetrust.com/dsarwebform/fa9f2f77-33ff-473b-ae55-579e2e693a91/ea2fadbb-3208-459b-8ed6-c975b6a9901c.html",
+   "reg_id": "20260032"
+  },
+  {
+   "name": "Index Exchange Inc.",
+   "dba": "",
+   "primary": "indexexchange.com",
+   "sites": [
+    "indexexchange.com"
+   ],
+   "privacy_url": "https://www.indexexchange.com/privacy/rights-exercising-rights/",
+   "reg_id": "20260031"
+  },
+  {
+   "name": "EverView Holdco, Inc",
+   "dba": "",
+   "primary": "evertrue.com",
+   "sites": [
+    "evertrue.com"
+   ],
+   "privacy_url": "https://www.evertrue.com/privacy-policy/",
+   "reg_id": "20260030"
+  },
+  {
+   "name": "Postie, Inc",
+   "dba": "",
+   "primary": "postie.com",
+   "sites": [
+    "postie.com"
+   ],
+   "privacy_url": "https://postie.com/your-privacy-choices/",
+   "reg_id": "20260029"
+  },
+  {
+   "name": "National Opinion Institute, LLC",
+   "dba": "",
+   "primary": "nationalopinioninstitute.com",
+   "sites": [
+    "nationalopinioninstitute.com"
+   ],
+   "privacy_url": "https://nationalopinioninstitute.com/disclosures/",
+   "reg_id": "20260028"
+  },
+  {
+   "name": "Babel Street, Inc.",
+   "dba": "",
+   "primary": "babelstreet.com",
+   "sites": [
+    "babelstreet.com"
+   ],
+   "privacy_url": "https://www.babelstreet.com/privacy",
+   "reg_id": "20260027"
+  },
+  {
+   "name": "Plug Chargers LLC",
+   "dba": "",
+   "primary": "plug-industries.com",
+   "sites": [
+    "plug-industries.com"
+   ],
+   "privacy_url": "https://plug-industries.com/opt-out",
+   "reg_id": "20260026"
+  },
+  {
+   "name": "Rickenbacher Data LLC",
+   "dba": "",
+   "primary": "datamasters.org",
+   "sites": [
+    "datamasters.org"
+   ],
+   "privacy_url": "https://www.datamasters.org/opt-out/",
+   "reg_id": "20260025"
+  },
+  {
+   "name": "Vistar Media, Inc.",
+   "dba": "",
+   "primary": "vistarmedia.com",
+   "sites": [
+    "vistarmedia.com"
+   ],
+   "privacy_url": "https://www.vistarmedia.com/privacy-choices",
+   "reg_id": "20260024"
+  },
+  {
+   "name": "Intent IQ LLC",
+   "dba": "",
+   "primary": "intentiq.com",
+   "sites": [
+    "intentiq.com"
+   ],
+   "privacy_url": "https://www.intentiq.com/opt-out/",
+   "reg_id": "20260023"
+  },
+  {
+   "name": "Circana, LLC",
+   "dba": "",
+   "primary": "circana.com",
+   "sites": [
+    "circana.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/2de05774-2e3d-45b0-a7c2-45bb6ba50ab1",
+   "reg_id": "20260022"
+  },
+  {
+   "name": "DB SUB, LLC",
+   "dba": "",
+   "primary": "partech.com",
+   "sites": [
+    "partech.com"
+   ],
+   "privacy_url": "https://partech.com/dbsubllc",
+   "reg_id": "20260021"
+  },
+  {
+   "name": "IDMAP INC",
+   "dba": "",
+   "primary": "idmap.ai",
+   "sites": [
+    "idmap.ai"
+   ],
+   "privacy_url": "https://idmap.ai/privacy-policy.html",
+   "reg_id": "20260020"
+  },
+  {
+   "name": "Visual Visitor LLC",
+   "dba": "",
+   "primary": "visualvisitor.com",
+   "sites": [
+    "visualvisitor.com"
+   ],
+   "privacy_url": "https://www.visualvisitor.com/legal-agreements/",
+   "reg_id": "20260019"
+  },
+  {
+   "name": "Global Source Data Solutions Inc",
+   "dba": "",
+   "primary": "gsdsi.com",
+   "sites": [
+    "gsdsi.com"
+   ],
+   "privacy_url": "https://gsdsi.com/privacy",
+   "reg_id": "20260018"
+  },
+  {
+   "name": "IQVIA Digital, Inc.",
+   "dba": "",
+   "primary": "iqviadigital.com",
+   "sites": [
+    "iqviadigital.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/07e8dc4d-6686-403e-9b11-39fe7347d2f4/2f999bd2-c826-498c-a504-894eaf543b6f",
+   "reg_id": "20260017"
+  },
+  {
+   "name": "Gigabite Inc",
+   "dba": "",
+   "primary": "boam.ai",
+   "sites": [
+    "boam.ai"
+   ],
+   "privacy_url": "https://boam.ai/privacy-policy",
+   "reg_id": "20260016"
+  },
+  {
+   "name": "Outkeep LLC",
+   "dba": "",
+   "primary": "outkeep.com",
+   "sites": [
+    "outkeep.com"
+   ],
+   "privacy_url": "https://outkeep.com/legal/",
+   "reg_id": "20260015"
+  },
+  {
+   "name": "Aristotle International, Inc.",
+   "dba": "",
+   "primary": "aristotle.com",
+   "sites": [
+    "aristotle.com"
+   ],
+   "privacy_url": "https://www.aristotle.com/privacy/",
+   "reg_id": "20260014"
+  },
+  {
+   "name": "AggKnowledge Inc.",
+   "dba": "",
+   "primary": "aggknowledge.ai",
+   "sites": [
+    "aggknowledge.ai"
+   ],
+   "privacy_url": "https://www.aggknowledge.ai/privacypolicy",
+   "reg_id": "20260013"
+  },
+  {
+   "name": "Response America Data, Inc.",
+   "dba": "",
+   "primary": "responseamerica.net",
+   "sites": [
+    "responseamerica.net"
+   ],
+   "privacy_url": "https://responseamerica.net/privacy_dec.html",
+   "reg_id": "20260012"
+  },
+  {
+   "name": "Key Marketing Advantage, LLC",
+   "dba": "",
+   "primary": "keymarketingadvantage.com",
+   "sites": [
+    "keymarketingadvantage.com"
+   ],
+   "privacy_url": "https://keymarketingadvantage.com/do_not_use_my_personal_information",
+   "reg_id": "20260011"
+  },
+  {
+   "name": "Lara Agency Inc",
+   "dba": "",
+   "primary": "farmers.com",
+   "sites": [
+    "farmers.com"
+   ],
+   "privacy_url": "https://agents.farmers.com/tx/houston/jose-lara/?SourceID=AMPALFGMAG&utm_medium=Local&utm_source=GMB",
+   "reg_id": "20260010"
+  },
+  {
+   "name": "Digital Viking Media, Inc",
+   "dba": "",
+   "primary": "digitalvikingmedia.com",
+   "sites": [
+    "digitalvikingmedia.com"
+   ],
+   "privacy_url": "https://www.digitalvikingmedia.com/privacy-policy",
+   "reg_id": "20260009"
+  },
+  {
+   "name": "Titan Locators",
+   "dba": "",
+   "primary": "secondchanceapartments.com",
+   "sites": [
+    "secondchanceapartments.com"
+   ],
+   "privacy_url": "https://secondchanceapartments.com/privacy-policy/",
+   "reg_id": "20260008"
+  },
+  {
+   "name": "TargetSmart Communications LLC",
+   "dba": "",
+   "primary": "targetsmart.com",
+   "sites": [
+    "targetsmart.com"
+   ],
+   "privacy_url": "https://targetsmart.com/about-targetsmart/support-center/privacy-policy/",
+   "reg_id": "20260007"
+  },
+  {
+   "name": "CTAM LeadShare Corp",
+   "dba": "",
+   "primary": "smartmove.us",
+   "sites": [
+    "smartmove.us"
+   ],
+   "privacy_url": "www.smartmove.us",
+   "reg_id": "20260006"
+  },
+  {
+   "name": "Statara Solutions LLC",
+   "dba": "",
+   "primary": "statara.com",
+   "sites": [
+    "statara.com"
+   ],
+   "privacy_url": "https://statara.com/privacy/",
+   "reg_id": "20260005"
+  },
+  {
+   "name": "Analyze Corporation",
+   "dba": "",
+   "primary": "analyzecorp.com",
+   "sites": [
+    "analyzecorp.com"
+   ],
+   "privacy_url": "https://www.analyzecorp.com/privacy-policy/",
+   "reg_id": "20260004"
+  },
+  {
+   "name": "Nuwber Inc.",
+   "dba": "",
+   "primary": "nuwber.com",
+   "sites": [
+    "nuwber.com"
+   ],
+   "privacy_url": "https://nuwber.com/policy",
+   "reg_id": "20260003"
+  },
+  {
+   "name": "OWMN, LTD.",
+   "dba": "",
+   "primary": "thebridgecorp.com",
+   "sites": [
+    "thebridgecorp.com"
+   ],
+   "privacy_url": "https://www.thebridgecorp.com/privacy-policy/",
+   "reg_id": "20260002"
+  },
+  {
+   "name": "M1 Data & Analytics, LLC",
+   "dba": "",
+   "primary": "m1-data.com",
+   "sites": [
+    "m1-data.com"
+   ],
+   "privacy_url": "https://m1-data.com/unsubscribe/",
+   "reg_id": "20260001"
+  },
+  {
+   "name": "Rushmore Labs, LLC",
+   "dba": "",
+   "primary": "rushmorelabs.com",
+   "sites": [
+    "rushmorelabs.com"
+   ],
+   "privacy_url": "https://rushmorelabs.com/disclosures/",
+   "reg_id": "20250220"
+  },
+  {
+   "name": "Virtual Marketing LLC",
+   "dba": "",
+   "primary": "fusion92.com",
+   "sites": [
+    "fusion92.com"
+   ],
+   "privacy_url": "https://www.fusion92.com/privacy-choices",
+   "reg_id": "20250219"
+  },
+  {
+   "name": "True Blue Analytics LLC",
+   "dba": "",
+   "primary": "trueblueanalytics.org",
+   "sites": [
+    "trueblueanalytics.org"
+   ],
+   "privacy_url": "https://trueblueanalytics.org/privacy-policy",
+   "reg_id": "20250218"
+  },
+  {
+   "name": "Irys Inc",
+   "dba": "",
+   "primary": "irys.us",
+   "sites": [
+    "irys.us"
+   ],
+   "privacy_url": "https://irys.us/privacy-policy",
+   "reg_id": "20250217"
+  },
+  {
+   "name": "Wiza Inc.",
+   "dba": "",
+   "primary": "wiza.com",
+   "sites": [
+    "wiza.co",
+    "wiza.com"
+   ],
+   "privacy_url": "https://wiza.co/privacy",
+   "reg_id": "20250216"
+  },
+  {
+   "name": "Outward Media, Inc.",
+   "dba": "",
+   "primary": "outwardmedia.com",
+   "sites": [
+    "outwardmedia.com"
+   ],
+   "privacy_url": "https://outwardmedia.com/privacypolicy",
+   "reg_id": "20250215"
+  },
+  {
+   "name": "Collectors Datastore LLC",
+   "dba": "",
+   "primary": "thecollectorsdatastore.com",
+   "sites": [
+    "fanalyticsiq.com",
+    "thecollectorsdatastore.com"
+   ],
+   "privacy_url": "www.fanalyticsiq.com/privacy-policy",
+   "reg_id": "20250214"
+  },
+  {
+   "name": "Mobile Technology Corporation",
+   "dba": "",
+   "primary": "onspotdata.com",
+   "sites": [
+    "onspotdata.com"
+   ],
+   "privacy_url": "https://www.onspotdata.com/privacy-policy/",
+   "reg_id": "20250213"
+  },
+  {
+   "name": "Anteriad, LLC",
+   "dba": "",
+   "primary": "anteriad.com",
+   "sites": [
+    "anteriad.com"
+   ],
+   "privacy_url": "https://forms.anteriad.com/privacy-portal?utm_source=website&utm_medium=lp&utm_campaign=2025",
+   "reg_id": "20250212"
+  },
+  {
+   "name": "Xcelerated Data LLC",
+   "dba": "",
+   "primary": "xcelerated.com",
+   "sites": [
+    "xcelerated.com"
+   ],
+   "privacy_url": "https://www.xcelerated.com/privacy",
+   "reg_id": "20250211"
+  },
+  {
+   "name": "Optable Technologies US Inc.",
+   "dba": "",
+   "primary": "optable.co",
+   "sites": [
+    "optable.co"
+   ],
+   "privacy_url": "https://terms.optable.co/privacy/opt-out-and-suppression-of-brokered-data",
+   "reg_id": "20250210"
+  },
+  {
+   "name": "DecisionLinks LLC",
+   "dba": "",
+   "primary": "decisionlinks.com",
+   "sites": [
+    "decisionlinks.com"
+   ],
+   "privacy_url": "https://www.decisionlinks.com/legal-pages/privacy-policy",
+   "reg_id": "20250209"
+  },
+  {
+   "name": "Collective Data Solutions, LLC",
+   "dba": "",
+   "primary": "www.collective",
+   "sites": [
+    "collectivedata.io",
+    "data.io",
+    "www.collective"
+   ],
+   "privacy_url": "https://www.collectivedata.io/website-visitor-privacy-policy/",
+   "reg_id": "20250208"
+  },
+  {
+   "name": "ROR Partners, LLC",
+   "dba": "",
+   "primary": "rorpartners.com",
+   "sites": [
+    "rorpartners.com"
+   ],
+   "privacy_url": "https://rorpartners.com/privacy-policy",
+   "reg_id": "20250207"
+  },
+  {
+   "name": "Allant Group, LLC",
+   "dba": "",
+   "primary": "allantgroup.com",
+   "sites": [
+    "allantgroup.com"
+   ],
+   "privacy_url": "https://allantgroup.com/privacy-policy",
+   "reg_id": "20250206"
+  },
+  {
+   "name": "WealthFeed, Inc.",
+   "dba": "",
+   "primary": "wealthfeed.com",
+   "sites": [
+    "wealthfeed.com"
+   ],
+   "privacy_url": "https://www.wealthfeed.com/privacy-choices/",
+   "reg_id": "20250205"
+  },
+  {
+   "name": "Stirista, LLC",
+   "dba": "",
+   "primary": "stirista.com",
+   "sites": [
+    "stirista.com"
+   ],
+   "privacy_url": "https://www.stirista.com/privacy-policy/",
+   "reg_id": "20250204"
+  },
+  {
+   "name": "Dallas Computer Services, Inc",
+   "dba": "",
+   "primary": "dcsinfosys.com",
+   "sites": [
+    "dcsinfosys.com"
+   ],
+   "privacy_url": "www.dcsinfosys.com",
+   "reg_id": "20250203"
+  },
+  {
+   "name": "Innovation Brands Corp",
+   "dba": "",
+   "primary": "proxima.ai",
+   "sites": [
+    "proxima.ai"
+   ],
+   "privacy_url": "www.proxima.ai/privacy",
+   "reg_id": "20250200"
+  },
+  {
+   "name": "AtData, LLC",
+   "dba": "",
+   "primary": "atdata.com",
+   "sites": [
+    "atdata.com"
+   ],
+   "privacy_url": "https://atdata.com/privacy-policy/#section-11",
+   "reg_id": "20250198"
+  },
+  {
+   "name": "PublicNSA LLC",
+   "dba": "",
+   "primary": "bigdbm.com",
+   "sites": [
+    "bigdbm.com"
+   ],
+   "privacy_url": "https://bigdbm.com/privacy-policy/",
+   "reg_id": "20250197"
+  },
+  {
+   "name": "Civis Analytics, Inc.",
+   "dba": "",
+   "primary": "civisanalytics.com",
+   "sites": [
+    "civisanalytics.com"
+   ],
+   "privacy_url": "www.civisanalytics.com/legal-pages/supplemental-privacy-notice",
+   "reg_id": "20250196"
+  },
+  {
+   "name": "Veeva Systems Inc.",
+   "dba": "",
+   "primary": "veeva.com",
+   "sites": [
+    "veeva.com"
+   ],
+   "privacy_url": "https://www.veeva.com/privacy/",
+   "reg_id": "20250194"
+  },
+  {
+   "name": "Reveal Mobile, Inc.",
+   "dba": "",
+   "primary": "revealmobile.com",
+   "sites": [
+    "revealmobile.com"
+   ],
+   "privacy_url": "https://revealmobile.com/privacy",
+   "reg_id": "20250193"
+  },
+  {
+   "name": "Black Pearl Group Limited",
+   "dba": "",
+   "primary": "blackpearl.com",
+   "sites": [
+    "blackpearl.com"
+   ],
+   "privacy_url": "https://www.blackpearl.com/your-privacy-choices",
+   "reg_id": "20250192"
+  },
+  {
+   "name": "Freewheel Media, Inc.",
+   "dba": "",
+   "primary": "freewheel.com",
+   "sites": [
+    "freewheel.com"
+   ],
+   "privacy_url": "https://www.freewheel.com/privacy-policy#tab1_section1_4",
+   "reg_id": "20250190"
+  },
+  {
+   "name": "Demandbase, Inc.",
+   "dba": "",
+   "primary": "demandbase.com",
+   "sites": [
+    "demandbase.com"
+   ],
+   "privacy_url": "https://www.demandbase.com/privacy/",
+   "reg_id": "20250188"
+  },
+  {
+   "name": "Civic Element LLC",
+   "dba": "",
+   "primary": "civicelement.com",
+   "sites": [
+    "civicelement.com"
+   ],
+   "privacy_url": "https://www.civicelement.com/privacy-policy",
+   "reg_id": "20250187"
+  },
+  {
+   "name": "RampedUp, LLC.",
+   "dba": "",
+   "primary": "rampedup.io",
+   "sites": [
+    "rampedup.io"
+   ],
+   "privacy_url": "https://rampedup.io/privacy-policy-1",
+   "reg_id": "20250186"
+  },
+  {
+   "name": "VentiveIQ LLC",
+   "dba": "",
+   "primary": "vetiveiq.com",
+   "sites": [
+    "ventiveiq.com",
+    "vetiveiq.com"
+   ],
+   "privacy_url": "https://ventiveiq.com/privacy-policy/",
+   "reg_id": "20250185"
+  },
+  {
+   "name": "VANGUARD AI LLC",
+   "dba": "",
+   "primary": "electhq.net",
+   "sites": [
+    "electhq.net"
+   ],
+   "privacy_url": "https://electhq.net/privacy.html",
+   "reg_id": "20250184"
+  },
+  {
+   "name": "AutoWeb, Inc.",
+   "dba": "",
+   "primary": "autoweb.com",
+   "sites": [
+    "autoweb.com"
+   ],
+   "privacy_url": "https://www.autoweb.com/privacy",
+   "reg_id": "20250183"
+  },
+  {
+   "name": "Lookify, LLC",
+   "dba": "",
+   "primary": "lookify.io",
+   "sites": [
+    "lookify.io"
+   ],
+   "privacy_url": "https://lookify.io/privacy-policy",
+   "reg_id": "20250182"
+  },
+  {
+   "name": "J2 Global Canada, Inc.",
+   "dba": "",
+   "primary": "ziffdavis.com",
+   "sites": [
+    "campaigner.com",
+    "ziffdavis.com"
+   ],
+   "privacy_url": "https://www.campaigner.com/legal/privacy-policy/",
+   "reg_id": "20250181"
+  },
+  {
+   "name": "J2 Martech Corp",
+   "dba": "",
+   "primary": "fullcontact.com",
+   "sites": [
+    "fullcontact.com"
+   ],
+   "privacy_url": "https://platform.fullcontact.com/your-privacy-choices",
+   "reg_id": "20250180"
+  },
+  {
+   "name": "Summit Resources, LLC d/b/a Client Command",
+   "dba": "",
+   "primary": "clientcommand.com",
+   "sites": [
+    "clientcommand.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal-cdn.onetrust.com/dsarwebform/555c3377-7eb2-4e7a-bf30-c408de4ab483/70df6685-8289-4d72-a9d7-9a736b3b837f.html",
+   "reg_id": "20250179"
+  },
+  {
+   "name": "MadHive, Inc",
+   "dba": "",
+   "primary": "madhive.com",
+   "sites": [
+    "madhive.com"
+   ],
+   "privacy_url": "https://www.madhive.com/user-rights",
+   "reg_id": "20250178"
+  },
+  {
+   "name": "Cybba Inc",
+   "dba": "",
+   "primary": "cybba.com",
+   "sites": [
+    "cybba.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/f89c576a-b5c6-498e-bad5-698f084ffd30",
+   "reg_id": "20250177"
+  },
+  {
+   "name": "Live Data Technologies Inc.",
+   "dba": "",
+   "primary": "livedatatechnologies.com",
+   "sites": [
+    "livedatatechnologies.com"
+   ],
+   "privacy_url": "https://www.livedatatechnologies.com/opting",
+   "reg_id": "20250175"
+  },
+  {
+   "name": "Insight Data Solutions LLC",
+   "dba": "",
+   "primary": "idatabasesolutions.com",
+   "sites": [
+    "idatabasesolutions.com"
+   ],
+   "privacy_url": "https://idatabasesolutions.com/do-not-sell-my-personal-info/",
+   "reg_id": "20250174"
+  },
+  {
+   "name": "The Data Group",
+   "dba": "",
+   "primary": "thedatagroup.com",
+   "sites": [
+    "thedatagroup.com"
+   ],
+   "privacy_url": "https://thedatagroup.com/privacy/",
+   "reg_id": "20250173"
+  },
+  {
+   "name": "Matchbook Data, LLC",
+   "dba": "",
+   "primary": "matchbookdata.com",
+   "sites": [
+    "matchbookdata.com"
+   ],
+   "privacy_url": "https://www.matchbookdata.com/your-privacy-choices/",
+   "reg_id": "20250172"
+  },
+  {
+   "name": "Outlogic, LLC",
+   "dba": "",
+   "primary": "outlogic.io",
+   "sites": [
+    "outlogic.io"
+   ],
+   "privacy_url": "https://outlogic.io/opt-out-form/",
+   "reg_id": "20250171"
+  },
+  {
+   "name": "GrayHair Software LLC",
+   "dba": "",
+   "primary": "grayhairsoftware.com",
+   "sites": [
+    "grayhairsoftware.com"
+   ],
+   "privacy_url": "https://grayhairsoftware.com/privacy-policy/",
+   "reg_id": "20250170"
+  },
+  {
+   "name": "33Across, Inc.",
+   "dba": "",
+   "primary": "33across.com",
+   "sites": [
+    "33across.com"
+   ],
+   "privacy_url": "https://udp.33across.com/udp_opt_out",
+   "reg_id": "20250169"
+  },
+  {
+   "name": "Buyerlink Inc.",
+   "dba": "",
+   "primary": "buyerlink.co",
+   "sites": [
+    "buyerlink.co"
+   ],
+   "privacy_url": "https://www.buyerlink.co/privacy",
+   "reg_id": "20250168"
+  },
+  {
+   "name": "Explorium Inc.",
+   "dba": "",
+   "primary": "explorium.ai",
+   "sites": [
+    "explorium.ai"
+   ],
+   "privacy_url": "https://www.explorium.ai/do-not-sell-my-personal-info/",
+   "reg_id": "20250167"
+  },
+  {
+   "name": "Guidestar Direct, Corp",
+   "dba": "",
+   "primary": "carneydirect.com",
+   "sites": [
+    "carneydirect.com"
+   ],
+   "privacy_url": "https://www.carneydirect.com/privacy-policy/",
+   "reg_id": "20250166"
+  },
+  {
+   "name": "Klarifi ApS",
+   "dba": "",
+   "primary": "klarifi.io",
+   "sites": [
+    "klarifi.io"
+   ],
+   "privacy_url": "https://klarifi.io/privacy-center",
+   "reg_id": "20250165"
+  },
+  {
+   "name": "GETEMAILS LLC",
+   "dba": "",
+   "primary": "retention.com",
+   "sites": [
+    "retention.com"
+   ],
+   "privacy_url": "https://www.retention.com/article-update-privacy-policy",
+   "reg_id": "20250164"
+  },
+  {
+   "name": "PostPilot, Inc.",
+   "dba": "",
+   "primary": "postpilot.com",
+   "sites": [
+    "postpilot.com"
+   ],
+   "privacy_url": "https://www.postpilot.com/privacy-policy",
+   "reg_id": "20250163"
+  },
+  {
+   "name": "Infillion Inc.",
+   "dba": "",
+   "primary": "infillion.com",
+   "sites": [
+    "infillion.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/22033015-0970-44c0-b5a5-8b180f7e4ef1",
+   "reg_id": "20250162"
+  },
+  {
+   "name": "Audience Mix LLC",
+   "dba": "",
+   "primary": "audiencemix.net",
+   "sites": [
+    "audiencemix.net"
+   ],
+   "privacy_url": "https://www.audiencemix.net/general-clean",
+   "reg_id": "20250161"
+  },
+  {
+   "name": "RESONATE NETWORKS, INC.",
+   "dba": "",
+   "primary": "resonate.com",
+   "sites": [
+    "resonate.com"
+   ],
+   "privacy_url": "https://www.resonate.com/privacy-policy/",
+   "reg_id": "20250160"
+  },
+  {
+   "name": "Datonics LLC",
+   "dba": "",
+   "primary": "datonics.com",
+   "sites": [
+    "datonics.com"
+   ],
+   "privacy_url": "https://www.datonics.com/privacy/privacy-choices",
+   "reg_id": "20250158"
+  },
+  {
+   "name": "Audience Acuity LLC",
+   "dba": "",
+   "primary": "audienceacuity.com",
+   "sites": [
+    "audienceacuity.com"
+   ],
+   "privacy_url": "https://audienceacuity.com/privacy/",
+   "reg_id": "20250156"
+  },
+  {
+   "name": "Lead411 Corporation",
+   "dba": "",
+   "primary": "lead411.com",
+   "sites": [
+    "lead411.com"
+   ],
+   "privacy_url": "https://www.lead411.com/your-privacy-choices/",
+   "reg_id": "20250155"
+  },
+  {
+   "name": "Disco Technology Inc",
+   "dba": "",
+   "primary": "disconetwork.com",
+   "sites": [
+    "disconetwork.com"
+   ],
+   "privacy_url": "https://disconetwork.com/privacy-policy",
+   "reg_id": "20250154"
+  },
+  {
+   "name": "Buxton Company, LLC",
+   "dba": "",
+   "primary": "buxtonco.com",
+   "sites": [
+    "buxtonco.com"
+   ],
+   "privacy_url": "https://www.buxtonco.com/privacy",
+   "reg_id": "20250153"
+  },
+  {
+   "name": "Swarm Holdings, Inc.",
+   "dba": "",
+   "primary": "theswarm.com",
+   "sites": [
+    "theswarm.com"
+   ],
+   "privacy_url": "https://www.theswarm.com/privacy",
+   "reg_id": "20250150"
+  },
+  {
+   "name": "Brooks Integrated Marketing, LLC",
+   "dba": "",
+   "primary": "brooksim.com",
+   "sites": [
+    "brooksim.com"
+   ],
+   "privacy_url": "https://www.brooksim.com/privacy-form",
+   "reg_id": "20250149"
+  },
+  {
+   "name": "Bachmanity Inc.",
+   "dba": "",
+   "primary": "aviato.co",
+   "sites": [
+    "aviato.co"
+   ],
+   "privacy_url": "https://www.aviato.co/legal/privacy",
+   "reg_id": "20250148"
+  },
+  {
+   "name": "Command Precision, Inc.",
+   "dba": "",
+   "primary": "persistent.id",
+   "sites": [
+    "persistent.id",
+    "trustsuperset.com"
+   ],
+   "privacy_url": "https://www.trustsuperset.com/dsrs?orgId=7b774bc1-608f-8c4c-bb90-453b1540f48b",
+   "reg_id": "20250147"
+  },
+  {
+   "name": "InfoPay, Inc",
+   "dba": "",
+   "primary": "infopay.com",
+   "sites": [
+    "infopay.com"
+   ],
+   "privacy_url": "https://www.infopay.com/privacy",
+   "reg_id": "20250146"
+  },
+  {
+   "name": "upcell, LLC.",
+   "dba": "",
+   "primary": "upcell.io",
+   "sites": [
+    "upcell.io"
+   ],
+   "privacy_url": "https://www.upcell.io/data-claim",
+   "reg_id": "20250144"
+  },
+  {
+   "name": "MarketOps LLC",
+   "dba": "",
+   "primary": "marketops.com",
+   "sites": [
+    "marketops.com"
+   ],
+   "privacy_url": "https://marketops.com/data-inquiries/",
+   "reg_id": "20250143"
+  },
+  {
+   "name": "Speedeon Data LLC",
+   "dba": "",
+   "primary": "speedeondata.com",
+   "sites": [
+    "speedeondata.com"
+   ],
+   "privacy_url": "https://speedeondata.com/privacy-policy/",
+   "reg_id": "20250142"
+  },
+  {
+   "name": "Yobi Ventures, Inc.",
+   "dba": "",
+   "primary": "yobi.ai",
+   "sites": [
+    "yobi.ai"
+   ],
+   "privacy_url": "https://www.yobi.ai/opt-out",
+   "reg_id": "20250141"
+  },
+  {
+   "name": "Carry Technologies, Inc",
+   "dba": "",
+   "primary": "hightouch.com",
+   "sites": [
+    "hightouch.com"
+   ],
+   "privacy_url": "hightouch.com/privacy-policy",
+   "reg_id": "20250140"
+  },
+  {
+   "name": "Giant Partners, Inc.",
+   "dba": "",
+   "primary": "giantpartners.com",
+   "sites": [
+    "giantpartners.com"
+   ],
+   "privacy_url": "https://giantpartners.com/do-not-sell-my-personal-info-all-other-states/",
+   "reg_id": "20250139"
+  },
+  {
+   "name": "Monevo Inc",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20250138"
+  },
+  {
+   "name": "LiveIntent",
+   "dba": "",
+   "primary": "liveintent.com",
+   "sites": [
+    "liveintent.com"
+   ],
+   "privacy_url": "https://privacy.liveintent.com/",
+   "reg_id": "20250137"
+  },
+  {
+   "name": "BDO GCI, LLC",
+   "dba": "",
+   "primary": "bdo.com",
+   "sites": [
+    "bdo.com"
+   ],
+   "privacy_url": "https://www.bdo.com/do-not-sell-my-personal-information",
+   "reg_id": "20250135"
+  },
+  {
+   "name": "Clay Labs, LLC",
+   "dba": "",
+   "primary": "clay.com",
+   "sites": [
+    "clay.com"
+   ],
+   "privacy_url": "https://privacy.clay.com/policies?name=privacy-policy",
+   "reg_id": "20250134"
+  },
+  {
+   "name": "Catalina Marketing Corporation",
+   "dba": "",
+   "primary": "catalina.com",
+   "sites": [
+    "catalina.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/1bb0c042-b42f-49cc-8779-0bdf8f2ac522",
+   "reg_id": "20250133"
+  },
+  {
+   "name": "West Publishing Corporation",
+   "dba": "",
+   "primary": "thomsonreuters.com",
+   "sites": [
+    "thomsonreuters.com"
+   ],
+   "privacy_url": "https://www.thomsonreuters.com/en/trust-center/data-privacy-information",
+   "reg_id": "20250132"
+  },
+  {
+   "name": "Cognism Inc.",
+   "dba": "",
+   "primary": "cognism.com",
+   "sites": [
+    "cognism.com",
+    "saymine.io"
+   ],
+   "privacy_url": "https://cognism.privacy.saymine.io/cognism",
+   "reg_id": "20250131"
+  },
+  {
+   "name": "TrueData Solutions, Inc.",
+   "dba": "",
+   "primary": "truedata.co",
+   "sites": [
+    "truedata.co"
+   ],
+   "privacy_url": "https://info-prod.truedata.co/access-delete-request",
+   "reg_id": "20250130"
+  },
+  {
+   "name": "360 Media Direct",
+   "dba": "",
+   "primary": "360mediadirect.com",
+   "sites": [
+    "360mediadirect.com"
+   ],
+   "privacy_url": "https://360mediadirect.com/privacy-policy/",
+   "reg_id": "20250129"
+  },
+  {
+   "name": "eContext.ai Limited",
+   "dba": "",
+   "primary": "complementics.com",
+   "sites": [
+    "complementics.com"
+   ],
+   "privacy_url": "https://www.complementics.com/opt-out",
+   "reg_id": "20250128"
+  },
+  {
+   "name": "DealerDirect LLC",
+   "dba": "",
+   "primary": "forddirect.com",
+   "sites": [
+    "forddirect.com",
+    "saymine.io"
+   ],
+   "privacy_url": "https://forddirect.privacy.saymine.io/forddirect",
+   "reg_id": "20250122"
+  },
+  {
+   "name": "Rainbarrel USA LLC",
+   "dba": "",
+   "primary": "knowertech.com",
+   "sites": [
+    "knowertech.com",
+    "rbarrel.com"
+   ],
+   "privacy_url": "https://www.rbarrel.com/privacy-policy",
+   "reg_id": "20250121"
+  },
+  {
+   "name": "Equation Consulting, LLC",
+   "dba": "",
+   "primary": "finthrive.com",
+   "sites": [
+    "finthrive.com"
+   ],
+   "privacy_url": "https://finthrive.com/texas-data-broker-disclosure-equation-consulting?hs_preview=jhDXCUDm-205479481866",
+   "reg_id": "20250120"
+  },
+  {
+   "name": "Steppingblocks, Inc.",
+   "dba": "",
+   "primary": "steppingblocks.com",
+   "sites": [
+    "steppingblocks.com"
+   ],
+   "privacy_url": "https://www.steppingblocks.com/privacy-ccpa",
+   "reg_id": "20250118"
+  },
+  {
+   "name": "StackAdapt Inc.",
+   "dba": "",
+   "primary": "stackadapt.com",
+   "sites": [
+    "stackadapt.com"
+   ],
+   "privacy_url": "https://www.stackadapt.com/legal-document-centre/platform-and-services-privacy-policy",
+   "reg_id": "20250117"
+  },
+  {
+   "name": "Elevar, LLC",
+   "dba": "",
+   "primary": "getelevar.com",
+   "sites": [
+    "getelevar.com"
+   ],
+   "privacy_url": "https://getelevar.com/consumer-personal-information-requests/",
+   "reg_id": "20250114"
+  },
+  {
+   "name": "Media Resource Group LLC",
+   "dba": "",
+   "primary": "mrginc.com",
+   "sites": [
+    "mrginc.com",
+    "mrgstaging.com"
+   ],
+   "privacy_url": "https://mrgstaging.com/policy/mrgprivacy.html",
+   "reg_id": "20250113"
+  },
+  {
+   "name": "Adept ID, Inc.",
+   "dba": "",
+   "primary": "adept-id.com",
+   "sites": [
+    "adept-id.com"
+   ],
+   "privacy_url": "https://www.adept-id.com/opt-out-preferences/",
+   "reg_id": "20250111"
+  },
+  {
+   "name": "Leadpsace Inc",
+   "dba": "",
+   "primary": "leadspace.com",
+   "sites": [
+    "leadspace.com"
+   ],
+   "privacy_url": "https://www.leadspace.com/do-not-sell-form",
+   "reg_id": "20250109"
+  },
+  {
+   "name": "Salutary Data LLC.",
+   "dba": "",
+   "primary": "salutarydata.com",
+   "sites": [
+    "salutarydata.com"
+   ],
+   "privacy_url": "https://salutarydata.com/privacy-opt-out-and-disclosure-form/",
+   "reg_id": "20250108"
+  },
+  {
+   "name": "BH MARKETING GROUP, LLC",
+   "dba": "",
+   "primary": "usmarketinggrp.com",
+   "sites": [
+    "usmarketinggrp.com"
+   ],
+   "privacy_url": "https://usmarketinggrp.com/privacy-policy/",
+   "reg_id": "20250107"
+  },
+  {
+   "name": "BRIGHT POLICY, LLC",
+   "dba": "",
+   "primary": "quotefinders.com",
+   "sites": [
+    "quotefinders.com"
+   ],
+   "privacy_url": "https://www.quotefinders.com/privacy",
+   "reg_id": "20250105"
+  },
+  {
+   "name": "Digital Segment, LLC",
+   "dba": "",
+   "primary": "digitalsegment.com",
+   "sites": [
+    "digitalsegment.com"
+   ],
+   "privacy_url": "https://www.digitalsegment.com/about/opt-out/",
+   "reg_id": "20250100"
+  },
+  {
+   "name": "Faraday, Inc.",
+   "dba": "",
+   "primary": "faraday.ai",
+   "sites": [
+    "faraday.ai"
+   ],
+   "privacy_url": "https://faraday.ai/privacy-options",
+   "reg_id": "20250099"
+  },
+  {
+   "name": "iSpot.TV, Inc.",
+   "dba": "",
+   "primary": "ispot.tv",
+   "sites": [
+    "ispot.tv"
+   ],
+   "privacy_url": "https://www.ispot.tv/hub/agreements/privacy/",
+   "reg_id": "20250098"
+  },
+  {
+   "name": "Claritas LLC",
+   "dba": "",
+   "primary": "claritas.com",
+   "sites": [
+    "claritas.com"
+   ],
+   "privacy_url": "https://claritas.com/privacy-legal/",
+   "reg_id": "20250096"
+  },
+  {
+   "name": "Juicebox App, Inc.",
+   "dba": "",
+   "primary": "juicebox.ai",
+   "sites": [
+    "juicebox.ai"
+   ],
+   "privacy_url": "https://juicebox.ai/privacy-center",
+   "reg_id": "20250092"
+  },
+  {
+   "name": "TripleLift, Inc.",
+   "dba": "",
+   "primary": "triplelift.com",
+   "sites": [
+    "triplelift.com"
+   ],
+   "privacy_url": "https://triplelift.com/user-rights-policy-and-opt-out/",
+   "reg_id": "20250091"
+  },
+  {
+   "name": "Helix Campaigns LLC",
+   "dba": "",
+   "primary": "helixcampaigns.com",
+   "sites": [
+    "helixcampaigns.com"
+   ],
+   "privacy_url": "helixcampaigns.com/privacy",
+   "reg_id": "20250087"
+  },
+  {
+   "name": "R.L. Polk & Co.",
+   "dba": "",
+   "primary": "polk.com",
+   "sites": [
+    "onetrust.com",
+    "polk.com"
+   ],
+   "privacy_url": "https://privacyportal.onetrust.com/webform/5cb57702-8ef7-437e-a62b-408fe78cd310/93391c3d-d6c8-45b1-a169-39a0b7f9fb74",
+   "reg_id": "20250086"
+  },
+  {
+   "name": "Growing Libraries, LLC",
+   "dba": "",
+   "primary": "growinglibraries.com",
+   "sites": [
+    "growinglibraries.com"
+   ],
+   "privacy_url": "https://growinglibraries.com/privacy-policy",
+   "reg_id": "20250085"
+  },
+  {
+   "name": "Azira LLC",
+   "dba": "",
+   "primary": "azira.com",
+   "sites": [
+    "azira.com",
+    "trustarc.com"
+   ],
+   "privacy_url": "https://submit-irm.trustarc.com/services/validation/0a80503b-1d56-4d50-a898-4377a0227dab",
+   "reg_id": "20250084"
+  },
+  {
+   "name": "Nexxen, Inc.",
+   "dba": "",
+   "primary": "nexxen.com",
+   "sites": [
+    "nexxen.com"
+   ],
+   "privacy_url": "https://nexxen.com/privacy-data-subject-rights-request/",
+   "reg_id": "20250083"
+  },
+  {
+   "name": "Trans Union LLC",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20250081"
+  },
+  {
+   "name": "TransUnion Risk and Alternative Data Solutions, Inc.",
+   "dba": "",
+   "primary": "transunion.com",
+   "sites": [
+    "transunion.com"
+   ],
+   "privacy_url": "https://www.transunion.com/consumer-privacy",
+   "reg_id": "20250080"
+  },
+  {
+   "name": "Altair Data Resources, Inc.",
+   "dba": "",
+   "primary": "altairdata.com",
+   "sites": [
+    "altairdata.com"
+   ],
+   "privacy_url": "https://altairdata.com/privacy-policy/",
+   "reg_id": "20250079"
+  },
+  {
+   "name": "ListKit LLC",
+   "dba": "",
+   "primary": "listkit.io",
+   "sites": [
+    "listkit.io"
+   ],
+   "privacy_url": "https://www.listkit.io/privacy-statement",
+   "reg_id": "20250078"
+  },
+  {
+   "name": "Altrata, Inc.",
+   "dba": "",
+   "primary": "altrata.com",
+   "sites": [
+    "altrata.com"
+   ],
+   "privacy_url": "https://altrata.com/",
+   "reg_id": "20250077"
+  },
+  {
+   "name": "PrivCo Media, LLC",
+   "dba": "",
+   "primary": "privco.com",
+   "sites": [
+    "privco.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20250075"
+  },
+  {
+   "name": "Acronymix LLC",
+   "dba": "",
+   "primary": "acronymix.com",
+   "sites": [
+    "acronymix.com"
+   ],
+   "privacy_url": "https://acronymix.com/privacy-policy/",
+   "reg_id": "20250074"
+  },
+  {
+   "name": "Precisely Software Incorporated",
+   "dba": "",
+   "primary": "precisely.com",
+   "sites": [
+    "precisely.com"
+   ],
+   "privacy_url": "https://www.precisely.com/your-privacy-choices/",
+   "reg_id": "20250066"
+  },
+  {
+   "name": "Electronic Voice Services, Inc.",
+   "dba": "",
+   "primary": "evs7.com",
+   "sites": [
+    "evs7.com"
+   ],
+   "privacy_url": "https://www.evs7.com/privacy-policy",
+   "reg_id": "20250065"
+  },
+  {
+   "name": "People Data Labs, Inc.",
+   "dba": "",
+   "primary": "peopledatalabs.com",
+   "sites": [
+    "peopledatalabs.com"
+   ],
+   "privacy_url": "https://privacy.peopledatalabs.com/policies?modal=select-subject",
+   "reg_id": "20250063"
+  },
+  {
+   "name": "PossibleNOW, Inc.",
+   "dba": "",
+   "primary": "possiblenow.com",
+   "sites": [
+    "possiblenow.com"
+   ],
+   "privacy_url": "https://www.possiblenow.com/privacy-statement",
+   "reg_id": "20250062"
+  },
+  {
+   "name": "BDEX LLC",
+   "dba": "",
+   "primary": "bdex.com",
+   "sites": [
+    "bdex.com"
+   ],
+   "privacy_url": "https://www.bdex.com/privacy-policy/",
+   "reg_id": "20250060"
+  },
+  {
+   "name": "Unearth Campaigns LLC",
+   "dba": "",
+   "primary": "unearthcampaigns.com",
+   "sites": [
+    "unearthcampaigns.com"
+   ],
+   "privacy_url": "https://www.unearthcampaigns.com/privacy-policy/",
+   "reg_id": "20250059"
+  },
+  {
+   "name": "Ownco, LLC",
+   "dba": "",
+   "primary": "monitorbase.com",
+   "sites": [
+    "monitorbase.com"
+   ],
+   "privacy_url": "https://my.monitorbase.com/privacypolicy",
+   "reg_id": "20250058"
+  },
+  {
+   "name": "Free Data Services, LLC",
+   "dba": "",
+   "primary": "truepeoplesearch.com",
+   "sites": [
+    "truepeoplesearch.com"
+   ],
+   "privacy_url": "https://www.truepeoplesearch.com/privacy",
+   "reg_id": "20250056"
+  },
+  {
+   "name": "Commercial Real Estate Exchange, Inc.",
+   "dba": "",
+   "primary": "crexi.com",
+   "sites": [
+    "crexi.com"
+   ],
+   "privacy_url": "https://www.crexi.com/privacy",
+   "reg_id": "20250053"
+  },
+  {
+   "name": "DataDelivers LLC",
+   "dba": "",
+   "primary": "datadelivers.com",
+   "sites": [
+    "datadelivers.com"
+   ],
+   "privacy_url": "https://datadelivers.com/privacy-policy/",
+   "reg_id": "20250052"
+  },
+  {
+   "name": "Redmob Limited Liability Company",
+   "dba": "",
+   "primary": "redmob.io",
+   "sites": [
+    "redmob.io"
+   ],
+   "privacy_url": "www.redmob.io/privacy-policy",
+   "reg_id": "20250051"
+  },
+  {
+   "name": "Snovio Inc",
+   "dba": "",
+   "primary": "snov.io",
+   "sites": [
+    "snov.io"
+   ],
+   "privacy_url": "https://snov.io/tdpsa",
+   "reg_id": "20250050"
+  },
+  {
+   "name": "Consumer Canvas, LLC",
+   "dba": "",
+   "primary": "consumercanvas.net",
+   "sites": [
+    "consumercanvas.net"
+   ],
+   "privacy_url": "https://www.consumercanvas.net/privacy/",
+   "reg_id": "20250048"
+  },
+  {
+   "name": "Family Tree Now, LLC",
+   "dba": "",
+   "primary": "familytreenow.com",
+   "sites": [
+    "familytreenow.com"
+   ],
+   "privacy_url": "https://www.familytreenow.com/privacy",
+   "reg_id": "20250046"
+  },
+  {
+   "name": "Leidos Digital Solutions, Inc.",
+   "dba": "",
+   "primary": "leidosiq.com",
+   "sites": [
+    "leidosiq.com"
+   ],
+   "privacy_url": "https://leidosiq.com",
+   "reg_id": "20250043"
+  },
+  {
+   "name": "Tagis, Inc.",
+   "dba": "",
+   "primary": "amplemarket.com",
+   "sites": [
+    "amplemarket.com"
+   ],
+   "privacy_url": "https://www.amplemarket.com/legal/privacy",
+   "reg_id": "20250042"
+  },
+  {
+   "name": "Mississippi Tornado Alley LLC",
+   "dba": "",
+   "primary": "usa-people-search.com",
+   "sites": [
+    "advancedbackgroundchecks.com",
+    "cyberbackgroundchecks.com",
+    "fastbackgroundcheck.com",
+    "fastpeoplesearch.com",
+    "peoplesearchnow.com",
+    "phonebooks.com",
+    "searchpeoplefree.com",
+    "smartbackgroundchecks.com",
+    "usa-people-search.com",
+    "usphonebook.com"
+   ],
+   "privacy_url": "https://www.fastpeoplesearch.com/privacy",
+   "reg_id": "20250041"
+  },
+  {
+   "name": "The Nielsen Company, LLC",
+   "dba": "",
+   "primary": "nielsen.com",
+   "sites": [
+    "nielsen.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/17f0d6c3-8c86-4594-b68b-c8879ec128eb",
+   "reg_id": "20250040"
+  },
+  {
+   "name": "eXelate, Inc.",
+   "dba": "",
+   "primary": "nielsen.com",
+   "sites": [
+    "nielsen.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/85c00ce0-85a5-4c1c-bb29-2967224c1b83",
+   "reg_id": "20250039"
+  },
+  {
+   "name": "Plunge, LLC",
+   "dba": "",
+   "primary": "plungedigital.com",
+   "sites": [
+    "plungedigital.com"
+   ],
+   "privacy_url": "https://www.plungedigital.com/privacy-policy/",
+   "reg_id": "20250038"
+  },
+  {
+   "name": "Similarweb Ltd.",
+   "dba": "",
+   "primary": "similarweb.com",
+   "sites": [
+    "similarweb.com"
+   ],
+   "privacy_url": "https://www.similarweb.com/corp/legal/privacy-policy/",
+   "reg_id": "20250037"
+  },
+  {
+   "name": "VideoAmp, Inc.",
+   "dba": "",
+   "primary": "videoamp.com",
+   "sites": [
+    "videoamp.com"
+   ],
+   "privacy_url": "https://videoamp.com/your-privacy-choices/",
+   "reg_id": "20250034"
+  },
+  {
+   "name": "Semcasting, Inc.",
+   "dba": "",
+   "primary": "semcasting.com",
+   "sites": [
+    "privacychoice.com",
+    "semcasting.com"
+   ],
+   "privacy_url": "https://privacychoice.com/",
+   "reg_id": "20250031"
+  },
+  {
+   "name": "Quad/Graphics, Inc",
+   "dba": "",
+   "primary": "quad.com",
+   "sites": [
+    "quad.com"
+   ],
+   "privacy_url": "https://www.quad.com/legal/privacy-policy",
+   "reg_id": "20250030"
+  },
+  {
+   "name": "Data Decisions Group, LLC",
+   "dba": "",
+   "primary": "datadecisionsgroup.com",
+   "sites": [
+    "datadecisionsgroup.com"
+   ],
+   "privacy_url": "https://datadecisionsgroup.com/preferences",
+   "reg_id": "20250029"
+  },
+  {
+   "name": "TSG Holdco, LLC",
+   "dba": "",
+   "primary": "finthrive.com",
+   "sites": [
+    "finthrive.com"
+   ],
+   "privacy_url": "https://finthrive.com/texas-data-broker-disclosure-tsg-holdco?hs_preview=hmAXRXQn-205484825751",
+   "reg_id": "20250028"
+  },
+  {
+   "name": "Reklaim Ltd.",
+   "dba": "",
+   "primary": "reklaimyours.com",
+   "sites": [
+    "reklaimyours.com"
+   ],
+   "privacy_url": "https://www.reklaimyours.com/privacy-policy",
+   "reg_id": "20250026"
+  },
+  {
+   "name": "01Advertising Inc.",
+   "dba": "",
+   "primary": "01advertising.com",
+   "sites": [
+    "01advertising.com"
+   ],
+   "privacy_url": "https://www.01advertising.com/legal/",
+   "reg_id": "20250024"
+  },
+  {
+   "name": "Sterling Data Company LLC",
+   "dba": "",
+   "primary": "sterling.ai",
+   "sites": [
+    "sterling.ai"
+   ],
+   "privacy_url": "https://sterling.ai/privacy-policy/",
+   "reg_id": "20250023"
+  },
+  {
+   "name": "Forager.ai, LLC",
+   "dba": "",
+   "primary": "forager.ai",
+   "sites": [
+    "forager.ai"
+   ],
+   "privacy_url": "https://app.forager.ai/privacy",
+   "reg_id": "20250021"
+  },
+  {
+   "name": "LeadPost LLC",
+   "dba": "",
+   "primary": "leadpost.com",
+   "sites": [
+    "leadpost.com"
+   ],
+   "privacy_url": "https://leadpost.com/privacy-policy/",
+   "reg_id": "20250018"
+  },
+  {
+   "name": "adsquare gmbH",
+   "dba": "",
+   "primary": "adsquare.com",
+   "sites": [
+    "adsquare.com"
+   ],
+   "privacy_url": "https://adsquare.com/privacy/us-privacy-supplement",
+   "reg_id": "20250017"
+  },
+  {
+   "name": "Message Digital LLC",
+   "dba": "",
+   "primary": "messagedigital.com",
+   "sites": [
+    "messagedigital.com"
+   ],
+   "privacy_url": "https://messagedigital.com/my-data",
+   "reg_id": "20250016"
+  },
+  {
+   "name": "Narvar, Inc.",
+   "dba": "",
+   "primary": "narvar.com",
+   "sites": [
+    "narvar.com"
+   ],
+   "privacy_url": "https://corp.narvar.com/",
+   "reg_id": "20250015"
+  },
+  {
+   "name": "Aidentified, Inc.",
+   "dba": "",
+   "primary": "aidentified.com",
+   "sites": [
+    "aidentified.com"
+   ],
+   "privacy_url": "https://www.aidentified.com/privacy--policy",
+   "reg_id": "20250013"
+  },
+  {
+   "name": "Clearview AI, Inc.",
+   "dba": "",
+   "primary": "clearview.ai",
+   "sites": [
+    "clearview.ai"
+   ],
+   "privacy_url": "https://www.clearview.ai/privacy-policy",
+   "reg_id": "20250011"
+  },
+  {
+   "name": "LoopMe Ltd",
+   "dba": "",
+   "primary": "loopme.com",
+   "sites": [
+    "loopme.com"
+   ],
+   "privacy_url": "https://legal.loopme.com/privacy-center",
+   "reg_id": "20250008"
+  },
+  {
+   "name": "Belardi Wong, ALC, LLC",
+   "dba": "",
+   "primary": "belardiwong.com",
+   "sites": [
+    "belardiwong.com"
+   ],
+   "privacy_url": "https://belardiwong.com/privacy-policy/",
+   "reg_id": "20250005"
+  },
+  {
+   "name": "Dun & Bradstreet, Inc.",
+   "dba": "",
+   "primary": "dnb.com",
+   "sites": [
+    "dnb.com",
+    "trustarc.eu"
+   ],
+   "privacy_url": "https://submit-irm.trustarc.eu/services/validation/ba81b98f-997d-4216-b4cc-d64cf261b082",
+   "reg_id": "20250004"
+  },
+  {
+   "name": "Anchor Computer Inc.",
+   "dba": "",
+   "primary": "anchorcomputer.com",
+   "sites": [
+    "anchorcomputer.com"
+   ],
+   "privacy_url": "https://www.anchorcomputer.com/privacy-policy/",
+   "reg_id": "20250003"
+  },
+  {
+   "name": "Zenleads, Inc.",
+   "dba": "",
+   "primary": "apollo.io",
+   "sites": [
+    "apollo.io"
+   ],
+   "privacy_url": "https://www.apollo.io/company/privacy-center",
+   "reg_id": "20240271"
+  },
+  {
+   "name": "FourLeaf LLC",
+   "dba": "",
+   "primary": "fourleafdata.com",
+   "sites": [
+    "fourleafdata.com"
+   ],
+   "privacy_url": "https://www.fourleafdata.com/privacy-policy/",
+   "reg_id": "20240270"
+  },
+  {
+   "name": "Affinity Solutions Inc.",
+   "dba": "",
+   "primary": "affinity.solutions",
+   "sites": [
+    "affinity.solutions"
+   ],
+   "privacy_url": "https://www.affinity.solutions/",
+   "reg_id": "20240269"
+  },
+  {
+   "name": "Redi-Data Inc.",
+   "dba": "",
+   "primary": "redidata.com",
+   "sites": [
+    "redidata.com"
+   ],
+   "privacy_url": "https://www.redidata.com/privacy-policy/",
+   "reg_id": "20240265"
+  },
+  {
+   "name": "True Blue Analytics LLC",
+   "dba": "",
+   "primary": "trueblueanalytics.org",
+   "sites": [
+    "trueblueanalytics.org"
+   ],
+   "privacy_url": "https://trueblueanalytics.org/privacy-policy",
+   "reg_id": "20240262"
+  },
+  {
+   "name": "Preqin Ltd",
+   "dba": "",
+   "primary": "preqin.com",
+   "sites": [
+    "preqin.com"
+   ],
+   "privacy_url": "https://www.preqin.com/policies/privacy-policy",
+   "reg_id": "20240257"
+  },
+  {
+   "name": "saleSEER, Inc.",
+   "dba": "",
+   "primary": "saleseer.com",
+   "sites": [
+    "saleseer.com"
+   ],
+   "privacy_url": "N/A",
+   "reg_id": "20240256"
+  },
+  {
+   "name": "Blis Global Ltd",
+   "dba": "",
+   "primary": "blis.com",
+   "sites": [
+    "blis.com"
+   ],
+   "privacy_url": "https://blis.com/privacy-centre/",
+   "reg_id": "20240255"
+  },
+  {
+   "name": "Foursquare Labs, Inc.",
+   "dba": "",
+   "primary": "foursquare.com",
+   "sites": [
+    "foursquare.com"
+   ],
+   "privacy_url": "https://foursquare.com/legal/privacy-center/us-state-consumer-privacy-notice/",
+   "reg_id": "20240253"
+  },
+  {
+   "name": "El Toro.com, LLC",
+   "dba": "",
+   "primary": "eltoro.com",
+   "sites": [
+    "eltoro.com"
+   ],
+   "privacy_url": "https://eltoro.com/your-privacy-choices/",
+   "reg_id": "20240252"
+  },
+  {
+   "name": "Uplead LLC",
+   "dba": "",
+   "primary": "uplead.com",
+   "sites": [
+    "uplead.com"
+   ],
+   "privacy_url": "https://www.uplead.com/privacy",
+   "reg_id": "20240251"
+  },
+  {
+   "name": "ActivImpact, LLC",
+   "dba": "",
+   "primary": "activimpact.ai",
+   "sites": [
+    "activimpact.ai"
+   ],
+   "privacy_url": "https://activimpact.ai/dsar",
+   "reg_id": "20240250"
+  },
+  {
+   "name": "RocketReach LLC",
+   "dba": "",
+   "primary": "rocketreach.co",
+   "sites": [
+    "rocketreach.co"
+   ],
+   "privacy_url": "https://rocketreach.co/privacy",
+   "reg_id": "20240248"
+  },
+  {
+   "name": "Datasys Group, Inc.",
+   "dba": "",
+   "primary": "datasys.com",
+   "sites": [
+    "datasys.com"
+   ],
+   "privacy_url": "https://datasys.com/privacy-policy",
+   "reg_id": "20240247"
+  },
+  {
+   "name": "Cognism, Inc.",
+   "dba": "",
+   "primary": "cognism.com",
+   "sites": [
+    "cognism.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240241"
+  },
+  {
+   "name": "Versar Data Solutions Inc",
+   "dba": "",
+   "primary": "versium.com",
+   "sites": [
+    "versium.com"
+   ],
+   "privacy_url": "https://versium.com/privacy-policy/.",
+   "reg_id": "20240233"
+  },
+  {
+   "name": "Warmly, Inc.",
+   "dba": "",
+   "primary": "warmly.ai",
+   "sites": [
+    "warmly.ai"
+   ],
+   "privacy_url": "https://www.warmly.ai/p/do-not-sell-share-my-data",
+   "reg_id": "20240231"
+  },
+  {
+   "name": "Choreograph LLC",
+   "dba": "",
+   "primary": "choreograph.com",
+   "sites": [
+    "choreograph.com"
+   ],
+   "privacy_url": "https://www.choreograph.com/global-privacy-policy/global-privacy-policy-english",
+   "reg_id": "20240218"
+  },
+  {
+   "name": "Infinite Media Concepts Inc",
+   "dba": "",
+   "primary": "mailinglists.com",
+   "sites": [
+    "mailinglists.com"
+   ],
+   "privacy_url": "https://mailinglists.com/about/privacy-policy",
+   "reg_id": "20240213"
+  },
+  {
+   "name": "Complete Mailing Lists LLC",
+   "dba": "",
+   "primary": "completemailinglists.com",
+   "sites": [
+    "completemailinglists.com"
+   ],
+   "privacy_url": "https://completemailinglists.com/do-not-sell-my-information",
+   "reg_id": "20240209"
+  },
+  {
+   "name": "Complete Medical Lists Inc",
+   "dba": "",
+   "primary": "completemedicallists.com",
+   "sites": [
+    "completemedicallists.com"
+   ],
+   "privacy_url": "https://www.completemedicallists.com/ccpa.php",
+   "reg_id": "20240207"
+  },
+  {
+   "name": "Data Axle Inc.",
+   "dba": "",
+   "primary": "data-axle.com",
+   "sites": [
+    "data-axle.com"
+   ],
+   "privacy_url": "https://www.data-axle.com/do-not-sell-my-data/",
+   "reg_id": "20240192"
+  },
+  {
+   "name": "ZoomInfo Technologies LLC",
+   "dba": "",
+   "primary": "zoominfo.com",
+   "sites": [
+    "zoominfo.com"
+   ],
+   "privacy_url": "https://www.zoominfo.com/legal/privacy-statement-for-residents-of-specified-states",
+   "reg_id": "20240187"
+  },
+  {
+   "name": "Datanyze, LLC",
+   "dba": "",
+   "primary": "datanyze.com",
+   "sites": [
+    "datanyze.com"
+   ],
+   "privacy_url": "https://www.datanyze.com/privacy-center",
+   "reg_id": "20240186"
+  },
+  {
+   "name": "Clickagy LLC",
+   "dba": "",
+   "primary": "clickagy.com",
+   "sites": [
+    "clickagy.com"
+   ],
+   "privacy_url": "https://www.clickagy.com/privacy-statement",
+   "reg_id": "20240185"
+  },
+  {
+   "name": "Peoplefinders, LLC",
+   "dba": "",
+   "primary": "peoplefinders.com",
+   "sites": [
+    "peoplefinders.com"
+   ],
+   "privacy_url": "https://www.peoplefinders.com/about/privacy",
+   "reg_id": "20240183"
+  },
+  {
+   "name": "Enformion, LLC",
+   "dba": "",
+   "primary": "enformion.com",
+   "sites": [
+    "enformion.com"
+   ],
+   "privacy_url": "https://www.enformion.com/privacy-policy/",
+   "reg_id": "20240180"
+  },
+  {
+   "name": "Property Reach LP",
+   "dba": "",
+   "primary": "propertyreach.com",
+   "sites": [
+    "propertyreach.com"
+   ],
+   "privacy_url": "https://www.propertyreach.com/privacy",
+   "reg_id": "20240179"
+  },
+  {
+   "name": "Experian Health, Inc.",
+   "dba": "",
+   "primary": "experian.com",
+   "sites": [
+    "experian.com"
+   ],
+   "privacy_url": "https://www.experian.com/privacy/us-consumer-data-privacy-policy",
+   "reg_id": "20240175"
+  },
+  {
+   "name": "Whitepages, Inc",
+   "dba": "",
+   "primary": "whitepages.com",
+   "sites": [
+    "whitepages.com"
+   ],
+   "privacy_url": "https://www.whitepages.com/privacy/consumer-rights",
+   "reg_id": "20240174"
+  },
+  {
+   "name": "BeenVerified, LLC",
+   "dba": "",
+   "primary": "beenverified.com",
+   "sites": [
+    "beenverified.com",
+    "bumper.com",
+    "famfinder.com",
+    "moneybot5000.com",
+    "neighborwho.com",
+    "numberguru.com",
+    "ownerly.com",
+    "peoplelooker.com",
+    "peoplesmart.com",
+    "reversephone.com"
+   ],
+   "privacy_url": "https://www.beenverified.com/svc/optout/search/comprehensive_optouts",
+   "reg_id": "20240172"
+  },
+  {
+   "name": "Valassis Communications, Inc., an RRD Company",
+   "dba": "",
+   "primary": "rrd.com",
+   "sites": [
+    "rrd.com"
+   ],
+   "privacy_url": "https://www.rrd.com/privacy-policy/valassis",
+   "reg_id": "20240169"
+  },
+  {
+   "name": "Nexxa Group, Inc.",
+   "dba": "",
+   "primary": "nexxagroup.com",
+   "sites": [
+    "nexxagroup.com"
+   ],
+   "privacy_url": "https://www.nexxagroup.com/corporate-overview/consumer-opt-out/",
+   "reg_id": "20240168"
+  },
+  {
+   "name": "PropertyRadar Inc.",
+   "dba": "",
+   "primary": "propertyradar.com",
+   "sites": [
+    "propertyradar.com"
+   ],
+   "privacy_url": "https://www.propertyradar.com/privacy-policy",
+   "reg_id": "20240167"
+  },
+  {
+   "name": "AnalyticsIQ Inc",
+   "dba": "",
+   "primary": "analyticsiq.com",
+   "sites": [
+    "analytics-iq.com",
+    "analyticsiq.com"
+   ],
+   "privacy_url": "https://analytics-iq.com/privacy-policy/",
+   "reg_id": "20240166"
+  },
+  {
+   "name": "Datamentors, LLC",
+   "dba": "",
+   "primary": "porchgroupmedia.com",
+   "sites": [
+    "porchgroupmedia.com"
+   ],
+   "privacy_url": "https://datarightsrequest.porchgroupmedia.com/",
+   "reg_id": "20240165"
+  },
+  {
+   "name": "Seamless Contacts, Inc.",
+   "dba": "",
+   "primary": "seamless.ai",
+   "sites": [
+    "seamless.ai"
+   ],
+   "privacy_url": "https://preferences.seamless.ai/",
+   "reg_id": "20240162"
+  },
+  {
+   "name": "Epsilon Data Management, LLC",
+   "dba": "",
+   "primary": "epsilon.com",
+   "sites": [
+    "epsilon.com"
+   ],
+   "privacy_url": "https://legal.epsilon.com/dsr/",
+   "reg_id": "20240161"
+  },
+  {
+   "name": "Cuebiq Group, LLC",
+   "dba": "",
+   "primary": "cuebiq.com",
+   "sites": [
+    "cuebiq.com"
+   ],
+   "privacy_url": "https://cuebiq.com/privacy-request/",
+   "reg_id": "20240160"
+  },
+  {
+   "name": "Lusha Systems, Inc.",
+   "dba": "",
+   "primary": "lusha.com",
+   "sites": [
+    "lusha.com"
+   ],
+   "privacy_url": "https://www.lusha.com/privacy-center/request-removal/",
+   "reg_id": "20240159"
+  },
+  {
+   "name": "Aristotle International, Inc.",
+   "dba": "",
+   "primary": "aristotle.com",
+   "sites": [
+    "aristotle.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240158"
+  },
+  {
+   "name": "DataDojo CDP Inc.",
+   "dba": "",
+   "primary": "datadojo.ai",
+   "sites": [
+    "datadojo.ai"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240157"
+  },
+  {
+   "name": "EAB Global, Inc",
+   "dba": "",
+   "primary": "eab.com",
+   "sites": [
+    "eab.com"
+   ],
+   "privacy_url": "https://eab.com/privacy-policy/",
+   "reg_id": "20240156"
+  },
+  {
+   "name": "Path2Response, LLC",
+   "dba": "",
+   "primary": "path2response.com",
+   "sites": [
+    "onetrust.com",
+    "path2response.com"
+   ],
+   "privacy_url": "https://privacyportal-cdn.onetrust.com/dsarwebform/2de26f06-de6f-45a7-8e1d-7d1148a3f301/draft/7a5dc7d1-cc7e-43a8-9f24-702807deb65b.html",
+   "reg_id": "20240155"
+  },
+  {
+   "name": "Samba TV, Inc.",
+   "dba": "",
+   "primary": "samba.tv",
+   "sites": [
+    "samba.tv"
+   ],
+   "privacy_url": "https://samba.tv/privacy-center/notice-of-right-to-opt-out",
+   "reg_id": "20240153"
+  },
+  {
+   "name": "Merkle Inc",
+   "dba": "",
+   "primary": "merkle.com",
+   "sites": [
+    "merkle.com"
+   ],
+   "privacy_url": "https://www.merkle.com/en/privacy-policy/data-product-privacy-notice.html",
+   "reg_id": "20240149"
+  },
+  {
+   "name": "ATTOM Data Solutions LLC",
+   "dba": "",
+   "primary": "attomdata.com",
+   "sites": [
+    "attomdata.com"
+   ],
+   "privacy_url": "https://www.attomdata.com/privacy/",
+   "reg_id": "20240147"
+  },
+  {
+   "name": "The Alesco Group, L.L.C.",
+   "dba": "",
+   "primary": "alescodata.com",
+   "sites": [
+    "alescodata.com",
+    "mydataprivacy.com"
+   ],
+   "privacy_url": "https://mydataprivacy.com/upload-csv",
+   "reg_id": "20240145"
+  },
+  {
+   "name": "Blackbaud, Inc.",
+   "dba": "",
+   "primary": "blackbaud.com",
+   "sites": [
+    "blackbaud.com"
+   ],
+   "privacy_url": "https://www.blackbaud.com/company/data-subject-rights-request",
+   "reg_id": "20240142"
+  },
+  {
+   "name": "Compact Information Systems, LLC dba HomeData",
+   "dba": "",
+   "primary": "deepsync.com",
+   "sites": [
+    "deepsync.com"
+   ],
+   "privacy_url": "https://deepsync.com/privacy-policy/",
+   "reg_id": "20240138"
+  },
+  {
+   "name": "Compact Information Systems, LLC d/b/a Deep Sync",
+   "dba": "",
+   "primary": "deepsync.com",
+   "sites": [
+    "deepsync.com"
+   ],
+   "privacy_url": "https://deepsync.com/privacy-policy/",
+   "reg_id": "20240137"
+  },
+  {
+   "name": "ASL Marketing, a Deep Sync Property",
+   "dba": "",
+   "primary": "deepsync.com",
+   "sites": [
+    "deepsync.com"
+   ],
+   "privacy_url": "https://deepsync.com/privacy-policy/",
+   "reg_id": "20240136"
+  },
+  {
+   "name": "Alliant Cooperative Data Solutions, LLC",
+   "dba": "",
+   "primary": "alliantinsight.com",
+   "sites": [
+    "alliantinsight.com"
+   ],
+   "privacy_url": "https://alliantinsight.com/alliant-privacy-policy/",
+   "reg_id": "20240134"
+  },
+  {
+   "name": "AccuData Integrated Marketing, Inc.",
+   "dba": "",
+   "primary": "accudata.com",
+   "sites": [
+    "accudata.com",
+    "deepsync.com"
+   ],
+   "privacy_url": "https://deepsync.com/privacy-policy/",
+   "reg_id": "20240133"
+  },
+  {
+   "name": "Wiland, Inc.",
+   "dba": "",
+   "primary": "wiland.com",
+   "sites": [
+    "wiland.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240127"
+  },
+  {
+   "name": "FIRST ORION CORP.",
+   "dba": "",
+   "primary": "firstorion.com",
+   "sites": [
+    "firstorion.com"
+   ],
+   "privacy_url": "https://firstorion.com/legal/",
+   "reg_id": "20240126"
+  },
+  {
+   "name": "RealSource, Inc",
+   "dba": "",
+   "primary": "realsourcedata.com",
+   "sites": [
+    "realsourcedata.com"
+   ],
+   "privacy_url": "https://www.realsourcedata.com/privacy-policy",
+   "reg_id": "20240116"
+  },
+  {
+   "name": "Focus USA. Inc",
+   "dba": "",
+   "primary": "focus-usa.com",
+   "sites": [
+    "focus-usa.com"
+   ],
+   "privacy_url": "https://www.focus-usa.com/consumer-rights-privacy-notice/",
+   "reg_id": "20240115"
+  },
+  {
+   "name": "CTAM LeadShare Corp",
+   "dba": "",
+   "primary": "smartmove.us",
+   "sites": [
+    "smartmove.us"
+   ],
+   "privacy_url": "www.smartmove.us",
+   "reg_id": "20240113"
+  },
+  {
+   "name": "Disqus, Inc.",
+   "dba": "",
+   "primary": "disqus.com",
+   "sites": [
+    "disqus.com",
+    "onetrust.com"
+   ],
+   "privacy_url": "https://privacyportal-cdn.onetrust.com/dsarwebform/bc2d3301-11a5-4de5-b15e-ce796187a352/9a049fa1-37af-4598-a87a-d0df2e2d904b.html",
+   "reg_id": "20240106"
+  },
+  {
+   "name": "CareerBuilder, LLC",
+   "dba": "",
+   "primary": "careerbuilder.com",
+   "sites": [
+    "careerbuilder.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240104"
+  },
+  {
+   "name": "TechTarget, Inc.",
+   "dba": "",
+   "primary": "informatechtarget.com",
+   "sites": [
+    "informatechtarget.com"
+   ],
+   "privacy_url": "https://www.informatechtarget.com/privacy-policy/#contact:~:text=Us%E2%80%9D%20section%20below.-,23.%20Contact%20Us,-If%20you%20wish",
+   "reg_id": "20240102"
+  },
+  {
+   "name": "Azerion US Inc.",
+   "dba": "",
+   "primary": "azerion.com",
+   "sites": [
+    "azerion.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240101"
+  },
+  {
+   "name": "US Data Corporation",
+   "dba": "",
+   "primary": "usdatacorporation.com",
+   "sites": [
+    "usdatacorporation.com"
+   ],
+   "privacy_url": "https://www.usdatacorporation.com/do-not-sell-my-info/",
+   "reg_id": "20240096"
+  },
+  {
+   "name": "PlaceIQ, Inc.",
+   "dba": "",
+   "primary": "precisely.com",
+   "sites": [
+    "precisely.com"
+   ],
+   "privacy_url": "https://www.precisely.com/your-privacy-choices/",
+   "reg_id": "20240094"
+  },
+  {
+   "name": "MaxMind, Inc.",
+   "dba": "",
+   "primary": "maxmind.com",
+   "sites": [
+    "maxmind.com"
+   ],
+   "privacy_url": "https://www.maxmind.com/en/privacy-policy",
+   "reg_id": "20240093"
+  },
+  {
+   "name": "Stirista, LLC",
+   "dba": "",
+   "primary": "stirista.com",
+   "sites": [
+    "stirista.com"
+   ],
+   "privacy_url": "https://unsubscribe.stirista.com/",
+   "reg_id": "20240092"
+  },
+  {
+   "name": "Austin Consolidated Holdings, Inc.",
+   "dba": "",
+   "primary": "equifax.com",
+   "sites": [
+    "equifax.com"
+   ],
+   "privacy_url": "https://www.equifax.com/personal/my-privacy/",
+   "reg_id": "20240090"
+  },
+  {
+   "name": "IXI Corporation",
+   "dba": "",
+   "primary": "equifax.com",
+   "sites": [
+    "equifax.com"
+   ],
+   "privacy_url": "https://www.equifax.com/personal/my-privacy/",
+   "reg_id": "20240089"
+  },
+  {
+   "name": "Dataline, Inc.",
+   "dba": "",
+   "primary": "datalilnedata.com",
+   "sites": [
+    "datalilnedata.com",
+    "datalinedata.com"
+   ],
+   "privacy_url": "https://datalinedata.com/privacy-policy/",
+   "reg_id": "20240088"
+  },
+  {
+   "name": "Catalist LLC",
+   "dba": "",
+   "primary": "catalist.us",
+   "sites": [
+    "catalist.us"
+   ],
+   "privacy_url": "https://catalist.us/privacy-policy/",
+   "reg_id": "20240087"
+  },
+  {
+   "name": "Spokeo, Inc.",
+   "dba": "",
+   "primary": "spokeo.com",
+   "sites": [
+    "spokeo.com"
+   ],
+   "privacy_url": "www.spokeo.com/privacy-policy",
+   "reg_id": "20240084"
+  },
+  {
+   "name": "Digital Viking Media",
+   "dba": "",
+   "primary": "digitalvikingmedia.com",
+   "sites": [
+    "digitalvikingmedia.com"
+   ],
+   "privacy_url": "https://www.digitalvikingmedia.com/privacy-policy",
+   "reg_id": "20240081"
+  },
+  {
+   "name": "MediaZod LLC dba LeadZod",
+   "dba": "",
+   "primary": "leadzod.com",
+   "sites": [
+    "leadzod.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240080"
+  },
+  {
+   "name": "Address Clearing House, LLC",
+   "dba": "",
+   "primary": "achcoop.com",
+   "sites": [
+    "achcoop.com"
+   ],
+   "privacy_url": "https://www.achcoop.com/privacy-policy",
+   "reg_id": "20240079"
+  },
+  {
+   "name": "Acxiom LLC",
+   "dba": "",
+   "primary": "acxiom.com",
+   "sites": [
+    "acxiom.com"
+   ],
+   "privacy_url": "https://www.acxiom.com/privacy/us/consumer-instructions/",
+   "reg_id": "20240078"
+  },
+  {
+   "name": "Fideo Intelligence, Inc.",
+   "dba": "",
+   "primary": "fideo.ai",
+   "sites": [
+    "fideo.ai"
+   ],
+   "privacy_url": "https://app.fideo.ai/your-privacy-choices",
+   "reg_id": "20240076"
+  },
+  {
+   "name": "FOREWARN, LLC",
+   "dba": "",
+   "primary": "forewarn.com",
+   "sites": [
+    "forewarn.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240074"
+  },
+  {
+   "name": "NextRoll, Inc.",
+   "dba": "",
+   "primary": "nextroll.com",
+   "sites": [
+    "nextroll.com"
+   ],
+   "privacy_url": "https://www.nextroll.com/privacy",
+   "reg_id": "20240071"
+  },
+  {
+   "name": "INTERACTIVE DATA, LLC",
+   "dba": "",
+   "primary": "ididata.com",
+   "sites": [
+    "ididata.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240069"
+  },
+  {
+   "name": "WINR Data B.V.",
+   "dba": "",
+   "primary": "winrdata.com",
+   "sites": [
+    "winrdata.com"
+   ],
+   "privacy_url": "https://www.winrdata.com/privacy-policy-us/",
+   "reg_id": "20240067"
+  },
+  {
+   "name": "LeadIQ, Inc.",
+   "dba": "",
+   "primary": "leadiq.com",
+   "sites": [
+    "leadiq.com"
+   ],
+   "privacy_url": "https://leadiq.com/privacy-center",
+   "reg_id": "20240066"
+  },
+  {
+   "name": "RevOptimal, LLC",
+   "dba": "",
+   "primary": "revoptimal.com",
+   "sites": [
+    "revoptimal.com"
+   ],
+   "privacy_url": "https://revoptimal.com/privacy/",
+   "reg_id": "20240063"
+  },
+  {
+   "name": "Labels & Lists, Inc",
+   "dba": "",
+   "primary": "l2-data.com",
+   "sites": [
+    "l2-data.com"
+   ],
+   "privacy_url": "https://www.l2-data.com/",
+   "reg_id": "20240061"
+  },
+  {
+   "name": "Task Genie, Inc.",
+   "dba": "",
+   "primary": "datalane.com",
+   "sites": [
+    "datalane.com"
+   ],
+   "privacy_url": "https://www.datalane.com/privacy",
+   "reg_id": "20240059"
+  },
+  {
+   "name": "PaeDae, Inc. dba Infillion",
+   "dba": "",
+   "primary": "infillion.com",
+   "sites": [
+    "infillion.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240056"
+  },
+  {
+   "name": "All Web Leads, Inc.",
+   "dba": "",
+   "primary": "awl.com",
+   "sites": [
+    "awl.com"
+   ],
+   "privacy_url": "https://awl.com/privacy/",
+   "reg_id": "20240055"
+  },
+  {
+   "name": "Bridg, a division of Cardlytics, Inc.",
+   "dba": "",
+   "primary": "bridg.com",
+   "sites": [
+    "bridg.com"
+   ],
+   "privacy_url": "https://www.bridg.com/privacy-policy",
+   "reg_id": "20240053"
+  },
+  {
+   "name": "Webbula, LLC",
+   "dba": "",
+   "primary": "webbula.com",
+   "sites": [
+    "webbula.com"
+   ],
+   "privacy_url": "https://webbula.com/privacy-center/",
+   "reg_id": "20240050"
+  },
+  {
+   "name": "6Sense Insights, Inc.",
+   "dba": "",
+   "primary": "6sense.com",
+   "sites": [
+    "6sense.com"
+   ],
+   "privacy_url": "https://6sense.com/privacy-center/",
+   "reg_id": "20240047"
+  },
+  {
+   "name": "Black Pearl Group Limited",
+   "dba": "",
+   "primary": "blackpearl.com",
+   "sites": [
+    "blackpearl.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240046"
+  },
+  {
+   "name": "PubMatic, Inc.",
+   "dba": "",
+   "primary": "pubmatic.com",
+   "sites": [
+    "pubmatic.com"
+   ],
+   "privacy_url": "https://pubmatic.com/legal/privacy-policy/",
+   "reg_id": "20240045"
+  },
+  {
+   "name": "Digital Segment, LLC",
+   "dba": "",
+   "primary": "digitalsegment.com",
+   "sites": [
+    "digitalsegment.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240044"
+  },
+  {
+   "name": "Semasio, Inc.",
+   "dba": "",
+   "primary": "semasio.com",
+   "sites": [
+    "semasio.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240043"
+  },
+  {
+   "name": "EproDirect LLC",
+   "dba": "",
+   "primary": "eprodirect.com",
+   "sites": [
+    "eprodirect.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240042"
+  },
+  {
+   "name": "First Direct, Inc",
+   "dba": "",
+   "primary": "firstdirectmarketing.com",
+   "sites": [
+    "firstdirectmarketing.com"
+   ],
+   "privacy_url": "https://compliance.firstdirectmarketing.com/",
+   "reg_id": "20240038"
+  },
+  {
+   "name": "Blue Hill Marketing Solutions, Inc. d/b/a LiftEngine",
+   "dba": "",
+   "primary": "liftengine.com",
+   "sites": [
+    "liftengine.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240037"
+  },
+  {
+   "name": "Knowledge Works, Inc.",
+   "dba": "",
+   "primary": "paynetonline.com",
+   "sites": [
+    "equifax.com",
+    "paynetonline.com"
+   ],
+   "privacy_url": "https://www.equifax.com/personal/my-privacy/",
+   "reg_id": "20240035"
+  },
+  {
+   "name": "Lead Intelligence, Inc. D/B/A InfutorData",
+   "dba": "",
+   "primary": "verisk.com",
+   "sites": [
+    "verisk.com"
+   ],
+   "privacy_url": "https://marketing.verisk.com/privacy-center/",
+   "reg_id": "20240030"
+  },
+  {
+   "name": "SheerID, Inc.",
+   "dba": "",
+   "primary": "sheerid.com",
+   "sites": [
+    "sheerid.com"
+   ],
+   "privacy_url": "https://www.sheerid.com/global-privacy-policy/",
+   "reg_id": "20240029"
+  },
+  {
+   "name": "Equifax Information Services LLC",
+   "dba": "",
+   "primary": "equifax.com",
+   "sites": [
+    "equifax.com"
+   ],
+   "privacy_url": "https://www.equifax.com/personal/my-privacy/",
+   "reg_id": "20240028"
+  },
+  {
+   "name": "Amerilist Inc",
+   "dba": "",
+   "primary": "amerilist.com",
+   "sites": [
+    "amerilist.com"
+   ],
+   "privacy_url": "",
+   "reg_id": "20240025"
+  },
+  {
+   "name": "Decide Technologies Inc.",
+   "dba": "",
+   "primary": "decide.co",
+   "sites": [
+    "decide.co"
+   ],
+   "privacy_url": "https://decide.co/privacy",
+   "reg_id": "20240024"
+  },
+  {
+   "name": "Simio Cloud, LLC",
+   "dba": "",
+   "primary": "simiocloud.com",
+   "sites": [
+    "simiocloud.com"
+   ],
+   "privacy_url": "https://simiocloud.com/simiocloud-products-services-privacy-policy/",
+   "reg_id": "20240023"
+  },
+  {
+   "name": "Magnite Inc",
+   "dba": "",
+   "primary": "magnite.com",
+   "sites": [
+    "magnite.com"
+   ],
+   "privacy_url": "https://www.magnite.com/legal/user-choice-portal/",
+   "reg_id": "20240020"
+  },
+  {
+   "name": "Heartbeat.ai Inc",
+   "dba": "",
+   "primary": "heartbeat.ai",
+   "sites": [
+    "heartbeat.ai"
+   ],
+   "privacy_url": "https://heartbeat.ai/texas-privacy-rights",
+   "reg_id": "20240019"
+  },
+  {
+   "name": "SWORDFISH AI INC",
+   "dba": "",
+   "primary": "swordfish.ai",
+   "sites": [
+    "swordfish.ai"
+   ],
+   "privacy_url": "https://swordfish.ai/texas-privacy-rights",
+   "reg_id": "20240018"
+  },
+  {
+   "name": "HireTeamMate, Inc. dba hireEZ",
+   "dba": "",
+   "primary": "hireez.com",
+   "sites": [
+    "hireez.com"
+   ],
+   "privacy_url": "https://app.hireez.com/policies/databrokerregistration",
+   "reg_id": "20240016"
+  },
+  {
+   "name": "I360, LLC",
+   "dba": "",
+   "primary": "i-360.com",
+   "sites": [
+    "i-360.com"
+   ],
+   "privacy_url": "https://www.i-360.com/disclosures/",
+   "reg_id": "20240013"
+  },
+  {
+   "name": "Experian Information Solutions, Inc.",
+   "dba": "",
+   "primary": "experian.com",
+   "sites": [
+    "experian.com"
+   ],
+   "privacy_url": "https://www.experian.com/privacy/us-consumer-data-privacy-policy",
+   "reg_id": "20240012"
+  },
+  {
+   "name": "Experian Marketing Solutions, LLC",
+   "dba": "",
+   "primary": "experian.com",
+   "sites": [
+    "experian.com"
+   ],
+   "privacy_url": "https://www.experian.com/privacy/us-consumer-data-privacy-policy",
+   "reg_id": "20240011"
+  },
+  {
+   "name": "LexisNexis, a division of RELX Inc.",
+   "dba": "",
+   "primary": "lexisnexis.com",
+   "sites": [
+    "lexisnexis.com"
+   ],
+   "privacy_url": "https://www.lexisnexis.com/en-us/terms/us-privacy-notice.page",
+   "reg_id": "20240010"
+  },
+  {
+   "name": "Deloitte Consulting LLP",
+   "dba": "",
+   "primary": "deloitte.com",
+   "sites": [
+    "deloitte.com"
+   ],
+   "privacy_url": "datasubject.deloitte.com",
+   "reg_id": "20240007"
+  },
+  {
+   "name": "LiveRamp Holdings Inc.",
+   "dba": "",
+   "primary": "liveramp.com",
+   "sites": [
+    "liveramp.com"
+   ],
+   "privacy_url": "https://liveramp.com/privacy/my-privacy-choices",
+   "reg_id": "20240003"
+  },
+  {
+   "name": "Deloitte Financial Advisory Services LLP",
+   "dba": "",
+   "primary": "deloitte.com",
+   "sites": [
+    "deloitte.com"
+   ],
+   "privacy_url": "datasubject.deloitte.com",
+   "reg_id": "20240002"
+  },
+  {
+   "name": "HealthWise Data LLC",
+   "dba": "",
+   "primary": "healthwisedata.com",
+   "sites": [
+    "healthwisedata.com"
+   ],
+   "privacy_url": "https://healthwisedata.com/compliance-optout/",
+   "reg_id": "20240001"
+  }
+ ]
+}

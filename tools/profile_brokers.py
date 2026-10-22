@@ -20,11 +20,18 @@ HARD_CHALLENGE = ["just a moment", "attention required", "verify you are human",
                   "checking your browser", "performing security verification", "security challenge", "managed challenge"]
 LINK_SCORE = [(r"opt[\s_-]?out", 10), (r"do[\s_-]?not[\s_-]?sell", 8), (r"remov", 8), (r"suppress", 8),
               (r"delete[\s_-]?my|data[\s_-]?delet", 7), (r"your[\s_-]?privacy[\s_-]?choices|privacy[\s_-]?rights|privacy[\s_-]?request", 6),
-              (r"privacy", 2)]
-GUESS_PATHS = ["/optout", "/opt-out", "/optout/", "/opt-out/", "/privacy", "/remove", "/removal", "/privacy-rights"]
+              (r"d[ée]sinscri|d[ée]sabonn|darse de baja|dar de baja|abmeld", 10), (r"ne pas vendre|no vender|nicht verkaufen", 8),
+              (r"supprim|effac|eliminar|borrar|l[öo]sch|entfern", 7),
+              (r"vos droits|droits.{0,10}(vie priv|donn)|derechos.{0,12}(privacidad|datos)|datenschutzrechte|ihre rechte|widerspr|opposition|oposici[oó]n", 6),
+              (r"privacy", 2), (r"confidentialit|privacidad|datenschutz", 2)]
+GUESS_PATHS = ["/optout", "/opt-out", "/optout/", "/opt-out/", "/privacy", "/remove", "/removal", "/privacy-rights",
+               "/desinscription", "/confidentialite", "/privacidad", "/baja", "/datenschutz", "/abmelden", "/widerspruch"]
 # Links to these are never a shared opt-out (share buttons, privacy policies of platforms, search engines).
 NOT_A_FAMILY = ("globalprivacycontrol", "linkedin", "bing", "google", "facebook", "twitter", "x.com", "instagram", "youtube", "pinterest", "reddit",
-                "tiktok", "zendesk", "freshdesk", "helpscout", "intercom", "dataprivacyframework", "apple.com", "microsoft", "amazon", "cloudflare", "wordpress", "w3.org", "gstatic", "doubleclick")
+                "tiktok", "zendesk", "freshdesk", "helpscout", "intercom", "dataprivacyframework", "apple.com", "microsoft", "amazon", "cloudflare", "wordpress", "w3.org", "gstatic", "doubleclick",
+                # advertising-cookie opt-outs, government pages, and form/email vendors are not one shared personal-data opt-out
+                "thenai.org", "networkadvertising.org", "aboutads.info", "youradchoices.com", "ca.gov", "texasattorneygeneral.gov", "hsforms.com",
+                "list-manage.com", "outlook.com", "termsfeed.com", "trustarc.eu", "saymine.io", "bidr.io", "optoutprescreen.com", "mailchimp.com", "hubspot.com")
 PORTALS = {"trustarc.com": "trustarc", "onetrust.com": "onetrust", "transcend.io": "transcend", "ketch.com": "ketch",
            "datagrail.io": "datagrail", "privacyportal": "onetrust", "osano.com": "osano", "securiti.ai": "securiti"}
 
@@ -147,7 +154,7 @@ def parse(html):
     return p
 
 
-NOT_FOUND = re.compile(r"page (can.?t|cannot|could not) be found|page not found|not found|doesn.?t exist|does not exist|error 404|404 error|\\b404\\b|oops", re.I)
+NOT_FOUND = re.compile(r"page (can.?t|cannot|could not) be found|page not found|not found|doesn.?t exist|does not exist|error 404|404 error|\b404\b|oops|page introuvable|page non trouv[ée]e|n.existe pas|erreur 404|p[áa]gina no encontrada|no se encontr[óo]|no existe|seite nicht gefunden|nicht gefunden|existiert nicht|fehler 404", re.I)
 
 
 def is_error_page(status, page, text):
@@ -161,7 +168,7 @@ def is_blocked(status, html):
     return status in (403, 429, 503) or any(m in low for m in HARD_CHALLENGE)
 
 
-OPT_WORDS = re.compile(r"opt[\s_-]?out|remov|suppress|delete|do[\s_-]?not[\s_-]?sell|privacy (request|rights|choices)|control your", re.I)
+OPT_WORDS = re.compile(r"opt[\s_-]?out|remov|suppress|delete|do[\s_-]?not[\s_-]?sell|privacy (request|rights|choices)|control your|d[ée]sinscri|d[ée]sabonn|opposition|supprim|effac|ne pas vendre|ne vendez pas|vos droits|darse de baja|dar de baja|eliminar|borrar|no vender|derechos de privacidad|oposici[oó]n|exclusi[oó]n|abmeld|widerspr|l[öo]sch|entfern|nicht verkaufen|datenschutzrechte|ihre rechte", re.I)
 SEARCHY = re.compile(r"search|find|lookup|people|name|query|\bq\b", re.I)
 
 
@@ -192,9 +199,9 @@ def score_form(page, idx, base, page_text):
     if path in ("", "/") or not OPT_WORDS.search(context): return -9
     kinds = " ".join(f["type"] + " " + f["name"] + " " + f["label"] for f in fields).lower()
     sc = 2
-    if re.search(r"e-?mail", kinds): sc += 3
-    if re.search(r"url|link|profile|listing", kinds): sc += 3
-    if re.search(r"first|last|full.?name|\bname\b", kinds): sc += 1
+    if re.search(r"e-?mail|courriel|correo", kinds): sc += 3
+    if re.search(r"url|link|profile|listing|\blien\b|enlace", kinds): sc += 3
+    if re.search(r"first|last|full.?name|\bname\b|pr[ée]nom|nom de famille|apellido|vorname|nachname|\bnom\b|\bnombre\b", kinds): sc += 1
     if any(i["form"] == idx and i["type"] == "submit" for i in page.inputs) or any(b[0] == idx for b in page.buttons): sc += 1
     if "password" in kinds: sc -= 3
     action = urllib.parse.urljoin(base, form["action"]).lower()
@@ -203,7 +210,7 @@ def score_form(page, idx, base, page_text):
     here = registrable(urllib.parse.urlsplit(base).netloc); there = registrable(urllib.parse.urlsplit(action).netloc)
     if there != here and not action_is_removal and not any(n in action for n in PORTALS): return -9
     if action_is_removal: sc += 3          # the form posts to a removal / opt-out address
-    elif re.search(r"\bcity\b|\bstate\b|\bage\b|zip", kinds) and not re.search(r"e-?mail|url|link", kinds): sc -= 4
+    elif re.search(r"\bcity\b|\bstate\b|\bage\b|zip|\bville\b|ciudad|\bstadt\b|code postal|c[óo]digo postal|\bplz\b", kinds) and not re.search(r"e-?mail|courriel|correo|url|link", kinds): sc -= 4
     if len(fields) <= 2 and (re.search(r"search|find|lookup|people", action) or re.search(r"\bq\b|query|search", kinds)) \
             and not re.search(r"e-?mail|url|link", kinds): sc -= 5
     return sc
@@ -317,29 +324,45 @@ def classify(blocked, robots_ok, found_page, sig):
     return None, "unknown", "low"
 
 
+def load_seeds(path="pipeline/registry-seeds.json"):
+    """Registered brokers' own details (business name and privacy-rights page), by site domain. See tools/registries.py."""
+    try: return json.load(open(path))
+    except (OSError, ValueError): return {}
+
+
+SEEDS = load_seeds()
+
+
 def profile(domain, bucket, fetcher):
     rec = {"domain": domain, "bucket": bucket, "profiled": datetime.date.today().isoformat()}
-    # Some sites answer robots.txt differently on the bare and www hosts (the bare host often just redirects),
-    # so try both and use the first host whose robots.txt allows the home page.
-    start = next((u for u in (f"https://{domain}/", f"https://www.{domain}/") if fetcher.allowed(u)), None)
-    if start is None:
-        start = f"https://{domain}/"
-        rec.update(tier=None, automation="robots_disallowed", confidence="n/a", signals=[], opt_out_url=None)
-        return rec
-    status, final, html = fetcher.get(start)
-    time.sleep(1)
-    if status is None:
-        rec.update(tier=None, automation="unreachable", confidence="n/a", signals=[], opt_out_url=None)
-        return rec
-    rec["home_status"] = status
-    if is_blocked(status, html):
-        rec.update(tier=None, automation="blocked", confidence="n/a", signals=["bot_check_on_home"], opt_out_url=None)
-        return rec
     own = registrable(domain)
-    best, trail, blocked_seen = crawl_for_form(final, fetcher, own)
+    best, trail, blocked_seen = None, None, False
+    # A broker registered in California names its own privacy-rights page: the best place to look first.
+    seed = (SEEDS.get(domain) or {}).get("privacy_url")
+    if seed and fetcher.allowed(seed):
+        sbest, _, _ = crawl_for_form(seed, fetcher, registrable(urllib.parse.urlsplit(seed).netloc))
+        if sbest and sbest.get("form"): best = sbest
     if best is None:
-        rec.update(tier=None, automation="unknown", confidence="none", signals=[], opt_out_url=None)
-        return rec
+        # Some sites answer robots.txt differently on the bare and www hosts (the bare host often just redirects),
+        # so try both and use the first host whose robots.txt allows the home page.
+        start = next((u for u in (f"https://{domain}/", f"https://www.{domain}/") if fetcher.allowed(u)), None)
+        if start is None:
+            start = f"https://{domain}/"
+            rec.update(tier=None, automation="robots_disallowed", confidence="n/a", signals=[], opt_out_url=None)
+            return rec
+        status, final, html = fetcher.get(start)
+        time.sleep(1)
+        if status is None:
+            rec.update(tier=None, automation="unreachable", confidence="n/a", signals=[], opt_out_url=None)
+            return rec
+        rec["home_status"] = status
+        if is_blocked(status, html):
+            rec.update(tier=None, automation="blocked", confidence="n/a", signals=["bot_check_on_home"], opt_out_url=None)
+            return rec
+        best, trail, blocked_seen = crawl_for_form(final, fetcher, own)
+        if best is None:
+            rec.update(tier=None, automation="unknown", confidence="none", signals=[], opt_out_url=None)
+            return rec
     sig = best["sig"]
     tier, auto, conf = classify(best["blocked"], True, True, sig)
     form = best.get("form")
@@ -364,15 +387,16 @@ def profile(domain, bucket, fetcher):
 
 
 def to_yaml(rec):
-    def q(v): return json.dumps(v) if isinstance(v, str) else ("null" if v is None else str(v).lower() if isinstance(v, bool) else str(v))
+    def q(v): return json.dumps(v, ensure_ascii=False) if isinstance(v, str) else ("null" if v is None else str(v).lower() if isinstance(v, bool) else str(v))
     lines = [f"# GENERATED by tools/profile_brokers.py on {rec['profiled']}. A provisional guess from the page's shape; edit or",
              "# replace with a hand-written flow in brokers/ once a real run confirms it."]
-    order = ["id", "domain", "name", "bucket", "tier", "automation", "confidence", "opt_out_url", "opt_out_form", "family", "family_parent", "template", "signals", "profiled"]
+    order = ["id", "domain", "name", "bucket", "tier", "automation", "confidence", "opt_out_url", "opt_out_form", "family", "family_parent", "template", "registered_in", "signals", "profiled"]
     for k in order:
         if k not in rec or rec[k] in (None, "") and k not in ("tier", "opt_out_url"): continue
         v = rec[k]
         if k == "signals": lines.append("signals: [" + ", ".join(v) + "]")
-        elif k == "opt_out_form": lines.append("opt_out_form: " + json.dumps(v))
+        elif k == "registered_in": lines.append("registered_in: [" + ", ".join(v) + "]")
+        elif k == "opt_out_form": lines.append("opt_out_form: " + json.dumps(v, ensure_ascii=False))
         else: lines.append(f"{k}: {q(v)}")
     return "\n".join(lines) + "\n"
 
@@ -429,7 +453,8 @@ def main():
         if len(members) >= 3 and not (members[0].get("family")):
             for r in members: r["template"] = "t_" + hashlib.sha1(key.encode()).hexdigest()[:6]
     for r in recs:
-        r["id"] = re.sub(r"[^a-z0-9]+", "_", r["domain"].lower()).strip("_"); r["name"] = r["domain"]
+        r["id"] = re.sub(r"[^a-z0-9]+", "_", r["domain"].lower()).strip("_"); r["name"] = (SEEDS.get(r["domain"]) or {}).get("name") or r["domain"]
+        r["registered_in"] = (SEEDS.get(r["domain"]) or {}).get("registered_in") or None
         target = os.path.join(a.out, r["id"] + ".yml")
         kept = ""
         if os.path.exists(target):

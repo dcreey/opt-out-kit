@@ -2,12 +2,13 @@
 # replace with a hand-written flow in brokers/ once a real run confirms it.
 id: "whitepages_com"
 domain: "whitepages.com"
-name: "whitepages.com"
+name: "Whitepages, Inc"
 bucket: "direct"
 tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.whitepages.com/privacy"
+registered_in: [CA, OR, TX]
 signals: [account_hint, captcha_datadome, captcha_turnstile, mail_option, name_input, phone_input]
 profiled: "2026-10-21"
 search_check:

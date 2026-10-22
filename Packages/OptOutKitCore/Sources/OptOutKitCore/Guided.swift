@@ -87,7 +87,7 @@ public struct GuidedFlow: Equatable, Sendable {
     public var isFinished: Bool { index >= plan.steps.count }
     public var current: GuidedStep? { plan.steps.indices.contains(index) ? plan.steps[index] : nil }
     /// "Step 2 of 5", or nil when the flow is finished.
-    public var progressLabel: String? { isFinished ? nil : "Step \(index + 1) of \(total)" }
+    public var progressLabel: String? { isFinished ? nil : L10n.f("Step %@ of %@", index + 1, total) }
 
     /// Applies an event and returns the id of a step it finished, if any.
     @discardableResult
@@ -99,8 +99,8 @@ public struct GuidedFlow: Equatable, Sendable {
         }
         if case .formSent(let awaitingEmail) = event, awaitingEmail, plan.addsEmailStepAfterSend,
            !plan.steps.contains(where: { if case .waitForEmail = $0.action { return true } else { return false } }) {
-            plan.steps.append(GuidedStep(id: plan.steps.count, title: "Confirm the email they sent you",
-                                         detail: "Open the message and click its link. We cannot read your inbox.",
+            plan.steps.append(GuidedStep(id: plan.steps.count, title: L10n.t("Confirm the email they sent you"),
+                                         detail: L10n.t("Open the message and click its link. We cannot read your inbox."),
                                          action: .waitForEmail(subject: nil, minutes: nil)))
         }
         guard let step = current else { return nil }
@@ -166,17 +166,17 @@ public enum GuidedPlanner {
         for (i, s) in broker.steps.enumerated() {
             let rule = rule(for: s.doneWhen)
             if let url = s.open {
-                steps.append(GuidedStep(id: i, title: "Open \(url.host ?? "the site")", action: .openPage(url), rule: .pageLoaded))
+                steps.append(GuidedStep(id: i, title: L10n.f("Open %@", url.host ?? "the site"), action: .openPage(url), rule: .pageLoaded))
             } else if let field = s.copy {
-                steps.append(GuidedStep(id: i, title: "Copy your \(Describe.field(field).lowercased())", detail: "Tap Copy, then paste it into the form. It is cleared from the clipboard after a minute.", action: .copy(field: field), rule: .copied))
+                steps.append(GuidedStep(id: i, title: L10n.f("Copy your %@", Describe.field(field).lowercased()), detail: L10n.t("Tap Copy, then paste it into the form. It is cleared from the clipboard after a minute."), action: .copy(field: field), rule: .copied))
             } else if let w = s.waitForEmail {
-                var detail = "Open the email and click its link. We cannot read your inbox."
-                if let subject = w.subject { detail = "Look for an email titled \"\(subject)\". " + detail }
+                var detail = L10n.t("Open the email and click its link. We cannot read your inbox.")
+                if let subject = w.subject { detail = L10n.f("Look for an email titled \"%@\". ", subject) + detail }
                 if let m = w.withinMinutes { detail += " The link expires in \(m) minutes." }
-                steps.append(GuidedStep(id: i, title: "Confirm the email they send you", detail: detail,
+                steps.append(GuidedStep(id: i, title: L10n.t("Confirm the email they send you"), detail: detail,
                                         action: .waitForEmail(subject: w.subject, minutes: w.withinMinutes)))
             } else if let m = s.searchMatch {
-                steps.append(GuidedStep(id: i, title: "Find your listing", detail: m, action: .instruction, rule: rule))
+                steps.append(GuidedStep(id: i, title: L10n.t("Find your listing"), detail: m, action: .instruction, rule: rule))
             } else if let say = s.say {
                 steps.append(GuidedStep(id: i, title: say, action: s.needsConfirm ? .confirm : .instruction, rule: rule))
             } else {
@@ -194,11 +194,11 @@ public enum GuidedPlanner {
         func add(_ title: String, _ detail: String? = nil, _ action: GuidedStep.Action, _ rule: GuidedStep.Rule? = nil) {
             steps.append(GuidedStep(id: steps.count, title: title, detail: detail, action: action, rule: rule))
         }
-        add("Open your own listing", "We searched \(entry.domain) for you. Tap the result that is you, then tap \"This is my listing\". If none is you, tap Not working.", .pickListing(search: search))
-        add("Open the opt-out page", entry.domain, .openPage(form.page), .pageLoaded)
-        add("We fill in your details", "Your email and the address of your listing.", .autofill, .formFilled)
-        add("Clear the check", "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.", .clearBlockers, .blockersCleared)
-        add("We send it", "Then we look for the site's confirmation.", .send, .formSent)
+        add(L10n.t("Open your own listing"), L10n.f("We searched %@ for you by name. Tap the result that is you, then tap \"This is my listing\". You never need to buy a report: the opt-out only needs the address of that page. If none is you, tap Not working.", entry.domain), .pickListing(search: search))
+        add(L10n.t("Open the opt-out page"), entry.domain, .openPage(form.page), .pageLoaded)
+        add(L10n.t("We fill in your details"), L10n.t("Your email and the address of your listing."), .autofill, .formFilled)
+        add(L10n.t("Clear the check"), L10n.t("Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
+        add(L10n.t("We send it"), L10n.t("Then we look for the site's confirmation."), .send, .formSent)
         var p = GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
         p.listingFields = form.fields.filter(FormFiller.isListingField).map(\.name)
         return p
@@ -211,17 +211,17 @@ public enum GuidedPlanner {
             steps.append(GuidedStep(id: steps.count, title: title, detail: detail, action: action, rule: rule))
         }
         if let form = entry.optOutForm {
-            add("Open the opt-out page", entry.domain, .openPage(form.page), .pageLoaded)
-            add("We fill in your details", "Only the fields this form asks for.", .autofill, .formFilled)
-            add("Clear the check", "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.", .clearBlockers, .blockersCleared)
-            add("We send it", "Then we look for the site's confirmation.", .send, .formSent)
+            add(L10n.t("Open the opt-out page"), entry.domain, .openPage(form.page), .pageLoaded)
+            add(L10n.t("We fill in your details"), L10n.t("Only the fields this form asks for."), .autofill, .formFilled)
+            add(L10n.t("Clear the check"), L10n.t("Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
+            add(L10n.t("We send it"), L10n.t("Then we look for the site's confirmation."), .send, .formSent)
             return GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
         }
         let start = entry.optOutURL ?? URL(string: "https://\(entry.domain)/")!
-        add("Open the site's opt-out page", entry.domain, .openPage(start), .pageLoaded)
-        add("Find the opt-out or privacy request form and fill it in", "We could not find the form automatically.", .instruction)
-        add("Submit it", nil, .confirm)
-        add("Confirm the email they send you, if they send one", "Open the message and click its link.", .waitForEmail(subject: nil, minutes: nil))
+        add(L10n.t("Open the site's opt-out page"), entry.domain, .openPage(start), .pageLoaded)
+        add(L10n.t("Find the opt-out or privacy request form and fill it in"), L10n.t("We could not find the form automatically."), .instruction)
+        add(L10n.t("Submit it"), nil, .confirm)
+        add(L10n.t("Confirm the email they send you, if they send one"), L10n.t("Open the message and click its link."), .waitForEmail(subject: nil, minutes: nil))
         return GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: false)
     }
 
@@ -241,10 +241,10 @@ public enum IssueKind: String, Codable, CaseIterable, Sendable {
 
     public var label: String {
         switch self {
-        case .brokenLink: return "The page or link is broken"
-        case .gatedByOther: return "It needs something else (login, payment, ID or a phone call)"
-        case .blockedMe: return "The site blocked me"
-        case .other: return "Something else is wrong"
+        case .brokenLink: return L10n.t("The page or link is broken")
+        case .gatedByOther: return L10n.t("It needs something else (login, payment, ID or a phone call)")
+        case .blockedMe: return L10n.t("The site blocked me")
+        case .other: return L10n.t("Something else is wrong")
         }
     }
 }

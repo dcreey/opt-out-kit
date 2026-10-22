@@ -6,7 +6,7 @@ canonical(paragraph, domain):
   2. Any web address (word.tld, optional www.) becomes {domain}.
   3. The site's own name becomes {site}: its domain label, and the label split before its suffix word
      (alabamaarrests -> "alabama arrests").
-  4. US state names (longest first) and the site's own short prefix (ct, ny ...) become {state}.
+  4. US state names, in English, French, Spanish and German (longest first) and the site's own short prefix (ct, ny ...) become {state}.
   5. Four-digit years 1990-2039 become {year}; "(c)" and the copyright sign are dropped.
 A paragraph is "substantial" when it has at least 12 words; shorter lines are page chrome (menus, buttons, footers).
 """
@@ -17,6 +17,8 @@ STATES = ["alabama","alaska","arizona","arkansas","california","colorado","conne
           "missouri","montana","nebraska","nevada","new hampshire","new jersey","new mexico","new york","north carolina","north dakota","ohio","oklahoma",
           "oregon","pennsylvania","rhode island","south carolina","south dakota","tennessee","texas","utah","vermont","virginia","washington",
           "west virginia","wisconsin","wyoming"]
+# State names as they appear in French, Spanish and German text, so sister sites in any of those languages cluster too.
+STATES += ['californie', 'caroline du nord', 'caroline du sud', 'dakota du nord', 'dakota du sud', 'virginie-occidentale', 'virginie', 'floride', 'géorgie', 'hawaï', 'louisiane', 'pennsylvanie', 'nouveau-mexique', 'nouveau-hampshire', 'rhode island', 'carolina del norte', 'carolina del sur', 'dakota del norte', 'dakota del sur', 'virginia occidental', 'nueva york', 'nueva jersey', 'nuevo méxico', 'nuevo hampshire', 'luisiana', 'hawái', 'misisipi', 'misuri', 'oregón', 'míchigan', 'pensilvania', 'kalifornien', 'nordkarolina', 'südkarolina', 'norddakota', 'süddakota', 'westvirginia']
 SUFFIXES = ["courtrecords", "arrestwarrants", "warrantroundup", "arrests", "arrest", "warrants", "records", "residentdatabase"]
 MIN_WORDS = 12
 
@@ -40,7 +42,7 @@ def site_tokens(domain):
 
 def canonical(paragraph, domain):
     t = _norm(paragraph)
-    t = re.sub(r"\b(?:www\.)?[a-z0-9][a-z0-9-]*\.(?:org|com|net|us|gov|edu|io|info)\b", "{domain}", t)
+    t = re.sub(r"\b(?:www\.)?[a-z0-9][a-z0-9-]*\.(?:org|com|net|us|gov|edu|io|info|fr|es|de|ca|uk|mx|eu|ch|at|be|nl|it)\b", "{domain}", t)
     names, prefix = site_tokens(domain)
     for n in names: t = t.replace(n, "{site}")
     for st in sorted(STATES, key=len, reverse=True): t = t.replace(st, "{state}")
