@@ -27,7 +27,7 @@ final class DryRunUITests: XCTestCase {
         // 2. The Sites page lists Spokeo with what it will receive.
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("spokeo")
-        app.buttons["site-spokeo"].tap()
+        app.buttons["task-flow-spokeo"].tap()
         XCTAssertTrue(app.staticTexts["site-summary"].waitForExistence(timeout: 5)
                       || app.staticTexts["Not started"].waitForExistence(timeout: 5))
 

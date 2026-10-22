@@ -5,8 +5,7 @@ final class GuidedFlowUITests: XCTestCase {
     private func openGuide(_ app: XCUIApplication) {
         app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
         app.launch()
-        XCTAssertTrue(app.buttons["broker-peopleconnect"].waitForExistence(timeout: 10))
-        app.buttons["broker-peopleconnect"].tap()
+        app.openFlowTask("peopleconnect")
         let start = app.buttons["guide-me"]
         XCTAssertTrue(start.waitForExistence(timeout: 5))
         start.tap()
@@ -73,7 +72,7 @@ final class GuidedFlowUITests: XCTestCase {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 3), "\(label) is offered")
         }
         app.buttons["The page or link is broken"].tap()
-        XCTAssertTrue(app.staticTexts["reported-issue"].waitForExistence(timeout: 5), "the site now shows it was reported")
+        XCTAssertTrue(app.descendants(matching: .any)["reported-issue"].waitForExistence(timeout: 5), "the site now shows it was reported")
     }
 }
 
@@ -88,8 +87,8 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("peopleconnect")
-        XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 10))
-        app.buttons["site-peopleconnect"].tap()
+        XCTAssertTrue(app.buttons["task-flow-peopleconnect"].waitForExistence(timeout: 10))
+        app.buttons["task-flow-peopleconnect"].tap()
         let guide = app.buttons["guide-me"]
         XCTAssertTrue(guide.waitForExistence(timeout: 5))
         let screen = app.windows.firstMatch.frame
@@ -107,9 +106,8 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
-        let search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5)); search.tap(); search.typeText("texascourtrecords")
-        let row = app.buttons["dir-texascourtrecords_us"]
+        app.searchSites("texascourtrecords")
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
         let guide = app.buttons["guide-me"]
         XCTAssertTrue(guide.waitForExistence(timeout: 5))
@@ -125,7 +123,7 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("peopleconnect")
-        app.buttons["site-peopleconnect"].tap()
+        app.buttons["task-flow-peopleconnect"].tap()
         app.buttons["guide-me"].tap()
         XCTAssertTrue(app.staticTexts["guided-progress"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["guided-cancel"].exists)

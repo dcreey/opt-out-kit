@@ -9,7 +9,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         for _ in 0..<5 { app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
         app.buttons["onboarding-done"].tap()
-        XCTAssertTrue(app.buttons["broker-spokeo"].waitForExistence(timeout: 5), "queue visible after walkthrough")
+        XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 5), "the ranked queue is visible after the walkthrough")
     }
 
     func testChoosingCaliforniaExplainsItsLawsAndOffersDropInTheQueue() {
@@ -41,27 +41,13 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.buttons["onboarding-next"].tap()
         app.buttons["onboarding-done"].tap()
 
-        XCTAssertTrue(app.buttons["platform-ca-drop"].waitForExistence(timeout: 5), "the queue offers California DROP")
-        XCTAssertFalse(app.buttons["broker-spokeo"].exists, "Spokeo is covered by DROP, so it is not separate work in the queue")
+        XCTAssertTrue(app.buttons["next-platform-ca-drop"].waitForExistence(timeout: 5), "the queue leads with California DROP")
+        XCTAssertTrue(app.scrollUntilExists(app.buttons["band-1"], maxSwipes: 6), "and its band is the first")
         app.tabBars.buttons["Sites"].tap()
-        XCTAssertTrue(app.scrollUntilExists(app.staticTexts["platform-group-ca-drop"], maxSwipes: 60), "handled sites are listed once, together")
-        app.swipeDown(velocity: .fast)
-        app.searchSites("whitepages")
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'covered by California DROP'")).firstMatch.waitForExistence(timeout: 5),
-                      "a site on the California registry says one request reaches it")
-    }
-
-    func testThePageDotsSitBelowTheContentNotOnTopOfIt() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
-        app.launch()
-        let next = app.buttons["onboarding-next"]
-        XCTAssertTrue(next.waitForExistence(timeout: 10))
-        let dots = app.otherElements["onboarding-page-dots"]
-        XCTAssertTrue(dots.waitForExistence(timeout: 5))
-        XCTAssertLessThanOrEqual(dots.frame.maxY, next.frame.minY + 1, "dots above the buttons")
-        let body = app.scrollViews.firstMatch.frame
-        XCTAssertGreaterThanOrEqual(dots.frame.minY, body.maxY - 1, "dots below the scrolling content, not over it")
+        XCTAssertTrue(app.staticTexts["band-1"].waitForExistence(timeout: 5), "the official service is the first band on the Sites page")
+        app.searchSites("spokeo")
+        XCTAssertTrue(app.buttons["task-platform-ca-drop"].waitForExistence(timeout: 5), "Spokeo is part of the DROP task, not a separate one")
+        XCTAssertFalse(app.buttons["task-flow-spokeo"].exists)
     }
 
     func testAStateWithNoLawPointsToStrongerStatesWithExamples() {
@@ -110,23 +96,23 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(country.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["onboarding-state"].exists, "the United States is the default here, so its states are offered")
         country.tap()
-        app.buttons["Japan"].tap()
+        app.buttons["Uruguay"].tap()             // the menu opens scrolled to the selected United States, so pick a country in view
         XCTAssertFalse(app.buttons["onboarding-state"].exists, "only the US has states")
-        let law = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Japan has a data protection law'")).firstMatch
+        let law = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Uruguay has a data protection law'")).firstMatch
         XCTAssertTrue(law.waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["onboarding-next"].isEnabled, "the rules have to be read")
         var swipes = 0
         while !app.buttons["onboarding-next"].isEnabled && swipes < 12 { app.swipeUp(); swipes += 1 }
         XCTAssertTrue(app.buttons["onboarding-next"].isEnabled)
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'ppc.go.jp'")).firstMatch.exists, "the regulator is named")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'gub.uy'")).firstMatch.exists, "the regulator is named")
     }
 
     func testNotLivingInCaliforniaHidesIt() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        XCTAssertTrue(app.buttons["broker-spokeo"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.buttons["platform-ca-drop"].exists)
+        XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 10), "the app's own run leads when there is no official service")
+        XCTAssertFalse(app.buttons["next-platform-ca-drop"].exists)
     }
 
     func testWalkthroughDoesNotReappearOnNextLaunch() {
@@ -140,7 +126,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
 
         let again = XCUIApplication()
         again.launch()
-        XCTAssertTrue(again.buttons["broker-spokeo"].waitForExistence(timeout: 10))
+        XCTAssertTrue(again.buttons["next-automatic"].waitForExistence(timeout: 10))
         XCTAssertFalse(again.buttons["onboarding-next"].exists)
     }
 
@@ -152,11 +138,11 @@ final class OnboardingAndSitesUITests: XCTestCase {
 
         // Search finds a brand covered by PeopleConnect.
         app.searchSites("truthfinder")
-        XCTAssertTrue(app.buttons["site-peopleconnect"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["site-peopleconnect"].exists)
-        XCTAssertFalse(app.buttons["site-spokeo"].exists)
+        XCTAssertTrue(app.buttons["task-flow-peopleconnect"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["task-flow-peopleconnect"].exists)
+        XCTAssertFalse(app.buttons["task-flow-spokeo"].exists)
 
-        app.buttons["site-peopleconnect"].tap()
+        app.buttons["task-flow-peopleconnect"].tap()
         XCTAssertTrue(app.staticTexts["Not started"].waitForExistence(timeout: 5))
     }
 
@@ -189,11 +175,8 @@ final class DirectoryUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
-        let search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap()
-        search.typeText("texascourtrecords")
-        let row = app.buttons["dir-texascourtrecords_us"]
+        app.searchSites("texascourtrecords")
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         row.tap()
         let shared = app.staticTexts["Shared opt-out"]

@@ -12,9 +12,7 @@ final class BrokerFlowUITests: XCTestCase {
 
     private func walk(_ id: String) {
         let app = launch()
-        let row = app.buttons["broker-\(id)"]
-        XCTAssertTrue(row.waitForExistence(timeout: 10), "\(id) missing from list")
-        row.tap()
+        app.openFlowSteps(id)
 
         // Count cards from the "Step N of M" label on the first card.
         let first = app.buttons["done-0"]
@@ -36,7 +34,8 @@ final class BrokerFlowUITests: XCTestCase {
         }
 
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        let done = app.buttons["broker-\(id)"]
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let done = app.buttons["task-flow-\(id)"]
         XCTAssertTrue(done.waitForExistence(timeout: 5))
         XCTAssertTrue(done.images["checkmark.circle.fill"].exists || done.label.contains("checkmark"),
                       "\(id) should show as done")

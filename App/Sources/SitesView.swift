@@ -217,7 +217,7 @@ struct BrokerInfoView: View {
                         }
                         Spacer()
                         Button(buttonTitle(item.status)) { model.select(item.person.id); openFlow = true }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(.bordered).accessibilityIdentifier("open-flow")
                     }
                     if broker.recheck != nil {
                         scanRow(item.person)

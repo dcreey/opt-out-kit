@@ -1,9 +1,9 @@
 import XCTest
 
 extension XCUIApplication {
-    /// The Sites list is grouped by method and long, so find a hand-written site by searching for it.
+    /// The Sites list is a long ranked queue, so find a site by typing in its search box.
     func searchSites(_ text: String) {
-        let search = searchFields.firstMatch
+        let search = textFields["sites-search"]
         XCTAssertTrue(search.waitForExistence(timeout: 10))
         search.tap()
         search.typeText(text)
@@ -54,5 +54,24 @@ extension XCUIApplication {
         var n = 0
         while !element.exists && n < maxSwipes { swipeUp(); n += 1 }
         return element.exists
+    }
+}
+
+extension XCUIApplication {
+    /// Goes to the Sites tab, searches, and opens the task of a hand-written flow (spokeo, peopleconnect...).
+    func openFlowTask(_ id: String, search: String? = nil) {
+        tabBars.buttons["Sites"].tap()
+        searchSites(search ?? id)
+        let row = buttons["task-flow-\(id)"]
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "\(id) missing from the queue")
+        row.tap()
+    }
+
+    /// Opens a flow's step cards (the guided walk-through screen) from its task page.
+    func openFlowSteps(_ id: String) {
+        openFlowTask(id)
+        let open = buttons["open-flow"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5))
+        open.tap()
     }
 }
