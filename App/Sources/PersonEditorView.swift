@@ -70,7 +70,6 @@ struct PersonEditorView: View {
             }
         }
         .navigationTitle(person.displayName.isEmpty ? "Profile" : person.displayName)
-        .keyboardDone()
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: person) { _, new in model.update(new) }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {

@@ -52,7 +52,6 @@ struct PlanTaskRow: View {
             Spacer()
         }
         .accessibilityElement(children: .combine)
-        .simultaneousGesture(TapGesture().onEnded { Keyboard.hide() })      // opening a task puts the keyboard away
     }
 }
 

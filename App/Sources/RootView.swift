@@ -12,12 +12,10 @@ struct RootView: View {
             AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
         }
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
-        .onChange(of: tab) { _, _ in Keyboard.hide() }
-        .keyboardDone()
         .fullScreenCover(isPresented: Binding(
             get: { model.pending == .walkthrough },
             set: { _ in })) {
-            OnboardingView(onDecide: { scan, optOut in model.setAuto(scan: scan, optOut: optOut) }) { model.finishAnnouncements() }.keyboardDone()
+            OnboardingView(onDecide: { scan, optOut in model.setAuto(scan: scan, optOut: optOut) }) { model.finishAnnouncements() }
         }
         .sheet(isPresented: Binding(
             get: { if case .whatsNew = model.pending { return true } else { return false } },

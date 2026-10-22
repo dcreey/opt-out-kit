@@ -92,7 +92,7 @@ final class LinkHealingTests: XCTestCase {
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
         m.update(me)
         let submitter = GoneThenFine()
-        await m.runAutoOptOut(for: me, submitter: submitter, inspector: AnySite())
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: submitter, inspector: AnySite())
         XCTAssertFalse(submitter.calls.pages.isEmpty)
         XCTAssertTrue(submitter.calls.pages.contains { $0.hasPrefix("/request-portal") }, "a site whose page was gone was tried again at its new address")
         XCTAssertNotNil(m.directory.first { m.healedLink(for: $0.id) != nil }, "and the new address was remembered")

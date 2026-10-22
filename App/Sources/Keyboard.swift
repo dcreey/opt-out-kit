@@ -63,10 +63,3 @@ private final class DoneOverlay {
         })
     }
 }
-
-/// Dragging a scrolling page down puts the keyboard away. (The Done button is drawn by `Keyboard.install`.)
-struct KeyboardDone: ViewModifier {
-    func body(content: Content) -> some View { content.scrollDismissesKeyboard(.interactively) }
-}
-
-extension View { func keyboardDone() -> some View { modifier(KeyboardDone()) } }

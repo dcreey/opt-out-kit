@@ -74,7 +74,7 @@ final class PlatformAppTests: XCTestCase {
             func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { pages.append(form.page.host ?? ""); return .submitted(awaitingEmail: false) }
         }
         let seen = Seen()
-        await m.runAutoOptOut(for: me, submitter: seen)
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: seen)
         let held = m.holds(for: me)
         XCTAssertFalse(held.isEmpty)
         for row in m.optOutRun[me.id] ?? [] where held[row.id] != nil {
@@ -169,7 +169,7 @@ final class HandledOnceTests: XCTestCase {
         final class Seen: FormSubmitter, @unchecked Sendable {
             func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
         }
-        await m.runAutoOptOut(for: me, submitter: Seen())
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: Seen())
         let covered = Set(m.platformGroups[0].entries.map(\.id))
         let rows = (m.optOutRun[me.id] ?? []).filter { covered.contains($0.id) }
         XCTAssertFalse(rows.isEmpty)
@@ -218,6 +218,27 @@ final class ProfileGateAppTests: XCTestCase {
 
 @MainActor
 final class AutomaticRunAppTests: XCTestCase {
+    func testTheRunWorksThroughExactlyTheSitesTheAutomaticTaskShows() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        final class Seen: FormSubmitter, @unchecked Sendable {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+        }
+        let shown = m.automaticDomains(for: me)
+        XCTAssertFalse(shown.isEmpty)
+        let task = try XCTUnwrap(m.plan.flatMap(\.tasks).first { $0.kind == .automatic })
+        XCTAssertEqual(Set(task.domains), shown, "the count on the task is the set the run works through")
+        await m.runAutoOptOut(for: me, submitter: Seen())
+        let ran = Set((m.optOutRun[me.id] ?? []).map(\.domain))
+        XCTAssertFalse(ran.isEmpty)
+        XCTAssertTrue(ran.isSubset(of: shown), "no semi-automated or guided site is sent in the background: \(ran.subtracting(shown).sorted().prefix(5))")
+        XCTAssertLessThan(ran.count, m.directory.filter { $0.optOutForm != nil }.count)
+    }
+
     func testASiteThatFailedAutomaticallyMovesToAGuideAndACheckToSemiAutomated() {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)

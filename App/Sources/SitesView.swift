@@ -96,7 +96,6 @@ struct SitesView: View {
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
             .planDestinations()
-            .keyboardDone()
             .coach(.sites)
             .sheet(isPresented: $showScan) { ExposureView() }
             .sheet(isPresented: $showQuick) { QuickCheckView() }

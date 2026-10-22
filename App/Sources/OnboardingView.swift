@@ -117,7 +117,6 @@ struct OnboardingView: View {
                 .tag(pages.count + 3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .onChange(of: index) { _, _ in emailFocused = false; Keyboard.hide() }
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {
@@ -135,7 +134,7 @@ struct OnboardingView: View {
                 Button("Skip") { withAnimation { index = max(index, pages.count) } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
                 if index < pages.count + 3 {
-                    Button("Next") { emailFocused = false; withAnimation { index += 1 } }
+                    Button("Next") { withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
                         .disabled((index == pages.count && model.formEmail == nil) || (index == pages.count + 1 && !rulesRead))
                 } else {

@@ -49,7 +49,7 @@ final class AutoProtectionTests: XCTestCase {
         let m = model()
         let me = try withProfile(m)
         let box = CallBox()
-        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: CountingSubmitter(box: box))
         let sites = m.directory.filter { $0.optOutForm != nil }
         XCTAssertGreaterThan(sites.count, 50, "the directory has many forms")
         let rows = try XCTUnwrap(m.optOutRun[me.id])
@@ -63,10 +63,10 @@ final class AutoProtectionTests: XCTestCase {
         let m = model()
         let me = try withProfile(m)
         let box = CallBox()
-        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: CountingSubmitter(box: box))
         let first = box.calls
         XCTAssertGreaterThan(first, 0)
-        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: CountingSubmitter(box: box))
         XCTAssertEqual(box.calls, first, "each site is sent at most once a week")
     }
 
@@ -74,7 +74,7 @@ final class AutoProtectionTests: XCTestCase {
         let m = model()
         let me = try withProfile(m)
         let box = CallBox()
-        await m.runAutoOptOut(for: me, dryRun: true, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: me, dryRun: true, automaticOnly: false, submitter: CountingSubmitter(box: box))
         XCTAssertGreaterThan(box.calls, 0)
         XCTAssertTrue(m.progress.optOutAttempts.isEmpty)
         XCTAssertNil(m.autoSettings.lastOptOut)
@@ -88,7 +88,7 @@ final class AutoProtectionTests: XCTestCase {
         var k = kid; k.isMinor = true; k.emails = ["k@example.com"]; k.addresses = [Address(city: "Springfield", state: "IL")]
         m.update(k)
         let box = CallBox()
-        await m.runAutoOptOut(for: k, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: k, automaticOnly: false, submitter: CountingSubmitter(box: box))
         XCTAssertGreaterThan(box.calls, 0, "opt-out requests are not searches")
         XCTAssertFalse(k.canBeSearched())
     }
@@ -97,7 +97,7 @@ final class AutoProtectionTests: XCTestCase {
         let m = model()
         let me = try XCTUnwrap(m.selectedPerson)         // no name or email yet
         let box = CallBox()
-        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: box))
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: CountingSubmitter(box: box))
         XCTAssertEqual(box.calls, 0)
         XCTAssertTrue(m.optOutRun[me.id]!.contains { if case .needsData = $0.result { return true } else { return false } }
                       || m.optOutRun[me.id]!.allSatisfy { if case .needsYou = $0.result { return true } else { return false } })

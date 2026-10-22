@@ -50,6 +50,55 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertFalse(app.buttons["task-flow-spokeo"].exists)
     }
 
+    func testThePageDotsSitBelowTheContentNotOnTopOfIt() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
+        app.launch()
+        let next = app.buttons["onboarding-next"]
+        XCTAssertTrue(next.waitForExistence(timeout: 10))
+        let dots = app.otherElements["onboarding-page-dots"]
+        XCTAssertTrue(dots.waitForExistence(timeout: 5))
+        XCTAssertLessThanOrEqual(dots.frame.maxY, next.frame.minY + 1, "dots above the buttons")
+        let body = app.scrollViews.firstMatch.frame
+        XCTAssertGreaterThanOrEqual(dots.frame.minY, body.maxY - 1, "dots below the scrolling content, not over it")
+    }
+
+    func testTheWalkthroughOpensWithAutomaticRemovalAndHasNoSitePages() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["We find and remove your data for you"].waitForExistence(timeout: 10), "the first page is automatic scanning and removal")
+        XCTAssertFalse(app.staticTexts["Work through a site"].exists)
+        XCTAssertFalse(app.staticTexts["Track every site"].exists)
+    }
+
+    func testFirstVisitsShowAShortGuideOnceInsteadOfWalkthroughPages() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-coach"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        XCTAssertTrue(app.buttons["coach-done"].waitForExistence(timeout: 5), "the first visit to Sites explains the queue")
+        app.buttons["coach-done"].tap()
+        XCTAssertFalse(app.buttons["coach-done"].waitForExistence(timeout: 1))
+        app.tabBars.buttons["Queue"].tap()
+        app.tabBars.buttons["Sites"].tap()
+        XCTAssertFalse(app.buttons["coach-done"].waitForExistence(timeout: 2), "and only the first time")
+    }
+
+    func testEveryKeyboardHasADoneButtonThatPutsItAway() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        let search = app.textFields["sites-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("spo")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["keyboard-done"].waitForExistence(timeout: 3), "a Done button sits above the keyboard")
+        app.buttons["keyboard-done"].tap()
+        XCTAssertFalse(app.keyboards.firstMatch.waitForExistence(timeout: 1), "and puts the keyboard away")
+    }
+
     func testAStateWithNoLawPointsToStrongerStatesWithExamples() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]

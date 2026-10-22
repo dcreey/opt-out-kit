@@ -282,12 +282,24 @@ final class AppModel: ObservableObject {
 
     private func builtPlan() -> (plan: [PlanStep], queue: [QueueBand]) {
         if let planCache { return planCache }
-        let eligible: [Platform] = selectedPerson.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
-        let plan = OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
-                                    classifyEntry: { method(for: $0) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
+        let plan = buildPlan(for: selectedPerson)
         let built = (plan, OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries))
         planCache = built
         return built
+    }
+
+    /// The plan for any one person (the selected one is cached by `plan`).
+    func buildPlan(for person: Person?) -> [PlanStep] {
+        let eligible: [Platform] = person.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
+        return OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
+                                classifyEntry: { method(for: $0, person: person) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
+    }
+
+    /// The sites the app opts a person out of by itself: exactly the ones in the plan's automatic task, so the count the person is
+    /// shown is the number the run works through.
+    func automaticDomains(for person: Person) -> Set<String> {
+        let steps = person.id == selectedID ? plan : buildPlan(for: person)
+        return Set(steps.flatMap(\.tasks).filter { $0.kind == .automatic }.flatMap(\.domains))
     }
 
     /// The ordered steps for the selected person: their official removal service first, then ours, each site once.
@@ -420,10 +432,13 @@ final class AppModel: ObservableObject {
     /// The person's answer to the first-run question, or a later change in Settings.
     /// Whether the account owner allowed "I am this person" boxes to be ticked for them. Never applies to family profiles.
     /// How this site gets opted out for the selected person, including what real page loads and past sends have shown.
-    func method(for entry: DirectoryEntry) -> MethodVerdict {
-        // What the last automatic try showed: a check moves the site to semi-automated, a failure or refusal to a guide.
-        let last = progress.optOutAttempts[entry.id]?.last?.outcome
-        return OptOutMethods.classify(resolved(entry), confirmingIdentity: confirmingIdentityForSelected, challengedBefore: last == "challenged",
+    func method(for entry: DirectoryEntry) -> MethodVerdict { method(for: entry, person: selectedPerson) }
+
+    /// How this site gets opted out for one person. What the last automatic try showed counts: a check moves the site to
+    /// semi-automated, a failure or refusal to a guide.
+    func method(for entry: DirectoryEntry, person: Person?) -> MethodVerdict {
+        let last = person.flatMap { household.progress(for: $0.id).optOutAttempts[entry.id]?.last?.outcome }
+        return OptOutMethods.classify(resolved(entry), confirmingIdentity: person?.mayConfirmOwnIdentity() ?? false, challengedBefore: last == "challenged",
                                       failedBefore: last == "failed" || last == "rejected")
     }
     var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
@@ -457,15 +472,17 @@ final class AppModel: ObservableObject {
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
-    func runAutoOptOut(for original: Person, dryRun: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
+    func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
         guard storageProblem == nil, isReady(original) else { return }
+        // Only the sites in the "done for you" task. Semi-automated and guided sites need the person, so they are never sent in the background.
+        let runnable = automaticOnly ? automaticDomains(for: original) : nil
         let ownsBusy = autoBusy == nil && !dryRun
         if ownsBusy { autoBusy = "optout" }
         defer { if ownsBusy { autoBusy = nil; autoProgress = nil } }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
-        var results = await engine.run(entries: directory.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
+        var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } })
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {

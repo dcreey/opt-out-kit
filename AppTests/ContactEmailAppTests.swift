@@ -62,7 +62,7 @@ final class ContactEmailAppTests: XCTestCase {
         m.setContactEmail("pat@gmail.com")
         for person in [me, mum] {
             let capture = Capture()
-            await m.runAutoOptOut(for: person, submitter: capture)
+            await m.runAutoOptOut(for: person, automaticOnly: false, submitter: capture)
             XCTAssertFalse(capture.emails.isEmpty, person.displayName)
             XCTAssertTrue(capture.emails.allSatisfy { $0 == "pat+optoutkit@gmail.com" }, "\(person.displayName): \(Set(capture.emails))")
         }
