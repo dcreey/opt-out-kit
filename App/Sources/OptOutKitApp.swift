@@ -272,6 +272,7 @@ final class AppModel: ObservableObject {
     /// A guided runner for a hand-written broker flow, resuming at the first step not yet done.
     func guidedRunner(for broker: Broker) -> GuidedRunner? {
         guard let person = selectedPerson else { return nil }
+        if let listing = listingRunner(for: broker, person: person) { return listing }
         var plan = GuidedPlanner.plan(for: broker)
         if let healed = household.healedLink(for: broker.id), let first = plan.steps.firstIndex(where: { if case .openPage = $0.action { return true } else { return false } }) {
             plan.steps[first].action = .openPage(healed.form.page)         // the first page moved: use where it went
@@ -283,11 +284,36 @@ final class AppModel: ObservableObject {
                             healer: { [weak self] in await self?.healLink(for: broker)?.form.page })
     }
 
+    /// Semi-automated flow for a hand-written broker whose own opt-out form wants the person's listing (Spokeo): the app searches
+    /// for them, they pick their listing, the app fills in and sends, they clear the check. Nil when that does not apply.
+    private func listingRunner(for broker: Broker, person: Person) -> GuidedRunner? {
+        guard let entry = Directory.entry(for: broker, in: directory).map(resolved), let form = entry.optOutForm,
+              FormFiller.needsListing(form), let search = entry.listingSearchURL(for: person) else { return nil }
+        let plan = GuidedPlanner.listingPlan(for: entry, search: search)
+        let values = FormFiller.plan(for: form, signals: entry.signals, person: person).values
+        let emailStep = broker.steps.firstIndex { $0.waitForEmail != nil } ?? broker.steps.count
+        return GuidedRunner(plan: plan, person: person, fillValues: values, page: makeGuidedPageMaker().make(),
+                            onStepCompleted: { [weak self] i in
+                                // The plan's last step is sending; the broker steps before its email wait are done then, the rest after the email.
+                                guard let self else { return }
+                                if plan.steps.indices.contains(i), case .send = plan.steps[i].action { for k in 0..<emailStep { self.complete(broker, step: k) } }
+                                else if i >= plan.steps.count { for k in emailStep..<broker.steps.count { self.complete(broker, step: k) } }
+                            },
+                            onSent: { [weak self] result in self?.recordAssisted(entry, result, for: person) },
+                            onIssue: { [weak self] kind in self?.reportIssue(kind, site: broker.id) },
+                            healer: { [weak self] in await self?.healLink(for: broker)?.form.page })
+    }
+
     /// A guided runner for a directory site: the app fills and sends the form, the person clears what only they can.
     func guidedRunner(for original: DirectoryEntry) -> GuidedRunner? {
         guard let person = selectedPerson else { return nil }
         let entry = resolved(original)
-        let plan = GuidedPlanner.plan(for: entry)
+        let plan: GuidedPlan
+        if let form = entry.optOutForm, FormFiller.needsListing(form), let search = entry.listingSearchURL(for: person) {
+            plan = GuidedPlanner.listingPlan(for: entry, search: search)
+        } else {
+            plan = GuidedPlanner.plan(for: entry)
+        }
         let values: [FieldValue] = entry.optOutForm.map { FormFiller.plan(for: $0, signals: entry.signals, person: person).values } ?? []
         return GuidedRunner(plan: plan, person: person, fillValues: values, page: makeGuidedPageMaker().make(),
                             onSent: { [weak self] result in self?.recordAssisted(entry, result, for: person) },

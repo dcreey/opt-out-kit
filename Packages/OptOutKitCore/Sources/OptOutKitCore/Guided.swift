@@ -11,6 +11,7 @@ public struct GuidedStep: Equatable, Identifiable, Sendable {
         case send                           // the app presses submit once the blockers are cleared
         case waitForEmail(subject: String?, minutes: Int?)
         case confirm
+        case pickListing(search: URL)       // the person taps their own listing in the site's search results
     }
 
     /// How the app can tell the step is done without being told. Nil means only the Next button can say so.
@@ -44,6 +45,8 @@ public struct GuidedPlan: Equatable, Sendable {
     public var steps: [GuidedStep]
     /// True when the form is filled and sent by the app, so a confirmation email step may be added after sending.
     public var addsEmailStepAfterSend: Bool
+    /// Names of the form's fields that take the address of the person's own listing, filled once they have picked it.
+    public var listingFields: [String] = []
 }
 
 public enum GuidedEvent: Equatable, Sendable {
@@ -54,6 +57,7 @@ public enum GuidedEvent: Equatable, Sendable {
     case blockersCleared
     case formSent(awaitingEmail: Bool)
     case copied
+    case searchLanded(URL?)         // the search results finished loading; this address is the one that is NOT a listing
     case nextTapped
     case backTapped
 }
@@ -66,6 +70,9 @@ public struct GuidedFlow: Equatable, Sendable {
     public private(set) var autoCompleted: Set<Int> = []   // which of them the app detected itself
     private var stepStartURL: URL?
     private var lastURL: URL?
+    /// The listing the person picked, once the "tap your listing" step is done.
+    public private(set) var chosenListing: URL?
+    private var searchBaseline: URL?
 
     public init(plan: GuidedPlan) { self.plan = plan }
 
@@ -97,6 +104,18 @@ public struct GuidedFlow: Equatable, Sendable {
                                          action: .waitForEmail(subject: nil, minutes: nil)))
         }
         guard let step = current else { return nil }
+        if case .pickListing(let search) = step.action {
+            // Done only when the person says the page they are on is their listing ("This is my listing"): pages of results,
+            // pagination and redirects all look alike, so the app never guesses.
+            switch event {
+            case .searchLanded(let u): searchBaseline = u ?? search; return nil
+            case .nextTapped:
+                guard Self.isListing(lastURL, searchedAt: searchBaseline ?? search) else { return nil }
+                chosenListing = lastURL
+                return finish(step, automatic: false)
+            default: break
+            }
+        }
         switch event {
         case .nextTapped: return finish(step, automatic: false)
         case .backTapped:
@@ -105,6 +124,15 @@ public struct GuidedFlow: Equatable, Sendable {
         default:
             return matches(step.rule, event) ? finish(step, automatic: true) : nil
         }
+    }
+
+    /// A page of the same site as the search results, but not the results page itself or the home page.
+    public static func isListing(_ url: URL?, searchedAt search: URL) -> Bool {
+        guard let url, let host = url.host, let searchHost = search.host,
+              LinkRules.registrable(host) == LinkRules.registrable(searchHost) else { return false }
+        func norm(_ u: URL) -> String { (u.host ?? "") + u.path.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "?" + (u.query ?? "") }
+        let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        return !path.isEmpty && norm(url) != norm(search)
     }
 
     private func matches(_ rule: GuidedStep.Rule?, _ event: GuidedEvent) -> Bool {
@@ -156,6 +184,24 @@ public enum GuidedPlanner {
             }
         }
         return GuidedPlan(siteID: broker.id, siteName: broker.name, steps: steps, addsEmailStepAfterSend: false)
+    }
+
+    /// A walk for a site whose opt-out form wants the address of the person's own listing: the app searches for them, they tap
+    /// their listing, the app fills in the form with that address, they clear the check and the app sends it.
+    public static func listingPlan(for entry: DirectoryEntry, search: URL) -> GuidedPlan {
+        guard let form = entry.optOutForm else { return plan(for: entry) }
+        var steps: [GuidedStep] = []
+        func add(_ title: String, _ detail: String? = nil, _ action: GuidedStep.Action, _ rule: GuidedStep.Rule? = nil) {
+            steps.append(GuidedStep(id: steps.count, title: title, detail: detail, action: action, rule: rule))
+        }
+        add("Open your own listing", "We searched \(entry.domain) for you. Tap the result that is you, then tap \"This is my listing\". If none is you, tap Not working.", .pickListing(search: search))
+        add("Open the opt-out page", entry.domain, .openPage(form.page), .pageLoaded)
+        add("We fill in your details", "Your email and the address of your listing.", .autofill, .formFilled)
+        add("Clear the check", "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.", .clearBlockers, .blockersCleared)
+        add("We send it", "Then we look for the site's confirmation.", .send, .formSent)
+        var p = GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
+        p.listingFields = form.fields.filter(FormFiller.isListingField).map(\.name)
+        return p
     }
 
     /// A guided walk for a directory site: the app fills the form and sends it, and the person clears whatever only they can.

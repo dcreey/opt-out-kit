@@ -80,6 +80,15 @@ public struct SearchCheck: Codable, Equatable, Hashable, Sendable {
         public var method: String
         public var url: String
         public var body: String?
+        public init(method: String, url: String, body: String? = nil) { self.method = method; self.url = url; self.body = body }
+    }
+
+    public init(status: Status, searchURL: String? = nil, validPage: [String]? = nil, noResults: [String]? = nil, ignoreLocation: Bool? = nil,
+                calibration: Recheck.Calibration? = nil, method: String? = nil, body: String? = nil, needsBrowser: Bool? = nil,
+                candidate: Candidate? = nil, checked: String? = nil) {
+        self.status = status; self.searchURL = searchURL; self.validPage = validPage; self.noResults = noResults
+        self.ignoreLocation = ignoreLocation; self.calibration = calibration; self.method = method; self.body = body
+        self.needsBrowser = needsBrowser; self.candidate = candidate; self.checked = checked
     }
 
     enum CodingKeys: String, CodingKey {
@@ -106,6 +115,23 @@ public struct SearchCheck: Codable, Equatable, Hashable, Sendable {
         case .termsGate: return "Results are behind terms you must accept yourself"
         case .noSearch: return "No simple name search found"
         }
+    }
+}
+
+public extension DirectoryEntry {
+    /// Whether the site has a plain address that searches it by name, so a person can be taken to their own results.
+    var hasListingSearch: Bool {
+        searchCheck?.recheck != nil || (searchCheck?.candidate.map { $0.method.uppercased() == "GET" } ?? false)
+    }
+
+    /// The site's search results for this person (name and, when known, city), or nil if there is no such address or the person
+    /// may not be searched (minors and public figures, see `Person.canBeSearched`).
+    func listingSearchURL(for person: Person) -> URL? {
+        guard person.canBeSearched(), hasListingSearch else { return nil }
+        let template = searchCheck?.recheck?.searchURL ?? searchCheck?.candidate?.url
+        guard let template else { return nil }
+        let address = person.addresses.first
+        return Rechecker.fill(template, name: person.legalName, city: address?.city, state: address?.state, encoding: .path).flatMap(URL.init(string:))
     }
 }
 
@@ -175,6 +201,16 @@ public enum Directory {
             !covered.contains(e.domain) &&
             !brokers.contains { e.id == $0.id || e.domain.hasPrefix($0.id + ".") }
         }
+    }
+
+    /// The hand-written flow that owns this site: its own (spokeo for spokeo.com) or the one whose request clears it (`covers:`).
+    public static func owner(of entry: DirectoryEntry, brokers: [Broker]) -> Broker? {
+        brokers.first { $0.id == entry.id || entry.domain.hasPrefix($0.id + ".") || ($0.covers ?? []).contains(entry.domain) }
+    }
+
+    /// The generated entry for a hand-written flow's own site (spokeo for spokeo.com), when there is one.
+    public static func entry(for broker: Broker, in entries: [DirectoryEntry]) -> DirectoryEntry? {
+        entries.first { $0.id == broker.id || $0.domain.hasPrefix(broker.id + ".") }
     }
 
     /// How many directory sites share this entry's opt-out (including itself), or 1 when it stands alone.

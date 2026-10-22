@@ -7,6 +7,10 @@ public struct FieldValue: Equatable, Sendable {
     /// For text fields, one value. For a dropdown, candidates to match against its options, best first ("IL", "Illinois").
     public var candidates: [String]
     public var label: String
+
+    public init(name: String, type: String, candidates: [String], label: String) {
+        self.name = name; self.type = type; self.candidates = candidates; self.label = label
+    }
 }
 
 /// What the app can do with a form for one person: the values to enter, and why it cannot go further when it cannot.
@@ -44,7 +48,17 @@ public enum FormFiller {
         return selfIdentity.firstMatch(in: text, range: r) != nil && notSelfIdentity.firstMatch(in: text, range: r) == nil
     }
 
-    public static func plan(for form: OptOutForm, signals: [String]?, person: Person) -> FillPlan {
+    /// A field that wants the address of the person's own listing on the site ("Enter URL here", "Link to your listing").
+    static func isListingField(_ field: FormField) -> Bool {
+        let key = (field.name + " " + field.label).lowercased()
+        return field.type != "email" && key.range(of: "\\burl\\b|listing|profile.?link|\\blink\\b", options: .regularExpression) != nil
+    }
+
+    /// Whether the form can only be completed with the address of the person's own listing on the site.
+    public static func needsListing(_ form: OptOutForm) -> Bool { form.fields.contains(where: isListingField) }
+
+    /// `listingURL` is the person's own listing, picked by them on the site; without it a form that needs one is left to the person.
+    public static func plan(for form: OptOutForm, signals: [String]?, person: Person, listingURL: URL? = nil) -> FillPlan {
         if let hit = (signals ?? []).compactMap({ humanOnlySignals[$0] }).first {
             return FillPlan(values: [], verdict: .needsYou("This site \(hit)."))
         }
@@ -86,8 +100,9 @@ public enum FormFiller {
             // Middle names and suffixes are optional and the profile does not hold them: leave them empty, never reuse another name.
             if key.range(of: "\\b(middle|mn|mi|suffix)\\b|middle.?name|middle.?initial", options: .regularExpression) != nil { continue }
             // A link to the person's own listing has to come from them: the form cannot succeed without it.
-            if key.range(of: "\\burl\\b|listing|profile.?link|\\blink\\b", options: .regularExpression) != nil, field.type != "email" {
-                needsYou = needsYou ?? "This form needs the link to your listing on the site, which you find there first."
+            if isListingField(field) {
+                if let listingURL { values.append(FieldValue(name: field.name, type: field.type, candidates: [listingURL.absoluteString], label: field.label)) }
+                else { needsYou = needsYou ?? "This form needs the link to your listing on the site, which you find there first." }
                 continue
             }
             if field.type == "email" || key.contains("e-mail") || key.contains("email") { put([person.emails.first], "email address") }

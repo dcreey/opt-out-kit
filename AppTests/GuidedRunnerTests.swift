@@ -273,3 +273,78 @@ final class GuidedHealingTests: XCTestCase {
         r.cancel(); await task.value
     }
 }
+
+@MainActor
+final class ListingGuideTests: XCTestCase {
+    private final class SitePage: GuidedPage {
+        var url: URL? = URL(string: "about:blank")
+        private(set) var loaded: [URL] = []
+        private(set) var filled: [[FieldValue]] = []
+        var webView: WKWebView? { nil }
+        func load(_ u: URL) async { loaded.append(u); url = u }
+        func currentURL() -> URL? { url }
+        func visibleText() async -> String { "A page" }
+        func fill(_ values: [FieldValue]) async -> Int { filled.append(values); return values.count }
+        func blockers() async -> [AssistedBlocker] { [] }
+        func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: true) }
+        func close() {}
+    }
+
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"])
+    private func entry() -> DirectoryEntry {
+        let form = OptOutForm(page: URL(string: "https://www.spokeo.com/optout")!, method: "get", action: nil,
+                              fields: [FormField(type: "url", name: "url", label: "Enter URL here"), FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        let check = SearchCheck(status: .calibrated, searchURL: "https://www.spokeo.com/{first}-{last}", validPage: ["Spokeo"], noResults: nil,
+                                ignoreLocation: nil, calibration: nil, method: nil, body: nil, needsBrowser: nil, candidate: nil, checked: nil)
+        return DirectoryEntry(id: "spokeo_com", domain: "spokeo.com", name: "spokeo.com", bucket: "direct", tier: .A, automation: .guided,
+                              optOutURL: form.page, optOutForm: form, searchCheck: check)
+    }
+
+    func testTheGuideSearchesForThePersonThenFillsTheirPickedListingIntoTheForm() async throws {
+        let e = entry()
+        let search = try XCTUnwrap(e.listingSearchURL(for: pat))
+        let page = SitePage()
+        let sentinel = FormFiller.plan(for: e.optOutForm!, signals: nil, person: pat).values
+        let r = GuidedRunner(plan: GuidedPlanner.listingPlan(for: e, search: search), person: pat, fillValues: sentinel, page: page)
+        r.pollInterval = 0.01
+        let task = Task { await r.run() }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(page.loaded.first, search, "it opened the site's results for this person")
+        XCTAssertEqual(r.flow.index, 0)
+
+        r.next()                                         // still on the results
+        XCTAssertEqual(r.flow.index, 0)
+        XCTAssertTrue(r.status?.contains("first") == true)
+
+        let mine = URL(string: "https://www.spokeo.com/Pat-Example/Chicago-IL/p123")!
+        page.url = mine                                   // the person taps their listing in the browser
+        try await Task.sleep(nanoseconds: 60_000_000)
+        r.next()                                         // "This is my listing"
+        XCTAssertEqual(r.flow.chosenListing, mine)
+        try await Task.sleep(nanoseconds: 400_000_000)
+        XCTAssertEqual(page.loaded.last?.path, "/optout", "then the opt-out page opened")
+        let lastFill = try XCTUnwrap(page.filled.last)
+        XCTAssertEqual(lastFill.first { $0.name == "url" }?.candidates, [mine.absoluteString], "their listing went into the form")
+        XCTAssertEqual(lastFill.first { $0.name == "email" }?.candidates, ["pat@example.com"])
+        r.cancel(); await task.value
+    }
+
+    func testAMinorOrPublicFigureIsNeverSearchedSoThereIsNoListingFlow() {
+        var kid = pat; kid.isMinor = true
+        XCTAssertNil(entry().listingSearchURL(for: kid))
+    }
+
+    func testSpokeoItselfGetsTheListingFlowFromTheShippedData() throws {
+        let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                             defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = try XCTUnwrap(model.selectedPerson)
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
+        model.update(me)
+        let spokeo = try XCTUnwrap(model.brokers.first { $0.id == "spokeo" })
+        XCTAssertEqual(OptOutMethods.classify(spokeo, in: model.directory).method, .semiAutomatic)
+        let runner = try XCTUnwrap(model.guidedRunner(for: spokeo))
+        XCTAssertEqual(runner.flow.plan.steps.first?.title, "Open your own listing")
+        let peopleconnect = try XCTUnwrap(model.brokers.first { $0.id == "peopleconnect" })
+        XCTAssertEqual(model.guidedRunner(for: peopleconnect)?.flow.plan.steps.first?.title, "Open suppression.peopleconnect.us", "other walkthroughs are unchanged")
+    }
+}

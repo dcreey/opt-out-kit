@@ -42,8 +42,8 @@ with the reason; regenerate it with `broker-pipeline --directory directory --met
 | Group | Meaning | Sites (2026-10-21) |
 |---|---|---|
 | Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 82 (83 for an owner who allows "I am this person" boxes) |
-| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you | 3 |
-| Guided, you do the steps | The page is found but needs something only you can do (login, ID, a listing link), or has no readable form, or is a hand-written walkthrough | 104 |
+| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 4 |
+| Guided, you do the steps | The page is found but needs something only you can do (login, ID), or has no readable form, or is a hand-written walkthrough | 103 |
 | Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 25 |
 
 **Measured, not guessed.** A reCAPTCHA or Turnstile script on a page is only a hint: most are invisible. So
@@ -53,6 +53,18 @@ forms had nothing blocking them; one showed a visible reCAPTCHA checkbox (smartb
 "I confirm that I am the person associated with this email" box (searchpeoplefree.com). A site that was never measured with a
 captcha script on the page stays Semi-automated until it is. An invisible check can still appear when a form is sent; the app then
 stops and asks, and that site moves to Semi-automated.
+
+**Listing-based walkthroughs (Spokeo).** Some opt-out forms want the address of the person's own listing on the site. The app
+searches the site for them (never for minors or public figures), the person taps their own result and then "This is my listing"
+(it never guesses which one is theirs), and the app fills in the form with that address and their email. They clear the bot check,
+the app sends it and they confirm the email. Only 3 of the 109 found forms need a listing address (Spokeo, FreePeopleDirectory, which
+sends its removals to Spokeo, and yellowbook.com, which has no name search so stays Guided). Other hand-written walkthroughs stay
+Guided: PeopleConnect needs a login-style email step and phone checks, and FastPeopleSearch's form asks who is submitting and
+requires a legal acknowledgement box.
+
+**One site, several names.** A hand-written flow can clear other sites with `covers:` (Spokeo covers FreePeopleDirectory;
+PeopleConnect covers TruthFinder, Instant Checkmate, Intelius and US Search). Covered sites are not listed separately; they appear
+under the flow that clears them, and a scan that finds a listing on any of them shows one row for the flow.
 
 **"I am this person" boxes.** The account owner (the "Me" profile) can allow the app to tick a plain box that says they are the
 person the request is about (About, "Confirm 'I am this person' boxes for me"; off until they turn it on). It never applies to

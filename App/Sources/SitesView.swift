@@ -186,7 +186,8 @@ struct BrokerInfoView: View {
         let summary = model.household.summary(for: broker)
         List {
             Section {
-                GuideButton(title: "Guide me through it", subtitle: "\(broker.steps.count) steps, in a full-screen browser") {
+                GuideButton(title: "Guide me through it", subtitle: OptOutMethods.classify(broker, in: model.directory).method == .semiAutomatic
+                            ? "We search for you; you tap your listing and clear the check" : "\(broker.steps.count) steps, in a full-screen browser") {
                     guide = model.guidedRunner(for: broker)
                 }
             }
@@ -223,8 +224,10 @@ struct BrokerInfoView: View {
             }
 
             Section("What to expect") {
-                Text(OptOutMethods.classify(broker).method.title).font(.headline)
-                Text(OptOutMethods.classify(broker).method.explanation).font(.footnote)
+                let verdict = OptOutMethods.classify(broker, in: model.directory)
+                Text(verdict.method.title).font(.headline).accessibilityIdentifier("method-title")
+                Text(verdict.reason).font(.footnote)
+                Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
                 ForEach(broker.signals ?? [], id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") }
             }
 
@@ -445,7 +448,7 @@ struct ExposureView: View {
                             ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
                             Text("Checked \(progress.done) of \(progress.total) sites").font(.footnote)
                         }
-                    } else if let results {
+                    } else if let results = results.map(rolledUp) {
                         summary(results)
                         group("Listed", .stillListed, results, color: .red)
                         group("Not found", .removed, results, color: .green)
@@ -468,6 +471,21 @@ struct ExposureView: View {
         }
     }
 
+    /// One row per site as the person knows it: a hand-written flow and the sites it clears (Spokeo and FreePeopleDirectory) are
+    /// one row, listed if any of them is.
+    private func rolledUp(_ results: [ScanResult]) -> [ScanResult] {
+        var out: [ScanResult] = []
+        var index: [String: Int] = [:]
+        let rank: [CheckResult: Int] = [.stillListed: 0, .inconclusive: 1, .removed: 2]
+        for r in results {
+            let key = Directory.owner(of: r.entry, brokers: model.brokers)?.id ?? r.entry.id
+            if let i = index[key] {
+                if rank[r.outcome.result, default: 3] < rank[out[i].outcome.result, default: 3] { out[i] = r }
+            } else { index[key] = out.count; out.append(r) }
+        }
+        return out
+    }
+
     private func summary(_ results: [ScanResult]) -> some View {
         let listed = results.filter { $0.outcome.result == .stillListed }.count
         return Section {
@@ -483,10 +501,11 @@ struct ExposureView: View {
             Section("\(title) (\(rows.count))") {
                 ForEach(rows) { r in
                     NavigationLink {
-                        DirectoryInfoView(entry: r.entry)
+                        if let owner = Directory.owner(of: r.entry, brokers: model.brokers) { BrokerInfoView(broker: owner) }
+                        else { DirectoryInfoView(entry: r.entry) }
                     } label: {
                         VStack(alignment: .leading) {
-                            Text(r.entry.domain)
+                            Text(Directory.owner(of: r.entry, brokers: model.brokers)?.name ?? r.entry.domain)
                             if result == .inconclusive {
                                 Text(reason(r.outcome.reason)).font(.caption).foregroundStyle(color)
                             }

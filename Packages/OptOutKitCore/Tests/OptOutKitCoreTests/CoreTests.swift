@@ -1657,3 +1657,96 @@ final class MeasuredMethodTests: XCTestCase {
         XCTAssertGreaterThan(measured.filter { $0.blockers.isEmpty }.count, measured.count / 2)
     }
 }
+
+
+final class SiteOwnerTests: XCTestCase {
+    private func entry(_ domain: String) -> DirectoryEntry {
+        DirectoryEntry(id: domain.replacingOccurrences(of: ".", with: "_"), domain: domain, name: domain, bucket: "direct", tier: nil, automation: .unknown)
+    }
+
+    func testASiteIsOwnedByItsOwnFlowOrTheOneThatClearsIt() {
+        let spokeo = Broker(id: "spokeo", name: "Spokeo", tier: .A, covers: ["freepeopledirectory.com"], signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil)
+        XCTAssertEqual(Directory.owner(of: entry("spokeo.com"), brokers: [spokeo])?.id, "spokeo")
+        XCTAssertEqual(Directory.owner(of: entry("freepeopledirectory.com"), brokers: [spokeo])?.id, "spokeo")
+        XCTAssertNil(Directory.owner(of: entry("other.com"), brokers: [spokeo]))
+    }
+
+    func testTheShippedSpokeoFlowClearsFreePeopleDirectoryAndNothingIsListedTwice() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let brokers = try Registry.load(directory: root.appendingPathComponent("brokers"))
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        XCTAssertFalse(brokers.contains { $0.id == "freepeopledirectory" }, "folded into Spokeo")
+        XCTAssertEqual(brokers.first { $0.id == "spokeo" }?.covers, ["freepeopledirectory.com"])
+        let listedAsOwn = Directory.unguided(entries, brokers: brokers).map(\.domain)
+        XCTAssertFalse(listedAsOwn.contains("spokeo.com")); XCTAssertFalse(listedAsOwn.contains("freepeopledirectory.com"))
+    }
+}
+
+final class ListingFlowTests: XCTestCase {
+    private let search = URL(string: "https://www.spokeo.com/pat-example")!
+    private func entry(search: Bool = true) -> DirectoryEntry {
+        let form = OptOutForm(page: URL(string: "https://www.spokeo.com/optout")!, method: "get", action: nil,
+                              fields: [FormField(type: "url", name: "url", label: "Enter URL here"), FormField(type: "email", name: "email", label: "Enter email address here")], hops: 1)
+        let check = search ? SearchCheck(status: .calibrated, searchURL: "https://www.spokeo.com/{first}-{last}", validPage: ["Spokeo"], noResults: nil,
+                                         ignoreLocation: nil, calibration: nil, method: nil, body: nil, needsBrowser: nil, candidate: nil, checked: nil) : nil
+        return DirectoryEntry(id: "spokeo_com", domain: "spokeo.com", name: "spokeo.com", bucket: "direct", tier: .A, automation: .guided,
+                              optOutURL: form.page, optOutForm: form, searchCheck: check, signals: ["captcha_recaptcha", "listing_url_input"])
+    }
+    private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")], emails: ["pat@example.com"])
+
+    func testAFormThatNeedsYourListingIsLeftToYouUnlessYouPickedOne() {
+        let form = entry().optOutForm!
+        XCTAssertTrue(FormFiller.needsListing(form))
+        if case .needsYou = FormFiller.plan(for: form, signals: nil, person: pat).verdict {} else { XCTFail() }
+        let listing = URL(string: "https://www.spokeo.com/Pat-Example/Chicago-IL/p123")!
+        let plan = FormFiller.plan(for: form, signals: nil, person: pat, listingURL: listing)
+        XCTAssertEqual(plan.verdict, .ready)
+        XCTAssertEqual(plan.values.first { $0.name == "url" }?.candidates, [listing.absoluteString])
+        XCTAssertEqual(plan.values.first { $0.name == "email" }?.candidates, ["pat@example.com"])
+    }
+
+    func testTheSearchAddressIsBuiltFromTheProfileAndNeverForPeopleWhoMayNotBeSearched() {
+        XCTAssertEqual(entry().listingSearchURL(for: pat)?.absoluteString, "https://www.spokeo.com/Pat-Example")
+        var minor = pat; minor.isMinor = true
+        XCTAssertNil(entry().listingSearchURL(for: minor))
+        var star = pat; star.isPublicFigure = true
+        XCTAssertNil(entry().listingSearchURL(for: star))
+        XCTAssertNil(entry(search: false).listingSearchURL(for: pat))
+    }
+
+    func testThePlanSearchesPicksFillsClearsAndSends() {
+        let plan = GuidedPlanner.listingPlan(for: entry(), search: search)
+        XCTAssertEqual(plan.steps.map(\.title), ["Open your own listing", "Open the opt-out page", "We fill in your details", "Clear the check", "We send it"])
+        XCTAssertEqual(plan.listingFields, ["url"])
+        if case .pickListing = plan.steps[0].action {} else { XCTFail() }
+        XCTAssertNil(plan.steps[0].rule, "never guessed: only the person's tap finishes it")
+    }
+
+    func testOnlyAnExplicitTapOnAPageThatIsNotTheResultsPicksTheListing() {
+        var flow = GuidedFlow(plan: GuidedPlanner.listingPlan(for: entry(), search: search))
+        flow.apply(.pageLoaded(search)); flow.apply(.searchLanded(search))
+        XCTAssertNil(flow.apply(.nextTapped), "still on the results")
+        XCTAssertEqual(flow.index, 0)
+        flow.apply(.url(URL(string: "https://www.spokeo.com/Pat-Example")!))
+        XCTAssertNil(flow.apply(.nextTapped), "same page as the results, different case")
+        flow.apply(.url(URL(string: "https://www.other.com/x")!))
+        XCTAssertNil(flow.apply(.nextTapped), "another site")
+        let mine = URL(string: "https://www.spokeo.com/Pat-Example/Chicago-IL/p123")!
+        flow.apply(.url(mine))
+        XCTAssertNil(flow.apply(.text("anything")), "navigating alone never picks it")
+        XCTAssertEqual(flow.index, 0)
+        XCTAssertEqual(flow.apply(.nextTapped), 0)
+        XCTAssertEqual(flow.chosenListing, mine)
+        XCTAssertEqual(flow.index, 1)
+    }
+
+    func testListingSitesAreSemiAutomatedOnlyWhenTheyCanBeSearched() {
+        XCTAssertEqual(OptOutMethods.classify(entry()).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(search: false)).method, .guided)
+        let spokeo = Broker(id: "spokeo", name: "Spokeo", tier: .A, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil)
+        let other = Broker(id: "peopleconnect", name: "PC", tier: .C, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil)
+        XCTAssertEqual(OptOutMethods.classify(spokeo, in: [entry()]).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(other, in: [entry()]).method, .guided)
+    }
+}

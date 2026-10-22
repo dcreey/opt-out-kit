@@ -6,7 +6,7 @@ anything by this feature, and no real person's details were used.
 ## How sites are grouped
 
 The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (82 sites), **Semi-automated, with
-prompts for you** (3), **Guided, you do the steps** (104, including the hand-written walkthroughs) and **Manual, you find the page** (25).
+prompts for you** (4), **Guided, you do the steps** (103, including the hand-written walkthroughs) and **Manual, you find the page** (25).
 The groups come from a real page load of each form with a made-up profile (nothing sent), not from captcha scripts on the page.
 See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was placed and why.
 

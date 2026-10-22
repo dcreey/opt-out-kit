@@ -1,10 +1,11 @@
 id: spokeo
 name: Spokeo
 tier: A
+covers: [freepeopledirectory.com]   # FreePeopleDirectory is sponsored by Spokeo: its "Do Not Sell My Info" link goes to spokeo.com/privacy/control, so one Spokeo request clears both
 signals: [search_first, email_link]
 fields: [email, full_name]
 steps:
-  - open: https://www.spokeo.com/optout   # dry run 2026-10-20: this is a privacy hub, not the form; the removal flow is probably under /privacy/control/ (unverified)
+  - open: https://www.spokeo.com/optout   # (FreePeopleDirectory's footer link lands in this same flow, verified 2026-10-21)  # dry run 2026-10-20: this is a privacy hub, not the form; the removal flow is probably under /privacy/control/ (unverified)
   - search_match: "Search for yourself and confirm which listing is you. Nothing is sent before this."
   - say: "Paste your listing's URL and enter your email."
   - wait_for_email:

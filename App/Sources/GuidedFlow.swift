@@ -72,7 +72,7 @@ final class GuidedRunner: ObservableObject {
 
     let siteName: String
     private let page: GuidedPage
-    private let fillValues: [FieldValue]
+    private var fillValues: [FieldValue]
     private let person: Person
     private let onStepCompleted: (Int) -> Void
     private let onSent: (AutoOptOutResult) -> Void
@@ -80,6 +80,7 @@ final class GuidedRunner: ObservableObject {
     /// Looks for the site's current opt-out page when the recorded one is gone. Nil means healing is not available.
     private let healer: (() async -> URL?)?
     private var triedHealing = false
+    private var openedSteps = Set<Int>()       // steps whose page the runner has already loaded
     private var lastURL: URL?
     private var filledFor: URL?
     private var started = false
@@ -97,7 +98,17 @@ final class GuidedRunner: ObservableObject {
 
     // The person's buttons
 
-    func next() { apply(.nextTapped); status = nil }
+    func next() {
+        let before = flow.index
+        apply(.nextTapped); status = nil
+        if case .pickListing? = flow.plan.steps.indices.contains(before) ? flow.plan.steps[before].action : nil {
+            if flow.index == before { status = "Open your own listing in the page first, then tap \"This is my listing\"." }
+            else if let listing = flow.chosenListing {
+                // The form's address field now has something to hold: the listing the person picked.
+                fillValues += flow.plan.listingFields.map { FieldValue(name: $0, type: "url", candidates: [listing.absoluteString], label: "") }
+            }
+        }
+    }
     func back() { apply(.backTapped); status = nil }
     func cancel() { finish(.cancelled) }
     func report(_ kind: IssueKind) {
@@ -149,12 +160,14 @@ final class GuidedRunner: ObservableObject {
     func run() async {
         guard !started else { return }
         started = true
-        if case .openPage(let url)? = flow.current?.action { await page.load(url) }
+        if case .openPage(let url)? = flow.current?.action { await page.load(url); openedSteps.insert(flow.current!.id) }
+        else if case .pickListing(let search)? = flow.current?.action { await page.load(search) }
         else if let url = firstURL { await page.load(url) }
         webView = page.webView
         lastURL = page.currentURL()
         if healer != nil, await looksBroken() { _ = await healAndReload() }      // heal a moved link before the person sees an error
         else { apply(.pageLoaded(lastURL)) }
+        if case .pickListing? = flow.current?.action { apply(.searchLanded(page.currentURL())) }     // this address is not a listing
         while ending == nil, !flow.isFinished {
             try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
             guard ending == nil else { break }
@@ -176,6 +189,12 @@ final class GuidedRunner: ObservableObject {
         guard flow.current?.id == step.id else { return }
 
         switch step.action {
+        case .openPage(let target):
+            // A later step that opens a page (the opt-out form after the person picked their listing) is opened for them.
+            if !openedSteps.contains(step.id) {
+                openedSteps.insert(step.id)
+                if page.currentURL()?.absoluteString != target.absoluteString { await page.load(target); lastURL = page.currentURL(); filledFor = nil; apply(.pageLoaded(lastURL)) }
+            }
         case .autofill:
             if filledFor != url {
                 if await page.fill(fillValues) > 0 { filledFor = url; status = "Your details are filled in."; apply(.formFilled) }
@@ -251,6 +270,10 @@ struct GuidedFlowView: View {
 /// The bottom quarter: the step, how far along, and the person's controls.
 struct GuidedPanel: View {
     @ObservedObject var runner: GuidedRunner
+    private var nextTitle: String {
+        if case .pickListing? = runner.flow.current?.action { return "This is my listing" }
+        return runner.flow.index + 1 >= runner.flow.total ? "Finish" : "Next step"
+    }
     /// Keeps the buttons clear of the home indicator while the panel itself still reaches the bottom edge.
     var bottomInset: CGFloat = 0
 
@@ -286,7 +309,7 @@ struct GuidedPanel: View {
                         .buttonStyle(.bordered).accessibilityIdentifier("guided-copy")
                 }
                 Spacer()
-                Button(runner.flow.index + 1 >= runner.flow.total ? "Finish" : "Next step") { runner.next() }
+                Button(nextTitle) { runner.next() }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("guided-next")
             }
         }
