@@ -300,6 +300,29 @@
     }
    }
   },
+  "%@ sends your deletion request to every broker registered in %@. Do this first: it handles these sites in one go.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ envoie votre demande de suppression à chaque courtier enregistré : %@. Commencez par là : cela couvre ces sites d’un coup."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ envía tu solicitud de eliminación a cada intermediario registrado en %@. Empieza por aquí: cubre estos sitios de una vez."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ sendet Ihre Löschanfrage an jeden in %@ registrierten Datenhändler. Beginnen Sie hier: Das erledigt diese Seiten auf einmal."
+     }
+    }
+   }
+  },
   "%@'s privacy law, the %@ (in effect since %@), gives residents the right to delete their data and to opt out of its sale.": {
    "extractionState": "manual",
    "localizations": {
@@ -2485,6 +2508,29 @@
     }
    }
   },
+  "Let the app do these for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Laisser l’app s’en occuper"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Deja que la app lo haga por ti"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die App erledigt diese für Sie"
+     }
+    }
+   }
+  },
   "Listed again": {
    "extractionState": "manual",
    "localizations": {
@@ -3539,6 +3585,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Oklahoma"
+     }
+    }
+   }
+  },
+  "One free request to %@ reaches all of these.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande gratuite à %@ les couvre tous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud gratuita a %@ los cubre todos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine kostenlose Anfrage an %@ erreicht sie alle."
+     }
+    }
+   }
+  },
+  "One opt-out request handles all %@ sites that share this process.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande d’opposition couvre les %@ sites qui partagent ce processus."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud de baja cubre los %@ sitios que comparten este proceso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine einzige Opt-out-Anfrage erledigt alle %@ Seiten, die diesen Ablauf teilen."
+     }
+    }
+   }
+  },
+  "One run fills in and sends all %@ opt-out forms. You only handle a check or an email link if a site asks.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule exécution remplit et envoie les %@ formulaires. Vous ne gérez une vérification ou un lien e-mail que si un site le demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola ejecución rellena y envía los %@ formularios. Solo atiendes una verificación o un enlace de correo si un sitio lo pide."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Durchlauf füllt alle %@ Formulare aus und sendet sie. Sie kümmern sich nur um eine Prüfung oder einen E-Mail-Link, wenn eine Seite das verlangt."
      }
     }
    }

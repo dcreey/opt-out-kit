@@ -62,6 +62,48 @@ struct SitesView: View {
         NavigationStack {
             List {
                 Section {
+                    HStack {
+                        Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                        TextField("Search all sites by name or web address", text: $search)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled()
+                            .accessibilityIdentifier("sites-search")
+                        if !search.isEmpty { Button { search = "" } label: { Image(systemName: "xmark.circle.fill") }.buttonStyle(.plain).foregroundStyle(.secondary) }
+                    }
+                    Picker("Filter", selection: $filter) {
+                        ForEach(Filter.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("sites-filter")
+                    PlaceScopePicker()
+                } footer: {
+                    Text("Tracking \(model.totalSites) sites. Each is listed once, in the first step below that handles it. A request that handles several sites is one task that names them all.")
+                        .accessibilityIdentifier("sites-total")
+                }
+                let steps = model.plan
+                let places = model.placeCodes(for: model.placeScope)
+                ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                    let tasks = PlaceSort.ordered(step.tasks.filter { visible($0) }, places: places)
+                    if !tasks.isEmpty {
+                        Section {
+                            ForEach(tasks) { task in
+                                NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("task-\(task.id)")
+                            }
+                        } header: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Step \(index + 1): \(step.title)").font(.subheadline.bold()).textCase(nil)
+                                    .accessibilityIdentifier("step-\(step.id)")
+                                Text(tasks.count == step.tasks.count ? stepSummary(step) : Loc.f("Showing %lld of %lld tasks", tasks.count, step.tasks.count))
+                                    .font(.caption).textCase(nil)
+                            }
+                        } footer: {
+                            Text(step.explanation)
+                        }
+                    }
+                }
+                if !search.isEmpty, !steps.contains(where: { $0.tasks.contains { visible($0) } }) {
+                    Section { Text("No site matches that search.").foregroundStyle(.secondary) }
+                }
+                Section {
                     scoreCard
                     Button { showQuick = true } label: {
                         Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
@@ -84,64 +126,10 @@ struct SitesView: View {
                 } footer: {
                     Text("Searches \(ExposureScan.scannable(model.directory).count) sites that can be checked automatically. Nothing is submitted.")
                 }
-                Section {
-                    Text("Tracking \(model.totalSites) sites. Each is listed once, in the first group below that handles it.")
-                        .font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("sites-total")
-                    Picker("Filter", selection: $filter) {
-                        ForEach(Filter.allCases) { Text($0.title).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityIdentifier("sites-filter")
-                }
-                // Groups run in order: official platform requests, then ours (automatic, semi-automated, guided, manual). A site is in the first one only.
-                ForEach(model.platformGroups) { group in
-                    let flows = group.brokers.filter { matches($0) }
-                    let entries = group.entries.filter { search.isEmpty || $0.domain.lowercased().contains(search.lowercased()) }
-                    if !flows.isEmpty || !entries.isEmpty {
-                        Section {
-                            ForEach(flows) { broker in
-                                NavigationLink(value: broker) { row(broker) }.accessibilityIdentifier("site-\(broker.id)")
-                            }
-                            ForEach(entries) { entry in
-                                NavigationLink(value: entry) { directoryRow(entry) }.accessibilityIdentifier("dir-\(entry.id)")
-                            }
-                        } header: {
-                            Text("Handled by \(group.platform.shortName) (\(flows.count + entries.count) sites)")
-                                .accessibilityIdentifier("platform-group-\(group.platform.id)")
-                        } footer: {
-                            Text("One \(group.platform.shortName) request reaches these, so they are not separate work. Tap one to see its details.")
-                        }
-                    }
-                }
-                ForEach(OptOutMethod.allCases, id: \.self) { method in
-                    let entries = shownDirectory(method)
-                    let brokers = shown.filter { model.method(for: $0) == method }
-                    if !entries.isEmpty || !brokers.isEmpty {
-                        Section {
-                            ForEach(brokers) { broker in
-                                NavigationLink(value: broker) { row(broker) }
-                                    .accessibilityIdentifier("site-\(broker.id)")
-                            }
-                            if filter != .done {
-                                ForEach(entries) { entry in
-                                    NavigationLink(value: entry) { directoryRow(entry) }
-                                        .accessibilityIdentifier("dir-\(entry.id)")
-                                }
-                            }
-                        } header: {
-                            Text("\(method.title) (\(brokers.count + (filter == .done ? 0 : entries.count)) sites)")
-                                .accessibilityIdentifier("method-\(method.rawValue)")
-                        } footer: {
-                            Text(method.explanation)
-                        }
-                    }
-                }
             }
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
-            .searchable(text: $search, prompt: Loc.t("Search by name or web address"))
-            .navigationDestination(for: Broker.self) { BrokerInfoView(broker: $0) }
-            .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
+            .planDestinations()
             .sheet(isPresented: $showScan) { ExposureView() }
             .sheet(isPresented: $showQuick) { QuickCheckView() }
         }
@@ -163,6 +151,18 @@ struct SitesView: View {
                 Text("Top level").font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+
+    /// Whether a task passes the search and the to-do filter. A shared task matches on any site it handles.
+    private func visible(_ task: PlanTask) -> Bool {
+        switch filter {
+        case .all: break
+        case .todo: if model.isDone(task) { return false }
+        case .done: if !model.isDone(task) { return false }
+        }
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !q.isEmpty else { return true }
+        return task.title.lowercased().contains(q) || task.domains.contains { $0.lowercased().contains(q) }
     }
 
     private func shownDirectory(_ method: OptOutMethod) -> [DirectoryEntry] {
@@ -397,6 +397,8 @@ struct BrokerInfoView: View {
 struct DirectoryInfoView: View {
     @EnvironmentObject var model: AppModel
     let entry: DirectoryEntry
+    /// Other sites the same request handles, when this site is the lead of a shared process.
+    var alsoHandles: [String] = []
     @State private var browserURL: URL?
     @State private var guide: GuidedRunner?
     @State private var healing = false
@@ -416,6 +418,11 @@ struct DirectoryInfoView: View {
                 GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
                     guide = model.guidedRunner(for: entry)
                 }
+            }
+            if !alsoHandles.isEmpty {
+                Section {
+                    ForEach(alsoHandles, id: \.self) { Text($0) }
+                } header: { Text("This one request also handles \(alsoHandles.count) sites") }
             }
             if let issue = model.activeIssue(for: entry.id) {
                 Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")

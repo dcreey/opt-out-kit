@@ -31,36 +31,24 @@ struct BrokerListView: View {
                         Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
                     }
                 }
+                let steps = model.plan
+                let tasks = steps.flatMap(\.tasks)
+                let done = tasks.filter { model.isDone($0) }.count
                 Section {
-                    ProgressView(value: model.progress.completion(in: model.queueBrokers)) {
-                        Text("Finished \(Int(model.progress.completion(in: model.queueBrokers) * 100))%")
+                    ProgressView(value: tasks.isEmpty ? 0 : Double(done) / Double(tasks.count)) {
+                        Text("Finished \(tasks.isEmpty ? 0 : done * 100 / tasks.count)%")
                     }
                     .accessibilityIdentifier("completion")
-                }
-                if !model.platformQueue.isEmpty {
-                    Section {
-                        ForEach(model.platformQueue) { broker in
-                            NavigationLink(value: broker) { platformRow(broker) }
-                                .accessibilityIdentifier("platform-\(broker.id)")
-                        }
-                    } header: {
-                        Text("One request for many sites")
-                    } footer: {
-                        Text("A free state service that sends your deletion request to every broker registered there. Doing it first saves doing many of the sites below by hand.")
-                    }
+                } footer: {
+                    Text("\(steps.reduce(0) { $0 + $1.siteCount }) sites, handled in \(steps.count) steps and \(tasks.count) tasks. Work from the top: each step is the quickest way to cover the most sites.")
                 }
                 Section {
-                    ForEach(model.queueBrokers) { broker in
-                        NavigationLink(value: broker) { row(broker) }
-                            .accessibilityIdentifier("broker-\(broker.id)")
+                    ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                        NavigationLink(value: step.id) { PlanStepHeader(number: index + 1, step: step) }
+                            .accessibilityIdentifier(step.id)
                     }
                 } header: {
-                    Text("Your queue")
-                } footer: {
-                    if let handled = model.platformGroups.first, handled.brokers.count > 0 {
-                        Text("\(handled.brokers.count) more are handled by \(handled.platform.shortName), so they are not listed here again. See the Sites tab.")
-                            .accessibilityIdentifier("queue-handled-note")
-                    }
+                    Text("Your plan")
                 }
             }
             .accessibilityIdentifier("broker-list")
@@ -111,6 +99,7 @@ struct BrokerListView: View {
             }
             .sheet(isPresented: $showAuto) { AutoProtectionView() }
             .navigationDestination(for: Broker.self) { BrokerDetailView(broker: $0) }
+            .planDestinations()
         }
     }
 

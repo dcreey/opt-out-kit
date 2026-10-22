@@ -2124,3 +2124,66 @@ final class LawSourcesAndPendingTests: XCTestCase {
         } }
     }
 }
+
+final class PlanTests: XCTestCase {
+    private var root: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+    private func plan(withPlatforms: Bool) throws -> (steps: [PlanStep], entries: [DirectoryEntry]) {
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let brokers = try Registry.load(directory: root.appendingPathComponent("brokers"))
+        let platforms = withPlatforms ? try PlatformLoader.load(directory: root.appendingPathComponent("platforms")).filter(\.live) : []
+        let steps = OptOutPlan.build(entries: entries, brokers: brokers, platforms: platforms,
+                                     classifyEntry: { OptOutMethods.classify($0) }, classifyBroker: { OptOutMethods.classify($0, in: entries) })
+        return (steps, entries)
+    }
+
+    func testEverySiteIsInExactlyOneStepAndNoneIsMissing() throws {
+        for withPlatforms in [true, false] {
+            let (steps, entries) = try plan(withPlatforms: withPlatforms)
+            let all = steps.flatMap { $0.tasks.flatMap(\.domains) }
+            XCTAssertEqual(all.count, Set(all).count, "a site is listed twice (platforms: \(withPlatforms))")
+            let missing = Set(entries.map(\.domain)).subtracting(all)
+            XCTAssertEqual(missing.sorted(), [], "platforms: \(withPlatforms)")
+        }
+    }
+
+    func testStepsRunInPriorityOrderWithTheOfficialServiceFirst() throws {
+        let (steps, _) = try plan(withPlatforms: true)
+        XCTAssertEqual(steps.first?.kind, .platform("ca-drop"))
+        let methods = steps.compactMap { s -> OptOutMethod? in if case .method(let m) = s.kind { return m } else { return nil } }
+        XCTAssertEqual(methods, OptOutMethod.allCases.filter { methods.contains($0) }, "automatic, semi-automated, guided, manual")
+        XCTAssertGreaterThan(steps[0].siteCount, 500, "DROP handles hundreds of sites in one task")
+        XCTAssertEqual(steps[0].tasks.count, 1)
+    }
+
+    func testAutomaticOptOutIsOneTaskAndSitesSharingAFormAreOneTask() throws {
+        let (steps, entries) = try plan(withPlatforms: false)
+        let auto = try XCTUnwrap(steps.first { $0.kind == .method(.automatic) })
+        XCTAssertEqual(auto.tasks.count, 1)
+        XCTAssertEqual(auto.tasks[0].kind, .automatic)
+        XCTAssertGreaterThan(auto.siteCount, 50)
+        let tasks = steps.flatMap(\.tasks)
+        for key in [\DirectoryEntry.template, \DirectoryEntry.family] as [KeyPath<DirectoryEntry, String?>] {
+            for (k, members) in Dictionary(grouping: entries.filter { $0[keyPath: key] != nil }, by: { $0[keyPath: key]! }) where members.count > 1 {
+                let holding = Set(members.compactMap { m in tasks.first { $0.domains.contains(m.domain) }?.id })
+                XCTAssertEqual(holding.count, 1, "\(k) is split across tasks: \(holding)")
+            }
+        }
+        for (u, members) in Dictionary(grouping: entries.filter { $0.optOutURL != nil }, by: { $0.optOutURL!.absoluteString }) where members.count > 1 {
+            let holding = Set(members.compactMap { m in tasks.first { $0.domains.contains(m.domain) }?.id })
+            XCTAssertEqual(holding.count, 1, "\(u) is split across tasks")
+        }
+    }
+
+    func testSitesSharingOneRequestAreOneTaskThatNamesThemAll() throws {
+        let (steps, _) = try plan(withPlatforms: false)
+        let tasks = steps.flatMap(\.tasks)
+        let spokeo = try XCTUnwrap(tasks.first { $0.kind == .flow("spokeo") })
+        XCTAssertTrue(spokeo.domains.contains("freepeopledirectory.com"))
+        XCTAssertTrue(spokeo.isShared)
+        XCTAssertEqual(tasks.filter { $0.domains.contains("freepeopledirectory.com") }.count, 1)
+        XCTAssertLessThan(tasks.count, steps.reduce(0) { $0 + $1.siteCount }, "fewer tasks than sites")
+    }
+}

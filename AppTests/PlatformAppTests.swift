@@ -124,8 +124,35 @@ final class HandledOnceTests: XCTestCase {
             let reachable = Set(seen).union(m.brokers.flatMap { $0.covers ?? [] })
             let all = Set(m.directory.map(\.domain))
             XCTAssertEqual(all.subtracting(reachable).sorted(), [], "\(state): in the directory but neither listed nor cleared by a listed site")
-            XCTAssertEqual(m.totalSites, m.directory.count)
+            XCTAssertGreaterThanOrEqual(m.totalSites, m.directory.count, "the count includes sites a shared request clears that have no page of their own")
         }
+    }
+
+    func testThePlanLeadsWithTheOfficialServiceThenOurOwnStepsAndListsEachSiteOnce() {
+        let (m, _) = model(state: "CA")
+        let steps = m.plan
+        XCTAssertEqual(steps.first?.kind, .platform("ca-drop"))
+        XCTAssertGreaterThan(steps[0].siteCount, 500)
+        let domains = steps.flatMap { $0.tasks.flatMap(\.domains) }
+        XCTAssertEqual(domains.count, Set(domains).count)
+        XCTAssertEqual(Set(domains).isSuperset(of: Set(m.directory.map(\.domain))), true)
+        let (il, _) = model(state: "IL")
+        if case .method = il.plan.first?.kind {} else { XCTFail("someone outside California starts with our own steps") }
+    }
+
+    func testThePlaceChoiceOnlyReordersAndMarks() {
+        let (m, _) = model(state: "TX")
+        m.placeScope = .all
+        XCTAssertTrue(m.placeCodes(for: .all).isEmpty)
+        XCTAssertEqual(m.placeCodes(for: .mine), ["TX"])
+        var me = m.people.first { $0.relationship == .me }!
+        me.addresses.append(Address(street: nil, city: "Portland", state: "OR"))
+        m.update(me)
+        XCTAssertEqual(m.placeCodes(for: .visited), ["TX", "OR"])
+        let tasks = m.plan.flatMap(\.tasks)
+        let ordered = PlaceSort.ordered(tasks, places: ["TX"])
+        XCTAssertEqual(ordered.count, tasks.count, "nothing is hidden")
+        XCTAssertTrue(ordered.first?.isRegistered(in: ["TX"]) ?? false)
     }
 
     func testNothingIsGroupedForSomeoneWhoCannotUseThePlatform() {

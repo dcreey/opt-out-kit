@@ -60,6 +60,8 @@ struct AutoProtectionView: View {
 struct AutoActivityView: View {
     @EnvironmentObject var model: AppModel
     @State private var runner: AssistedRunner?
+    /// The sites a plan task says this run handles, listed at the bottom when it is opened from the plan.
+    var handles: [String] = []
 
     private var rows: [AppModel.AutoOptOutRow] { model.selectedPerson.flatMap { model.optOutRun[$0.id] } ?? [] }
 
@@ -96,6 +98,11 @@ struct AutoActivityView: View {
                     group(Loc.t("Ready (preview only)"), rows.filter { $0.result == .dryRunReady }, tint: .blue)
                     group(Loc.t("Skipped or sent recently"), rows.filter { switch $0.result { case .skippedNotListed, .tooSoon: return true; default: return false } }, tint: .secondary)
                     group(Loc.t("The site refused or showed no confirmation"), rows.filter { switch $0.result { case .rejected, .failed: return true; default: return false } }, tint: .red)
+                }
+            }
+            if !handles.isEmpty {
+                Section("Sites in this run (\(handles.count))") {
+                    ForEach(handles, id: \.self) { Text($0).font(.footnote) }
                 }
             }
         }

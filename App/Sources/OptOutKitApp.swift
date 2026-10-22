@@ -244,7 +244,51 @@ final class AppModel: ObservableObject {
     }
 
     /// Every site we track, each shown once in the Sites list (some as part of another site's request).
-    var totalSites: Int { directory.count }
+    var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count }
+
+    // MARK: The plan
+
+    /// Which places' brokers to put first. Nothing is ever hidden: someone who lives here may still be listed by a broker registered
+    /// elsewhere, or have lived or travelled elsewhere.
+    enum PlaceScope: String, CaseIterable, Identifiable {
+        case all, mine, visited
+        var id: String { rawValue }
+    }
+    private static let placeKey = "placeScope"
+    var placeScope: PlaceScope {
+        get { PlaceScope(rawValue: defaults.string(forKey: Self.placeKey) ?? "") ?? .all }
+        set { objectWillChange.send(); defaults.set(newValue.rawValue, forKey: Self.placeKey) }
+    }
+
+    /// Two-letter codes of the US states the scope names for the selected person: where they live, or also where they have lived.
+    func placeCodes(for scope: PlaceScope) -> Set<String> {
+        guard scope != .all else { return [] }
+        var out = Set<String>()
+        if let code = ownerStateCode { out.insert(code) }
+        if scope == .visited, let person = selectedPerson {
+            for a in person.addresses { if let c = USStates.code(for: a.state) ?? (a.state.count == 2 ? a.state.uppercased() : nil) { out.insert(c) } }
+        }
+        return out
+    }
+
+    /// The ordered steps for the selected person: their official removal service first, then ours, each site once.
+    var plan: [PlanStep] {
+        let eligible: [Platform] = selectedPerson.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
+        return OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
+                                classifyEntry: { method(for: $0) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
+    }
+
+    /// Whether the selected person has already done what this task asks.
+    func isDone(_ task: PlanTask) -> Bool {
+        switch task.kind {
+        case .platform(let id): return progress.isDone(id)
+        case .flow(let id): return brokers.first { $0.id == id }.map { household.summary(for: $0).isFinished } ?? false
+        case .site(let id): return progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false
+        case .automatic:
+            let byDomain = Dictionary(directory.map { ($0.domain, $0.id) }, uniquingKeysWith: { a, _ in a })
+            return !task.domains.isEmpty && task.domains.allSatisfy { d in byDomain[d].map { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false } ?? true }
+        }
+    }
 
     /// The hand-written flows that are real work for the selected person: not the ones a platform request already handles.
     var queueBrokers: [Broker] { brokers.filter { !isHandledByPlatform($0) } }

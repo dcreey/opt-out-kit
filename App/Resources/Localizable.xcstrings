@@ -415,6 +415,29 @@
     }
    }
   },
+  "%@ sends your deletion request to every broker registered in %@. Do this first: it handles these sites in one go.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ envoie votre demande de suppression à chaque courtier enregistré : %@. Commencez par là : cela couvre ces sites d’un coup."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ envía tu solicitud de eliminación a cada intermediario registrado en %@. Empieza por aquí: cubre estos sitios de una vez."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ sendet Ihre Löschanfrage an jeden in %@ registrierten Datenhändler. Beginnen Sie hier: Das erledigt diese Seiten auf einmal."
+     }
+    }
+   }
+  },
   "%@ · %lld paragraphs · list %lld": {
    "extractionState": "manual",
    "localizations": {
@@ -507,6 +530,29 @@
     }
    }
   },
+  "%lld of %lld done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sur %lld terminés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld de %lld hechos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld erledigt"
+     }
+    }
+   }
+  },
   "%lld points to the next level": {
    "extractionState": "manual",
    "localizations": {
@@ -553,6 +599,52 @@
     }
    }
   },
+  "%lld sites in %lld tasks": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites en %lld tâches"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios en %lld tareas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten in %lld Aufgaben"
+     }
+    }
+   }
+  },
+  "%lld sites in one run": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites en une seule exécution"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios en una sola ejecución"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten in einem Durchlauf"
+     }
+    }
+   }
+  },
   "%lld sites send their opt-outs to %@, so one request may clear them all. Not yet confirmed by a real run.": {
    "extractionState": "manual",
    "localizations": {
@@ -572,6 +664,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld Websites leiten ihre Opt-out-Anträge an %@ weiter, ein einziger Antrag kann also alle abdecken. Noch nicht durch einen echten Durchlauf bestätigt."
+     }
+    }
+   }
+  },
+  "%lld sites, handled in %lld steps and %lld tasks. Work from the top: each step is the quickest way to cover the most sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites, traités en %lld étapes et %lld tâches. Avancez de haut en bas : chaque étape est le moyen le plus rapide de couvrir le plus de sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios, en %lld pasos y %lld tareas. Trabaja de arriba abajo: cada paso es la forma más rápida de cubrir más sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten, in %lld Schritten und %lld Aufgaben. Arbeiten Sie von oben nach unten: Jeder Schritt deckt am schnellsten die meisten Seiten ab."
+     }
+    }
+   }
+  },
+  "%lld sites, one at a time": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites, un par un"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios, uno por uno"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten, eine nach der anderen"
      }
     }
    }
@@ -3865,6 +4003,29 @@
     }
    }
   },
+  "Every site stays on the list. This only moves brokers registered where you live, or have lived, to the top and marks them, because a broker anywhere may still list you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les sites restent dans la liste. Cela place seulement en haut, en les signalant, les courtiers enregistrés là où vous vivez ou avez vécu, car un courtier n’importe où peut vous lister."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todos los sitios siguen en la lista. Esto solo sube y marca los intermediarios registrados donde vives o has vivido, porque cualquier intermediario puede listarte."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten bleiben in der Liste. Das rückt nur Datenhändler nach oben und markiert sie, die dort registriert sind, wo Sie wohnen oder gewohnt haben, denn jeder Händler irgendwo kann Sie führen."
+     }
+    }
+   }
+  },
   "Every week, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.": {
    "extractionState": "manual",
    "localizations": {
@@ -3884,6 +4045,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jede Woche sendet sie Opt-out-Anfragen. Auf jeder Website, auf der wir das Opt-out-Formular gefunden haben, füllt sie es nur mit dem aus, was es verlangt (etwa Name, E-Mail und Stadt), und sendet es ab. Zeigt eine aktuelle Prüfung, dass Sie dort nicht gelistet sind, sendet sie nichts."
+     }
+    }
+   }
+  },
+  "Everywhere": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Partout"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En todas partes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Überall"
      }
     }
    }
@@ -6947,6 +7131,29 @@
     }
    }
   },
+  "No site matches that search.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun site ne correspond à cette recherche."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ningún sitio coincide con esa búsqueda."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine Seite passt zu dieser Suche."
+     }
+    }
+   }
+  },
   "None of the %lld terms paragraphs we have collected has been reviewed by a person yet, so nothing can be accepted for you. Sites that need terms accepted stay in your hands.": {
    "extractionState": "manual",
    "localizations": {
@@ -7545,6 +7752,52 @@
     }
    }
   },
+  "One free request to %@ reaches all of these.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande gratuite à %@ les couvre tous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud gratuita a %@ los cubre todos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine kostenlose Anfrage an %@ erreicht sie alle."
+     }
+    }
+   }
+  },
+  "One opt-out request handles all %@ sites that share this process.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande d’opposition couvre les %@ sites qui partagent ce processus."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud de baja cubre los %@ sitios que comparten este proceso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine einzige Opt-out-Anfrage erledigt alle %@ Seiten, die diesen Ablauf teilen."
+     }
+    }
+   }
+  },
   "One request clears %lld sites": {
    "extractionState": "manual",
    "localizations": {
@@ -7587,6 +7840,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein Antrag für viele Websites"
+     }
+    }
+   }
+  },
+  "One request handles %lld sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une demande couvre %lld sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una solicitud cubre %lld sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Anfrage erledigt %lld Seiten"
      }
     }
    }
@@ -8488,6 +8764,29 @@
     }
    }
   },
+  "Places I've lived": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lieux où j’ai vécu"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lugares donde he vivido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Orte, an denen ich gewohnt habe"
+     }
+    }
+   }
+  },
   "Preview: fill the forms, send nothing": {
    "extractionState": "manual",
    "localizations": {
@@ -8902,6 +9201,29 @@
     }
    }
   },
+  "Registered in %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enregistré : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Registrado en %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Registriert in %@"
+     }
+    }
+   }
+  },
   "Relationship": {
    "extractionState": "manual",
    "localizations": {
@@ -9243,6 +9565,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Scrollen Sie nach unten, um fortzufahren."
+     }
+    }
+   }
+  },
+  "Search all sites by name or web address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechercher tous les sites par nom ou adresse web"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscar en todos los sitios por nombre o dirección web"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten nach Name oder Webadresse durchsuchen"
      }
     }
    }
@@ -9822,6 +10167,52 @@
     }
    }
   },
+  "Show first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Afficher d’abord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrar primero"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuerst zeigen"
+     }
+    }
+   }
+  },
+  "Showing %lld of %lld tasks": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld tâches affichées sur %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrando %lld de %lld tareas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld Aufgaben angezeigt"
+     }
+    }
+   }
+  },
   "Shows a bot check before anything else": {
    "extractionState": "manual",
    "localizations": {
@@ -9956,6 +10347,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites finden und entfernen Einträge anhand von rechtlichem Namen und Adresse, daher braucht jedes Profil beides. Gesendet werden nur die Felder, die das Formular einer Website verlangt."
+     }
+    }
+   }
+  },
+  "Sites in this run (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites de cette exécution (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios de esta ejecución (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seiten in diesem Durchlauf (%lld)"
      }
     }
    }
@@ -10531,6 +10945,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Schritt %lld von %lld"
+     }
+    }
+   }
+  },
+  "Step %lld: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape %lld : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso %lld: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt %lld: %@"
      }
     }
    }
@@ -12076,6 +12513,29 @@
     }
    }
   },
+  "This one request also handles %lld sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette demande couvre aussi %lld sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta solicitud también cubre %lld sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese eine Anfrage erledigt auch %lld Seiten"
+     }
+    }
+   }
+  },
   "This searches each site for %@ the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.": {
    "extractionState": "manual",
    "localizations": {
@@ -12279,6 +12739,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir verfolgen %lld Seiten. Jede steht nur einmal, in der ersten Gruppe unten, die sie übernimmt."
+     }
+    }
+   }
+  },
+  "Tracking %lld sites. Each is listed once, in the first step below that handles it. A request that handles several sites is one task that names them all.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous suivons %lld sites. Chacun apparaît une fois, dans la première étape ci-dessous qui le couvre. Une demande qui couvre plusieurs sites forme une seule tâche qui les nomme tous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seguimos %lld sitios. Cada uno aparece una vez, en el primer paso de abajo que lo cubre. Una solicitud que cubre varios sitios es una sola tarea que los nombra a todos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir verfolgen %lld Seiten. Jede steht einmal, im ersten Schritt unten, der sie erledigt. Eine Anfrage für mehrere Seiten ist eine Aufgabe, die alle nennt."
      }
     }
    }
@@ -13548,6 +14031,29 @@
     }
    }
   },
+  "Where I live": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Où j’habite"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Donde vivo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wo ich wohne"
+     }
+    }
+   }
+  },
   "Where do you live?": {
    "extractionState": "manual",
    "localizations": {
@@ -14464,6 +14970,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihr Ort: %@"
+     }
+    }
+   }
+  },
+  "Your plan": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre plan"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu plan"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Plan"
      }
     }
    }
