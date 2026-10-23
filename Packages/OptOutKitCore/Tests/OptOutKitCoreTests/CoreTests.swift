@@ -2406,12 +2406,17 @@ final class EmailBatchTests: XCTestCase {
         XCTAssertEqual(mail.method, .semiAutomatic)
         XCTAssertEqual(tasks.filter { $0.kind == .emails }.count, 1)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count, "still listed once")
-        let batches = EmailBatch.build(entries: entries.filter { mail.domains.contains($0.domain) })
-        XCTAssertLessThan(batches.count, mail.siteCount, "sites sharing an address share a message")
-        XCTAssertEqual(batches.flatMap(\.domains).count, mail.siteCount)
-        let court = try XCTUnwrap(batches.first { $0.domains.count > 1 }, "some address handles several sites")
-        let body = court.body(name: "Pat Example", email: "pat+optoutkit@gmail.com", address: "1 Main St, Springfield, IL 62701")
-        XCTAssertTrue(body.contains("Pat Example") && body.contains("pat+optoutkit@gmail.com") && body.contains(court.domains[0]))
+        let mine = entries.filter { mail.domains.contains($0.domain) }
+        let single = EmailBatch.single(entries: mine)
+        XCTAssertEqual(single.count, 1, "one message for everything")
+        XCTAssertEqual(single[0].domains.count, mail.siteCount)
+        XCTAssertEqual(single[0].addresses.count, Set(single[0].addresses).count, "each address once")
+        XCTAssertGreaterThan(single[0].addresses.count, 20)
+        XCTAssertEqual(EmailBatch.single(entries: mine, maxRecipients: 10).count, Int((Double(single[0].addresses.count) / 10).rounded(.up)), "a limit splits it")
+        XCTAssertEqual(EmailBatch.single(entries: mine, maxRecipients: 10).flatMap(\.domains).count, mail.siteCount)
+        let body = single[0].body(name: "Pat Example", email: "pat+optoutkit@gmail.com", address: "1 Main St, Springfield, IL 62701")
+        XCTAssertTrue(body.contains("Pat Example") && body.contains("pat+optoutkit@gmail.com") && body.contains(single[0].domains[0]))
+        XCTAssertTrue(body.hasPrefix("Dear Privacy Team"))
     }
 }
 

@@ -601,8 +601,17 @@ final class AppModel: ObservableObject {
     }
 
     func mailtoURL(for batch: EmailBatch) -> URL? {
-        var c = URLComponents(); c.scheme = "mailto"; c.path = batch.address
-        c.queryItems = [URLQueryItem(name: "subject", value: batch.subject), URLQueryItem(name: "body", value: emailBody(for: batch))]
+        var c = URLComponents(); c.scheme = "mailto"; c.path = formEmail ?? ""
+        c.queryItems = [URLQueryItem(name: "bcc", value: batch.addresses.joined(separator: ",")), URLQueryItem(name: "subject", value: batch.subject),
+                        URLQueryItem(name: "body", value: emailBody(for: batch))]
+        return c.url
+    }
+
+    /// The Gmail app's own compose link, prefilled the same way.
+    func gmailURL(for batch: EmailBatch) -> URL? {
+        var c = URLComponents(); c.scheme = "googlegmail"; c.host = ""; c.path = "/co"
+        c.queryItems = [URLQueryItem(name: "to", value: formEmail ?? ""), URLQueryItem(name: "bcc", value: batch.addresses.joined(separator: ",")),
+                        URLQueryItem(name: "subject", value: batch.subject), URLQueryItem(name: "body", value: emailBody(for: batch))]
         return c.url
     }
 

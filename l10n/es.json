@@ -771,5 +771,18 @@
  "Start (%lld pages)": "Empezar (%lld páginas)",
  "Tap to verify": "Toca para verificar",
  "Tap to verify, we do the rest": "Toca para verificar, nosotros hacemos el resto",
- "These %lld sites are filled in for you. Each shows a \"verify you are human\" box that only a person can tick. The next page loads while you tick the current one, so it is one tap per site.": "Estos %lld sitios se rellenan por ti. Cada uno muestra una casilla «verifica que eres humano» que solo una persona puede marcar. La siguiente página carga mientras marcas la actual: un toque por sitio."
+ "These %lld sites are filled in for you. Each shows a \"verify you are human\" box that only a person can tick. The next page loads while you tick the current one, so it is one tap per site.": "Estos %lld sitios se rellenan por ti. Cada uno muestra una casilla «verifica que eres humano» que solo una persona puede marcar. La siguiente página carga mientras marcas la actual: un toque por sitio.",
+ "%lld addresses, %lld sites": "%lld direcciones, %lld sitios",
+ "Did you send it?": "¿Lo enviaste?",
+ "Mail is not set up on this device, so \"Open in Mail\" opens your default mail app.": "El correo no está configurado en este dispositivo, así que «Abrir en Mail» abre tu app de correo predeterminada.",
+ "Message %lld of %lld": "Mensaje %lld de %lld",
+ "No": "No",
+ "One message goes to %lld addresses and covers %lld sites. Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": "Un mensaje va a %lld direcciones y cubre %lld sitios. Todas las direcciones van en Cco, así que ninguna empresa ve a las demás. Recibes una copia. Ábrelo, léelo y toca Enviar.",
+ "Open in Gmail": "Abrir en Gmail",
+ "Open in Mail": "Abrir en Mail",
+ "Opt-out email": "Correo de baja",
+ "Sites in this message": "Sitios de este mensaje",
+ "The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.": "Gmail y la app de correo predeterminada no nos dicen si enviaste el mensaje. Márcalo como enviado solo si lo hiciste.",
+ "The message": "El mensaje",
+ "Yes, I sent it": "Sí, lo envié"
 }

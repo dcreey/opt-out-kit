@@ -323,6 +323,52 @@
     }
    }
   },
+  "%@ messages, one per address, each naming every site it handles. You read them and tap Send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ messages, un par adresse, chacun nommant tous les sites qu’il couvre. Vous les lisez et touchez Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ mensajes, uno por dirección, cada uno con todos los sitios que cubre. Los lees y tocas Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ Nachrichten, eine pro Adresse, jede nennt alle Seiten, die sie abdeckt. Sie lesen sie und tippen auf Senden."
+     }
+    }
+   }
+  },
+  "%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ pages, l’une après l’autre. Chacune est remplie pour vous ; vous cochez sa case « je suis humain » et nous l’envoyons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ páginas, una tras otra. Cada una se rellena por ti; marcas su casilla «soy humano» y la enviamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ Seiten, nacheinander. Jede ist für Sie ausgefüllt; Sie haken das Feld „Ich bin ein Mensch“ an und wir senden sie."
+     }
+    }
+   }
+  },
   "%@ requires data brokers to register themselves. We pull this registry (%@ brokers) and add every broker on it to our list.": {
    "extractionState": "manual",
    "localizations": {
@@ -526,6 +572,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Datenschutzgesetz von %@, der %@ (tritt am %@ in Kraft), gibt Einwohnern das Recht, ihre Daten löschen zu lassen und dem Verkauf zu widersprechen. Bis dahin müssen Broker es nicht beachten."
+     }
+    }
+   }
+  },
+  "%lld addresses, %lld sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld adresses, %lld sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld direcciones, %lld sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Adressen, %lld Seiten"
      }
     }
    }
@@ -4164,6 +4233,29 @@
     }
    }
   },
+  "Did you send it?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’avez-vous envoyé ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Lo enviaste?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Haben Sie sie gesendet?"
+     }
+    }
+   }
+  },
   "Display name": {
    "extractionState": "manual",
    "localizations": {
@@ -7085,6 +7177,29 @@
     }
    }
   },
+  "Mail is not set up on this device, so \"Open in Mail\" opens your default mail app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La messagerie n’est pas configurée sur cet appareil : « Ouvrir dans Mail » ouvre votre app de messagerie par défaut."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El correo no está configurado en este dispositivo, así que «Abrir en Mail» abre tu app de correo predeterminada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mail ist auf diesem Gerät nicht eingerichtet, daher öffnet „In Mail öffnen“ Ihre Standard-Mail-App."
+     }
+    }
+   }
+  },
   "Mail is not set up on this device. Each message opens in your default mail app instead.": {
    "extractionState": "manual",
    "localizations": {
@@ -7334,6 +7449,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Erwähnt das Senden eines Antrags per Post"
+     }
+    }
+   }
+  },
+  "Message %lld of %lld": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Message %lld sur %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mensaje %lld de %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nachricht %lld von %lld"
      }
     }
    }
@@ -8093,6 +8231,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Neffe oder Nichte"
+     }
+    }
+   }
+  },
+  "No": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nein"
      }
     }
    }
@@ -8994,6 +9155,29 @@
     }
    }
   },
+  "One message goes to %lld addresses and covers %lld sites. Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un message va à %lld adresses et couvre %lld sites. Toutes les adresses sont en Cci : aucune entreprise ne voit les autres. Vous recevez une copie. Ouvrez-le, lisez-le et touchez Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un mensaje va a %lld direcciones y cubre %lld sitios. Todas las direcciones van en Cco, así que ninguna empresa ve a las demás. Recibes una copia. Ábrelo, léelo y toca Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Nachricht geht an %lld Adressen und deckt %lld Seiten ab. Alle Adressen stehen in Bcc, kein Unternehmen sieht die anderen. Sie erhalten eine Kopie. Öffnen, lesen und auf Senden tippen."
+     }
+    }
+   }
+  },
   "One opt-out request handles all %@ sites that share this process.": {
    "extractionState": "manual",
    "localizations": {
@@ -9266,6 +9450,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie eine Seite, um zu sehen, was sie nach dem Senden Ihrer Anfrage zeigte. Sieht es nicht abgeschlossen aus, sagen Sie es, und die Seite wird geführt."
+     }
+    }
+   }
+  },
+  "Open in Gmail": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir dans Gmail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir en Gmail"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Gmail öffnen"
+     }
+    }
+   }
+  },
+  "Open in Mail": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir dans Mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir en Mail"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Mail öffnen"
      }
     }
    }
@@ -9703,6 +9933,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Opt-Out Kit · Anleitung"
+     }
+    }
+   }
+  },
+  "Opt-out email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-mail de désinscription"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Correo de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-E-Mail"
      }
     }
    }
@@ -11455,6 +11708,29 @@
     }
    }
   },
+  "Send opt-out emails": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyer les e-mails de désinscription"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviar los correos de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-E-Mails senden"
+     }
+    }
+   }
+  },
   "Send opt-out requests every week": {
    "extractionState": "manual",
    "localizations": {
@@ -12049,6 +12325,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites finden und entfernen Einträge anhand von rechtlichem Namen und Adresse, daher braucht jedes Profil beides. Gesendet werden nur die Felder, die das Formular einer Website verlangt."
+     }
+    }
+   }
+  },
+  "Sites in this message": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites de ce message"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios de este mensaje"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seiten in dieser Nachricht"
      }
     }
    }
@@ -13203,6 +13502,29 @@
     }
    }
   },
+  "Tap to verify, we do the rest": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez pour vérifier, nous faisons le reste"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca para verificar, nosotros hacemos el resto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zum Bestätigen tippen, den Rest erledigen wir"
+     }
+    }
+   }
+  },
   "Tapping \"I agree\" means you accept its Terms of Service and Privacy Policy. Only a preliminary people search is free; full records need an account or purchase.": {
    "extractionState": "manual",
    "localizations": {
@@ -13314,6 +13636,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Texas"
+     }
+    }
+   }
+  },
+  "The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gmail et l’app de messagerie par défaut ne nous disent pas si vous avez envoyé le message. Marquez-le comme envoyé seulement si c’est le cas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gmail y la app de correo predeterminada no nos dicen si enviaste el mensaje. Márcalo como enviado solo si lo hiciste."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gmail und die Standard-Mail-App sagen uns nicht, ob Sie die Nachricht gesendet haben. Markieren Sie sie nur dann als gesendet, wenn Sie es getan haben."
      }
     }
    }
@@ -13659,6 +14004,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Anleitung bleibt oben auf dem Bildschirm, die Seite der Webseite darunter."
+     }
+    }
+   }
+  },
+  "The message": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le message"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El mensaje"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Nachricht"
      }
     }
    }
@@ -16626,6 +16994,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "JJJJ-MM-TT (optional)"
+     }
+    }
+   }
+  },
+  "Yes, I sent it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, je l’ai envoyé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, lo envié"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, ich habe sie gesendet"
      }
     }
    }

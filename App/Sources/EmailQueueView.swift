@@ -4,12 +4,12 @@ import OptOutKitCore
 
 /// The mail sheet, prefilled. The person reads it and taps Send; nothing is sent without that tap.
 struct MailComposer: UIViewControllerRepresentable {
-    let to: String, subject: String, body: String
+    let to: [String], bcc: [String], subject: String, body: String
     let finished: (MFMailComposeResult) -> Void
 
     func makeUIViewController(context: Context) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
-        vc.setToRecipients([to]); vc.setSubject(subject); vc.setMessageBody(body, isHTML: false)
+        vc.setToRecipients(to); vc.setBccRecipients(bcc); vc.setSubject(subject); vc.setMessageBody(body, isHTML: false)
         vc.mailComposeDelegate = context.coordinator
         return vc
     }
@@ -25,69 +25,66 @@ struct MailComposer: UIViewControllerRepresentable {
     }
 }
 
-/// Every site that takes opt-outs by email, as a short list of messages (one per address). Open a message, read it, tap Send.
+/// Every site that takes opt-outs by email, as one message to all their addresses (Bcc, so none sees another). Open it, read it, tap Send.
 struct EmailQueueView: View {
     @EnvironmentObject var model: AppModel
     let domains: [String]
     @State private var composing: EmailBatch?
+    @State private var confirmSent: EmailBatch?
 
-    private var person: Person? { model.selectedPerson }
     private var batches: [EmailBatch] {
         let set = Set(domains)
-        return EmailBatch.build(entries: model.directory.filter { set.contains($0.domain) })
+        return EmailBatch.single(entries: model.directory.filter { set.contains($0.domain) })
     }
     private func done(_ b: EmailBatch) -> Bool { b.entryIDs.allSatisfy { model.wasEmailed($0) } }
+    private var gmailInstalled: Bool { UIApplication.shared.canOpenURL(URL(string: "googlegmail://")!) }
 
     var body: some View {
         let list = batches
-        let pending = list.filter { !done($0) }
         List {
             Section {
-                Text("\(list.count) messages cover \(domains.count) sites. Each message names every site its address handles. Open one, read it, and tap Send in your mail app.")
+                Text("One message goes to \(list.first?.addresses.count ?? 0) addresses and covers \(domains.count) sites. Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.")
                     .font(.footnote)
-                if let next = pending.first {
-                    Button { open(next) } label: {
-                        Label("Open the next message (\(pending.count) left)", systemImage: "envelope.open").frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("email-next")
-                } else {
-                    Label("All messages sent", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
-                }
-                if !MFMailComposeViewController.canSendMail() {
-                    Label("Mail is not set up on this device. Each message opens in your default mail app instead.", systemImage: "exclamationmark.circle")
-                        .font(.footnote).foregroundStyle(.orange)
-                }
             }
-            Section("Messages") {
-                ForEach(list) { b in
-                    Button { open(b) } label: {
-                        HStack {
-                            Image(systemName: done(b) ? "checkmark.circle.fill" : "circle").foregroundStyle(done(b) ? .green : .secondary)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(b.address).font(.headline)
-                                Text(b.domains.count == 1 ? b.domains[0] : "\(b.domains.count) sites: \(b.domains.prefix(3).joined(separator: ", "))…")
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
+            ForEach(Array(list.enumerated()), id: \.element.id) { index, b in
+                Section(list.count > 1 ? "Message \(index + 1) of \(list.count)" : "The message") {
+                    if done(b) {
+                        Label("Sent", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    } else {
+                        Button { open(b, gmail: false) } label: { Label("Open in Mail", systemImage: "envelope.open").frame(maxWidth: .infinity) }
+                            .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("email-open-mail")
+                        if gmailInstalled {
+                            Button { open(b, gmail: true) } label: { Label("Open in Gmail", systemImage: "envelope").frame(maxWidth: .infinity) }
+                                .buttonStyle(.bordered).accessibilityIdentifier("email-open-gmail")
                         }
                     }
-                    .accessibilityIdentifier("email-\(b.address)")
+                    Text("\(b.addresses.count) addresses, \(b.domains.count) sites").font(.caption).foregroundStyle(.secondary)
+                    DisclosureGroup("Sites in this message") { ForEach(b.domains, id: \.self) { Text($0).font(.footnote) } }
                 }
             }
+            if !MFMailComposeViewController.canSendMail() {
+                Section { Label("Mail is not set up on this device, so \"Open in Mail\" opens your default mail app.", systemImage: "exclamationmark.circle").font(.footnote).foregroundStyle(.orange) }
+            }
         }
-        .navigationTitle("Opt-out emails")
+        .navigationTitle("Opt-out email")
         .sheet(item: $composing) { b in
-            MailComposer(to: b.address, subject: b.subject, body: model.emailBody(for: b)) { result in
+            MailComposer(to: [model.formEmail].compactMap { $0 }, bcc: b.addresses, subject: b.subject, body: model.emailBody(for: b)) { result in
                 if result == .sent { model.markEmailed(b) }
                 composing = nil
             }
             .ignoresSafeArea()
         }
+        .alert("Did you send it?", isPresented: Binding(get: { confirmSent != nil }, set: { if !$0 { confirmSent = nil } })) {
+            Button("Yes, I sent it") { if let b = confirmSent { model.markEmailed(b) }; confirmSent = nil }
+            Button("No", role: .cancel) { confirmSent = nil }
+        } message: { Text("The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.") }
     }
 
-    private func open(_ b: EmailBatch) {
+    private func open(_ b: EmailBatch, gmail: Bool) {
         model.requireProfile {
-            if MFMailComposeViewController.canSendMail() { composing = b }
-            else if let url = model.mailtoURL(for: b) { UIApplication.shared.open(url) }
+            if gmail, let url = model.gmailURL(for: b) { UIApplication.shared.open(url); confirmSent = b }
+            else if MFMailComposeViewController.canSendMail() { composing = b }
+            else if let url = model.mailtoURL(for: b) { UIApplication.shared.open(url); confirmSent = b }
         }
     }
 }

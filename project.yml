@@ -46,6 +46,7 @@ targets:
         CFBundleDisplayName: "Opt-Out Kit"
         UILaunchScreen: {}
         UIBackgroundModes: [fetch, processing]
+        LSApplicationQueriesSchemes: [googlegmail]
         BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck, dev.optoutkit.app.scan, dev.optoutkit.app.optout]
     settings:
       base:
