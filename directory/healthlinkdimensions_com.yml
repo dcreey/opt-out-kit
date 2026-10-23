@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://healthlinkdimensions.com/consumerprivacyrights"
+contact_email: "privacy@healthlinkdimensions.com"
+contact_email_source: "policy"
 registered_in: [CA, OR]
 signals: [portal_trustarc]
 profiled: "2026-10-22"

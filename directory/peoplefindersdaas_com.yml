@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://peoplefindersdaas.com/personal-information/"
+contact_email: "privacy@peoplefindersdaas.com"
+contact_email_source: "page"
 registered_in: [CA]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, email_only_wording, listing_url_input, name_input]
 profiled: "2026-10-22"

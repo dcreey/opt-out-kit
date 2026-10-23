@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.forewarn.com/opt-out-policy/"
+contact_email: "statebasedprivacy@forewarn.com"
+contact_email_source: "policy"
 registered_in: [TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, listing_url_input, login_required, name_input, phone_input]
 profiled: "2026-10-22"

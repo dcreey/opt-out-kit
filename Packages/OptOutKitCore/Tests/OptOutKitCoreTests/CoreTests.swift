@@ -2459,3 +2459,52 @@ final class GenericEmailAndMailAppTests: XCTestCase {
         XCTAssertEqual(Set(MailApp.probeSchemes), ["googlegmail", "ms-outlook", "ymail", "readdle-spark", "protonmail"])
     }
 }
+
+final class DailyGoalsTests: XCTestCase {
+    private func site(_ i: Int, email: Bool = true) -> DirectoryEntry {
+        var e = DirectoryEntry(id: "s\(i)", domain: "s\(i).com", name: "s\(i)", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        if email { e.contactEmail = "privacy@s\(i).com" }
+        return e
+    }
+
+    func testTodayIsTheNext25SitesAndTheirEmailsAndAnEarlierDayIsLeftBehind() {
+        let entries = (0..<60).map { site($0) }
+        let queue = entries.map(\.domain)
+        let cal = Calendar(identifier: .gregorian)
+        let now = Date()
+        var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
+        XCTAssertEqual(g.verify.count, 25)
+        XCTAssertEqual(g.verify.first, "s0.com")
+        XCTAssertEqual(g.email?.domains.count, 25)
+        XCTAssertEqual(g.verifyDone, 0); XCTAssertFalse(g.allComplete)
+
+        // Ten finished today stay in today's list and count.
+        var attempts: [String: [OptOutAttempt]] = [:]
+        for i in 0..<10 { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted")] }
+        g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
+        XCTAssertEqual(g.verify.count, 25); XCTAssertEqual(g.verify.first, "s0.com"); XCTAssertEqual(g.verifyDone, 10)
+
+        // Finished yesterday: tomorrow's list starts after them.
+        let tomorrow = now.addingTimeInterval(86_400)
+        g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: tomorrow, calendar: cal)
+        XCTAssertEqual(g.verify.first, "s10.com"); XCTAssertEqual(g.verifyDone, 0)
+    }
+
+    func testEmailingTheBatchCompletesTheSecondGoalAndAnotherBatchAddsTwentyFiveMore() {
+        let entries = (0..<60).map { site($0) }
+        let queue = entries.map(\.domain), now = Date(), cal = Calendar(identifier: .gregorian)
+        var attempts: [String: [OptOutAttempt]] = [:]
+        for i in 0..<25 { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted"), OptOutAttempt(date: now, outcome: "emailed")] }
+        var g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
+        XCTAssertTrue(g.verifyComplete && g.emailComplete && g.allComplete)
+        g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, batches: 2, calendar: cal)
+        XCTAssertEqual(g.verify.count, 50); XCTAssertFalse(g.allComplete)
+        XCTAssertEqual(DailyGoals.daysLeft(remaining: 700), 28)
+    }
+
+    func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
+        let entries = [site(0, email: false), site(1)]
+        let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])
+        XCTAssertEqual(g.verify.count, 2); XCTAssertEqual(g.email?.domains, ["s1.com"])
+    }
+}

@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://kalibrate.com/intalytics/"
+contact_email: "privacy@kalibrate.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, name_input, phone_input]
 profiled: "2026-10-22"

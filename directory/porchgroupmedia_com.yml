@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://optout.porchgroupmedia.com/"
+contact_email: "privacy@porchgroupmedia.com"
+contact_email_source: "page"
 registered_in: [CA, OR, TX]
 signals: [email_input, email_only_wording, name_input, phone_input]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.privco.com/privacy-policy"
+contact_email: "legal@privco.com"
+contact_email_source: "page"
 registered_in: [CA, TX]
 signals: [mail_option]
 profiled: "2026-10-22"

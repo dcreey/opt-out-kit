@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.grassrootsanalytics.com/california-consumer-privacy-act-ccpa"
+contact_email: "compliance@grassrootsanalytics.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, phone_input]
 profiled: "2026-10-22"

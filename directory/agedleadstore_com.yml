@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://store.agedleadstore.com/optout_request/share_sale_info_form/"
+contact_email: "privacy@agedleadstore.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_contact, email_input, mail_option, name_input, opt_out_form_found, phone_input, search_first]
 profiled: "2026-10-22"

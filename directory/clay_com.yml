@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.clay.com/"
+contact_email: "privacy@clay.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, listing_url_input]
 profiled: "2026-10-22"

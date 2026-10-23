@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://vi.co/do-not-sell-or-share-my-personal-information/"
+contact_email: "privacy@vi.co"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://vi.co/do-not-sell-or-share-my-personal-information/", "method": "post", "action": "https://vi.co/do-not-sell-or-share-my-personal-information/#wpcf7-f1567-p1501-o1", "fields": [{"type": "text", "name": "first_name", "label": "First Name"}, {"type": "text", "name": "last_name", "label": "Last Name"}, {"type": "email", "name": "email_address", "label": "Email"}, {"type": "textarea", "name": "optional_message", "label": "Message"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, email_contact, email_input, name_input, opt_out_form_found]

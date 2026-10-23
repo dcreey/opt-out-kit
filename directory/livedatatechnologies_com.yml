@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.livedatatech.com/opt-out"
+contact_email: "remove@livedatatechnologies.com"
+contact_email_source: "page"
 opt_out_form: {"page": "https://www.livedatatech.com/opt-out", "method": "get", "action": "https://www.livedatatech.com/opt-out", "fields": [{"type": "text", "name": "full-name", "label": "Your full name *"}, {"type": "email", "name": "work-email", "label": "Your work email *"}, {"type": "text", "name": "postal-address", "label": "Your postal address *"}, {"type": "textarea", "name": "message", "label": "I'd like to request an opt-out according to CCPA"}], "hops": 0}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, name_input, opt_out_form_found]

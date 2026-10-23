@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://statara.com/optin-optout/"
+contact_email: "privacyinfo@statara.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://statara.com/optin-optout/", "method": "post", "action": "https://statara.com/optin-optout/#gf_1", "fields": [{"type": "text", "name": "input_8.3", "label": "First"}, {"type": "text", "name": "input_8.6", "label": "Last"}, {"type": "text", "name": "input_9.1", "label": "Street Address"}, {"type": "text", "name": "input_9.2", "label": "Address Line 2"}, {"type": "text", "name": "input_9.3", "label": "City"}, {"type": "select", "name": "input_9.4", "label": "State"}, {"type": "text", "name": "input_9.5", "label": "ZIP Code"}, {"type": "email", "name": "input_10", "label": "Email(Required)"}, {"type": "tel", "name": "input_11", "label": "Phone(Required)"}, {"type": "checkbox", "name": "input_12.1", "label": "I agree to the privacy policy."}, {"type": "radio", "name": "input_16", "label": "The Right to Limit Use and Disclosure of your personal infor"}, {"type": "radio", "name": "input_16", "label": "The Right to Opt-Out of the selling or sharing of your perso"}, {"type": "radio", "name": "input_16", "label": "The Right to Opt-In of the selling or sharing of your person"}], "hops": 3}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, opt_out_form_found, phone_input]

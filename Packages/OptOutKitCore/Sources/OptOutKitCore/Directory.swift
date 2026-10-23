@@ -170,7 +170,8 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
     public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
     public var runCheck: RunCheck?        // what a real, reviewed run showed
-    public var contactEmail: String?      // the page says to write to this address instead of using a form
+    public var contactEmail: String?      // the privacy address found for this site
+    public var contactEmailSource: String?   // where it was found: the opt-out page or its privacy policy
     public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
     public var signals: [String]?
     public var profiled: String?
@@ -186,7 +187,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
+        case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
         case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }

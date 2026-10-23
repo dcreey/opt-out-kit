@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://datadelivers.com/do-not-sell-or-share-personal-information/"
+contact_email: "privacy@datadelivers.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://datadelivers.com/do-not-sell-or-share-personal-information/", "method": "post", "action": "https://datadelivers.com/do-not-sell-or-share-personal-information/#gf_10", "fields": [{"type": "text", "name": "input_1.3", "label": "First"}, {"type": "text", "name": "input_1.6", "label": "Last"}, {"type": "email", "name": "input_3", "label": "Email*"}, {"type": "text", "name": "input_4", "label": "Company*"}], "hops": 2}
 family: "trustsuperset_com"
 family_parent: "trustsuperset.com"

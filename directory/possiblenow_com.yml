@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.possiblenow.com/do-not-sell-my-personal-information"
+contact_email: "privacy@possiblenow.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.possiblenow.com/do-not-sell-my-personal-information", "method": "post", "action": "https://www.possiblenow.com/do-not-sell-my-personal-information", "fields": [{"type": "text", "name": "website_url", "label": "Leave this empty"}], "hops": 2}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, listing_url_input, opt_out_form_found, portal_trustarc]

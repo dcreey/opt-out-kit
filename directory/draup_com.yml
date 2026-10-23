@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://draup.com/"
+contact_email: "privacy@draup.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_contact, email_input]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://multimedialists.com/"
+contact_email: "compliance@multimedialists.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [account_hint, captcha_recaptcha, email_contact, email_input, name_input, phone_input]
 profiled: "2026-10-22"

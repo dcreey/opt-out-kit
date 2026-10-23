@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://wingify.com/opt-out/"
+contact_email: "privacy@wingify.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://wingify.com/opt-out/", "method": "post", "action": "https://wingify.com/opt-out/", "fields": [{"type": "text", "name": "url", "label": "Website Address"}], "hops": 3}
 signals: [email_contact, email_input, email_only_wording, listing_url_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-21"

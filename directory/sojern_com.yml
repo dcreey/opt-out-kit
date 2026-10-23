@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.sojern.com/privacy/opt-out-data"
+contact_email: "sojernprivacy@sojern.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.sojern.com/privacy/opt-out-data", "method": "get", "action": "https://www.sojern.com/privacy/opt-out-data", "fields": [{"type": "email", "name": "email", "label": "Your Email"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, opt_out_form_found]

@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.plungedigital.com/"
+contact_email: "privacy@plungedigital.com"
+contact_email_source: "policy"
 family: "datasubject_com"
 family_parent: "datasubject.com"
 registered_in: [CA, OR, TX]

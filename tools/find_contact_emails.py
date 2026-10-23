@@ -25,17 +25,43 @@ def pick(domain, html):
     return (own or ok or [None])[0]
 
 
+LINK = re.compile(r'href=["\']([^"\'#]+)["\'][^>]*>([^<]{0,80})<', re.I)
+POLICY = re.compile(r"privacy|data.?protection|do.?not.?sell|your.?rights|ccpa|gdpr", re.I)
+
+
+def fetch(f, url):
+    if not f.allowed(url): return None
+    st, _, body = f.get(url)
+    return body if st is not None and st < 400 else None
+
+
 def one(path):
+    """One address per site, looked for in this order: the opt-out page, the privacy policy it links to, the home page and its policy."""
     s = open(path).read()
-    if "contact_email:" in s or "email_contact" not in s: return None
-    m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M); d = re.search(r'^domain: "([^"]+)"', s, re.M)
-    if not m or not d: return None
+    if "contact_email:" in s: return None
+    d = re.search(r'^domain: "([^"]+)"', s, re.M)
+    if not d: return None
+    m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
     f = P.Fetcher()
-    if not f.allowed(m.group(1)): return None
-    st, _, body = f.get(m.group(1))
-    if st is None or st >= 400: return None
-    addr = pick(d.group(1), body)
-    return (path, addr) if addr else None
+    starts = [m.group(1)] if m else []
+    starts.append(f"https://{d.group(1)}/")
+    for start in starts:
+        body = fetch(f, start)
+        if not body: continue
+        addr = pick(d.group(1), body)
+        if addr: return (path, addr, "page")
+        seen = 0
+        for href, text in LINK.findall(body):
+            if not POLICY.search(href + " " + text): continue
+            url = urllib.parse.urljoin(start, href)
+            if urllib.parse.urlsplit(url).scheme not in ("http", "https"): continue
+            sub = fetch(f, url)
+            seen += 1
+            if sub:
+                addr = pick(d.group(1), sub)
+                if addr: return (path, addr, "policy")
+            if seen >= 3: break
+    return None
 
 
 def main():
@@ -44,10 +70,11 @@ def main():
     with cf.ThreadPoolExecutor(a.workers) as ex:
         for r in ex.map(one, sorted(glob.glob(os.path.join(a.dir, "*.yml")))):
             if not r: continue
-            path, addr = r; s = open(path).read()
-            s = re.sub(r"(\nopt_out_url: [^\n]*\n)", lambda m: m.group(1) + (m.group(1).count("\n") and "") , s, 1)
-            lines = s.split("\n"); i = next(k for k, l in enumerate(lines) if l.startswith("opt_out_url:"))
-            lines.insert(i + 1, f'contact_email: "{addr}"'); open(path, "w").write("\n".join(lines)); n += 1
+            path, addr, how = r; s = open(path).read()
+            lines = s.split("\n")
+            i = next((k for k, l in enumerate(lines) if l.startswith("opt_out_url:")), next(k for k, l in enumerate(lines) if l.startswith("confidence:")))
+            lines.insert(i + 1, f'contact_email: "{addr}"'); lines.insert(i + 2, f'contact_email_source: "{how}"')
+            open(path, "w").write("\n".join(lines)); n += 1
     print(f"wrote contact_email to {n} sites")
 
 

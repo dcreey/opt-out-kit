@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.realsourcedata.com/do-not-sell-my-personal-information"
+contact_email: "privacy@realsourcedata.com"
+contact_email_source: "policy"
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, email_contact, email_only_wording]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.wunderkind.co/your-ad-choices"
+contact_email: "privacyrequests@wunderkind.co"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [phone_verify]
 profiled: "2026-10-22"

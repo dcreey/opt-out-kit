@@ -8,6 +8,8 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://samba.com/privacy-center/notice-of-right-to-opt-out"
+contact_email: "privacy@samba.tv"
+contact_email_source: "page"
 registered_in: [CA, TX]
 signals: [email_only_wording]
 profiled: "2026-10-22"

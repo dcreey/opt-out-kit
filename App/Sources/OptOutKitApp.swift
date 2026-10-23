@@ -590,6 +590,35 @@ final class AppModel: ObservableObject {
     func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
 
+    // MARK: Today's goals
+
+    private static let batchDayKey = "daily.day", batchCountKey = "daily.batches"
+
+    /// How many batches of 25 the person has taken today (back to 1 each new day).
+    var dailyBatches: Int {
+        get {
+            guard defaults.string(forKey: Self.batchDayKey) == Self.dayString(Date()) else { return 1 }
+            return max(1, defaults.integer(forKey: Self.batchCountKey))
+        }
+        set {
+            objectWillChange.send()
+            defaults.set(Self.dayString(Date()), forKey: Self.batchDayKey); defaults.set(max(1, newValue), forKey: Self.batchCountKey)
+        }
+    }
+    private static func dayString(_ d: Date) -> String { let c = Calendar.current.dateComponents([.year, .month, .day], from: d); return "\(c.year ?? 0)-\(c.month ?? 0)-\(c.day ?? 0)" }
+
+    /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
+    var dailyGoals: DailyGoals {
+        let queue = plan.flatMap(\.tasks).first { $0.kind == .verify }?.domains ?? []
+        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches)
+    }
+
+    /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
+    var verifyRemaining: Int {
+        let ids = Set(directory.filter { d in (plan.flatMap(\.tasks).first { $0.kind == .verify }?.domains ?? []).contains(d.domain) }.map(\.id))
+        return ids.filter { !(progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false) }.count
+    }
+
     // MARK: Opt-out emails
 
     func wasEmailed(_ entryID: String) -> Bool {

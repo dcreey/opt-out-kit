@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.growbots.com/do-not-sell-my-info/"
+contact_email: "privacy@growbots.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

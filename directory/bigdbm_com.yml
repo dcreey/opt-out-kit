@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://optout.bigdbm.com/"
+contact_email: "privacy@bigdbm.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_input, file_upload, name_input, phone_input]
 profiled: "2026-10-22"

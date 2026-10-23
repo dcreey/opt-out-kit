@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://sourcepathdigital.com/california-consumer-portal/"
+contact_email: "privacy@sourcepathdigital.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, mail_option, name_input, phone_input, phone_verify]
 profiled: "2026-10-22"

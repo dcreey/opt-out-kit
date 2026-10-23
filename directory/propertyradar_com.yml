@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://thenai.org/glossary/opt-out-mechanism/"
+contact_email: "emailprivacy@generitech.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"

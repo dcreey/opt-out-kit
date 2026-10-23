@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://consumer.drop.privacy.ca.gov/"
+contact_email: "privacy@sdintelligence.com"
+contact_email_source: "page"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

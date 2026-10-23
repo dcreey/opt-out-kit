@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.veraset.com/legal/do-not-sell-request#consumer-opt-out-do-not-sell-request"
+contact_email: "privacy@veraset.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.veraset.com/legal/do-not-sell-request#consumer-opt-out-do-not-sell-request", "method": "get", "action": "https://www.veraset.com/legal/do-not-sell-request#consumer-opt-out-do-not-sell-request", "fields": [{"type": "text", "name": "name", "label": "name"}, {"type": "text", "name": "last-name", "label": "last-name"}, {"type": "email", "name": "email", "label": "email"}, {"type": "text", "name": "advertising-id", "label": "advertising-id"}, {"type": "checkbox", "name": "opt-out", "label": "opt-out"}, {"type": "checkbox", "name": "deletion", "label": "deletion"}, {"type": "checkbox", "name": "right-to-access", "label": "right-to-access"}, {"type": "checkbox", "name": "right-to-know", "label": "right-to-know"}, {"type": "checkbox", "name": "correction", "label": "correction"}, {"type": "checkbox", "name": "limited-use-of-sensitive-information", "label": "limited-use-of-sensitive-information"}], "hops": 0}
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, email_input, name_input, opt_out_form_found]

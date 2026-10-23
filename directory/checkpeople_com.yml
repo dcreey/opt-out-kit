@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://checkpeople.com/opt-out"
+contact_email: "privacy@checkpeople.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://checkpeople.com/opt-out", "method": "post", "action": "https://checkpeople.com/opt-out", "fields": [{"type": "email", "name": "requestoremail", "label": "Email"}, {"type": "checkbox", "name": "acknowledge", "label": "acknowledge"}], "hops": 2}
 registered_in: [CA, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]

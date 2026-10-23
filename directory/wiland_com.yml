@@ -8,6 +8,8 @@ tier: null
 automation: "robots_disallowed"
 confidence: "n/a"
 opt_out_url: null
+contact_email: "privacy@wiland.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"

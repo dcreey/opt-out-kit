@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://podscribe.com/privacy"
+contact_email: "privacy@podscribe.com"
+contact_email_source: "page"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_only_wording]
 profiled: "2026-10-22"

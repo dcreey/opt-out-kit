@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://hunter.io/claim?ref=donotsell"
+contact_email: "privacy@hunter.io"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://hunter.io/claim?ref=donotsell", "method": "post", "action": "https://hunter.io/claim/authenticate", "fields": [{"type": "email", "name": "claim[email]", "label": "you@company.com"}], "hops": 1}
 registered_in: [CA]
 signals: [account_hint, captcha_turnstile, email_input, opt_out_form_found]

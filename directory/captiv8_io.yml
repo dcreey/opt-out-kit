@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://captiv8.io/policy/opt-out/"
+contact_email: "privacy@captiv8.io"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-22"

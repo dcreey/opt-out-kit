@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://yieldmo.com/opt-out/"
+contact_email: "privacy@yieldmo.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.prospectbase.com/"
+contact_email: "privacy@prospectbase.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, name_input]
 profiled: "2026-10-22"

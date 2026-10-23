@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://privacy.ca.gov/drop/"
+contact_email: "privacy@pebblepost.com"
+contact_email_source: "policy"
 registered_in: [OR, TX]
 signals: [account_hint]
 profiled: "2026-10-22"

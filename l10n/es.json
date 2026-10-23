@@ -790,5 +790,16 @@
  "Advertising ID": "identificador de publicidad",
  "NSUserTrackingUsageDescription": "Algunos intermediarios de datos dan de baja tu teléfono con su identificador de publicidad. Opt-Out Kit lo lee solo para dárselo cuando te das de baja y nunca lo guarda.",
  "This form asks for your phone's advertising ID, which needs your permission to read.": "Este formulario pide el identificador de publicidad de tu teléfono, cuya lectura requiere tu permiso.",
- "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": "Ponemos esta dirección, exactamente como la escribiste, en cada formulario de baja y solicitud de eliminación, para ti y para cada persona que añadas. Muchos sitios te buscan por esa dirección exacta, así que nunca la cambiamos. Las respuestas y los enlaces de confirmación llegan a tu bandeja normal."
+ "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": "Ponemos esta dirección, exactamente como la escribiste, en cada formulario de baja y solicitud de eliminación, para ti y para cada persona que añadas. Muchos sitios te buscan por esa dirección exacta, así que nunca la cambiamos. Las respuestas y los enlaces de confirmación llegan a tu bandeja normal.",
+ "One message goes to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": "Un mensaje va a %lld direcciones (%lld sitios). Todas van en Cco. Recibes una copia. Ábrelo, léelo y toca Enviar.",
+ "%lld messages go to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open each, read it, and tap Send.": "%lld mensajes van a %lld direcciones (%lld sitios). Todas van en Cco. Recibes una copia. Abre cada uno, léelo y toca Enviar.",
+ "%lld of %lld": "%lld de %lld",
+ "About %lld days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.": "Quedan unos %lld días a 25 por día. Cumple ambos objetivos cada día y todos los sitios quedan cubiertos en un mes aproximadamente. Siempre puedes seguir.",
+ "Each is filled in; you tick the human check": "Cada uno se rellena; tú marcas la verificación humana",
+ "Email the same sites": "Escribir a los mismos sitios",
+ "Just in case: email every site, 100 at a time": "Por si acaso: escribir a todos los sitios, de 100 en 100",
+ "Keep going: take 25 more": "Seguir: tomar 25 más",
+ "One message, every address in Bcc, as a safety net": "Un mensaje, todas las direcciones en Cco, como red de seguridad",
+ "Today's goals": "Objetivos de hoy",
+ "Verify today's sites": "Verificar los sitios de hoy"
 }

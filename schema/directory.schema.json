@@ -38,6 +38,7 @@
     "template": { "type": "string" },
     "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
     "contact_email": { "type": "string" },
+    "contact_email_source": { "enum": ["page", "policy"] },
     "run_check": {
       "type": "object",
       "required": ["date", "result"],

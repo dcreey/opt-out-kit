@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://juicebox.ai/"
+contact_email: "privacy@juicebox.ai"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [name_input, portal_osano]
 profiled: "2026-10-22"

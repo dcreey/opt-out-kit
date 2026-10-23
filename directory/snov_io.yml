@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://snov.io/do-not-sell-my-personal-information"
+contact_email: "snovio_dpo@snov.io"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://snov.io/do-not-sell-my-personal-information", "method": "post", "action": "https://snov.io/api/form/dnsmpi/sendDeleteCCPA", "fields": [{"type": "text", "name": "field_1475ce70-1799-4f76-9c8c-faa5bb20e7b7", "label": "field_1475ce70-1799-4f76-9c8c-faa5bb20e7b7"}, {"type": "text", "name": "field_92fc3540-6dd3-47aa-8778-6aa8817d31fb", "label": "field_92fc3540-6dd3-47aa-8778-6aa8817d31fb"}, {"type": "email", "name": "field_9144a6da-28cb-4f62-84dd-8a51b2a04bb9", "label": "field_9144a6da-28cb-4f62-84dd-8a51b2a04bb9"}, {"type": "text", "name": "field_bfa4046d-1032-4380-98c6-8f450bf2dadd", "label": "field_bfa4046d-1032-4380-98c6-8f450bf2dadd"}, {"type": "text", "name": "field_0c2812dd-ca9e-441f-85de-8dbeec3a37b0", "label": "field_0c2812dd-ca9e-441f-85de-8dbeec3a37b0"}, {"type": "text", "name": "field_e9d564a0-b593-4d41-bee1-73fa5cf700cb", "label": "field_e9d564a0-b593-4d41-bee1-73fa5cf700cb"}, {"type": "text", "name": "field_e190dea2-5b02-4817-923c-8755295d276d", "label": "field_e190dea2-5b02-4817-923c-8755295d276d"}, {"type": "text", "name": "field_e1f21000-89b4-4f21-a928-e9f10895e374", "label": "field_e1f21000-89b4-4f21-a928-e9f10895e374"}, {"type": "checkbox", "name": "field_d3f99663-f1d8-4bce-a276-e0dfcc65798b", "label": "Do not sell my personal information"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, email_input, mail_option, opt_out_form_found]

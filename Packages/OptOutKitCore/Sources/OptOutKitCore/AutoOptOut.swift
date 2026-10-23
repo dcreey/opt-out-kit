@@ -69,7 +69,9 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
     public var outcome: String           // "submitted", "submitted_email", "challenged", "rejected", "failed"
     public var detail: String?
     public init(date: Date, outcome: String, detail: String? = nil) { self.date = date; self.outcome = outcome; self.detail = detail }
-    public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" || outcome == "emailed" }
+    /// A form was sent to the site. Emailing a request is tracked separately (`outcome == "emailed"`), so one never stands in for the other.
+    public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" }
+    public var wasEmailed: Bool { outcome == "emailed" }
 }
 
 /// Sends opt-out requests automatically for the sites whose form we found, and says plainly what it could not do.

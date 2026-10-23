@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://hightouch.com/playbooks/Suppress-Existing-Customers-from-Facebook-Campaigns"
+contact_email: "privacy@hightouch.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://hightouch.com/playbooks/Suppress-Existing-Customers-from-Facebook-Campaigns", "method": "get", "action": "https://hightouch.com/playbooks/Suppress-Existing-Customers-from-Facebook-Campaigns", "fields": [{"type": "email", "name": "email", "label": "Work email"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_input, opt_out_form_found]

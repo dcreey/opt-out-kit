@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.public.law/pricing"
+contact_email: "privacy@affinity.co"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.public.law/pricing", "method": "post", "action": "https://www.public.law/users/sign_in", "fields": [{"type": "email", "name": "user[email]", "label": "Email"}, {"type": "password", "name": "user[password]", "label": "Password"}, {"type": "checkbox", "name": "remember_me", "label": "Remember me"}], "hops": 2}
 registered_in: [CA, OR]
 signals: [email_input, login_required, opt_out_form_found]

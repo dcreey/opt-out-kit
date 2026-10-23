@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://privacycockpit.leadfeeder.com/"
+contact_email: "dpo@leadfeeder.com"
+contact_email_source: "policy"
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, email_input]
 profiled: "2026-10-22"

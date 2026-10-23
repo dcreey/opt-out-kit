@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://klear.com/opt-out/"
+contact_email: "privacy@meltwater.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://klear.com/opt-out/", "method": "get", "action": "https://klear.com/opt-out/", "fields": [{"type": "string", "name": "", "label": "John"}, {"type": "string", "name": "", "label": "Doe"}, {"type": "string", "name": "", "label": "john@doe.com"}, {"type": "string", "name": "", "label": "john@doe.com"}, {"type": "string", "name": "", "label": "@instagram"}, {"type": "string", "name": "", "label": "@twitter"}, {"type": "string", "name": "", "label": "facebook.com/username"}], "hops": 3}
 registered_in: [CA]
 signals: [opt_out_form_found]

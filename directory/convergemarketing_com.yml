@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.convergemarketing.com/"
+contact_email: "privacy@convergemarketing.com"
+contact_email_source: "policy"
 family: "datasubject_com"
 family_parent: "datasubject.com"
 registered_in: [CA]

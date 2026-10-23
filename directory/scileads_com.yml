@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://scileads.com/opt-out/"
+contact_email: "legal@scileads.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://scileads.com/opt-out/", "method": "get", "action": "https://scileads.com/opt-out/", "fields": [{"type": "text", "name": "firstname", "label": "firstname"}, {"type": "text", "name": "lastname", "label": "lastname"}, {"type": "email", "name": "email", "label": "email"}], "hops": 1}
 registered_in: [CA]
 signals: [email_input, name_input, opt_out_form_found]

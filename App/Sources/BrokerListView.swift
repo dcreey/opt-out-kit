@@ -44,6 +44,30 @@ struct BrokerListView: View {
                     }
                 }
                 if model.autoSettings.lastAttempted != nil { Section { LastRunRow() } }
+                let goals = model.dailyGoals
+                if !goals.verify.isEmpty {
+                    Section {
+                        NavigationLink(value: "daily-verify") {
+                            GoalRow(title: Loc.t("Verify today's sites"), subtitle: Loc.t("Each is filled in; you tick the human check"),
+                                    done: goals.verifyDone, total: goals.verify.count, symbol: "hand.tap")
+                        }.accessibilityIdentifier("goal-verify")
+                        if let mail = goals.email {
+                            NavigationLink(value: "daily-email") {
+                                GoalRow(title: Loc.t("Email the same sites"), subtitle: Loc.t("One message, every address in Bcc, as a safety net"),
+                                        done: goals.emailDone, total: mail.domains.count, symbol: "envelope")
+                            }.accessibilityIdentifier("goal-email")
+                        }
+                        NavigationLink(value: "all-email") {
+                            Label("Just in case: email every site, 100 at a time", systemImage: "envelope.badge")
+                        }.accessibilityIdentifier("goal-email-all")
+                        if goals.allComplete {
+                            Button { model.dailyBatches += 1 } label: { Label("Keep going: take 25 more", systemImage: "forward.fill") }
+                                .accessibilityIdentifier("goal-more")
+                        }
+                    } header: { Text("Today's goals") } footer: {
+                        Text("About \(DailyGoals.daysLeft(remaining: model.verifyRemaining)) days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.")
+                    }
+                }
                 let queue = model.queue
                 let tasks = queue.flatMap(\.tasks)
                 let done = tasks.filter { model.isDone($0) }.count
@@ -116,7 +140,15 @@ struct BrokerListView: View {
             }
             .sheet(isPresented: $showAuto) { AutoProtectionView() }
             .navigationDestination(for: Broker.self) { BrokerDetailView(broker: $0) }
-            .navigationDestination(for: String.self) { if $0 == "auto-activity" { AutoActivityView() } }
+            .navigationDestination(for: String.self) { key in
+                switch key {
+                case "auto-activity": AutoActivityView()
+                case "daily-verify": VerifyQueueView(domains: model.dailyGoals.verify)
+                case "daily-email": EmailQueueView(domains: model.dailyGoals.email?.domains ?? [])
+                case "all-email": EmailQueueView(domains: model.directory.filter { $0.contactEmail != nil }.map(\.domain), perMessage: 100)
+                default: EmptyView()
+                }
+            }
             .planDestinations()
         }
     }

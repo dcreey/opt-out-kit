@@ -622,6 +622,29 @@
     }
    }
   },
+  "%lld messages go to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open each, read it, and tap Send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld messages vont à %lld adresses (%lld sites). Toutes les adresses sont en Cci. Vous recevez une copie. Ouvrez chacun, lisez-le et touchez Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld mensajes van a %lld direcciones (%lld sitios). Todas van en Cco. Recibes una copia. Abre cada uno, léelo y toca Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Nachrichten gehen an %lld Adressen (%lld Seiten). Alle stehen in Bcc. Sie erhalten eine Kopie. Jede öffnen, lesen und auf Senden tippen."
+     }
+    }
+   }
+  },
   "%lld more are handled by %@, so they are not listed here again. See the Sites tab.": {
    "extractionState": "manual",
    "localizations": {
@@ -664,6 +687,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld brauchen Sie. Sie sind in Ihrer Warteschlange jetzt halbautomatische oder geführte Aufgaben."
+     }
+    }
+   }
+  },
+  "%lld of %lld": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sur %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld de %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld"
      }
     }
    }
@@ -1427,6 +1473,29 @@
     }
    }
   },
+  "About %lld days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Environ %lld jours restants à 25 par jour. Remplissez les deux objectifs chaque jour et tous les sites sont couverts en un mois environ. Vous pouvez toujours continuer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quedan unos %lld días a 25 por día. Cumple ambos objetivos cada día y todos los sitios quedan cubiertos en un mes aproximadamente. Siempre puedes seguir."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch etwa %lld Tage bei 25 pro Tag. Erfüllen Sie täglich beide Ziele, dann sind in etwa einem Monat alle Seiten abgedeckt. Sie können jederzeit weitermachen."
+     }
+    }
+   }
+  },
   "Accept site terms for you?": {
    "extractionState": "manual",
    "localizations": {
@@ -1975,6 +2044,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Adresse"
+     }
+    }
+   }
+  },
+  "Advertising ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "identifiant publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "identificador de publicidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbe-ID"
      }
     }
    }
@@ -4394,6 +4486,29 @@
     }
    }
   },
+  "Each is filled in; you tick the human check": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chacun est rempli ; vous cochez la vérification humaine"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada uno se rellena; tú marcas la verificación humana"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede ist ausgefüllt; Sie haken die Bestätigung an"
+     }
+    }
+   }
+  },
   "Each person": {
    "extractionState": "manual",
    "localizations": {
@@ -4551,6 +4666,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nur per E-Mail oder Brief"
+     }
+    }
+   }
+  },
+  "Email the same sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Écrire aux mêmes sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Escribir a los mismos sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieselben Seiten per E-Mail anschreiben"
      }
     }
    }
@@ -6303,6 +6441,29 @@
     }
    }
   },
+  "Just in case: email every site, 100 at a time": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Par précaution : écrire à tous les sites, 100 à la fois"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Por si acaso: escribir a todos los sitios, de 100 en 100"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zur Sicherheit: alle Seiten anschreiben, 100 auf einmal"
+     }
+    }
+   }
+  },
   "Kansas": {
    "extractionState": "manual",
    "localizations": {
@@ -6322,6 +6483,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kansas"
+     }
+    }
+   }
+  },
+  "Keep going: take 25 more": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuer : en prendre 25 de plus"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seguir: tomar 25 más"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weitermachen: 25 weitere übernehmen"
      }
     }
    }
@@ -9178,6 +9362,29 @@
     }
    }
   },
+  "One message goes to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un message va à %lld adresses (%lld sites). Toutes les adresses sont en Cci. Vous recevez une copie. Ouvrez-le, lisez-le et touchez Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un mensaje va a %lld direcciones (%lld sitios). Todas van en Cco. Recibes una copia. Ábrelo, léelo y toca Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Nachricht geht an %lld Adressen (%lld Seiten). Alle stehen in Bcc. Sie erhalten eine Kopie. Öffnen, lesen und auf Senden tippen."
+     }
+    }
+   }
+  },
   "One message goes to %lld addresses and covers %lld sites. Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": {
    "extractionState": "manual",
    "localizations": {
@@ -9197,6 +9404,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine Nachricht geht an %lld Adressen und deckt %lld Seiten ab. Alle Adressen stehen in Bcc, kein Unternehmen sieht die anderen. Sie erhalten eine Kopie. Öffnen, lesen und auf Senden tippen."
+     }
+    }
+   }
+  },
+  "One message, every address in Bcc, as a safety net": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un message, toutes les adresses en Cci, par précaution"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un mensaje, todas las direcciones en Cco, como red de seguridad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Nachricht, alle Adressen in Bcc, als Sicherheitsnetz"
      }
     }
    }
@@ -14882,6 +15112,29 @@
     }
    }
   },
+  "This form asks for your phone's advertising ID, which needs your permission to read.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande l’identifiant publicitaire de votre téléphone, dont la lecture exige votre autorisation."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide el identificador de publicidad de tu teléfono, cuya lectura requiere tu permiso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt die Werbe-ID Ihres Telefons; zum Lesen ist Ihre Erlaubnis nötig."
+     }
+    }
+   }
+  },
   "This form asks the person to confirm \"I am this person\" (\"%@\"). The app only does that for the account owner, and only if they allowed it.": {
    "extractionState": "manual",
    "localizations": {
@@ -15246,6 +15499,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bis Jahr"
+     }
+    }
+   }
+  },
+  "Today's goals": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Objectifs du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Objetivos de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutige Ziele"
      }
     }
    }
@@ -15706,6 +15982,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Entfernung bestätigt am %@"
+     }
+    }
+   }
+  },
+  "Verify today's sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifier les sites du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verificar los sitios de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutige Seiten bestätigen"
      }
     }
    }

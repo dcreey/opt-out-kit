@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.becausal.com/personal-information"
+contact_email: "privacy@becausal.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.becausal.com/personal-information", "method": "get", "action": "https://www.becausal.com/personal-information", "fields": [{"type": "select", "name": "opt-out-state", "label": "Please select the state in which you currently reside (requi"}, {"type": "text", "name": "opt-out-first-name", "label": "First name"}, {"type": "text", "name": "opt-out-last-name", "label": "Last name"}, {"type": "email", "name": "opt-out-email", "label": "Email Address"}, {"type": "radio", "name": "opt-out-type", "label": "opt-out-type"}, {"type": "radio", "name": "opt-out-type", "label": "opt-out-type"}], "hops": 0}
 registered_in: [CA, TX]
 signals: [email_input, name_input, opt_out_form_found]

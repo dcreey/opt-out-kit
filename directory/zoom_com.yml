@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.zoom.com/en/trust/disclosure-of-privacy-rights-requests/"
+contact_email: "privacy@zoom.us"
+contact_email_source: "policy"
 registered_in: [OR, TX]
 signals: [listing_url_input]
 profiled: "2026-10-22"

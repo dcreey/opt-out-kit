@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://jungroup.com/optout"
+contact_email: "privacy@jungroup.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://jungroup.com/optout", "method": "post", "action": "https://jungroup.com/optout#gf_2", "fields": [{"type": "email", "name": "input_1", "label": "Email(Required)"}, {"type": "text", "name": "input_2", "label": "Email"}], "hops": 1}
 registered_in: [CA]
 signals: [email_input, opt_out_form_found]

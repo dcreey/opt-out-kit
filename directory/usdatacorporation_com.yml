@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.usdatacorporation.com/opt-out"
+contact_email: "privacy@usdatacorportion.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.usdatacorporation.com/opt-out", "method": "get", "action": "https://www.usdatacorporation.com/opt-out", "fields": [{"type": "checkbox", "name": "asl_gen[]", "label": "Exact Matches Only"}, {"type": "checkbox", "name": "asl_gen[]", "label": "Search Title"}, {"type": "checkbox", "name": "asl_gen[]", "label": "Search Content"}, {"type": "checkbox", "name": "asl_gen[]", "label": "Search in excerpt"}, {"type": "checkbox", "name": "customset[]", "label": "Hidden"}, {"type": "checkbox", "name": "customset[]", "label": "Hidden"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, listing_url_input, opt_out_form_found]

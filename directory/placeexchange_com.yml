@@ -8,6 +8,8 @@ tier: "C"
 automation: "needs_browser"
 confidence: "low"
 opt_out_url: "https://www.placeexchange.com/do-not-sell-my-information"
+contact_email: "privacy@placeexchange.com"
+contact_email_source: "policy"
 registered_in: [CA, TX]
 signals: [captcha_hcaptcha, captcha_recaptcha, captcha_turnstile, script_rendered_form]
 profiled: "2026-10-22"

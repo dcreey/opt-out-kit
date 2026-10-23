@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.thebridgecorp.com/opt-out/"
+contact_email: "privacy@thebridgecorp.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.thebridgecorp.com/opt-out/", "method": "get", "action": "https://www.thebridgecorp.com/opt-out/", "fields": [{"type": "text", "name": "firstname", "label": "First name*"}, {"type": "text", "name": "lastname", "label": "Last name*"}, {"type": "email", "name": "email", "label": "Work Email*"}, {"type": "tel", "name": "phone", "label": "Phone number*"}, {"type": "text", "name": "company", "label": "Company name*"}, {"type": "select", "name": "company_type", "label": "Company Type*"}, {"type": "select", "name": "primary_role", "label": "Primary Role*"}, {"type": "checkbox", "name": "contact_me_to_schedule_a_demo", "label": "Contact me to schedule a demo"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_input, name_input, opt_out_form_found, phone_input]

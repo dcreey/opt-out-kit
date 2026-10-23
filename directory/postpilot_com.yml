@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.postpilot.com/opt-out-of-mailings-form"
+contact_email: "privacy@postpilot.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [email_contact]
 profiled: "2026-10-22"

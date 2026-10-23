@@ -790,5 +790,16 @@
  "Advertising ID": "Werbe-ID",
  "NSUserTrackingUsageDescription": "Manche Datenhändler tragen Ihr Telefon anhand seiner Werbe-ID aus. Opt-Out Kit liest sie nur, um sie beim Austragen an diese weiterzugeben, und speichert sie nie.",
  "This form asks for your phone's advertising ID, which needs your permission to read.": "Dieses Formular verlangt die Werbe-ID Ihres Telefons; zum Lesen ist Ihre Erlaubnis nötig.",
- "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": "Diese eine Adresse tragen wir genau so, wie Sie sie eingegeben haben, in jedes Opt-out- und Löschformular ein, für Sie und alle, die Sie hinzufügen. Viele Seiten suchen Sie mit genau dieser Adresse, deshalb ändern wir sie nie. Antworten und Bestätigungslinks kommen in Ihrem normalen Posteingang an."
+ "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": "Diese eine Adresse tragen wir genau so, wie Sie sie eingegeben haben, in jedes Opt-out- und Löschformular ein, für Sie und alle, die Sie hinzufügen. Viele Seiten suchen Sie mit genau dieser Adresse, deshalb ändern wir sie nie. Antworten und Bestätigungslinks kommen in Ihrem normalen Posteingang an.",
+ "One message goes to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.": "Eine Nachricht geht an %lld Adressen (%lld Seiten). Alle stehen in Bcc. Sie erhalten eine Kopie. Öffnen, lesen und auf Senden tippen.",
+ "%lld messages go to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open each, read it, and tap Send.": "%lld Nachrichten gehen an %lld Adressen (%lld Seiten). Alle stehen in Bcc. Sie erhalten eine Kopie. Jede öffnen, lesen und auf Senden tippen.",
+ "%lld of %lld": "%lld von %lld",
+ "About %lld days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.": "Noch etwa %lld Tage bei 25 pro Tag. Erfüllen Sie täglich beide Ziele, dann sind in etwa einem Monat alle Seiten abgedeckt. Sie können jederzeit weitermachen.",
+ "Each is filled in; you tick the human check": "Jede ist ausgefüllt; Sie haken die Bestätigung an",
+ "Email the same sites": "Dieselben Seiten per E-Mail anschreiben",
+ "Just in case: email every site, 100 at a time": "Zur Sicherheit: alle Seiten anschreiben, 100 auf einmal",
+ "Keep going: take 25 more": "Weitermachen: 25 weitere übernehmen",
+ "One message, every address in Bcc, as a safety net": "Eine Nachricht, alle Adressen in Bcc, als Sicherheitsnetz",
+ "Today's goals": "Heutige Ziele",
+ "Verify today's sites": "Heutige Seiten bestätigen"
 }

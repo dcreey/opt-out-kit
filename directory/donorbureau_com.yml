@@ -8,6 +8,8 @@ tier: "C"
 automation: "needs_browser"
 confidence: "low"
 opt_out_url: "https://donorbureau.com/opt-out"
+contact_email: "ccpa@donorbureau.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [script_rendered_page]
 profiled: "2026-10-22"

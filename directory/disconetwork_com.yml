@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://support.disconetwork.com/hc/en-us/articles/4418121857819-Notice-of-Right-to-Opt-Out-of-Sale-and-Sharing-Targeted-Advertising"
+contact_email: "privacy@disconetwork.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"

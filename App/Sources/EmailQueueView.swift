@@ -29,12 +29,14 @@ struct MailComposer: UIViewControllerRepresentable {
 struct EmailQueueView: View {
     @EnvironmentObject var model: AppModel
     let domains: [String]
+    /// How many addresses go in one message (the default keeps to Gmail's limit; "send to everyone" uses 100).
+    var perMessage: Int = EmailBatch.maxRecipients
     @State private var composing: EmailBatch?
     @State private var confirmSent: EmailBatch?
 
     private var batches: [EmailBatch] {
         let set = Set(domains)
-        return EmailBatch.single(entries: model.directory.filter { set.contains($0.domain) })
+        return EmailBatch.single(entries: model.directory.filter { set.contains($0.domain) }, maxRecipients: perMessage)
     }
     private func done(_ b: EmailBatch) -> Bool { b.entryIDs.allSatisfy { model.wasEmailed($0) } }
     /// The mail apps on this phone we know how to open, besides the system Mail composer.
@@ -49,7 +51,9 @@ struct EmailQueueView: View {
         let list = batches
         List {
             Section {
-                Text("One message goes to \(list.first?.addresses.count ?? 0) addresses and covers \(domains.count) sites. Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.")
+                Text(list.count == 1
+                     ? Loc.f("One message goes to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open it, read it, and tap Send.", list[0].addresses.count, domains.count)
+                     : Loc.f("%lld messages go to %lld addresses (%lld sites). Every address is in Bcc, so no company sees another. You get a copy. Open each, read it, and tap Send.", list.count, list.reduce(0) { $0 + $1.addresses.count }, domains.count))
                     .font(.footnote)
             }
             ForEach(Array(list.enumerated()), id: \.element.id) { index, b in

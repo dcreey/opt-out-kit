@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://claritas.com/"
+contact_email: "privacyinfo@claritas.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_hcaptcha, captcha_recaptcha, email_contact, email_input, phone_input]
 profiled: "2026-10-22"

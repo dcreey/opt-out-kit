@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://mediawallah.com/donotsell/"
+contact_email: "privacy@mediawallah.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://mediawallah.com/donotsell/", "method": "post", "action": "https://mediawallah.com/donotsell/", "fields": [{"type": "email", "name": "email", "label": "Email address"}, {"type": "text", "name": "_mc4wp_honeypot", "label": "_mc4wp_honeypot"}], "hops": 1}
 registered_in: [CA, OR]
 signals: [email_input, opt_out_form_found, portal_onetrust]

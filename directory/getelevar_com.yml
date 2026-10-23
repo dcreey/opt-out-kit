@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.audiense.com/products/audiense-online/"
+contact_email: "consumerprivacy@buxtonco.com"
+contact_email_source: "policy"
 family: "audiense_com"
 family_parent: "audiense.com"
 registered_in: [CA, TX]

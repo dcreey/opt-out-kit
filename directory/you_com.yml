@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://you.com/privacy-requests"
+contact_email: "privacy@you.com"
+contact_email_source: "policy"
 registered_in: [TX]
 signals: []
 profiled: "2026-10-22"

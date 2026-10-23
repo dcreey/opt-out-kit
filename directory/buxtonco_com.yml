@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.audiense.com/products/audiense-in-person/"
+contact_email: "consumerprivacy@buxtonco.com"
+contact_email_source: "policy"
 family: "audiense_com"
 family_parent: "audiense.com"
 registered_in: [CA, OR, TX]

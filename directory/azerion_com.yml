@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://liveramp.com/privacy/my-privacy-choices"
+contact_email: "dpo@azerion.com"
+contact_email_source: "policy"
 family: "liveramp_com"
 family_parent: "liveramp.com"
 registered_in: [CA, TX]

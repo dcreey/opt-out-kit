@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.aggknowledge.ai/"
+contact_email: "privacy@aggknowledge.ai"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [email_input, name_input, phone_input]
 profiled: "2026-10-22"

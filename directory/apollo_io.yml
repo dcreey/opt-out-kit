@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.apollo.io/privacy-policy/remove"
+contact_email: "u003eprivacy@apollo.io"
+contact_email_source: "page"
 opt_out_form: {"page": "https://www.apollo.io/privacy-policy/remove", "method": "get", "action": "https://www.apollo.io/privacy-policy/remove", "fields": [{"type": "email", "name": "email", "label": "Work email"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_input, opt_out_form_found]

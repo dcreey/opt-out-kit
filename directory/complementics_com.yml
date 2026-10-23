@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://complementics.com/opt-out"
+contact_email: "privacy@complementics.com"
+contact_email_source: "page"
 opt_out_form: {"page": "https://complementics.com/opt-out", "method": "get", "action": "https://complementics.com/opt-out", "fields": [{"type": "text", "name": "maid", "label": "Device ID (MAID)"}, {"type": "email", "name": "email", "label": "Email Address"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, email_input, opt_out_form_found]

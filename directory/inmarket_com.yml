@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://inmarket.com/business-contacts-opt-out/"
+contact_email: "privacy@inmarket.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://inmarket.com/business-contacts-opt-out/", "method": "post", "action": "https://inmarket.com/business-contacts-opt-out/#wpcf7-f6398-p6399-o1", "fields": [{"type": "email", "name": "your-email", "label": "your-email"}, {"type": "text", "name": "full-name", "label": "full-name"}, {"type": "radio", "name": "residency", "label": "residency"}, {"type": "radio", "name": "residency", "label": "residency"}, {"type": "radio", "name": "submitter", "label": "submitter"}, {"type": "radio", "name": "submitter", "label": "submitter"}, {"type": "text", "name": "full-name-registered-agent", "label": "full-name-registered-agent"}, {"type": "checkbox", "name": "delete-personal-information[]", "label": "delete-personal-information[]"}], "hops": 2}
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, name_input, opt_out_form_found]

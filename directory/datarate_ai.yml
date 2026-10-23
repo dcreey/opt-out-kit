@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://datarate.ai/my-privacy-choices"
+contact_email: "privacy@datarate.ai"
+contact_email_source: "policy"
 registered_in: [OR, TX]
 signals: []
 profiled: "2026-10-22"

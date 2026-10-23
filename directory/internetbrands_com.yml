@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.d1.sc.omtrdc.net/optout.html?omniture=1&popup=1&locale=en_US&second=1&second_has_cookie=0"
+contact_email: "privacy@internetbrands.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.d1.sc.omtrdc.net/optout.html?omniture=1&popup=1&locale=en_US&second=1&second_has_cookie=0", "method": "get", "action": "https://www.d1.sc.omtrdc.net/optout.html?Omniture=1&locale=en-US&popup=1", "fields": [{"type": "select", "name": "locale", "label": "Select language"}], "hops": 2}
 registered_in: [CA]
 signals: [opt_out_form_found]

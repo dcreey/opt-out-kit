@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.resonate.com/privacy-policy/opt-out-success/"
+contact_email: "privacy@resonate.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.resonate.com/privacy-policy/opt-out-success/", "method": "post", "action": "https://www.resonate.com/privacy-policy/opt-out-success/", "fields": [{"type": "text", "name": "input_2", "label": "Comments"}, {"type": "email", "name": "input_1", "label": "Email(Required)"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [email_contact, email_input, opt_out_form_found]

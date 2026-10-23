@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.freewheel.com/do-not-sell-my-information"
+contact_email: "legalnotices@freewheel.tv"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.freewheel.com/do-not-sell-my-information", "method": "post", "action": "https://www.freewheel.com/do-not-sell-my-information#wpcf7-f826-o1", "fields": [{"type": "text", "name": "first-name", "label": "First Name (Required)"}, {"type": "text", "name": "last-name", "label": "Last Name (Required)"}, {"type": "email", "name": "email", "label": "Email Address (Required)"}], "hops": 1}
 registered_in: [CA]
 signals: [captcha_recaptcha, email_contact, email_input, listing_url_input, name_input, opt_out_form_found]

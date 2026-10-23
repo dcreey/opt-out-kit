@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.searchquarry.com/"
+contact_email: "privacy@searchquarry.com"
+contact_email_source: "policy"
 signals: [name_input, phone_input, phone_verify]
 profiled: "2026-10-21"
 search_check:

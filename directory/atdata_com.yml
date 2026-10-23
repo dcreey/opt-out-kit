@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://instantdata.atdata.com/optout"
+contact_email: "emailprivacy@generitech.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://instantdata.atdata.com/optout", "method": "post", "action": "https://instantdata.atdata.com/optout#opt_form", "fields": [{"type": "email", "name": "opt_out[email]", "label": "Email:"}, {"type": "text", "name": "opt_out[first_name]", "label": "First Name:"}, {"type": "text", "name": "opt_out[last_name]", "label": "Last Name:"}, {"type": "text", "name": "opt_out[street]", "label": "Street Address:"}, {"type": "text", "name": "opt_out[city]", "label": "City:"}, {"type": "text", "name": "opt_out[state]", "label": "State:"}, {"type": "select", "name": "opt_out[country_code]", "label": "Country:"}, {"type": "text", "name": "opt_out[zip]", "label": "Zip/Postal Code:"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_input, mail_option, name_input, opt_out_form_found, search_first]

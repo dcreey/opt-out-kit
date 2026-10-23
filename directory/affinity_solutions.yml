@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.affinity.solutions/data-privacy-notice/"
+contact_email: "emailprivacy@generitech.com"
+contact_email_source: "policy"
 registered_in: [CA, TX]
 signals: [captcha_turnstile, email_contact, email_input, id_required, mail_option]
 profiled: "2026-10-22"

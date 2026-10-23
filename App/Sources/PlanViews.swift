@@ -105,3 +105,26 @@ struct PlanDestinations: ViewModifier {
 }
 
 extension View { func planDestinations() -> some View { modifier(PlanDestinations()) } }
+
+/// One of today's goals: a title, what it is, and how far along it is.
+struct GoalRow: View {
+    let title: String, subtitle: String
+    let done: Int, total: Int, symbol: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle().stroke(Color.secondary.opacity(0.25), lineWidth: 4)
+                Circle().trim(from: 0, to: total == 0 ? 0 : min(1, Double(done) / Double(total))).stroke(done >= total && total > 0 ? Color.green : Color.accentColor, style: StrokeStyle(lineWidth: 4, lineCap: .round)).rotationEffect(.degrees(-90))
+                Image(systemName: done >= total && total > 0 ? "checkmark" : symbol).font(.caption.bold())
+            }
+            .frame(width: 38, height: 38)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.headline)
+                Text(subtitle).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Text("\(done) of \(total)").font(.caption.bold()).foregroundStyle(done >= total && total > 0 ? .green : .blue)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+}

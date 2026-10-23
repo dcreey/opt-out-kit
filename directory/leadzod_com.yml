@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.leadzod.com/your-privacy-choices"
+contact_email: "privacy@leadzod.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.leadzod.com/your-privacy-choices", "method": "get", "action": "https://www.leadzod.com/your-privacy-choices", "fields": [{"type": "text", "name": "form-field-input-7e9d7a34-8f8d-481e-ee07-66a36d1ef4ed-comp-lz1mqa5d-", "label": "First name*"}, {"type": "text", "name": "form-field-input-4f006c2a-1363-4911-5f72-020aa087e055-comp-lz1mqa5d-", "label": "Last name"}, {"type": "email", "name": "form-field-input-8ffeec5e-d1fd-49d4-b311-bf77a33d3eea-comp-lz1mqa5d-", "label": "Email*"}, {"type": "textarea", "name": "form-field-input-8aeac2cb-e4f2-4a80-9a92-21d659b14f99-comp-lz1mqa5d-", "label": "Write a message"}], "hops": 1}
 registered_in: [TX]
 signals: [email_input, name_input, opt_out_form_found]

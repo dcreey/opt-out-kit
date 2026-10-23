@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://analytics-iq.com/opt-out-statistics/"
+contact_email: "emailprivacy@generitech.com"
+contact_email_source: "policy"
 registered_in: [TX]
 signals: [captcha_recaptcha]
 profiled: "2026-10-22"

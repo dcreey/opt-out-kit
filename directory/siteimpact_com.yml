@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://siteimpact.com/compliance-page"
+contact_email: "privacy@siteimpact.com"
+contact_email_source: "page"
 opt_out_form: {"page": "https://siteimpact.com/compliance-page", "method": "get", "action": "https://siteimpact.com/compliance-page", "fields": [{"type": "text", "name": "first-name", "label": "First name*"}, {"type": "text", "name": "last-name", "label": "Last name*"}, {"type": "date", "name": "date of birth", "label": "date of birth"}, {"type": "tel", "name": "phone", "label": "Phone*"}, {"type": "email", "name": "email", "label": "Email*"}, {"type": "email", "name": "confirm-email-address", "label": "Confirm email address*"}, {"type": "text", "name": "address", "label": "Address*"}, {"type": "text", "name": "address-2", "label": "Address 2"}, {"type": "text", "name": "city", "label": "City*"}, {"type": "text", "name": "zipcode", "label": "Zipcode*"}, {"type": "radio", "name": "request-type", "label": "request-type"}, {"type": "radio", "name": "request-type", "label": "request-type"}, {"type": "file", "name": "government-id---access-request", "label": "Upload File"}, {"type": "radio", "name": "request-type", "label": "request-type"}, {"type": "file", "name": "government-id---delete-request", "label": "Upload File"}], "hops": 1}
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, file_upload, name_input, opt_out_form_found, phone_input]

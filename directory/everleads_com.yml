@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://everleads.com/do-not-sell"
+contact_email: "privacy@everleads.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_input, name_input]
 profiled: "2026-10-22"

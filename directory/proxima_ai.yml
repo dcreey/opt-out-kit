@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.proxima.ai/"
+contact_email: "privacy@proxima.ai"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.findem.ai/privacy-rights"
+contact_email: "privacy@findem.ai"
+contact_email_source: "page"
 opt_out_form: {"page": "https://www.findem.ai/privacy-rights", "method": "post", "action": "https://www.findem.ai/privacy-rights#", "fields": [{"type": "text", "name": "first-name", "label": "First Name"}, {"type": "text", "name": "last-name", "label": "Last Name: *"}, {"type": "email", "name": "email-address", "label": "Email Address: *"}, {"type": "text", "name": "other-comments", "label": "Other comments"}, {"type": "text", "name": "company-website", "label": "company-website"}], "hops": 1}
 registered_in: [CA]
 signals: [email_input, listing_url_input, name_input, opt_out_form_found]

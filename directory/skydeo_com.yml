@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://skydeo.com/opt-out/"
+contact_email: "privacy@skydeo.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://skydeo.com/opt-out/", "method": "get", "action": "https://skydeo.com/opt-out/", "fields": [{"type": "email", "name": "email", "label": "Your email"}, {"type": "text", "name": "website_url", "label": "website_url"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_turnstile, email_input, listing_url_input, opt_out_form_found]

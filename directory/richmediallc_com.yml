@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://richmediallc.com/"
+contact_email: "privacy@richmediallc.com"
+contact_email_source: "policy"
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_input]
 profiled: "2026-10-22"

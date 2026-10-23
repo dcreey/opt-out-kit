@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://usonekeyproddt.oa.iqvia.com/auth/maintenance/login?returnUrl=%2Fauth%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Denhanced_view%26redirect_uri%3Dhttps%253A%252F%252Fusonekeyproddt.oa.iqvia.com%252Fenhanced-view%252Fauth-callback%26response_type%3Did_token%2520token%26scope%3Dauthentication_read_access%2520openid%2520profile%2520enhanced_view_service_read_access%2520enhanced_view_service_write_access%26state%3D4b3580c9a02a4631977d7f3bb0728c6a%26nonce%3Dc0f37368b28b4f7a99441176d7ee50f9%26prompt%3Dlogin%26max_age%3D36000%26suppressed_prompt%3Dlogin"
+contact_email: "privacyofficer@iqvia.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [login_required]
 profiled: "2026-10-22"

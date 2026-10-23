@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://blog.citydata.ai/is-it-legal-to-use-a-wi-fi-sniffer-to-count-people/"
+contact_email: "privacy@citydata.ai"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_input, phone_verify]
 profiled: "2026-10-22"

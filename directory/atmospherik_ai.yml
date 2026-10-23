@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://atmospherik.ai/privacy"
+contact_email: "privacy@atmospherik.ai"
+contact_email_source: "page"
 registered_in: [TX]
 signals: [mail_option, phone_verify]
 profiled: "2026-10-22"

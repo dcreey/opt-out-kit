@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://www.biscred.com/do-not-sell-my-information"
+contact_email: "privacy@biscred.com"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://www.biscred.com/do-not-sell-my-information", "method": "get", "action": "https://www.biscred.com/do-not-sell-my-information", "fields": [{"type": "text", "name": "first-name", "label": "First Name"}, {"type": "text", "name": "last-name", "label": "Last Name"}, {"type": "select", "name": "collection_comp-lbpjuop7", "label": "Choose an option"}, {"type": "checkbox", "name": "", "label": ""}, {"type": "email", "name": "email", "label": "Email"}], "hops": 1}
 registered_in: [CA]
 signals: [email_contact, email_input, name_input, opt_out_form_found]

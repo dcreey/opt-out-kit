@@ -8,6 +8,8 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://thenai.org/how-to-opt-out/"
+contact_email: "privacy@fraiser.org"
+contact_email_source: "policy"
 registered_in: [CA, OR]
 signals: []
 profiled: "2026-10-22"

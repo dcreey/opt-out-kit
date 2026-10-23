@@ -8,6 +8,8 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.acxiom.com/optout/"
+contact_email: "emailprivacy@generitech.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [email_contact, mail_option]
 profiled: "2026-10-21"

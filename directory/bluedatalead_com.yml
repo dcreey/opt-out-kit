@@ -8,6 +8,8 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://bluedatalead.com/"
+contact_email: "unsubscribe@bluedatalead.com"
+contact_email_source: "policy"
 registered_in: [TX]
 signals: [captcha_recaptcha, file_upload]
 profiled: "2026-10-22"

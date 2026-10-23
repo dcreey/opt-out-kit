@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.nielsen.com/legal/optout-page/"
+contact_email: "privacy.department@nielsen.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_hcaptcha, captcha_recaptcha, captcha_turnstile, portal_onetrust]
 profiled: "2026-10-22"

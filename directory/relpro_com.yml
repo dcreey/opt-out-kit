@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://relpro.com/opt-out"
+contact_email: "opt-out@relpro.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact]
 profiled: "2026-10-22"

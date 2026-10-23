@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.revcontent.com:443/"
+contact_email: "privacy@revcontent.com"
+contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_input]
 profiled: "2026-10-22"

@@ -8,6 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://firmable.ai/au/profile-removal-request/"
+contact_email: "privacy@firmable.ai"
+contact_email_source: "policy"
 opt_out_form: {"page": "https://firmable.ai/au/profile-removal-request/", "method": "post", "action": "https://firmable.ai/au/profile-removal-request/#gf_3", "fields": [{"type": "email", "name": "input_1", "label": "Email(Required)"}], "hops": 2}
 registered_in: [OR, TX]
 signals: [email_input, opt_out_form_found]

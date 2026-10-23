@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.mobilewalla.com/global-opt-out-request"
+contact_email: "privacy@mobilewalla.com"
+contact_email_source: "page"
 opt_out_form: {"page": "https://www.mobilewalla.com/global-opt-out-request", "method": "get", "action": "https://www.mobilewalla.com/global-opt-out-request", "fields": [{"type": "checkbox", "name": "info-request", "label": "info-request"}, {"type": "checkbox", "name": "info-request", "label": "info-request"}, {"type": "checkbox", "name": "info-request", "label": "info-request"}, {"type": "checkbox", "name": "info-request", "label": "info-request"}, {"type": "email", "name": "email", "label": "Enter Email (Required)"}, {"type": "text", "name": "maid", "label": "Enter MAID (Required)"}, {"type": "select", "name": "country", "label": "country"}, {"type": "select", "name": "state", "label": "state"}, {"type": "radio", "name": "verify-resident", "label": "verify-resident"}, {"type": "radio", "name": "verify-resident", "label": "verify-resident"}], "hops": 0}
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_input, opt_out_form_found]

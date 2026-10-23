@@ -8,6 +8,8 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.beenverified.com/"
+contact_email: "dpo@beenverified.com"
+contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, email_input, email_only_wording, name_input, phone_input]
 profiled: "2026-10-21"
