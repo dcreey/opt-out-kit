@@ -162,6 +162,33 @@ final class AppModel: ObservableObject {
     }
 
     #if DEBUG
+    /// Launched with `-export-evidence` (simulator work only): also writes each screenshot, unsealed, to Documents/evidence-export so a
+    /// whole run can be reviewed from outside the app. Never present in a release build.
+    nonisolated static func exportForReview(_ domain: String, _ jpeg: Data) {
+        guard ProcessInfo.processInfo.arguments.contains("-export-evidence"),
+              let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let dir = docs.appendingPathComponent("evidence-export")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try? jpeg.write(to: dir.appendingPathComponent(domain + ".jpg"))
+    }
+    #else
+    nonisolated static func exportForReview(_ domain: String, _ jpeg: Data) {}
+    #endif
+
+    #if DEBUG
+    nonisolated static func exportResults(_ rows: [(String, String)]) {
+        guard ProcessInfo.processInfo.arguments.contains("-export-evidence"),
+              let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let dir = docs.appendingPathComponent("evidence-export")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let text = rows.map { "\($0.0)\t\($0.1)" }.joined(separator: "\n")
+        try? text.write(to: dir.appendingPathComponent("results.tsv"), atomically: true, encoding: .utf8)
+    }
+    #else
+    nonisolated static func exportResults(_ rows: [(String, String)]) {}
+    #endif
+
+    #if DEBUG
     /// For looking at the result screens: runs the automatic opt-out against the fake submitter at launch.
     func runDemoOptOut() async {
         guard let me = people.first(where: { $0.relationship == .me }) else { return }
@@ -508,7 +535,10 @@ final class AppModel: ObservableObject {
         let now = Date()
         var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } },
-                                   evidence: { [evidence, personID = original.id] entry, shot in try? evidence.save(shot, person: personID, site: entry.id) })
+                                   evidence: { [evidence, personID = original.id] entry, shot in
+                                       try? evidence.save(shot, person: personID, site: entry.id)
+                                       Self.exportForReview(entry.domain, shot)
+                                   })
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -527,6 +557,7 @@ final class AppModel: ObservableObject {
             }
         }
         optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
+        Self.exportResults(results.map { ($0.0.domain, $0.1.label) })
         if !dryRun {
             let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [], personID: original.id)
             household.updateAuto {
