@@ -18,7 +18,7 @@ DENY = re.compile(r"^\s*(reject( all)?( cookies| non-essential( cookies)?)?|deny
 KNOWN = ["#onetrust-reject-all-handler", "#CybotCookiebotDialogBodyButtonDecline", "button#truste-consent-required", ".cc-deny", "[data-cookiefirst-action=reject]",
          "#cookie-reject", ".osano-cm-denyAll", "#didomi-notice-disagree-button", "button[aria-label*='Reject' i]", "#axeptio_btn_dismiss"]
 MARKETING = re.compile(r"subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", re.I)
-OPTOUT = re.compile(r"opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe me", re.I)
+OPTOUT = re.compile(r"opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", re.I)
 IDENT = re.compile(r"first|last|name|email|e-mail|address|zip|postal|phone|city", re.I)
 FORMS_JS = """() => {
   const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
@@ -37,7 +37,7 @@ BLOCK_JS = """() => { const t = (document.body.innerText || '').toLowerCase(); c
   return [...new Set(out)]; }"""
 
 
-def score(form):
+def score(form, ctx=""):
     fields = [f for f in form["fields"] if f["type"] not in ("password",)]
     if not form["visible"] or not fields: return -100
     buttons = " ".join(form["buttons"]); s = 0
@@ -45,6 +45,7 @@ def score(form):
     if OPTOUT.search(form["text"]): s += 2
     if MARKETING.search(buttons): s -= 6
     if MARKETING.search(form["text"]) and not OPTOUT.search(buttons): s -= 3
+    if OPTOUT.search(ctx): s += 3          # the page's own address or title is about opting out
     s += min(4, sum(1 for f in fields if IDENT.search(f["label"] + " " + f["name"])))
     if any(f["type"] == "email" or re.search("e-?mail", f["label"] + f["name"], re.I) for f in fields): s += 2
     if any(f["type"] == "password" for f in form["forms_pw"]) if False else False: s -= 8
@@ -70,10 +71,11 @@ async def look(ctx, url):
         await deny_cookies(page); await page.wait_for_timeout(500)
         for y in range(0, 6000, 900): await page.evaluate(f"window.scrollTo(0,{y})"); await page.wait_for_timeout(80)
         forms = await page.evaluate(FORMS_JS)
-        best = max(((score(f), f) for f in forms), key=lambda x: x[0], default=(-100, None))
+        ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
+        best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
         links = await page.evaluate(LINKS_JS)
-        blockers = await page.evaluate(BLOCK_JS) if best[0] >= 4 else []
-        return best[0] if best[0] >= 4 else None, blockers, links, page.url
+        blockers = await page.evaluate(BLOCK_JS) if best[0] >= 5 else []
+        return best[0] if best[0] >= 5 else None, blockers, links, page.url
     except Exception:
         return None, [], [], url
     finally:

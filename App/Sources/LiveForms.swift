@@ -32,13 +32,13 @@ struct LiveForm: Decodable, Equatable {
 
 enum LiveFormPicker {
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
-    private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe me", options: .caseInsensitive)
+    private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
 
     /// How likely a form is the opt-out form: opt-out wording and several identity fields count for it, marketing wording against it.
-    static func score(_ f: LiveForm) -> Int {
+    static func score(_ f: LiveForm, pageContext: String = "") -> Int {
         guard f.visible else { return -100 }
         let fields = f.fields.filter { $0.visible && !["hidden", "submit", "button", "image", "password"].contains($0.type) }
         guard !fields.isEmpty else { return -100 }
@@ -49,6 +49,7 @@ enum LiveFormPicker {
         if has(optOut, heading) { s += 2 }
         if has(marketing, buttons) { s -= 6 }
         if has(marketing, heading) && !has(optOut, buttons) { s -= 3 }
+        if has(optOut, pageContext) { s += 3 }
         s += min(4, fields.filter { has(identity, $0.label + " " + $0.name) }.count)
         if fields.contains(where: { $0.type == "email" || has(try! NSRegularExpression(pattern: "e-?mail", options: .caseInsensitive), $0.label + $0.name) }) { s += 2 }
         if fields.contains(where: { $0.type == "password" }) { s -= 8 }
@@ -56,9 +57,9 @@ enum LiveFormPicker {
     }
 
     /// The best candidate, or nil when nothing on the page looks like an opt-out form.
-    static func pick(_ forms: [LiveForm]) -> LiveForm? {
-        let ranked = forms.map { ($0, score($0)) }.sorted { $0.1 > $1.1 }
-        guard let best = ranked.first, best.1 > 0 else { return nil }
+    static func pick(_ forms: [LiveForm], pageContext: String = "") -> LiveForm? {
+        let ranked = forms.map { ($0, score($0, pageContext: pageContext)) }.sorted { $0.1 > $1.1 }
+        guard let best = ranked.first, best.1 >= 3 else { return nil }
         return best.0
     }
 }
@@ -224,6 +225,11 @@ extension WebViewSession {
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
+    /// The page's address path and title: a form on a page about opting out is more likely the opt-out form.
+    func pageContext() async -> String {
+        ((try? await webView.evaluateJavaScript("location.pathname + ' ' + document.title")) as? String) ?? ""
+    }
+
     /// Whether the chosen form is still on the page and visible, and the page's address.
     func formState(_ token: String) async -> (visible: Bool, url: String) {
         let js = "(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); var v=false; if(f){var r=f.getBoundingClientRect(),s=getComputedStyle(f); v=r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';} return JSON.stringify({v:v,u:location.href});})();"
@@ -288,7 +294,8 @@ extension FormRun {
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
 
         let forms = await session.discoverForms()
-        guard let form = LiveFormPicker.pick(forms) else { return .failed("no opt-out form was found on the page") }
+        let context = await session.pageContext()
+        guard let form = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
         session.chosenForm = form.token
         let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
         switch plan.verdict {

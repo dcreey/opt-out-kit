@@ -49,7 +49,7 @@ struct WebAssistedDriver: AssistedDriver {
         await session.hideConsentOverlays()
         let page = WebAssistedPage(session: session, plan: plan)
         if let person {
-            guard let live = LiveFormPicker.pick(await session.discoverForms()) else { session.close(); return nil }
+            guard let live = LiveFormPicker.pick(await session.discoverForms(), pageContext: await session.pageContext()) else { session.close(); return nil }
             let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person, advertisingID: advertisingID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
         }
