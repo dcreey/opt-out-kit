@@ -600,19 +600,9 @@ final class AppModel: ObservableObject {
         return batch.body(name: p.legalName, email: formEmail ?? "", address: street)
     }
 
-    func mailtoURL(for batch: EmailBatch) -> URL? {
-        var c = URLComponents(); c.scheme = "mailto"; c.path = formEmail ?? ""
-        c.queryItems = [URLQueryItem(name: "bcc", value: batch.addresses.joined(separator: ",")), URLQueryItem(name: "subject", value: batch.subject),
-                        URLQueryItem(name: "body", value: emailBody(for: batch))]
-        return c.url
-    }
-
-    /// The Gmail app's own compose link, prefilled the same way.
-    func gmailURL(for batch: EmailBatch) -> URL? {
-        var c = URLComponents(); c.scheme = "googlegmail"; c.host = ""; c.path = "/co"
-        c.queryItems = [URLQueryItem(name: "to", value: formEmail ?? ""), URLQueryItem(name: "bcc", value: batch.addresses.joined(separator: ",")),
-                        URLQueryItem(name: "subject", value: batch.subject), URLQueryItem(name: "body", value: emailBody(for: batch))]
-        return c.url
+    /// The link that opens `app`'s compose screen with the message ready: you as the To address, every company in Bcc.
+    func composeURL(for batch: EmailBatch, app: MailApp) -> URL? {
+        app.composeURL(to: formEmail ?? "", bcc: batch.addresses, subject: batch.subject, body: emailBody(for: batch))
     }
 
     /// The person tapped Send on the message: every site it covers is recorded as asked.

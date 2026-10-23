@@ -784,5 +784,7 @@
  "Sites in this message": "Seiten in dieser Nachricht",
  "The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.": "Gmail und die Standard-Mail-App sagen uns nicht, ob Sie die Nachricht gesendet haben. Markieren Sie sie nur dann als gesendet, wenn Sie es getan haben.",
  "The message": "Die Nachricht",
- "Yes, I sent it": "Ja, ich habe sie gesendet"
+ "Yes, I sent it": "Ja, ich habe sie gesendet",
+ "Open in %@": "In %@ öffnen",
+ "Use another mail app": "Andere Mail-App verwenden"
 }

@@ -37,7 +37,13 @@ struct EmailQueueView: View {
         return EmailBatch.single(entries: model.directory.filter { set.contains($0.domain) })
     }
     private func done(_ b: EmailBatch) -> Bool { b.entryIDs.allSatisfy { model.wasEmailed($0) } }
-    private var gmailInstalled: Bool { UIApplication.shared.canOpenURL(URL(string: "googlegmail://")!) }
+    /// The mail apps on this phone we know how to open, besides the system Mail composer.
+    private var installedApps: [MailApp] {
+        MailApp.allCases.filter { app in
+            guard let scheme = app.probeScheme, let url = URL(string: scheme + "://") else { return false }
+            return UIApplication.shared.canOpenURL(url)
+        }
+    }
 
     var body: some View {
         let list = batches
@@ -51,12 +57,14 @@ struct EmailQueueView: View {
                     if done(b) {
                         Label("Sent", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                     } else {
-                        Button { open(b, gmail: false) } label: { Label("Open in Mail", systemImage: "envelope.open").frame(maxWidth: .infinity) }
+                        Button { open(b, app: .mail) } label: { Label("Open in Mail", systemImage: "envelope.open").frame(maxWidth: .infinity) }
                             .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("email-open-mail")
-                        if gmailInstalled {
-                            Button { open(b, gmail: true) } label: { Label("Open in Gmail", systemImage: "envelope").frame(maxWidth: .infinity) }
-                                .buttonStyle(.bordered).accessibilityIdentifier("email-open-gmail")
+                        ForEach(installedApps, id: \.self) { app in
+                            Button { open(b, app: app) } label: { Label("Open in \(app.name)", systemImage: "envelope").frame(maxWidth: .infinity) }
+                                .buttonStyle(.bordered).accessibilityIdentifier("email-open-\(app.rawValue)")
                         }
+                        Button { open(b, app: .other) } label: { Label("Use another mail app", systemImage: "ellipsis.circle").frame(maxWidth: .infinity) }
+                            .buttonStyle(.bordered).accessibilityIdentifier("email-open-other")
                     }
                     Text("\(b.addresses.count) addresses, \(b.domains.count) sites").font(.caption).foregroundStyle(.secondary)
                     DisclosureGroup("Sites in this message") { ForEach(b.domains, id: \.self) { Text($0).font(.footnote) } }
@@ -80,11 +88,11 @@ struct EmailQueueView: View {
         } message: { Text("The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.") }
     }
 
-    private func open(_ b: EmailBatch, gmail: Bool) {
+    private func open(_ b: EmailBatch, app: MailApp) {
         model.requireProfile {
-            if gmail, let url = model.gmailURL(for: b) { UIApplication.shared.open(url); confirmSent = b }
-            else if MFMailComposeViewController.canSendMail() { composing = b }
-            else if let url = model.mailtoURL(for: b) { UIApplication.shared.open(url); confirmSent = b }
+            if app == .mail, MFMailComposeViewController.canSendMail() { composing = b; return }
+            // Every other way of opening a message cannot tell us whether it was sent, so we ask afterwards.
+            if let url = model.composeURL(for: b, app: app) { UIApplication.shared.open(url); confirmSent = b }
         }
     }
 }

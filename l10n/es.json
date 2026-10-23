@@ -784,5 +784,7 @@
  "Sites in this message": "Sitios de este mensaje",
  "The Gmail and default mail apps do not tell us whether you sent the message. Mark it as sent only if you did.": "Gmail y la app de correo predeterminada no nos dicen si enviaste el mensaje. Márcalo como enviado solo si lo hiciste.",
  "The message": "El mensaje",
- "Yes, I sent it": "Sí, lo envié"
+ "Yes, I sent it": "Sí, lo envié",
+ "Open in %@": "Abrir en %@",
+ "Use another mail app": "Usar otra app de correo"
 }

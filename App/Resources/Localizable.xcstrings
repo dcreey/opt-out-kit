@@ -9454,6 +9454,29 @@
     }
    }
   },
+  "Open in %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir dans %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir en %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In %@ öffnen"
+     }
+    }
+   }
+  },
   "Open in Gmail": {
    "extractionState": "manual",
    "localizations": {
@@ -15476,6 +15499,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Unter 18"
+     }
+    }
+   }
+  },
+  "Use another mail app": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Utiliser une autre app de messagerie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Usar otra app de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Andere Mail-App verwenden"
      }
     }
    }

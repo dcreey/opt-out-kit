@@ -39,14 +39,21 @@ public struct EmailBatch: Identifiable, Equatable, Sendable {
 
     public var subject: String { "Opt-out and deletion request" }
 
-    /// The message, always in English (brokers read English): who is asking, what they ask for, which sites it covers. The person reads it before sending.
-    public func body(name: String, email: String, address street: String) -> String {
-        var lines = [addresses.count > 1 ? "Dear Privacy Team," : "Hello,", "",
-                     "I am writing to opt out of the sale and sharing of my personal information, to opt out of targeted advertising and profiling, and to ask you to delete the personal information you hold about me.", "",
-                     "Name: \(name)", "Email: \(email)", "Address: \(street)", ""]
-        lines.append(domains.count > 1 ? "This request applies to each of these sites and brands, wherever you operate them. Please act on those you operate or own:" : "This request covers this site:")
-        lines += domains.map { "- \($0)" }
-        lines += ["", "Please confirm by email when this is done.", "", "Thank you."]
-        return lines.joined(separator: "\n")
+    /// The message, always in English and the same for every company: who is asking and what they ask for, with the details a company needs
+    /// to find the record. It does not name the company or its sites, so it can go to any of them.
+    public func body(name: String, email: String, address street: String) -> String { Self.genericBody(name: name, email: email, address: street) }
+
+    public static func genericBody(name: String, email: String, address street: String) -> String {
+        [
+            "To the privacy team,", "",
+            "I am a consumer asking you to act on my personal information under the privacy laws that apply to me (including the CCPA/CPRA and other state privacy laws, and the GDPR where it applies).", "",
+            "1. Opt me out of the sale and sharing of my personal information, and of targeted advertising and profiling.",
+            "2. Delete the personal information you hold about me, and tell any service providers and third parties you have shared it with to do the same.",
+            "3. Stop collecting, selling or sharing my personal information in future.", "",
+            "Details to find my records:",
+            "Name: \(name)", "Email: \(email)", "Address: \(street)", "",
+            "If you need anything else to verify this request, reply to this email. Please confirm when it is done.", "",
+            "Thank you.", name,
+        ].joined(separator: "\n")
     }
 }

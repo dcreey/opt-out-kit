@@ -2415,8 +2415,8 @@ final class EmailBatchTests: XCTestCase {
         XCTAssertEqual(EmailBatch.single(entries: mine, maxRecipients: 10).count, Int((Double(single[0].addresses.count) / 10).rounded(.up)), "a limit splits it")
         XCTAssertEqual(EmailBatch.single(entries: mine, maxRecipients: 10).flatMap(\.domains).count, mail.siteCount)
         let body = single[0].body(name: "Pat Example", email: "pat+optoutkit@gmail.com", address: "1 Main St, Springfield, IL 62701")
-        XCTAssertTrue(body.contains("Pat Example") && body.contains("pat+optoutkit@gmail.com") && body.contains(single[0].domains[0]))
-        XCTAssertTrue(body.hasPrefix("Dear Privacy Team"))
+        XCTAssertTrue(body.contains("Pat Example") && body.contains("pat+optoutkit@gmail.com"))
+        XCTAssertFalse(body.contains(single[0].domains[0]), "generic: it names no site")
     }
 }
 
@@ -2434,5 +2434,28 @@ final class VerifyTaskTests: XCTestCase {
         XCTAssertGreaterThan(verify.siteCount, 5)
         XCTAssertEqual(verify.method, .semiAutomatic)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count)
+    }
+}
+
+final class GenericEmailAndMailAppTests: XCTestCase {
+    func testTheMessageIsTheSameForEveryCompanyAndNamesNeitherTheCompanyNorItsSites() {
+        let a = EmailBatch(address: "a@x.com", addresses: ["a@x.com"], domains: ["x.com"], entryIDs: ["x"])
+        let b = EmailBatch(address: "b@y.com", addresses: ["b@y.com", "c@z.com"], domains: ["y.com", "z.com"], entryIDs: ["y", "z"])
+        let ba = a.body(name: "Pat Example", email: "pat@gmail.com", address: "1 Main St"), bb = b.body(name: "Pat Example", email: "pat@gmail.com", address: "1 Main St")
+        XCTAssertEqual(ba, bb)
+        XCTAssertFalse(ba.contains("x.com") || ba.contains("y.com"))
+        for need in ["Pat Example", "pat@gmail.com", "1 Main St", "Opt me out", "Delete"] { XCTAssertTrue(ba.contains(need), need) }
+    }
+
+    func testEveryMailAppGetsALinkCarryingTheBccListSubjectAndBody() throws {
+        for app in MailApp.allCases {
+            let url = try XCTUnwrap(app.composeURL(to: "me@gmail.com", bcc: ["a@x.com", "b@y.com"], subject: "Opt-out request", body: "Hello"), app.name)
+            let text = url.absoluteString.removingPercentEncoding ?? ""
+            XCTAssertTrue(text.contains("a@x.com") && text.contains("b@y.com"), "\(app.name): \(text)")
+            XCTAssertTrue(text.contains("Opt-out request") && text.contains("Hello"), app.name)
+        }
+        XCTAssertEqual(MailApp.gmail.composeURL(to: "", bcc: ["a@x.com"], subject: "s", body: "b")?.scheme, "googlegmail")
+        XCTAssertEqual(MailApp.other.composeURL(to: "", bcc: ["a@x.com"], subject: "s", body: "b")?.scheme, "mailto")
+        XCTAssertEqual(Set(MailApp.probeSchemes), ["googlegmail", "ms-outlook", "ymail", "readdle-spark", "protonmail"])
     }
 }
