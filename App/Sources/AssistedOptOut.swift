@@ -15,9 +15,13 @@ protocol AssistedPage: AnyObject {
     func refill() async
     func send() async -> SubmitOutcome
     func close()
-    /// The live web view to show the person, or nil in tests.
+    /// The live web view to show the person, or nil in tests. Reading it changes nothing: `present()` must be called first.
     var webView: WKWebView? { get }
+    /// Moves the page's web view out of its hidden window so a screen can show it. Called by the runner, never while a view is drawing.
+    func present()
 }
+
+extension AssistedPage { func present() {} }
 
 @MainActor
 protocol AssistedDriver {
@@ -66,7 +70,8 @@ final class WebAssistedPage: AssistedPage {
 
     func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm }
 
-    var webView: WKWebView? { shown ?? { shown = session.presentable(); return shown }() }
+    var webView: WKWebView? { shown }
+    func present() { if shown == nil { shown = session.presentable() } }
 
     func blockers() async -> [AssistedBlocker] {
         var out: [AssistedBlocker] = []
@@ -159,6 +164,7 @@ final class AssistedRunner: ObservableObject {
             index = i; phase = .loading; skipFlag = false; page = nil
             prepare(i)
             guard let ready = await preparing[i]?.value else { record(items[i], .failed("the page would not load")); continue }
+            ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready
             prepare(i + 1)      // load the next one while the person works on this one
 
