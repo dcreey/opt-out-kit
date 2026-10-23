@@ -79,6 +79,7 @@ final class WebAssistedPage: AssistedPage {
         if await session.hasTermsPrompt() { out.append(.terms) }
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
         if let why = await session.visibleChallenge() { out.append(.check(why)) }
+        if await session.emptyCodeField() { out.append(.check("a code to type")) }
         return out
     }
 

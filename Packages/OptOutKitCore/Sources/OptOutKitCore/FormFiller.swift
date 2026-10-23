@@ -54,6 +54,15 @@ public enum FormFiller {
         return selfIdentity.firstMatch(in: text, range: r) != nil && notSelfIdentity.firstMatch(in: text, range: r) == nil
     }
 
+    /// A text box that asks the person to type a code shown in a picture or sent to them ("Captcha", "Security code"). Only they can fill it.
+    static func isTypedCode(_ field: FormField) -> Bool {
+        guard field.type == "text" || field.type == "tel" || field.type == "number" else { return false }
+        return (field.name + " " + field.label).range(of: "captcha|security.?code|verification.?code|enter the (code|text|characters)|type the (code|characters)", options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    /// Whether the form has one: the person types it, so the site is semi-automated and goes last in the queue.
+    public static func hasTypedCode(_ form: OptOutForm) -> Bool { form.fields.contains(where: isTypedCode) }
+
     /// A field that wants the address of the person's own listing on the site ("Enter URL here", "Link to your listing").
     static func isListingField(_ field: FormField) -> Bool {
         let key = (field.name + " " + field.label).lowercased()
@@ -82,6 +91,7 @@ public enum FormFiller {
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         for field in form.fields {
             let key = (field.name + " " + field.label).lowercased()
+            if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
             let required = field.label.contains("*") || field.label.lowercased().contains("(required)")
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }

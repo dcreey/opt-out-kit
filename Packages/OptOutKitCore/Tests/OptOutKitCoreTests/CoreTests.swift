@@ -2530,6 +2530,25 @@ final class CoverageReportTests: XCTestCase {
             if v.method == .guided || v.method == .manual { reasons[String(v.reason.prefix(90)), default: 0] += 1 }
         }
         print("COVERAGE", counts.sorted { $0.key < $1.key })
-        for (r, n) in reasons.sorted(by: { $0.value > $1.value }).prefix(12) { print("REASON \(n) \(r)") }
+        for (r, n) in reasons.sorted(by: { $0.value > $1.value }).prefix(40) { print("REASON \(n) \(r)") }
+    }
+}
+
+final class TypedCodeTests: XCTestCase {
+    func testACaptchaTextBoxIsLeftForThePersonAndTheSiteGoesLastInTheVerifyTask() throws {
+        let plain = OptOutForm(page: URL(string: "https://a.example/o")!, method: "post", action: nil,
+                               fields: [FormField(type: "text", name: "first", label: "First *"), FormField(type: "email", name: "em", label: "Email *")], hops: 1)
+        let coded = OptOutForm(page: URL(string: "https://b.example/o")!, method: "post", action: nil,
+                               fields: plain.fields + [FormField(type: "text", name: "cap", label: "Captcha *")], hops: 1)
+        XCTAssertTrue(FormFiller.hasTypedCode(coded)); XCTAssertFalse(FormFiller.hasTypedCode(plain))
+        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main", city: "X", state: "IL", zip: "60601")], emails: ["pat@example.com"])
+        let plan = FormFiller.plan(for: coded, signals: nil, person: p)
+        XCTAssertEqual(plan.verdict, .ready, "the code is not something we lack: the person types it")
+        XCTAssertNil(plan.values.first { $0.name == "cap" })
+        func entry(_ id: String, _ f: OptOutForm) -> DirectoryEntry { DirectoryEntry(id: id, domain: id + ".example", name: id, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: []) }
+        let entries = [entry("b", coded), entry("a", plain)]            // the coded one is listed first
+        let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { OptOutMethods.classify($0) }, classifyBroker: { OptOutMethods.classify($0) })
+        let verify = try XCTUnwrap(steps.flatMap(\.tasks).first { $0.kind == .verify })
+        XCTAssertEqual(verify.domains, ["a.example", "b.example"], "typed-code forms come last")
     }
 }

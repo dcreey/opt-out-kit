@@ -110,6 +110,16 @@ extension WebViewSession {
               if(vis(b)) buttons.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
             out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
                       text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240)});});
+          // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
+          var loose=[].slice.call(document.querySelectorAll('input,select,textarea')).filter(function(e){
+            return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e);});
+          if(loose.length>=2&&document.body){
+            document.body.setAttribute('data-ook-form','fx'); var lf=[];
+            loose.forEach(function(e,j){var type=e.tagName.toLowerCase()==='select'?'select':(e.tagName.toLowerCase()==='textarea'?'textarea':(e.type||'text'));
+              var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);
+              lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true});});
+            var lb=[]; document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
+            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(document.body.innerText||'').replace(/\s+/g,' ').trim().slice(0,240)});}
           return JSON.stringify(out);})();
         """#
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8) else { return [] }
@@ -228,6 +238,20 @@ extension WebViewSession {
     /// The page's address path and title: a form on a page about opting out is more likely the opt-out form.
     func pageContext() async -> String {
         ((try? await webView.evaluateJavaScript("location.pathname + ' ' + document.title")) as? String) ?? ""
+    }
+
+    /// A visible, empty text box that asks for a code ("Captcha", "Security code"): the person types it, and the form is not sent until it is filled.
+    func emptyCodeField() async -> Bool {
+        let js = #"""
+        (function(){var re=/captcha|security.?code|verification.?code|enter the (code|text|characters)|type the (code|characters)/i;
+          var els=document.querySelectorAll('input[type=text],input:not([type]),input[type=tel],input[type=number]');
+          for(var i=0;i<els.length;i++){var e=els[i],r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
+            var l=(e.name||'')+' '+(e.id||'')+' '+(e.placeholder||'')+' '+(e.getAttribute('aria-label')||'');
+            if(e.id){var lb=document.querySelector('label[for="'+e.id+'"]'); if(lb) l+=' '+lb.innerText;}
+            if(re.test(l)&&!e.value) return true;}
+          return false;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
     /// Whether the chosen form is still on the page and visible, and the page's address.

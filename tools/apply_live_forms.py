@@ -14,7 +14,7 @@ def main():
         for line in open(f):
             parts = line.rstrip("\n").split("\t")
             if len(parts) < 4: continue
-            domain, result, page, blockers = parts[:4]
+            domain, result, page, blockers = parts[:4]; mail = parts[4] if len(parts) > 4 else ""
             path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", domain.lower()).strip("_") + ".yml")
             if not os.path.exists(path): continue
             s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", "\n", open(path).read()).rstrip("\n")
@@ -22,6 +22,8 @@ def main():
             items = ", ".join('"' + b.replace('"', "'") + '"' for b in blockers.split(";") if b)
             block = f'\nlive_form:\n  checked: "{a.date}"\n  found: {"true" if ok else "false"}\n'
             if ok: block += f'  page: "{page}"\n  blockers: [{items}]\n'
+            if mail and "\ncontact_email:" not in s:
+                block += f'contact_email: "{mail}"\ncontact_email_source: "browser"\n'
             open(path, "w").write(s + block); found += ok; missing += not ok
     print(f"found a form on {found} sites, none on {missing}")
 

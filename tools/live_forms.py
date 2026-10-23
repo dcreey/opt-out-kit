@@ -25,11 +25,23 @@ FORMS_JS = """() => {
   const label = e => { let t = ''; if (e.id) { const l = document.querySelector('label[for="' + e.id + '"]'); if (l) t = l.innerText; }
     if (!t) { const p = e.closest('label'); if (p) t = p.innerText; } if (!t) t = e.getAttribute('aria-label') || e.placeholder || e.name || '';
     return t.replace(/\\s+/g, ' ').trim().slice(0, 80); };
-  return [...document.querySelectorAll('form')].map(f => ({ visible: vis(f),
+  const loose = [...document.querySelectorAll('input,select,textarea')].filter(e => !e.closest('form') && !['hidden','submit','button','image','reset','search'].includes(e.type) && vis(e));
+  const pseudo = loose.length >= 2 ? [{ visible: true,
+    fields: loose.map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
+    buttons: [...document.querySelectorAll('button,input[type=submit],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)).slice(0, 12),
+    text: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }] : [];
+  return pseudo.concat([...document.querySelectorAll('form')].map(f => ({ visible: vis(f),
     fields: [...f.querySelectorAll('input,select,textarea')].filter(e => !['hidden','submit','button','image','reset'].includes(e.type) && vis(e)).map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)),
-    text: (f.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) })); }"""
-LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80)])"""
+    text: (f.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }))); }"""
+PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm", re.I)
+# Links, plus the addresses of embedded privacy portals (a request form shown in a frame cannot be read from the page around it).
+LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80)])
+  .concat([...document.querySelectorAll('iframe[src]')].map(f => [f.src, 'privacy portal request form']))"""
+EMAIL_JS = """() => { const t = (document.body.innerText || ''); const m = [...document.querySelectorAll('a[href^="mailto:"]')].map(a => a.href.replace('mailto:', '').split('?')[0]);
+  return [...new Set(m.concat(t.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}/g) || []))].slice(0, 12); }"""
+WANT_MAIL = re.compile(r"privacy|dpo|optout|opt-out|dsar|rights|ccpa|gdpr|legal|compliance|dataprotection|consumer|removal|remove|unsubscribe|suppress|inquir", re.I)
+BAD_MAIL = re.compile(r"sales@|support@|press@|careers?@|jobs@|billing@|abuse@|noreply|no-reply|example\.|sentry|wixpress|cloudflare|info@", re.I)
 BLOCK_JS = """() => { const t = (document.body.innerText || '').toLowerCase(); const out = [];
   if (document.querySelector('iframe[src*="recaptcha"],iframe[src*="hcaptcha"],iframe[src*="challenges.cloudflare"],.cf-turnstile,[class*="turnstile" i],.g-recaptcha,[class*="captcha" i]')) out.push('check');
   if (/verify you are human|i.?m not a robot|confirm you are human/.test(t)) out.push('check');
@@ -74,6 +86,8 @@ async def look(ctx, url):
         ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
         best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
         links = await page.evaluate(LINKS_JS)
+        for m in await page.evaluate(EMAIL_JS):
+            if WANT_MAIL.search(m) and not BAD_MAIL.search(m): MAILS.setdefault(urllib.parse.urlsplit(url).netloc.replace("www.", ""), m.lower())
         blockers = await page.evaluate(BLOCK_JS) if best[0] >= 5 else []
         return best[0] if best[0] >= 5 else None, blockers, links, page.url
     except Exception:
@@ -82,13 +96,16 @@ async def look(ctx, url):
         await page.close()
 
 
+MAILS = {}
+
+
 def good_links(base, links, own):
     seen, out = set(), []
     for href, text in links:
         u = urllib.parse.urljoin(base, href).split("#")[0]
         if not u.startswith("http") or u in seen: continue
-        if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS): continue
-        sc = P.link_score(u, text)
+        if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u): continue
+        sc = P.link_score(u, text) + (8 if PORTAL_HOSTS.search(u) else 0)
         if sc >= 6: seen.add(u); out.append((sc, u))
     return [u for _, u in sorted(out, reverse=True)[:3]]
 
@@ -132,7 +149,8 @@ async def main():
         with open(os.path.join(a.out, "shard-0.tsv"), "w") as out:
             for coro in asyncio.as_completed([site(browser, d, u, sem) for d, u in targets]):
                 d, r, page, bl = await coro; done += 1
-                out.write(f"{d}\t{r}\t{page}\t{bl}\n"); out.flush()
+                mail = next((m for k, m in MAILS.items() if d.endswith(k) or k.endswith(d)), "")
+                out.write(f"{d}\t{r}\t{page}\t{bl}\t{mail}\n"); out.flush()
                 if done % 25 == 0: print(f"{done}/{len(targets)}", flush=True)
         await browser.close()
 

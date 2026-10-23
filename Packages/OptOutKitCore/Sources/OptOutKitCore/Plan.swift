@@ -113,7 +113,9 @@ public enum OptOutPlan {
             return classifyEntry(e).method == .semiAutomatic
         }
         if !verifyEntries.isEmpty {
-            let domains = verifyEntries.map(\.domain)
+            // Forms that ask the person to type a code take the most effort, so they come last.
+            let ordered = verifyEntries.filter { !($0.optOutForm.map(FormFiller.hasTypedCode) ?? false) } + verifyEntries.filter { $0.optOutForm.map(FormFiller.hasTypedCode) ?? false }
+            let domains = ordered.map(\.domain)
             claimed.formUnion(domains)
             byMethod[.semiAutomatic, default: []].append(PlanTask(kind: .verify, title: L10n.t("Tap to verify, we do the rest"), domains: domains,
                 reason: L10n.f("%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.", domains.count),
