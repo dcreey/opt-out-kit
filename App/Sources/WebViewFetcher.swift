@@ -246,12 +246,17 @@ struct WebFormSubmitter: FormSubmitter {
     var maxWait: TimeInterval = 20
 
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
-        await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait)
+        await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: false).outcome
+    }
+
+    /// Fills and sends the form in a hidden web view, then takes a screenshot of whatever the page showed at the end.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
+        await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: !dryRun)
     }
 
     /// Test hook: run the same steps against HTML the test supplies.
     func submit(html: String, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
-        await FormRun.run(url: nil, html: html, plan: plan, dryRun: dryRun, maxWait: maxWait)
+        await FormRun.run(url: nil, html: html, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: false).outcome
     }
 
     /// Test hook: fill and send a local page, then return the page title it set, so a test can see what the form received.
@@ -273,14 +278,21 @@ enum FormRun {
     static let pageGone = "the page was gone (not found)"
 
     @MainActor
-    static func run(url: URL?, html: String?, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
+    static func run(url: URL?, html: String?, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval, capture: Bool = false) async -> SubmitEvidence {
         let session = WebViewSession.make()
         defer { session.close() }
         do {
             if let html { try await session.loadHTML(html) }
             else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
-            else { return .failed("not a secure page") }
-        } catch { return .failed("the page would not load") }
+            else { return SubmitEvidence(outcome: .failed("not a secure page")) }
+        } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
+        let outcome = await steps(session, plan: plan, dryRun: dryRun, maxWait: maxWait)
+        // What the page shows at the end: the confirmation, or whatever stopped the form.
+        return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG() : nil)
+    }
+
+    @MainActor
+    private static func steps(_ session: WebViewSession, plan: FillPlan, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
         await session.settlePage(maxWait: 10)
         _ = await session.declineBanner()
 
@@ -313,6 +325,16 @@ enum FormRun {
 
 extension WebViewSession {
     func settlePage(maxWait: TimeInterval) async { await settle(maxWait: maxWait) }
+
+    /// A picture of the page as it is now, as a compressed JPEG. The web view is kept at phone size, so the picture reads like a
+    /// phone screen.
+    func screenshotJPEG(quality: CGFloat = 0.6) async -> Data? {
+        if webView.frame.isEmpty { webView.frame = CGRect(x: 0, y: 0, width: 390, height: 800) }
+        let config = WKSnapshotConfiguration()
+        config.rect = webView.bounds
+        guard let image = try? await webView.takeSnapshot(configuration: config) else { return nil }
+        return image.jpegData(compressionQuality: quality)
+    }
 
     /// True when the page just loaded is an error page, which means the recorded link has moved or died.
     func pageLooksMissing() async -> Bool {

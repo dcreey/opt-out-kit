@@ -736,5 +736,19 @@
  "Last run: all %lld sites went through": "Dernière exécution : les %lld sites ont tous abouti",
  "Nothing more to do for these. Some sites email a link to confirm; that tap is yours.": "Rien d’autre à faire pour ceux-ci. Certains sites envoient un lien de confirmation par e-mail ; ce clic vous revient.",
  "ZIP code": "Code postal",
- "ZIP code for a previous address": "Code postal d’une adresse précédente"
+ "ZIP code for a previous address": "Code postal d’une adresse précédente",
+ "%@ · %@": "%@ · %@",
+ "After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.": "Après l’envoi à chaque site, nous gardons une capture de la page affichée pour que vous puissiez vérifier ce qui s’est passé.",
+ "If you say it does not look finished, this site is no longer counted as done and moves to your queue as a guided task.": "Si vous indiquez que cela ne semble pas terminé, ce site n’est plus compté comme fait et passe dans votre file en tâche guidée.",
+ "Looks right": "C’est correct",
+ "No screenshot": "Pas de capture",
+ "Nothing to review yet. Run the automatic opt-out and each site's result appears here.": "Rien à vérifier pour l’instant. Lancez la désinscription automatique et le résultat de chaque site apparaîtra ici.",
+ "Open any site to see the page it showed after your request was sent. If it does not look finished, say so and the site moves to a guide.": "Ouvrez un site pour voir la page affichée après l’envoi de votre demande. Si cela ne semble pas terminé, dites-le : le site passe en guide.",
+ "Review": "Vérifier",
+ "Review every site and its screenshot": "Vérifier chaque site et sa capture",
+ "Review the last run and its screenshots": "Vérifier la dernière exécution et ses captures",
+ "There is no screenshot for this site.": "Il n’y a pas de capture pour ce site.",
+ "This does not look finished": "Cela ne semble pas terminé",
+ "This is the page the site showed when we finished.": "Voici la page affichée par le site à la fin.",
+ "Went through (%lld)": "Abouti (%lld)"
 }

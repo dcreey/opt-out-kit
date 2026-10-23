@@ -57,6 +57,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var scanProgress: (done: Int, total: Int)?
 
     private let store: HouseholdStore
+    /// Screenshots of what each site showed when an automatic opt-out finished, sealed with the household key.
+    let evidence: EvidenceStore
     private let defaults: UserDefaults
     private let catalog: [Announcement]
     private static let seenKey = "announcement.lastSeen"
@@ -107,6 +109,7 @@ final class AppModel: ObservableObject {
          defaults: UserDefaults = .standard,
          catalog: [Announcement] = AnnouncementCatalog.all) {
         self.store = store
+        self.evidence = EvidenceStore(directory: store.url.deletingPathExtension().appendingPathExtension("evidence"), keys: store.keyProvider)
         self.defaults = defaults
         self.catalog = catalog
         let args = ProcessInfo.processInfo.arguments
@@ -118,6 +121,7 @@ final class AppModel: ObservableObject {
         language = initial; L10n.language = initial; Loc.language = initial
         if args.contains("-uitest-reset") {
             try? store.erase()
+            try? FileManager.default.removeItem(at: evidence.directory)
             // UI tests skip the walkthrough unless a test asks for it.
             if args.contains("-uitest-onboarding") { defaults.removeObject(forKey: Self.seenKey) }
             else { defaults.set(Announcements.newestID(catalog), forKey: Self.seenKey) }
@@ -145,7 +149,25 @@ final class AppModel: ObservableObject {
         } catch {
             loadError = Loc.f("Could not load the broker registry: %@", error)
         }
+        #if DEBUG
+        // A complete made-up profile, so screens that need one can be looked at without typing.
+        if args.contains("-uitest-seed-profile"), var me = household.people.first(where: { $0.relationship == .me }) {
+            me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+            me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+            household.update(me)
+            household.setContactEmail("pat@example.com")
+            household.updateAuto { $0.decidedAt = Date() }
+        }
+        #endif
     }
+
+    #if DEBUG
+    /// For looking at the result screens: runs the automatic opt-out against the fake submitter at launch.
+    func runDemoOptOut() async {
+        guard let me = people.first(where: { $0.relationship == .me }) else { return }
+        await runAutoOptOut(for: me, submitter: FakeSubmitter())
+    }
+    #endif
 
     func complete(_ broker: Broker, step: Int) {
         let wasDone = progress.isDone(broker.id)
@@ -485,7 +507,8 @@ final class AppModel: ObservableObject {
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
-                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } })
+                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } },
+                                   evidence: { [evidence, personID = original.id] entry, shot in try? evidence.save(shot, person: personID, site: entry.id) })
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -505,7 +528,7 @@ final class AppModel: ObservableObject {
         }
         optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
         if !dryRun {
-            let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [])
+            let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [], personID: original.id)
             household.updateAuto {
                 $0.lastOptOut = now
                 $0.lastAttempted = report.attempted; $0.lastSent = report.sent; $0.lastNeedYou = report.needYou.count
@@ -521,6 +544,53 @@ final class AppModel: ObservableObject {
     func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
     func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
+
+    // MARK: Reviewing a run
+
+    /// One site's result from the last run, with whether there is a screenshot to look at.
+    struct ReviewItem: Identifiable, Equatable {
+        let id: String            // directory entry id
+        let domain: String
+        let outcome: String       // submitted | submitted_email | challenged | rejected | failed
+        let detail: String?
+        let date: Date
+        let hasScreenshot: Bool
+        var worked: Bool { outcome.hasPrefix("submitted") }
+        var label: String {
+            switch outcome {
+            case "submitted": return Loc.t("Sent")
+            case "submitted_email": return Loc.t("Sent; confirm the email they sent you")
+            case "challenged": return Loc.f("Stopped: %@", detail ?? "")
+            case "rejected": return Loc.f("The site refused: %@", detail ?? "")
+            default: return Loc.f("No confirmation: %@", detail ?? "")
+            }
+        }
+    }
+
+    /// Every site the last run tried for this person, the ones that need them first. Built from the saved history, so it is still there
+    /// after the app is closed.
+    func reviewItems(for person: Person) -> [ReviewItem] {
+        guard let lastRun = household.autoSettings.lastOptOut else { return [] }
+        let attempts = household.progress(for: person.id).optOutAttempts
+        let byID = Dictionary(directory.map { ($0.id, $0.domain) }, uniquingKeysWith: { a, _ in a })
+        let items: [ReviewItem] = attempts.compactMap { id, list in
+            guard let last = list.last, abs(last.date.timeIntervalSince(lastRun)) < 3600, let domain = byID[id] else { return nil }
+            return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date,
+                              hasScreenshot: evidence.exists(person: person.id, site: id))
+        }
+        return items.sorted { ($0.worked ? 1 : 0, $0.domain) < ($1.worked ? 1 : 0, $1.domain) }
+    }
+
+    func screenshot(for item: ReviewItem, person: Person) -> Data? { evidence.load(person: person.id, site: item.id) }
+
+    /// The person looked at the screenshot and it does not show a finished request: the site is not counted as done and moves to a guide.
+    func markLooksWrong(_ item: ReviewItem, for person: Person) {
+        household.mutateProgress(for: person.id) { p in
+            p.optOutAttempts[item.id, default: []].removeAll { $0.wasSubmitted && abs($0.date.timeIntervalSince(item.date)) < 1 }
+            p.recordOptOutAttempt(OptOutAttempt(date: item.date.addingTimeInterval(1), outcome: "failed", detail: "you said the confirmation did not look right"), site: item.id)
+        }
+        save()
+    }
 
     /// The one way to run the automatic opt-out by hand: it works in the background and only reports the sites that need the person.
     func runAutomaticNow() {
@@ -816,6 +886,7 @@ final class AppModel: ObservableObject {
     func remove(_ id: UUID) {
         guard household.people.count > 1 else { return }
         household.remove(id)
+        evidence.removeAll(person: id)
         if selectedID == id { selectedID = household.people[0].id }
         save()
     }
@@ -838,6 +909,7 @@ final class AppModel: ObservableObject {
     /// The user chose to discard unreadable data and start over.
     func eraseAndStartOver() {
         try? store.erase()
+        try? FileManager.default.removeItem(at: evidence.directory)
         household = Household()
         household.add(Person(displayName: "Me", relationship: .me))
         selectedID = household.people[0].id
@@ -868,6 +940,19 @@ struct FakeSubmitter: FormSubmitter {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         if dryRun { return .filledNotSubmitted }
         return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a bot check")
+    }
+
+    /// A drawn stand-in for the page, so the review screens have something to show without loading a site.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
+        let outcome = await submit(form, plan: plan, dryRun: dryRun)
+        let text = "\(form.page.host ?? "site")\nFake page after sending"
+        let image = await MainActor.run {
+            UIGraphicsImageRenderer(size: CGSize(width: 390, height: 800)).image { ctx in
+                UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 390, height: 800))
+                (text as NSString).draw(in: CGRect(x: 20, y: 300, width: 350, height: 120), withAttributes: [.font: UIFont.systemFont(ofSize: 22)])
+            }
+        }
+        return SubmitEvidence(outcome: outcome, screenshot: image.jpegData(compressionQuality: 0.5))
     }
 }
 #endif

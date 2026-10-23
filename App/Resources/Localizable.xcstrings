@@ -438,6 +438,29 @@
     }
    }
   },
+  "%@ · %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ · %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ · %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ · %@"
+     }
+    }
+   }
+  },
   "%@ · %lld paragraphs · list %lld": {
    "extractionState": "manual",
    "localizations": {
@@ -1768,6 +1791,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Adresse"
+     }
+    }
+   }
+  },
+  "After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Après l’envoi à chaque site, nous gardons une capture de la page affichée pour que vous puissiez vérifier ce qui s’est passé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tras enviar a cada sitio guardamos una captura de la página que mostró, para que puedas confirmar lo ocurrido."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nach dem Senden an jede Seite speichern wir einen Screenshot der angezeigten Seite, damit Sie prüfen können, was passiert ist."
      }
     }
    }
@@ -3727,6 +3773,29 @@
     }
    }
   },
+  "Current ZIP code": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal actuel"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal actual"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aktuelle Postleitzahl"
+     }
+    }
+   }
+  },
   "Current city": {
    "extractionState": "manual",
    "localizations": {
@@ -5498,6 +5567,29 @@
     }
    }
   },
+  "If you say it does not look finished, this site is no longer counted as done and moves to your queue as a guided task.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si vous indiquez que cela ne semble pas terminé, ce site n’est plus compté comme fait et passe dans votre file en tâche guidée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si indicas que no parece terminado, este sitio deja de contarse como hecho y pasa a tu cola como tarea guiada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn Sie angeben, dass es nicht abgeschlossen aussieht, zählt diese Seite nicht mehr als erledigt und wandert als geführte Aufgabe in Ihre Warteschlange."
+     }
+    }
+   }
+  },
   "Illinois": {
    "extractionState": "manual",
    "localizations": {
@@ -6740,6 +6832,29 @@
     }
    }
   },
+  "Looks right": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "C’est correct"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se ve bien"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sieht richtig aus"
+     }
+    }
+   }
+  },
   "Lost phone with no backup means lost data; a normal iPhone backup carries it": {
    "extractionState": "manual",
    "localizations": {
@@ -7913,6 +8028,29 @@
     }
    }
   },
+  "No screenshot": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas de capture"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin captura"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kein Screenshot"
+     }
+    }
+   }
+  },
   "No simple name search found": {
    "extractionState": "manual",
    "localizations": {
@@ -8346,6 +8484,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Hier ist nichts weiter zu tun. Manche Seiten senden einen Bestätigungslink per E-Mail; dieser Tipp ist Ihre."
+     }
+    }
+   }
+  },
+  "Nothing to review yet. Run the automatic opt-out and each site's result appears here.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien à vérifier pour l’instant. Lancez la désinscription automatique et le résultat de chaque site apparaîtra ici."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no hay nada que revisar. Ejecuta la baja automática y el resultado de cada sitio aparecerá aquí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch nichts zu prüfen. Starten Sie das automatische Austragen, dann erscheint hier das Ergebnis jeder Seite."
      }
     }
    }
@@ -8875,6 +9036,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie eine Website, um ihre Schrittkarten zu sehen. Tippen Sie auf In Safari öffnen, kopieren Sie Ihre Angaben, erledigen Sie den Schritt und tippen Sie auf Als erledigt markieren. Spätere Schritte werden nach und nach freigeschaltet."
+     }
+    }
+   }
+  },
+  "Open any site to see the page it showed after your request was sent. If it does not look finished, say so and the site moves to a guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez un site pour voir la page affichée après l’envoi de votre demande. Si cela ne semble pas terminé, dites-le : le site passe en guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre cualquier sitio para ver la página que mostró tras enviar tu solicitud. Si no parece terminado, dilo y el sitio pasa a una guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie eine Seite, um zu sehen, was sie nach dem Senden Ihrer Anfrage zeigte. Sieht es nicht abgeschlossen aus, sagen Sie es, und die Seite wird geführt."
      }
     }
    }
@@ -10443,6 +10627,29 @@
     }
    }
   },
+  "Review": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revisar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prüfen"
+     }
+    }
+   }
+  },
   "Review and allow…": {
    "extractionState": "manual",
    "localizations": {
@@ -10462,6 +10669,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Prüfen und erlauben …"
+     }
+    }
+   }
+  },
+  "Review every site and its screenshot": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifier chaque site et sa capture"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revisar cada sitio y su captura"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Seite und ihren Screenshot prüfen"
+     }
+    }
+   }
+  },
+  "Review the last run and its screenshots": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifier la dernière exécution et ses captures"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revisar la última ejecución y sus capturas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Letzten Durchlauf und Screenshots prüfen"
      }
     }
    }
@@ -13617,6 +13870,29 @@
     }
    }
   },
+  "There is no screenshot for this site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il n’y a pas de capture pour ce site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No hay captura de este sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für diese Seite gibt es keinen Screenshot."
+     }
+    }
+   }
+  },
   "They and their advertisers may set tracking cookies that follow purchases and target ads. Opt-Out Kit's browser keeps no cookies between visits and turns down cookie banners.": {
    "extractionState": "manual",
    "localizations": {
@@ -13778,6 +14054,29 @@
     }
    }
   },
+  "This does not look finished": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cela ne semble pas terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No parece terminado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das sieht nicht abgeschlossen aus"
+     }
+    }
+   }
+  },
   "This flow has not been verified by a real run yet. Steps may be out of date.": {
    "extractionState": "manual",
    "localizations": {
@@ -13935,6 +14234,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das ist mein Eintrag"
+     }
+    }
+   }
+  },
+  "This is the page the site showed when we finished.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Voici la page affichée par le site à la fin."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta es la página que mostró el sitio al terminar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das ist die Seite, die die Webseite am Ende zeigte."
      }
     }
    }
@@ -15338,6 +15660,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Willkommen bei Opt-Out Kit"
+     }
+    }
+   }
+  },
+  "Went through (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abouti (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Completados (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Durchgegangen (%lld)"
      }
     }
    }
@@ -16879,6 +17224,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Postleitzahl"
+     }
+    }
+   }
+  },
+  "ZIP code for a previous address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal d’une adresse précédente"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal de una dirección anterior"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Postleitzahl einer früheren Adresse"
      }
     }
    }

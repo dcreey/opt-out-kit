@@ -6,6 +6,7 @@ struct RunReport: Identifiable, Equatable {
     let id = UUID()
     let person: String
     let rows: [AppModel.AutoOptOutRow]
+    var personID: UUID = UUID()
 
     var sent: Int { rows.filter { if case .submitted = $0.result { return true } else { return false } }.count }
     /// Sites that did not go through and now wait for the person.
@@ -22,7 +23,14 @@ struct RunReportSheet: View {
     let report: RunReport
     let done: () -> Void
 
+    @EnvironmentObject var model: AppModel
+
     var body: some View {
+        NavigationStack { content.navigationBarHidden(true) }
+            .presentationDetents([.medium, .large])
+    }
+
+    private var content: some View {
         VStack(spacing: 16) {
             Image(systemName: report.allSucceeded ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
                 .font(.system(size: 52)).foregroundStyle(report.allSucceeded ? .green : .orange).padding(.top, 24)
@@ -41,11 +49,16 @@ struct RunReportSheet: View {
                 }
                 .listStyle(.plain)
             }
+            if let person = model.people.first(where: { $0.id == report.personID }) {
+                NavigationLink { RunReviewView(person: person) } label: {
+                    Label("Review every site and its screenshot", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered).accessibilityIdentifier("run-report-review")
+            }
             Spacer(minLength: 0)
             Button("Done", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-done").padding(.bottom, 20)
         }
         .padding(.horizontal, 20)
-        .presentationDetents([.medium, .large])
     }
 }
 

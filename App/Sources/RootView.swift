@@ -4,6 +4,7 @@ import OptOutKitCore
 struct RootView: View {
     @EnvironmentObject var model: AppModel
     @State private var tab = 0
+    @State private var showDemoReview = false
 
     var body: some View {
         TabView(selection: $tab) {
@@ -11,6 +12,16 @@ struct RootView: View {
             SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }.tag(1)
             AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
         }
+        #if DEBUG
+        .task {
+            let args = ProcessInfo.processInfo.arguments
+            if args.contains("-uitest-demo-run") { await model.runDemoOptOut() }
+            if args.contains("-uitest-demo-review") { await model.runDemoOptOut(); model.runReport = nil; showDemoReview = true }
+        }
+        .sheet(isPresented: $showDemoReview) {
+            if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
+        }
+        #endif
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
         .sheet(item: $model.runReport) { report in RunReportSheet(report: report) { model.runReport = nil } }
         .fullScreenCover(isPresented: Binding(

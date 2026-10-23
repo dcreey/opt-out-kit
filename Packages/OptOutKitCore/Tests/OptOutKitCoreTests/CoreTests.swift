@@ -2269,3 +2269,50 @@ final class MeasuredAutomaticTests: XCTestCase {
         for e in withCheck { XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, e.domain) }
     }
 }
+
+final class EvidenceTests: XCTestCase {
+    private func store() -> EvidenceStore {
+        EvidenceStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent("ook-evidence-\(UUID())"), keys: FixedKey())
+    }
+
+    func testAScreenshotIsKeptSealedAndComesBackIntact() throws {
+        let s = store(), who = UUID()
+        let image = Data((0..<2000).map { UInt8($0 % 251) })
+        try s.save(image, person: who, site: "example.com")
+        XCTAssertEqual(s.load(person: who, site: "example.com"), image)
+        let raw = try Data(contentsOf: s.directory.appendingPathComponent(who.uuidString).appendingPathComponent("example.com.jpg.sealed"))
+        XCTAssertNil(raw.range(of: image.prefix(64)), "the file does not hold the picture in the clear")
+        XCTAssertNil(s.load(person: UUID(), site: "example.com"), "another person's screenshots are separate")
+        s.removeAll(person: who)
+        XCTAssertFalse(s.exists(person: who, site: "example.com"))
+    }
+
+    func testOldScreenshotsArePruned() throws {
+        let s = store(), who = UUID()
+        try s.save(Data([1, 2, 3]), person: who, site: "a.com")
+        s.prune(olderThan: 90, now: Date().addingTimeInterval(30 * 86_400)); XCTAssertTrue(s.exists(person: who, site: "a.com"))
+        s.prune(olderThan: 90, now: Date().addingTimeInterval(120 * 86_400)); XCTAssertFalse(s.exists(person: who, site: "a.com"))
+    }
+
+    func testTheRunHandsEachSitesScreenshotToTheCallerAndNeverForAPreview() async throws {
+        struct Shot: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
+                SubmitEvidence(outcome: .submitted(awaitingEmail: false), screenshot: Data([9, 9]))
+            }
+        }
+        final class Got: @unchecked Sendable { var sites: [String] = [] }
+        let form = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil,
+                              fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        let entry = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+                                   optOutURL: form.page, optOutForm: form, signals: [])
+        let person = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
+        let got = Got()
+        _ = await AutoOptOut(submitter: Shot(), spacing: 0).run(entries: [entry], person: person, progress: Progress(), dryRun: false, evidence: { e, _ in got.sites.append(e.id) })
+        XCTAssertEqual(got.sites, ["x"])
+        let preview = Got()
+        _ = await AutoOptOut(submitter: Shot(), spacing: 0).run(entries: [entry], person: person, progress: Progress(), dryRun: true, evidence: { e, _ in preview.sites.append(e.id) })
+        XCTAssertTrue(preview.sites.isEmpty)
+    }
+}

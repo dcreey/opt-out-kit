@@ -44,6 +44,9 @@ public struct HouseholdStore {
         self.keys = keys
     }
 
+    /// The same key, for other things kept sealed beside the household (the screenshots of what each site showed).
+    public var keyProvider: KeyProviding { keys }
+
     /// Nil when nothing has been saved yet. Throws when the file exists but cannot be opened
     /// (wrong key, corruption), so callers never overwrite data they could not read.
     public func load() throws -> Household? {

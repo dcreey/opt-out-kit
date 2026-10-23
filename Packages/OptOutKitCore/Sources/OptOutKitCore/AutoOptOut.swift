@@ -11,6 +11,20 @@ public enum SubmitOutcome: Equatable, Sendable {
 /// Fills in and sends one site's opt-out form. The app backs it with its hidden web view; tests use fakes.
 public protocol FormSubmitter: Sendable {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome
+    /// The same, and a screenshot of what the page showed when it finished (the confirmation, or what stopped it), as JPEG data.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence
+}
+
+public struct SubmitEvidence: Sendable {
+    public var outcome: SubmitOutcome
+    public var screenshot: Data?
+    public init(outcome: SubmitOutcome, screenshot: Data? = nil) { self.outcome = outcome; self.screenshot = screenshot }
+}
+
+public extension FormSubmitter {
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
+        SubmitEvidence(outcome: await submit(form, plan: plan, dryRun: dryRun))
+    }
 }
 
 /// A site already reached by a platform request the person made (California DROP): we leave it alone until `until`.
@@ -96,15 +110,17 @@ public struct AutoOptOut: Sendable {
 
     /// Runs the opt-out for every site with a form, one at a time. `dryRun` fills forms but never sends them.
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
-                    holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
+                    holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
+                    evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         let targets = entries.filter { $0.optOutForm != nil }
         var out: [(DirectoryEntry, AutoOptOutResult)] = []
         for (i, entry) in targets.enumerated() {
             let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id])
             if let result = pre.result { out.append((entry, result)) }
             else if let plan = pre.plan, let form = entry.optOutForm {
-                let outcome = await submitter.submit(form, plan: plan, dryRun: dryRun)
-                out.append((entry, Self.result(for: outcome)))
+                let report = await submitter.submitCapturing(form, plan: plan, dryRun: dryRun)
+                if let shot = report.screenshot, !dryRun { evidence?(entry, shot) }
+                out.append((entry, Self.result(for: report.outcome)))
                 if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
             }
             progressCallback?(i + 1, targets.count)

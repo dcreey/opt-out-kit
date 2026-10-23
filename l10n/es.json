@@ -736,5 +736,19 @@
  "Last run: all %lld sites went through": "Última ejecución: los %lld sitios se completaron",
  "Nothing more to do for these. Some sites email a link to confirm; that tap is yours.": "Nada más que hacer con estos. Algunos sitios envían un enlace de confirmación por correo; ese toque es tuyo.",
  "ZIP code": "Código postal",
- "ZIP code for a previous address": "Código postal de una dirección anterior"
+ "ZIP code for a previous address": "Código postal de una dirección anterior",
+ "%@ · %@": "%@ · %@",
+ "After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.": "Tras enviar a cada sitio guardamos una captura de la página que mostró, para que puedas confirmar lo ocurrido.",
+ "If you say it does not look finished, this site is no longer counted as done and moves to your queue as a guided task.": "Si indicas que no parece terminado, este sitio deja de contarse como hecho y pasa a tu cola como tarea guiada.",
+ "Looks right": "Se ve bien",
+ "No screenshot": "Sin captura",
+ "Nothing to review yet. Run the automatic opt-out and each site's result appears here.": "Aún no hay nada que revisar. Ejecuta la baja automática y el resultado de cada sitio aparecerá aquí.",
+ "Open any site to see the page it showed after your request was sent. If it does not look finished, say so and the site moves to a guide.": "Abre cualquier sitio para ver la página que mostró tras enviar tu solicitud. Si no parece terminado, dilo y el sitio pasa a una guía.",
+ "Review": "Revisar",
+ "Review every site and its screenshot": "Revisar cada sitio y su captura",
+ "Review the last run and its screenshots": "Revisar la última ejecución y sus capturas",
+ "There is no screenshot for this site.": "No hay captura de este sitio.",
+ "This does not look finished": "No parece terminado",
+ "This is the page the site showed when we finished.": "Esta es la página que mostró el sitio al terminar.",
+ "Went through (%lld)": "Completados (%lld)"
 }

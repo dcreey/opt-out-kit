@@ -736,5 +736,19 @@
  "Last run: all %lld sites went through": "Letzter Durchlauf: alle %lld Seiten sind durchgegangen",
  "Nothing more to do for these. Some sites email a link to confirm; that tap is yours.": "Hier ist nichts weiter zu tun. Manche Seiten senden einen Bestätigungslink per E-Mail; dieser Tipp ist Ihre.",
  "ZIP code": "Postleitzahl",
- "ZIP code for a previous address": "Postleitzahl einer früheren Adresse"
+ "ZIP code for a previous address": "Postleitzahl einer früheren Adresse",
+ "%@ · %@": "%@ · %@",
+ "After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.": "Nach dem Senden an jede Seite speichern wir einen Screenshot der angezeigten Seite, damit Sie prüfen können, was passiert ist.",
+ "If you say it does not look finished, this site is no longer counted as done and moves to your queue as a guided task.": "Wenn Sie angeben, dass es nicht abgeschlossen aussieht, zählt diese Seite nicht mehr als erledigt und wandert als geführte Aufgabe in Ihre Warteschlange.",
+ "Looks right": "Sieht richtig aus",
+ "No screenshot": "Kein Screenshot",
+ "Nothing to review yet. Run the automatic opt-out and each site's result appears here.": "Noch nichts zu prüfen. Starten Sie das automatische Austragen, dann erscheint hier das Ergebnis jeder Seite.",
+ "Open any site to see the page it showed after your request was sent. If it does not look finished, say so and the site moves to a guide.": "Öffnen Sie eine Seite, um zu sehen, was sie nach dem Senden Ihrer Anfrage zeigte. Sieht es nicht abgeschlossen aus, sagen Sie es, und die Seite wird geführt.",
+ "Review": "Prüfen",
+ "Review every site and its screenshot": "Jede Seite und ihren Screenshot prüfen",
+ "Review the last run and its screenshots": "Letzten Durchlauf und Screenshots prüfen",
+ "There is no screenshot for this site.": "Für diese Seite gibt es keinen Screenshot.",
+ "This does not look finished": "Das sieht nicht abgeschlossen aus",
+ "This is the page the site showed when we finished.": "Das ist die Seite, die die Webseite am Ende zeigte.",
+ "Went through (%lld)": "Durchgegangen (%lld)"
 }

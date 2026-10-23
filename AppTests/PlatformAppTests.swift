@@ -266,6 +266,34 @@ final class RunReportTests: XCTestCase {
 }
 
 @MainActor
+final class RunReviewAppTests: XCTestCase {
+    func testEachSiteSentKeepsAScreenshotThePersonCanReviewAndRejectIt() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        struct Shot: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
+                SubmitEvidence(outcome: .submitted(awaitingEmail: false), screenshot: Data([1, 2, 3, 4]))
+            }
+        }
+        await m.runAutoOptOut(for: me, submitter: Shot())
+        let items = m.reviewItems(for: me)
+        XCTAssertFalse(items.isEmpty)
+        XCTAssertTrue(items.allSatisfy { $0.hasScreenshot && $0.worked })
+        let first = try XCTUnwrap(items.first)
+        XCTAssertEqual(m.screenshot(for: first, person: me), Data([1, 2, 3, 4]))
+        let entry = try XCTUnwrap(m.directory.first { $0.id == first.id })
+        m.markLooksWrong(first, for: me)
+        XCTAssertEqual(m.method(for: entry).method, .guided, "a site the person says did not finish moves to a guide")
+        XCTAssertFalse(m.reviewItems(for: me).first { $0.id == first.id }?.worked ?? true)
+    }
+}
+
+@MainActor
 final class CoachGuideAppTests: XCTestCase {
     func testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn() {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),

@@ -100,6 +100,14 @@ struct AutoActivityView: View {
                 } header: { Text(person.displayName) } footer: {
                     Text("It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.")
                 }
+                if model.autoSettings.lastAttempted != nil {
+                    Section {
+                        NavigationLink { RunReviewView(person: person) } label: {
+                            Label("Review the last run and its screenshots", systemImage: "photo.on.rectangle.angled")
+                        }
+                        .accessibilityIdentifier("review-last-run")
+                    } footer: { Text("After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.") }
+                }
                 if !rows.isEmpty {
                     let sent = rows.filter(isSent).count
                     let attention = rows.filter(needsPerson)

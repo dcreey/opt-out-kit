@@ -33,6 +33,25 @@ final class WebFormSubmitterTests: XCTestCase {
     private let fields: [(String, String, String)] = [("text", "first", "First Name*"), ("text", "last", "Last Name*"), ("email", "email", "Email"),
                                                       ("text", "city", "City"), ("select", "state", "State")]
 
+    func testTheFinishedPageIsPhotographedAndThePictureIsNotBlank() async throws {
+        let html = page(extra: "<div style='height:300px;background:#1f7a3c;color:white;font-size:28px'>CONFIRMATION SHOWN</div>")
+        let report = await FormRun.run(url: nil, html: html, plan: plan(fields), dryRun: false, maxWait: 8, capture: true)
+        XCTAssertEqual(report.outcome, .submitted(awaitingEmail: true))
+        let data = try XCTUnwrap(report.screenshot, "a screenshot was taken")
+        let image = try XCTUnwrap(UIImage(data: data))
+        XCTAssertGreaterThan(image.size.width, 300)
+        // Not a blank white page: sample a column of pixels and expect some that are not white.
+        let cg = try XCTUnwrap(image.cgImage)
+        let ctx = CGContext(data: nil, width: cg.width, height: cg.height, bitsPerComponent: 8, bytesPerRow: cg.width * 4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: cg.width, height: cg.height))
+        let px = ctx.data!.assumingMemoryBound(to: UInt8.self)
+        var nonWhite = 0
+        for y in stride(from: 0, to: cg.height, by: 8) { let i = (y * cg.width + cg.width / 2) * 4; if px[i] < 240 || px[i + 1] < 240 || px[i + 2] < 240 { nonWhite += 1 } }
+        XCTAssertGreaterThan(nonWhite, 5, "the picture shows the page, not a blank sheet")
+        let preview = await FormRun.run(url: nil, html: html, plan: plan(fields), dryRun: true, maxWait: 8, capture: false)
+        XCTAssertNil(preview.screenshot)
+    }
+
     func testFillsTheFormFromTheProfileAndReportsTheSuccessMessage() async {
         let outcome = await WebFormSubmitter(maxWait: 8).submit(html: page(), plan: plan(fields), dryRun: false)
         XCTAssertEqual(outcome, .submitted(awaitingEmail: true))
