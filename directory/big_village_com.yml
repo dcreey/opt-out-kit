@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://big-village.com/do-not-sell-or-share-my-personal-information/"
+contact_email: "dpo_us@big-village.com"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_contact]
 profiled: "2026-10-22"

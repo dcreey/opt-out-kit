@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.brooksim.com/privacy-form"
+contact_email: "privacy@brooksim.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_only_wording]
 profiled: "2026-10-22"

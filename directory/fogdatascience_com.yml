@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.fogdatascience.com/opt-out"
+contact_email: "privacy@fogdatascience.com"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_contact]
 profiled: "2026-10-22"

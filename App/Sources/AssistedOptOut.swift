@@ -29,6 +29,8 @@ protocol AssistedDriver {
 struct WebAssistedDriver: AssistedDriver {
     /// Test hook: render this HTML instead of loading the site, so a test can imitate a form and a bot check.
     var htmlOverride: String?
+    /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
+    var person: Person?
 
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? {
         let session = WebViewSession.make()
@@ -36,8 +38,16 @@ struct WebAssistedDriver: AssistedDriver {
             if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page)) }
         } catch { session.close(); return nil }
         await session.settlePage(maxWait: 10)
-        _ = await session.declineBanner()
+        _ = await session.denyCookies()
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        _ = await session.denyCookies()
+        await session.hideConsentOverlays()
         let page = WebAssistedPage(session: session, plan: plan)
+        if let person {
+            guard let live = LiveFormPicker.pick(await session.discoverForms()) else { session.close(); return nil }
+            let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person)
+            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
+        }
         await page.refill()
         await session.scrollChallengeIntoView()
         return page
@@ -47,10 +57,14 @@ struct WebAssistedDriver: AssistedDriver {
 @MainActor
 final class WebAssistedPage: AssistedPage {
     private let session: WebViewSession
-    private let plan: FillPlan
+    private var plan: FillPlan
+    private var liveForm: String?
+    private var ownerMayConfirm = false
     private var shown: WKWebView?
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
+
+    func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm }
 
     var webView: WKWebView? { shown ?? { shown = session.presentable(); return shown }() }
 
@@ -62,13 +76,21 @@ final class WebAssistedPage: AssistedPage {
         return out
     }
 
-    func refill() async { _ = await session.fillFields(plan.values) }
+    func refill() async {
+        if let liveForm {
+            _ = await session.fillLive(plan.values)
+            _ = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
+        } else { _ = await session.fillFields(plan.values) }
+    }
 
     func send() async -> SubmitOutcome {
-        guard await session.pressSubmit(for: plan.values) else { return .failed("no submit button found") }
+        let before = await session.visibleText()
+        let pressed: Bool
+        if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
+        guard pressed else { return .failed("no submit button found") }
         await session.settlePage(maxWait: 20)
         if let why = await session.visibleChallenge() { return .challenged(why) }
-        return FormRun.classify(await session.visibleText())
+        return WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
     }
 
     func close() { session.close() }

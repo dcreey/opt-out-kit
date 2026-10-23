@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://wednes.day/privacy/texas"
+contact_email: "privacy@wednes.day"
 registered_in: [TX]
 signals: [email_contact]
 profiled: "2026-10-22"

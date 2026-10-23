@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.onspotdata.com/"
+contact_email: "optout@onspotdata.com"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, email_input, name_input]
 profiled: "2026-10-22"

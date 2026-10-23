@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://staterecords.org/optout"
+contact_email: "privacy@staterecords.org"
 registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-21"

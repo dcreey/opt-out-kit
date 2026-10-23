@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.stirista.com/privacy-policy/"
+contact_email: "privacy@stirista.com"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, mail_option]
 profiled: "2026-10-22"

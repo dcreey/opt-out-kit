@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://adsquare.com/privacy"
+contact_email: "privacy@adsquare.com"
 registered_in: [CA, TX]
 signals: [captcha_turnstile, email_contact, email_input, email_only_wording, name_input]
 profiled: "2026-10-22"

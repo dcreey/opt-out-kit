@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.matchbookdata.com/your-privacy-choices/"
+contact_email: "privacy@matchbookdata.com"
 opt_out_form: {"page": "https://www.matchbookdata.com/your-privacy-choices/", "method": "post", "action": "https://www.matchbookdata.com/your-privacy-choices/", "fields": [{"type": "text", "name": "form_fields[device_id]", "label": "Device ID"}, {"type": "email", "name": "form_fields[email]", "label": "Email"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, email_only_wording, opt_out_form_found, phone_verify]

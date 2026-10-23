@@ -8,6 +8,7 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.semasio.com/legal/privacy-choices"
+contact_email: "privacy@semasio.com"
 opt_out_form: {"page": "https://www.semasio.com/legal/privacy-choices", "method": "get", "action": "https://www.semasio.com/legal/privacy-choices", "fields": [{"type": "select", "name": "select-type", "label": "Request Type *"}, {"type": "select", "name": "select-country-2", "label": "Country *"}, {"type": "select", "name": "state", "label": "State"}, {"type": "email", "name": "email-2", "label": "Email"}, {"type": "checkbox", "name": "request-for-information-2", "label": "request-for-information-2"}, {"type": "checkbox", "name": "ccpa-2", "label": "ccpa-2"}], "hops": 2}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, opt_out_form_found]

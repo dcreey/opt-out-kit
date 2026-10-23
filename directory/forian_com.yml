@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://forian.com/privacy-notice/"
+contact_email: "privacy@forian.com"
 registered_in: [TX]
 signals: [account_hint, email_contact, mail_option]
 profiled: "2026-10-22"

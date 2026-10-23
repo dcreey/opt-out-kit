@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://kbsynergy.com/privacy-policy-ccpa-do-not-sell-my-information/"
+contact_email: "compliance@kbsynergy.com"
 registered_in: [CA]
 signals: [account_hint, email_contact, email_only_wording, id_required, mail_option]
 profiled: "2026-10-22"

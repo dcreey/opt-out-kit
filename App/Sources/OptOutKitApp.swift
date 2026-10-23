@@ -362,6 +362,12 @@ final class AppModel: ObservableObject {
         case .platform(let id): return progress.isDone(id)
         case .flow(let id): return brokers.first { $0.id == id }.map { household.summary(for: $0).isFinished } ?? false
         case .site(let id): return progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false
+        case .verify:
+            let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
+            return !ids.isEmpty && ids.allSatisfy { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false }
+        case .emails:
+            let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
+            return !ids.isEmpty && ids.allSatisfy { wasEmailed($0) }
         case .automatic:
             let byDomain = Dictionary(directory.map { ($0.domain, $0.id) }, uniquingKeysWith: { a, _ in a })
             return !task.domains.isEmpty && task.domains.allSatisfy { d in byDomain[d].map { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false } ?? true }
@@ -581,6 +587,33 @@ final class AppModel: ObservableObject {
     func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
 
+    // MARK: Opt-out emails
+
+    func wasEmailed(_ entryID: String) -> Bool {
+        progress.optOutAttempts[entryID]?.contains { $0.outcome == "emailed" && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval * 4 } ?? false
+    }
+
+    func emailBody(for batch: EmailBatch) -> String {
+        guard let p = selectedPerson else { return "" }
+        let a = p.currentAddress
+        let street = [a?.street, a?.city, [a?.state, a?.zip].compactMap { $0 }.joined(separator: " ")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
+        return batch.body(name: p.legalName, email: formEmail ?? "", address: street)
+    }
+
+    func mailtoURL(for batch: EmailBatch) -> URL? {
+        var c = URLComponents(); c.scheme = "mailto"; c.path = batch.address
+        c.queryItems = [URLQueryItem(name: "subject", value: batch.subject), URLQueryItem(name: "body", value: emailBody(for: batch))]
+        return c.url
+    }
+
+    /// The person tapped Send on the message: every site it covers is recorded as asked.
+    func markEmailed(_ batch: EmailBatch) {
+        household.mutateProgress(for: selectedID) { p in
+            for id in batch.entryIDs { p.recordOptOutAttempt(OptOutAttempt(date: Date(), outcome: "emailed", detail: batch.address), site: id) }
+        }
+        save()
+    }
+
     // MARK: Reviewing a run
 
     /// One site's result from the last run, with whether there is a screenshot to look at.
@@ -655,7 +688,21 @@ final class AppModel: ObservableObject {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeAssistedDriver() }
         #endif
-        return WebAssistedDriver()
+        return WebAssistedDriver(person: selectedPerson.map(formPerson))
+    }
+
+    /// The pages in the "tap to verify" task, ready for the visible runner. A placeholder plan stands in when the stored form's plan is
+    /// not usable: the live page decides what is filled.
+    func verifyItems(domains: [String], for original: Person) -> [AssistedRunner.Item] {
+        guard isReady(original) else { return [] }
+        let set = Set(domains), person = formPerson(original)
+        let progress = household.progress(for: person.id)
+        return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
+            guard set.contains(entry.domain), let form = entry.optOutForm else { return nil }
+            if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
+            let plan = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: Date()).plan ?? FillPlan(values: [], verdict: .ready)
+            return AssistedRunner.Item(entry: entry, form: form, plan: plan)
+        }
     }
 
     /// The person reported a problem with a site (broken link, gated by something else, blocked them). Queues leave it alone for a month.

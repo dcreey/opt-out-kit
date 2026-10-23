@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.abovedata.io/opt-out"
+contact_email: "privacy@abovedata.io"
 opt_out_form: {"page": "https://www.abovedata.io/opt-out", "method": "get", "action": "https://www.abovedata.io/opt-out", "fields": [{"type": "text", "name": "_gotcha", "label": "_gotcha"}, {"type": "text", "name": "firstname", "label": "First Name"}, {"type": "text", "name": "lastname", "label": "Last Name"}, {"type": "text", "name": "company", "label": "Company (optional)"}, {"type": "email", "name": "email", "label": "Email"}, {"type": "text", "name": "country", "label": "Country"}, {"type": "checkbox", "name": "requests", "label": "requests"}, {"type": "checkbox", "name": "requests", "label": "requests"}, {"type": "checkbox", "name": "requests", "label": "requests"}, {"type": "checkbox", "name": "requests", "label": "requests"}], "hops": 1}
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_input, name_input, opt_out_form_found]

@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://thenai.org/how-to-opt-out/how-to-exercise-your-privacy-choices/"
+contact_email: "privacy@accretiveads.com"
 registered_in: [CA, OR]
 signals: [email_contact, phone_verify]
 profiled: "2026-10-22"

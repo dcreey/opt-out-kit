@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://marketops.com/data-inquiries/"
+contact_email: "privacy@marketops.com"
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, email_contact, email_input, mail_option, phone_input]
 profiled: "2026-10-22"

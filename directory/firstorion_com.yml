@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://firstorion.com/legal"
+contact_email: "privacy@firstorion.com"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, id_required, mail_option, name_input, phone_input, phone_verify]
 profiled: "2026-10-22"

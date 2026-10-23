@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.cotality.com/legal/privacy-policy"
+contact_email: "privacy@cotality.com"
 registered_in: [TX]
 signals: [email_contact, email_only_wording, phone_verify]
 profiled: "2026-10-22"

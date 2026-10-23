@@ -530,6 +530,29 @@
     }
    }
   },
+  "%lld messages cover %lld sites. Each message names every site its address handles. Open one, read it, and tap Send in your mail app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld messages couvrent %lld sites. Chaque message nomme tous les sites de son adresse. Ouvrez-en un, lisez-le et touchez Envoyer dans votre app de messagerie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld mensajes cubren %lld sitios. Cada mensaje nombra todos los sitios de su dirección. Abre uno, léelo y toca Enviar en tu app de correo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Nachrichten decken %lld Seiten ab. Jede nennt alle Seiten ihrer Adresse. Öffnen Sie eine, lesen Sie sie und tippen Sie in Ihrer Mail-App auf Senden."
+     }
+    }
+   }
+  },
   "%lld more are handled by %@, so they are not listed here again. See the Sites tab.": {
    "extractionState": "manual",
    "localizations": {
@@ -668,6 +691,29 @@
     }
    }
   },
+  "%lld pages, one tap each": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld pages, un toucher chacune"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld páginas, un toque cada una"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten, je ein Tipp"
+     }
+    }
+   }
+  },
   "%lld points to the next level": {
    "extractionState": "manual",
    "localizations": {
@@ -710,6 +756,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld Pkt."
+     }
+    }
+   }
+  },
+  "%lld sites by email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites par e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Seiten per E-Mail"
      }
     }
    }
@@ -1952,6 +2021,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Alles erledigt"
+     }
+    }
+   }
+  },
+  "All messages sent": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les messages sont envoyés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todos los mensajes enviados"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Nachrichten gesendet"
      }
     }
    }
@@ -6993,6 +7085,29 @@
     }
    }
   },
+  "Mail is not set up on this device. Each message opens in your default mail app instead.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La messagerie n’est pas configurée sur cet appareil. Chaque message s’ouvre dans votre app de messagerie par défaut."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El correo no está configurado en este dispositivo. Cada mensaje se abre en tu app de correo predeterminada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mail ist auf diesem Gerät nicht eingerichtet. Jede Nachricht öffnet sich stattdessen in Ihrer Standard-Mail-App."
+     }
+    }
+   }
+  },
   "Maine": {
    "extractionState": "manual",
    "localizations": {
@@ -7219,6 +7334,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Erwähnt das Senden eines Antrags per Post"
+     }
+    }
+   }
+  },
+  "Messages": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Messages"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mensajes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nachrichten"
      }
     }
    }
@@ -8511,6 +8649,29 @@
     }
    }
   },
+  "Nothing left to verify": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Plus rien à vérifier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nada más que verificar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nichts mehr zu bestätigen"
+     }
+    }
+   }
+  },
   "Nothing more to do for these. Some sites email a link to confirm; that tap is yours.": {
    "extractionState": "manual",
    "localizations": {
@@ -9247,6 +9408,29 @@
     }
    }
   },
+  "Open the next message (%lld left)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir le message suivant (%lld restants)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir el siguiente mensaje (%lld restantes)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nächste Nachricht öffnen (%lld übrig)"
+     }
+    }
+   }
+  },
   "Open the opt-out page": {
    "extractionState": "manual",
    "localizations": {
@@ -9519,6 +9703,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Opt-Out Kit · Anleitung"
+     }
+    }
+   }
+  },
+  "Opt-out emails": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-mails de désinscription"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Correos de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-E-Mails"
      }
     }
    }
@@ -12398,6 +12605,29 @@
     }
    }
   },
+  "Start (%lld pages)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Commencer (%lld pages)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empezar (%lld páginas)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Starten (%lld Seiten)"
+     }
+    }
+   }
+  },
   "Start over": {
    "extractionState": "manual",
    "localizations": {
@@ -12946,6 +13176,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Tippen Sie auf eine Aufgabe, um vor dem Start genau zu sehen, was sie tut."
+     }
+    }
+   }
+  },
+  "Tap to verify": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toucher pour vérifier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca para verificar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zum Bestätigen tippen"
      }
     }
    }
@@ -13939,6 +14192,29 @@
     }
    }
   },
+  "These %lld sites are filled in for you. Each shows a \"verify you are human\" box that only a person can tick. The next page loads while you tick the current one, so it is one tap per site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces %lld sites sont remplis pour vous. Chacun affiche une case « vérifiez que vous êtes humain » que seule une personne peut cocher. La page suivante se charge pendant que vous cochez la courante : un toucher par site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos %lld sitios se rellenan por ti. Cada uno muestra una casilla «verifica que eres humano» que solo una persona puede marcar. La siguiente página carga mientras marcas la actual: un toque por sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese %lld Seiten sind für Sie ausgefüllt. Jede zeigt ein Feld „Bestätigen Sie, dass Sie ein Mensch sind“, das nur eine Person anhaken kann. Die nächste Seite lädt, während Sie die aktuelle anhaken: ein Tipp pro Seite."
+     }
+    }
+   }
+  },
   "They and their advertisers may set tracking cookies that follow purchases and target ads. Opt-Out Kit's browser keeps no cookies between visits and turns down cookie banners.": {
    "extractionState": "manual",
    "localizations": {
@@ -14441,6 +14717,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Seite nimmt Opt-outs per E-Mail an, nicht über ein Formular. Die Nachricht ist mit Ihrem Namen und der Haushalts-E-Mail vorausgefüllt; lesen Sie sie und senden Sie sie aus Ihrer Mail-App."
+     }
+    }
+   }
+  },
+  "This site takes opt-outs by email: write to %@. We prepare the message for you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce site accepte les désinscriptions par e-mail : écrivez à %@. Nous préparons le message pour vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este sitio acepta las bajas por correo: escribe a %@. Preparamos el mensaje por ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite nimmt Opt-outs per E-Mail an: schreiben Sie an %@. Wir bereiten die Nachricht für Sie vor."
      }
     }
    }

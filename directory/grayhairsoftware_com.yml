@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://grayhairsoftware.com/"
+contact_email: "privacy@grayhairsoftware.com"
 registered_in: [CA, TX]
 signals: [email_contact, email_only_wording, mail_option]
 profiled: "2026-10-22"

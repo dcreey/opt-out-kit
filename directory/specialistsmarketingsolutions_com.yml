@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://specialistsmarketingsolutions.com/do-not-sell-or-share-my-personal-information/"
+contact_email: "privacy@specialistsdata.com"
 opt_out_form: {"page": "https://specialistsmarketingsolutions.com/do-not-sell-or-share-my-personal-information/", "method": "post", "action": "https://specialistsmarketingsolutions.com/do-not-sell-or-share-my-personal-information/", "fields": [{"type": "text", "name": "form_fields[name]", "label": "Full Name"}, {"type": "tel", "name": "form_fields[field_4b72ac8]", "label": "Phone"}, {"type": "email", "name": "form_fields[email]", "label": "Business Email"}, {"type": "text", "name": "form_fields[field_af67ec0]", "label": "Website URL"}, {"type": "textarea", "name": "form_fields[message]", "label": "Message"}, {"type": "text", "name": "form_fields[field_32661b6]", "label": "form_fields[field_32661b6]"}], "hops": 1}
 registered_in: [OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, email_input, name_input, opt_out_form_found, phone_input]

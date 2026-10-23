@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://adttribution.com/opt-out/"
+contact_email: "privacy@adttribution.com"
 opt_out_form: {"page": "https://adttribution.com/opt-out/", "method": "get", "action": "https://adttribution.com/opt-out/", "fields": [{"type": "email", "name": "email", "label": "E-mail"}], "hops": 1}
 template: "t_37b62c"
 registered_in: [CA]

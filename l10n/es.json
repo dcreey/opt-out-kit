@@ -755,5 +755,21 @@
  "A real run on %@ showed this site's confirmation.": "Una ejecución real el %@ mostró la confirmación de este sitio.",
  "This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.": "Este sitio acepta las bajas por correo, no por formulario. El mensaje se rellena con tu nombre y el correo del hogar; léelo y envíalo desde tu app de correo.",
  "This site takes opt-outs by email: write to %@. We prepare the message for you.": "Este sitio acepta las bajas por correo: escribe a %@. Preparamos el mensaje por ti.",
- "Write the email to %@": "Escribir a %@"
+ "Write the email to %@": "Escribir a %@",
+ "%@ messages, one per address, each naming every site it handles. You read them and tap Send.": "%@ mensajes, uno por dirección, cada uno con todos los sitios que cubre. Los lees y tocas Enviar.",
+ "%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.": "%@ páginas, una tras otra. Cada una se rellena por ti; marcas su casilla «soy humano» y la enviamos.",
+ "%lld messages cover %lld sites. Each message names every site its address handles. Open one, read it, and tap Send in your mail app.": "%lld mensajes cubren %lld sitios. Cada mensaje nombra todos los sitios de su dirección. Abre uno, léelo y toca Enviar en tu app de correo.",
+ "%lld pages, one tap each": "%lld páginas, un toque cada una",
+ "%lld sites by email": "%lld sitios por correo",
+ "All messages sent": "Todos los mensajes enviados",
+ "Mail is not set up on this device. Each message opens in your default mail app instead.": "El correo no está configurado en este dispositivo. Cada mensaje se abre en tu app de correo predeterminada.",
+ "Messages": "Mensajes",
+ "Nothing left to verify": "Nada más que verificar",
+ "Open the next message (%lld left)": "Abrir el siguiente mensaje (%lld restantes)",
+ "Opt-out emails": "Correos de baja",
+ "Send opt-out emails": "Enviar los correos de baja",
+ "Start (%lld pages)": "Empezar (%lld páginas)",
+ "Tap to verify": "Toca para verificar",
+ "Tap to verify, we do the rest": "Toca para verificar, nosotros hacemos el resto",
+ "These %lld sites are filled in for you. Each shows a \"verify you are human\" box that only a person can tick. The next page loads while you tick the current one, so it is one tap per site.": "Estos %lld sitios se rellenan por ti. Cada uno muestra una casilla «verifica que eres humano» que solo una persona puede marcar. La siguiente página carga mientras marcas la actual: un toque por sitio."
 }

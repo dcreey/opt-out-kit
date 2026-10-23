@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.nordicdataresources.com/opt-out/"
+contact_email: "privacy@nordicdataresources.com"
 opt_out_form: {"page": "https://www.nordicdataresources.com/opt-out/", "method": "get", "action": "https://www.nordicdataresources.com/opt-out/", "fields": [{"type": "email", "name": "email-input", "label": "E-mail"}], "hops": 1}
 registered_in: [CA]
 signals: [captcha_turnstile, email_contact, email_input, opt_out_form_found]

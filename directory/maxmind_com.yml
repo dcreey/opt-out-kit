@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.maxmind.com/en/opt-out"
+contact_email: "privacy@maxmind.com"
 opt_out_form: {"page": "https://www.maxmind.com/en/opt-out", "method": "post", "action": "https://www.maxmind.com/en/opt-out", "fields": [{"type": "radio", "name": "request_type", "label": "request_type"}, {"type": "radio", "name": "request_type", "label": "request_type"}, {"type": "checkbox", "name": "confirm_opt_out", "label": "I understand that opting-out may result in degradation or lo"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_contact, mail_option, opt_out_form_found]

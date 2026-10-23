@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://datalinedata.com/do-not-sell-my-information/"
+contact_email: "privacy.officer@datalinedata.com"
 opt_out_form: {"page": "https://datalinedata.com/do-not-sell-my-information/", "method": "post", "action": "https://datalinedata.com/do-not-sell-my-information/", "fields": [{"type": "checkbox", "name": "input_1.1", "label": "View personal information Dataline has about me subject to t"}, {"type": "checkbox", "name": "input_1.2", "label": "Delete my personal information*"}, {"type": "checkbox", "name": "input_1.3", "label": "“Opt Out” and Do Not Sell my personal information*"}, {"type": "checkbox", "name": "input_1.4", "label": "Remove my personal information from your cross-contextual be"}, {"type": "checkbox", "name": "input_1.5", "label": "Correct my personal information (we will delete your informa"}, {"type": "text", "name": "input_6", "label": "Full Legal Name(Required)"}, {"type": "email", "name": "input_7", "label": "Email(Required)"}, {"type": "text", "name": "input_8.1", "label": "Street Address"}, {"type": "text", "name": "input_8.2", "label": "Address Line 2"}, {"type": "text", "name": "input_8.3", "label": "City"}, {"type": "select", "name": "input_8.4", "label": "State"}, {"type": "text", "name": "input_8.5", "label": "ZIP Code"}], "hops": 1}
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_input, opt_out_form_found]

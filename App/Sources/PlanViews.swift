@@ -41,7 +41,9 @@ struct PlanTaskRow: View {
             Image(systemName: model.isDone(task) ? "checkmark.circle.fill" : "circle").foregroundStyle(model.isDone(task) ? .green : .secondary).padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
                 Text(task.title).font(.headline)
-                if task.kind == .automatic { Text(Loc.f("%lld sites in one run", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
+                if task.kind == .verify { Text(Loc.f("%lld pages, one tap each", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
+                else if task.kind == .emails { Text(Loc.f("%lld sites by email", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
+                else if task.kind == .automatic { Text(Loc.f("%lld sites in one run", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 else if task.isShared { Text(Loc.f("One request handles %lld sites", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 Text(task.reason).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 if !places.isEmpty, task.isRegistered(in: places) {
@@ -90,6 +92,10 @@ struct PlanDestinations: ViewModifier {
                     if let b = model.brokers.first(where: { $0.id == id }) { BrokerInfoView(broker: b) }
                 case .automatic:
                     AutoActivityView(handles: task.domains)
+                case .emails:
+                    EmailQueueView(domains: task.domains)
+                case .verify:
+                    VerifyQueueView(domains: task.domains)
                 case .site(let id):
                     if let e = model.directory.first(where: { $0.id == id }) { DirectoryInfoView(entry: e, alsoHandles: task.domains.filter { $0 != e.domain }) }
                 }

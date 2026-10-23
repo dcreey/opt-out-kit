@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://thedatagroup.com/privacy/consumer-optout-request-form/"
+contact_email: "compliance@thedatagroup.com"
 opt_out_form: {"page": "https://thedatagroup.com/privacy/consumer-optout-request-form/", "method": "post", "action": "https://thedatagroup.com/privacy/consumer-optout-request-form/", "fields": [{"type": "email", "name": "form_fields[email]", "label": "Email"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_hcaptcha, captcha_recaptcha, captcha_turnstile, email_contact, email_input, opt_out_form_found]

@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.outbrain.com/privacy/?who=support&search_form_nonce=ef1198e7f9&post_type=advertisers&facet2=pdf"
+contact_email: "ob-dpo@teads.com"
 registered_in: [CA, TX]
 signals: [email_contact, email_only_wording]
 profiled: "2026-10-22"

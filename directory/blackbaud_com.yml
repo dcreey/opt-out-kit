@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.blackbaud.com/company/privacy-policy/north-america"
+contact_email: "privacy@blackbaud.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, mail_option, phone_verify]
 profiled: "2026-10-22"

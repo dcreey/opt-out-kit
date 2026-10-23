@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://irys.us/do-not-sell-ccpa"
+contact_email: "privacy@irys.us"
 opt_out_form: {"page": "https://irys.us/do-not-sell-ccpa", "method": "post", "action": "https://irys.us/do-not-sell-ccpa", "fields": [{"type": "text", "name": "fname", "label": "First Name"}, {"type": "text", "name": "lname", "label": "Last Name"}, {"type": "email", "name": "email", "label": "Email Address"}], "hops": 0}
 family: "trustsuperset_com"
 family_parent: "trustsuperset.com"

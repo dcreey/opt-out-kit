@@ -7,6 +7,8 @@ public struct PlanTask: Identifiable, Equatable, Sendable {
         case flow(String)          // a hand-written walkthrough, by broker id
         case site(String)          // a directory site, by entry id (the lead site when sites share one opt-out)
         case automatic             // every site the app opts out of by itself: one task, one run
+        case emails                // every site that takes opt-outs by email: one task, one message per address
+        case verify                // every form that only needs the person to tick a bot check: one task, one tap per page
     }
     public var kind: Kind
     public var title: String
@@ -21,7 +23,7 @@ public struct PlanTask: Identifiable, Equatable, Sendable {
         self.kind = kind; self.title = title; self.domains = domains; self.reason = reason; self.method = method; self.registeredIn = registeredIn
     }
     public var id: String {
-        switch kind { case .platform(let i): return "platform-\(i)"; case .flow(let i): return "flow-\(i)"; case .site(let i): return "site-\(i)"; case .automatic: return "automatic" }
+        switch kind { case .platform(let i): return "platform-\(i)"; case .flow(let i): return "flow-\(i)"; case .site(let i): return "site-\(i)"; case .automatic: return "automatic"; case .emails: return "emails"; case .verify: return "verify" }
     }
     public var siteCount: Int { domains.count }
     public var isShared: Bool { domains.count > 1 }
@@ -91,6 +93,29 @@ public enum OptOutPlan {
             claimed.formUnion(domains)
             byMethod[best.1.method, default: []].append(PlanTask(kind: .site(lead.id), title: lead.domain, domains: domains,
                                                                    reason: L10n.f("One opt-out request handles all %@ sites that share this process.", domains.count), method: best.1.method, registeredIn: states(domains)))
+        }
+        // Sites that take opt-outs by email (and that no automatic form handles) are one task: a message per address, naming every site
+        // that address handles. The person reads each one and taps Send.
+        let emailEntries = entries.filter { !claimed.contains($0.domain) && $0.contactEmail != nil && classifyEntry($0).method != .automatic }
+        if !emailEntries.isEmpty {
+            let domains = emailEntries.map(\.domain)
+            claimed.formUnion(domains)
+            let addresses = Set(emailEntries.compactMap { $0.contactEmail?.lowercased() }).count
+            byMethod[.semiAutomatic, default: []].append(PlanTask(kind: .emails, title: L10n.t("Send opt-out emails"), domains: domains,
+                reason: L10n.f("%@ messages, one per address, each naming every site it handles. You read them and tap Send.", addresses),
+                method: .semiAutomatic, registeredIn: states(domains)))
+        }
+        // Forms we fill in and send ourselves except for a bot check the person has to tick: one task, a visible page per site.
+        let verifyEntries = entries.filter { e in
+            guard !claimed.contains(e.domain), let form = e.optOutForm, !FormFiller.needsListing(form) else { return false }
+            return classifyEntry(e).method == .semiAutomatic
+        }
+        if !verifyEntries.isEmpty {
+            let domains = verifyEntries.map(\.domain)
+            claimed.formUnion(domains)
+            byMethod[.semiAutomatic, default: []].append(PlanTask(kind: .verify, title: L10n.t("Tap to verify, we do the rest"), domains: domains,
+                reason: L10n.f("%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.", domains.count),
+                method: .semiAutomatic, registeredIn: states(domains)))
         }
         for e in entries where !claimed.contains(e.domain) {
             claimed.insert(e.domain)

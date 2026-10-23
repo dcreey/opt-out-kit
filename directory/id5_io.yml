@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://id5.io/trust/privacy-policy"
+contact_email: "privacy@id5.io"
 registered_in: [CA]
 signals: [email_contact, mail_option]
 profiled: "2026-10-22"

@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.gsdsi.com/privacy-center"
+contact_email: "privacy@gsdsi.com"
 family: "trustsuperset_com"
 family_parent: "trustsuperset.com"
 registered_in: [CA, OR, TX]

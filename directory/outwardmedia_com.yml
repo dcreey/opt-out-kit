@@ -8,6 +8,7 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://outwardmedia.com/privacypolicy"
+contact_email: "privacy@outwardmedia.com"
 opt_out_form: {"page": "https://outwardmedia.com/privacypolicy", "method": "post", "action": "https://outwardmedia.com/api/newsletter-form", "fields": [{"type": "text", "name": "name", "label": "Full Name"}, {"type": "text", "name": "company", "label": "Company"}, {"type": "email", "name": "email", "label": "Email Address (required)"}], "hops": 0}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]

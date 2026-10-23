@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.iss-stoxx.com/legal/iss-inc-privacy-notice/"
+contact_email: "dataprotectionofficer@issgovernance.com"
 registered_in: [CA, OR]
 signals: [email_contact, id_required, phone_verify]
 profiled: "2026-10-22"

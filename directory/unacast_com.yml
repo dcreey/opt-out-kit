@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.unacast.com/opt-out"
+contact_email: "privacy@unacast.com"
 opt_out_form: {"page": "https://www.unacast.com/opt-out", "method": "get", "action": "https://www.unacast.com/opt-out", "fields": [{"type": "checkbox", "name": "marketing-2", "label": "marketing-2"}, {"type": "checkbox", "name": "analytics-2", "label": "analytics-2"}, {"type": "checkbox", "name": "personalization-2", "label": "personalization-2"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, opt_out_form_found]

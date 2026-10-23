@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://salesassistiq.ai/data-trust-center/"
+contact_email: "legal@aniline.ai"
 registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-22"

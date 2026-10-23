@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.endgame.io/privacy"
+contact_email: "privacy@endgame.io"
 registered_in: [CA]
 signals: [account_hint, email_contact]
 profiled: "2026-10-22"

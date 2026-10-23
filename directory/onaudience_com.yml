@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://onaudience.com/opt-out/"
+contact_email: "privacy@onaudience.com"
 opt_out_form: {"page": "https://onaudience.com/opt-out/", "method": "get", "action": "https://onaudience.com/opt-out/", "fields": [{"type": "email", "name": "email", "label": "E-mail"}], "hops": 1}
 template: "t_37b62c"
 registered_in: [CA]

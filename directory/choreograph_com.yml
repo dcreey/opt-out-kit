@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.choreograph.com/pages/talent-privacy-policy"
+contact_email: "dpo@choreograph.com"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_only_wording, mail_option, phone_verify]
 profiled: "2026-10-22"

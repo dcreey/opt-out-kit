@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://catchlight.ai/privacy"
+contact_email: "privacy@catchlight.ai"
 registered_in: [TX]
 signals: [email_contact, id_required, mail_option, phone_verify]
 profiled: "2026-10-22"

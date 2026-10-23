@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.aidentified.com/utah-privacy-rights"
+contact_email: "privacy@aidentified.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, id_required, mail_option]
 profiled: "2026-10-22"

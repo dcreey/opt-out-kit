@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.venntel.com/opt-out"
+contact_email: "privacy@venntel.com"
 opt_out_form: {"page": "https://www.venntel.com/opt-out", "method": "get", "action": "https://www.venntel.com/opt-out", "fields": [{"type": "text", "name": "contact-2-first-name", "label": "First Name"}, {"type": "text", "name": "contact-2-last-name", "label": "Last Name"}, {"type": "email", "name": "contact-2-email-2", "label": "Phone number*"}, {"type": "tel", "name": "contact-2-phone", "label": "Business email*"}, {"type": "email", "name": "contact-2-email-2", "label": "Phone number*"}, {"type": "select", "name": "contact-2-select", "label": "Request Type*"}, {"type": "textarea", "name": "contact-2-message", "label": "Message"}, {"type": "checkbox", "name": "contact-2-checkbox", "label": "contact-2-checkbox"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, name_input, opt_out_form_found, phone_input]

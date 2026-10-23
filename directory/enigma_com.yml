@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://www.enigma.com/legal/do-not-sell"
+contact_email: "privacy@enigma.com"
 registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-22"

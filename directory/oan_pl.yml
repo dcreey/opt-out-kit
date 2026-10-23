@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://oan.pl/opt-out"
+contact_email: "privacy@oan.pl"
 opt_out_form: {"page": "https://oan.pl/opt-out", "method": "get", "action": "https://oan.pl/opt-out", "fields": [{"type": "email", "name": "email", "label": "E-mail"}], "hops": 1}
 template: "t_37b62c"
 registered_in: [CA]

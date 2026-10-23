@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://www.captifytechnologies.com/data-subject-rights-request/"
+contact_email: "privacy@captify.co.uk"
 registered_in: [CA]
 signals: [email_contact, email_only_wording]
 profiled: "2026-10-22"

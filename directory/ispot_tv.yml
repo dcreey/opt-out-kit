@@ -8,6 +8,7 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.ispot.tv/privacy/opt-out"
+contact_email: "privacy+ispot@ispot.tv"
 opt_out_form: {"page": "https://www.ispot.tv/privacy/opt-out", "method": "post", "action": "https://www.ispot.tv/ajax/users/clearbitrisk", "fields": [{"type": "email", "name": "email", "label": "Work Email Address"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, opt_out_form_found]

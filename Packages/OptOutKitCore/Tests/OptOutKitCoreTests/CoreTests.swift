@@ -2391,3 +2391,43 @@ final class EmailOnlyAndAddressTests: XCTestCase {
         XCTAssertEqual(byName["z"], ["62701"])
     }
 }
+
+final class EmailBatchTests: XCTestCase {
+    func testSitesThatTakeEmailAreOneTaskAndAMessageListsEverySiteForItsAddress() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        let brokers = try Registry.load(directory: dir.appendingPathComponent("brokers"))
+        let steps = OptOutPlan.build(entries: entries, brokers: brokers, platforms: [], classifyEntry: { OptOutMethods.classify($0, confirmingIdentity: true) },
+                                     classifyBroker: { OptOutMethods.classify($0, in: entries) })
+        let tasks = steps.flatMap(\.tasks)
+        let mail = try XCTUnwrap(tasks.first { $0.kind == .emails })
+        XCTAssertGreaterThan(mail.siteCount, 100)
+        XCTAssertEqual(mail.method, .semiAutomatic)
+        XCTAssertEqual(tasks.filter { $0.kind == .emails }.count, 1)
+        let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count, "still listed once")
+        let batches = EmailBatch.build(entries: entries.filter { mail.domains.contains($0.domain) })
+        XCTAssertLessThan(batches.count, mail.siteCount, "sites sharing an address share a message")
+        XCTAssertEqual(batches.flatMap(\.domains).count, mail.siteCount)
+        let court = try XCTUnwrap(batches.first { $0.domains.count > 1 }, "some address handles several sites")
+        let body = court.body(name: "Pat Example", email: "pat+optoutkit@gmail.com", address: "1 Main St, Springfield, IL 62701")
+        XCTAssertTrue(body.contains("Pat Example") && body.contains("pat+optoutkit@gmail.com") && body.contains(court.domains[0]))
+    }
+}
+
+final class VerifyTaskTests: XCTestCase {
+    func testFormsThatOnlyNeedABotCheckTickedAreOneTaskWithTheEmailTaskAlongside() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        let brokers = try Registry.load(directory: dir.appendingPathComponent("brokers"))
+        let steps = OptOutPlan.build(entries: entries, brokers: brokers, platforms: [], classifyEntry: { OptOutMethods.classify($0, confirmingIdentity: true) },
+                                     classifyBroker: { OptOutMethods.classify($0, in: entries) })
+        let tasks = steps.flatMap(\.tasks)
+        let verify = try XCTUnwrap(tasks.first { $0.kind == .verify })
+        XCTAssertEqual(tasks.filter { $0.kind == .verify }.count, 1)
+        XCTAssertGreaterThan(verify.siteCount, 5)
+        XCTAssertEqual(verify.method, .semiAutomatic)
+        let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count)
+    }
+}

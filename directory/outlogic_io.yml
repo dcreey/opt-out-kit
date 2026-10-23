@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://outlogic.io/opt-out-form/"
+contact_email: "privacy@outlogic.io"
 opt_out_form: {"page": "https://outlogic.io/opt-out-form/", "method": "post", "action": "https://outlogic.io/opt-out-form/#gf_3", "fields": [{"type": "email", "name": "input_2", "label": "Email(Required)"}, {"type": "textarea", "name": "input_3", "label": "Question(Required)"}, {"type": "text", "name": "input_4", "label": "Phone"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, opt_out_form_found, phone_verify]

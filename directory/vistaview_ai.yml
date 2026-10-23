@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://vistaview.ai/privacy"
+contact_email: "privacy@vistaview.ai"
 registered_in: [TX]
 signals: [email_contact, phone_verify]
 profiled: "2026-10-22"

@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://partech.com/privacy-policy/california-privacy-rights/"
+contact_email: "privacy@partech.com"
 registered_in: [OR, TX]
 signals: [email_contact, email_only_wording, id_required]
 profiled: "2026-10-22"

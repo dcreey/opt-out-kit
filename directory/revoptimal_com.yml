@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://revoptimal.com/privacy/"
+contact_email: "privacy@revoptimal.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, mail_option, phone_verify]
 profiled: "2026-10-22"

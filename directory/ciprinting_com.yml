@@ -8,6 +8,7 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://ciprinting.com/privacy-request/"
+contact_email: "privacy@communityimpact.com"
 opt_out_form: {"page": "https://ciprinting.com/privacy-request/", "method": "post", "action": "https://ciprinting.com/api/privacy-request", "fields": [{"type": "text", "name": "name", "label": "Full Name *"}, {"type": "email", "name": "email", "label": "Email Address *"}, {"type": "text", "name": "address", "label": "Postal Address"}, {"type": "select", "name": "request_type", "label": "Request Type *"}, {"type": "textarea", "name": "details", "label": "Additional Details"}, {"type": "text", "name": "website", "label": "Website"}], "hops": 1}
 registered_in: [TX]
 signals: [email_contact, email_input, mail_option, name_input, opt_out_form_found]

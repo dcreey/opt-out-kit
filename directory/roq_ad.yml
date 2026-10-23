@@ -8,6 +8,7 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://roq.ad/opt-out"
+contact_email: "privacy@roq.ad"
 opt_out_form: {"page": "https://roq.ad/opt-out", "method": "get", "action": "https://roq.ad/opt-out", "fields": [{"type": "email", "name": "email", "label": "Work email"}, {"type": "text", "name": "company", "label": "Company"}, {"type": "checkbox", "name": "newsletter-dark-consent", "label": "I agree to ROQAD emailing me the newsletter. Unsubscribe any"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [email_contact, email_input, opt_out_form_found]

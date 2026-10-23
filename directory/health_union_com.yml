@@ -8,6 +8,7 @@ tier: "D"
 automation: "guided"
 confidence: "low"
 opt_out_url: "https://health-union.com/privacy-choices/"
+contact_email: "privacy@health-union.com"
 registered_in: [CA]
 signals: [email_contact, email_only_wording]
 profiled: "2026-10-22"

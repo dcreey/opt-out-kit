@@ -8,6 +8,7 @@ tier: "A"
 automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://persistent.id/opt-out"
+contact_email: "privacy@persistent.id"
 opt_out_form: {"page": "https://persistent.id/opt-out", "method": "post", "action": "https://persistent.id/", "fields": [{"type": "input", "name": "company-site", "label": "company-site"}, {"type": "text", "name": "first_name", "label": "Enter first name"}, {"type": "text", "name": "last_name", "label": "Enter last name"}, {"type": "email", "name": "email", "label": "Enter email address"}, {"type": "text", "name": "company", "label": "Enter company name"}, {"type": "text", "name": "job_title", "label": "Enter job title"}, {"type": "select", "name": "country", "label": "country"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]

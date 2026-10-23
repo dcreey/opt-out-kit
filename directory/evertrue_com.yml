@@ -8,6 +8,7 @@ tier: "C"
 automation: "needs_browser"
 confidence: "low"
 opt_out_url: "https://www.evertrue.com/privacy-policy/"
+contact_email: "privacy@evertrue.com"
 registered_in: [CA, TX]
 signals: [email_contact, email_only_wording, phone_verify, script_rendered_form]
 profiled: "2026-10-22"

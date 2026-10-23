@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: "https://revealmobile.com/do-not-sell-or-share-my-personal-information"
+contact_email: "privacy@revealmobile.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, portal_osano]
 profiled: "2026-10-22"
