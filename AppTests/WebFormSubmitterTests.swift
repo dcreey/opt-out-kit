@@ -45,11 +45,36 @@ final class WebFormSubmitterTests: XCTestCase {
         let ctx = CGContext(data: nil, width: cg.width, height: cg.height, bitsPerComponent: 8, bytesPerRow: cg.width * 4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
         ctx.draw(cg, in: CGRect(x: 0, y: 0, width: cg.width, height: cg.height))
         let px = ctx.data!.assumingMemoryBound(to: UInt8.self)
-        var nonWhite = 0
-        for y in stride(from: 0, to: cg.height, by: 8) { let i = (y * cg.width + cg.width / 2) * 4; if px[i] < 240 || px[i + 1] < 240 || px[i + 2] < 240 { nonWhite += 1 } }
-        XCTAssertGreaterThan(nonWhite, 5, "the picture shows the page, not a blank sheet")
+        var nonWhite = 0, dark = 0
+        for y in stride(from: 0, to: cg.height, by: 3) { for x in stride(from: 0, to: cg.width, by: 3) {
+            let i = (y * cg.width + x) * 4
+            if px[i] < 200 { nonWhite += 1 }
+            if px[i] < 20 && px[i + 1] < 20 && px[i + 2] < 20 { dark += 1 }
+        } }
+        XCTAssertGreaterThan(nonWhite, 50, "the picture shows the page's text, not a blank sheet")
+        XCTAssertLessThan(dark, (cg.width / 3) * (cg.height / 3) / 2, "and it is not a black sheet")
         let preview = await FormRun.run(url: nil, html: html, plan: plan(fields), dryRun: true, maxWait: 8, capture: false)
         XCTAssertNil(preview.screenshot)
+    }
+
+    func testAPageWithNoBackgroundIsPhotographedOnWhiteNotBlack() async throws {
+        let report = await FormRun.run(url: nil, html: page(), plan: plan(fields), dryRun: false, maxWait: 8, capture: true)
+        let image = try XCTUnwrap(UIImage(data: try XCTUnwrap(report.screenshot)))
+        let cg = try XCTUnwrap(image.cgImage)
+        let ctx = CGContext(data: nil, width: cg.width, height: cg.height, bitsPerComponent: 8, bytesPerRow: cg.width * 4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: cg.width, height: cg.height))
+        let px = ctx.data!.assumingMemoryBound(to: UInt8.self)
+        let corner = (cg.height - 5) * cg.width * 4 + 5 * 4          // an empty corner of the page
+        XCTAssertGreaterThan(Int(px[corner]), 235, "a page with no background shows white, not black")
+    }
+
+    func testOnlyNewTextCountsAndAnErrorIsNeverAConfirmation() {
+        let before = "Opt out\nSome footer: your request has been received by our team in the past\nFirst name"
+        let after = "Opt out\nSome footer: your request has been received by our team in the past\nThere was a problem with your submission. Please review the fields below."
+        XCTAssertEqual(WebFormSubmitter.classifyAfterSending(before: before, after: after), .rejected("the site showed an error after sending"))
+        XCTAssertEqual(WebFormSubmitter.classifyAfterSending(before: before, after: before), .failed("nothing on the page changed after sending"))
+        XCTAssertEqual(WebFormSubmitter.classifyAfterSending(before: before, after: before + "\nThank you. We have received your request."), .submitted(awaitingEmail: false))
+        XCTAssertEqual(FormRun.classify("Welcome to the Privacy Rights Portal. Click the Data Subject Rights tab."), .failed("no success message was shown"))
     }
 
     func testFillsTheFormFromTheProfileAndReportsTheSuccessMessage() async {

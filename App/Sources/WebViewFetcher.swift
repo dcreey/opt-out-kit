@@ -242,6 +242,15 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
 /// Fills in a site's real opt-out form from a person's profile and sends it. It stops, and says so, at anything a person
 /// must handle: a visible bot check, a terms prompt, a form it cannot fill. It never solves a challenge, never ticks a
 /// legal acknowledgement, and only reports "sent" when the site shows a success message.
+extension WebFormSubmitter {
+    /// What the page said after sending, judged only on the lines that were not there before.
+    nonisolated static func classifyAfterSending(before: String, after: String) -> SubmitOutcome {
+        let added = FormRun.newText(before: before, after: after)
+        if added.isEmpty { return .failed("nothing on the page changed after sending") }
+        return FormRun.classify(added)
+    }
+}
+
 struct WebFormSubmitter: FormSubmitter {
     var maxWait: TimeInterval = 20
 
@@ -305,18 +314,32 @@ enum FormRun {
         if dryRun { return .filledNotSubmitted }
         if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
 
+        let before = await session.visibleText()
         guard await session.pressSubmit(for: plan.values) else { return .failed("no submit button found") }
         await session.settlePage(maxWait: maxWait)
         if let why = await session.visibleChallenge() { return .challenged(why) }
-        return Self.classify(await session.visibleText())
+        // Only what appeared after sending counts: a page that already said "request received" somewhere (hidden templates, footers,
+        // policy text) is not a confirmation.
+        return WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
+    }
+
+    /// The lines of `after` that were not in `before`.
+    nonisolated static func newText(before: String, after: String) -> String {
+        let seen = Set(before.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) })
+        return after.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty && !seen.contains($0) }.joined(separator: "\n")
     }
 
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
-        let success = t.range(of: "thank you|request (has been )?(received|submitted)|successfully|we have received|has been submitted|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)", options: .regularExpression) != nil
+        // An error comes first: "problem with your submission" pages often also contain the word "request".
+        if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
+            return .rejected("the site showed an error after sending")
+        }
+        let success = t.range(of: "request (has been |was )?(received|submitted|processed|sent)|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
         let needsEmail = t.range(of: "check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|click the link", options: .regularExpression) != nil
         if success { return .submitted(awaitingEmail: needsEmail) }
-        if t.range(of: "invalid|is required|please enter|please provide|error occurred|try again", options: .regularExpression) != nil {
+        if t.range(of: "please enter|please provide", options: .regularExpression) != nil {
             return .rejected("the site flagged a field or asked to try again")
         }
         return .failed("no success message was shown")
@@ -330,10 +353,19 @@ extension WebViewSession {
     /// phone screen.
     func screenshotJPEG(quality: CGFloat = 0.6) async -> Data? {
         if webView.frame.isEmpty { webView.frame = CGRect(x: 0, y: 0, width: 390, height: 800) }
+        // The web view is kept almost invisible in a hidden window; a snapshot would inherit that and come out nearly transparent.
+        let previousAlpha = webView.alpha
+        webView.alpha = 1
+        defer { webView.alpha = previousAlpha }
         let config = WKSnapshotConfiguration()
         config.rect = webView.bounds
         guard let image = try? await webView.takeSnapshot(configuration: config) else { return nil }
-        return image.jpegData(compressionQuality: quality)
+        // A page without its own background snapshots with transparency, which a JPEG shows as black: paint it on white first.
+        let flat = UIGraphicsImageRenderer(size: image.size).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: image.size))
+            image.draw(at: .zero)
+        }
+        return flat.jpegData(compressionQuality: quality)
     }
 
     /// True when the page just loaded is an error page, which means the recorded link has moved or died.

@@ -58,7 +58,7 @@ private struct Thumbnail: View {
             else { Image(systemName: item.worked ? "checkmark.circle" : "exclamationmark.triangle").foregroundStyle(.secondary) }
         }
         .frame(width: 44, height: 78).background(Color(.secondarySystemBackground)).clipShape(RoundedRectangle(cornerRadius: 6))
-        .task { if item.hasScreenshot, let data = model.screenshot(for: item, person: person) { image = UIImage(data: data) } }
+        .task { if item.hasScreenshot, let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
     }
 }
 
@@ -99,6 +99,6 @@ struct EvidenceDetailView: View {
         }
         .navigationTitle(item.domain)
         .navigationBarTitleDisplayMode(.inline)
-        .task { if let data = model.screenshot(for: item, person: person) { image = UIImage(data: data) } }
+        .task { if let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
     }
 }

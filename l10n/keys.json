@@ -778,6 +778,8 @@
   "A form plus a CAPTCHA that you solve",
   "A guided walkthrough with a phone, ID or account step",
   "A hand-written walkthrough with %@ steps.",
+  "A real run on %@ did not go through (%@), so you do this one with a guide.",
+  "A real run on %@ showed this site's confirmation.",
   "A recent automatic send was stopped by a check on the site, so you solve it.",
   "A simple form and an email link",
   "Add a family member's address and their state's rules apply to them. Brokers outside those states usually still accept opt-out requests, and that is what this app sends.",

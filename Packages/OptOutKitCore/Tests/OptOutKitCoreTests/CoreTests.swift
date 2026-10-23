@@ -2253,20 +2253,24 @@ final class RequestAcknowledgementTests: XCTestCase {
 }
 
 final class MeasuredAutomaticTests: XCTestCase {
-    func testDataAxleIsFullyAutomaticForTheOwnerBecauseItOnlyNotesThatItMayVerifyIdentity() throws {
+    func testDataAxleOwnNoteIsNotABlockerButItsSisterSitesNeedAMenuFilledIn() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
-        for domain in ["data-axle.com", "donorbase.com", "exactdata.com", "usadata.com"] {
+        let axle = try XCTUnwrap(entries.first { $0.domain == "data-axle.com" })
+        XCTAssertNotNil(axle.liveCheck)
+        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .automatic, "its identity note counts as the owner's own box")
+        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: false).method, .semiAutomatic)
+        // The reviewed real run showed the sister sites' forms need a required menu filled in, which the page's own text did not suggest.
+        for domain in ["donorbase.com", "exactdata.com", "usadata.com"] {
             let e = try XCTUnwrap(entries.first { $0.domain == domain }, domain)
-            XCTAssertNotNil(e.liveCheck, "\(domain) was loaded on a real page")
-            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic, domain)
-            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: false).method, .semiAutomatic, "family profiles still do it themselves: \(domain)")
+            XCTAssertEqual(e.runCheck?.result, "failed", domain)
+            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .guided, domain)
         }
-        // Sites with a visible bot check stay semi-automated.
+        // Sites with a visible bot check never count as automatic.
         let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }
         XCTAssertFalse(withCheck.isEmpty)
-        for e in withCheck { XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, e.domain) }
+        for e in withCheck { XCTAssertNotEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic, e.domain) }
     }
 }
 
@@ -2314,5 +2318,34 @@ final class EvidenceTests: XCTestCase {
         let preview = Got()
         _ = await AutoOptOut(submitter: Shot(), spacing: 0).run(entries: [entry], person: person, progress: Progress(), dryRun: true, evidence: { e, _ in preview.sites.append(e.id) })
         XCTAssertTrue(preview.sites.isEmpty)
+    }
+}
+
+final class RunCheckTests: XCTestCase {
+    private func clean(_ run: RunCheck?) -> DirectoryEntry {
+        let f = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil,
+                           fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        e.liveCheck = LiveCheck(checked: "2026-10-22", blockers: []); e.runCheck = run
+        return e
+    }
+
+    func testAReviewedRealRunOutranksEveryGuess() {
+        XCTAssertEqual(OptOutMethods.classify(clean(nil)).method, .automatic, "clean at load, nothing more known")
+        XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "failed", note: "a cookie banner covered the form"))).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed"))).method, .automatic)
+        XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed")), challengedBefore: true).method, .semiAutomatic,
+                       "a later check still moves it")
+    }
+
+    func testTheReviewedRunIsInTheDirectory() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
+        XCTAssertEqual(confirmed, ["apollo.io", "lionsharemarketing.com", "scileads.com"])
+        let failed = entries.filter { $0.runCheck?.result == "failed" }
+        XCTAssertGreaterThan(failed.count, 40)
+        for e in failed { XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .guided, e.domain) }
     }
 }

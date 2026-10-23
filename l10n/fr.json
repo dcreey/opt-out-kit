@@ -750,5 +750,7 @@
  "There is no screenshot for this site.": "Il n’y a pas de capture pour ce site.",
  "This does not look finished": "Cela ne semble pas terminé",
  "This is the page the site showed when we finished.": "Voici la page affichée par le site à la fin.",
- "Went through (%lld)": "Abouti (%lld)"
+ "Went through (%lld)": "Abouti (%lld)",
+ "A real run on %@ did not go through (%@), so you do this one with a guide.": "Une exécution réelle le %@ n’a pas abouti (%@) : vous faites celui-ci avec un guide.",
+ "A real run on %@ showed this site's confirmation.": "Une exécution réelle le %@ a affiché la confirmation de ce site."
 }

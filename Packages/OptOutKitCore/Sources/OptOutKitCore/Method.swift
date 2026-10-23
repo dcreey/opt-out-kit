@@ -59,6 +59,15 @@ public enum OptOutMethods {
             if listing != nil {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We search the site for you; you tap your own listing and clear the check, and we fill in and send the rest."))
             }
+            // A reviewed real run beats every guess made from reading the page.
+            if let run = e.runCheck {
+                if run.result == "failed" {
+                    return MethodVerdict(method: .guided, reason: L10n.f("A real run on %@ did not go through (%@), so you do this one with a guide.", run.date, run.note ?? "-"))
+                }
+                if run.result == "confirmed", !failedBefore, !challengedBefore {
+                    return MethodVerdict(method: .automatic, reason: L10n.f("A real run on %@ showed this site's confirmation.", run.date))
+                }
+            }
             if failedBefore {
                 return MethodVerdict(method: .guided, reason: L10n.t("The app tried this site automatically and it did not go through, so you do it with a guide."))
             }

@@ -750,5 +750,7 @@
  "There is no screenshot for this site.": "No hay captura de este sitio.",
  "This does not look finished": "No parece terminado",
  "This is the page the site showed when we finished.": "Esta es la página que mostró el sitio al terminar.",
- "Went through (%lld)": "Completados (%lld)"
+ "Went through (%lld)": "Completados (%lld)",
+ "A real run on %@ did not go through (%@), so you do this one with a guide.": "Una ejecución real el %@ no se completó (%@), así que haces este con una guía.",
+ "A real run on %@ showed this site's confirmation.": "Una ejecución real el %@ mostró la confirmación de este sitio."
 }

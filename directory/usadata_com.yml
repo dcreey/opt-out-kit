@@ -18,3 +18,7 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["certify: By submitting, I understand that I may be required to verify my identity to complete this request, and I authorize Data Axle to contact me i"]
+run_check:
+  date: "2026-10-23"
+  result: "failed"
+  note: "a required menu was left empty"

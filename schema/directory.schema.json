@@ -37,6 +37,16 @@
     "family_parent": { "type": "string" },
     "template": { "type": "string" },
     "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
+    "run_check": {
+      "type": "object",
+      "required": ["date", "result"],
+      "additionalProperties": false,
+      "properties": {
+        "date": { "type": "string" },
+        "result": { "enum": ["confirmed", "failed"] },
+        "note": { "type": "string" }
+      }
+    },
     "live_check": {
       "type": "object",
       "required": ["checked", "blockers"],

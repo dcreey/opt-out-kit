@@ -144,6 +144,15 @@ public struct LiveCheck: Codable, Equatable, Hashable, Sendable {
     public init(checked: String, blockers: [String]) { self.checked = checked; self.blockers = blockers }
 }
 
+/// What a real, reviewed run showed: the screenshot of the page after sending either showed a confirmation (`confirmed`) or it did not
+/// (`failed`, with what the page showed instead). This outranks every guess from reading the page.
+public struct RunCheck: Codable, Equatable, Hashable, Sendable {
+    public var date: String
+    public var result: String          // confirmed | failed
+    public var note: String?
+    public init(date: String, result: String, note: String? = nil) { self.date = date; self.result = result; self.note = note }
+}
+
 /// One site we know about but have no hand-written flow for yet. Generated, provisional, and safe to regenerate.
 public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendable {
     public var id: String
@@ -160,23 +169,24 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var template: String?        // sites running the same opt-out form: one flow, one request per site
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
     public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
+    public var runCheck: RunCheck?        // what a real, reviewed run showed
     public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
     public var signals: [String]?
     public var profiled: String?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, registeredIn: [String]? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.registeredIn = registeredIn
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
-        case searchCheck = "search_check", liveCheck = "live_check", registeredIn = "registered_in"
+        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

@@ -750,5 +750,7 @@
  "There is no screenshot for this site.": "Für diese Seite gibt es keinen Screenshot.",
  "This does not look finished": "Das sieht nicht abgeschlossen aus",
  "This is the page the site showed when we finished.": "Das ist die Seite, die die Webseite am Ende zeigte.",
- "Went through (%lld)": "Durchgegangen (%lld)"
+ "Went through (%lld)": "Durchgegangen (%lld)",
+ "A real run on %@ did not go through (%@), so you do this one with a guide.": "Ein echter Durchlauf am %@ ging nicht durch (%@), also machen Sie diese Seite mit einer Anleitung.",
+ "A real run on %@ showed this site's confirmation.": "Ein echter Durchlauf am %@ zeigte die Bestätigung dieser Seite."
 }

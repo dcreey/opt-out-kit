@@ -424,3 +424,21 @@ final class CountryAppTests: XCTestCase {
         XCTAssertTrue(m.platformQueue.isEmpty, "California's service is for California residents")
     }
 }
+
+final class EvidenceImageTests: XCTestCase {
+    private func jpeg(gray: CGFloat) -> Data {
+        UIGraphicsImageRenderer(size: CGSize(width: 40, height: 80)).image { ctx in
+            UIColor(white: gray, alpha: 1).setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 40, height: 80))
+            UIColor(white: 0, alpha: 1).setFill(); ctx.fill(CGRect(x: 10, y: 10, width: 20, height: 20))
+        }.jpegData(compressionQuality: 0.9)!
+    }
+
+    func testAnAlmostBlackScreenshotIsBrightenedAndANormalOneIsLeftAlone() throws {
+        let dark = try XCTUnwrap(UIImage(data: jpeg(gray: 5.0 / 255)))
+        XCTAssertLessThan(EvidenceImage.mean(of: dark), 0.03)
+        let fixed = try XCTUnwrap(EvidenceImage.image(from: jpeg(gray: 5.0 / 255)))
+        XCTAssertGreaterThan(EvidenceImage.mean(of: fixed), 0.3, "the page shows again")
+        let normal = try XCTUnwrap(EvidenceImage.image(from: jpeg(gray: 1)))
+        XCTAssertGreaterThan(EvidenceImage.mean(of: normal), 0.8)
+    }
+}
