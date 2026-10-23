@@ -248,9 +248,11 @@ struct GuidedFlowView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
+        // The geometry is read with the safe area intact, so the guide knows how tall the status bar and the camera cut-out are; only
+        // the content ignores the top safe area, so the coloured band can run behind it.
         GeometryReader { geo in
             VStack(spacing: 0) {
-                GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.18)
+                GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.2)
                 // The site's own page sits below the guide, clearly a different thing.
                 Group {
                     if let web = runner.webView { WebViewHost(webView: web) }
@@ -259,8 +261,8 @@ struct GuidedFlowView: View {
                 .frame(maxHeight: .infinity)
                 .accessibilityIdentifier("guided-browser")
             }
+            .ignoresSafeArea(edges: .top)
         }
-        .ignoresSafeArea(edges: .top)
         .task { await runner.run() }
         .onChange(of: runner.ending) { _, e in if e != nil { dismiss() } }
     }
@@ -279,6 +281,7 @@ struct GuidedPanel: View {
     /// content starts below it.
     var topInset: CGFloat = 0
     var maxStepHeight: CGFloat = 140
+    @State private var stepHeight: CGFloat = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -316,8 +319,11 @@ struct GuidedPanel: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(GeometryReader { Color.clear.preference(key: StepHeightKey.self, value: $0.size.height) })
                     }
-                    .frame(maxHeight: maxStepHeight)
+                    // As tall as the text needs, up to a cap; only a long instruction scrolls.
+                    .frame(height: min(max(stepHeight, 20), maxStepHeight))
+                    .onPreferenceChange(StepHeightKey.self) { stepHeight = $0 }
                 }
                 if let status = runner.status {
                     Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
@@ -340,4 +346,9 @@ struct GuidedPanel: View {
             Rectangle().fill(Color.accentColor).frame(height: 3)
         }
     }
+}
+
+private struct StepHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
 }
