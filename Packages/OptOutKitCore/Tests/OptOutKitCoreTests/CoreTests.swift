@@ -2337,10 +2337,10 @@ final class RunCheckTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
         let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
-        XCTAssertEqual(confirmed, ["apollo.io", "lionsharemarketing.com", "scileads.com"])
+        XCTAssertEqual(confirmed, ["abovedata.io", "apollo.io", "lionsharemarketing.com", "scileads.com"])
         // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
         // unticked choices) and were fixed, so the next real run decides.
-        XCTAssertTrue(entries.filter { $0.runCheck?.result == "failed" }.isEmpty)
+        XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a bot check")
     }
 }
 

@@ -340,7 +340,7 @@ enum FormRun {
         if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
             return .rejected("the site showed an error after sending")
         }
-        let success = t.range(of: "request (has been |was )?(received|submitted|processed|sent)|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
+        let success = t.range(of: "request (has been |was )?(received|submitted|processed|sent)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
         let needsEmail = t.range(of: "check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|click the link", options: .regularExpression) != nil
         if success { return .submitted(awaitingEmail: needsEmail) }
         if t.range(of: "please enter|please provide", options: .regularExpression) != nil {
@@ -361,6 +361,12 @@ extension WebViewSession {
         let previousAlpha = webView.alpha
         webView.alpha = 1
         defer { webView.alpha = previousAlpha }
+        // Capture the whole page (up to a limit), so the result a site shows below the form is in the picture.
+        let pageHeight = ((try? await webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)")) as? Double) ?? 800
+        let originalFrame = webView.frame
+        webView.frame = CGRect(x: 0, y: 0, width: originalFrame.width, height: min(max(800, CGFloat(pageHeight)), 3200))
+        defer { webView.frame = originalFrame }
+        try? await Task.sleep(nanoseconds: 400_000_000)
         let config = WKSnapshotConfiguration()
         config.rect = webView.bounds
         guard let image = try? await webView.takeSnapshot(configuration: config) else { return nil }
@@ -402,7 +408,9 @@ extension WebViewSession {
         let js = #"""
         (function(){
           var text=(document.body?document.body.innerText:'').toLowerCase();
-          if(/confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
+          if(/anti-?spam check|wait for the (anti-?spam|security) check|confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
+          var ts=document.querySelector('.cf-turnstile,[class*="turnstile" i],[id*="turnstile" i]');
+          if(ts){var tr=ts.getBoundingClientRect(),tt=document.querySelector('input[name="cf-turnstile-response"]'); if(tr.width>0&&tr.height>0&&(!tt||!tt.value)) return 'a Cloudflare check';}
           var frames=document.querySelectorAll('iframe');
           for(var i=0;i<frames.length;i++){var f=frames[i],src=f.src||'',r=f.getBoundingClientRect();
             if(r.width<40||r.height<40) continue;
