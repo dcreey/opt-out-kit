@@ -39,6 +39,9 @@ public enum OptOutMethods {
     public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false, failedBefore: Bool = false) -> MethodVerdict {
         let signals = e.signals ?? []
         guard let form = e.optOutForm else {
+            if let mail = e.contactEmail {
+                return MethodVerdict(method: .guided, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
+            }
             if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page but could not read a form on it, so we take you there.")) }
             switch e.automation {
             case .blocked: return MethodVerdict(method: .manual, reason: L10n.t("The site refuses automated visits, so we could not find its opt-out page."))

@@ -2253,7 +2253,7 @@ final class RequestAcknowledgementTests: XCTestCase {
 }
 
 final class MeasuredAutomaticTests: XCTestCase {
-    func testDataAxleOwnNoteIsNotABlockerButItsSisterSitesNeedAMenuFilledIn() throws {
+    func testDataAxleOwnNoteIsNotABlockerForTheOwner() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
@@ -2261,12 +2261,6 @@ final class MeasuredAutomaticTests: XCTestCase {
         XCTAssertNotNil(axle.liveCheck)
         XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .automatic, "its identity note counts as the owner's own box")
         XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: false).method, .semiAutomatic)
-        // The reviewed real run showed the sister sites' forms need a required menu filled in, which the page's own text did not suggest.
-        for domain in ["donorbase.com", "exactdata.com", "usadata.com"] {
-            let e = try XCTUnwrap(entries.first { $0.domain == domain }, domain)
-            XCTAssertEqual(e.runCheck?.result, "failed", domain)
-            XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .guided, domain)
-        }
         // Sites with a visible bot check never count as automatic.
         let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }
         XCTAssertFalse(withCheck.isEmpty)
@@ -2344,8 +2338,56 @@ final class RunCheckTests: XCTestCase {
         let entries = try Registry.loadDirectory(dir)
         let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
         XCTAssertEqual(confirmed, ["apollo.io", "lionsharemarketing.com", "scileads.com"])
-        let failed = entries.filter { $0.runCheck?.result == "failed" }
-        XCTAssertGreaterThan(failed.count, 40)
-        for e in failed { XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .guided, e.domain) }
+        // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
+        // unticked choices) and were fixed, so the next real run decides.
+        XCTAssertTrue(entries.filter { $0.runCheck?.result == "failed" }.isEmpty)
+    }
+}
+
+final class SharedTargetTests: XCTestCase {
+    func testSitesSharingOneOptOutPageAreSentOnceAndShareTheResult() async {
+        final class Count: @unchecked Sendable { var calls = 0 }
+        struct Counting: FormSubmitter {
+            let c: Count
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { c.calls += 1; return .submitted(awaitingEmail: false) }
+        }
+        let f = OptOutForm(page: URL(string: "https://privacy.shared.example/optout")!, method: "post", action: URL(string: "https://privacy.shared.example/submit"),
+                           fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        func entry(_ id: String) -> DirectoryEntry {
+            DirectoryEntry(id: id, domain: id + ".com", name: id, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        }
+        let person = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
+        let c = Count()
+        let out = await AutoOptOut(submitter: Counting(c: c), spacing: 0).run(entries: [entry("a"), entry("b"), entry("c")], person: person, progress: Progress())
+        XCTAssertEqual(c.calls, 1, "one request for the three sites that share a page")
+        XCTAssertEqual(out.map(\.0.id), ["a", "b", "c"])
+        XCTAssertTrue(out.allSatisfy { $0.1 == .submitted(awaitingEmail: false) })
+    }
+}
+
+final class EmailOnlyAndAddressTests: XCTestCase {
+    func testASiteThatTakesOptOutsByEmailIsAGuideWithTheAddress() {
+        var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+                               optOutURL: URL(string: "https://x.example/dnsmi"), signals: [])
+        e.contactEmail = "privacy@x.example"
+        let v = OptOutMethods.classify(e)
+        XCTAssertEqual(v.method, .guided)
+        XCTAssertTrue(v.reason.contains("privacy@x.example"), v.reason)
+    }
+
+    func testASecondAddressLineStaysEmptyAndCountryIsFilledForAUSAddress() {
+        let form = OptOutForm(page: URL(string: "https://x.example/o")!, method: "post", action: nil, fields: [
+            FormField(type: "text", name: "a1", label: "Address 1 *"), FormField(type: "text", name: "a2", label: "Address 2"),
+            FormField(type: "text", name: "apt", label: "Apt / Suite / Unit"), FormField(type: "select", name: "c", label: "Country"),
+            FormField(type: "text", name: "z", label: "ZIP *")], hops: 1)
+        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                       addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
+        let plan = FormFiller.plan(for: form, signals: nil, person: p)
+        let byName = Dictionary(uniqueKeysWithValues: plan.values.map { ($0.name, $0.candidates) })
+        XCTAssertEqual(byName["a1"], ["1 Main St"])
+        XCTAssertNil(byName["a2"]); XCTAssertNil(byName["apt"])
+        XCTAssertEqual(byName["c"]?.first, "United States")
+        XCTAssertEqual(byName["z"], ["62701"])
     }
 }

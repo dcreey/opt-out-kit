@@ -352,6 +352,17 @@ struct BrokerInfoView: View {
 
 
 /// A site we found automatically: what we know, what we are guessing, and a link to its own opt-out page.
+extension DirectoryInfoView {
+    /// A mail link addressed to the site, with a subject and a body that ask for what the person wants.
+    static func mailto(_ to: String, person: Person?, email: String?, site: String) -> URL? {
+        let name = person?.legalName ?? ""
+        let body = "Hello,\n\nI am writing to opt out of the sale and sharing of my personal information and to ask you to delete the personal information you hold about me.\n\nName: \(name)\nEmail: \(email ?? "")\n\nPlease confirm when this is done.\n\nThank you."
+        var c = URLComponents(); c.scheme = "mailto"; c.path = to
+        c.queryItems = [URLQueryItem(name: "subject", value: "Opt-out and deletion request"), URLQueryItem(name: "body", value: body)]
+        return c.url
+    }
+}
+
 struct DirectoryInfoView: View {
     @EnvironmentObject var model: AppModel
     let entry: DirectoryEntry
@@ -385,6 +396,14 @@ struct DirectoryInfoView: View {
             if let issue = model.activeIssue(for: entry.id) {
                 Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+            }
+            if let mail = entry.contactEmail, let url = Self.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: entry.domain) {
+                Section {
+                    Link(destination: url) {
+                        Label("Write the email to \(mail)", systemImage: "envelope").font(.headline).frame(maxWidth: .infinity)
+                    }
+                    .accessibilityIdentifier("write-email")
+                } footer: { Text("This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.") }
             }
             Section {
                 let verdict = model.method(for: entry)

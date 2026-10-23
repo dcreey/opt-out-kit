@@ -1496,6 +1496,29 @@
     }
    }
   },
+  "Country": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pays"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "País"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Land"
+     }
+    }
+   }
+  },
   "Cousin": {
    "extractionState": "manual",
    "localizations": {
@@ -5678,6 +5701,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Website %@."
+     }
+    }
+   }
+  },
+  "This site takes opt-outs by email: write to %@. We prepare the message for you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce site accepte les désinscriptions par e-mail : écrivez à %@. Nous préparons le message pour vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este sitio acepta las bajas por correo: escribe a %@. Preparamos el mensaje por ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite nimmt Opt-outs per E-Mail an: schreiben Sie an %@. Wir bereiten die Nachricht für Sie vor."
      }
     }
    }

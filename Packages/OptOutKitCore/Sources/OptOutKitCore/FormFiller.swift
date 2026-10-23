@@ -40,7 +40,7 @@ public enum FormFiller {
 
     /// A plain statement that the person filling the form is the subject of it ("I confirm that I am the person associated with this
     /// email"). Not a legal certification, an agent statement or an acceptance of terms.
-    static let selfIdentity = try! NSRegularExpression(pattern: "\\bi (confirm|verify|am)\\b.{0,60}\\b(person|owner|me)\\b.{0,40}(email|e-mail|address|account|request|record)", options: .caseInsensitive)
+    static let selfIdentity = try! NSRegularExpression(pattern: "\\bi (confirm|verify|am|declare)\\b.{0,100}\\b(person|owner|me)\\b.{0,60}(email|e-mail|address|account|request|record|name|information)", options: .caseInsensitive)
     static let notSelfIdentity = try! NSRegularExpression(pattern: "penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal", options: .caseInsensitive)
 
     /// "I understand I may be required to verify my identity, and I authorize <the broker> to contact me": a note about the person's own
@@ -117,6 +117,12 @@ public enum FormFiller {
             }
             // Field names and labels in English, French, Spanish and German.
             func has(_ pattern: String) -> Bool { key.range(of: pattern, options: .regularExpression) != nil }
+            // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
+            if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { continue }
+            if has("country|\\bpays\\b|pa[ií]s\\b") {
+                if let a = address, USStates.code(for: a.state) != nil { put(["United States", "United States of America", "USA", "US"], L10n.noun("Country")) }
+                continue
+            }
             if field.type == "email" || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
             else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }

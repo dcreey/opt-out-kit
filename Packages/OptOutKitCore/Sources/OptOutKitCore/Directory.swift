@@ -35,7 +35,7 @@ public struct FormField: Codable, Equatable, Hashable, Sendable {
     /// What a person would call it: the label if the site gave one, else a tidy version of the field name.
     public var display: String {
         let t = label.trimmingCharacters(in: CharacterSet(charactersIn: " *:"))
-        if !t.isEmpty, t.count < 40 { return t }
+        if !t.isEmpty, t.count < 100 { return t }
         let base = name.split(separator: "[").last.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "]")) } ?? name
         return base.replacingOccurrences(of: "_", with: " ").capitalized
     }
@@ -170,23 +170,24 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
     public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
     public var runCheck: RunCheck?        // what a real, reviewed run showed
+    public var contactEmail: String?      // the page says to write to this address instead of using a form
     public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
     public var signals: [String]?
     public var profiled: String?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, registeredIn: [String]? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.registeredIn = registeredIn
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.contactEmail = contactEmail; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled
-        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", registeredIn = "registered_in"
+        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

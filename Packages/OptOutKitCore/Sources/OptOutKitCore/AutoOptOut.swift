@@ -114,13 +114,24 @@ public struct AutoOptOut: Sendable {
                     evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         let targets = entries.filter { $0.optOutForm != nil }
         var out: [(DirectoryEntry, AutoOptOutResult)] = []
+        // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture.
+        var sent: [String: (AutoOptOutResult, Data?)] = [:]
         for (i, entry) in targets.enumerated() {
             let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id])
             if let result = pre.result { out.append((entry, result)) }
             else if let plan = pre.plan, let form = entry.optOutForm {
+                let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
+                if let again = sent[key] {
+                    out.append((entry, again.0))
+                    if let shot = again.1, !dryRun { evidence?(entry, shot) }
+                    progressCallback?(i + 1, targets.count)
+                    continue
+                }
                 let report = await submitter.submitCapturing(form, plan: plan, dryRun: dryRun)
                 if let shot = report.screenshot, !dryRun { evidence?(entry, shot) }
-                out.append((entry, Self.result(for: report.outcome)))
+                let result = Self.result(for: report.outcome)
+                sent[key] = (result, report.screenshot)
+                out.append((entry, result))
                 if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
             }
             progressCallback?(i + 1, targets.count)

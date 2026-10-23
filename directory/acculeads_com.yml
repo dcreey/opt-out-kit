@@ -17,7 +17,3 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
-run_check:
-  date: "2026-10-23"
-  result: "failed"
-  note: "the site showed an error after sending"

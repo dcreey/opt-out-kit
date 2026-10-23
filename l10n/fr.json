@@ -752,5 +752,8 @@
  "This is the page the site showed when we finished.": "Voici la page affichée par le site à la fin.",
  "Went through (%lld)": "Abouti (%lld)",
  "A real run on %@ did not go through (%@), so you do this one with a guide.": "Une exécution réelle le %@ n’a pas abouti (%@) : vous faites celui-ci avec un guide.",
- "A real run on %@ showed this site's confirmation.": "Une exécution réelle le %@ a affiché la confirmation de ce site."
+ "A real run on %@ showed this site's confirmation.": "Une exécution réelle le %@ a affiché la confirmation de ce site.",
+ "This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.": "Ce site accepte les désinscriptions par e-mail, pas par formulaire. Le message est prérempli avec votre nom et l’e-mail du foyer ; relisez-le, puis envoyez-le depuis votre app de messagerie.",
+ "This site takes opt-outs by email: write to %@. We prepare the message for you.": "Ce site accepte les désinscriptions par e-mail : écrivez à %@. Nous préparons le message pour vous.",
+ "Write the email to %@": "Écrire à %@"
 }

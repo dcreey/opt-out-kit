@@ -253,6 +253,9 @@ extension WebFormSubmitter {
 
 struct WebFormSubmitter: FormSubmitter {
     var maxWait: TimeInterval = 20
+    /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint). When nil, the
+    /// stored form's plan is followed, which tests use.
+    var person: Person?
 
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: false).outcome
@@ -260,7 +263,8 @@ struct WebFormSubmitter: FormSubmitter {
 
     /// Fills and sends the form in a hidden web view, then takes a screenshot of whatever the page showed at the end.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
-        await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: !dryRun)
+        if let person { return await FormRun.runLive(url: form.page, html: nil, person: person, dryRun: dryRun, maxWait: maxWait, capture: !dryRun) }
+        return await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: !dryRun)
     }
 
     /// Test hook: run the same steps against HTML the test supplies.
@@ -398,7 +402,7 @@ extension WebViewSession {
         let js = #"""
         (function(){
           var text=(document.body?document.body.innerText:'').toLowerCase();
-          if(/verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
+          if(/confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
           var frames=document.querySelectorAll('iframe');
           for(var i=0;i<frames.length;i++){var f=frames[i],src=f.src||'',r=f.getBoundingClientRect();
             if(r.width<40||r.height<40) continue;

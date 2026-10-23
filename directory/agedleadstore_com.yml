@@ -7,15 +7,10 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://store.agedleadstore.com/optout_request/"
-opt_out_form: {"page": "https://store.agedleadstore.com/optout_request/", "method": "post", "action": "https://store.agedleadstore.com/optout_request/optout", "fields": [{"type": "text", "name": "website", "label": "Website"}, {"type": "text", "name": "firstname", "label": "First Name *"}, {"type": "text", "name": "lastname", "label": "Last Name *"}, {"type": "email", "name": "email", "label": "Email *"}, {"type": "replytoemail", "name": "replytoemail", "label": "Reply-To Email"}, {"type": "tel", "name": "phone", "label": "Phone Number (USA)"}, {"type": "text", "name": "streetaddress", "label": "Street Address"}, {"type": "text", "name": "city", "label": "City"}, {"type": "select", "name": "state", "label": "State *"}, {"type": "text", "name": "zipcode", "label": "Zip Code"}, {"type": "radio", "name": "requestmadeby", "label": "myself the consumer"}, {"type": "radio", "name": "requestmadeby", "label": "authorized agent on behalf of consumer"}, {"type": "textarea", "name": "authorization", "label": "Consumer Authorization Text (0 / 1200)"}, {"type": "checkbox", "name": "optout[]", "label": "Do not share my personal information with third parties"}, {"type": "checkbox", "name": "optout[]", "label": "Do not sell my information to third parties"}], "hops": 3}
+opt_out_url: "https://store.agedleadstore.com/optout_request/share_sale_info_form/"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_contact, email_input, mail_option, name_input, opt_out_form_found, phone_input, search_first]
 profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
-run_check:
-  date: "2026-10-23"
-  result: "failed"
-  note: "the page is a policy or information page with no form"

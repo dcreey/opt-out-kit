@@ -515,11 +515,11 @@ final class AppModel: ObservableObject {
         #endif
     }
 
-    private func makeSubmitter() -> FormSubmitter {
+    private func makeSubmitter(for person: Person? = nil) -> FormSubmitter {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeSubmitter() }
         #endif
-        return WebFormSubmitter()
+        return WebFormSubmitter(person: person)
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
@@ -527,11 +527,16 @@ final class AppModel: ObservableObject {
         let person = formPerson(original)
         guard storageProblem == nil, isReady(original) else { return }
         // Only the sites in the "done for you" task. Semi-automated and guided sites need the person, so they are never sent in the background.
-        let runnable = automaticOnly ? automaticDomains(for: original) : nil
+        var runnable = automaticOnly ? automaticDomains(for: original) : nil
+        #if DEBUG
+        // Simulator work: `-only-domains a.com,b.com` runs just those sites, whatever group they are in.
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-only-domains"), args.indices.contains(i + 1) { runnable = Set(args[i + 1].split(separator: ",").map(String.init)) }
+        #endif
         let ownsBusy = autoBusy == nil && !dryRun
         if ownsBusy { autoBusy = "optout" }
         defer { if ownsBusy { autoBusy = nil; autoProgress = nil } }
-        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
+        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } },

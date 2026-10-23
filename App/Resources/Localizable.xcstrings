@@ -1174,6 +1174,52 @@
     }
    }
   },
+  "A real run on %@ did not go through (%@), so you do this one with a guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution réelle le %@ n’a pas abouti (%@) : vous faites celui-ci avec un guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución real el %@ no se completó (%@), así que haces este con una guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein echter Durchlauf am %@ ging nicht durch (%@), also machen Sie diese Seite mit einer Anleitung."
+     }
+    }
+   }
+  },
+  "A real run on %@ showed this site's confirmation.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution réelle le %@ a affiché la confirmation de ce site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución real el %@ mostró la confirmación de este sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein echter Durchlauf am %@ zeigte die Bestätigung dieser Seite."
+     }
+    }
+   }
+  },
   "A recent automatic send was stopped by a check on the site, so you solve it.": {
    "extractionState": "manual",
    "localizations": {
@@ -14376,6 +14422,29 @@
     }
    }
   },
+  "This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce site accepte les désinscriptions par e-mail, pas par formulaire. Le message est prérempli avec votre nom et l’e-mail du foyer ; relisez-le, puis envoyez-le depuis votre app de messagerie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este sitio acepta las bajas por correo, no por formulario. El mensaje se rellena con tu nombre y el correo del hogar; léelo y envíalo desde tu app de correo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite nimmt Opt-outs per E-Mail an, nicht über ein Formular. Die Nachricht ist mit Ihrem Namen und der Haushalts-E-Mail vorausgefüllt; lesen Sie sie und senden Sie sie aus Ihrer Mail-App."
+     }
+    }
+   }
+  },
   "This site's opt-out page had moved. We found the new one on %@.": {
    "extractionState": "manual",
    "localizations": {
@@ -16189,6 +16258,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Funktioniert nur in einem echten Browser"
+     }
+    }
+   }
+  },
+  "Write the email to %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Écrire à %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Escribir a %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail an %@ schreiben"
      }
     }
    }

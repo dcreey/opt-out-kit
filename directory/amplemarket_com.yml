@@ -8,14 +8,10 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.amplemarket.com/legal/do-not-sell-my-info"
-opt_out_form: {"page": "https://www.amplemarket.com/legal/do-not-sell-my-info", "method": "get", "action": "https://www.amplemarket.com/legal/do-not-sell-my-info", "fields": [{"type": "email", "name": "email", "label": "Enter your company email"}], "hops": 1}
+contact_email: "privacy@amplemarket.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, opt_out_form_found]
 profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
-run_check:
-  date: "2026-10-23"
-  result: "failed"
-  note: "the page is a sign-up, not an opt-out"
