@@ -73,10 +73,6 @@ struct OnboardingView: View {
                             .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
                             .textContentType(.emailAddress).textFieldStyle(.roundedBorder).focused($emailFocused)
                             .accessibilityIdentifier("onboarding-email")
-                        if let tagged = model.formEmail, tagged != model.contactEmail.trimmingCharacters(in: .whitespaces) {
-                            Label("On forms we use \(tagged)", systemImage: "envelope.badge").font(.callout)
-                                .accessibilityIdentifier("onboarding-tagged-email")
-                        }
                         Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
                         if model.formEmail == nil {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")

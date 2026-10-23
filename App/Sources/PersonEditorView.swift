@@ -167,10 +167,6 @@ struct PersonEditorView: View {
         TextField("Your email address", text: Binding(get: { model.contactEmail }, set: { model.setContactEmail($0) }))
             .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
             .textContentType(.emailAddress).accessibilityIdentifier("contact-email")
-        if let tagged = model.formEmail, tagged != model.contactEmail.trimmingCharacters(in: .whitespaces) {
-            Label("On forms we use \(tagged)", systemImage: "envelope.badge")
-                .font(.footnote).accessibilityIdentifier("tagged-email")
-        }
         Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
     }
 
@@ -269,5 +265,5 @@ struct StringListSection: View {
 
 /// The same words wherever the app asks for the email, so what it does with it is always said the same way.
 enum EmailExplainer {
-    static let text = Loc.t("We put this one address on every opt-out form and data-deletion request, for you and everyone you add. For Gmail we add +optoutkit before the @ (you@gmail.com becomes you+optoutkit@gmail.com). Mail still arrives in your normal inbox, and you can search or filter for +optoutkit to find every reply.")
+    static let text = Loc.t("We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.")
 }

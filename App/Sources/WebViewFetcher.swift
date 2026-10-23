@@ -47,6 +47,8 @@ protocol TermsPolicy: Sendable {
 final class WebViewSession: NSObject, WKNavigationDelegate {
     let webView: WKWebView
     private var status = 200
+    /// The token of the form a live run chose, so the final picture is cropped around it.
+    var chosenForm: String?
     private var loadContinuation: CheckedContinuation<Void, Error>?
 
     /// The HTTP status of the last page the web view loaded.
@@ -244,6 +246,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
 /// legal acknowledgement, and only reports "sent" when the site shows a success message.
 extension WebFormSubmitter {
     /// What the page said after sending, judged only on the lines that were not there before.
+    nonisolated static func newLines(before: String, after: String) -> String { FormRun.newText(before: before, after: after) }
+
     nonisolated static func classifyAfterSending(before: String, after: String) -> SubmitOutcome {
         let added = FormRun.newText(before: before, after: after)
         if added.isEmpty { return .failed("nothing on the page changed after sending") }
@@ -256,6 +260,8 @@ struct WebFormSubmitter: FormSubmitter {
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint). When nil, the
     /// stored form's plan is followed, which tests use.
     var person: Person?
+    /// The phone's advertising ID, when a form asks for it and the person allowed reading it.
+    var advertisingID: String?
 
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: false).outcome
@@ -263,7 +269,7 @@ struct WebFormSubmitter: FormSubmitter {
 
     /// Fills and sends the form in a hidden web view, then takes a screenshot of whatever the page showed at the end.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
-        if let person { return await FormRun.runLive(url: form.page, html: nil, person: person, dryRun: dryRun, maxWait: maxWait, capture: !dryRun) }
+        if let person { return await FormRun.runLive(url: form.page, html: nil, person: person, dryRun: dryRun, maxWait: maxWait, capture: !dryRun, advertisingID: advertisingID) }
         return await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: !dryRun)
     }
 
@@ -334,13 +340,16 @@ enum FormRun {
             .filter { !$0.isEmpty && !seen.contains($0) }.joined(separator: "\n")
     }
 
+    /// Only a success reading, for text that may be anything: error and unknown readings come back as failed.
+    nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome { text.isEmpty ? .failed("") : classify(text) }
+
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
         // An error comes first: "problem with your submission" pages often also contain the word "request".
         if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
             return .rejected("the site showed an error after sending")
         }
-        let success = t.range(of: "request (has been |was )?(received|submitted|processed|sent)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
+        let success = t.range(of: "thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
         let needsEmail = t.range(of: "check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|click the link", options: .regularExpression) != nil
         if success { return .submitted(awaitingEmail: needsEmail) }
         if t.range(of: "please enter|please provide", options: .regularExpression) != nil {
@@ -355,7 +364,7 @@ extension WebViewSession {
 
     /// A picture of the page as it is now, as a compressed JPEG. The web view is kept at phone size, so the picture reads like a
     /// phone screen.
-    func screenshotJPEG(quality: CGFloat = 0.6) async -> Data? {
+    func screenshotJPEG(quality: CGFloat = 0.6, aroundForm token: String? = nil) async -> Data? {
         if webView.frame.isEmpty { webView.frame = CGRect(x: 0, y: 0, width: 390, height: 800) }
         // The web view is kept almost invisible in a hidden window; a snapshot would inherit that and come out nearly transparent.
         let previousAlpha = webView.alpha
@@ -364,11 +373,18 @@ extension WebViewSession {
         // Capture the whole page (up to a limit), so the result a site shows below the form is in the picture.
         let pageHeight = ((try? await webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)")) as? Double) ?? 800
         let originalFrame = webView.frame
-        webView.frame = CGRect(x: 0, y: 0, width: originalFrame.width, height: min(max(800, CGFloat(pageHeight)), 3200))
+        // A snapshot taller than about 8000 pixels comes out blank, so a long page is cropped to a window around the form.
+        let capHeight: CGFloat = 2400
+        let fullHeight = min(max(800, CGFloat(pageHeight)), 6000)
+        webView.frame = CGRect(x: 0, y: 0, width: originalFrame.width, height: fullHeight)
         defer { webView.frame = originalFrame }
         try? await Task.sleep(nanoseconds: 400_000_000)
+        var top: CGFloat = 0
+        if let token, let y = (try? await webView.evaluateJavaScript("(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); return f? f.getBoundingClientRect().top+window.scrollY : 0;})();")) as? Double {
+            top = max(0, CGFloat(y) - 200)
+        }
         let config = WKSnapshotConfiguration()
-        config.rect = webView.bounds
+        config.rect = CGRect(x: 0, y: min(top, max(0, fullHeight - 800)), width: webView.bounds.width, height: min(capHeight, fullHeight - min(top, max(0, fullHeight - 800))))
         guard let image = try? await webView.takeSnapshot(configuration: config) else { return nil }
         // A page without its own background snapshots with transparency, which a JPEG shows as black: paint it on white first.
         let flat = UIGraphicsImageRenderer(size: image.size).image { ctx in

@@ -786,5 +786,9 @@
  "The message": "Die Nachricht",
  "Yes, I sent it": "Ja, ich habe sie gesendet",
  "Open in %@": "In %@ öffnen",
- "Use another mail app": "Andere Mail-App verwenden"
+ "Use another mail app": "Andere Mail-App verwenden",
+ "Advertising ID": "Werbe-ID",
+ "NSUserTrackingUsageDescription": "Manche Datenhändler tragen Ihr Telefon anhand seiner Werbe-ID aus. Opt-Out Kit liest sie nur, um sie beim Austragen an diese weiterzugeben, und speichert sie nie.",
+ "This form asks for your phone's advertising ID, which needs your permission to read.": "Dieses Formular verlangt die Werbe-ID Ihres Telefons; zum Lesen ist Ihre Erlaubnis nötig.",
+ "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": "Diese eine Adresse tragen wir genau so, wie Sie sie eingegeben haben, in jedes Opt-out- und Löschformular ein, für Sie und alle, die Sie hinzufügen. Viele Seiten suchen Sie mit genau dieser Adresse, deshalb ändern wir sie nie. Antworten und Bestätigungslinks kommen in Ihrem normalen Posteingang an."
 }

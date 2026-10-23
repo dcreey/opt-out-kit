@@ -64,7 +64,7 @@ public enum FormFiller {
     public static func needsListing(_ form: OptOutForm) -> Bool { form.fields.contains(where: isListingField) }
 
     /// `listingURL` is the person's own listing, picked by them on the site; without it a form that needs one is left to the person.
-    public static func plan(for form: OptOutForm, signals: [String]?, person: Person, listingURL: URL? = nil) -> FillPlan {
+    public static func plan(for form: OptOutForm, signals: [String]?, person: Person, listingURL: URL? = nil, advertisingID: String? = nil) -> FillPlan {
         if let hit = (signals ?? []).compactMap({ humanOnlySignals[$0] }).first {
             return FillPlan(values: [], verdict: .needsYou(L10n.f("This site %@.", hit)))
         }
@@ -82,7 +82,7 @@ public enum FormFiller {
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         for field in form.fields {
             let key = (field.name + " " + field.label).lowercased()
-            let required = field.label.contains("*")
+            let required = field.label.contains("*") || field.label.lowercased().contains("(required)")
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }
                 if c.isEmpty { if required || field.type == "email" { missing.append(what) } }
@@ -117,6 +117,12 @@ public enum FormFiller {
             }
             // Field names and labels in English, French, Spanish and German.
             func has(_ pattern: String) -> Bool { key.range(of: pattern, options: .regularExpression) != nil }
+            // The phone's advertising ID, for the sites that opt a device out by it. It is read on the phone only when a form asks.
+            if has("\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad(vertising)?.?(id|identifier)|\\bad.?id\\b|device.?(id|identifier)") {
+                if let advertisingID { put([advertisingID], L10n.noun("Advertising ID")) }
+                else if required { needsYou = needsYou ?? L10n.t("This form asks for your phone's advertising ID, which needs your permission to read.") }
+                continue
+            }
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
             if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { continue }
             if has("country|\\bpays\\b|pa[ií]s\\b") {
@@ -135,7 +141,8 @@ public enum FormFiller {
             else if has("phone|t[ée]l[ée]phone|tel[ée]fono|telefon|handy") || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
             else if has("birth|dob|naissance|nacimiento|geburt") { put([person.birthdate], L10n.noun("Birthdate")) }
             else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }
-            else if required { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
+            // A required menu of request choices ("Privacy Choice", "Choose an option") is chosen on the live page, from its own options.
+            else if required, field.type != "select" { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
         }
         if let needsYou { return FillPlan(values: values, verdict: .needsYou(needsYou)) }
         if !missing.isEmpty { return FillPlan(values: values, verdict: .needsData(Array(Set(missing)).sorted())) }

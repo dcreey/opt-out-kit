@@ -1799,11 +1799,11 @@ final class RequiredDetailsTests: XCTestCase {
 
 final class ContactEmailTests: XCTestCase {
     func testGmailAddressesGetTheTrackingTagBeforeTheAtSign() {
-        XCTAssertEqual(ContactEmail.forForms("pat@gmail.com"), "pat+optoutkit@gmail.com")
-        XCTAssertEqual(ContactEmail.forForms("Pat.Example@GMAIL.com"), "Pat.Example+optoutkit@GMAIL.com")
-        XCTAssertEqual(ContactEmail.forForms("pat@googlemail.com"), "pat+optoutkit@googlemail.com")
-        XCTAssertEqual(ContactEmail.forForms("pat+news@gmail.com"), "pat+news+optoutkit@gmail.com", "always appended, an existing tag is kept")
-        XCTAssertEqual(ContactEmail.forForms("  pat@gmail.com "), "pat+optoutkit@gmail.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@gmail.com"), "pat@gmail.com")
+        XCTAssertEqual(ContactEmail.forForms("Pat.Example@GMAIL.com"), "Pat.Example@GMAIL.com")
+        XCTAssertEqual(ContactEmail.forForms("pat@googlemail.com"), "pat@googlemail.com")
+        XCTAssertEqual(ContactEmail.forForms("pat+news@gmail.com"), "pat+news@gmail.com")
+        XCTAssertEqual(ContactEmail.forForms("  pat@gmail.com "), "pat@gmail.com")
     }
 
     func testTheTagIsNeverAddedTwiceOrToOtherProviders() {
@@ -1822,7 +1822,7 @@ final class ContactEmailTests: XCTestCase {
         var h = Household()
         XCTAssertNil(h.formEmail)
         h.setContactEmail("pat@gmail.com")
-        XCTAssertEqual(h.formEmail, "pat+optoutkit@gmail.com")
+        XCTAssertEqual(h.formEmail, "pat@gmail.com", "unaltered: many forms look the person up by that exact address")
         h.setContactEmail("not an email")
         XCTAssertNil(h.formEmail, "an invalid address is never put on a form")
         h.setContactEmail("  ")
@@ -2259,7 +2259,7 @@ final class MeasuredAutomaticTests: XCTestCase {
         let entries = try Registry.loadDirectory(dir)
         let axle = try XCTUnwrap(entries.first { $0.domain == "data-axle.com" })
         XCTAssertNotNil(axle.liveCheck)
-        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .automatic, "its identity note counts as the owner's own box")
+        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .automatic, "its identity note counts as the owner's own box: \(OptOutMethods.classify(axle, confirmingIdentity: true).reason)")
         XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: false).method, .semiAutomatic)
         // Sites with a visible bot check never count as automatic.
         let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }

@@ -521,11 +521,11 @@ final class AppModel: ObservableObject {
         #endif
     }
 
-    private func makeSubmitter(for person: Person? = nil) -> FormSubmitter {
+    private func makeSubmitter(for person: Person? = nil, advertisingID: String? = nil) -> FormSubmitter {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeSubmitter() }
         #endif
-        return WebFormSubmitter(person: person)
+        return WebFormSubmitter(person: person, advertisingID: advertisingID)
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
@@ -542,7 +542,10 @@ final class AppModel: ObservableObject {
         let ownsBusy = autoBusy == nil && !dryRun
         if ownsBusy { autoBusy = "optout" }
         defer { if ownsBusy { autoBusy = nil; autoProgress = nil } }
-        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
+        // Only when a form in this run asks for the phone's advertising ID is the person asked (once) for permission to read it.
+        var adID: String?
+        if submitter == nil, AdvertisingID.isAsked(by: directory.filter { runnable?.contains($0.domain) ?? true }) { adID = await AdvertisingID.current() }
+        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } },
@@ -687,7 +690,7 @@ final class AppModel: ObservableObject {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeAssistedDriver() }
         #endif
-        return WebAssistedDriver(person: selectedPerson.map(formPerson))
+        return WebAssistedDriver(person: selectedPerson.map(formPerson), advertisingID: nil)
     }
 
     /// The pages in the "tap to verify" task, ready for the visible runner. A placeholder plan stands in when the stored form's plan is

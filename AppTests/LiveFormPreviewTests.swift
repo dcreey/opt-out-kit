@@ -14,7 +14,7 @@ final class LiveFormPreviewTests: XCTestCase {
                          addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"], phones: ["555-010-0199"])
         let dir = URL(fileURLWithPath: "/private/tmp/ook-live-shots"); try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         for url in urls {
-            let report = await FormRun.runLive(url: url, html: nil, person: pat, dryRun: true, maxWait: 12, capture: true)
+            let report = await FormRun.runLive(url: url, html: nil, person: pat, dryRun: true, maxWait: 12, capture: true, advertisingID: "11111111-2222-3333-4444-555555555555")
             print("LIVEFORM \(url.host ?? "") \(url.path): \(report.outcome)")
             if let shot = report.screenshot { try? shot.write(to: dir.appendingPathComponent((url.host ?? "site") + ".jpg")) }
         }

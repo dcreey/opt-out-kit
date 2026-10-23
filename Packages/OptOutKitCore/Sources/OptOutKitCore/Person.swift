@@ -230,8 +230,8 @@ public struct HouseholdSettings: Codable, Equatable, Sendable {
     }
 }
 
-/// The single address used on every form. Gmail addresses get `+optoutkit` before the `@`, so every reply from an opt-out is easy
-/// to find and filter; mail still lands in the normal inbox.
+/// The single address used on every form, exactly as the person typed it. (An earlier version tagged Gmail addresses with `+optoutkit`,
+/// but many opt-out forms look the person up by that exact address, so a changed one finds nothing.)
 public enum ContactEmail {
     public static let tag = "+optoutkit"
 
@@ -249,19 +249,13 @@ public enum ContactEmail {
         return domain == "gmail.com" || domain == "googlemail.com"
     }
 
-    /// What goes into forms: the address as typed, or for Gmail the same address with `+optoutkit` before the `@`.
-    public static func forForms(_ email: String) -> String {
-        let t = email.trimmingCharacters(in: .whitespaces)
-        guard isGmail(t), let at = t.lastIndex(of: "@") else { return t }
-        let local = t[..<at]
-        if local.lowercased().hasSuffix(tag) { return t }
-        return local + tag + t[at...]
-    }
+    /// What goes into forms: the address as typed, unaltered.
+    public static func forForms(_ email: String) -> String { email.trimmingCharacters(in: .whitespaces) }
 }
 
 public extension Household {
     var contactEmail: String? { settings.contactEmail }
-    /// The address used on forms (with the Gmail tag), or nil until one has been given.
+    /// The address used on forms, exactly as typed, or nil until one has been given.
     var formEmail: String? { settings.contactEmail.flatMap { ContactEmail.isValid($0) ? ContactEmail.forForms($0) : nil } }
     var ownerState: String? { settings.ownerState }
     mutating func setOwnerState(_ code: String?) { settings.ownerState = code }

@@ -47,7 +47,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
         me.addresses = [Address(street: "1 Main St", city: "Chicago", state: "IL", zip: "62701")]
         XCTAssertTrue(me.isComplete)
         model.update(me)
-        model.setContactEmail("pat@gmail.com")          // forms get pat+optoutkit@gmail.com
+        model.setContactEmail("pat@gmail.com")          // forms get pat@gmail.com
 
         let page = NoSendPage()
         model.guidedPageMakerOverride = Maker(page: page)
@@ -97,7 +97,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
         let filledEmail = await js(web, "(function(){var u=document.querySelector('input[name=email]');return u?u.value:''})();") as? String
         print("LIVESPOKEO form: url=\(filledURL ?? "nil") email=\(filledEmail ?? "nil") step=\(runner.flow.current?.title ?? "done") status=\(runner.status ?? "-") sendAttempts=\(page.sendAttempts)")
         XCTAssertEqual(filledURL, listing.absoluteString, "their listing is in the form")
-        XCTAssertEqual(filledEmail, "pat+optoutkit@gmail.com", "the household email, tagged for Gmail")
+        XCTAssertEqual(filledEmail, "pat@gmail.com", "the household email, unaltered")
         _ = await js(web, "(function(){var u=document.querySelector('input[name=url]'); if(u){u.scrollIntoView({block:'center'});} })();")
         try await Task.sleep(nanoseconds: 1_500_000_000)
         await shot(web, "3-filled-form")

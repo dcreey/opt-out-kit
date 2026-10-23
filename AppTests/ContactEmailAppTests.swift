@@ -2,7 +2,7 @@ import XCTest
 import OptOutKitCore
 @testable import OptOutKit
 
-/// The household's one email address, and that every form for every profile gets it (Gmail with +optoutkit).
+/// The household's one email address, and that every form for every profile gets it (exactly as typed).
 @MainActor
 final class ContactEmailAppTests: XCTestCase {
     private func model() -> AppModel {
@@ -34,9 +34,9 @@ final class ContactEmailAppTests: XCTestCase {
         var mumWithOwn = mum; mumWithOwn.emails = ["mum@example.com"]
         XCTAssertNil(m.formEmail, "nothing until an address is given")
         m.setContactEmail("pat@gmail.com")
-        XCTAssertEqual(m.formEmail, "pat+optoutkit@gmail.com")
-        XCTAssertEqual(m.formPerson(me).emails, ["pat+optoutkit@gmail.com"])
-        XCTAssertEqual(m.formPerson(mumWithOwn).emails, ["pat+optoutkit@gmail.com"], "family forms use the one address too")
+        XCTAssertEqual(m.formEmail, "pat@gmail.com")
+        XCTAssertEqual(m.formPerson(me).emails, ["pat@gmail.com"])
+        XCTAssertEqual(m.formPerson(mumWithOwn).emails, ["pat@gmail.com"], "family forms use the one address too")
         m.setContactEmail("pat@example.com")
         XCTAssertEqual(m.formEmail, "pat@example.com", "other providers are left alone")
     }
@@ -64,7 +64,7 @@ final class ContactEmailAppTests: XCTestCase {
             let capture = Capture()
             await m.runAutoOptOut(for: person, automaticOnly: false, submitter: capture)
             XCTAssertFalse(capture.emails.isEmpty, person.displayName)
-            XCTAssertTrue(capture.emails.allSatisfy { $0 == "pat+optoutkit@gmail.com" }, "\(person.displayName): \(Set(capture.emails))")
+            XCTAssertTrue(capture.emails.allSatisfy { $0 == "pat@gmail.com" }, "\(person.displayName): \(Set(capture.emails))")
         }
     }
 }

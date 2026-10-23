@@ -116,7 +116,15 @@ extension WebViewSession {
     }
 
     /// Fills the values the plan chose, finding each field by its token.
+    /// Fills the form; menus that fill in after another choice (a state list that waits for the country) get a second pass.
     func fillLive(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
+        let first = await fillLiveOnce(values)
+        guard !first.unmatchedRequired.isEmpty else { return first }
+        try? await Task.sleep(nanoseconds: 900_000_000)
+        return await fillLiveOnce(values)
+    }
+
+    private func fillLiveOnce(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
         let normal = values.filter { $0.type != FormFiller.confirmIdentityType }
         if values.contains(where: { $0.type == FormFiller.confirmIdentityType }) { _ = await tickIdentityBoxes() }
         let payload = normal.map { ["name": $0.name, "candidates": $0.candidates] as [String: Any] }
@@ -131,6 +139,10 @@ extension WebViewSession {
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
                 for(var i=0;i<el.options.length;i++){var o=el.options[i];
                   if(o.value.toLowerCase()===want||o.text.trim().toLowerCase()===want){el.value=o.value;done=true;break;}}}
+              if(!done&&/state|province|region/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||''))){
+                // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
+                for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();
+                  if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
             } else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,v.candidates[0]);filled++;}});
@@ -175,17 +187,19 @@ extension WebViewSession {
             if(c.checked||!t) return; if(yesOrOptOut(t)||isDecl(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
           f.querySelectorAll('select').forEach(function(s){
             var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
-            var nearby=(s.closest('div')?s.closest('div').innerText:'').toLowerCase();
-            if(!/(request|right|choice|action|type|purpose)/.test(l+' '+nearby.slice(0,80))) return;
-            if(/state|country|province/.test(l)) return;
+            var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);
+            if(/state|country|province|region/.test(l)||/state of|country/.test(near)) return;
             if(s.selectedIndex>0 && s.value) return;
             var best=-1,bestScore=0;
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
-              if(/delet|remov|eras/i.test(t)) sc=3; else if(/do not sell|opt.?out|do not share/i.test(t)) sc=2;
-              if(/access|know|correct/i.test(t)) sc=0;
+              if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=3;
+              if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,2);
+              if(/\b(consumer|individual|myself|resident|person)\b/i.test(t)&&!/business|agent|deceased/i.test(t)) sc=Math.max(sc,1);
+              if(/access|know|correct|update|portab/i.test(t)) sc=0;
               if(sc>bestScore){bestScore=sc;best=i;}}
-            if(best>=0){s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); chosen++;}
-            else if(s.required) unresolved.push(l||'a menu');});
+            var placeholder=s.selectedIndex<=0;
+            if(best>=0&&placeholder){s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); s.dispatchEvent(new Event('input',{bubbles:true})); chosen++;}
+            else if(s.required&&placeholder) unresolved.push((near.split('\n')[0]||l||'a menu').slice(0,60));});
           return JSON.stringify({chosen:chosen,unresolved:unresolved});})(\#(Self.liveLiteral(token)));
         """#
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8),
@@ -208,6 +222,14 @@ extension WebViewSession {
           if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})(\#(Self.liveLiteral(token)));
         """#
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+    }
+
+    /// Whether the chosen form is still on the page and visible, and the page's address.
+    func formState(_ token: String) async -> (visible: Bool, url: String) {
+        let js = "(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); var v=false; if(f){var r=f.getBoundingClientRect(),s=getComputedStyle(f); v=r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';} return JSON.stringify({v:v,u:location.href});})();"
+        guard let out = (try? await webView.evaluateJavaScript(js)) as? String, let d = out.data(using: .utf8),
+              let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (true, "") }
+        return (o["v"] as? Bool ?? true, o["u"] as? String ?? "")
     }
 
     /// Hides what is left of a cookie or consent overlay that would not be dismissed, so it does not cover the form or the result.
@@ -242,7 +264,7 @@ extension FormRun {
     /// Opens the page, denies cookie prompts, finds the opt-out form on the live page, fills it from the person's details, chooses the
     /// opt-out options, sends it and judges only what appeared afterwards. `person` is already the household's form view of them.
     @MainActor
-    static func runLive(url: URL?, html: String?, person: Person, dryRun: Bool, maxWait: TimeInterval, capture: Bool) async -> SubmitEvidence {
+    static func runLive(url: URL?, html: String?, person: Person, dryRun: Bool, maxWait: TimeInterval, capture: Bool, advertisingID: String? = nil) async -> SubmitEvidence {
         let session = WebViewSession.make()
         defer { session.close() }
         do {
@@ -250,12 +272,12 @@ extension FormRun {
             else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
             else { return SubmitEvidence(outcome: .failed("not a secure page")) }
         } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
-        let outcome = await liveSteps(session, page: url ?? URL(string: "https://local.test/")!, person: person, dryRun: dryRun, maxWait: maxWait)
-        return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG() : nil)
+        let outcome = await liveSteps(session, page: url ?? URL(string: "https://local.test/")!, person: person, dryRun: dryRun, maxWait: maxWait, advertisingID: advertisingID)
+        return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil)
     }
 
     @MainActor
-    private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval) async -> SubmitOutcome {
+    private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval, advertisingID: String?) async -> SubmitOutcome {
         await session.settlePage(maxWait: 10)
         _ = await session.denyCookies()
         try? await Task.sleep(nanoseconds: 1_200_000_000)
@@ -267,7 +289,8 @@ extension FormRun {
 
         let forms = await session.discoverForms()
         guard let form = LiveFormPicker.pick(forms) else { return .failed("no opt-out form was found on the page") }
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person)
+        session.chosenForm = form.token
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
         switch plan.verdict {
         case .ready: break
         case .needsData(let what): return .failed("the form asks for \(what.joined(separator: ", ")), which we do not hold")
@@ -276,13 +299,21 @@ extension FormRun {
         let fill = await session.fillLive(plan.values)
         if fill.filled == 0 { return .failed("the form's fields could not be filled in") }
         if let miss = fill.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
+        let beforeFill = await session.visibleText()
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+        // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        let earlyText = await session.visibleText()
+        if earlyText != beforeFill, case .submitted(let email) = FormRun.classifyConfirmed(WebFormSubmitter.newLines(before: beforeFill, after: earlyText)), !dryRun {
+            return .submitted(awaitingEmail: email)
+        }
         if let missing = options.unresolved.first { return .failed("the form needs a choice we cannot make for you (\(missing))") }
         if dryRun { await session.scrollFormIntoView(form.token); return .filledNotSubmitted }
         if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
         if let why = await session.visibleChallenge() { return .challenged(why) }
 
         let before = await session.visibleText()
+        let stateBefore = await session.formState(form.token)
         guard await session.pressLiveSubmit(form: form.token) else { return .failed("no submit button found") }
         await session.settlePage(maxWait: maxWait)
         if let why = await session.visibleChallenge() { return .challenged(why) }
@@ -291,7 +322,15 @@ extension FormRun {
         #if DEBUG
         debugLastPageText = after
         #endif
-        return WebFormSubmitter.classifyAfterSending(before: before, after: after)
+        let result = WebFormSubmitter.classifyAfterSending(before: before, after: after)
+        // No confirmation wording, but the form is gone or the page moved on, and nothing says it went wrong: the site took it.
+        if case .failed(let why) = result, why != "nothing on the page changed after sending" || true {
+            let now = await session.formState(form.token)
+            let moved = !now.visible || (!now.url.isEmpty && now.url != stateBefore.url)
+            let errorSeen = FormRun.classify(WebFormSubmitter.newLines(before: before, after: after).isEmpty ? "" : WebFormSubmitter.newLines(before: before, after: after)) != .failed("no success message was shown")
+            if moved, !errorSeen { return .submitted(awaitingEmail: false) }
+        }
+        return result
     }
 
     #if DEBUG

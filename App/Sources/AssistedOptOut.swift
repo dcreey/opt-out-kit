@@ -35,6 +35,7 @@ struct WebAssistedDriver: AssistedDriver {
     var htmlOverride: String?
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
     var person: Person?
+    var advertisingID: String?
 
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? {
         let session = WebViewSession.make()
@@ -49,7 +50,7 @@ struct WebAssistedDriver: AssistedDriver {
         let page = WebAssistedPage(session: session, plan: plan)
         if let person {
             guard let live = LiveFormPicker.pick(await session.discoverForms()) else { session.close(); return nil }
-            let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person)
+            let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person, advertisingID: advertisingID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
         }
         await page.refill()

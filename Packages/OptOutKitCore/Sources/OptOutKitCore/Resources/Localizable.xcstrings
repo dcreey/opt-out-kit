@@ -760,6 +760,29 @@
     }
    }
   },
+  "Advertising ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "identifiant publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "identificador de publicidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbe-ID"
+     }
+    }
+   }
+  },
   "Alabama": {
    "extractionState": "manual",
    "localizations": {
@@ -5678,6 +5701,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieses Formular verlangt etwas, das wir nicht haben („%@“)."
+     }
+    }
+   }
+  },
+  "This form asks for your phone's advertising ID, which needs your permission to read.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande l’identifiant publicitaire de votre téléphone, dont la lecture exige votre autorisation."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide el identificador de publicidad de tu teléfono, cuya lectura requiere tu permiso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt die Werbe-ID Ihres Telefons; zum Lesen ist Ihre Erlaubnis nötig."
      }
     }
    }
