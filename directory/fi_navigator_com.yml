@@ -11,3 +11,6 @@ opt_out_url: "https://www.fi-navigator.com:443/remove/"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

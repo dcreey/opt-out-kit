@@ -11,3 +11,8 @@ opt_out_url: "https://www.datapartners.com/manage-your-privacy-preferences/"
 registered_in: [CA, OR]
 signals: [phone_verify]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://www.datapartners.com/opt-out-request/"
+  blockers: []

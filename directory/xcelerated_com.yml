@@ -11,3 +11,6 @@ opt_out_url: "https://xcelerated.com/unsubscribe/"
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, name_input, phone_input, phone_verify]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

@@ -11,3 +11,6 @@ opt_out_url: "https://finsum.com/"
 registered_in: [CA]
 signals: [email_input]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

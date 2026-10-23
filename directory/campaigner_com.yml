@@ -12,3 +12,8 @@ contact_email: "privacy@campaigner.com"
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_only_wording, phone_verify]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://privacyportal.onetrust.com/webform/f73513a8-7a10-4a9d-939a-703f8d994839/3c13d43a-d7e0-4758-93e4-8da05db63282?_gl=1*18nbbqe*_gcl_au*MTcwMDQzMDE5OC4xNzQyMzIzMjE3*_ga*MTUyNzEzNDQxNS4xNzQyMzIzMjE3*_ga_BGYQF4VFQ8*MTc0NTI3NDI0OS45LjAuMTc0NTI3NDI0OS42MC4wLjA."
+  blockers: ["check:a bot check"]

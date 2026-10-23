@@ -599,6 +599,29 @@
     }
    }
   },
+  "A real run did not go through, so you do this one with a guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution réelle n’a pas abouti : vous faites celui-ci avec un guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución real no se completó, así que haces este con una guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein echter Durchlauf ging nicht durch, also machen Sie diese Seite mit einer Anleitung."
+     }
+    }
+   }
+  },
   "A real run on %@ did not go through (%@), so you do this one with a guide.": {
    "extractionState": "manual",
    "localizations": {
@@ -2807,25 +2830,25 @@
     }
    }
   },
-  "Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.": {
+  "Loaded %@: nothing blocked the form. We fill it in and send it; you tick any check the site shows. A confirmed real run would make it automatic.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Chargé le %@ : rien ne bloque le formulaire. Si une vérification apparaît un jour à l’envoi, ce site passe en semi-automatisé."
+      "value": "Chargé le %@ : rien ne bloquait le formulaire. Nous le remplissons et l’envoyons ; vous cochez toute vérification affichée. Une exécution réelle confirmée le rendrait automatique."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cargado el %@: nada bloquea el formulario. Si alguna vez aparece una verificación al enviar, este sitio pasa a semiautomático."
+      "value": "Cargado el %@: nada bloqueaba el formulario. Lo rellenamos y enviamos; tú marcas cualquier verificación que muestre. Una ejecución real confirmada lo haría automático."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Geladen am %@: Nichts blockiert das Formular. Erscheint beim Senden doch eine Prüfung, wird diese Seite halbautomatisch."
+      "value": "Geladen am %@: Nichts blockierte das Formular. Wir füllen es aus und senden es; Sie haken jede angezeigte Prüfung an. Ein bestätigter echter Durchlauf würde es automatisch machen."
      }
     }
    }
@@ -5402,6 +5425,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Formular verlangt %@, was wir nicht haben."
+     }
+    }
+   }
+  },
+  "The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire d’opposition apparaît quand la page se charge dans un navigateur. Nous le remplissons ; vous validez toute vérification affichée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario de baja aparece cuando la página carga en un navegador. Lo rellenamos; tú resuelves cualquier verificación que muestre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Opt-out-Formular erscheint, wenn die Seite in einem Browser lädt. Wir füllen es aus; Sie lösen jede angezeigte Prüfung."
      }
     }
    }

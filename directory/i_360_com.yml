@@ -11,3 +11,8 @@ opt_out_url: "https://www.i-360.com/ccpa/"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_only_wording, mail_option]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://privacyportal.onetrust.com/webform/94afa614-d9cb-419b-99f1-20c87afaca7f/7527122f-48fe-46ad-bd59-6d69a33ac4db"
+  blockers: ["check:a bot check"]

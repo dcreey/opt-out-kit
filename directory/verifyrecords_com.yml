@@ -14,3 +14,6 @@ search_check:
   status: "undifferentiated"
   candidate: {"method": "GET", "url": "https://verifyrecords.com/reg7/loader.php?firstname={first}&lastname={last}&page_name=People_Search&state={state}", "body": null}
   checked: "2026-10-21"
+live_form:
+  checked: "2026-10-23"
+  found: false

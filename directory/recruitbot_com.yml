@@ -12,3 +12,6 @@ contact_email: "privacy@recruitbot.com"
 registered_in: [CA, TX]
 signals: [email_contact, email_input, email_only_wording, id_required, mail_option, name_input, phone_verify]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

@@ -14,3 +14,6 @@ search_check:
   status: "undifferentiated"
   candidate: {"method": "POST", "url": "https://sheriffsdepartment.net/", "body": "post_id=1603&form_id=2420dcda&queried_id=1603&form_fields[fname]={first}&form_fields[lname]={last}"}
   checked: "2026-10-21"
+live_form:
+  checked: "2026-10-23"
+  found: false

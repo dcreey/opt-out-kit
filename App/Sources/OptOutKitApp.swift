@@ -729,7 +729,9 @@ final class AppModel: ObservableObject {
         let set = Set(domains), person = formPerson(original)
         let progress = household.progress(for: person.id)
         return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
-            guard set.contains(entry.domain), let form = entry.optOutForm else { return nil }
+            guard set.contains(entry.domain) else { return nil }
+            // A form the crawl could not read but a real page load found: the live page decides what is filled, so a stand-in form is enough.
+            guard let form = entry.optOutForm ?? entry.liveForm?.page.flatMap(URL.init(string:)).map({ OptOutForm(page: $0, method: "post", action: nil, fields: [], hops: 1) }) else { return nil }
             if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
             let plan = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: Date()).plan ?? FillPlan(values: [], verdict: .ready)
             return AssistedRunner.Item(entry: entry, form: form, plan: plan)

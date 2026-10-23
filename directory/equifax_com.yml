@@ -11,3 +11,8 @@ opt_out_url: "https://www.equifax.com/"
 registered_in: [CA, OR, TX]
 signals: [phone_verify]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://myprivacy.equifax.com/opt-in-opt-out/personal-info"
+  blockers: ["check:a bot check"]

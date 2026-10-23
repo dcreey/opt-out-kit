@@ -11,3 +11,8 @@ opt_out_url: "https://getrev.ai/opt-out"
 registered_in: [CA]
 signals: [script_rendered_page]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://getrev.ai/privacy-request"
+  blockers: []

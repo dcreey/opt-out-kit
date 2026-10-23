@@ -308,7 +308,18 @@ extension FormRun {
             return .submitted(awaitingEmail: email)
         }
         if let missing = options.unresolved.first { return .failed("the form needs a choice we cannot make for you (\(missing))") }
-        if dryRun { await session.scrollFormIntoView(form.token); return .filledNotSubmitted }
+        if dryRun {
+            await session.scrollFormIntoView(form.token)
+            #if DEBUG
+            var found: [String] = []
+            if await session.hasTermsPrompt() { found.append("terms") }
+            if let c = await session.pendingCertification() { found.append("certify:" + c.prefix(40)) }
+            if let c = await session.visibleChallenge() { found.append("check:" + c) }
+            debugLastBlockers = found
+            debugLastFormPage = page.absoluteString
+            #endif
+            return .filledNotSubmitted
+        }
         if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
         if let why = await session.visibleChallenge() { return .challenged(why) }
 
@@ -336,5 +347,7 @@ extension FormRun {
     #if DEBUG
     /// What the page said at the end of the last live run, for tests that check what the form received.
     nonisolated(unsafe) static var debugLastPageText = ""
+    nonisolated(unsafe) static var debugLastBlockers: [String] = []
+    nonisolated(unsafe) static var debugLastFormPage = ""
     #endif
 }

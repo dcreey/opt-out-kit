@@ -12,3 +12,8 @@ contact_email: "privacy@evertrue.com"
 registered_in: [CA, TX]
 signals: [email_contact, email_only_wording, phone_verify, script_rendered_form]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://www.evertrue.com/privacy-policy/"
+  blockers: []

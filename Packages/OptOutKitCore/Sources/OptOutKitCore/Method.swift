@@ -39,6 +39,10 @@ public enum OptOutMethods {
     public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false, failedBefore: Bool = false) -> MethodVerdict {
         let signals = e.signals ?? []
         guard let form = e.optOutForm else {
+            if let live = e.liveForm, live.found {
+                if e.runCheck?.result == "failed" { return MethodVerdict(method: .guided, reason: L10n.t("A real run did not go through, so you do this one with a guide.")) }
+                return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
+            }
             if let mail = e.contactEmail {
                 return MethodVerdict(method: .guided, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
             }
@@ -67,7 +71,11 @@ public enum OptOutMethods {
                 if run.result == "failed" {
                     return MethodVerdict(method: .guided, reason: L10n.f("A real run on %@ did not go through (%@), so you do this one with a guide.", run.date, run.note ?? "-"))
                 }
-                if run.result == "confirmed", !failedBefore, !challengedBefore {
+                // Confirmed counts unless the page also shows something this person must clear (a bot check, a box they may not tick).
+                let personMustClear = (e.liveCheck?.blockers ?? []).contains { b in
+                    !(b.hasPrefix("certify:") && confirmingIdentity && FormFiller.isSelfIdentityBox(String(b.dropFirst(8))))
+                }
+                if run.result == "confirmed", !failedBefore, !challengedBefore, !personMustClear {
                     return MethodVerdict(method: .automatic, reason: L10n.f("A real run on %@ showed this site's confirmation.", run.date))
                 }
             }
@@ -91,7 +99,9 @@ public enum OptOutMethods {
                 let what = blocker.hasPrefix("check") ? "a bot check" : blocker.hasPrefix("terms") ? "a terms prompt" : "a confirmation box"
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.f("We fill in and send the form; the page shows %@ that you handle.", what))
             }
-            return MethodVerdict(method: .automatic, reason: L10n.f("Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.", live.checked))
+            // Nothing blocked the form at load, but a real send is what proves a site takes it with no human check: until a reviewed real run
+            // confirms it (`run_check: confirmed`), we fill it in and the person ticks whatever check appears.
+            return MethodVerdict(method: .semiAutomatic, reason: L10n.f("Loaded %@: nothing blocked the form. We fill it in and send it; you tick any check the site shows. A confirmed real run would make it automatic.", live.checked))
         }
     }
 

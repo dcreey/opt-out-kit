@@ -12,3 +12,8 @@ contact_email: "privacy@enigma.com"
 registered_in: [CA]
 signals: [email_contact]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://www.enigma.com/legal/do-not-sell"
+  blockers: []

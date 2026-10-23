@@ -144,6 +144,22 @@ public struct LiveCheck: Codable, Equatable, Hashable, Sendable {
     public init(checked: String, blockers: [String]) { self.checked = checked; self.blockers = blockers }
 }
 
+/// What opening the site's page in a real browser (scripts running) found when the crawler had not read a form: whether an opt-out form is
+/// there, on which page, and what a person would have to clear before sending (a bot check, a terms prompt, a confirmation box).
+public struct LiveFormCheck: Codable, Equatable, Hashable, Sendable {
+    public var checked: String
+    public var found: Bool
+    public var page: String?
+    public var blockers: [String]
+    public init(checked: String, found: Bool, page: String? = nil, blockers: [String] = []) { self.checked = checked; self.found = found; self.page = page; self.blockers = blockers }
+    enum CodingKeys: String, CodingKey { case checked, found, page, blockers }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        checked = try c.decode(String.self, forKey: .checked); found = try c.decode(Bool.self, forKey: .found)
+        page = try c.decodeIfPresent(String.self, forKey: .page); blockers = try c.decodeIfPresent([String].self, forKey: .blockers) ?? []
+    }
+}
+
 /// What a real, reviewed run showed: the screenshot of the page after sending either showed a confirmation (`confirmed`) or it did not
 /// (`failed`, with what the page showed instead). This outranks every guess from reading the page.
 public struct RunCheck: Codable, Equatable, Hashable, Sendable {
@@ -170,6 +186,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var searchCheck: SearchCheck?  // how to tell whether a person is listed, when that can be automated
     public var liveCheck: LiveCheck?      // what blocked the form on a real page load, when that was measured
     public var runCheck: RunCheck?        // what a real, reviewed run showed
+    public var liveForm: LiveFormCheck?   // an opt-out form found on the live page when the crawl could not read one
     public var contactEmail: String?      // the privacy address found for this site
     public var contactEmailSource: String?   // where it was found: the opt-out page or its privacy policy
     public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
@@ -178,17 +195,17 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, liveForm: LiveFormCheck? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.contactEmail = contactEmail; self.registeredIn = registeredIn
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.liveForm = liveForm; self.contactEmail = contactEmail; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
-        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", contactEmail = "contact_email", registeredIn = "registered_in"
+        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

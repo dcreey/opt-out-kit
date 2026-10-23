@@ -1512,7 +1512,10 @@ final class OptOutMethodTests: XCTestCase {
     func testOnlyAFormLoadedOnARealPageWithNothingBlockingItIsAutomatic() {
         var measured = entry(signals: ["email_input"])
         measured.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
+        XCTAssertEqual(OptOutMethods.classify(measured).method, .semiAutomatic, "clean at load is not proof: only a confirmed real run makes a site automatic")
+        measured.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(measured).method, .automatic)
+        measured.runCheck = nil
         XCTAssertEqual(OptOutMethods.classify(entry(signals: ["email_input"])).method, .semiAutomatic,
                        "never loaded: a check might appear, and anything a person might have to solve is not fully automated")
         measured.liveCheck = LiveCheck(checked: "2026-10-22", blockers: ["check:recaptcha"])
@@ -1621,6 +1624,7 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
                                optOutURL: URL(string: "https://x.example/optout"), optOutForm: form(box), signals: [])
         e.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
+        e.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(e).method, .guided)
     }
@@ -1636,7 +1640,8 @@ final class MeasuredMethodTests: XCTestCase {
     private let selfBox = "certify: I confirm that I am the person associated with this email address and consent to receive an email."
 
     func testACaptchaScriptAloneDoesNotMakeASiteSemiAutomatedOnceItWasMeasured() {
-        let measured = entry(["captcha_recaptcha", "captcha_turnstile"], live: LiveCheck(checked: "2026-10-21", blockers: []))
+        var measured = entry(["captcha_recaptcha", "captcha_turnstile"], live: LiveCheck(checked: "2026-10-21", blockers: []))
+        measured.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(measured).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(entry(["captcha_recaptcha"], live: nil)).method, .semiAutomatic, "unmeasured stays cautious")
     }
@@ -1648,13 +1653,15 @@ final class MeasuredMethodTests: XCTestCase {
     }
 
     func testTheSelfStatementBoxIsAutomaticOnlyForAnOwnerWhoAllowedIt() {
-        let e = entry([], live: LiveCheck(checked: "d", blockers: [selfBox]))
+        var e = entry([], live: LiveCheck(checked: "d", blockers: [selfBox]))
+        e.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: false).method, .semiAutomatic, "family profiles and owners who did not allow it")
     }
 
     func testASendThatFailedOrWasRefusedMovesTheSiteToAGuide() {
-        let e = entry([], live: LiveCheck(checked: "d", blockers: []))
+        var e = entry([], live: LiveCheck(checked: "d", blockers: []))
+        e.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(e).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(e, failedBefore: true).method, .guided)
     }
@@ -2185,7 +2192,7 @@ final class PlanTests: XCTestCase {
         let auto = try XCTUnwrap(steps.first { $0.kind == .method(.automatic) })
         XCTAssertEqual(auto.tasks.count, 1)
         XCTAssertEqual(auto.tasks[0].kind, .automatic)
-        XCTAssertGreaterThan(auto.siteCount, 50)
+        XCTAssertGreaterThanOrEqual(auto.siteCount, 3, "only sites a reviewed real run confirmed")
         let tasks = steps.flatMap(\.tasks)
         for key in [\DirectoryEntry.template, \DirectoryEntry.family] as [KeyPath<DirectoryEntry, String?>] {
             for (k, members) in Dictionary(grouping: entries.filter { $0[keyPath: key] != nil }, by: { $0[keyPath: key]! }) where members.count > 1 {
@@ -2259,8 +2266,8 @@ final class MeasuredAutomaticTests: XCTestCase {
         let entries = try Registry.loadDirectory(dir)
         let axle = try XCTUnwrap(entries.first { $0.domain == "data-axle.com" })
         XCTAssertNotNil(axle.liveCheck)
-        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .automatic, "its identity note counts as the owner's own box: \(OptOutMethods.classify(axle, confirmingIdentity: true).reason)")
-        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: false).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .semiAutomatic, "unproven by a real run, so a person confirms")
+        XCTAssertFalse(OptOutMethods.classify(axle, confirmingIdentity: true).reason.contains("page shows"), "its identity note is not a blocker for the owner")
         // Sites with a visible bot check never count as automatic.
         let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }
         XCTAssertFalse(withCheck.isEmpty)
@@ -2325,7 +2332,7 @@ final class RunCheckTests: XCTestCase {
     }
 
     func testAReviewedRealRunOutranksEveryGuess() {
-        XCTAssertEqual(OptOutMethods.classify(clean(nil)).method, .automatic, "clean at load, nothing more known")
+        XCTAssertEqual(OptOutMethods.classify(clean(nil)).method, .semiAutomatic, "clean at load, nothing proven by a real run")
         XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "failed", note: "a cookie banner covered the form"))).method, .guided)
         XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed"))).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed")), challengedBefore: true).method, .semiAutomatic,
@@ -2506,5 +2513,23 @@ final class DailyGoalsTests: XCTestCase {
         let entries = [site(0, email: false), site(1)]
         let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])
         XCTAssertEqual(g.verify.count, 2); XCTAssertEqual(g.email?.domains, ["s1.com"])
+    }
+}
+
+final class CoverageReportTests: XCTestCase {
+    func testPrintTheCoverage() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        var counts: [String: Int] = [:]; var reasons: [String: Int] = [:]
+        for e in entries {
+            let v = OptOutMethods.classify(e, confirmingIdentity: true)
+            var tag = "\(v.method)"
+            if e.optOutForm == nil { tag += e.contactEmail != nil ? "+emailonly" : (e.optOutURL != nil ? "+pageNoForm" : "+nopage") }
+            counts[tag, default: 0] += 1
+            if v.method == .guided || v.method == .manual { reasons[String(v.reason.prefix(90)), default: 0] += 1 }
+        }
+        print("COVERAGE", counts.sorted { $0.key < $1.key })
+        for (r, n) in reasons.sorted(by: { $0.value > $1.value }).prefix(12) { print("REASON \(n) \(r)") }
     }
 }

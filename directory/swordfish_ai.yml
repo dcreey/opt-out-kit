@@ -11,3 +11,6 @@ opt_out_url: "https://swordfish.ai/"
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, script_rendered_page]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

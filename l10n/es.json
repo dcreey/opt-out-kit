@@ -801,5 +801,8 @@
  "Keep going: take 25 more": "Seguir: tomar 25 más",
  "One message, every address in Bcc, as a safety net": "Un mensaje, todas las direcciones en Cco, como red de seguridad",
  "Today's goals": "Objetivos de hoy",
- "Verify today's sites": "Verificar los sitios de hoy"
+ "Verify today's sites": "Verificar los sitios de hoy",
+ "A real run did not go through, so you do this one with a guide.": "Una ejecución real no se completó, así que haces este con una guía.",
+ "Loaded %@: nothing blocked the form. We fill it in and send it; you tick any check the site shows. A confirmed real run would make it automatic.": "Cargado el %@: nada bloqueaba el formulario. Lo rellenamos y enviamos; tú marcas cualquier verificación que muestre. Una ejecución real confirmada lo haría automático.",
+ "The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows.": "El formulario de baja aparece cuando la página carga en un navegador. Lo rellenamos; tú resuelves cualquier verificación que muestre."
 }

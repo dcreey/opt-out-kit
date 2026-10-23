@@ -12,3 +12,8 @@ contact_email: "privacy@wealthfeed.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_only_wording, mail_option]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://portal.wealthfeed.com/opt-out"
+  blockers: []

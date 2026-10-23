@@ -16,3 +16,4 @@ App/Info.plist
 # Registry downloads kept for the importers (public data, but large and re-fetched each run)
 registries/inbox/
 .run-review/
+.live-forms/

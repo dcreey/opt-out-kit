@@ -11,3 +11,8 @@ opt_out_url: "https://lsmapps.com/"
 registered_in: [CA]
 signals: [script_rendered_page]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://lsmapps.com/opt-out"
+  blockers: []

@@ -107,7 +107,9 @@ public enum OptOutPlan {
         }
         // Forms we fill in and send ourselves except for a bot check the person has to tick: one task, a visible page per site.
         let verifyEntries = entries.filter { e in
-            guard !claimed.contains(e.domain), let form = e.optOutForm, !FormFiller.needsListing(form) else { return false }
+            guard !claimed.contains(e.domain) else { return false }
+            if let form = e.optOutForm { if FormFiller.needsListing(form) { return false } }
+            else if e.liveForm?.found != true { return false }
             return classifyEntry(e).method == .semiAutomatic
         }
         if !verifyEntries.isEmpty {

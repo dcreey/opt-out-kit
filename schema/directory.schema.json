@@ -39,6 +39,17 @@
     "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
     "contact_email": { "type": "string" },
     "contact_email_source": { "enum": ["page", "policy"] },
+    "live_form": {
+      "type": "object",
+      "required": ["checked", "found"],
+      "additionalProperties": false,
+      "properties": {
+        "checked": { "type": "string" },
+        "found": { "type": "boolean" },
+        "page": { "type": "string" },
+        "blockers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "run_check": {
       "type": "object",
       "required": ["date", "result"],

@@ -11,3 +11,6 @@ opt_out_url: "https://modfxlabs.com/privacy"
 registered_in: [CA]
 signals: [email_only_wording]
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: false

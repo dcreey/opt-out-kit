@@ -11,3 +11,8 @@ opt_out_url: "https://www.nexxagroup.com/corporate-overview/consumer-opt-out/"
 registered_in: [OR, TX]
 signals: []
 profiled: "2026-10-22"
+live_form:
+  checked: "2026-10-23"
+  found: true
+  page: "https://privacyportal.onetrust.com/webform/c02129bc-bbab-43a6-a0b4-175489cb893e/156ac96a-9d7e-4fe6-bab8-a44df779202b"
+  blockers: ["check:a bot check"]
