@@ -13,5 +13,7 @@ registered_in: [CA]
 signals: [email_contact, id_required, mail_option]
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-23"
-  found: false
+  checked: "2026-10-24"
+  found: true
+  page: "https://my.datasubject.com/Uw03R7mCGS/60313"
+  blockers: []

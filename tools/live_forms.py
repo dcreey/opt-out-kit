@@ -31,11 +31,12 @@ FORMS_JS = """() => {
     fields: loose.map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...document.querySelectorAll('button,input[type=submit],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)).slice(0, 12),
     text: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }] : [];
-  return pseudo.concat([...document.querySelectorAll('form')].map(f => ({ visible: vis(f),
-    fields: [...f.querySelectorAll('input,select,textarea')].filter(e => !['hidden','submit','button','image','reset'].includes(e.type) && vis(e)).map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
+  const head = f => { let n = f; for (let i = 0; i < 6 && n; i++, n = n.parentElement) { let p = n.previousElementSibling; for (let j = 0; j < 8 && p; j++, p = p.previousElementSibling) { if (/^H[1-5]$/.test(p.tagName)) return (p.innerText || '').trim().slice(0, 80); const h = p.querySelector && p.querySelector('h1,h2,h3,h4,h5'); if (h) return (h.innerText || '').trim().slice(0, 80); } } return ''; };
+  return pseudo.map(x => Object.assign(x, { head: '' })).concat([...document.querySelectorAll('form')].map(f => ({ visible: vis(f),
+    head: head(f), fields: [...f.querySelectorAll('input,select,textarea')].filter(e => !['hidden','submit','button','image','reset'].includes(e.type) && vis(e)).map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)),
     text: (f.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }))); }"""
-PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm|atlassian\.net/servicedesk|\.zendesk\.com/hc/.*request|force\.com/.*(privacy|request|optout)", re.I)
+PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm|privacyengine\.io|privacyprocessing\.com|atlassian\.net/servicedesk|\.zendesk\.com/hc/.*request|force\.com/.*(privacy|request|optout)", re.I)
 # Links, plus the addresses of embedded privacy portals (a request form shown in a frame cannot be read from the page around it).
 LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80), ((a.closest('p,li,td,h1,h2,h3,h4,div') || a.parentElement || {}).innerText || '').trim().slice(0, 160)])
   .concat([...document.querySelectorAll('iframe[src]')].map(f => [f.src, 'privacy portal request form']))"""
@@ -58,6 +59,7 @@ def score(form, ctx=""):
     if OPTOUT.search(form["text"]): s += 2
     if MARKETING.search(buttons): s -= 6
     if MARKETING.search(form["text"]) and not OPTOUT.search(buttons): s -= 3
+    if OPTOUT.search(form.get("head", "")): s += 3          # the heading just above the form is about opting out
     if OPTOUT.search(ctx): s += 3          # the page's own address or title is about opting out
     s += min(4, sum(1 for f in fields if IDENT.search(f["label"] + " " + f["name"])))
     if any(f["type"] == "email" or re.search("e-?mail", f["label"] + f["name"], re.I) for f in fields): s += 2
@@ -80,10 +82,12 @@ async def deny_cookies(page):
 async def look(ctx, url):
     page = await ctx.new_page()
     try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=25000); await page.wait_for_timeout(4500)
+        resp = await page.goto(url, wait_until="domcontentloaded", timeout=25000); await page.wait_for_timeout(4500)
         await deny_cookies(page); await page.wait_for_timeout(500)
         for y in range(0, 6000, 900): await page.evaluate(f"window.scrollTo(0,{y})"); await page.wait_for_timeout(80)
         forms = await page.evaluate(FORMS_JS)
+        if (resp is None or resp.status in (401, 403, 429, 503)) and not forms and WALL.search((await page.evaluate("document.body ? document.body.innerText : ''"))[:600]):
+            WALLED.add(urllib.parse.urlsplit(url).netloc.replace("www.", ""))
         for fr in page.frames[1:]:                  # forms embedded in frames (HubSpot, Clym, Ketch) are read in their own frame
             try: forms += await fr.evaluate(FORMS_JS)
             except Exception: pass
@@ -103,6 +107,8 @@ async def look(ctx, url):
 
 
 MAILS = {}
+WALL = re.compile(r"security verification|you have been blocked|sorry, you have been blocked|just a moment|attention required|verify you are (a )?human|access denied", re.I)
+WALLED = set()
 
 
 def good_links(base, links, own):
@@ -130,6 +136,7 @@ async def site(browser, domain, opt_url, sem):
                     if u in tried: continue
                     tried.add(u)
                     sc, blockers, links, final = await look(ctx, u)
+                    if domain in WALLED: return domain, "none", "", "wall"        # a bot wall in front of the whole site: never retried
                     if sc and urllib.parse.urlsplit(final).path not in ("", "/"): return domain, "form", final, ";".join(("check:a bot check" if b == "check" else b) for b in blockers)
                     nxt += good_links(final, links, own)
                 frontier = [u for u in nxt if u not in tried]
@@ -151,6 +158,7 @@ async def main():
         if re.search(r"^opt_out_form: ", s, re.M): continue
         d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1); m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
         if a.only and d not in a.only.split(","): continue
+        if re.search(r'blockers: \["wall"\]', s): continue            # walled off by a bot check: not recrawled
         targets.append((d, m.group(1) if m else None))
     sem = asyncio.Semaphore(a.workers); done = 0
     async with async_playwright() as p:

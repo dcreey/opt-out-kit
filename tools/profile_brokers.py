@@ -19,7 +19,7 @@ UA = "OptOutKit-Profiler/1.0 (open source; polite, robots.txt honored)"
 HARD_CHALLENGE = ["just a moment", "attention required", "verify you are human", "are you a human",
                   "checking your browser", "performing security verification", "security challenge", "managed challenge"]
 LINK_SCORE = [(r"opt[\s_-]?out", 10), (r"do[\s_-]?not[\s_-]?sell|don.?t[\s_-]?sell", 8), (r"request[\s_-]?portal|privacy[\s_-]?portal|data[\s_-]?subject|privacy[\s_-]?center|privacy[\s_-]?cockpit", 8), (r"remov", 8), (r"suppress", 8),
-              (r"delete[\s_-]?my|data[\s_-]?delet", 7), (r"your[\s_-]?privacy[\s_-]?choices|privacy[\s_-]?rights|privacy[\s_-]?request", 6),
+              (r"delete[\s_-]?my|data[\s_-]?delet", 7), (r"your[\s_-]?privacy[\s_-]?choices|privacy[\s_-]?rights|privacy[\s_-]?request|your[\s_-]?rights", 6),
               (r"d[ée]sinscri|d[ée]sabonn|darse de baja|dar de baja|abmeld", 10), (r"ne pas vendre|no vender|nicht verkaufen", 8),
               (r"supprim|effac|eliminar|borrar|l[öo]sch|entfern", 7),
               (r"vos droits|droits.{0,10}(vie priv|donn)|derechos.{0,12}(privacidad|datos)|datenschutzrechte|ihre rechte|widerspr|opposition|oposici[oó]n", 6),

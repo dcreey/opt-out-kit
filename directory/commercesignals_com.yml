@@ -11,10 +11,10 @@ opt_out_url: null
 registered_in: [CA, OR, TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-22"
+contact_email: "privacy+authorizedagent@commercesignals.com"
+contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: true
   page: "https://www.commercesignals.com/contact/"
   blockers: ["check:a bot check"]
-contact_email: "privacy+authorizedagent@commercesignals.com"
-contact_email_source: "browser"

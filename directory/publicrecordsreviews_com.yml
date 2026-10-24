@@ -13,9 +13,6 @@ profiled: "2026-10-21"
 search_check:
   status: "no_search"
   checked: "2026-10-20"
-live_form:
-  checked: "2026-10-23"
-  found: false
 closed:
   checked: "2026-10-24"
   evidence:
@@ -23,3 +20,6 @@ closed:
     - "try 1 https://www.publicrecordsreviews.com: Page.goto: Timeout 25000ms exceeded.; resolves to 150.238.59.221"
     - "try 2 https://publicrecordsreviews.com: ERR_CONNECTION_TIMED_OUT; resolves to 150.238.59.221"
     - "try 2 https://www.publicrecordsreviews.com: Page.goto: Timeout 25000ms exceeded.; resolves to 150.238.59.221"
+live_form:
+  checked: "2026-10-24"
+  found: false

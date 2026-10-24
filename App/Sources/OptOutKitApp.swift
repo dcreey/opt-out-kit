@@ -612,13 +612,13 @@ final class AppModel: ObservableObject {
 
     /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
-        let queue = plan.flatMap(\.tasks).first { $0.kind == .verify }?.domains ?? []
+        let queue = OptOutPlan.verifyQueue(plan, entries: directory)
         return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches)
     }
 
     /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
     var verifyRemaining: Int {
-        let ids = Set(directory.filter { d in (plan.flatMap(\.tasks).first { $0.kind == .verify }?.domains ?? []).contains(d.domain) }.map(\.id))
+        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let ids = Set(directory.filter { queued.contains($0.domain) }.map(\.id))
         return ids.filter { !(progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false) }.count
     }
 

@@ -11,10 +11,10 @@ opt_out_url: null
 registered_in: [TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-22"
+contact_email: "dpo@bold.com"
+contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: true
   page: "https://www.careerbuilder.com/privacy/"
   blockers: []
-contact_email: "dpo@bold.com"
-contact_email_source: "browser"

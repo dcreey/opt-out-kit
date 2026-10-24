@@ -44,6 +44,20 @@ public struct PlanStep: Identifiable, Equatable, Sendable {
 /// Builds the ordered plan: the official removal service for the person's place first, then our automatic opt-out, semi-automated,
 /// guided and manual. A site belongs to the first step that handles it and to no later one; sites that share one opt-out are one task.
 public enum OptOutPlan {
+    /// Whether the site has a form the app can fill in (read from the page, or found on the live page).
+    public static func hasForm(_ e: DirectoryEntry) -> Bool { e.optOutForm != nil || e.liveForm?.found == true }
+
+    /// The single sites of the semi-automated step that the app fills in and sends for the person (they only tick the check), in the
+    /// order the step lists them. Shared-form groups are not in it: they are one task each.
+    public static func verifyQueue(_ steps: [PlanStep], entries: [DirectoryEntry]) -> [String] {
+        let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        return steps.filter { $0.kind == .method(.semiAutomatic) }.flatMap(\.tasks).compactMap { t in
+            guard case .site = t.kind, t.domains.count == 1, let e = byDomain[t.domains[0]], hasForm(e) else { return nil }
+            if let f = e.optOutForm, FormFiller.needsListing(f) { return nil }
+            return e.domain
+        }
+    }
+
     public static func build(entries: [DirectoryEntry], brokers: [Broker], platforms: [Platform],
                              classifyEntry: (DirectoryEntry) -> MethodVerdict, classifyBroker: (Broker) -> MethodVerdict) -> [PlanStep] {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
@@ -94,32 +108,17 @@ public enum OptOutPlan {
             byMethod[best.1.method, default: []].append(PlanTask(kind: .site(lead.id), title: lead.domain, domains: domains,
                                                                    reason: L10n.f("One opt-out request handles all %@ sites that share this process.", domains.count), method: best.1.method, registeredIn: states(domains)))
         }
-        // Sites that take opt-outs by email (and that no automatic form handles) are one task: a message per address, naming every site
-        // that address handles. The person reads each one and taps Send.
-        let emailEntries = entries.filter { !claimed.contains($0.domain) && $0.contactEmail != nil && classifyEntry($0).method != .automatic }
+        // Sites whose only route is an email address (no form we can fill) are one guided task: a message per address, naming every
+        // site that address handles. The person reads each one and taps Send. Sites with a form keep their own task; email is the
+        // extra layer for those (see `EmailBatch`), never a reason to move them out of the semi-automated step.
+        let emailEntries = entries.filter { !claimed.contains($0.domain) && $0.contactEmail != nil && !hasForm($0) && classifyEntry($0).method != .automatic }
         if !emailEntries.isEmpty {
             let domains = emailEntries.map(\.domain)
             claimed.formUnion(domains)
             let addresses = Set(emailEntries.compactMap { $0.contactEmail?.lowercased() }).count
-            byMethod[.semiAutomatic, default: []].append(PlanTask(kind: .emails, title: L10n.t("Send opt-out emails"), domains: domains,
+            byMethod[.guided, default: []].append(PlanTask(kind: .emails, title: L10n.t("Send opt-out emails"), domains: domains,
                 reason: L10n.f("%@ messages, one per address, each naming every site it handles. You read them and tap Send.", addresses),
-                method: .semiAutomatic, registeredIn: states(domains)))
-        }
-        // Forms we fill in and send ourselves except for a bot check the person has to tick: one task, a visible page per site.
-        let verifyEntries = entries.filter { e in
-            guard !claimed.contains(e.domain) else { return false }
-            if let form = e.optOutForm { if FormFiller.needsListing(form) { return false } }
-            else if e.liveForm?.found != true { return false }
-            return classifyEntry(e).method == .semiAutomatic
-        }
-        if !verifyEntries.isEmpty {
-            // Forms that ask the person to type a code take the most effort, so they come last.
-            let ordered = verifyEntries.filter { !($0.optOutForm.map(FormFiller.hasTypedCode) ?? false) } + verifyEntries.filter { $0.optOutForm.map(FormFiller.hasTypedCode) ?? false }
-            let domains = ordered.map(\.domain)
-            claimed.formUnion(domains)
-            byMethod[.semiAutomatic, default: []].append(PlanTask(kind: .verify, title: L10n.t("Tap to verify, we do the rest"), domains: domains,
-                reason: L10n.f("%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.", domains.count),
-                method: .semiAutomatic, registeredIn: states(domains)))
+                method: .guided, registeredIn: states(domains)))
         }
         for e in entries where !claimed.contains(e.domain) {
             claimed.insert(e.domain)
@@ -135,7 +134,10 @@ public enum OptOutPlan {
                                   reason: L10n.f("One run fills in and sends all %@ opt-out forms. You only handle a check or an email link if a site asks.", domains.count),
                                   method: .automatic, registeredIn: states(domains))]
             }
-            steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation, tasks: tasks.sorted { $0.title.lowercased() < $1.title.lowercased() }))
+            // Forms that ask the person to type a code take the most effort, so they come last in the semi-automated step.
+            func typed(_ t: PlanTask) -> Bool { m == .semiAutomatic && (byDomain[t.domains.first ?? ""]?.optOutForm.map(FormFiller.hasTypedCode) ?? false) }
+            steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation,
+                                  tasks: tasks.sorted { (typed($0) ? 1 : 0, $0.title.lowercased()) < (typed($1) ? 1 : 0, $1.title.lowercased()) }))
         }
         return steps
     }

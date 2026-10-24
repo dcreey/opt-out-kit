@@ -11,9 +11,6 @@ opt_out_url: null
 registered_in: [TX]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: false
 closed:
   checked: "2026-10-24"
   evidence:
@@ -21,3 +18,6 @@ closed:
     - "try 1 https://www.mobiityglobal.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NXDOMAIN, no address"
     - "try 2 https://mobiityglobal.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NXDOMAIN, no address"
     - "try 2 https://www.mobiityglobal.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NXDOMAIN, no address"
+live_form:
+  checked: "2026-10-24"
+  found: false

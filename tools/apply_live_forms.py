@@ -21,6 +21,7 @@ def main():
             ok = result == "form"
             items = ", ".join('"' + b.replace('"', "'") + '"' for b in blockers.split(";") if b)
             block = f'\nlive_form:\n  checked: "{a.date}"\n  found: {"true" if ok else "false"}\n'
+            if blockers == "wall": block += '  blockers: ["wall"]\n'
             if ok: block += f'  page: "{page}"\n  blockers: [{items}]\n'
             if mail and "\ncontact_email:" not in s:
                 block += f'contact_email: "{mail}"\ncontact_email_source: "browser"\n'

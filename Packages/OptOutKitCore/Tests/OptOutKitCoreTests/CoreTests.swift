@@ -2418,8 +2418,9 @@ final class EmailBatchTests: XCTestCase {
                                      classifyBroker: { OptOutMethods.classify($0, in: entries) })
         let tasks = steps.flatMap(\.tasks)
         let mail = try XCTUnwrap(tasks.first { $0.kind == .emails })
-        XCTAssertGreaterThan(mail.siteCount, 100)
-        XCTAssertEqual(mail.method, .semiAutomatic)
+        XCTAssertGreaterThanOrEqual(mail.siteCount, 50)
+        XCTAssertEqual(mail.method, .guided, "email is not part of the semi-automated step")
+        XCTAssertTrue(entries.filter { mail.domains.contains($0.domain) }.allSatisfy { !OptOutPlan.hasForm($0) }, "only sites with no form")
         XCTAssertEqual(tasks.filter { $0.kind == .emails }.count, 1)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count, "still listed once")
         let mine = entries.filter { mail.domains.contains($0.domain) }
@@ -2445,10 +2446,12 @@ final class VerifyTaskTests: XCTestCase {
         let steps = OptOutPlan.build(entries: entries, brokers: brokers, platforms: [], classifyEntry: { OptOutMethods.classify($0, confirmingIdentity: true) },
                                      classifyBroker: { OptOutMethods.classify($0, in: entries) })
         let tasks = steps.flatMap(\.tasks)
-        let verify = try XCTUnwrap(tasks.first { $0.kind == .verify })
-        XCTAssertEqual(tasks.filter { $0.kind == .verify }.count, 1)
-        XCTAssertGreaterThan(verify.siteCount, 5)
-        XCTAssertEqual(verify.method, .semiAutomatic)
+        XCTAssertNil(tasks.first { $0.kind == .verify }, "no mega-task: each site or shared-form group is its own task")
+        let semi = try XCTUnwrap(steps.first { $0.kind == .method(.semiAutomatic) }).tasks
+        XCTAssertGreaterThan(semi.count, 100)
+        XCTAssertTrue(semi.allSatisfy { $0.kind != .emails })
+        XCTAssertTrue(semi.contains { $0.domains.count > 1 }, "shared-form groups such as data-axle stay one task")
+        XCTAssertGreaterThan(OptOutPlan.verifyQueue(steps, entries: entries).count, 50)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count)
     }
 }
@@ -2557,7 +2560,7 @@ final class TypedCodeTests: XCTestCase {
         func entry(_ id: String, _ f: OptOutForm) -> DirectoryEntry { DirectoryEntry(id: id, domain: id + ".example", name: id, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: []) }
         let entries = [entry("b", coded), entry("a", plain)]            // the coded one is listed first
         let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { OptOutMethods.classify($0) }, classifyBroker: { OptOutMethods.classify($0) })
-        let verify = try XCTUnwrap(steps.flatMap(\.tasks).first { $0.kind == .verify })
-        XCTAssertEqual(verify.domains, ["a.example", "b.example"], "typed-code forms come last")
+        XCTAssertEqual(steps.flatMap(\.tasks).map(\.title), ["a.example", "b.example"], "typed-code forms come last")
+        XCTAssertEqual(OptOutPlan.verifyQueue(steps, entries: entries), ["a.example", "b.example"])
     }
 }

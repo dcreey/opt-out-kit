@@ -15,5 +15,5 @@ search_check:
   candidate: {"method": "GET", "url": "https://www.sdarrests.org/Results?fname={first}&lname={last}&stage=1&rType=Warrant&state={state}&city={city}", "body": null}
   checked: "2026-10-21"
 live_form:
-  checked: "2026-10-23"
+  checked: "2026-10-24"
   found: false
