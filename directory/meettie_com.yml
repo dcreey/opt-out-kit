@@ -11,8 +11,8 @@ opt_out_url: "https://meettie.com/"
 registered_in: [CA]
 signals: [phone_verify]
 profiled: "2026-10-22"
+contact_email: "legal@meettie.com"
+contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
-contact_email: "legal@meettie.com"
-contact_email_source: "browser"

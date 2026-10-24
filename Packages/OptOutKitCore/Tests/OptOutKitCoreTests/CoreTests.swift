@@ -2521,6 +2521,16 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertEqual(DailyGoals.daysLeft(remaining: 700), 28)
     }
 
+    func testEverythingFinishedTodayIsEmailedEvenWhenItIsNotInTheListedBatch() {
+        let entries = (0..<40).map { site($0) }
+        let queue = Array(entries.prefix(30).map(\.domain)), now = Date(), cal = Calendar(identifier: .gregorian)
+        let attempts = ["s35": [OptOutAttempt(date: now, outcome: "submitted")]]          // done by the automatic run, not in the queue
+        let g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
+        XCTAssertEqual(g.verify.count, 25)
+        XCTAssertEqual(g.email?.domains.count, 26, "the batch plus the site done another way")
+        XCTAssertTrue(g.email?.domains.contains("s35.com") ?? false)
+    }
+
     func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
         let entries = [site(0, email: false), site(1)]
         let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])

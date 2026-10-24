@@ -15,4 +15,6 @@ contact_email: "legal@demandscience.com"
 contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
-  found: false
+  found: true
+  page: "https://privacyprocessing.com/cgi-bin/unsubscribe.cgi?e=e472cdd6355b6ae710e7a380e4fd8fcd"
+  blockers: []

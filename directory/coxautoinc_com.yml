@@ -15,4 +15,6 @@ contact_email: "privacy@coxautoinc.com"
 contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
-  found: false
+  found: true
+  page: "https://www.coxautoinc.com/consumerprivacyrights/"
+  blockers: []

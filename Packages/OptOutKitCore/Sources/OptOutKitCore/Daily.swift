@@ -38,7 +38,11 @@ public struct DailyGoals: Equatable, Sendable {
         let todays = Array(open.prefix(batchSize * max(1, batches)))
         let verifyDone = todays.filter { e in (attempts[e.id] ?? []).contains { $0.wasSubmitted && calendar.isDate($0.date, inSameDayAs: now) } }.count
 
-        let withAddress = todays.filter { $0.contactEmail != nil }
+        // The email covers everything done today, not just the listed batch: a site the person finished any other way (the automatic run,
+        // a guide) gets its email too, so every opt-out sent today has a second route behind it.
+        let listed = Set(todays.map(\.id))
+        let doneElsewhere = entries.filter { e in !listed.contains(e.id) && (attempts[e.id] ?? []).contains { $0.wasSubmitted && calendar.isDate($0.date, inSameDayAs: now) } }
+        let withAddress = (todays + doneElsewhere).filter { $0.contactEmail != nil }
         let batch = EmailBatch.single(entries: withAddress, maxRecipients: 1000).first
         let emailedToday = withAddress.filter { e in emailedDates(e.id).contains { calendar.isDate($0, inSameDayAs: now) } }.count
         return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches))

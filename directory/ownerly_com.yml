@@ -13,8 +13,9 @@ profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"
   checked: "2026-10-20"
+contact_email: "dpo@ownerly.com"
+contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
-contact_email: "dpo@ownerly.com"
-contact_email_source: "browser"
+  blockers: ["wall"]

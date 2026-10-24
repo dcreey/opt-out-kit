@@ -91,6 +91,7 @@ async def look(ctx, url):
         for fr in page.frames[1:]:                  # forms embedded in frames (HubSpot, Clym, Ketch) are read in their own frame
             try: forms += await fr.evaluate(FORMS_JS)
             except Exception: pass
+        if resp is not None and resp.status >= 400: forms = []          # an error page is never the opt-out form (its search box is not)
         ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
         best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
         links = await page.evaluate(LINKS_JS)
