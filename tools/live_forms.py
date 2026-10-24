@@ -35,9 +35,9 @@ FORMS_JS = """() => {
     fields: [...f.querySelectorAll('input,select,textarea')].filter(e => !['hidden','submit','button','image','reset'].includes(e.type) && vis(e)).map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)),
     text: (f.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }))); }"""
-PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm", re.I)
+PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm|atlassian\.net/servicedesk|\.zendesk\.com/hc/.*request|force\.com/.*(privacy|request|optout)", re.I)
 # Links, plus the addresses of embedded privacy portals (a request form shown in a frame cannot be read from the page around it).
-LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80)])
+LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80), ((a.closest('p,li,td,h1,h2,h3,h4,div') || a.parentElement || {}).innerText || '').trim().slice(0, 160)])
   .concat([...document.querySelectorAll('iframe[src]')].map(f => [f.src, 'privacy portal request form']))"""
 EMAIL_JS = """() => { const t = (document.body.innerText || ''); const m = [...document.querySelectorAll('a[href^="mailto:"]')].map(a => a.href.replace('mailto:', '').split('?')[0]);
   return [...new Set(m.concat(t.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}/g) || []))].slice(0, 12); }"""
@@ -89,6 +89,8 @@ async def look(ctx, url):
         links = await page.evaluate(LINKS_JS)
         for m in await page.evaluate(EMAIL_JS):
             if WANT_MAIL.search(m) and not BAD_MAIL.search(m): MAILS.setdefault(urllib.parse.urlsplit(url).netloc.replace("www.", ""), m.lower())
+        # A hosted privacy portal that opens on a choice (location, request type) shows its form only after one, so its landing page counts.
+        if best[0] < 5 and re.search(r"datasubject\.com|atlassian\.net/servicedesk", page.url): best = (5, best[1])
         blockers = await page.evaluate(BLOCK_JS) if best[0] >= 5 else []
         return best[0] if best[0] >= 5 else None, blockers, links, page.url
     except Exception:
@@ -102,12 +104,12 @@ MAILS = {}
 
 def good_links(base, links, own):
     seen, out = set(), []
-    for href, text in links:
+    for href, text, *around in links:
         u = urllib.parse.urljoin(base, href).split("#")[0]
         if not u.startswith("http") or u in seen: continue
         if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u) \
                 and not re.search(r"opt[\\s_-]?out|do[\\s_-]?not[\\s_-]?sell|privacy[\\s_-]?request", u, re.I): continue
-        sc = P.link_score(u, text) + (8 if PORTAL_HOSTS.search(u) else 0)
+        sc = max(P.link_score(u, text), P.link_score(u, text + " " + (around[0] if around else "")) - 2) + (8 if PORTAL_HOSTS.search(u) else 0)
         if sc >= 6: seen.add(u); out.append((sc, u))
     return [u for _, u in sorted(out, reverse=True)[:3]]
 
