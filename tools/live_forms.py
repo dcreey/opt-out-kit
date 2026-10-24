@@ -24,9 +24,10 @@ FORMS_JS = """() => {
   const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
   const label = e => { let t = ''; if (e.id) { const l = document.querySelector('label[for="' + e.id + '"]'); if (l) t = l.innerText; }
     if (!t) { const p = e.closest('label'); if (p) t = p.innerText; } if (!t) t = e.getAttribute('aria-label') || e.placeholder || e.name || '';
+    if (!t) { let n = e.parentElement; for (let i = 0; i < 3 && n && !t; i++, n = n.parentElement) { const tx = (n.innerText || '').replace(/\\s+/g, ' ').trim(); if (tx && tx.length < 80) t = tx; } }
     return t.replace(/\\s+/g, ' ').trim().slice(0, 80); };
   const loose = [...document.querySelectorAll('input,select,textarea')].filter(e => !e.closest('form') && !['hidden','submit','button','image','reset','search'].includes(e.type) && vis(e));
-  const pseudo = loose.length >= 2 ? [{ visible: true,
+  const pseudo = loose.length >= 1 ? [{ visible: true,
     fields: loose.map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...document.querySelectorAll('button,input[type=submit],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)).slice(0, 12),
     text: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }] : [];
@@ -51,7 +52,7 @@ BLOCK_JS = """() => { const t = (document.body.innerText || '').toLowerCase(); c
 
 def score(form, ctx=""):
     fields = [f for f in form["fields"] if f["type"] not in ("password",)]
-    if not form["visible"] or not fields: return -100
+    if not fields: return -100          # a form wrapper can have no size while its fields show; only the fields count
     buttons = " ".join(form["buttons"]); s = 0
     if OPTOUT.search(buttons): s += 4
     if OPTOUT.search(form["text"]): s += 2
@@ -104,7 +105,8 @@ def good_links(base, links, own):
     for href, text in links:
         u = urllib.parse.urljoin(base, href).split("#")[0]
         if not u.startswith("http") or u in seen: continue
-        if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u): continue
+        if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u) \
+                and not re.search(r"opt[\\s_-]?out|do[\\s_-]?not[\\s_-]?sell|privacy[\\s_-]?request", u, re.I): continue
         sc = P.link_score(u, text) + (8 if PORTAL_HOSTS.search(u) else 0)
         if sc >= 6: seen.add(u); out.append((sc, u))
     return [u for _, u in sorted(out, reverse=True)[:3]]
@@ -115,9 +117,11 @@ async def site(browser, domain, opt_url, sem):
         ctx = await browser.new_context(user_agent=UA, viewport={"width": 390, "height": 844}, is_mobile=True)
         try:
             own = P.registrable(domain); tried = set(); frontier = [u for u in (opt_url, f"https://{domain}/") if u]
+            # Sites built from one template (the arrests and court-records families) keep their removal form at the same path.
+            frontier += [f"https://{domain}/request-portal/", f"https://www.{domain}/request-portal/"]
             for depth in range(3):
                 nxt = []
-                for u in frontier[:4]:
+                for u in frontier[:6]:
                     if u in tried: continue
                     tried.add(u)
                     sc, blockers, links, final = await look(ctx, u)

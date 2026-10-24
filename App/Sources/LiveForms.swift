@@ -39,9 +39,8 @@ enum LiveFormPicker {
 
     /// How likely a form is the opt-out form: opt-out wording and several identity fields count for it, marketing wording against it.
     static func score(_ f: LiveForm, pageContext: String = "") -> Int {
-        guard f.visible else { return -100 }
         let fields = f.fields.filter { $0.visible && !["hidden", "submit", "button", "image", "password"].contains($0.type) }
-        guard !fields.isEmpty else { return -100 }
+        guard !fields.isEmpty else { return -100 }       // a form wrapper can have no size while its fields show; only the fields count
         let buttons = f.buttons.joined(separator: " ")
         let heading = f.text
         var s = 0
