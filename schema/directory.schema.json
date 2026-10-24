@@ -39,6 +39,15 @@
     "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
     "contact_email": { "type": "string" },
     "contact_email_source": { "enum": ["page", "policy", "browser"] },
+    "closed": {
+      "type": "object",
+      "required": ["checked", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "checked": { "type": "string" },
+        "evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "live_form": {
       "type": "object",
       "required": ["checked", "found"],

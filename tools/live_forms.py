@@ -84,6 +84,9 @@ async def look(ctx, url):
         await deny_cookies(page); await page.wait_for_timeout(500)
         for y in range(0, 6000, 900): await page.evaluate(f"window.scrollTo(0,{y})"); await page.wait_for_timeout(80)
         forms = await page.evaluate(FORMS_JS)
+        for fr in page.frames[1:]:                  # forms embedded in frames (HubSpot, Clym, Ketch) are read in their own frame
+            try: forms += await fr.evaluate(FORMS_JS)
+            except Exception: pass
         ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
         best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
         links = await page.evaluate(LINKS_JS)
@@ -106,12 +109,12 @@ def good_links(base, links, own):
     seen, out = set(), []
     for href, text, *around in links:
         u = urllib.parse.urljoin(base, href).split("#")[0]
-        if not u.startswith("http") or u in seen: continue
+        if not u.startswith("http") or u in seen or "clym-widget.net" in u: continue     # a consent-widget bridge, not a form
         if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u) \
                 and not re.search(r"opt[\\s_-]?out|do[\\s_-]?not[\\s_-]?sell|privacy[\\s_-]?request", u, re.I): continue
         sc = max(P.link_score(u, text), P.link_score(u, text + " " + (around[0] if around else "")) - 2) + (8 if PORTAL_HOSTS.search(u) else 0)
         if sc >= 6: seen.add(u); out.append((sc, u))
-    return [u for _, u in sorted(out, reverse=True)[:3]]
+    return [u for _, u in sorted(out, reverse=True)[:5]]
 
 
 async def site(browser, domain, opt_url, sem):
@@ -127,7 +130,7 @@ async def site(browser, domain, opt_url, sem):
                     if u in tried: continue
                     tried.add(u)
                     sc, blockers, links, final = await look(ctx, u)
-                    if sc: return domain, "form", final, ";".join(("check:a bot check" if b == "check" else b) for b in blockers)
+                    if sc and urllib.parse.urlsplit(final).path not in ("", "/"): return domain, "form", final, ";".join(("check:a bot check" if b == "check" else b) for b in blockers)
                     nxt += good_links(final, links, own)
                 frontier = [u for u in nxt if u not in tried]
                 if not frontier: break

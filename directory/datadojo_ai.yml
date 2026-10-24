@@ -14,3 +14,10 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
   found: false
+closed:
+  checked: "2026-10-24"
+  evidence:
+    - "try 1 https://datadojo.ai: HTTP 403: host reports the name points to a prohibited address (Cloudflare error 1000); resolves to 23.227.38.65"
+    - "try 1 https://www.datadojo.ai: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NXDOMAIN, no address"
+    - "try 2 https://datadojo.ai: HTTP 403: host reports the name points to a prohibited address (Cloudflare error 1000); resolves to 23.227.38.65"
+    - "try 2 https://www.datadojo.ai: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NXDOMAIN, no address"

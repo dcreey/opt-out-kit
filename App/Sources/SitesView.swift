@@ -69,6 +69,18 @@ struct SitesView: View {
                 if !search.isEmpty, !queue.contains(where: { $0.tasks.contains { visible($0) } }) {
                     Section { Text("No site matches that search.").foregroundStyle(.secondary) }
                 }
+                if search.isEmpty || closedMatches {
+                    let closed = model.closedSites.filter { closedVisible($0) }
+                    if !closed.isEmpty {
+                        Section {
+                            NavigationLink { ClosedSitesView(sites: closed) } label: {
+                                Label(Loc.f("%lld sites no longer respond", closed.count), systemImage: "wifi.slash")
+                            }.accessibilityIdentifier("closed-sites")
+                        } footer: {
+                            Text("These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.")
+                        }
+                    }
+                }
                 Section {
                     scoreCard
                     Button { model.requireProfile { showQuick = true } } label: {
@@ -125,6 +137,13 @@ struct SitesView: View {
         let q = search.trimmingCharacters(in: .whitespaces).lowercased()
         guard !q.isEmpty else { return true }
         return task.title.lowercased().contains(q) || task.domains.contains { $0.lowercased().contains(q) }
+    }
+
+    private var closedMatches: Bool { model.closedSites.contains { closedVisible($0) } }
+
+    private func closedVisible(_ e: DirectoryEntry) -> Bool {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        return q.isEmpty || e.domain.lowercased().contains(q) || e.name.lowercased().contains(q)
     }
 
     private func directoryRow(_ e: DirectoryEntry) -> some View {
@@ -684,5 +703,34 @@ struct HealControls: View {
         .disabled(looking)
         .accessibilityIdentifier("find-current-page")
         if let message { Text(message).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("heal-message") }
+    }
+}
+
+
+/// The sites that no longer respond, each with the checks that showed it.
+struct ClosedSitesView: View {
+    let sites: [DirectoryEntry]
+
+    var body: some View {
+        List {
+            Section {
+                Text("Each site was tried at its plain and its www address, twice, and failed the same way every time. The same proof is kept in the project's CLOSED_SITES.md file.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            ForEach(sites) { e in
+                Section {
+                    ForEach(e.closed?.evidence ?? [], id: \.self) { line in
+                        Text(line).font(.caption.monospaced()).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                } header: {
+                    Text(e.domain).textCase(nil).font(.subheadline.bold())
+                } footer: {
+                    Text(Loc.f("Checked %@", e.closed?.checked ?? "-"))
+                }
+            }
+        }
+        .navigationTitle("No longer respond")
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier("closed-sites-list")
     }
 }

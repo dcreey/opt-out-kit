@@ -301,7 +301,10 @@ final class AppModel: ObservableObject {
     }
 
     /// Every site we track, each shown once in the Sites list (some as part of another site's request).
-    var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count }
+    var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count + closedSites.count }
+
+    /// Sites that no longer respond, with the evidence. They are not tasks: there is nothing left to opt out of.
+    var closedSites: [DirectoryEntry] { directory.filter { $0.closed != nil }.sorted { $0.domain < $1.domain } }
 
     // MARK: First-visit guides
 
@@ -342,7 +345,7 @@ final class AppModel: ObservableObject {
     /// The plan for any one person (the selected one is cached by `plan`).
     func buildPlan(for person: Person?) -> [PlanStep] {
         let eligible: [Platform] = person.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
-        return OptOutPlan.build(entries: directory, brokers: brokers, platforms: eligible,
+        return OptOutPlan.build(entries: directory.filter { $0.closed == nil }, brokers: brokers, platforms: eligible,
                                 classifyEntry: { method(for: $0, person: person) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
     }
 

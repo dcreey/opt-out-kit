@@ -594,6 +594,15 @@ final class DirectoryTests: XCTestCase {
         XCTAssertTrue(entries.allSatisfy { !$0.domain.isEmpty && $0.id == $0.domain.replacingOccurrences(of: ".", with: "_").replacingOccurrences(of: "-", with: "_") })
     }
 
+    func testEverySiteMarkedClosedCarriesItsEvidenceAndNoWayToOptOut() throws {
+        let closed = try Registry.loadDirectory(directoryURL).filter { $0.closed != nil }
+        XCTAssertGreaterThanOrEqual(closed.count, 10)
+        for e in closed {
+            XCTAssertGreaterThanOrEqual(e.closed?.evidence.count ?? 0, 4, "\(e.domain): two tries at two addresses")
+            XCTAssertTrue(e.optOutForm == nil && e.contactEmail == nil && e.liveForm?.found != true, "\(e.domain) has a way to opt out")
+        }
+    }
+
     func testFoundFormsDecodeWithTheirFields() throws {
         let entries = try Registry.loadDirectory(directoryURL)
         let withForm = entries.filter { $0.optOutForm != nil }

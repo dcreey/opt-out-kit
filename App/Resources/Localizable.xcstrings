@@ -990,6 +990,29 @@
     }
    }
   },
+  "%lld sites no longer respond": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites ne répondent plus"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios ya no responden"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Websites antworten nicht mehr"
+     }
+    }
+   }
+  },
   "%lld sites send their opt-outs to %@, so one request may clear them all. Not yet confirmed by a real run.": {
    "extractionState": "manual",
    "localizations": {
@@ -1354,6 +1377,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein einfaches Formular, das wir ausfüllen und senden können, ohne erkennbare Bot-Prüfung."
+     }
+    }
+   }
+  },
+  "A real run did not go through, so you do this one with a guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution réelle n’a pas abouti : vous faites celui-ci avec un guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución real no se completó, así que haces este con una guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein echter Durchlauf ging nicht durch, also machen Sie diese Seite mit einer Anleitung."
      }
     }
    }
@@ -3313,6 +3359,29 @@
     }
    }
   },
+  "Checked %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifié le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comprobado el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geprüft am %@"
+     }
+    }
+   }
+  },
   "Checked %lld of %lld sites": {
    "extractionState": "manual",
    "localizations": {
@@ -4597,6 +4666,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jede Website sieht nur die Angaben, die ihr Formular braucht"
+     }
+    }
+   }
+  },
+  "Each site was tried at its plain and its www address, twice, and failed the same way every time. The same proof is kept in the project's CLOSED_SITES.md file.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque site a été essayé deux fois, à son adresse simple et à son adresse www, et a échoué de la même façon à chaque fois. La même preuve est conservée dans le fichier CLOSED_SITES.md du projet."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada sitio se probó dos veces, en su dirección simple y en la de www, y falló igual todas las veces. La misma prueba se guarda en el archivo CLOSED_SITES.md del proyecto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Website wurde zweimal unter der einfachen und der www-Adresse aufgerufen und scheiterte jedes Mal auf dieselbe Weise. Derselbe Nachweis steht in der Datei CLOSED_SITES.md des Projekts."
      }
     }
    }
@@ -7062,6 +7154,29 @@
     }
    }
   },
+  "Loaded %@: nothing blocked the form. We fill it in and send it; you tick any check the site shows. A confirmed real run would make it automatic.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chargé le %@ : rien ne bloquait le formulaire. Nous le remplissons et l’envoyons ; vous cochez toute vérification affichée. Une exécution réelle confirmée le rendrait automatique."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cargado el %@: nada bloqueaba el formulario. Lo rellenamos y enviamos; tú marcas cualquier verificación que muestre. Una ejecución real confirmada lo haría automático."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geladen am %@: Nichts blockierte das Formular. Wir füllen es aus und senden es; Sie haken jede angezeigte Prüfung an. Ein bestätigter echter Durchlauf würde es automatisch machen."
+     }
+    }
+   }
+  },
   "Loaded %@: nothing blocks the form. If a check ever appears when sending, this site moves to semi-automated.": {
    "extractionState": "manual",
    "localizations": {
@@ -8530,6 +8645,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kein Eintrag gefunden"
+     }
+    }
+   }
+  },
+  "No longer respond": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne répondent plus"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ya no responden"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Antworten nicht mehr"
      }
     }
    }
@@ -14330,6 +14468,29 @@
     }
    }
   },
+  "The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire d’opposition apparaît quand la page se charge dans un navigateur. Nous le remplissons ; vous validez toute vérification affichée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario de baja aparece cuando la página carga en un navegador. Lo rellenamos; tú resuelves cualquier verificación que muestre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Opt-out-Formular erscheint, wenn die Seite in einem Browser lädt. Wir füllen es aus; Sie lösen jede angezeigte Prüfung."
+     }
+    }
+   }
+  },
   "The opt-out page has moved and we could not find the new one. You will need to find it yourself on the site; the steps below still apply.": {
    "extractionState": "manual",
    "localizations": {
@@ -14855,6 +15016,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese %lld Seiten sind für Sie ausgefüllt. Jede zeigt ein Feld „Bestätigen Sie, dass Sie ein Mensch sind“, das nur eine Person anhaken kann. Die nächste Seite lädt, während Sie die aktuelle anhaken: ein Tipp pro Seite."
+     }
+    }
+   }
+  },
+  "These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces sites ne répondent plus, il n'y a donc rien à supprimer. Nous gardons les preuves recueillies."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos sitios ya no responden, así que no hay nada de lo que darse de baja. Guardamos las pruebas que reunimos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Websites antworten nicht mehr, daher gibt es nichts abzumelden. Wir bewahren die gesammelten Nachweise auf."
      }
     }
    }

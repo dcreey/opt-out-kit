@@ -16,3 +16,10 @@ search_check:
 live_form:
   checked: "2026-10-23"
   found: false
+closed:
+  checked: "2026-10-24"
+  evidence:
+    - "try 1 https://govregistry.us: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says SERVFAIL, no address"
+    - "try 1 https://www.govregistry.us: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says SERVFAIL, no address"
+    - "try 2 https://govregistry.us: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says SERVFAIL, no address"
+    - "try 2 https://www.govregistry.us: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says SERVFAIL, no address"

@@ -14,3 +14,10 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
   found: false
+closed:
+  checked: "2026-10-24"
+  evidence:
+    - "try 1 https://nuwber.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NOERROR, no address"
+    - "try 1 https://www.nuwber.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NOERROR, no address"
+    - "try 2 https://nuwber.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NOERROR, no address"
+    - "try 2 https://www.nuwber.com: ERR_NAME_NOT_RESOLVED; DNS lookup failed (nodename nor servname provided, or not known); 8.8.8.8 says NOERROR, no address"
