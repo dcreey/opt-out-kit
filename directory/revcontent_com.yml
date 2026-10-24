@@ -15,4 +15,6 @@ signals: [email_input]
 profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
-  found: false
+  found: true
+  page: "https://www.revcontent.com/legal/optout/?hsCtaTracking=5306afdf-6769-4bd9-87ab-280b36dd7363%7C39c8c8b7-a7b1-4c60-9381-2624d1633c34"
+  blockers: []

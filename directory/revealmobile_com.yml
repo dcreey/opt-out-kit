@@ -14,4 +14,6 @@ signals: [email_contact, portal_osano]
 profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
-  found: false
+  found: true
+  page: "https://4785246.hs-sites.com/hs-web-interactive-4785246-210352946767?utm_campaign=cmp&utm_source=cmp-dialog&utm_medium=banner&utk=3d9498aa1dc465376bb1456cc18e827a&parentPageUrl=https%3A%2F%2Fwww.osano.com%2F&enableResponsiveStyles=true"
+  blockers: []

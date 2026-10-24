@@ -14,4 +14,6 @@ signals: [account_hint, email_contact, email_only_wording, mail_option, phone_ve
 profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
-  found: false
+  found: true
+  page: "https://360-media-direct.privacy.saymine.io/360_Media_Direct"
+  blockers: ["check:a bot check"]

@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-23"
   found: false
+contact_email: "privacy@idahoarrests.org"
+contact_email_source: "browser"
