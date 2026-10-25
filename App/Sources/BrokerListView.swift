@@ -14,6 +14,7 @@ struct BrokerListView: View {
     }
     @State private var showAuto = false
     @State private var chooser: ChooserMode?
+    @State private var summary: ActivitySummary?
 
     var body: some View {
         NavigationStack {
@@ -99,6 +100,12 @@ struct BrokerListView: View {
             }
             .accessibilityIdentifier("broker-list")
             .navigationTitle("Opt-Out Kit")
+            .sheet(isPresented: Binding(get: { summary != nil }, set: { if !$0 { summary = nil } })) {
+                if let sum = summary { DailySummaryView(summary: sum) { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { chooser = .start } } }
+            }
+            .onAppear {
+                if model.shouldShowDailySummary { summary = model.activitySummary; model.markDailySummaryShown() }
+            }
             .sheet(item: $chooser) { mode in
                 KindChooserView(mode: mode) { id in
                     switch mode { case .start: model.chooseFirstKind(id); case .more: model.addBatch(kind: id) }
@@ -307,3 +314,68 @@ struct HarmMeter: View {
 
 /// Darker for the kinds that matter most.
 func rankColor(_ rank: Int) -> Color { rank <= 4 ? .red : rank <= 9 ? .orange : rank <= 14 ? .blue : .gray }
+
+
+/// Shown the first time the app opens each day: what the person has done so far, led by their most recent work and what it did for them.
+struct DailySummaryView: View {
+    @EnvironmentObject var model: AppModel
+    @Environment(\.dismiss) private var dismiss
+    let summary: ActivitySummary
+    let chooseKind: () -> Void
+
+    private func title(_ kind: String) -> String { (BrokerCategory(rawValue: kind) ?? .other).title }
+
+    private var when: String {
+        guard let day = summary.lastDay else { return "" }
+        let f = RelativeDateTimeFormatter(); f.dateTimeStyle = .named; f.unitsStyle = .full
+        let text = f.localizedString(for: day, relativeTo: Calendar.current.startOfDay(for: Date()))
+        return text.prefix(1).uppercased() + text.dropFirst()
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(summary.sites == 1 ? Loc.t("You have asked 1 site to remove you") : Loc.f("You have asked %lld sites to remove you", summary.sites)).font(.title3.bold())
+                        if summary.emails > 0 { Text(Loc.f("and emailed %lld more as a second route", summary.emails)).font(.subheadline).foregroundStyle(.secondary) }
+                        if summary.activeDays > 1 { Text(Loc.f("across %lld days. Every request counts.", summary.activeDays)).font(.footnote).foregroundStyle(.secondary) }
+                    }
+                    .accessibilityIdentifier("summary-headline")
+                }
+                if summary.lastDay != nil, summary.lastDaySites > 0 {
+                    Section {
+                        ForEach(summary.lastDayKinds.prefix(3), id: \.kind) { item in
+                            let category = BrokerCategory(rawValue: item.kind) ?? .other
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(item.count == 1 ? Loc.f("%@: 1 site", category.title) : Loc.f("%@: %lld sites", category.title, item.count)).font(.headline)
+                                Label(category.protects, systemImage: "checkmark.shield.fill").font(.footnote).foregroundStyle(.green)
+                            }
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
+                    } header: { Text(summary.lastDaySites == 1 ? Loc.f("%@ you sent 1 request", when) : Loc.f("%@ you sent %lld requests", when, summary.lastDaySites)).textCase(nil).font(.subheadline.bold()) }
+                      footer: { Text(FollowUpNote.text) }
+                }
+                if summary.byKind.count > 1 {
+                    Section {
+                        ForEach(summary.byKind.prefix(6), id: \.kind) { item in
+                            HStack { Text(title(item.kind)); Spacer(); Text("\(item.count)").foregroundStyle(.secondary) }
+                        }
+                    } header: { Text("So far, by kind of broker") }
+                }
+                if let next = model.remainingKinds.first {
+                    Section {
+                        let category = BrokerCategory(rawValue: next.kind) ?? .other
+                        Label(Loc.f("Next up: %@, %lld left", category.title, next.count), systemImage: "arrow.forward.circle.fill").font(.headline)
+                        Text(category.rankReason).font(.footnote).foregroundStyle(.secondary)
+                        Button("Choose today's kind of broker") { dismiss(); chooseKind() }.accessibilityIdentifier("summary-choose")
+                    } header: { Text("Today") }
+                }
+            }
+            .navigationTitle("Welcome back")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Continue") { dismiss() }.accessibilityIdentifier("summary-continue") } }
+        }
+        .accessibilityIdentifier("daily-summary")
+    }
+}

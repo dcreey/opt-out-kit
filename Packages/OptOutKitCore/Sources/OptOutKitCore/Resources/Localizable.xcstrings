@@ -2899,6 +2899,29 @@
     }
    }
   },
+  "Dealers and insurers have less to go on about your car and when you might buy.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concessionnaires et assureurs ont moins d'éléments sur votre voiture et le moment où vous pourriez acheter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concesionarios y aseguradoras tienen menos datos sobre tu coche y cuándo podrías comprar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Händler und Versicherer wissen weniger über Ihr Auto und wann Sie kaufen könnten."
+     }
+    }
+   }
+  },
   "Dealers and insurers learn about your car and when you may buy. Costly in rates at worst, rarely dangerous.": {
    "extractionState": "manual",
    "localizations": {
@@ -3401,6 +3424,121 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wenige Seiten, und die Gefährdung betrifft vor allem Verwandte und Adressen lebender Personen. Geringes Volumen, daher weiter unten."
+     }
+    }
+   }
+  },
+  "Fewer ad companies can trade your devices and browsing, so ads follow you around less.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises publicitaires peuvent échanger vos appareils et votre navigation : les pubs vous suivent moins."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas de anuncios pueden intercambiar tus dispositivos y navegación, así que los anuncios te siguen menos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Werbefirmen können Ihre Geräte und Ihr Surfen handeln, sodass Ihnen Werbung weniger folgt."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell estimates of your income and wealth, which means fewer scams aimed at you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des estimations de vos revenus et de votre patrimoine : moins d'arnaques vous visent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender estimaciones de tus ingresos y patrimonio, lo que significa menos estafas dirigidas a ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Schätzungen Ihres Einkommens und Vermögens verkaufen, also weniger Betrug gegen Sie."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell guesses about your health to marketers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des déductions sur votre santé aux marketeurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender suposiciones sobre tu salud a especialistas en marketing."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Vermutungen über Ihre Gesundheit an Marketer verkaufen."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell lists with your name, address and habits, so there are fewer targeted scams and less junk mail and fewer calls.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des listes avec votre nom, adresse et habitudes : moins d'arnaques ciblées, de courrier indésirable et d'appels."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender listas con tu nombre, dirección y hábitos, así que hay menos estafas dirigidas, correo basura y llamadas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Listen mit Ihrem Namen, Ihrer Adresse und Ihren Gewohnheiten verkaufen, also weniger gezielter Betrug, Werbepost und Anrufe."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell where your phone goes, which protects where you live, work and get care.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre où va votre téléphone, ce qui protège où vous habitez, travaillez et vous faites soigner."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender adónde va tu teléfono, lo que protege dónde vives, trabajas y recibes atención."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können verkaufen, wohin Ihr Handy geht, was schützt, wo Sie wohnen, arbeiten und behandelt werden."
      }
     }
    }
@@ -4551,6 +4689,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Rechtlicher Name"
+     }
+    }
+   }
+  },
+  "Less commercial data is added to the voter and donor lists used to target you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins de données commerciales s'ajoutent aux fichiers d'électeurs et de donateurs utilisés pour vous cibler."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se añaden menos datos comerciales a los padrones de votantes y listas de donantes usados para dirigirse a ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger kommerzielle Daten fließen in die Wähler- und Spenderlisten, mit denen Sie angesprochen werden."
+     }
+    }
+   }
+  },
+  "Less of your history is available to marketers, though credit and screening reports often stay on file by law.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins de votre historique est accessible aux marketeurs, même si les rapports de crédit et de vérification restent souvent archivés selon la loi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hay menos de tu historial disponible para especialistas en marketing, aunque los informes de crédito y verificación suelen conservarse por ley."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Ihrer Historie steht Marketern zur Verfügung, auch wenn Kredit- und Prüfberichte gesetzlich oft gespeichert bleiben."
      }
     }
    }
@@ -5820,6 +6004,29 @@
     }
    }
   },
+  "Old or dropped charges are harder for employers, landlords and neighbors to find on those sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les anciennes accusations ou celles abandonnées sont plus difficiles à trouver pour employeurs, propriétaires et voisins sur ces sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los cargos antiguos o retirados son más difíciles de encontrar para empleadores, arrendadores y vecinos en esos sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alte oder fallengelassene Anschuldigungen sind für Arbeitgeber, Vermieter und Nachbarn auf diesen Seiten schwerer zu finden."
+     }
+    }
+   }
+  },
   "One form fill can sell your phone number to dozens of buyers, which is the main reason spam calls and texts multiply.": {
    "extractionState": "manual",
    "localizations": {
@@ -6694,6 +6901,29 @@
     }
    }
   },
+  "Recruiters and scammers posting fake jobs can find you less easily through those sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruteurs et escrocs publiant de fausses offres vous trouvent plus difficilement via ces sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reclutadores y estafadores que publican falsos empleos te encuentran con más dificultad en esos sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruiter und Betrüger mit falschen Jobangeboten finden Sie über diese Seiten schwerer."
+     }
+    }
+   }
+  },
   "Recruiting and workforce data": {
    "extractionState": "manual",
    "localizations": {
@@ -7292,6 +7522,29 @@
     }
    }
   },
+  "Some of your identity data is removed from their products, which shrinks what a breach or a wrong buyer could expose.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une partie de vos données d'identité est retirée de leurs produits, ce qui réduit ce qu'une fuite ou un mauvais acheteur pourrait exposer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parte de tus datos de identidad se quita de sus productos, lo que reduce lo que una filtración o un mal comprador podría exponer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Teil Ihrer Identitätsdaten wird aus ihren Produkten entfernt, was verringert, was eine Panne oder ein falscher Käufer offenlegen könnte."
+     }
+    }
+   }
+  },
   "Some places go further than %@. Here is what stronger rules look like, so you know what to expect and what a family member living there would get:": {
    "extractionState": "manual",
    "localizations": {
@@ -7495,6 +7748,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gestoppt: %@"
+     }
+    }
+   }
+  },
+  "Strangers can no longer look you up on those sites to find your address, phone number and relatives.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Des inconnus ne peuvent plus vous chercher sur ces sites pour trouver votre adresse, votre numéro et vos proches."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los desconocidos ya no pueden buscarte en esos sitios para encontrar tu dirección, teléfono y familiares."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fremde können Sie auf diesen Seiten nicht mehr suchen, um Ihre Adresse, Telefonnummer und Verwandten zu finden."
      }
     }
    }
@@ -8143,6 +8419,29 @@
     }
    }
   },
+  "Their campaigns stop mailing and emailing you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Leurs campagnes cessent de vous envoyer courrier et e-mails."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sus campañas dejan de enviarte correo y emails."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Kampagnen schicken Ihnen keine Post und E-Mails mehr."
+     }
+    }
+   }
+  },
   "Their file leaks or is bought by a stalker or scammer, or a mistake in it flags you as a fraud risk and gets you declined for an account, with no easy way to see or fix why.": {
    "extractionState": "manual",
    "localizations": {
@@ -8507,6 +8806,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Seite nimmt Opt-outs per E-Mail an: schreiben Sie an %@. Wir bereiten die Nachricht für Sie vor."
+     }
+    }
+   }
+  },
+  "Those companies hold less of your data.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces entreprises détiennent moins de vos données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esas empresas tienen menos de tus datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Firmen halten weniger Ihrer Daten."
      }
     }
    }
@@ -9684,6 +10006,29 @@
     }
    }
   },
+  "Your details are less likely to be resold as a lead, so there is less spam calling and texting.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos coordonnées risquent moins d'être revendues comme prospect : moins d'appels et SMS indésirables."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es menos probable que tus datos se revendan como cliente potencial, así que hay menos llamadas y mensajes basura."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Daten werden seltener als Lead weiterverkauft, also weniger Spam-Anrufe und SMS."
+     }
+    }
+   }
+  },
   "Your driving or vehicle history is sold to insurers who raise your rates, or dealers learn when you are likely to buy and pressure you.": {
    "extractionState": "manual",
    "localizations": {
@@ -9753,6 +10098,29 @@
     }
    }
   },
+  "Your home and what you owe are harder for investors, scammers and stalkers to use.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre logement et vos dettes sont plus difficiles à exploiter pour investisseurs, escrocs et harceleurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu casa y lo que debes son más difíciles de usar para inversores, estafadores y acosadores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Zuhause und Ihre Schulden sind für Investoren, Betrüger und Stalker schwerer zu nutzen."
+     }
+    }
+   }
+  },
   "Your party, voting history and donations, where public, are used to target you with political messages. Opting out limits what is added from commercial sources.": {
    "extractionState": "manual",
    "localizations": {
@@ -9818,6 +10186,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Der offizielle Löschdienst Ihres Ortes"
+     }
+    }
+   }
+  },
+  "Your record is hidden from family-tree searches, so strangers have a harder time finding living relatives.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre fiche est masquée des recherches généalogiques : des inconnus trouvent plus difficilement vos proches vivants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu registro se oculta de las búsquedas genealógicas, así que a los desconocidos les cuesta más encontrar a familiares vivos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Eintrag ist in Stammbaumsuchen verborgen, sodass Fremde lebende Verwandte schwerer finden."
      }
     }
    }
@@ -9956,6 +10347,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Wahlhistorie und Spenden werden genutzt, um Sie mit irreführenden Botschaften anzusprechen, oder Ihre Spenderdaten werden geteilt und Sie werden mit Bitten überhäuft."
+     }
+    }
+   }
+  },
+  "Your work email and phone are harder for salespeople and scammers to buy, so cold outreach to your work address drops.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre e-mail et votre téléphone professionnels sont plus difficiles à acheter pour commerciaux et escrocs : moins de sollicitations à votre adresse pro."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu correo y teléfono de trabajo son más difíciles de comprar para vendedores y estafadores, así que baja la prospección a tu dirección de trabajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Firmen-E-Mail und Telefonnummer sind für Vertriebler und Betrüger schwerer zu kaufen, daher sinkt die Kaltansprache."
      }
     }
    }

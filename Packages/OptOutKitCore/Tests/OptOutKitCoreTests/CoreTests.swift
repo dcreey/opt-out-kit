@@ -2686,3 +2686,48 @@ final class BrokerRankTests: XCTestCase {
         XCTAssertLessThan(BrokerCategory.location_data.rank, BrokerCategory.adtech.rank)
     }
 }
+
+
+final class DailyResetAndSummaryTests: XCTestCase {
+    private func entry(_ i: Int, _ kind: String) -> DirectoryEntry {
+        var e = DirectoryEntry(id: "s\(i)", domain: "s\(i).com", name: "s\(i)", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.about = BrokerAbout(category: kind, summary: "s"); return e
+    }
+
+    func testEachDayStartsAtTheBestRankedKindUnlessTodaysWorkIsUnderway() {
+        // Queue order puts ad tech first; people search outranks it.
+        let entries = (0..<20).map { entry($0, $0 < 10 ? "adtech" : "people_search") }
+        let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date(), yesterday = now.addingTimeInterval(-86_400)
+        // Nothing done: the best-ranked kind.
+        XCTAssertEqual(DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal).themes, ["people_search"])
+        // Ad tech finished YESTERDAY does not pull today toward ad tech: the day resets.
+        let past = ["s0": [OptOutAttempt(date: yesterday, outcome: "submitted")]]
+        XCTAssertEqual(DailyGoals.build(queue: queue, entries: entries, attempts: past, now: now, calendar: cal).themes, ["people_search"])
+        // Ad tech started TODAY and still unfinished: stay on it.
+        let today = ["s0": [OptOutAttempt(date: now, outcome: "submitted")]]
+        let g = DailyGoals.build(queue: queue, entries: entries, attempts: today, now: now, calendar: cal)
+        XCTAssertEqual(g.themes, ["adtech"]); XCTAssertEqual(g.verifyDone, 1)
+        // The chooser counts only sites still unfinished.
+        let left = DailyGoals.remainingByKind(queue: queue, entries: entries, attempts: today, now: now, calendar: cal)
+        XCTAssertEqual(left.first?.kind, "people_search"); XCTAssertEqual(left.first(where: { $0.kind == "adtech" })?.count, 9)
+    }
+
+    func testTheSummaryCountsSitesEmailsAndTheMostRecentDay() {
+        let entries = [entry(0, "people_search"), entry(1, "people_search"), entry(2, "adtech"), entry(3, "adtech")]
+        let cal = Calendar(identifier: .gregorian), now = Date(), d1 = now.addingTimeInterval(-3 * 86_400), d2 = now.addingTimeInterval(-86_400)
+        let attempts: [String: [OptOutAttempt]] = [
+            "s0": [OptOutAttempt(date: d1, outcome: "submitted"), OptOutAttempt(date: d1, outcome: "emailed")],
+            "s1": [OptOutAttempt(date: d2, outcome: "submitted")],
+            "s2": [OptOutAttempt(date: d2, outcome: "submitted_email")],
+            "s3": [OptOutAttempt(date: d2, outcome: "failed")],
+        ]
+        let s = ActivitySummary.build(entries: entries, attempts: attempts, calendar: cal)
+        XCTAssertEqual(s.sites, 3); XCTAssertEqual(s.emails, 1); XCTAssertEqual(s.activeDays, 2)
+        XCTAssertEqual(s.lastDay, cal.startOfDay(for: d2)); XCTAssertEqual(s.lastDaySites, 2)
+        XCTAssertEqual(Set(s.lastDayKinds.map(\.kind)), ["people_search", "adtech"])
+        XCTAssertEqual(s.byKind.first, KindCount(kind: "people_search", count: 2), "most first")
+        XCTAssertFalse(s.isEmpty)
+        XCTAssertTrue(ActivitySummary.build(entries: entries, attempts: [:], calendar: cal).isEmpty)
+        for c in BrokerCategory.allCases { XCTAssertFalse(c.protects.isEmpty) }
+    }
+}

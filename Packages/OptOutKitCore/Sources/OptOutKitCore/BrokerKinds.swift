@@ -110,6 +110,30 @@ public extension BrokerCategory {
         }
     }
 
+    /// What a finished opt-out of this kind does for you, in plain words.
+    var protects: String {
+        switch self {
+        case .people_search: return L10n.t("Strangers can no longer look you up on those sites to find your address, phone number and relatives.")
+        case .arrests: return L10n.t("Old or dropped charges are harder for employers, landlords and neighbors to find on those sites.")
+        case .consumer_reporting: return L10n.t("Less of your history is available to marketers, though credit and screening reports often stay on file by law.")
+        case .marketing_data: return L10n.t("Fewer companies can sell lists with your name, address and habits, so there are fewer targeted scams and less junk mail and fewer calls.")
+        case .b2b: return L10n.t("Your work email and phone are harder for salespeople and scammers to buy, so cold outreach to your work address drops.")
+        case .adtech: return L10n.t("Fewer ad companies can trade your devices and browsing, so ads follow you around less.")
+        case .healthcare: return L10n.t("Fewer companies can sell guesses about your health to marketers.")
+        case .financial: return L10n.t("Fewer companies can sell estimates of your income and wealth, which means fewer scams aimed at you.")
+        case .fraud_identity: return L10n.t("Some of your identity data is removed from their products, which shrinks what a breach or a wrong buyer could expose.")
+        case .real_estate: return L10n.t("Your home and what you owe are harder for investors, scammers and stalkers to use.")
+        case .genealogy: return L10n.t("Your record is hidden from family-tree searches, so strangers have a harder time finding living relatives.")
+        case .lead_generation: return L10n.t("Your details are less likely to be resold as a lead, so there is less spam calling and texting.")
+        case .political: return L10n.t("Less commercial data is added to the voter and donor lists used to target you.")
+        case .recruiting: return L10n.t("Recruiters and scammers posting fake jobs can find you less easily through those sites.")
+        case .automotive: return L10n.t("Dealers and insurers have less to go on about your car and when you might buy.")
+        case .location_data: return L10n.t("Fewer companies can sell where your phone goes, which protects where you live, work and get care.")
+        case .marketing_services: return L10n.t("Their campaigns stop mailing and emailing you.")
+        case .other: return L10n.t("Those companies hold less of your data.")
+        }
+    }
+
     /// Every kind in the default order.
     static var ranked: [BrokerCategory] { allCases.sorted { $0.rank < $1.rank } }
 }

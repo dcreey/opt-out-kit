@@ -639,6 +639,18 @@ final class AppModel: ObservableObject {
         DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts)
     }
 
+    // MARK: Daily summary
+
+    private static let summaryDayKey = "summary.day"
+
+    /// What the selected person has done so far, for the welcome-back summary.
+    var activitySummary: ActivitySummary { ActivitySummary.build(entries: directory, attempts: progress.optOutAttempts) }
+
+    /// True the first time the app is opened each day, once there is something to summarize.
+    var shouldShowDailySummary: Bool { defaults.string(forKey: Self.summaryDayKey) != Self.dayString(Date()) && !activitySummary.isEmpty }
+
+    func markDailySummaryShown() { defaults.set(Self.dayString(Date()), forKey: Self.summaryDayKey) }
+
     private static func dayString(_ d: Date) -> String { let c = Calendar.current.dateComponents([.year, .month, .day], from: d); return "\(c.year ?? 0)-\(c.month ?? 0)-\(c.day ?? 0)" }
 
     /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.

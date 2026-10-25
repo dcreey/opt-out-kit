@@ -507,6 +507,52 @@
     }
    }
   },
+  "%@ you sent %lld requests": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ vous avez envoyé %lld demandes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ enviaste %lld solicitudes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ haben Sie %lld Anfragen gesendet"
+     }
+    }
+   }
+  },
+  "%@ you sent 1 request": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ vous avez envoyé 1 demande"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ enviaste 1 solicitud"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ haben Sie 1 Anfrage gesendet"
+     }
+    }
+   }
+  },
   "%@ · %@": {
    "extractionState": "manual",
    "localizations": {
@@ -595,6 +641,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Datenschutzgesetz von %@, der %@ (tritt am %@ in Kraft), gibt Einwohnern das Recht, ihre Daten löschen zu lassen und dem Verkauf zu widersprechen. Bis dahin müssen Broker es nicht beachten."
+     }
+    }
+   }
+  },
+  "%@: %lld sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ : %lld sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@: %lld sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@: %lld Websites"
+     }
+    }
+   }
+  },
+  "%@: 1 site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ : 1 site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@: 1 sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@: 1 Website"
      }
     }
    }
@@ -1956,6 +2048,29 @@
     }
    }
   },
+  "A single old or dropped charge can cost a job or a home, and these sites often charge to remove it. The damage is lasting and public.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule ancienne accusation peut coûter un emploi ou un logement, et ces sites font souvent payer le retrait. Le dommage est durable et public."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un solo cargo antiguo o retirado puede costar un empleo o una vivienda, y estos sitios suelen cobrar por retirarlo. El daño es duradero y público."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine einzige alte oder fallengelassene Anschuldigung kann eine Stelle oder Wohnung kosten, und diese Seiten verlangen oft Geld für die Entfernung. Der Schaden ist dauerhaft und öffentlich."
+     }
+    }
+   }
+  },
   "A stalker or abusive ex finds your new address within minutes of you moving, or a scammer uses your relatives' names to make a convincing call to your parents.": {
    "extractionState": "manual",
    "localizations": {
@@ -3079,6 +3194,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jeder kann genau prüfen, was diese App tut."
+     }
+    }
+   }
+  },
+  "Anyone can use it for free, and the worst case is physical: a stalker or abuser finding where you live. Removing yourself here does the most for your safety.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "N'importe qui peut l'utiliser gratuitement, et le pire cas est physique : un harceleur ou un agresseur qui découvre où vous habitez. Vous retirer ici fait le plus pour votre sécurité."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquiera puede usarlo gratis y el peor caso es físico: un acosador o agresor que descubre dónde vives. Darte de baja aquí es lo que más hace por tu seguridad."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jeder kann es kostenlos nutzen, und der schlimmste Fall ist körperlich: ein Stalker oder Täter, der herausfindet, wo Sie wohnen. Sich hier zu entfernen bringt für Ihre Sicherheit am meisten."
      }
     }
    }
@@ -5590,6 +5728,52 @@
     }
    }
   },
+  "Dealers and insurers have less to go on about your car and when you might buy.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concessionnaires et assureurs ont moins d'éléments sur votre voiture et le moment où vous pourriez acheter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concesionarios y aseguradoras tienen menos datos sobre tu coche y cuándo podrías comprar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Händler und Versicherer wissen weniger über Ihr Auto und wann Sie kaufen könnten."
+     }
+    }
+   }
+  },
+  "Dealers and insurers learn about your car and when you may buy. Costly in rates at worst, rarely dangerous.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concessionnaires et assureurs apprennent tout sur votre voiture et quand vous pourriez acheter. Coûteux en primes au pire, rarement dangereux."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Concesionarios y aseguradoras saben de tu coche y cuándo podrías comprar. Costoso en tarifas en el peor caso, rara vez peligroso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Händler und Versicherer erfahren von Ihrem Auto und wann Sie kaufen könnten. Im schlimmsten Fall teuer bei den Beiträgen, selten gefährlich."
+     }
+    }
+   }
+  },
   "Delaware": {
    "extractionState": "manual",
    "localizations": {
@@ -5701,6 +5885,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Löscht Profil und Fortschritt von diesem Telefon."
+     }
+    }
+   }
+  },
+  "Detailed identity files are what thieves want and they can be wrong. Some uses are exempt by law, so opting out helps but not completely.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les fichiers d'identité détaillés sont ce que veulent les voleurs, et ils peuvent être faux. Certains usages sont exemptés par la loi : se retirer aide, mais pas complètement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los expedientes de identidad detallados son lo que quieren los ladrones y pueden estar equivocados. Algunos usos están exentos por ley, así que darte de baja ayuda, pero no del todo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Detaillierte Identitätsakten sind das, was Diebe wollen, und sie können falsch sein. Manche Nutzungen sind gesetzlich ausgenommen, daher hilft ein Opt-out, aber nicht vollständig."
      }
     }
    }
@@ -5908,6 +6115,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Als Nächstes erledigen"
+     }
+    }
+   }
+  },
+  "Does not fit a type, so read what they collect before deciding.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne rentre dans aucun type : lisez ce qu'ils collectent avant de décider."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No encaja en ningún tipo: lee lo que recopilan antes de decidir."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passt zu keiner Art: Lesen Sie, was sie erfassen, bevor Sie entscheiden."
      }
     }
    }
@@ -6349,6 +6579,29 @@
     }
    }
   },
+  "Estimates of your income and wealth attract scams and quietly change the offers you see.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les estimations de vos revenus et de votre patrimoine attirent les arnaques et modifient discrètement les offres que vous voyez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las estimaciones de tus ingresos y patrimonio atraen estafas y cambian discretamente las ofertas que ves."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schätzungen Ihres Einkommens und Vermögens ziehen Betrug an und verändern unbemerkt die Angebote, die Sie sehen."
+     }
+    }
+   }
+  },
   "European Union": {
    "extractionState": "manual",
    "localizations": {
@@ -6667,6 +6920,144 @@
      "stringUnit": {
       "state": "translated",
       "value": "Familienforschungsseiten, die öffentliche Register, Volkszählungen und andere Datenbanken nutzen, um Stammbäume zu erstellen, manchmal auch von lebenden Personen."
+     }
+    }
+   }
+  },
+  "Few sites, and the exposure is mostly to relatives and addresses of living people. Low volume, so it is lower on the list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Peu de sites, et l'exposition concerne surtout les proches et les adresses de personnes vivantes. Faible volume, donc plus bas dans la liste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pocos sitios, y la exposición afecta sobre todo a familiares y direcciones de personas vivas. Poco volumen, por eso va más abajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenige Seiten, und die Gefährdung betrifft vor allem Verwandte und Adressen lebender Personen. Geringes Volumen, daher weiter unten."
+     }
+    }
+   }
+  },
+  "Fewer ad companies can trade your devices and browsing, so ads follow you around less.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises publicitaires peuvent échanger vos appareils et votre navigation : les pubs vous suivent moins."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas de anuncios pueden intercambiar tus dispositivos y navegación, así que los anuncios te siguen menos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Werbefirmen können Ihre Geräte und Ihr Surfen handeln, sodass Ihnen Werbung weniger folgt."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell estimates of your income and wealth, which means fewer scams aimed at you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des estimations de vos revenus et de votre patrimoine : moins d'arnaques vous visent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender estimaciones de tus ingresos y patrimonio, lo que significa menos estafas dirigidas a ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Schätzungen Ihres Einkommens und Vermögens verkaufen, also weniger Betrug gegen Sie."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell guesses about your health to marketers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des déductions sur votre santé aux marketeurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender suposiciones sobre tu salud a especialistas en marketing."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Vermutungen über Ihre Gesundheit an Marketer verkaufen."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell lists with your name, address and habits, so there are fewer targeted scams and less junk mail and fewer calls.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre des listes avec votre nom, adresse et habitudes : moins d'arnaques ciblées, de courrier indésirable et d'appels."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender listas con tu nombre, dirección y hábitos, así que hay menos estafas dirigidas, correo basura y llamadas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können Listen mit Ihrem Namen, Ihrer Adresse und Ihren Gewohnheiten verkaufen, also weniger gezielter Betrug, Werbepost und Anrufe."
+     }
+    }
+   }
+  },
+  "Fewer companies can sell where your phone goes, which protects where you live, work and get care.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins d'entreprises peuvent vendre où va votre téléphone, ce qui protège où vous habitez, travaillez et vous faites soigner."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Menos empresas pueden vender adónde va tu teléfono, lo que protege dónde vives, trabajas y recibes atención."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Firmen können verkaufen, wohin Ihr Handy geht, was schützt, wo Sie wohnen, arbeiten und behandelt werden."
      }
     }
    }
@@ -7357,6 +7748,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Großelternteil"
+     }
+    }
+   }
+  },
+  "Guesses about your health are the most personal data there is, and you cannot see or correct what they think you have.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les déductions sur votre santé sont les données les plus personnelles qui soient, et vous ne pouvez ni voir ni corriger ce qu'ils pensent de vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las suposiciones sobre tu salud son los datos más personales que existen, y no puedes ver ni corregir lo que creen de ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vermutungen über Ihre Gesundheit sind die persönlichsten Daten überhaupt, und Sie können nicht sehen oder korrigieren, was man über Sie denkt."
      }
     }
    }
@@ -9017,6 +9431,52 @@
     }
    }
   },
+  "Less commercial data is added to the voter and donor lists used to target you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins de données commerciales s'ajoutent aux fichiers d'électeurs et de donateurs utilisés pour vous cibler."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se añaden menos datos comerciales a los padrones de votantes y listas de donantes usados para dirigirse a ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger kommerzielle Daten fließen in die Wähler- und Spenderlisten, mit denen Sie angesprochen werden."
+     }
+    }
+   }
+  },
+  "Less of your history is available to marketers, though credit and screening reports often stay on file by law.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Moins de votre historique est accessible aux marketeurs, même si les rapports de crédit et de vérification restent souvent archivés selon la loi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hay menos de tu historial disponible para especialistas en marketing, aunque los informes de crédito y verificación suelen conservarse por ley."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weniger Ihrer Historie steht Marketern zur Verfügung, auch wenn Kredit- und Prüfberichte gesetzlich oft gespeichert bleiben."
+     }
+    }
+   }
+  },
   "Let the app do these for you": {
    "extractionState": "manual",
    "localizations": {
@@ -10121,6 +10581,75 @@
     }
    }
   },
+  "Mostly cold outreach to your work address. Annoying, and occasionally used to impersonate a boss, but it rarely reaches your home.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Surtout des sollicitations à votre adresse pro. Agaçant, parfois utilisé pour se faire passer pour un patron, mais atteint rarement votre domicile."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sobre todo mensajes comerciales a tu dirección de trabajo. Molesto y a veces usado para suplantar a un jefe, pero rara vez llega a tu casa."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meist Kaltansprache an Ihre Arbeitsadresse. Lästig und gelegentlich zur Vortäuschung eines Chefs genutzt, erreicht aber selten Ihr Zuhause."
+     }
+    }
+   }
+  },
+  "Mostly tied to devices, not names, and there are over a hundred of them, so opting out of one removes little. Lowest value per site of the data-heavy types.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Surtout liés aux appareils, pas aux noms, et ils sont plus d'une centaine : se retirer de l'un retire peu. Valeur la plus faible par site parmi les types riches en données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sobre todo ligados a dispositivos, no a nombres, y hay más de cien: darte de baja de uno quita poco. Menor valor por sitio entre los tipos con muchos datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meist an Geräte gebunden, nicht an Namen, und es gibt über hundert: Ein Opt-out bei einer entfernt wenig. Geringster Wert pro Seite unter den datenreichen Arten."
+     }
+    }
+   }
+  },
+  "Mostly unwanted messages and solicitations. Voting records are public by law, so opting out limits only the commercial additions.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Surtout des messages et sollicitations non désirés. Les listes électorales sont publiques par la loi, donc se retirer ne limite que les ajouts commerciaux."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sobre todo mensajes y solicitudes no deseados. Los registros de votantes son públicos por ley, así que darte de baja solo limita los añadidos comerciales."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meist unerwünschte Nachrichten und Spendenbitten. Wählerverzeichnisse sind per Gesetz öffentlich, ein Opt-out begrenzt daher nur kommerzielle Ergänzungen."
+     }
+    }
+   }
+  },
   "Moving through the legislature, not law yet: %@. %@": {
    "extractionState": "manual",
    "localizations": {
@@ -10669,6 +11198,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nächster Schritt"
+     }
+    }
+   }
+  },
+  "Next up: %@, %lld left": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À suivre : %@, %lld restants"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "A continuación: %@, quedan %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als Nächstes: %@, noch %lld"
      }
     }
    }
@@ -11547,6 +12099,29 @@
     }
    }
   },
+  "Old or dropped charges are harder for employers, landlords and neighbors to find on those sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les anciennes accusations ou celles abandonnées sont plus difficiles à trouver pour employeurs, propriétaires et voisins sur ces sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los cargos antiguos o retirados son más difíciles de encontrar para empleadores, arrendadores y vecinos en esos sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alte oder fallengelassene Anschuldigungen sind für Arbeitgeber, Vermieter und Nachbarn auf diesen Seiten schwerer zu finden."
+     }
+    }
+   }
+  },
   "On forms we use %@": {
    "extractionState": "manual",
    "localizations": {
@@ -11658,6 +12233,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein %@-Antrag erreicht diese Website zusammen mit den übrigen. Er liegt in Ihrer Warteschlange auf dem ersten Tab."
+     }
+    }
+   }
+  },
+  "One form fill can sell your phone number to dozens of buyers, which is the main reason spam calls and texts multiply.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un seul formulaire peut vendre votre numéro à des dizaines d'acheteurs, ce qui explique la multiplication des appels et SMS indésirables."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar un formulario puede vender tu teléfono a decenas de compradores, la razón principal de que se multipliquen las llamadas y mensajes basura."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein einziges Formular kann Ihre Nummer an Dutzende Käufer verkaufen, der Hauptgrund für die Flut an Spam-Anrufen und SMS."
      }
     }
    }
@@ -13778,6 +14376,29 @@
     }
    }
   },
+  "Recruiters and scammers posting fake jobs can find you less easily through those sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruteurs et escrocs publiant de fausses offres vous trouvent plus difficilement via ces sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reclutadores y estafadores que publican falsos empleos te encuentran con más dificultad en esos sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruiter und Betrüger mit falschen Jobangeboten finden Sie über diese Seiten schwerer."
+     }
+    }
+   }
+  },
   "Recruiting and workforce data": {
    "extractionState": "manual",
    "localizations": {
@@ -15641,6 +16262,29 @@
     }
    }
   },
+  "So far, by kind of broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jusqu'ici, par type de courtier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hasta ahora, por tipo de corredor"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bisher, nach Brokerart"
+     }
+    }
+   }
+  },
   "Social media profiles": {
    "extractionState": "manual",
    "localizations": {
@@ -15775,6 +16419,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manche Broker-Websites zeigen vor ihrem Opt-out-Formular ein Fenster „Ich stimme unseren Bedingungen zu“. Wenn Sie es erlauben, drücken wir diese Schaltfläche für Sie, aber nur, wenn jeder Absatz des Fensters und der verlinkten Bedingungsseiten auf einer Liste steht, die eine Person gelesen und für akzeptabel befunden hat. So laufen mehr Opt-outs ohne Ihr Zutun."
+     }
+    }
+   }
+  },
+  "Some of your identity data is removed from their products, which shrinks what a breach or a wrong buyer could expose.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une partie de vos données d'identité est retirée de leurs produits, ce qui réduit ce qu'une fuite ou un mauvais acheteur pourrait exposer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parte de tus datos de identidad se quita de sus productos, lo que reduce lo que una filtración o un mal comprador podría exponer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Teil Ihrer Identitätsdaten wird aus ihren Produkten entfernt, was verringert, was eine Panne oder ein falscher Käufer offenlegen könnte."
      }
     }
    }
@@ -16373,6 +17040,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Verschlüsselt auf diesem Telefon gespeichert. Es gibt weder Server noch Konto; die App kontaktiert nur die Broker-Websites, bei denen Sie sich abmelden."
+     }
+    }
+   }
+  },
+  "Strangers can no longer look you up on those sites to find your address, phone number and relatives.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Des inconnus ne peuvent plus vous chercher sur ces sites pour trouver votre adresse, votre numéro et vos proches."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los desconocidos ya no pueden buscarte en esos sitios para encontrar tu dirección, teléfono y familiares."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fremde können Sie auf diesen Seiten nicht mehr suchen, um Ihre Adresse, Telefonnummer und Verwandten zu finden."
      }
     }
    }
@@ -17205,6 +17895,29 @@
     }
    }
   },
+  "The largest pool of profiles, and the one scammers buy to target you and older relatives. Removing it cuts the most junk and scams.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le plus grand réservoir de profils, celui que les escrocs achètent pour vous cibler, vous et vos proches âgés. Se retirer réduit le plus de courrier indésirable et d'arnaques."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El mayor depósito de perfiles, el que compran los estafadores para dirigirse a ti y a tus familiares mayores. Darte de baja reduce más el correo basura y las estafas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Der größte Profilpool, den Betrüger kaufen, um Sie und ältere Verwandte anzusprechen. Ein Opt-out verringert am meisten Werbung und Betrug."
+     }
+    }
+   }
+  },
   "The message": {
    "extractionState": "manual",
    "localizations": {
@@ -17734,6 +18447,29 @@
     }
    }
   },
+  "Their campaigns stop mailing and emailing you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Leurs campagnes cessent de vous envoyer courrier et e-mails."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sus campañas dejan de enviarte correo y emails."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Kampagnen schicken Ihnen keine Post und E-Mails mehr."
+     }
+    }
+   }
+  },
   "Their file leaks or is bought by a stalker or scammer, or a mistake in it flags you as a fraud risk and gets you declined for an account, with no easy way to see or fix why.": {
    "extractionState": "manual",
    "localizations": {
@@ -17918,6 +18654,29 @@
     }
    }
   },
+  "They can affect jobs, housing and loans, but credit and screening reports often stay on file by law, so opting out removes less.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ils peuvent influencer emploi, logement et prêts, mais les rapports de crédit et de vérification restent souvent archivés selon la loi : se retirer enlève moins."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pueden afectar empleo, vivienda y préstamos, pero los informes de crédito y verificación suelen conservarse por ley, así que darte de baja quita menos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können Jobs, Wohnen und Kredite beeinflussen, aber Kredit- und Prüfberichte bleiben gesetzlich oft gespeichert, ein Opt-out entfernt daher weniger."
+     }
+    }
+   }
+  },
   "They can change the terms at any time without telling you.": {
    "extractionState": "manual",
    "localizations": {
@@ -18029,6 +18788,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie helfen gegen Betrug, führen aber auch detaillierte Identitätsakten über Sie. Ein Opt-out entfernt einen Teil Ihrer Daten aus ihren Produkten, obwohl manche Prüfungen gesetzlich vorgeschrieben sind."
+     }
+    }
+   }
+  },
+  "They hold lists given to them by brands. Mostly junk mail, with a small breach risk.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ils détiennent des fichiers confiés par des marques. Surtout du courrier indésirable, avec un faible risque de fuite."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Guardan listas que les dan las marcas. Sobre todo correo basura, con un pequeño riesgo de filtración."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie halten Listen, die Marken ihnen überlassen. Meist Werbepost, mit geringem Risiko einer Datenpanne."
      }
     }
    }
@@ -18562,6 +19344,29 @@
     }
    }
   },
+  "Those companies hold less of your data.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces entreprises détiennent moins de vos données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esas empresas tienen menos de tus datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Firmen halten weniger Ihrer Daten."
+     }
+    }
+   }
+  },
   "Tick the confirmation box yourself if it is true, then solve the check.": {
    "extractionState": "manual",
    "localizations": {
@@ -18627,6 +19432,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bis Jahr"
+     }
+    }
+   }
+  },
+  "Today": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aujourd'hui"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heute"
      }
     }
    }
@@ -20057,6 +20885,29 @@
     }
    }
   },
+  "Welcome back": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bon retour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Te damos la bienvenida de nuevo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Willkommen zurück"
+     }
+    }
+   }
+  },
   "Welcome to Opt-Out Kit": {
    "extractionState": "manual",
    "localizations": {
@@ -20582,6 +21433,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wo Sie gelistet sind"
+     }
+    }
+   }
+  },
+  "Where your phone goes reveals your home, work, faith and health care. It is sold in bulk and cannot be taken back once sold.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les déplacements de votre téléphone révèlent votre domicile, travail, religion et soins. Ces données sont vendues en masse et ne peuvent pas être reprises."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adónde va tu teléfono revela tu casa, trabajo, fe y atención médica. Se vende en bloque y no se puede recuperar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wohin Ihr Handy geht, verrät Ihr Zuhause, Ihre Arbeit, Ihren Glauben und Ihre medizinische Versorgung. Es wird massenhaft verkauft und lässt sich nicht zurückholen."
      }
     }
    }
@@ -21184,6 +22058,52 @@
     }
    }
   },
+  "You have asked %lld sites to remove you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez demandé à %lld sites de vous retirer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Has pedido a %lld sitios que te quiten"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben %lld Websites gebeten, Sie zu entfernen"
+     }
+    }
+   }
+  },
+  "You have asked 1 site to remove you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez demandé à 1 site de vous retirer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Has pedido a 1 sitio que te quite"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben 1 Website gebeten, Sie zu entfernen"
+     }
+    }
+   }
+  },
   "You look up an old friend, or check a contractor before letting them into your home.": {
    "extractionState": "manual",
    "localizations": {
@@ -21506,6 +22426,29 @@
     }
    }
   },
+  "Your address and what you owe are easy for investors, scammers and stalkers to use, but much of it is public record anyway.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre adresse et vos dettes sont faciles à exploiter par investisseurs, escrocs et harceleurs, mais une grande partie est de toute façon publique."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu dirección y lo que debes son fáciles de usar para inversores, estafadores y acosadores, aunque gran parte es pública de todos modos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Adresse und Ihre Schulden sind für Investoren, Betrüger und Stalker leicht nutzbar, doch vieles ist ohnehin öffentlich."
+     }
+    }
+   }
+  },
   "Your address, what you paid and your mortgage are public in many places, and these companies package them so salespeople can find and contact owners.": {
    "extractionState": "manual",
    "localizations": {
@@ -21713,6 +22656,29 @@
     }
    }
   },
+  "Your details are less likely to be resold as a lead, so there is less spam calling and texting.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos coordonnées risquent moins d'être revendues comme prospect : moins d'appels et SMS indésirables."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es menos probable que tus datos se revendan como cliente potencial, así que hay menos llamadas y mensajes basura."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Daten werden seltener als Lead weiterverkauft, also weniger Spam-Anrufe und SMS."
+     }
+    }
+   }
+  },
   "Your driving or vehicle history is sold to insurers who raise your rates, or dealers learn when you are likely to buy and pressure you.": {
    "extractionState": "manual",
    "localizations": {
@@ -21801,6 +22767,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihr geschätztes Vermögen macht Sie zum Ziel für Betrugsanrufe und aggressive Verkaufsgespräche, oder eine falsche Schätzung bringt Ihnen unbemerkt schlechtere Angebote."
+     }
+    }
+   }
+  },
+  "Your home and what you owe are harder for investors, scammers and stalkers to use.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre logement et vos dettes sont plus difficiles à exploiter pour investisseurs, escrocs et harceleurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu casa y lo que debes son más difíciles de usar para inversores, estafadores y acosadores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Zuhause und Ihre Schulden sind für Investoren, Betrüger und Stalker schwerer zu nutzen."
      }
     }
    }
@@ -21966,6 +22955,29 @@
     }
    }
   },
+  "Your record is hidden from family-tree searches, so strangers have a harder time finding living relatives.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre fiche est masquée des recherches généalogiques : des inconnus trouvent plus difficilement vos proches vivants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu registro se oculta de las búsquedas genealógicas, así que a los desconocidos les cuesta más encontrar a familiares vivos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Eintrag ist in Stammbaumsuchen verborgen, sodass Fremde lebende Verwandte schwerer finden."
+     }
+    }
+   }
+  },
   "Your regulator is %@ (%@). You can complain to it if a company ignores a request.": {
    "extractionState": "manual",
    "localizations": {
@@ -22058,6 +23070,29 @@
     }
    }
   },
+  "Your résumé details can be scraped and used for fake job offers, but the harm is usually an annoyance or a scam attempt, not lasting damage.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les détails de votre CV peuvent être aspirés pour de fausses offres d'emploi, mais le dommage est en général une gêne ou une tentative d'arnaque, pas un préjudice durable."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los datos de tu currículum pueden extraerse para falsas ofertas de empleo, pero el daño suele ser una molestia o un intento de estafa, no un perjuicio duradero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Lebenslaufdaten können für falsche Jobangebote abgegriffen werden, doch der Schaden ist meist Ärger oder ein Betrugsversuch, nicht dauerhaft."
+     }
+    }
+   }
+  },
   "Your saved profiles could not be opened on this device (%@). They are untouched.": {
    "extractionState": "manual",
    "localizations": {
@@ -22146,6 +23181,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Wahlhistorie und Spenden werden genutzt, um Sie mit irreführenden Botschaften anzusprechen, oder Ihre Spenderdaten werden geteilt und Sie werden mit Bitten überhäuft."
+     }
+    }
+   }
+  },
+  "Your work email and phone are harder for salespeople and scammers to buy, so cold outreach to your work address drops.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre e-mail et votre téléphone professionnels sont plus difficiles à acheter pour commerciaux et escrocs : moins de sollicitations à votre adresse pro."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu correo y teléfono de trabajo son más difíciles de comprar para vendedores y estafadores, así que baja la prospección a tu dirección de trabajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Firmen-E-Mail und Telefonnummer sind für Vertriebler und Betrüger schwerer zu kaufen, daher sinkt die Kaltansprache."
      }
     }
    }
@@ -22261,6 +23319,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Postleitzahl"
+     }
+    }
+   }
+  },
+  "across %lld days. Every request counts.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "sur %lld jours. Chaque demande compte."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "en %lld días. Cada solicitud cuenta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "an %lld Tagen. Jede Anfrage zählt."
+     }
+    }
+   }
+  },
+  "and emailed %lld more as a second route": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "et envoyé %lld e-mails de plus comme second recours"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "y enviaste %lld correos más como segunda vía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "und %lld weitere E-Mails als zweiten Weg gesendet"
      }
     }
    }
