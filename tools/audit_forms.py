@@ -40,17 +40,28 @@ async def audit(ctx, url):
         for fr in page.frames[1:]:
             try: forms += await fr.evaluate(L.FORMS_JS)
             except Exception: pass
+        if max((L.score(f, "") for f in forms), default=-100) < 5:           # a button that opens the form in a panel or frame
+            for _ in range(2):
+                try:
+                    if not await page.evaluate(L.CLICK_JS): break
+                    await page.wait_for_timeout(3000); forms = await page.evaluate(L.FORMS_JS)
+                    for fr in page.frames[1:]:
+                        try: forms += await fr.evaluate(L.FORMS_JS)
+                        except Exception: pass
+                    if max((L.score(f, "") for f in forms), default=-100) >= 5: break
+                except Exception: break
         title = await page.title(); path = urllib.parse.urlsplit(page.url).path
         text = (await page.evaluate("document.body ? document.body.innerText : ''"))[:1500]
         if resp is not None and resp.status >= 400:
             return -100, [f"HTTP {resp.status}"] if not L.WALL.search(text[:600]) else ["bot wall"]
         ctxs = title + " " + path
         scored = sorted(((L.score(f, ctxs), f) for f in forms), key=lambda x: -x[0])
-        if re.search(r"datasubject\.com|atlassian\.net/servicedesk", page.url): return 5, []      # a hosted portal that shows its form after a choice
+        if re.search(L.HOSTED_LANDING, page.url): return 5, []      # a hosted portal that shows its form after a choice
         if not scored or scored[0][0] <= -100: return -100, ["no form on the page"]
         sc, best = scored[0]
         if sc < 5: reasons.append(f"best form scores {sc}")
-        if path in ("", "/"): reasons.append("the page is a home page")
+        host = urllib.parse.urlsplit(page.url).netloc.replace("www.", "")
+        if path in ("", "/") and P.registrable(host) == host: reasons.append("the page is a home page")
         if not ABOUT.search(ctxs + " " + best.get("head", "") + " " + text[:500]): reasons.append("page is not about opting out")
         bad = [b for b in best["buttons"] if BAD_BUTTON.search(b)]
         if bad and not any(L.OPTOUT.search(b) for b in best["buttons"]): reasons.append("button says " + bad[0])
@@ -69,6 +80,12 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         async def one(d, src, url):
+            # A hard limit per site, tried twice, so one hung page can never stall the run.
+            for attempt in (1, 2):
+                try: return await asyncio.wait_for(one_try(d, src, url), timeout=150)
+                except asyncio.TimeoutError: pass
+            return d, src, url, "suspect", "timed out twice", -100, ""
+        async def one_try(d, src, url):
             async with sem:
                 ctx = await browser.new_context(user_agent=L.UA, viewport={"width": 390, "height": 844}, is_mobile=True)
                 try:

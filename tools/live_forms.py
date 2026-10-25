@@ -36,7 +36,7 @@ FORMS_JS = """() => {
     head: head(f), fields: [...f.querySelectorAll('input,select,textarea')].filter(e => !['hidden','submit','button','image','reset'].includes(e.type) && vis(e)).map(e => ({ type: e.type || e.tagName.toLowerCase(), label: label(e), name: e.name || e.id || '' })),
     buttons: [...f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')].filter(vis).map(b => (b.innerText || b.value || '').trim().slice(0, 50)),
     text: (f.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 240) }))); }"""
-PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm|privacyengine\.io|privacyprocessing\.com|atlassian\.net/servicedesk|\.zendesk\.com/hc/.*request|force\.com/.*(privacy|request|optout)", re.I)
+PORTAL_HOSTS = re.compile(r"datasubject\.com|privacyportal|onetrust\.com/webform|trustarc\.com|clym|ketch\.com|transcend\.io|osano\.com|securiti|privacycockpit|mine\.io|saymine|ethyca|didomi|submit-irm|privacyengine\.io|trustsuperset\.com|privacy-portal|privacyprocessing\.com|atlassian\.net/servicedesk|\.zendesk\.com/hc/.*request|force\.com/.*(privacy|request|optout)", re.I)
 # Links, plus the addresses of embedded privacy portals (a request form shown in a frame cannot be read from the page around it).
 LINKS_JS = """() => [...document.querySelectorAll('a[href]')].map(a => [a.href, (a.innerText || '').trim().slice(0, 80), ((a.closest('p,li,td,h1,h2,h3,h4,div') || a.parentElement || {}).innerText || '').trim().slice(0, 160)])
   .concat([...document.querySelectorAll('iframe[src]')].map(f => [f.src, 'privacy portal request form']))"""
@@ -44,6 +44,12 @@ EMAIL_JS = """() => { const t = (document.body.innerText || ''); const m = [...d
   return [...new Set(m.concat(t.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}/g) || []))].slice(0, 12); }"""
 WANT_MAIL = re.compile(r"privacy|dpo|optout|opt-out|dsar|rights|ccpa|gdpr|legal|compliance|dataprotection|consumer|removal|remove|unsubscribe|suppress|inquir", re.I)
 BAD_MAIL = re.compile(r"sales@|support@|press@|careers?@|jobs@|billing@|abuse@|noreply|no-reply|example\.|sentry|wixpress|cloudflare|info@", re.I)
+HOSTED_LANDING = r"datasubject\.com|atlassian\.net/servicedesk|submit-irm\.trustarc|privacyengine\.io|trustsuperset\.com"
+# Clicks the first button or empty link whose words are about opting out (marked so it is clicked once); 1 when it clicked something.
+CLICK_JS = """() => { const re = /do not sell|don.?t sell|opt.?out|your privacy choices|privacy choices|exercise.*rights|submit (a )?request|make a request/i;
+  const el = [...document.querySelectorAll('button,[role=button],a')].find(e => !e.dataset.okClicked && re.test((e.innerText || '').trim()) && (e.innerText || '').trim().length < 60
+    && (e.tagName !== 'A' || !e.getAttribute('href') || e.getAttribute('href').startsWith('#') || e.getAttribute('href').startsWith('javascript')));
+  if (!el) return 0; el.dataset.okClicked = '1'; el.click(); return 1; }"""
 BLOCK_JS = """() => { const t = (document.body.innerText || '').toLowerCase(); const out = [];
   if (document.querySelector('iframe[src*="recaptcha"],iframe[src*="hcaptcha"],iframe[src*="challenges.cloudflare"],.cf-turnstile,[class*="turnstile" i],.g-recaptcha,[class*="captcha" i]')) out.push('check');
   if (/verify you are human|i.?m not a robot|confirm you are human/.test(t)) out.push('check');
@@ -94,11 +100,26 @@ async def look(ctx, url):
         if resp is not None and resp.status >= 400: forms = []          # an error page is never the opt-out form (its search box is not)
         ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
         best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
+        # A "Do Not Sell or Share" button or empty link opens the form in a panel or a frame: click it and read again.
+        if best[0] < 5 and not (resp is not None and resp.status >= 400):
+            for _ in range(2):
+                try:
+                    n = await page.evaluate(CLICK_JS)
+                    if not n: break
+                    await page.wait_for_timeout(3000)
+                    more = await page.evaluate(FORMS_JS)
+                    for fr in page.frames[1:]:
+                        try: more += await fr.evaluate(FORMS_JS)
+                        except Exception: pass
+                    cand = max(((score(f, ctx), f) for f in more), key=lambda x: x[0], default=(-100, None))
+                    if cand[0] > best[0]: best = cand
+                    if best[0] >= 5: break
+                except Exception: break
         links = await page.evaluate(LINKS_JS)
         for m in await page.evaluate(EMAIL_JS):
             if WANT_MAIL.search(m) and not BAD_MAIL.search(m): MAILS.setdefault(urllib.parse.urlsplit(url).netloc.replace("www.", ""), m.lower())
         # A hosted privacy portal that opens on a choice (location, request type) shows its form only after one, so its landing page counts.
-        if best[0] < 5 and re.search(r"datasubject\.com|atlassian\.net/servicedesk", page.url): best = (5, best[1])
+        if best[0] < 5 and re.search(HOSTED_LANDING, page.url): best = (5, best[1])
         blockers = await page.evaluate(BLOCK_JS) if best[0] >= 5 else []
         return best[0] if best[0] >= 5 else None, blockers, links, page.url
     except Exception:
@@ -138,7 +159,8 @@ async def site(browser, domain, opt_url, sem):
                     tried.add(u)
                     sc, blockers, links, final = await look(ctx, u)
                     if domain in WALLED: return domain, "none", "", "wall"        # a bot wall in front of the whole site: never retried
-                    if sc and urllib.parse.urlsplit(final).path not in ("", "/"): return domain, "form", final, ";".join(("check:a bot check" if b == "check" else b) for b in blockers)
+                    fh = urllib.parse.urlsplit(final)
+                    if sc and (fh.path not in ("", "/") or P.registrable(fh.netloc) != fh.netloc.replace("www.", "")): return domain, "form", final, ";".join(("check:a bot check" if b == "check" else b) for b in blockers)
                     nxt += good_links(final, links, own)
                 frontier = [u for u in nxt if u not in tried]
                 if not frontier: break
@@ -165,7 +187,13 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         with open(os.path.join(a.out, "shard-0.tsv"), "w") as out:
-            for coro in asyncio.as_completed([site(browser, d, u, sem) for d, u in targets]):
+            async def guarded(d, u):
+                # A hard limit per site, tried twice, so one hung page can never stall the run.
+                for _ in range(2):
+                    try: return await asyncio.wait_for(site(browser, d, u, sem), timeout=240)
+                    except asyncio.TimeoutError: pass
+                return d, "error:timed out twice", "", ""
+            for coro in asyncio.as_completed([guarded(d, u) for d, u in targets]):
                 d, r, page, bl = await coro; done += 1
                 mail = next((m for k, m in MAILS.items() if d.endswith(k) or k.endswith(d)), "")
                 out.write(f"{d}\t{r}\t{page}\t{bl}\t{mail}\n"); out.flush()

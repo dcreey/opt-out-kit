@@ -16,5 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
   found: true
-  page: "https://healthlinkdimensions.com/"
+  page: "https://submit-irm.trustarc.com/services/validation/ee84af17-5002-4c6b-843a-dd45637b93bf"
   blockers: ["check:a bot check"]

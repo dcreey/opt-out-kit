@@ -12,7 +12,5 @@ registered_in: [TX]
 signals: [captcha_recaptcha, email_contact, email_input, phone_verify]
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.analyzecorp.com/request-portal/"
-  blockers: ["check:a bot check"]
+  checked: "2026-10-25"
+  found: false

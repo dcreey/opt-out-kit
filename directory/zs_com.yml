@@ -14,7 +14,5 @@ profiled: "2026-10-22"
 contact_email: "dataprivacy@zs.com"
 contact_email_source: "browser"
 live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.zs.com/request-portal"
-  blockers: []
+  checked: "2026-10-25"
+  found: false

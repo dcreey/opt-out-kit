@@ -15,5 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: true
-  page: "https://www.erepublic.com/privacy/"
+  page: "https://erepublic.my.salesforce-sites.com/PrivacyRequest/"
   blockers: []

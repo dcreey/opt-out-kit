@@ -19,5 +19,5 @@ live_check:
 live_form:
   checked: "2026-10-23"
   found: true
-  page: "https://agedleadstore.com/"
+  page: "https://agedleadstore.com/privacy-notice-for-california-residents/"
   blockers: ["check:a bot check"]

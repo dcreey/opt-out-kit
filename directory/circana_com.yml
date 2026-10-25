@@ -15,5 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: true
-  page: "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/8b6288db-dcf1-460a-a6ed-0092e82d3215"
+  page: "https://www.circana.com/post/circana-completes-acquisition-of-ncsolutions"
   blockers: ["check:a bot check"]

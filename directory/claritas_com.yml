@@ -16,5 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-23"
   found: true
-  page: "https://claritas.com/"
+  page: "https://privacyportal.onetrust.com/webform/68582716-6ce4-4f6e-bf08-78371b5f3292/6c7dc52d-0e2b-481f-9256-0755179e3783"
   blockers: ["check:a bot check"]
