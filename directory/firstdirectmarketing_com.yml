@@ -16,5 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "b2b", "summary": "First Direct, Inc. is a business-contact and sales-data provider. Discover how First Direct delivers marketing that works. Let's create a plan that achieves real results through data-driven, multi-channel strategies. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://firstdirectmarketing.com/privacy-policy/"}
-priority: 30
+about: {"category": "marketing_data", "summary": "First Direct, Inc. is a marketing data provider. Discover how First Direct delivers marketing that works. Let's create a plan that achieves real results through data-driven, multi-channel strategies. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://firstdirectmarketing.com/privacy-policy/"}
+priority: 38

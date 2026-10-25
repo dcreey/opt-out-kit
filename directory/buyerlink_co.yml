@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/4e34d8c3-8173-42da-97dc-7774750fbca9"
   blockers: ["check:a bot check"]
-about: {"category": "b2b", "summary": "Buyerlink Inc. is a business-contact and sales-data provider. Buyerlink connects businesses with high-intent consumers through targeted digital marketing solutions. Drive growth with high-quality clicks, leads, calls, and appointments. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.buyerlink.co/"}
-priority: 29
+about: {"category": "lead_generation", "summary": "Buyerlink Inc. is a lead-generation company. Buyerlink connects businesses with high-intent consumers through targeted digital marketing solutions. Drive growth with high-quality clicks, leads, calls, and appointments. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.buyerlink.co/"}
+priority: 33

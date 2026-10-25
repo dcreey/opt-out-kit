@@ -17,5 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA puzzle"]
-about: {"category": "adtech", "summary": "Skydeo Inc. is an advertising technology company. Take the guesswork out of finding ideal customers with Skydeo Audience Marketplace (SAM). Explore predictive audience segments built from 1.4 trillion data points. Its own pages mention shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["purchases", "interests"], "sells_to": [], "source": "https://skydeo.com/"}
-priority: 22
+about: {"category": "marketing_data", "summary": "Skydeo Inc. is a marketing data provider. Take the guesswork out of finding ideal customers with Skydeo Audience Marketplace (SAM). Explore predictive audience segments built from 1.4 trillion data points. Its own pages mention shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["purchases", "interests"], "sells_to": [], "source": "https://skydeo.com/"}
+priority: 34

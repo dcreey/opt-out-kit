@@ -19,5 +19,5 @@ live_form:
   found: true
   page: "https://www.privatereports.com/api/helper/optOutLight/search"
   blockers: []
-about: {"category": "consumer_reporting", "summary": "Infomatics LLC is a background-screening and consumer-reporting company. Its own pages mention phone numbers, relatives and household members, job title and employer, property and vehicles, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "relatives", "employment", "property", "criminal", "social"], "sells_to": [], "source": "https://www.privatereports.com/nameSearch/landingPage"}
-priority: 51
+about: {"category": "people_search", "summary": "Infomatics LLC is a people-search and public-records site. Its own pages mention phone numbers, relatives and household members, job title and employer, property and vehicles, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "relatives", "employment", "property", "criminal", "social"], "sells_to": [], "source": "https://www.privatereports.com/nameSearch/landingPage"}
+priority: 57

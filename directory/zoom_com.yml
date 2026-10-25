@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://zoom-privacy.my.onetrust.com/webform/65962359-ef0d-4399-9db4-572d06de08aa/f277f9f7-bfee-4233-815e-80e290139bc2"
   blockers: ["check:a bot check"]
-about: {"category": "real_estate", "summary": "Zoom Communications, Inc. is a property and real-estate data company. Modernize workflows with Zoom's trusted collaboration tools: including video meetings, Zoom Chat, VoIP phone, webinars, whiteboard, contact center, and events. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://privacyportal.onetrust.com/webform/65962359-ef0d-4399-9db4-572d06de08aa/f277f9f7-bfee-4233-815e-80e290139bc2"}
-priority: 28
+about: {"category": "other", "summary": "Zoom Communications, Inc. is a property and real-estate data company. Modernize workflows with Zoom's trusted collaboration tools: including video meetings, Zoom Chat, VoIP phone, webinars, whiteboard, contact center, and events. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://privacyportal.onetrust.com/webform/65962359-ef0d-4399-9db4-572d06de08aa/f277f9f7-bfee-4233-815e-80e290139bc2"}
+priority: 18

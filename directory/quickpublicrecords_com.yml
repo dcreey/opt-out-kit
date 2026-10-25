@@ -15,5 +15,5 @@ profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
-about: {"category": "consumer_reporting", "summary": "quickpublicrecords.com is a background-screening and consumer-reporting company. Discover detailed information about yourself, friends, family, or anyone. Uncover insights into criminal and professional histories. Start a secure search now. Its own pages mention phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "property", "criminal"], "sells_to": [], "source": "https://www.quickpublicrecords.com/help-center/privacy-requests"}
-priority: 42
+about: {"category": "people_search", "summary": "quickpublicrecords.com is a people-search and public-records site. Discover detailed information about yourself, friends, family, or anyone. Uncover insights into criminal and professional histories. Start a secure search now. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "property", "criminal"], "sells_to": [], "source": "https://www.quickpublicrecords.com/help-center/privacy-requests"}
+priority: 49

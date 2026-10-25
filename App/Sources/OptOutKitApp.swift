@@ -614,12 +614,37 @@ final class AppModel: ObservableObject {
             defaults.set(Self.dayString(Date()), forKey: Self.batchDayKey); defaults.set(max(1, newValue), forKey: Self.batchCountKey)
         }
     }
+    private static let themesKey = "daily.themes"
+
+    /// The kinds of broker the person chose for today's batches, in order. Empty until they choose, and again each new day.
+    var dailyThemes: [String] {
+        get { defaults.string(forKey: Self.batchDayKey) == Self.dayString(Date()) ? (defaults.stringArray(forKey: Self.themesKey) ?? []) : [] }
+        set { objectWillChange.send(); defaults.set(Self.dayString(Date()), forKey: Self.batchDayKey); defaults.set(newValue, forKey: Self.themesKey) }
+    }
+
+    /// Choose the kind for today's first batch (before anything is finished today).
+    func chooseFirstKind(_ id: String) {
+        var t = dailyGoals.themes; if t.isEmpty { t = [id] } else { t[0] = id }
+        dailyThemes = t; dailyBatches = max(dailyBatches, t.count)
+    }
+
+    /// Take another 25 of a kind the person picks.
+    func addBatch(kind id: String) {
+        var t = dailyGoals.themes; t.append(id)
+        dailyThemes = t; dailyBatches = t.count
+    }
+
+    /// How many sites still wait in each kind of broker, for the person to choose from.
+    var remainingKinds: [(kind: String, count: Int)] {
+        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts)
+    }
+
     private static func dayString(_ d: Date) -> String { let c = Calendar.current.dateComponents([.year, .month, .day], from: d); return "\(c.year ?? 0)-\(c.month ?? 0)-\(c.day ?? 0)" }
 
     /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
         let queue = OptOutPlan.verifyQueue(plan, entries: directory)
-        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches)
+        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches, chosen: dailyThemes)
     }
 
     /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.

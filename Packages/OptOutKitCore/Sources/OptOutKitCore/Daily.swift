@@ -29,7 +29,7 @@ public struct DailyGoals: Equatable, Sendable {
     ///   - attempts: every recorded attempt for the person, by entry id.
     ///   - batches: how many batches of 25 the person has asked for today.
     public static func build(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(),
-                             batches: Int = 1, calendar: Calendar = .current) -> DailyGoals {
+                             batches: Int = 1, chosen: [String] = [], calendar: Calendar = .current) -> DailyGoals {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         func emailedDates(_ id: String) -> [Date] { (attempts[id] ?? []).filter { $0.outcome == "emailed" }.map(\.date) }
         func doneBeforeToday(_ id: String, _ dates: [Date]) -> Bool { dates.contains { !calendar.isDate($0, inSameDayAs: now) } }
@@ -48,9 +48,11 @@ public struct DailyGoals: Equatable, Sendable {
         }.max { $0.0 < $1.0 }?.1
         var remaining = open, todays: [DirectoryEntry] = [], themes: [String] = []
         var theme = lastDone.map(kind)
-        for _ in 0..<max(1, batches) {
+        for i in 0..<max(1, batches, chosen.count) {
             guard let first = remaining.first else { break }
-            if theme == nil || !remaining.contains(where: { kind($0) == theme }) { theme = kind(first) }
+            // A kind the person chose for this batch wins; otherwise carry on with the last kind, else the first site waiting.
+            if i < chosen.count, remaining.contains(where: { kind($0) == chosen[i] }) { theme = chosen[i] }
+            else if theme == nil || !remaining.contains(where: { kind($0) == theme }) { theme = kind(first) }
             let batch = Array(remaining.filter { kind($0) == theme }.prefix(batchSize))
             todays += batch; themes.append(theme!)
             let taken = Set(batch.map(\.id)); remaining.removeAll { taken.contains($0.id) }
@@ -64,7 +66,19 @@ public struct DailyGoals: Equatable, Sendable {
         let withAddress = (todays + doneElsewhere).filter { $0.contactEmail != nil }
         let batch = EmailBatch.single(entries: withAddress, maxRecipients: 1000).first
         let emailedToday = withAddress.filter { e in emailedDates(e.id).contains { calendar.isDate($0, inSameDayAs: now) } }.count
-        return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches), themes: themes)
+        return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches, chosen.count), themes: themes)
+    }
+
+    /// How many sites still wait in each kind of broker (finished-before-today sites do not count), biggest first. The person picks from these.
+    public static func remainingByKind(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(), calendar: Calendar = .current) -> [(kind: String, count: Int)] {
+        let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        var counts: [String: Int] = [:]
+        for d in queue {
+            guard let e = byDomain[d] else { continue }
+            let doneBefore = (attempts[e.id] ?? []).contains { $0.wasSubmitted && !calendar.isDate($0.date, inSameDayAs: now) }
+            if !doneBefore { counts[e.about?.category ?? "other", default: 0] += 1 }
+        }
+        return counts.map { (kind: $0.key, count: $0.value) }.sorted { ($0.count, $1.kind) > ($1.count, $0.kind) }
     }
 
     /// Whole days left to finish a queue of `remaining` sites at one batch a day.

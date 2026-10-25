@@ -19,5 +19,5 @@ live_form:
   found: true
   page: "https://dsr.trustsuperset.com/?orgId=0d0512a8-9337-4cb5-9369-acf2ef40a077"
   blockers: []
-about: {"category": "location_data", "summary": "Irys, Inc is a device and location data company. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online", "location"], "sells_to": [], "source": "https://irys.us/do-not-sell-ccpa"}
-priority: 42
+about: {"category": "marketing_data", "summary": "Irys, Inc is a marketing data provider. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online", "location"], "sells_to": [], "source": "https://irys.us/do-not-sell-ccpa"}
+priority: 44

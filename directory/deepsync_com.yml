@@ -20,5 +20,5 @@ run_check:
   date: "2026-10-23"
   result: "failed"
   note: "Deep Sync rejects automatic sends with an invisible bot check"
-about: {"category": "adtech", "summary": "ASL Marketing is an advertising technology company. Deep Sync is the AI-driven identity data company that resolves fragmented customer data into real people for accurate targeting, activation, and measurement. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests"], "sells_to": [], "source": "https://deepsync.com/"}
-priority: 26
+about: {"category": "marketing_data", "summary": "ASL Marketing is a marketing data provider. Deep Sync is the AI-driven identity data company that resolves fragmented customer data into real people for accurate targeting, activation, and measurement. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests"], "sells_to": [], "source": "https://deepsync.com/"}
+priority: 38

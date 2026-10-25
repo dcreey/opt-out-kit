@@ -622,6 +622,29 @@
     }
    }
   },
+  "%lld left": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld restants"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld restantes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld übrig"
+     }
+    }
+   }
+  },
   "%lld messages cover %lld sites. Each message names every site its address handles. Open one, read it, and tap Send in your mail app.": {
    "extractionState": "manual",
    "localizations": {
@@ -2991,6 +3014,29 @@
     }
    }
   },
+  "Automotive data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données automobiles"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos del automóvil"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fahrzeugdaten"
+     }
+    }
+   }
+  },
   "Back": {
    "extractionState": "manual",
    "localizations": {
@@ -3746,6 +3792,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kind"
+     }
+    }
+   }
+  },
+  "Choose today's kind of broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Choisir le type de courtier du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elegir el tipo de corredor de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutigen Brokertyp wählen"
      }
     }
    }
@@ -4762,6 +4831,29 @@
     }
    }
   },
+  "Device and location data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données d'appareils et de localisation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos de dispositivos y ubicación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geräte- und Standortdaten"
+     }
+    }
+   }
+  },
   "Devices and online activity": {
    "extractionState": "manual",
    "localizations": {
@@ -4965,6 +5057,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Von der App für Sie erledigt"
+     }
+    }
+   }
+  },
+  "Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque jour, vous traitez jusqu'à 25 courtiers du même type. Choisissez celui que vous voulez traiter aujourd'hui."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada día trabajas hasta 25 corredores del mismo tipo. Elige el que quieres abordar hoy."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jeden Tag bearbeiten Sie bis zu 25 Broker einer Art. Wählen Sie die Art, die Sie heute angehen möchten."
      }
     }
    }
@@ -7407,6 +7522,29 @@
     }
    }
   },
+  "Kinds of broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Types de courtiers"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tipos de corredores"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arten von Brokern"
+     }
+    }
+   }
+  },
   "Landlords": {
    "extractionState": "manual",
    "localizations": {
@@ -7702,6 +7840,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesetze zu Datenbrokern unterscheiden sich je nach Bundesstaat. Wählen Sie Ihren, dann zeigen wir, was das für Sie bedeutet und was wir tun."
+     }
+    }
+   }
+  },
+  "Lead generation": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Génération de prospects"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Generación de clientes potenciales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lead-Generierung"
      }
     }
    }
@@ -8415,6 +8576,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Als erledigt markieren"
+     }
+    }
+   }
+  },
+  "Marketing and direct-mail services": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Services de marketing et de publipostage"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Servicios de marketing y correo directo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marketing- und Direktmailing-Dienste"
      }
     }
    }
@@ -9339,6 +9523,29 @@
     }
    }
   },
+  "Next 25": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "25 suivants"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Siguientes 25"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nächste 25"
+     }
+    }
+   }
+  },
   "Next site": {
    "extractionState": "manual",
    "localizations": {
@@ -9381,6 +9588,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nächster Schritt"
+     }
+    }
+   }
+  },
+  "Nice work. Pick the kind of broker for your next 25.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bravo. Choisissez le type de courtier pour vos 25 suivants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buen trabajo. Elige el tipo de corredor para los siguientes 25."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gut gemacht. Wählen Sie die Art des Brokers für die nächsten 25."
      }
     }
    }
@@ -11869,6 +12099,29 @@
     }
    }
   },
+  "Political and nonprofit data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données politiques et associatives"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos políticos y de organizaciones sin fines de lucro"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Politische und gemeinnützige Daten"
+     }
+    }
+   }
+  },
   "Precise location": {
    "extractionState": "manual",
    "localizations": {
@@ -12371,6 +12624,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bereit (nur Vorschau)"
+     }
+    }
+   }
+  },
+  "Recruiting and workforce data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recrutement et données sur la main-d'œuvre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reclutamiento y datos laborales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruiting- und Arbeitsmarktdaten"
      }
     }
    }
@@ -14372,6 +14648,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manche Seiten senden Ihnen einen Bestätigungslink per E-Mail. Auch dieser Tipp ist Ihre."
+     }
+    }
+   }
+  },
+  "Some sites will email you afterwards with a link, a code or one more step to finish the opt-out. Watch your inbox, including spam. We will do our best to complete every opt-out inside the app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites vous enverront ensuite un e-mail avec un lien, un code ou une étape de plus pour terminer la suppression. Surveillez votre boîte de réception, y compris les courriers indésirables. Nous ferons de notre mieux pour terminer chaque suppression dans l'app."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios te enviarán después un correo con un enlace, un código o un paso más para completar la baja. Revisa tu bandeja de entrada, incluido el spam. Haremos todo lo posible por completar cada baja dentro de la app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einige Websites schicken Ihnen danach eine E-Mail mit einem Link, einem Code oder einem weiteren Schritt, um die Abmeldung abzuschließen. Behalten Sie Ihren Posteingang im Blick, auch den Spam-Ordner. Wir tun unser Bestes, jede Abmeldung in der App abzuschließen."
      }
     }
    }
@@ -16948,6 +17247,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Heutige Ziele"
+     }
+    }
+   }
+  },
+  "Today's kind of broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Type de courtier du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tipo de corredor de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutiger Brokertyp"
      }
     }
    }

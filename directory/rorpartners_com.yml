@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://rorpartners-privacy.my.onetrust.com/webform/d0cdf2ee-71d9-477a-be86-8a96dceab8ca/34a5377e-d7ce-4147-90ad-2119b80975d1"
   blockers: ["check:a bot check"]
-about: {"category": "marketing_services", "summary": "ROR Partners, LLC is a marketing and direct-mail services company. Transform your health and lifestyle brand with ROR's data-driven marketing solutions. Stay ahead in the active lifestyle industry with our innovative strategies and expert team. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health"], "sells_to": [], "source": "https://rorpartners.com/privacy-policy"}
-priority: 43
+about: {"category": "healthcare", "summary": "ROR Partners, LLC is a healthcare data company. Transform your health and lifestyle brand with ROR's data-driven marketing solutions. Stay ahead in the active lifestyle industry with our innovative strategies and expert team. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health"], "sells_to": [], "source": "https://rorpartners.com/privacy-policy"}
+priority: 55

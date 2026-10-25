@@ -12,5 +12,5 @@ opt_out_form: {"page": "https://www.fivestarrated.com/do-not-sell", "method": "p
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
-about: {"category": "real_estate", "summary": "Home Contractors Review, LLC is a property and real-estate data company. Using comprehensive research evaluations, Five Star Rated identifies the top local home service companies in your area. Contact a verified Five Star Rated company to get your project... Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.fivestarrated.com/"}
-priority: 23
+about: {"category": "other", "summary": "Home Contractors Review, LLC is a property and real-estate data company. Using comprehensive research evaluations, Five Star Rated identifies the top local home service companies in your area. Contact a verified Five Star Rated company to get your project... Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.fivestarrated.com/"}
+priority: 13

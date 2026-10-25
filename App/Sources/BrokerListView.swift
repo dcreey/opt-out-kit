@@ -13,6 +13,7 @@ struct BrokerListView: View {
         return current.isComplete && (current.relationship != .me || model.formEmail != nil)
     }
     @State private var showAuto = false
+    @State private var chooser: ChooserMode?
 
     var body: some View {
         NavigationStack {
@@ -57,12 +58,19 @@ struct BrokerListView: View {
                                         done: goals.emailDone, total: mail.domains.count, symbol: "envelope")
                             }.accessibilityIdentifier("goal-email")
                         }
+                        if goals.verifyDone == 0 {
+                            Button { chooser = .start } label: { Label("Choose today's kind of broker", systemImage: "square.grid.2x2") }
+                                .accessibilityIdentifier("goal-choose")
+                        }
                         if goals.allComplete {
-                            Button { model.dailyBatches += 1 } label: { Label("Keep going: take 25 more", systemImage: "forward.fill") }
+                            Button { chooser = .more } label: { Label("Keep going: take 25 more", systemImage: "forward.fill") }
                                 .accessibilityIdentifier("goal-more")
                         }
                     } header: { Text("Today's goals") } footer: {
-                        Text("About \(DailyGoals.daysLeft(remaining: model.verifyRemaining)) days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.")
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("About \(DailyGoals.daysLeft(remaining: model.verifyRemaining)) days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.")
+                            Text(FollowUpNote.text)
+                        }
                     }
                 }
                 let queue = model.queue
@@ -91,6 +99,11 @@ struct BrokerListView: View {
             }
             .accessibilityIdentifier("broker-list")
             .navigationTitle("Opt-Out Kit")
+            .sheet(item: $chooser) { mode in
+                KindChooserView(mode: mode) { id in
+                    switch mode { case .start: model.chooseFirstKind(id); case .more: model.addBatch(kind: id) }
+                }
+            }
             .sheet(item: $editing) { person in
                 NavigationStack {
                     PersonEditorView(person: person)
@@ -186,5 +199,57 @@ extension BrokerListView {
         let names = goals.themes.compactMap { BrokerCategory(rawValue: $0)?.title }
         var seen = Set<String>(); let unique = names.filter { seen.insert($0).inserted }
         return unique.isEmpty ? Loc.t("Verify today's sites") : Loc.f("Today: %@", unique.joined(separator: ", "))
+    }
+}
+
+
+/// Why a day's batch is being chosen: the first of the day, or another 25 after finishing.
+enum ChooserMode: String, Identifiable { case start, more; var id: String { rawValue } }
+
+/// The words every opt-out flow repeats: finishing an opt-out sometimes takes a follow-up email.
+enum FollowUpNote {
+    static let text = Loc.t("Some sites will email you afterwards with a link, a code or one more step to finish the opt-out. Watch your inbox, including spam. We will do our best to complete every opt-out inside the app.")
+}
+
+/// Pick which kind of broker to work on: each is described in plain words with how many sites are left.
+struct KindChooserView: View {
+    @EnvironmentObject var model: AppModel
+    @Environment(\.dismiss) private var dismiss
+    let mode: ChooserMode
+    let onPick: (String) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text(mode == .start ? Loc.t("Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.")
+                                        : Loc.t("Nice work. Pick the kind of broker for your next 25."))
+                        .font(.subheadline)
+                    Label(FollowUpNote.text, systemImage: "envelope.badge").font(.footnote).foregroundStyle(.secondary)
+                }
+                Section {
+                    ForEach(model.remainingKinds, id: \.kind) { item in
+                        let category = BrokerCategory(rawValue: item.kind) ?? .other
+                        Button { onPick(item.kind); dismiss() } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(category.title).font(.headline)
+                                    Spacer()
+                                    Text(Loc.f("%lld left", item.count)).font(.caption.bold()).foregroundStyle(.tint)
+                                }
+                                Text(category.about).font(.footnote).foregroundStyle(.primary)
+                                Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
+                            }
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("kind-\(item.kind)")
+                    }
+                } header: { Text("Kinds of broker") }
+            }
+            .navigationTitle(mode == .start ? Loc.t("Today's kind of broker") : Loc.t("Next 25"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        }
     }
 }

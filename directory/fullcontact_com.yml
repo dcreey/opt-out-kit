@@ -16,5 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "fraud_identity", "summary": "J2 Martech Corp is an identity and fraud-prevention data provider. FullContact Identity Resolution allows businesses to recognize an individual person, in real-time, by connecting various identifiers from their digital interactions. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online"], "sells_to": [], "source": "https://www.fullcontact.com/solutions/privacy-compliance/"}
-priority: 36
+about: {"category": "marketing_data", "summary": "J2 Martech Corp is a marketing data provider. FullContact Identity Resolution allows businesses to recognize an individual person, in real-time, by connecting various identifiers from their digital interactions. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online"], "sells_to": [], "source": "https://www.fullcontact.com/solutions/privacy-compliance/"}
+priority: 42

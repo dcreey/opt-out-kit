@@ -2555,6 +2555,25 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertEqual(g.verify.count, 40)
     }
 
+    func testThePersonChoosesTheKindForEachBatchAndSeesHowManyAreLeft() {
+        func kinded(_ i: Int, _ k: String) -> DirectoryEntry { var e = site(i); e.about = BrokerAbout(category: k, summary: "s"); return e }
+        let entries = (0..<60).map { kinded($0, $0 < 30 ? "adtech" : "people_search") }      // ad tech first in the queue
+        let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date()
+        let left = DailyGoals.remainingByKind(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
+        XCTAssertEqual(left.map(\.count), [30, 30]); XCTAssertEqual(Set(left.map(\.kind)), ["adtech", "people_search"])
+        // Default: the first waiting kind. Chosen: people search, even though ad tech is first in the queue.
+        XCTAssertEqual(DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal).themes, ["adtech"])
+        let g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["people_search"], calendar: cal)
+        XCTAssertEqual(g.themes, ["people_search"])
+        XCTAssertTrue(g.verify.allSatisfy { Int($0.dropFirst().dropLast(4))! >= 30 })
+        // A second batch of a chosen kind: people search then ad tech.
+        let two = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["people_search", "adtech"], calendar: cal)
+        XCTAssertEqual(two.themes, ["people_search", "adtech"]); XCTAssertEqual(two.verify.count, 50)
+        // A chosen kind with nothing left falls back instead of an empty batch.
+        let none = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["political"], calendar: cal)
+        XCTAssertEqual(none.themes, ["adtech"])
+    }
+
     func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
         let entries = [site(0, email: false), site(1)]
         let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])

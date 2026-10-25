@@ -29,6 +29,56 @@ public enum BrokerCategory: String, CaseIterable, Sendable {
 }
 
 /// A kind of data a broker's own pages say it handles. The ids match `tracks` in the `about:` block.
+public extension BrokerCategory {
+    /// What this kind of company does and how it uses and sells data, in plain words.
+    var about: String {
+        switch self {
+        case .people_search: return L10n.t("Websites that gather public records, phone books and data bought from other brokers into a profile of you, then let anyone search by name, phone number or address. They earn from ads, subscriptions and paid reports.")
+        case .arrests: return L10n.t("Sites that republish arrest, mugshot and court records from public sources. They earn from ads and, often, from charging people to take a record down. Because they copy records, the same record can sit on many of them.")
+        case .consumer_reporting: return L10n.t("Companies that compile credit, rental, employment and background history into reports they sell to employers, landlords, lenders and insurers. Many are regulated by the Fair Credit Reporting Act.")
+        case .marketing_data: return L10n.t("Companies that gather your name, address, shopping habits, income estimates and interests from many sources, then rent or sell lists of people like you to advertisers and mailers.")
+        case .b2b: return L10n.t("Companies that sell business contact details (name, work email, phone, job title, employer) to sales and recruiting teams. They collect them from public profiles, company websites and other lists.")
+        case .adtech: return L10n.t("Companies that run the behind-the-scenes auctions for online ads. They track your devices, browsing and apps with cookies and ad IDs, and trade that data with advertisers and publishers in milliseconds.")
+        case .healthcare: return L10n.t("Companies that handle data about doctors, patients and health interests, sometimes built from pharmacy, insurance and web activity, and sell it to drug makers, health marketers and researchers.")
+        case .financial: return L10n.t("Companies that gather credit, income and wealth information and sell it to lenders, marketers and investors.")
+        case .fraud_identity: return L10n.t("Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. They buy data from many sources and sell the checks to banks and online businesses.")
+        case .real_estate: return L10n.t("Companies that combine property records, ownership and mortgage data and sell it to agents, investors and marketers.")
+        case .genealogy: return L10n.t("Family-history sites that draw on public records, censuses and other databases to build family trees, sometimes including living people.")
+        case .lead_generation: return L10n.t("Companies that collect your details through quote forms and surveys and sell them as leads to businesses such as insurers, lenders and home contractors.")
+        case .political: return L10n.t("Companies that build voter files and donor lists from public voting records and purchased data, then sell targeting to campaigns and causes.")
+        case .recruiting: return L10n.t("Companies that compile work history and contact details from public profiles and sell them to recruiters and employers.")
+        case .automotive: return L10n.t("Companies that combine vehicle registrations, dealer records and driving data and sell them to dealers, insurers and marketers.")
+        case .location_data: return L10n.t("Companies that buy location data from apps and devices and sell movement patterns to advertisers, retailers and sometimes governments.")
+        case .marketing_services: return L10n.t("Agencies and mail houses that run campaigns for brands and handle large customer lists on their clients' behalf.")
+        case .other: return L10n.t("Companies that hold personal data but do not fit the other types, such as software, media and research firms.")
+        }
+    }
+
+    /// What that means for the person, in plain words.
+    var whatItMeans: String {
+        switch self {
+        case .people_search: return L10n.t("Anyone, including a stranger or an ex, can find where you live, your phone number and your relatives in seconds. Removing yourself here does the most for your safety.")
+        case .arrests: return L10n.t("An old arrest or a dismissed case can follow you for years, and employers, landlords and neighbors can find it. These sites rarely tell you who else copied the record.")
+        case .consumer_reporting: return L10n.t("What they hold can affect whether you get a job, an apartment or a loan. Opting out stops some marketing uses, but credit and screening reports often stay on file by law.")
+        case .marketing_data: return L10n.t("This is why junk mail, calls and ads seem to know you. Opting out means less marketing aimed at you and fewer companies holding a profile of you.")
+        case .b2b: return L10n.t("Your work email and phone number can be bought by salespeople you have never heard of. Opting out cuts cold calls and spam to your work address.")
+        case .adtech: return L10n.t("Websites and apps pass your activity to them, so ads follow you across devices. They mostly know a device, not your name, but they can link the two.")
+        case .healthcare: return L10n.t("Health-related guesses about you, such as conditions you search for or treat, can be sold for marketing. Opting out limits who can target you using your health.")
+        case .financial: return L10n.t("Estimates of what you earn or are worth can change which offers you see, and they are sold without you asking.")
+        case .fraud_identity: return L10n.t("They help stop scams but also keep detailed identity files on you. Opting out removes some of your data from their products, though some checks are required by law.")
+        case .real_estate: return L10n.t("Your address, what you paid and your mortgage are public in many places, and these companies package them so salespeople can find and contact owners.")
+        case .genealogy: return L10n.t("They can reveal relatives and addresses of living people. Opting out hides your own record from searches.")
+        case .lead_generation: return L10n.t("One quote request can sell your contact details to many companies, which is why calls and emails multiply after you fill in a form.")
+        case .political: return L10n.t("Your party, voting history and donations, where public, are used to target you with political messages. Opting out limits what is added from commercial sources.")
+        case .recruiting: return L10n.t("Your résumé details can be found and shared without you applying anywhere. Opting out stops recruiters finding you through them.")
+        case .automotive: return L10n.t("Your car, your address and when you might buy again are shared with dealers and insurers. Opting out reduces targeted offers and some data used in insurance.")
+        case .location_data: return L10n.t("Where you go, such as home, work or a clinic, can be inferred from your phone. This is among the most sensitive data, so opting out here matters.")
+        case .marketing_services: return L10n.t("They hold mailing lists given to them and may add data from brokers. Opting out stops mail and email from their campaigns.")
+        case .other: return L10n.t("What they hold varies, so read what they say they collect before deciding.")
+        }
+    }
+}
+
 public enum DataKind: String, CaseIterable, Sendable {
     case name, address, phone, email, age, relatives, employment, education, income, property, criminal, purchases, interests, online, location, health, social, credit
 

@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://www.forewarn.com/opt-out-policy/"
   blockers: ["check:a bot check"]
-about: {"category": "fraud_identity", "summary": "FOREWARN, LLC is an identity and fraud-prevention data provider. FOREWARN is a proactive safety and intelligence app that provides instant knowledge prior to face-to-face engagements to better understand and address risk. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, property and vehicles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "employment", "education", "property", "criminal"], "sells_to": [], "source": "https://www.forewarn.com/opt-out-policy/"}
-priority: 39
+about: {"category": "people_search", "summary": "FOREWARN, LLC is a people-search and public-records site. FOREWARN is a proactive safety and intelligence app that provides instant knowledge prior to face-to-face engagements to better understand and address risk. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "employment", "education", "property", "criminal"], "sells_to": [], "source": "https://www.forewarn.com/opt-out-policy/"}
+priority: 54

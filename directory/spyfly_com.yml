@@ -18,5 +18,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
-about: {"category": "consumer_reporting", "summary": "Digital Safety Products, LLC is a background-screening and consumer-reporting company. View information about yourself, friends, family, properties and phone numbers that Google can't show you. Start your search with a name, address or phone number. Its own pages mention phone numbers, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["phone", "property", "criminal"], "sells_to": [], "source": "https://www.spyfly.com/"}
-priority: 41
+about: {"category": "people_search", "summary": "Digital Safety Products, LLC is a people-search and public-records site. View information about yourself, friends, family, properties and phone numbers that Google can't show you. Start your search with a name, address or phone number. Its own pages mention names and aliases, phone numbers, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "property", "criminal"], "sells_to": [], "source": "https://www.spyfly.com/"}
+priority: 48

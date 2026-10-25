@@ -17,5 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
-about: {"category": "adtech", "summary": "Webbula, LLC is an advertising technology company. Protect performance with accurate, validated data. Eliminate hidden risks and ensure every campaign is built on truth. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://webbula.com/privacy-center/"}
-priority: 24
+about: {"category": "marketing_data", "summary": "Webbula, LLC is a marketing data provider. Protect performance with accurate, validated data. Eliminate hidden risks and ensure every campaign is built on truth. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://webbula.com/privacy-center/"}
+priority: 36

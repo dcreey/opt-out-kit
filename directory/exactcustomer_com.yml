@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://exactcustomer.com/"
   blockers: ["check:a bot check"]
-about: {"category": "b2b", "summary": "Exact Opco, LLC is a business-contact and sales-data provider. Exact Customer is a software-enabled, digital performance marketing agency, focused on providing high-value purchase sales leads of high intent consumers to. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": [], "sells_to": ["businesses"], "sells_note": "Our goal isn’t to sell leads, it’s to drive sales for our clients.", "source": "https://exactcustomer.com/"}
-priority: 30
+about: {"category": "marketing_services", "summary": "Exact Opco, LLC is a marketing and direct-mail services company. Exact Customer is a software-enabled, digital performance marketing agency, focused on providing high-value purchase sales leads of high intent consumers to. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": [], "sells_to": ["businesses"], "sells_note": "Our goal isn’t to sell leads, it’s to drive sales for our clients.", "source": "https://exactcustomer.com/"}
+priority: 22

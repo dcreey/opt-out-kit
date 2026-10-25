@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://www.plug-industries.com/contact"
   blockers: []
-about: {"category": "real_estate", "summary": "Plug Chargers LLC is a property and real-estate data company. Enterprise data solutions for accurate business intelligence. Access to a broad set of U.S. consumer and business data along with the tools to put that data to work — direct mail, email,... Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://www.plug-industries.com/"}
-priority: 38
+about: {"category": "marketing_data", "summary": "Plug Chargers LLC is a marketing data provider. Enterprise data solutions for accurate business intelligence. Access to a broad set of U.S. consumer and business data along with the tools to put that data to work — direct mail, email,... Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://www.plug-industries.com/"}
+priority: 44

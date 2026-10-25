@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://optout.bigdbm.com/"
   blockers: ["check:a bot check"]
-about: {"category": "fraud_identity", "summary": "BIGDBM is an identity and fraud-prevention data provider. BIGDBM delivers identity resolution and real-time enrichment on 280M+ U.S. consumer records. CCPA-compliant, SOC 2 Type II, trusted by 100+ businesses. Its own pages mention property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["property", "purchases"], "sells_to": [], "source": "https://optout.bigdbm.com/"}
-priority: 31
+about: {"category": "marketing_data", "summary": "BIGDBM is a marketing data provider. BIGDBM delivers identity resolution and real-time enrichment on 280M+ U.S. consumer records. CCPA-compliant, SOC 2 Type II, trusted by 100+ businesses. Its own pages mention property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["property", "purchases"], "sells_to": [], "source": "https://optout.bigdbm.com/"}
+priority: 37

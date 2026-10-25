@@ -15,5 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "financial", "summary": "Teads Inc is a financial and credit data company. Outbrain and Teads have merged to create the omnichannel outcomes platform for the open internet. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://privacy-policy.teads.com/"}
-priority: 29
+about: {"category": "adtech", "summary": "Teads Inc is an advertising technology company. Outbrain and Teads have merged to create the omnichannel outcomes platform for the open internet. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://privacy-policy.teads.com/"}
+priority: 21

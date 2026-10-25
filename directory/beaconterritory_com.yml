@@ -14,5 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "real_estate", "summary": "Beacon Territory Group LLC is a property and real-estate data company. Beacon Territory Group allocates exclusive, ZIP-coded territories to independent P&C insurance agencies. Filtered homeowner records with appended phone numbers, delivered weekly. Owned... Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.beaconterritory.com/texas-privacy-rights/"}
-priority: 27
+about: {"category": "lead_generation", "summary": "Beacon Territory Group LLC is a lead-generation company. Beacon Territory Group allocates exclusive, ZIP-coded territories to independent P&C insurance agencies. Filtered homeowner records with appended phone numbers, delivered weekly. Owned... Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.beaconterritory.com/texas-privacy-rights/"}
+priority: 29

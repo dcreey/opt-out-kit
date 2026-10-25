@@ -17,5 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
-about: {"category": "financial", "summary": "Mobilewalla, Inc. is a financial and credit data company. Benchmark the competition, understand consumer behavior, and power strategic decisions with domain-specific AI and proprietary consumer intelligence. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://www.mobilewalla.com/global-opt-out-request"}
-priority: 31
+about: {"category": "location_data", "summary": "Mobilewalla, Inc. is a device and location data company. Benchmark the competition, understand consumer behavior, and power strategic decisions with domain-specific AI and proprietary consumer intelligence. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://www.mobilewalla.com/global-opt-out-request"}
+priority: 33

@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-eu-cdn.onetrust.com/dsarwebform/942fbf02-bbfe-4a5d-808d-080b06c5651c/3fdf8f1d-7ab3-4a99-bb4e-24965500290d.html"
   blockers: ["check:a bot check"]
-about: {"category": "real_estate", "summary": "ReallyGreatRate, Inc is a property and real-estate data company. Buy verified leads for solar, mortgage, and home improvement. 20+ years experience, TCPA compliant, real-time delivery. Trusted lead generation partner. Its own pages mention age or birthdate, property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["age", "property", "purchases"], "sells_to": [], "source": "https://www.rgrmarketing.com/"}
-priority: 27
+about: {"category": "lead_generation", "summary": "ReallyGreatRate, Inc is a lead-generation company. Buy verified leads for solar, mortgage, and home improvement. 20+ years experience, TCPA compliant, real-time delivery. Trusted lead generation partner. Its own pages mention age or birthdate, property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["age", "property", "purchases"], "sells_to": [], "source": "https://www.rgrmarketing.com/"}
+priority: 29

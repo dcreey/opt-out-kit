@@ -15,5 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
-about: {"category": "b2b", "summary": "Fushia Media, LLC is a business-contact and sales-data provider. Fuchsia Media specializes in data enhancement, analytics, and customized marketing solutions. Leverage over 600 demographic attributes and cutting-edge analytics tools to empower your... Its own pages mention email addresses, age or birthdate, property and vehicles, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "age", "property", "purchases", "interests", "online"], "sells_to": [], "source": "https://fushiamedia.com/privacy"}
-priority: 29
+about: {"category": "marketing_data", "summary": "Fushia Media, LLC is a marketing data provider. Fuchsia Media specializes in data enhancement, analytics, and customized marketing solutions. Leverage over 600 demographic attributes and cutting-edge analytics tools to empower your... Its own pages mention email addresses, age or birthdate, property and vehicles, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "age", "property", "purchases", "interests", "online"], "sells_to": [], "source": "https://fushiamedia.com/privacy"}
+priority: 37

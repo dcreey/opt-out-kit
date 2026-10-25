@@ -23,6 +23,7 @@ struct CoachGuide: Identifiable {
             Loc.t("The app fills in the site's form with only the details it asks for."),
             Loc.t("You solve the bot check, and pick your own listing if the site asks. We never do that for you."),
             Loc.t("Some sites email you a link to confirm. That tap is yours too."),
+            FollowUpNote.text,
         ])
     }
     /// The guide for a task done this way, or none for what the app does by itself.
