@@ -301,9 +301,12 @@ final class AppModel: ObservableObject {
     }
 
     /// Every site we track, each shown once in the Sites list (some as part of another site's request).
-    var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count + closedSites.count }
+    var totalSites: Int { Set(plan.flatMap { $0.tasks.flatMap(\.domains) }).count + closedSites.count + lockedSites.count }
 
     /// Sites that no longer respond, with the evidence. They are not tasks: there is nothing left to opt out of.
+    /// Sites with no route to opt out yet. They wait here until a form, page or address is found for them.
+    var lockedSites: [DirectoryEntry] { OptOutPlan.locked(plan, entries: directory) }
+
     var closedSites: [DirectoryEntry] { directory.filter { $0.closed != nil }.sorted { $0.domain < $1.domain } }
 
     // MARK: First-visit guides

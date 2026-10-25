@@ -69,6 +69,18 @@ struct SitesView: View {
                 if !search.isEmpty, !queue.contains(where: { $0.tasks.contains { visible($0) } }) {
                     Section { Text("No site matches that search.").foregroundStyle(.secondary) }
                 }
+                if search.isEmpty || !model.lockedSites.filter({ closedVisible($0) }).isEmpty {
+                    let locked = model.lockedSites.filter { closedVisible($0) }
+                    if !locked.isEmpty {
+                        Section {
+                            NavigationLink { LockedSitesView(sites: locked) } label: {
+                                Label(Loc.f("%lld sites unlock later", locked.count), systemImage: "lock")
+                            }.accessibilityIdentifier("locked-sites")
+                        } footer: {
+                            Text("We have not found a way to opt out of these yet: no form, page or email. They become tasks the day we do.")
+                        }
+                    }
+                }
                 if search.isEmpty || closedMatches {
                     let closed = model.closedSites.filter { closedVisible($0) }
                     if !closed.isEmpty {
@@ -732,5 +744,31 @@ struct ClosedSitesView: View {
         .navigationTitle("No longer respond")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("closed-sites-list")
+    }
+}
+
+
+/// Sites with no route to opt out yet: not tasks, listed so every site is accounted for.
+struct LockedSitesView: View {
+    let sites: [DirectoryEntry]
+
+    var body: some View {
+        List {
+            Section {
+                Text("These sites have no form, page or email we can use. Nothing for you to do; we keep looking, and a site moves into your tasks as soon as we find a route.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            Section {
+                ForEach(sites) { e in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label(e.domain, systemImage: "lock").font(.headline)
+                        Text(e.name).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .navigationTitle("Unlock later")
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier("locked-sites-list")
     }
 }

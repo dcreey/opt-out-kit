@@ -1036,6 +1036,29 @@
     }
    }
   },
+  "%lld sites unlock later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites se débloquent plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios se desbloquean más adelante"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Websites werden später freigeschaltet"
+     }
+    }
+   }
+  },
   "%lld sites, handled in %lld steps and %lld tasks. Work from the top: each step is the quickest way to cover the most sites.": {
    "extractionState": "manual",
    "localizations": {
@@ -15043,6 +15066,29 @@
     }
    }
   },
+  "These sites have no form, page or email we can use. Nothing for you to do; we keep looking, and a site moves into your tasks as soon as we find a route.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces sites n'ont ni formulaire, ni page, ni adresse e-mail utilisable. Rien à faire de votre côté ; nous continuons à chercher, et un site passe dans vos tâches dès que nous trouvons un moyen."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos sitios no tienen formulario, página ni correo que podamos usar. No tienes nada que hacer; seguimos buscando y un sitio pasa a tus tareas en cuanto encontremos una vía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Websites haben kein Formular, keine Seite und keine E-Mail-Adresse, die wir nutzen können. Sie müssen nichts tun; wir suchen weiter, und sobald wir einen Weg finden, wird die Website zu einer Ihrer Aufgaben."
+     }
+    }
+   }
+  },
   "They and their advertisers may set tracking cookies that follow purchases and target ads. Opt-Out Kit's browser keeps no cookies between visits and turns down cookie banners.": {
    "extractionState": "manual",
    "localizations": {
@@ -15986,6 +16032,29 @@
     }
    }
   },
+  "Unlock later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À débloquer plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se desbloquean después"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Später freischalten"
+     }
+    }
+   }
+  },
   "Use another mail app": {
    "extractionState": "manual",
    "localizations": {
@@ -16718,6 +16787,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir gehen über das Register eines einzelnen Landes hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (bisher US-Bundesstaaten), mit weiteren bekannten Brokern – insgesamt %@ Websites. Viele sind US-Unternehmen, die das Recht Ihres Landes womöglich nicht beachten müssen, doch die meisten nehmen Opt-out-Anfragen von jedem an, und diese App sendet sie ihnen."
+     }
+    }
+   }
+  },
+  "We have not found a way to opt out of these yet: no form, page or email. They become tasks the day we do.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas encore trouvé comment vous retirer de ces sites : ni formulaire, ni page, ni e-mail. Ils deviennent des tâches dès que nous trouvons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no hemos encontrado cómo darte de baja de estos sitios: ni formulario, ni página, ni correo. Se convierten en tareas el día que lo encontremos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben noch keinen Weg gefunden, Sie dort abzumelden: kein Formular, keine Seite, keine E-Mail. Sie werden zu Aufgaben, sobald wir einen finden."
      }
     }
    }

@@ -57,9 +57,6 @@ struct BrokerListView: View {
                                         done: goals.emailDone, total: mail.domains.count, symbol: "envelope")
                             }.accessibilityIdentifier("goal-email")
                         }
-                        NavigationLink(value: "all-email") {
-                            Label("Just in case: email every site, 100 at a time", systemImage: "envelope.badge")
-                        }.accessibilityIdentifier("goal-email-all")
                         if goals.allComplete {
                             Button { model.dailyBatches += 1 } label: { Label("Keep going: take 25 more", systemImage: "forward.fill") }
                                 .accessibilityIdentifier("goal-more")
@@ -145,7 +142,6 @@ struct BrokerListView: View {
                 case "auto-activity": AutoActivityView()
                 case "daily-verify": VerifyQueueView(domains: model.dailyGoals.verify)
                 case "daily-email": EmailQueueView(domains: model.dailyGoals.email?.domains ?? [])
-                case "all-email": EmailQueueView(domains: model.directory.filter { $0.contactEmail != nil }.map(\.domain), perMessage: 100)
                 default: EmptyView()
                 }
             }

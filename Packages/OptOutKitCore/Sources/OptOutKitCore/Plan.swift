@@ -44,6 +44,12 @@ public struct PlanStep: Identifiable, Equatable, Sendable {
 /// Builds the ordered plan: the official removal service for the person's place first, then our automatic opt-out, semi-automated,
 /// guided and manual. A site belongs to the first step that handles it and to no later one; sites that share one opt-out are one task.
 public enum OptOutPlan {
+    /// Sites with no route to opt out yet (no form, no page, no email): not tasks, kept to be unlocked once a route is found.
+    public static func locked(_ steps: [PlanStep], entries: [DirectoryEntry]) -> [DirectoryEntry] {
+        let planned = Set(steps.flatMap { $0.tasks.flatMap(\.domains) })
+        return entries.filter { $0.closed == nil && !planned.contains($0.domain) }.sorted { $0.domain < $1.domain }
+    }
+
     /// Whether the site has a form the app can fill in (read from the page, or found on the live page).
     public static func hasForm(_ e: DirectoryEntry) -> Bool { e.optOutForm != nil || e.liveForm?.found == true }
 
@@ -104,6 +110,7 @@ public enum OptOutPlan {
             let best = verdicts.min { order.firstIndex(of: $0.1.method)! < order.firstIndex(of: $1.1.method)! }!
             let lead = members.first { $0.id == $0.familyParent } ?? best.0
             let domains = [lead.domain] + members.map(\.domain).filter { $0 != lead.domain }.sorted()
+            if best.1.method == .manual { continue }
             claimed.formUnion(domains)
             byMethod[best.1.method, default: []].append(PlanTask(kind: .site(lead.id), title: lead.domain, domains: domains,
                                                                    reason: L10n.f("One opt-out request handles all %@ sites that share this process.", domains.count), method: best.1.method, registeredIn: states(domains)))
@@ -123,6 +130,7 @@ public enum OptOutPlan {
         for e in entries where !claimed.contains(e.domain) {
             claimed.insert(e.domain)
             let v = classifyEntry(e)
+            if v.method == .manual { continue }          // no route to opt out yet: not a task, listed as "later" (see `locked`)
             byMethod[v.method, default: []].append(PlanTask(kind: .site(e.id), title: e.domain, domains: [e.domain], reason: v.reason, method: v.method, registeredIn: Set(e.registeredIn ?? [])))
         }
         for m in order {

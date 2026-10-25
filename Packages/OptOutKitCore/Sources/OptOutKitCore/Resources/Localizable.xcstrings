@@ -231,29 +231,6 @@
     }
    }
   },
-  "%@ pages, one after another. Each is filled in for you; you tick its \"I am human\" box and we send it.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%@ pages, l’une après l’autre. Chacune est remplie pour vous ; vous cochez sa case « je suis humain » et nous l’envoyons."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%@ páginas, una tras otra. Cada una se rellena por ti; marcas su casilla «soy humano» y la enviamos."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%@ Seiten, nacheinander. Jede ist für Sie ausgefüllt; Sie haken das Feld „Ich bin ein Mensch“ an und wir senden sie."
-     }
-    }
-   }
-  },
   "%@ requires data brokers to register themselves. We pull this registry (%@ brokers) and add every broker on it to our list.": {
    "extractionState": "manual",
    "localizations": {
@@ -5172,29 +5149,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Tippen Sie auf Kopieren und fügen Sie es ins Formular ein. Nach einer Minute wird es aus der Zwischenablage gelöscht."
-     }
-    }
-   }
-  },
-  "Tap to verify, we do the rest": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Touchez pour vérifier, nous faisons le reste"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Toca para verificar, nosotros hacemos el resto"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Zum Bestätigen tippen, den Rest erledigen wir"
      }
     }
    }

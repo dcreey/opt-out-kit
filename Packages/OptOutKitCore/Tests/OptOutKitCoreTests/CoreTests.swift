@@ -2182,8 +2182,13 @@ final class PlanTests: XCTestCase {
             let (steps, entries) = try plan(withPlatforms: withPlatforms)
             let all = steps.flatMap { $0.tasks.flatMap(\.domains) }
             XCTAssertEqual(all.count, Set(all).count, "a site is listed twice (platforms: \(withPlatforms))")
-            let missing = Set(entries.map(\.domain)).subtracting(all)
+            // Closed sites are not tasks, and sites with no route yet are "locked" (listed apart): nothing else may be missing.
+            let locked = OptOutPlan.locked(steps, entries: entries).map(\.domain)
+            let missing = Set(entries.filter { $0.closed == nil }.map(\.domain)).subtracting(all).subtracting(locked)
             XCTAssertEqual(missing.sorted(), [], "platforms: \(withPlatforms)")
+            XCTAssertTrue(OptOutPlan.locked(steps, entries: entries).allSatisfy { OptOutMethods.classify($0).method == .manual },
+                          "only sites with no route are locked")
+            XCTAssertFalse(steps.contains { $0.kind == .method(.manual) }, "there is no manual step: no route means locked")
         }
     }
 
