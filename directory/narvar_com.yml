@@ -18,3 +18,7 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_services", "summary": "Narvar, Inc is a marketing and direct-mail services company. Narvar's IRIS™ analyzes billions of data points, creating post-purchase experiences that boost customer loyalty, efficiency and drive sustainable retail growth. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": ["advertisers"], "sells_note": "We will retain personal information in accordance with the time periods set forth in “Retention of Personal Information.” We “sell” and “share” your personal information to provide you with “cross-context behavioral advertising” about Narva", "source": "https://corp.narvar.com/legal/privacy-policy"}
 priority: 46
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "post-purchase software for retailers; opt-out is for its business customers"

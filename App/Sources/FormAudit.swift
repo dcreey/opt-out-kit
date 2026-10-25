@@ -27,6 +27,9 @@ struct AuditSite: Codable {
     var fields: [AuditField]
     var blockers: [String]
     var typedCodeBox: Bool
+    var title: String = ""
+    var formText: String = ""
+    var buttons: [String] = []
 }
 
 @MainActor
@@ -52,17 +55,53 @@ enum FormAudit {
         return out
     }
 
+    /// Every site that has a page to open, in the default order of kinds, best first.
+    static func all(model: AppModel) -> [String] {
+        let rank = Dictionary(uniqueKeysWithValues: BrokerCategory.allCases.map { ($0.rawValue, $0.rank) })
+        return model.directory.filter { $0.closed == nil && ($0.optOutForm != nil || $0.liveForm?.found == true || $0.optOutURL != nil) }
+            .sorted { (rank[$0.about?.category ?? "other"] ?? 99, -($0.priority ?? 0), $0.domain) < (rank[$1.about?.category ?? "other"] ?? 99, -($1.priority ?? 0), $1.domain) }.map(\.domain)
+    }
+
     static func run(domains: [String], model: AppModel) async {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("audit")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        var results: [AuditSite] = []
-        for d in domains {
-            guard let entry = model.directory.first(where: { $0.domain == d }).map(model.resolved) else { continue }
-            let site = await one(entry, model: model, dir: dir)
-            results.append(site)
-            if let data = try? JSONEncoder().encode(results) { try? data.write(to: dir.appendingPathComponent("results.json")) }
+        let file = dir.appendingPathComponent("results.json")
+        // Resume: sites already audited are kept and skipped, so a long run can be stopped and started again.
+        var results: [AuditSite] = (try? Data(contentsOf: file)).flatMap { try? JSONDecoder().decode([AuditSite].self, from: $0) } ?? []
+        let done = Set(results.map(\.domain))
+        let todo: [DirectoryEntry] = domains.filter { !done.contains($0) }.compactMap { d in model.directory.first(where: { $0.domain == d }).map(model.resolved) }
+        let width = 4
+        var next = 0
+        await withTaskGroup(of: AuditSite?.self) { group in
+            func add() {
+                guard next < todo.count else { return }
+                let entry = todo[next]; next += 1
+                group.addTask { @MainActor in await timed(entry, model: model, dir: dir) }
+            }
+            for _ in 0..<width { add() }
+            for await site in group {
+                if let site { results.append(site); if let data = try? JSONEncoder().encode(results) { try? data.write(to: file) } }
+                add()
+            }
         }
         try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
+    }
+
+    /// One site, given at most 75 seconds so a page that never settles cannot hold the run.
+    private static func timed(_ entry: DirectoryEntry, model: AppModel, dir: URL) async -> AuditSite? {
+        await withTaskGroup(of: AuditSite?.self) { race in
+            race.addTask { @MainActor in await one(entry, model: model, dir: dir) }
+            race.addTask { @MainActor in
+                try? await Task.sleep(nanoseconds: 75_000_000_000)
+                var site = AuditSite(domain: entry.domain, kind: entry.about?.category ?? "other", opens: "", finalURL: "", method: "", methodReason: "", outcome: "timed out after 75 seconds",
+                                     formFound: false, planVerdict: "", fields: [], blockers: [], typedCodeBox: false)
+                site.opens = (entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL)?.absoluteString ?? ""
+                return site
+            }
+            let first = await race.next() ?? nil
+            race.cancelAll()
+            return first
+        }
     }
 
     private static func one(_ entry: DirectoryEntry, model: AppModel, dir: URL) async -> AuditSite {
@@ -87,6 +126,7 @@ enum FormAudit {
         let context = await session.pageContext()
         guard let form = LiveFormPicker.pick(forms, pageContext: context) else { site.outcome = "no opt-out form found on the page (\(forms.count) forms seen)"; return site }
         site.formFound = true; session.chosenForm = form.token
+        site.title = await session.pageTitle(); site.formText = form.text; site.buttons = form.buttons
         let person = model.formPerson(pat)
         let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person)
         switch plan.verdict {

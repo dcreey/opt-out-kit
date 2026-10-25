@@ -20,7 +20,7 @@ def targets(only):
     out = []
     for f in sorted(glob.glob("directory/*.yml")):
         s = open(f).read()
-        if re.search(r"^closed:", s, re.M): continue
+        if re.search(r"^(closed|excluded):", s, re.M): continue
         d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
         if only and d not in only: continue
         m = re.search(r'^opt_out_form: \{"page": "([^"]+)"', s, re.M)

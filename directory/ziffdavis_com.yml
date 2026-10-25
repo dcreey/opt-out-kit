@@ -20,3 +20,7 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "other", "summary": "Ziff Davis LLC is a financial and credit data company. Ziff Davis (Nasdaq: ZD) is a vertically focused digital media and internet company whose portfolio includes leading brands in technology, entertainment, shopping, health, cybersecurity,... Its own pages mention criminal and court records, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["criminal", "purchases", "interests"], "sells_to": [], "source": "https://www.ziffdavis.com/"}
 priority: 24
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "a media publisher; not a data broker"

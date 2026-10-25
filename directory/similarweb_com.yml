@@ -16,3 +16,7 @@ live_form:
   found: false
 about: {"category": "other", "summary": "Similarweb Ltd. is a business-contact and sales-data provider. Similarweb is an AI-powered digital data company providing real-time market intelligence, competitive insights, and consumer trends to accelerate business growth. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.similarweb.com/"}
 priority: 18
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "website-traffic analytics about sites, not people"

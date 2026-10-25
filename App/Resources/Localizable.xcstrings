@@ -3934,6 +3934,29 @@
     }
    }
   },
+  "Best and worst case": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meilleur et pire cas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mejor y peor caso"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bester und schlimmster Fall"
+     }
+    }
+   }
+  },
   "Big manual tasks where you live or in your country": {
    "extractionState": "manual",
    "localizations": {
@@ -9634,6 +9657,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die App erledigt diese für Sie"
+     }
+    }
+   }
+  },
+  "Let's go": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "C'est parti"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vamos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los geht's"
      }
     }
    }
@@ -19735,6 +19781,29 @@
     }
    }
   },
+  "Today's briefing": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Briefing du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Resumen de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutiges Briefing"
+     }
+    }
+   }
+  },
   "Today's goals": {
    "extractionState": "manual",
    "localizations": {
@@ -21322,6 +21391,29 @@
     }
    }
   },
+  "What opting out does for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce que vous apporte le retrait"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Qué hace por ti darte de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was ein Opt-out für Sie bewirkt"
+     }
+    }
+   }
+  },
   "What stays off the table": {
    "extractionState": "manual",
    "localizations": {
@@ -21847,6 +21939,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "An wen sie verkaufen"
+     }
+    }
+   }
+  },
+  "Why this matters": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pourquoi c'est important"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Por qué importa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Warum das wichtig ist"
      }
     }
    }

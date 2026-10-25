@@ -15,7 +15,9 @@ struct RootView: View {
         #if DEBUG
         .task {
             let args = ProcessInfo.processInfo.arguments
-            if let i = args.firstIndex(of: "-audit-first-per-kind"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {
+            if args.contains("-audit-all") {
+                await FormAudit.run(domains: FormAudit.all(model: model), model: model)
+            } else if let i = args.firstIndex(of: "-audit-first-per-kind"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {
                 await FormAudit.run(domains: FormAudit.firstPerKind(n, model: model), model: model)
             } else if let i = args.firstIndex(of: "-audit-domains"), args.indices.contains(i + 1) {
                 await FormAudit.run(domains: args[i + 1].split(separator: ",").map(String.init), model: model)

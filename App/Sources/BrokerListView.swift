@@ -16,6 +16,7 @@ struct BrokerListView: View {
     @State private var chooser: ChooserMode?
     @State private var summary: ActivitySummary?
     @State private var explainFollowUp = false
+    @State private var briefing: BrokerCategory?
 
     var body: some View {
         NavigationStack {
@@ -51,7 +52,7 @@ struct BrokerListView: View {
                     // Every day opens on one question: which kind of broker to tackle.
                     Section {
                         ForEach(Array(model.remainingKinds.enumerated()), id: \.element.kind) { index, item in
-                            Button { model.chooseFirstKind(item.kind) } label: { KindOption(kind: item.kind, count: item.count, suggested: index == 0) }
+                            Button { model.chooseFirstKind(item.kind); briefing = BrokerCategory(rawValue: item.kind) } label: { KindOption(kind: item.kind, count: item.count, suggested: index == 0) }
                                 .buttonStyle(.plain).accessibilityIdentifier("kind-\(item.kind)")
                         }
                     } header: { Text("What do you want to tackle today?").font(.title3.bold()).textCase(nil).foregroundStyle(.primary) }
@@ -80,9 +81,11 @@ struct BrokerListView: View {
                 else if model.shouldExplainFollowUp { explainFollowUp = true; model.markFollowUpExplained() }
             }
             .sheet(isPresented: $explainFollowUp) { FollowUpExplainerView() }
+            .sheet(item: $briefing) { KindBriefingView(category: $0) }
             .sheet(item: $chooser) { mode in
                 KindChooserView(mode: mode) { id in
                     switch mode { case .start: model.chooseFirstKind(id); case .more: model.addBatch(kind: id) }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { briefing = BrokerCategory(rawValue: id) }
                 }
             }
             .sheet(item: $editing) { person in
@@ -449,5 +452,44 @@ struct FollowUpExplainerView: View {
             Button("Got it") { dismiss() }.buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("followup-done").padding(.bottom, 24)
         }
         .presentationDetents([.medium, .large])
+    }
+}
+
+
+extension BrokerCategory: Identifiable { public var id: String { rawValue } }
+
+/// Shown each time a day's kind of broker is chosen: who they are, why they matter today, and the best and worst a person can expect.
+struct KindBriefingView: View {
+    @Environment(\.dismiss) private var dismiss
+    let category: BrokerCategory
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 10) {
+                        Text("\(category.rank)").font(.headline).foregroundStyle(.white).frame(width: 32, height: 32).background(rankColor(category.rank), in: Circle())
+                        Text(category.title).font(.title3.bold())
+                    }
+                    HarmMeter(harm: category.harm)
+                } footer: { Text(category.about) }
+                Section("Why this matters") {
+                    Text(category.rankReason).font(.subheadline)
+                    Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
+                }
+                Section("Best and worst case") { CaseExamples(category: category) }
+                Section("What opting out does for you") {
+                    Label(category.protects, systemImage: "checkmark.shield.fill").font(.subheadline).foregroundStyle(.green)
+                }
+            }
+            .navigationTitle("Today's briefing")
+            .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom) {
+                Button { dismiss() } label: { Text("Let's go").font(.headline).frame(maxWidth: .infinity) }
+                    .buttonStyle(.borderedProminent).controlSize(.large).padding()
+                    .accessibilityIdentifier("briefing-go")
+            }
+        }
+        .presentationDetents([.large])
     }
 }

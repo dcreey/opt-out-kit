@@ -17,3 +17,7 @@ live_form:
   found: false
 about: {"category": "other", "summary": "DB SUB, LLC is a financial and credit data company. Modern restaurant tech that unifies POS, management tools, & scheduling software—helping restaurants streamline operations, cut chaos, and delight guests. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; publishers and ad platforms; government and law enforcement.", "tracks": ["phone", "email", "age", "employment", "education", "purchases", "interests", "online", "location", "credit"], "sells_to": ["advertisers", "businesses", "publishers", "government"], "sells_note": "To provide our Services, we utilize (i) Personal Information provided to us by or on behalf of our Clients (“Client Information”) solely for their own use, and (ii) Personal Information that we license from third parties (“Licensed Informat", "source": "https://www.bridg.com/privacy-policy"}
 priority: 50
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "restaurant software company; opt-out page is for business customers"

@@ -53,6 +53,16 @@
         "source": { "type": "string" }
       }
     },
+    "excluded": {
+      "type": "object",
+      "required": ["checked", "kind", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "checked": { "type": "string" },
+        "kind": { "enum": ["business_only", "not_a_data_broker"] },
+        "reason": { "type": "string" }
+      }
+    },
     "closed": {
       "type": "object",
       "required": ["checked", "evidence"],

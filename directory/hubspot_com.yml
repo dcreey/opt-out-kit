@@ -19,3 +19,7 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "other", "summary": "HubSpot, Inc. is a business-contact and sales-data provider. HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, interests and demographics. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["businesses", "advertisers", "government"], "sells_note": "You will always have a choice as to whether to disclose your Personal Information to our co-marketing partners.", "source": "https://legal.hubspot.com/privacy-policy"}
 priority: 46
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "marketing software company; its privacy form is for its customers' contacts, not a broker"

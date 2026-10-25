@@ -18,3 +18,7 @@ live_form:
   found: false
 about: {"category": "other", "summary": "Exa Labs Inc. is a people-search and public-records site. Search API for AI agents that need real-time web data, deep research, and structured content from one endpoint. Try our API for free. Its own pages mention health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["health", "social"], "sells_to": [], "source": "https://exa.ai/"}
 priority: 24
+excluded:
+  checked: "2026-10-25"
+  kind: "not_a_data_broker"
+  reason: "a search API for AI agents; no consumer opt-out"

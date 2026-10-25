@@ -138,7 +138,7 @@ final class AppModel: ObservableObject {
         household = loaded
         selectedID = loaded.people[0].id
         storageProblem = problem
-        if let directoryURL { directory = (try? Registry.loadDirectory(directoryURL)) ?? [] }
+        if let directoryURL { directory = ((try? Registry.loadDirectory(directoryURL)) ?? []).filter { $0.excluded == nil } }       // excluded sites are never shown
         if let jurisdictionsURL { jurisdictions = (try? JurisdictionLoader.load(directory: jurisdictionsURL)) ?? [] }
         if let registrySummaryURL { registrySummary = JurisdictionLoader.loadSummary(registrySummaryURL) }
         if let platformsURL { platforms = (try? PlatformLoader.load(directory: platformsURL)) ?? [] }

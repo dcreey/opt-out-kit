@@ -67,7 +67,7 @@ async def main():
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); reg = registry(); sem = asyncio.Semaphore(a.workers); todo = []
     for f in sorted(glob.glob("directory/*.yml")):
         s = open(f).read()
-        if re.search(r"^closed:", s, re.M): continue
+        if re.search(r"^(closed|excluded):", s, re.M): continue
         d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
         if a.only and d not in a.only.split(","): continue
         todo.append((d, s))

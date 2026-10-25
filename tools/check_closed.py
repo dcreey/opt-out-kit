@@ -59,7 +59,7 @@ async def main():
     a = ap.parse_args(); targets = {}
     for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
         s = open(f).read()
-        if re.search(r"^opt_out_form:|^  found: true|^contact_email:|^opt_out_url: \"", s, re.M): continue
+        if re.search(r"^opt_out_form:|^  found: true|^contact_email:|^opt_out_url: \"|^excluded:", s, re.M): continue
         targets[re.search(r'^domain: "([^"]+)"', s, re.M).group(1)] = f
     sem = asyncio.Semaphore(6)
     async with async_playwright() as p:

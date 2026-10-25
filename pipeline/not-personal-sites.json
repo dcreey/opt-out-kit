@@ -1,0 +1,98 @@
+{
+ "affinity.co": {
+  "kind": "not_a_data_broker",
+  "reason": "CRM software for investment firms; privacy form is for its business users"
+ },
+ "americantreasurytaxsolutions.com": {
+  "kind": "not_a_data_broker",
+  "reason": "a tax-services firm serving individuals and businesses; it does not sell data about people"
+ },
+ "bdo.com": {
+  "kind": "not_a_data_broker",
+  "reason": "accounting and advisory firm; its pages are for business clients, not a data broker"
+ },
+ "communityimpact.com": {
+  "kind": "not_a_data_broker",
+  "reason": "a local news publisher; not a data broker"
+ },
+ "deloitte.com": {
+  "kind": "not_a_data_broker",
+  "reason": "consulting firm; its pages are for business clients, not a data broker"
+ },
+ "evs7.com": {
+  "kind": "not_a_data_broker",
+  "reason": "dialer software company; contact form is for business customers"
+ },
+ "exa.ai": {
+  "kind": "not_a_data_broker",
+  "reason": "a search API for AI agents; no consumer opt-out"
+ },
+ "exlservice.com": {
+  "kind": "not_a_data_broker",
+  "reason": "business process outsourcing company; contact form is for business inquiries"
+ },
+ "hubspot.com": {
+  "kind": "not_a_data_broker",
+  "reason": "marketing software company; its privacy form is for its customers' contacts, not a broker"
+ },
+ "informa.com": {
+  "kind": "not_a_data_broker",
+  "reason": "events and media group; contact route is for business"
+ },
+ "klarifi.io": {
+  "kind": "not_a_data_broker",
+  "reason": "wastewater market data on facilities, not people"
+ },
+ "modfxlabs.com": {
+  "kind": "not_a_data_broker",
+  "reason": "event-planning software; not a data broker"
+ },
+ "narvar.com": {
+  "kind": "not_a_data_broker",
+  "reason": "post-purchase software for retailers; opt-out is for its business customers"
+ },
+ "partech.com": {
+  "kind": "not_a_data_broker",
+  "reason": "restaurant software company; opt-out page is for business customers"
+ },
+ "qualfon.com": {
+  "kind": "not_a_data_broker",
+  "reason": "call-center outsourcing company; contact form is for business inquiries"
+ },
+ "similarweb.com": {
+  "kind": "not_a_data_broker",
+  "reason": "website-traffic analytics about sites, not people"
+ },
+ "sproutsocial.com": {
+  "kind": "not_a_data_broker",
+  "reason": "social-media software; opt-out is for its business customers"
+ },
+ "supplier.io": {
+  "kind": "not_a_data_broker",
+  "reason": "supplier data about companies, not people"
+ },
+ "trustandwill.com": {
+  "kind": "not_a_data_broker",
+  "reason": "an estate-planning service; not a data broker"
+ },
+ "us.com": {
+  "kind": "not_a_data_broker",
+  "reason": "a domain-name registry service; no personal data about people"
+ },
+ "vintory.com": {
+  "kind": "not_a_data_broker",
+  "reason": "vacation-rental CRM software; not a data broker"
+ },
+ "ziffdavis.com": {
+  "kind": "not_a_data_broker",
+  "reason": "a media publisher; not a data broker"
+ },
+ "zoom.com": {
+  "kind": "not_a_data_broker",
+  "reason": "a video-meeting product site; the opt-out is a general contact route, not a broker removal"
+ },
+ "zs.com": {
+  "kind": "not_a_data_broker",
+  "reason": "management consulting firm for businesses"
+ }
+}

@@ -187,7 +187,7 @@ async def main():
     targets = []
     for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
         s = open(f).read()
-        if re.search(r"^opt_out_form: ", s, re.M): continue
+        if re.search(r"^opt_out_form: ", s, re.M) or re.search(r"^excluded:", s, re.M): continue          # excluded sites are never crawled
         d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1); m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
         if a.only and d not in a.only.split(","): continue
         if re.search(r'blockers: \["wall"\]', s): continue            # walled off by a bot check: not recrawled
