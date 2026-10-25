@@ -16,8 +16,8 @@ signals: [email_input, login_required, opt_out_form_found]
 profiled: "2026-10-22"
 about: {"category": "other", "summary": "Project Affinity, Inc. is a financial and credit data company. Affinity CRM helps PE and VC firms source deals, manage relationships, and close faster with AI-powered relationship intelligence and automated data capture. Its own pages mention email addresses, age or birthdate, job title and employer, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["email", "age", "employment", "purchases", "interests", "online", "location"], "sells_to": ["advertisers", "government"], "sells_note": "Other State Law Privacy Rights California Resident Rights Under California Civil Code Sections 1798.83-1798.84, California residents are entitled to contact us to prevent disclosure of Personal Data to third parties for such third parties’ ", "source": "https://www.affinity.co/legal/privacy-policy"}
 priority: 36
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "CRM software for investment firms; privacy form is for its business users"
-persistence: {"result": "unknown", "reup_months": 12}

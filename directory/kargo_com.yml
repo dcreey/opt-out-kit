@@ -12,11 +12,9 @@ contact_email: "privacy@accretiveads.com"
 registered_in: [CA]
 signals: [email_contact, phone_verify]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: true
-  page: "https://www.kargo.com/"
-  blockers: []
 about: {"category": "adtech", "summary": "Kargo Global LLC is an advertising technology company. Kargo helps brands reach consumers through premium media, breakthrough creative, retail media, and AI-powered advertising solutions that drive measurable business results. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://www.kargo.com/"}
 priority: 18
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: false

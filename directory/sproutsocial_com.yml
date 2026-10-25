@@ -20,8 +20,8 @@ live_form:
   blockers: []
 about: {"category": "marketing_services", "summary": "Sprout Social, Inc. is a marketing and direct-mail services company. Maximize your social ROI with Sprout Social, trusted by 30k+ brands. Power everything from publishing and engagement to analytics and influencer marketing. Try 30 days free. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, shopping and purchase behavior. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; government and law enforcement.", "tracks": ["phone", "email", "age", "employment", "education", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["businesses", "advertisers", "government"], "sells_note": "Competent law enforcement bodies, regulatory, government agencies, courts or other third parties where we believe disclosure is necessary (i) as a matter of applicable law or court order or regulation, (ii) to exercise, establish or defend ", "source": "https://sproutsocial.com/legal/privacy-policy/"}
 priority: 49
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "social-media software; opt-out is for its business customers"
-persistence: {"result": "unknown", "reup_months": 12}

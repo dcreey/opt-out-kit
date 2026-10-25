@@ -18,8 +18,8 @@ live_form:
   found: false
 about: {"category": "recruiting", "summary": "Deloitte Consulting LLP is a recruiting and workforce data provider. Discover industry insights and audit, tax, and consulting services that drive impact from Deloitte’s global network of member firms. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://datasubject.deloitte.com/"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "consulting firm; its pages are for business clients, not a data broker"
-persistence: {"result": "unknown", "reup_months": 12}

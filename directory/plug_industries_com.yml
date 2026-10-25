@@ -11,11 +11,9 @@ opt_out_url: "https://www.plug-industries.com/do-not-sell"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_only_wording, phone_verify]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.plug-industries.com/contact"
-  blockers: []
 about: {"category": "marketing_data", "summary": "Plug Chargers LLC is a marketing data provider. Enterprise data solutions for accurate business intelligence. Access to a broad set of U.S. consumer and business data along with the tools to put that data to work — direct mail, email,... Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://www.plug-industries.com/"}
 priority: 44
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

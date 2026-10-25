@@ -51,7 +51,8 @@ async def main():
             text = open(path).read(); old = current_page(text) or "https://" + d
             async with sem:
                 ctx = await browser.new_context(user_agent=L.UA, viewport={"width": 390, "height": 844}, is_mobile=True)
-                try: main_score, (score, frame) = await find(ctx, old)
+                try: main_score, (score, frame) = await asyncio.wait_for(find(ctx, old), timeout=70)
+                except asyncio.TimeoutError: main_score, (score, frame) = -100, (-100, None)
                 finally: await ctx.close()
             if frame and score >= 5 and score > main_score:
                 if a.apply:
@@ -60,8 +61,8 @@ async def main():
                     open(path, "w").write(text)
                 return d, old, frame, score
             return d, old, None, score
-        for r in await asyncio.gather(*[one(d) for d in a.domains.split(",")]):
-            print("\t".join(str(x) for x in r))
+        for coro in asyncio.as_completed([one(d) for d in a.domains.split(",")]):
+            print("\t".join(str(x) for x in await coro), flush=True)
         await browser.close()
 
 

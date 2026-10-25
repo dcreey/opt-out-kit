@@ -2768,3 +2768,40 @@ final class RenewalTests: XCTestCase {
         XCTAssertEqual(s.dueToRenew, 2)
     }
 }
+
+
+final class FormFillerMoreFieldsTests: XCTestCase {
+    private let pat = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                             addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"], birthdate: "1980-03-09")
+    private func plan(_ f: [(String, String, String)], person: Person? = nil) -> FillPlan {
+        FormFiller.plan(for: OptOutForm(page: URL(string: "https://x.example/o")!, method: "post", action: nil, fields: f.map { FormField(type: $0.0, name: $0.1, label: $0.2) }, hops: 1), signals: nil, person: person ?? pat)
+    }
+    private func v(_ p: FillPlan, _ name: String) -> [String]? { p.values.first { $0.name == name }?.candidates }
+
+    func testAgeBirthPartsTodaysDateAndTheStateOfResidenceAreFilled() {
+        let p = plan([("text", "age", "Age*"), ("text", "m", "Birth month *"), ("text", "d", "Day *"), ("text", "y", "Year *"), ("text", "td", "Today's Date"),
+                      ("select", "res", "Resident of (required)"), ("text", "first", "First / Middle Name(s) *")])
+        XCTAssertEqual(p.verdict, .ready)
+        XCTAssertEqual(v(p, "age"), [String(pat.age()!)])
+        XCTAssertEqual(v(p, "m")?.first, "3"); XCTAssertTrue(v(p, "m")?.contains("March") ?? false)
+        XCTAssertEqual(v(p, "d")?.first, "9"); XCTAssertEqual(v(p, "y"), ["1980"])
+        XCTAssertEqual(v(p, "td")?.count, 3, "date in three common formats")
+        XCTAssertTrue(v(p, "res")?.contains("IL") ?? false, "Resident of is the state")
+        XCTAssertEqual(v(p, "first"), ["Pat"], "First / Middle Name(s) is the first name, not a middle-name field to skip")
+    }
+
+    func testASubjectAndAMessageBoxGetThePlainRequestAndABusinessFormIsNotPersonal() {
+        let p = plan([("text", "s", "Subject*"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "s"), ["Privacy opt-out and deletion request"])
+        XCTAssertTrue(v(p, "m")?.first?.contains("resident of Illinois") ?? false)
+        XCTAssertTrue(v(p, "m")?.first?.contains("stop selling or sharing") ?? false)
+        let biz = plan([("text", "fn", "First Name"), ("email", "e", "Email"), ("text", "c", "Company *"), ("text", "t", "Job Title*")])
+        guard case .needsYou(let why) = biz.verdict else { return XCTFail("a company and job title make it a business form") }
+        XCTAssertTrue(why.contains("business"))
+        // A name prefix menu called "Title" is not a job title.
+        XCTAssertEqual(plan([("text", "fn", "First Name"), ("email", "e", "Email"), ("select", "t", "Title")]).verdict, .ready)
+        // Age needs a birthdate the profile does not have: asked for, not invented.
+        var nobirth = pat; nobirth.birthdate = nil
+        if case .needsData(let what) = plan([("text", "age", "Age*"), ("text", "fn", "First Name"), ("email", "e", "Email")], person: nobirth).verdict { XCTAssertFalse(what.isEmpty) } else { XCTFail("needs the birthdate") }
+    }
+}

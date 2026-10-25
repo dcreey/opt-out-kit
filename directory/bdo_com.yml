@@ -16,8 +16,8 @@ live_form:
   found: false
 about: {"category": "other", "summary": "BDO GCI, LLC is a data company. BDO delivers assurance, tax, and financial advisory services that are tailored to our clients' industry, unique needs and goals. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.bdo.com/"}
 priority: 17
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "accounting and advisory firm; its pages are for business clients, not a data broker"
-persistence: {"result": "unknown", "reup_months": 12}

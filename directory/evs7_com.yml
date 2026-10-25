@@ -18,8 +18,8 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "other", "summary": "Electronic Voice Services, Inc. is a business-contact and sales-data provider. EVS7 builds cloud dialers & AI answering software for outbound & inbound teams. Serving 20k+ businesses from Dallas since 1993. Free trial. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "purchases", "interests", "online", "credit"], "sells_to": ["advertisers"], "source": "https://www.evs7.com/privacy-policy"}
 priority: 34
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "dialer software company; contact form is for business customers"
-persistence: {"result": "unknown", "reup_months": 12}

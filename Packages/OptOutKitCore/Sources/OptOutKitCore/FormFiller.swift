@@ -118,7 +118,9 @@ public enum FormFiller {
                 continue
             }
             // Middle names and suffixes are optional and the profile does not hold them: leave them empty, never reuse another name.
-            if key.range(of: "\\b(middle|mn|mi|suffix)\\b|middle.?name|middle.?initial", options: .regularExpression) != nil { continue }
+            // (A field that asks for "First / Middle Name(s)" is the first name.)
+            if key.range(of: "\\b(middle|mn|mi|suffix)\\b|middle.?name|middle.?initial", options: .regularExpression) != nil,
+               key.range(of: "first|pr[ée]nom|vorname|given", options: .regularExpression) == nil { continue }
             // A link to the person's own listing has to come from them: the form cannot succeed without it.
             if isListingField(field) {
                 if let listingURL { values.append(FieldValue(name: field.name, type: field.type, candidates: [listingURL.absoluteString], label: field.label)) }
@@ -133,6 +135,35 @@ public enum FormFiller {
                 else if required { needsYou = needsYou ?? L10n.t("This form asks for your phone's advertising ID, which needs your permission to read.") }
                 continue
             }
+            // A business contact form (company, job title, industry) is not a personal opt-out: only the person could answer it as a business.
+            if has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
+                if required { needsYou = needsYou ?? L10n.f("This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.", field.display) }
+                continue
+            }
+            // Today's date, for forms that ask for it beside a signature or request.
+            if has("today.?s date|current date|date of (request|submission)|\\bdate\\b") && !has("birth|dob|born") {
+                let now = Date(); let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX")
+                put(["yyyy-MM-dd", "MM/dd/yyyy", "MMMM d, yyyy"].map { f.dateFormat = $0; return f.string(from: now) }, L10n.noun("Date")); continue
+            }
+            // Age, or the parts of the birthdate, from the birthdate the person gave.
+            if has("\\bage\\b") && !has("manage|message|usage|page|image|stage|average") {
+                if let age = person.age() { put([String(age)], L10n.noun("Age")) } else if required { missing.append(L10n.noun("Birthdate")) }
+                continue
+            }
+            if let b = person.birthdate, b.count == 10, has("birth|dob|born") || has("^(month|day|year)\\b|\\b(month|day|year)\\b") {
+                let p = b.split(separator: "-").map(String.init)
+                if p.count == 3, let y = Int(p[0]), let m = Int(p[1]), let d = Int(p[2]) {
+                    let months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+                    if has("month") { put([String(m), String(format: "%02d", m), months[m - 1], String(months[m - 1].prefix(3))], L10n.noun("Birth month")); continue }
+                    if has("\\bday\\b") { put([String(d), String(format: "%02d", d)], L10n.noun("Birth day")); continue }
+                    if has("\\byear\\b") { put([String(y)], L10n.noun("Birth year")); continue }
+                }
+            }
+            // A subject or message box: the same plain request every time, stating only what the person already sends.
+            if field.label.lowercased().range(of: "^\\s*(subject|topic|regarding)\\b", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
+            if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
+                put([FormFiller.standardRequest(for: person)], L10n.noun("Message")); continue
+            }
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
             if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { continue }
             if has("country|\\bpays\\b|pa[ií]s\\b") {
@@ -144,7 +175,7 @@ public enum FormFiller {
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }
             else if has("full|\\bname\\b|\\bnom\\b|\\bnombre\\b") { put([legal], L10n.noun("Full name")) }
             else if has("city|\\bville\\b|ciudad|\\bstadt\\b|\\bort\\b") { put([address?.city], L10n.noun("City")) }
-            else if has("state|province|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
+            else if has("state|province|resident|reside|residency|residence|\\bregion\\b|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
                 put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
             else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }
@@ -161,6 +192,13 @@ public enum FormFiller {
         // anything else that certifies, attests or accepts terms is left alone. Never added for anyone else's profile.
         if person.mayConfirmOwnIdentity() { values.append(FieldValue(name: "", type: confirmIdentityType, candidates: ["on"], label: "")) }
         return FillPlan(values: values, verdict: .ready)
+    }
+
+    /// The request text for a free-text box: plain, the same for everyone, and only what the form already receives.
+    public static func standardRequest(for person: Person) -> String {
+        let state = person.addresses.first.flatMap { USStates.name(for: $0.state) } ?? ""
+        let where_ = state.isEmpty ? "" : " and a resident of \(state)"
+        return "I am an individual\(where_). Please stop selling or sharing my personal information, delete the personal information you hold about me, and keep me on your suppression list so it is not collected again. Please confirm by email."
     }
 
     /// A marker value (not a real field) that tells the web view to tick plain "I am this person" boxes.

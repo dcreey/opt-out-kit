@@ -160,7 +160,7 @@ async def site(browser, domain, opt_url, sem):
         try:
             own = P.registrable(domain); tried = set(); frontier = [u for u in (opt_url, f"https://{domain}/") if u]
             # Sites built from one template (the arrests and court-records families) keep their removal form at the same path.
-            frontier += [f"https://{domain}/request-portal/", f"https://www.{domain}/request-portal/", f"https://www.{domain}/privacy-request-portal", f"https://{domain}/privacy-request-portal"]
+            frontier += [f"https://{domain}/request-portal/", f"https://www.{domain}/request-portal/", f"https://www.{domain}/privacy-request-portal", f"https://{domain}/privacy-request-portal", f"https://www.{domain}/the-privacy-request-portal/"]
             for depth in range(3):
                 nxt = []
                 for u in frontier[:6]:

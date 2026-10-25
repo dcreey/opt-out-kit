@@ -18,8 +18,8 @@ live_form:
   found: false
 about: {"category": "other", "summary": "ZS Associates, Inc. is a healthcare data company. ZS is a global management consulting and technology firm that partners with companies to improve life and how we live it. Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://www.zs.com/"}
 priority: 22
+persistence: {"result": "unknown", "reup_months": 12}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "management consulting firm for businesses"
-persistence: {"result": "unknown", "reup_months": 12}

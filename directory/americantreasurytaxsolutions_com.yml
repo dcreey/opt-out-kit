@@ -18,8 +18,8 @@ live_form:
   blockers: []
 about: {"category": "lead_generation", "summary": "American Treasury Tax Solutions Inc is a lead-generation company. American Treasury Tax Solutions Inc has a decade of experience serving individuals and businesses in Dallas, Texas with their different tax needs. W... Its own pages mention income or wealth, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["income", "credit"], "sells_to": [], "source": "https://www.americantreasurytaxsolutions.com/"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 6}
 excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "a tax-services firm serving individuals and businesses; it does not sell data about people"
-persistence: {"result": "unknown", "reup_months": 6}
