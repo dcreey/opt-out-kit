@@ -420,6 +420,8 @@ def main():
     for line in open(a.sites):
         if line.strip() and not line.startswith("#"):
             p = line.split(); sites.append((p[0], p[1] if len(p) > 1 else "direct"))
+    excluded = {l.split("\t")[0] for l in open("pipeline/excluded-sites.txt") if l.strip() and not l.startswith("#")} if os.path.exists("pipeline/excluded-sites.txt") else set()
+    sites = [s for s in sites if s[0] not in excluded]          # never fetch a site we have excluded (hijacked, defunct, unsafe)
     if a.only: sites = [s for s in sites if s[0] in a.only.split(",")]
     os.makedirs(a.cache, exist_ok=True); os.makedirs(a.out, exist_ok=True)
     fetcher = Fetcher()

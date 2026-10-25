@@ -292,7 +292,6 @@ The app opens the right page and walks you through each step. Some steps need th
 - **buyerlink.co**: We found the opt-out page but could not read a form on it, so we take you there.
 - **cadent.com**: We found the opt-out page but could not read a form on it, so we take you there.
 - **cadent.tv**: We found the opt-out page but could not read a form on it, so we take you there.
-- **californiaarrestrecords.org**: We found the opt-out page but could not read a form on it, so we take you there.
 - **campaigner.com**: We found the opt-out page but could not read a form on it, so we take you there.
 - **captifytechnologies.com**: We found the opt-out page but could not read a form on it, so we take you there.
 - **captiv8.io**: We found the opt-out page but could not read a form on it, so we take you there.

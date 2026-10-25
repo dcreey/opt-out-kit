@@ -1,0 +1,3 @@
+# Sites that must never be fetched, profiled or listed. One per line: domain<TAB>date<TAB>reason. See docs/EXCLUDED_SITES.md.
+# tools/profile_brokers.py skips every domain here, even if a seed list or registry names it again.
+californiaarrestrecords.org	2026-10-25	hijacked: serves an Indonesian online-gambling ("VWTOTO slot") storefront, not an arrest-records site

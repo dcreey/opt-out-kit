@@ -21,7 +21,6 @@ backgroundchecks.me	indirect
 backgroundchecks.org	indirect
 beenverified.com	direct
 bumper.com	direct
-californiaarrestrecords.org	indirect
 californiaarrests.org	indirect
 californiacourtrecords.us	direct
 checkpeople.com	direct
