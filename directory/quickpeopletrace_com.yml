@@ -21,3 +21,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "people_search", "summary": "quickpeopletrace.com is a people-search and public-records site. We help you find people and public records - fast. Its own pages mention names and aliases, phone numbers, relatives and household members, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "relatives", "criminal"], "sells_to": [], "source": "https://www.quickpeopletrace.com/"}
+priority: 48

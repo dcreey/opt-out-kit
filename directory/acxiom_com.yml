@@ -21,3 +21,5 @@ live_form:
   found: true
   page: "https://omnicom-privacy.my.onetrust.com/webform/c0a325be-6f68-46be-a0de-e4a750890f7d/257a5cb1-b4b6-4ff1-bb7a-687c056fac91"
   blockers: ["check:a bot check"]
+about: {"category": "healthcare", "summary": "Acxiom LLC is a healthcare data company. Acxiom empowers brands to own their data, identity, and agentic future to maximize the value of their data and technology. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.acxiom.com/privacy/"}
+priority: 33

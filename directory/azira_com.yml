@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://submit-irm.trustarc.com/services/validation/0a80503b-1d56-4d50-a898-4377a0227dab"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Azira, LLC is an advertising technology company. Azira’s leading location intelligence platform for marketers and data leaders. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, property and vehicles. Its policy names these buyers or recipients: other data brokers and resellers; government and law enforcement; business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "education", "property", "purchases", "interests", "online", "location", "health", "social"], "sells_to": ["brokers", "government", "businesses", "advertisers"], "sells_note": "Our third-party data partners provide your personal information to us only where you have consented to such collection and disclosure to us.", "source": "https://www.azira.com/privacy-policy"}
+priority: 59

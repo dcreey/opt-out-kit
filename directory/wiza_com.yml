@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://wiza.co/optout-contact-info"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "Wiza, Inc. is a business-contact and sales-data provider. Discover 850M+ contacts with real-time verified emails, mobile numbers, and more. Trusted by 500k+ GTM professionals. Get started for free. Its own pages mention phone numbers, email addresses, job title and employer, social media profiles, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "social", "credit"], "sells_to": [], "source": "https://wiza.co/"}
+priority: 39

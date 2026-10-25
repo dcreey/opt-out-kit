@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "Revenue Roll Inc. is a data company. Tie (formerly Revenue Roll) is the AI shopper intelligence platform for ecommerce brands. Identify anonymous visitors, predict buyer intent, boost email deliverability & revenue. Its own pages mention devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["online", "credit"], "sells_to": [], "source": "https://meettie.com/"}
+priority: 18

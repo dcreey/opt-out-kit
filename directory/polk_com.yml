@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "R.L. Polk & Co. is a data company. Its own pages mention email addresses. Its policy does not name who it sells to.", "tracks": ["email"], "sells_to": [], "source": "https://privacyportal.onetrust.com/webform/5cb57702-8ef7-437e-a62b-408fe78cd310/93391c3d-d6c8-45b1-a169-39a0b7f9fb74"}
+priority: 15

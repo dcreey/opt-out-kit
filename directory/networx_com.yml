@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.networx.com/do-not-sell"
   blockers: []
+about: {"category": "real_estate", "summary": "Networx Systems Inc. is a property and real-estate data company. Find local contractors & home improvement professionals with Networx. Get a free quote today! Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "employment", "criminal", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": [], "source": "https://www.networx.com/privacy"}
+priority: 47

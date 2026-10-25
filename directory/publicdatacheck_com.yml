@@ -16,3 +16,5 @@ profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
+about: {"category": "people_search", "summary": "National Data Analytics, LLC is a people-search and public-records site. View information about yourself, friends, family, properties, phone numbers and vehicles that Google can't show you. Start your search with a name, address, phone number, VIN or license... Its own pages mention names and aliases, phone numbers, email addresses, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "property", "criminal"], "sells_to": [], "source": "https://www.publicdatacheck.com/"}
+priority: 50

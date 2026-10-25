@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://nexxen.com/privacy-data-subject-rights-request/"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Nexxen Inc is an advertising technology company. Nexxen's advertising technology platform delivers performance powered by unique data and media, to help advertisers and publishers achieve their full-funnel goals. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://nexxen.com/"}
+priority: 24

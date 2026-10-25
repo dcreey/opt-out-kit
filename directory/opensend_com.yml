@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "Opensend Inc is an advertising technology company. Identify, engage, and retain high-value shoppers with Opensend's lead generation platform. Capture anonymous website visitors, grow email lists, and boost revenue with AI-powered persona... Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.opensend.com/privacy-polic"}
+priority: 24

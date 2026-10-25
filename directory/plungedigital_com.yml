@@ -20,3 +20,5 @@ live_form:
   found: true
   page: "https://my.datasubject.com/Azq9ITU2sQjNPKhSo/38050"
   blockers: []
+about: {"category": "marketing_data", "summary": "Plunge, LLC is a marketing data provider. Better Data, Targeting & Segmentation - Data-driven solutions built by proprietary sourcing from public domain, cooperative databases, self-reported inputs. Its own pages mention email addresses, property and vehicles, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "property", "interests", "online"], "sells_to": ["advertisers"], "sells_note": "All consumer transactional information is sourced from both actual offline and online, direct-to-consumer marketers who use promotional offers to sell products/services, subscriptions, continuity and memberships.", "source": "https://www.plungedigital.com/"}
+priority: 43

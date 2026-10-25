@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "arrests", "summary": "ndarrests.org is a public arrest and court records site. Know your community - search North Dakota arrest records and warrants today. Its own pages mention names and aliases, age or birthdate, job title and employer, criminal and court records, interests and demographics, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["name", "age", "employment", "criminal", "interests", "credit"], "sells_to": [], "source": "https://www.ndarrests.org/content/privacy-in-north-dakota/"}
+priority: 45

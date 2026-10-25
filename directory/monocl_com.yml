@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://account.monocl.com/auth/realms/monocl/protocol/openid-connect/auth?client_id=app&redirect_uri=https%3A%2F%2Fapp.monocl.com%2Frequest-portal%2F&state=a6105820-4799-467e-9b37-afe566b6299d&response_mode=fragment&response_type=code&scope=openid&nonce=7d1cd9f0-b9df-47e6-8e7d-2f05304768b4&code_challenge=Hd-ClC49EVlZZbpFZsyrgrRcOSLgeZwMxKlelMNyHoE&code_challenge_method=S256"
   blockers: []
+about: {"category": "other", "summary": "Monocl AB is a data company. Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://privacy.monocl.com/"}
+priority: 22

@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-eu-cdn.onetrust.com/dsarwebform/65164905-7762-4cb1-93fa-0f0765f2c90f/eb84be74-925d-48ea-a4c9-1f1979b090e4.html"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Yieldmo, Inc. is an advertising technology company. Why Yieldmo Imagine Ads That Move People Yieldmo is a creative and media results company. We combine contextual curation, privacy-safe audience extension, and connected creative so... Its own pages mention interests and demographics, devices and online activity, social media profiles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["interests", "online", "social"], "sells_to": ["advertisers"], "sells_note": "To help us promote our business products and services online we may disclose personal information to providers of targeted advertising and related analytics services.", "source": "https://yieldmo.com/"}
+priority: 24

@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "consumer_reporting", "summary": "texaswarrantroundup.org is a background-screening and consumer-reporting company. Its own pages mention email addresses, education, property and vehicles, criminal and court records, devices and online activity, credit and financial accounts. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "education", "property", "criminal", "online", "credit"], "sells_to": ["advertisers"], "sells_note": "If you choose to receive communications from our marketing partners, advertisers, or other third parties, we may sell, rent or lease your personal information to those parties.", "source": "https://texaswarrantroundup.org/Privacy.html"}
+priority: 46

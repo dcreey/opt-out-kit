@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "real_estate", "summary": "Vintory, LLC is a property and real-estate data company. Vintory helps vacation rental managers grow their inventory. Purpose-built CRM, sales automation, and marketing automation for VRMs. Trusted by hundreds of companies. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, property and vehicles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "property", "online", "location", "social", "credit"], "sells_to": ["advertisers"], "sells_note": "Right to Opt-Out of Sales or Sharing You may instruct us not to sell your personal data or share it with third parties for cross-context behavioral advertising or targeted advertising.", "source": "https://vintory.com/privacy-policy"}
+priority: 50

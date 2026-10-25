@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://xcelerated.com/unsubscribe/"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "Xcelerated Data LLC is a marketing data provider. Xcelerated Data delivers consumer data solutions built on identity resolution, data hygiene, enrichment, and activation for modern marketing. Its own pages mention email addresses, interests and demographics. Its policy does not name who it sells to.", "tracks": ["email", "interests"], "sells_to": [], "source": "https://xcelerated.com/"}
+priority: 35

@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "marketing_data", "summary": "Catalina Marketing Corporation is a marketing data provider. Catalina's open ecosystem of solutions helps retailers, CPG brands, and agencies turn shoppers into buyers and buyers into fans. Its own pages mention shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "social"], "sells_to": [], "source": "https://www.catalina.com/"}
+priority: 39

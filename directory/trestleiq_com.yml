@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://portal.trestleiq.com/do-not-sell"
   blockers: []
+about: {"category": "fraud_identity", "summary": "Trestle Solutions, Inc. is an identity and fraud-prevention data provider. Trestle provides quality identity data APIs, which include phone verification, phone validation, CNAM lookup, reverse phone lookup API, and reverse address lookup API. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: government and law enforcement; advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health", "credit"], "sells_to": ["government", "advertisers", "businesses"], "sells_note": "We may disclose your Personal Information: (i) if we are required to do so by law or legal process, (ii) in response to a request from a court, law enforcement authorities, or government officials, or (iii) when we believe disclosure is nec", "source": "https://trestleiq.com/privacy-policy/"}
+priority: 59

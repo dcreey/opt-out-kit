@@ -12,3 +12,5 @@ opt_out_form: {"page": "https://www.lead411.com/your-privacy-choices/", "method"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, listing_url_input, opt_out_form_found, phone_verify]
 profiled: "2026-10-22"
+about: {"category": "b2b", "summary": "Lead411 Corporation is a business-contact and sales-data provider. Unlimited verified B2B leads database provider with direct dials, email addresses, and buyer intent data with Lead411’s B2B database. No credit limits. Start your free trial today. Its own pages mention phone numbers, email addresses, property and vehicles, shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "property", "purchases", "online", "social"], "sells_to": [], "source": "https://www.lead411.com/your-privacy-choices/"}
+priority: 37

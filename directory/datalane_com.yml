@@ -15,3 +15,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "b2b", "summary": "Task Genie, Inc. is a business-contact and sales-data provider. Enterprise B2B data for selling to local businesses. Get 3-7x more decision-maker contacts, TAM intelligence & precision signals. Trusted by 5000+ reps. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://www.datalane.com/"}
+priority: 28

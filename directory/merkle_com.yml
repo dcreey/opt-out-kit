@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-de.onetrust.com/webform/79bad1a6-7964-4224-be55-bb1da49b8d2d/3e467ef9-b66a-49d8-bc62-40943a80745c"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Merkle Inc. is a data company. The next decade belongs to brands that are positioned to win on customer experience. And the competition gets more fierce every day. Let's create together. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["phone", "email", "online"], "sells_to": ["brokers"], "sells_note": "EMAIL US Legal Terms Privacy Policy Your Privacy Choices Disclosure Policy Cookie Notice Email Preferences Sitemap Merkle is a data broker under Texas law.", "source": "https://www.merkle.com/en/privacy-policy.html"}
+priority: 28

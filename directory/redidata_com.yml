@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.redidata.com/opt-out-form/"
   blockers: ["check:a bot check"]
+about: {"category": "healthcare", "summary": "Redi-Data Inc is a healthcare data company. Discover quality mailing lists for precise B2B or healthcare outreach. Build segmented lists to boost engagement and results. Enquire now. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "education", "property", "interests", "online", "health"], "sells_to": [], "source": "https://www.redidata.com/privacy-policy/"}
+priority: 53

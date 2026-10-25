@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://getrev.ai/privacy-request"
   blockers: []
+about: {"category": "b2b", "summary": "LeadCrunch is a business-contact and sales-data provider. GetRev delivers managed AI demand generation with audience intelligence, campaign design, content syndication, and Agent Syndication with on-page AI and AEO. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://getrev.ai/"}
+priority: 22

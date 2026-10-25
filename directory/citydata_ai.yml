@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "CITYDATA Inc. is a data company. CityData.AI creates urban digital twins with big data and AI for civic innovation: parks and recreation visitation, trails, events and festivals attendance, economic development,... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "income", "property", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": [], "source": "https://www.citydata.ai/privacy/"}
+priority: 37

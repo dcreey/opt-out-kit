@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://360-media-direct.privacy.saymine.io/360_Media_Direct"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "360 Media Direct is a data company. With 360 Media Direct, brands reach the right customers, through the right channels, while paving the right customer journey. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "income", "interests", "online"], "sells_to": ["advertisers"], "sells_note": "When you access or use the Site, you consent to the collection, use, processing, and disclosure of your Information in accordance with this Policy by us, our third party marketing partners, and our parent, subsidiaries and entities under co", "source": "https://360mediadirect.com/privacy-policy/"}
+priority: 33

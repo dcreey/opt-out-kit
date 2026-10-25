@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/96e88ef7-218d-4979-ba92-634d98263159/518b4a8d-97b3-4fb6-a5a7-e1a1cd8de290"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "El Toro.com, LLC is a marketing data provider. Hyper-targeted audience and marketing platform by El Toro. Digital ad delivery, precise IP targeting, and actionable analytics. Sign up today! Its own pages mention age or birthdate, education, income or wealth, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["age", "education", "income", "purchases", "interests", "online", "location"], "sells_to": ["advertisers"], "sells_note": "This further prevents such information from being shared, sold, or used in targeted advertising activities by our company.", "source": "https://eltoro.com/your-privacy-choices/"}
+priority: 54

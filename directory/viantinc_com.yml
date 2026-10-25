@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/18c06089-a9ec-473c-a6d8-23d20fea46af/43201dea-88d7-44cd-9142-e5b4f485e428"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Viant US LLC is an advertising technology company. Viant, a pioneer in people-based digital advertising on the open web, empowers marketers with cookieless targeting, measurement and innovative analytics tools. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.viantinc.com/"}
+priority: 19

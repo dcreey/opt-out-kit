@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://datacloudhome.atlassian.net/servicedesk/customer/portal/12"
   blockers: []
+about: {"category": "financial", "summary": "Altair Data Resources, Inc is a financial and credit data company. Altair Data delivers tri-bureau credit, consumer, and life-event data to help financial marketers find and convert potential customers. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests", "credit"], "sells_to": [], "source": "https://altairdata.com/consumer-info/"}
+priority: 38

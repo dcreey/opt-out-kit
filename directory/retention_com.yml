@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://app.retention.com/optout/"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "GETEMAILS LLC is an advertising technology company. The identity foundation that AI needs to understand, personalize, and act — person-level resolution and identifiers for your platform, CDP, and marketing engine. Its own pages mention shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["purchases", "interests"], "sells_to": [], "source": "https://www.retention.com/"}
+priority: 25

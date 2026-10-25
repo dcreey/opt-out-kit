@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "financial", "summary": "Swarm Holdings, Inc. is a financial and credit data company. The Swarm curates a rich dataset of 500M profiles with daily job changes, 50M companies with fundraising data, and a unique relationship mapping technology for builders and investors. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["advertisers", "government"], "sells_note": "Law enforcement Under certain circumstances, the Company may be required to disclose Your Personal Data if required to do so by law or in response to valid requests by public authorities (e.g.", "source": "https://www.theswarm.com/privacy"}
+priority: 61

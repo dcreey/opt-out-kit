@@ -18,3 +18,5 @@ search_check:
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "arrests", "summary": "virginiaarrests.org is a public arrest and court records site. Virginia Arrests | Find arrest records and warrants in VA. Police records database. criminal background check. search for inmates in the Virginia Jail and Prison System. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.virginiaarrests.org/"}
+priority: 39

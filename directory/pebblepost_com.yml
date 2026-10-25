@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/f3224586-fa40-4b58-822e-e86fec4761ed/39d1f47c-b268-42dc-8009-25d1fd37d305"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "PebblePost, Inc. is an advertising technology company. PebblePost drives measurable incremental revenue across CTV and Programmatic Direct Mail using first-party data from hundreds of brands. Its own pages mention home addresses, phone numbers, shopping and purchase behavior, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "purchases", "online"], "sells_to": ["advertisers"], "sells_note": "While we do not “sell” your data in the traditional sense, our use of advertising services may involve a “sale,” “share,” or “targeted advertising” involving personal information under certain laws.", "source": "https://privacyportal-cdn.onetrust.com/dsarwebform/f3224586-fa40-4b58-822e-e86fec4761ed/39d1f47c-b268-42dc-8009-25d1fd37d305.html"}
+priority: 32

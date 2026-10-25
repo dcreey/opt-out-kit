@@ -2597,7 +2597,7 @@ final class BrokerAboutTests: XCTestCase {
         XCTAssertEqual(e.priority, 72)
         XCTAssertEqual(e.about?.sellsTo, ["advertisers and marketers"])
         XCTAssertEqual(e.about?.category, "people_search")
-        XCTAssertEqual(BrokerPriority.tier(72), "High priority"); XCTAssertEqual(BrokerPriority.tier(55), "Medium priority"); XCTAssertEqual(BrokerPriority.tier(10), "Lower priority")
+        XCTAssertEqual(BrokerPriority.tier(72), "High priority"); XCTAssertEqual(BrokerPriority.tier(50), "Medium priority"); XCTAssertEqual(BrokerPriority.tier(10), "Lower priority")
     }
 
     func testWithinABandTheHighestPriorityBrokersComeFirst() {
@@ -2609,5 +2609,25 @@ final class BrokerAboutTests: XCTestCase {
         let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { _ in MethodVerdict(method: .semiAutomatic, reason: "r") }, classifyBroker: { _ in MethodVerdict(method: .semiAutomatic, reason: "r") })
         let band = OptOutPlan.queue(steps, local: [], countryHasRegistries: false).flatMap(\.tasks).map(\.title)
         XCTAssertEqual(band, ["b.com", "c.com", "a.com"])
+    }
+}
+
+
+final class BrokerKindsTests: XCTestCase {
+    func testEveryIdTheDescriberWritesIsAKnownKindAndFiltersMatchOnIt() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        let described = entries.filter { $0.about != nil }
+        XCTAssertGreaterThan(described.count, 500)
+        for e in described {
+            XCTAssertNotNil(e.brokerCategory, "\(e.domain): unknown category \(e.about?.category ?? "")")
+            XCTAssertEqual(e.dataKinds.count, e.about?.tracks.count, "\(e.domain): unknown data kind")
+            XCTAssertEqual(e.buyerKinds.count, e.about?.sellsTo.count, "\(e.domain): unknown buyer kind")
+        }
+        let people = described.first { $0.brokerCategory == .people_search && $0.dataKinds.contains(.relatives) }
+        let p = try XCTUnwrap(people)
+        XCTAssertTrue(p.matches(category: .people_search, data: .relatives, buyer: nil))
+        XCTAssertFalse(p.matches(category: .adtech, data: nil, buyer: nil))
+        XCTAssertTrue(p.matches(category: nil, data: nil, buyer: nil))
     }
 }

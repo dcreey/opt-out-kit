@@ -15,3 +15,5 @@ search_check:
   status: "undifferentiated"
   candidate: {"method": "GET", "url": "https://www.missouriarrests.org/Results?fname={first}&lname={last}&stage=1&rType=Warrant&state={state}&city={city}", "body": null}
   checked: "2026-10-21"
+about: {"category": "arrests", "summary": "missouriarrests.org is a public arrest and court records site. Find arrest records in Missouri. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.missouriarrests.org/"}
+priority: 39

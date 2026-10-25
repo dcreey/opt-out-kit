@@ -18,3 +18,5 @@ live_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "b2b", "summary": "Tagis Inc is a business-contact and sales-data provider. AI agents find your next buyers while your team sells. Get 200M+ B2B profiles, buying signals, multichannel outreach and deliverability in one sales platform. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, devices and online activity, social media profiles. Its policy names these buyers or recipients: advertisers and marketers; other data brokers and resellers; business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "employment", "online", "social"], "sells_to": ["advertisers", "brokers", "businesses", "government"], "sells_note": "Our business consists of; ‘Data Broker’ activities, consisting of selling, sharing or licensing personal information to our Customers for their own independent marketing, communications or other business purposes, and;‍ ‘Business Services’ ", "source": "https://www.amplemarket.com/legal/privacy"}
+priority: 50

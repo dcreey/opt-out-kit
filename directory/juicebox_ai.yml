@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://juicebox.ai/privacy-center"
   blockers: []
+about: {"category": "other", "summary": "Juicebox App, Inc. is a data company. Find, verify, and email perfect-fit candidates in one prompt. Search 800M+ profiles across 30+ sources and hire faster with AI. Its own pages mention job title and employer, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["employment", "online", "social"], "sells_to": [], "source": "https://juicebox.ai/"}
+priority: 23

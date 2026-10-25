@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://atmospherik.ai/privacy-choices"
   blockers: []
+about: {"category": "other", "summary": "ATMOSPHERIK INC. is a data company. We create the customers your stack can't see. Operated by Rik Works, measured on incremental net-new customers. Its own pages mention email addresses, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["email", "online", "health"], "sells_to": [], "source": "https://atmospherik.ai/privacy-choices"}
+priority: 22

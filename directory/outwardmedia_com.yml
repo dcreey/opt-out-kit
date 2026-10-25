@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "b2b", "summary": "Outward Media Inc. is a business-contact and sales-data provider. Outward Media helps B2B brands reach and convert their ideal buyers with precision-targeted email marketing, verified contact data, intent monitoring, and data cleansing — all backed by... Its own pages mention phone numbers, email addresses, age or birthdate, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["phone", "email", "age", "online"], "sells_to": ["businesses"], "sells_note": "Legal Requirements: We may disclose information if required by law, court order, or governmental authority, or to protect the rights, property, or safety of OMI, our clients, or others.", "source": "https://outwardmedia.com/privacypolicy"}
+priority: 38

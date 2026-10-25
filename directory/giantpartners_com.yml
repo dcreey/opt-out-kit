@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://giantpartners.com/do-not-sell-my-personal-info-all-other-states/"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "Giant Partners, Inc. is a business-contact and sales-data provider. Data driven marketing agency with 25 years experience across 6000+ clients. B2C and B2B Postal, Phone, Email, Google, Social, and LinkedIn advertising experts. Its own pages mention home addresses, income or wealth, property and vehicles, interests and demographics, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "income", "property", "interests", "social"], "sells_to": [], "source": "https://giantpartners.com/"}
+priority: 39

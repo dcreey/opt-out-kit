@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://ecom2.anchorcomputer.com/privacyrequest", "metho
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "marketing_data", "summary": "Anchor Computer Inc. is a marketing data provider. Improve campaign performance with Anchor Computer’s marketing data services. Clean, enrich, and analyze your data to effectively target the right audience. Its own pages mention shopping and purchase behavior, interests and demographics, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "health", "social"], "sells_to": [], "source": "https://www.anchorcomputer.com/"}
+priority: 45

@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "marketing_data", "summary": "Infinite Media Concepts, Inc. is a marketing data provider. Accurate, compliant marketing data and mailing lists for B2B and B2C campaigns, backed by experienced data experts. Its own pages mention interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["interests", "online", "location"], "sells_to": [], "source": "https://mailinglists.com/about/privacy-policy"}
+priority: 43

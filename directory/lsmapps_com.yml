@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://lsmapps.com/opt-out"
   blockers: []
+about: {"category": "other", "summary": "L.S Mobile Apps Holdings LTD is a data company. LSM Apps - Easily manage your contacts. Backup, Cleanup and Caller ID. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, precise location, health information. Its policy names these buyers or recipients: government and law enforcement; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "location", "health"], "sells_to": ["government", "advertisers"], "sells_note": "We may disclose all of the Personal Information we collect from you with Government Entities/Law Enforcement if we requested to do so.", "source": "https://lsmapps.com/ccpa"}
+priority: 39

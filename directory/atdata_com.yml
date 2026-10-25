@@ -21,3 +21,5 @@ run_check:
   date: "2026-10-23"
   result: "failed"
   note: "a picture puzzle bot check appears after sending"
+about: {"category": "fraud_identity", "summary": "AtData, LLC is an identity and fraud-prevention data provider. Unlock intelligence about the person behind the email address with email validation, data enrichment, identity matching, and fraud protection. Its own pages mention email addresses, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "interests", "online", "social"], "sells_to": [], "source": "https://atdata.com/"}
+priority: 35

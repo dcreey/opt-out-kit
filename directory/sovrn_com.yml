@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacy.sovrn.com/opt-out"
   blockers: []
+about: {"category": "adtech", "summary": "Sovrn, Inc. is an advertising technology company. Thousands of the world’s top publishers trust the Sovrn Platform, a complete set of data and monetization tools, to thrive on the open web. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.sovrn.com/privacy-policy/policy-center/"}
+priority: 18

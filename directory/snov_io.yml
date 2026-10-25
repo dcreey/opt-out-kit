@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
+about: {"category": "b2b", "summary": "Snovio Inc is a business-contact and sales-data provider. Snov.io is trusted by 300,000 companies in 180+ countries to find leads, enrich them with verified emails and phone numbers, and automate cold outreach. Try for free. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online", "health", "social"], "sells_to": [], "source": "https://snov.io/do-not-sell-my-personal-information"}
+priority: 42

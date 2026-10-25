@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "BECAUSAL, INC. is a data company. Its own pages mention email addresses, shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "purchases", "online", "social"], "sells_to": [], "source": "https://www.becausal.com/personal-information"}
+priority: 22

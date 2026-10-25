@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.exlservice.com/"
   blockers: []
+about: {"category": "financial", "summary": "ExlService.com, LLC is a financial and credit data company. From trusted data foundations to enterprise AI, agentic deployment and AI-powered operations, EXL helps organizations transform workflows and drive business outcomes. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, shopping and purchase behavior. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "education", "purchases", "interests", "online", "social", "credit"], "sells_to": ["businesses", "advertisers"], "sells_note": "We are not responsible for the privacy policies or the data collection, use, or disclosure practices of our customers or third-party sites.", "source": "https://www.exlservice.com/privacy-notice"}
+priority: 49

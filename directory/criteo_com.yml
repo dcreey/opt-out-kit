@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "Criteo Corp. is an advertising technology company. Make every shopping moment smarter with ads powered by commerce AI fueled by the world’s largest set of commerce data. Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms.", "tracks": ["phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": ["advertisers", "publishers"], "sells_note": "Supply-side platforms (SSPs) Technology platforms that help publishers manage, sell, and optimize their ad inventory.", "source": "https://www.criteo.com/privacy/"}
+priority: 42

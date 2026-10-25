@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "Civic Element LLC is a data company. Unlock powerful voter data services with Civic Element. Get accurate, fast, and actionable insights designed for campaigns, unions, and advocacy groups ready to win and influence. Its own pages mention phone numbers, email addresses, age or birthdate, education, income or wealth, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["phone", "email", "age", "education", "income", "interests", "online", "location"], "sells_to": ["advertisers", "businesses"], "sells_note": "Specifically, in the past 12 months, we have sold the above-listed categories of personal information to our customers so they may conduct campaigns or outreach to you, and our data augmentation providers to enhance the data maintained and ", "source": "https://www.civicelement.com/privacy-policy"}
+priority: 42

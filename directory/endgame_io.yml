@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "Endgame Labs, Inc. is a data company. Endgame compiles every call, email, meeting, and playbook your team produces into one living context graph that people and agents can act on. Its own pages mention social media profiles. Its policy does not name who it sells to.", "tracks": ["social"], "sells_to": [], "source": "https://docs.endgame.io/trust/privacy"}
+priority: 15

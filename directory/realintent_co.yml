@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://realintent.fillout.com/t/mkg26nYjCdus"
   blockers: []
+about: {"category": "b2b", "summary": "REAL INTENT INC is a business-contact and sales-data provider. Built with with love for real estate agents. You're good at selling homes - let us do the rest. We automate client portals, personal email nurturing, branded social videos, always-on... Its own pages mention phone numbers, email addresses, age or birthdate, property and vehicles, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "property", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.realintent.co/privacy-policy"}
+priority: 39

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.vistarmedia.com/privacy-choices"
   blockers: []
+about: {"category": "adtech", "summary": "Vistar Media Inc. is an advertising technology company. Turn to Vistar Media for all things out of home advertising and DOOH. We work with enterprise brands, agencies, & media owners across the world. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.vistarmedia.com/"}
+priority: 24

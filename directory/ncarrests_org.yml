@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "arrests", "summary": "ncarrests.org is a public arrest and court records site. Easily access North Carolina arrest records and discover the truth. Conduct thorough warrant searches to stay informed. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.ncarrests.org/"}
+priority: 39

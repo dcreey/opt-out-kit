@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://unsubscribe.stirista.com/"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Stirista, LLC is an advertising technology company. Power customer acquisition with identity-driven marketing, CTV advertising, email activation, and premium B2B & consumer data solutions. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy names these buyers or recipients: other data brokers and resellers; business customers and sales teams; advertisers and marketers; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "income", "purchases", "interests", "online", "location", "health", "social"], "sells_to": ["brokers", "businesses", "advertisers", "government"], "sells_note": "This includes sharing in the following ways: With Our Customers: As described above, we license the Information in various ways to our customers (and something to partners and resellers, who license the Information to their customer), when ", "source": "https://www.stirista.com/privacy-policy/"}
+priority: 59

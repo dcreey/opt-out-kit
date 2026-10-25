@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.growthcode.io/do-not-sell"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "GrowthCode, LLC is an advertising technology company. Publishers monetize signals. SSPs route them. DSPs and agencies bid on them. GrowthCode gives every participant the infrastructure to capture, own, and activate first-party signals —... Its own pages mention home addresses, email addresses, age or birthdate, devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["address", "email", "age", "online"], "sells_to": ["brokers"], "sells_note": "Texas Data Broker Disclosures GrowthCode, LLC is registered as a data broker with the Texas Secretary of State under Chapter 509/510 of the Texas Business and Commerce Code.", "source": "https://www.growthcode.io/do-not-sell"}
+priority: 35

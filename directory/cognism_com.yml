@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://cognism.privacy.saymine.io/cognism"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "Cognism is a business-contact and sales-data provider. Cognism is a leader in premium sales intelligence, setting a new standard for data quality and compliance, trusted by over +4000 customers worldwide. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.cognism.com/"}
+priority: 28

@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://growinglibraries.com/do-not-sell"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Growing Libraries, LLC is a data company. Helping public libraries better understand and grow the communities they serve through community intelligence, demographic insights and targeted outreach. Its own pages mention interests and demographics. Its policy does not name who it sells to.", "tracks": ["interests"], "sells_to": [], "source": "https://growinglibraries.com/"}
+priority: 17

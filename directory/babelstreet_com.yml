@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/2ddc0d62-7d6a-4de2-b5c4-9f9f68116970"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Babel Street, Inc. is a data company. Uncover hidden risks with Babel Street's agentic risk intelligence platform. Resolve identities, secure supply chains, and act with mission-grade clarity. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "criminal", "purchases", "interests", "online", "location", "social"], "sells_to": ["government"], "sells_note": "Babel Street will not disclose or provide access to processed personal information to law enforcement unless required by law.", "source": "https://www.babelstreet.com/privacy"}
+priority: 46

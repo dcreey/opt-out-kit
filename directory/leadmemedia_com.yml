@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "Lead Me Media LLC is a data company. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://leadmemedia.com/"}
+priority: 17

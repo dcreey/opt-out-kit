@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.brooksim.com/privacy-form"
   blockers: []
+about: {"category": "marketing_data", "summary": "Brooks Integrated Marketing, LLC is a marketing data provider. BrooksIM is an integrated marketing company that specializes in Database Marketing includinge NCOA Processing, PCOA Processing, Email Appends, and Phone Appends. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: government and law enforcement; other data brokers and resellers.", "tracks": ["phone", "email", "interests", "online"], "sells_to": ["government", "brokers"], "sells_note": "HOW WE DISCLOSE PERSONAL INFORMATION In addition to the specific situations discussed elsewhere in this Privacy Notice we may disclose any of the personal information we collect to the third parties described below, in the following situati", "source": "https://www.brooksim.com/privacy-policy"}
+priority: 48

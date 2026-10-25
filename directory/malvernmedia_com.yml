@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal.privacypillar.com/dsar/form?formid=6e6ff4b8-2296-4589-ae7f-563fa743ec2d&orgid=369c8ff9-8ffb-4308-8362-f01691e77db8&propid=64c8904f-8bac-4dd9-8e6c-d052be1918a2&status=publish"
   blockers: []
+about: {"category": "marketing_data", "summary": "Malvern Media Inc. is a marketing data provider. BIG DATA Is who we are. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "interests", "online", "location"], "sells_to": ["advertisers", "businesses"], "sells_note": "The California “Shine the Light” law gives residents of California the right under certain circumstances to request information from us regarding the manner in which we disclose certain categories of Personal Information (as defined in the ", "source": "https://www.malvernmedia.com/privacy-policy"}
+priority: 54

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://form.jotform.com/241991033205147?parentURL=https%3A%2F%2Fwww.attribits.com%2Fdo-not-sell&jsForm=true"
   blockers: []
+about: {"category": "other", "summary": "Attribits is a data company. We have active users based on your custom behavioral and demographic criteria. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": ["advertisers", "businesses"], "sells_note": "California Shine the Light Disclosure Under California’s “Shine the Light” law, California residents who provide personal information to the Website may request certain information regarding our disclosure of personal information to Third P", "source": "https://www.attribits.com/privacy-policy"}
+priority: 42

@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "marketing_data", "summary": "Focus USA, Inc. is a marketing data provider. Focus USA is a data & analytics company that specializes in digital and direct marketing solutions. Its own pages mention age or birthdate, relatives and household members, income or wealth, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["age", "relatives", "income", "interests", "online", "social", "credit"], "sells_to": [], "source": "https://www.focus-usa.com/your-privacy-choices/"}
+priority: 53

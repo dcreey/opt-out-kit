@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal-eu.onetrust.com/webform/d88b298e-1f7e-420f-949c-fedc475c1e77/draft/dd6f8024-50ae-4974-bc54-178a48e6571e"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "PlaceIQ, Inc. is a data company. Unlock trust across your enterprise with data integrity software built to scale, deliver accurate AI-ready data, and power confident business decisions. Its own pages mention home addresses, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "email", "age", "employment", "interests", "online", "location", "social"], "sells_to": ["advertisers"], "sells_note": "How to Exercise Your Rights To make a request to opt-out of the sale or sharing of your personal information for cross-context behavioral advertising purposes, or to request to limit the use or disclosure of your sensitive personal informat", "source": "https://www.precisely.com/legal/placeiq-california-notice-at-collection-and-privacy-notice/"}
+priority: 41

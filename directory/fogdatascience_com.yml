@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.fogdatascience.com/opt-out"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Fog Data science LLC is a data company. Fog Data Science transforms commercially available device location data into investigative intelligence for law enforcement, government, insurance, financial services, and corporate... Its own pages mention home addresses, phone numbers, email addresses, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "online", "location"], "sells_to": [], "source": "https://www.fogdatascience.com/opt-out"}
+priority: 29

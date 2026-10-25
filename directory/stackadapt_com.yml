@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.stackadapt.com/legal-document-centre/opt-out-of-sale-targeted-advertising"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "StackAdapt Inc. is an advertising technology company. StackAdapt is the AI advertising platform that helps marketers orchestrate audiences, creative, channels, and measurement from one platform with AI built into every stage of advertising. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online"], "sells_to": [], "source": "https://www.stackadapt.com/"}
+priority: 26

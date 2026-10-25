@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "financial", "summary": "Experian Information Solutions, Inc is a financial and credit data company. Get your free credit report and FICO® Score. Experian can help you with credit cards, loans, insurance, and more. Its own pages mention phone numbers, property and vehicles, credit and financial accounts. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "property", "credit"], "sells_to": ["advertisers"], "sells_note": "Here's what you can do: Opt out You can choose to opt out of the sale/sharing of personal information associated with you, opt out of the use of personal information associated with you for targeted advertising, and limit the processing, us", "source": "https://consumerprivacy.experian.com/"}
+priority: 42

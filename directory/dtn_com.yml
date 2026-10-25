@@ -14,3 +14,5 @@ opt_out_form: {"page": "https://www.dtn.com/do-not-sell-my-information-form/", "
 registered_in: [CA, OR]
 signals: [captcha_turnstile, email_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "other", "summary": "DTN, LLC is a data company. At DTN°, our mission is to empower you with intelligent and actionable insights. These insights, make sense of the data to help you and your business prosper. We are your trusted... Its own pages mention education, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["education", "interests", "online"], "sells_to": [], "source": "https://www.dtn.com/"}
+priority: 19

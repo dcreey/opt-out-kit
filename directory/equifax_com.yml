@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://myprivacy.equifax.com/opt-in-opt-out/personal-info"
   blockers: ["check:a bot check"]
+about: {"category": "consumer_reporting", "summary": "Austin Consolidated Holdings, Inc. is a background-screening and consumer-reporting company. Get credit reports and credit scores for businesses and consumers from Equifax today! We also have identity protection tools with daily monitoring and alerts. Its own pages mention devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["online", "credit"], "sells_to": [], "source": "https://www.equifax.com/personal/my-privacy/"}
+priority: 42

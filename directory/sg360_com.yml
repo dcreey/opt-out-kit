@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "marketing_data", "summary": "The Segerdahl LLC is a marketing data provider. sg360° helps B2C marketers find your audience, reveal what makes them tick, message them appropriately, repeat what works. Its own pages mention home addresses. Its policy does not name who it sells to.", "tracks": ["address"], "sells_to": [], "source": "https://sg360.com/do-not-sell-my-info/"}
+priority: 39

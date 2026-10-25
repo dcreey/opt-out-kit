@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.01advertising.com/"
   blockers: []
+about: {"category": "adtech", "summary": "01Advertising Inc. is an advertising technology company. We deliver high-quality data and cutting-edge technology to seamlessly integrate you into the AdTech ecosystem, elevating your advertising to the next level. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "income", "criminal", "purchases", "interests", "online", "location", "health", "social"], "sells_to": [], "source": "https://www.01advertising.com/legal/privacy/"}
+priority: 47

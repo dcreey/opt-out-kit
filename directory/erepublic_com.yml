@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://erepublic.my.salesforce-sites.com/PrivacyRequest/"
   blockers: []
+about: {"category": "other", "summary": "e.Republic, LLC is a data company. e.Republic connects public-sector leaders and private-sector innovators via media, events, and insights to advance government and education. Its own pages mention names and aliases. Its policy does not name who it sells to.", "tracks": ["name"], "sells_to": [], "source": "https://erepublic.my.salesforce-sites.com/PrivacyRequest/"}
+priority: 17

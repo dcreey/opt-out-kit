@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacy.firstorion.com/opt-out/step-one"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "First Orion Corp is an identity and fraud-prevention data provider. Stop spam labels & boost answer rates with branded calling solutions. Caller ID, call protection & STIR/SHAKEN authentication. Get started today! Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://firstorion.com/"}
+priority: 35

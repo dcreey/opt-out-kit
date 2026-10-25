@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.convex.com/request-removal"
   blockers: []
+about: {"category": "b2b", "summary": "Convex Labs LLC is a business-contact and sales-data provider. The only sales intelligence platform built for commercial services teams to reach decision-makers and win more deals across 5.9 M+ properties. Its own pages mention phone numbers, property and vehicles, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "property", "purchases", "online"], "sells_to": [], "source": "https://www.convex.com/"}
+priority: 33

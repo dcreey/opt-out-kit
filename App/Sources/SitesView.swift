@@ -30,6 +30,10 @@ struct SitesView: View {
     @State private var search = ""
     @State private var showScan = false
     @State private var showQuick = false
+    @State private var fCategory: BrokerCategory?
+    @State private var fData: DataKind?
+    @State private var fBuyer: BuyerKind?
+    private var filtering: Bool { fCategory != nil || fData != nil || fBuyer != nil }
 
     var body: some View {
         NavigationStack {
@@ -69,7 +73,7 @@ struct SitesView: View {
                 if !search.isEmpty, !queue.contains(where: { $0.tasks.contains { visible($0) } }) {
                     Section { Text("No site matches that search.").foregroundStyle(.secondary) }
                 }
-                if search.isEmpty || !model.lockedSites.filter({ closedVisible($0) }).isEmpty {
+                if !filtering, search.isEmpty || !model.lockedSites.filter({ closedVisible($0) }).isEmpty {
                     let locked = model.lockedSites.filter { closedVisible($0) }
                     if !locked.isEmpty {
                         Section {
@@ -81,7 +85,7 @@ struct SitesView: View {
                         }
                     }
                 }
-                if search.isEmpty || closedMatches {
+                if !filtering, search.isEmpty || closedMatches {
                     let closed = model.closedSites.filter { closedVisible($0) }
                     if !closed.isEmpty {
                         Section {
@@ -119,6 +123,28 @@ struct SitesView: View {
             }
             .accessibilityIdentifier("sites-list")
             .navigationTitle("Sites")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Picker("Type of company", selection: $fCategory) {
+                            Text("Any type").tag(BrokerCategory?.none)
+                            ForEach(BrokerCategory.allCases, id: \.self) { Text($0.title).tag(BrokerCategory?.some($0)) }
+                        }
+                        Picker("Data they collect", selection: $fData) {
+                            Text("Any data").tag(DataKind?.none)
+                            ForEach(DataKind.allCases, id: \.self) { Text($0.title).tag(DataKind?.some($0)) }
+                        }
+                        Picker("Who they sell to", selection: $fBuyer) {
+                            Text("Anyone").tag(BuyerKind?.none)
+                            ForEach(BuyerKind.allCases, id: \.self) { Text($0.title).tag(BuyerKind?.some($0)) }
+                        }
+                        if filtering { Button("Clear filters", role: .destructive) { fCategory = nil; fData = nil; fBuyer = nil } }
+                    } label: {
+                        Image(systemName: filtering ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                    }
+                    .accessibilityIdentifier("sites-filter")
+                }
+            }
             .planDestinations()
             .coach(.sites)
             .sheet(isPresented: $showScan) { ExposureView() }
@@ -146,6 +172,11 @@ struct SitesView: View {
 
     /// Whether a task passes the search and the to-do filter. A shared task matches on any site it handles.
     private func visible(_ task: PlanTask) -> Bool {
+        if filtering {
+            // A shared task passes when any site it handles fits.
+            let byDomain = model.entryByDomain
+            guard task.domains.contains(where: { byDomain[$0]?.matches(category: fCategory, data: fData, buyer: fBuyer) ?? false }) else { return false }
+        }
         let q = search.trimmingCharacters(in: .whitespaces).lowercased()
         guard !q.isEmpty else { return true }
         return task.title.lowercased().contains(q) || task.domains.contains { $0.lowercased().contains(q) }
@@ -415,20 +446,21 @@ struct DirectoryInfoView: View {
     /// Who the company is, what it tracks and who it sells to, as its own pages say.
     @ViewBuilder private func aboutSection(_ about: BrokerAbout) -> some View {
         Section {
+            if let cat = entry.brokerCategory { Label(cat.title, systemImage: "building.2").font(.caption.bold()).foregroundStyle(.tint) }
             Text(about.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
             if let score = entry.priority {
                 Label(Loc.f("%@ (%lld of 100)", BrokerPriority.tier(score), score), systemImage: "flag.fill")
-                    .font(.caption.bold()).foregroundStyle(score >= 70 ? .red : score >= 50 ? .orange : .secondary)
+                    .font(.caption.bold()).foregroundStyle(score >= 60 ? .red : score >= 45 ? .orange : .secondary)
             }
         } header: { Text("Who they are") }
         if !about.tracks.isEmpty {
             Section {
-                ForEach(about.tracks, id: \.self) { Text($0.prefix(1).uppercased() + $0.dropFirst()) }
+                ForEach(about.tracks, id: \.self) { Text(DataKind(rawValue: $0)?.title ?? $0) }
             } header: { Text("What they track") } footer: { Text("From the company's own privacy policy and pages.") }
         }
         Section {
             if about.sellsTo.isEmpty { Text("Its policy does not name who it sells to.").foregroundStyle(.secondary) }
-            ForEach(about.sellsTo, id: \.self) { Text($0.prefix(1).uppercased() + $0.dropFirst()) }
+            ForEach(about.sellsTo, id: \.self) { Text(BuyerKind(rawValue: $0)?.title ?? $0) }
             if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
             if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
         } header: { Text("Who they sell to") }

@@ -15,3 +15,5 @@ profiled: "2026-10-21"
 search_check:
   status: "undifferentiated"
   checked: "2026-10-20"
+about: {"category": "arrests", "summary": "arizonaarrests.org is a public arrest and court records site. How to search Arizona arrest records, active warrants and county jail rosters — official county and state sources, plus how to request copies. Its own pages mention names and aliases, email addresses, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "email", "criminal"], "sells_to": [], "source": "https://www.arizonaarrests.org/the-privacy-request-portal"}
+priority: 39

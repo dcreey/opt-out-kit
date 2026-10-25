@@ -17,3 +17,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "fraud_identity", "summary": "Lookify.io is an identity and fraud-prevention data provider. Instantly identify unknown calls or texts, find the owner of any phone number. Get detailed caller information, location data, risk assessment, and more. Its own pages mention phone numbers, email addresses, job title and employer, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "location", "social"], "sells_to": [], "source": "https://lookify.io/"}
+priority: 43

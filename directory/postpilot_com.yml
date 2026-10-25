@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.postpilot.com/opt-out-of-mailings-form"
   blockers: []
+about: {"category": "b2b", "summary": "PostPilot, Inc. is a business-contact and sales-data provider. Beat digital overload. Drive incremental revenue & profits. Powerful, easy-to-use programmatic direct mail built for Shopify & eCommerce. Try it risk-free. 📬. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "criminal", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["advertisers", "businesses"], "sells_note": "Our clients rely on our Services to promote their businesses, and on occasion we may disclose your personal information with some of these clients solely for their own internal analytics, such as to understand how well their promotional cam", "source": "https://www.postpilot.com/privacy-policy"}
+priority: 57

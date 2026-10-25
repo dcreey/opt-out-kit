@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://triplelift.com/"
   blockers: []
+about: {"category": "adtech", "summary": "TripleLift, Inc. is an advertising technology company. Turn fragmented media into a coordinated system. TripleLift connects data, creative, and supply to drive measurable advertising outcomes. Its own pages mention email addresses, interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["email", "interests", "online", "location"], "sells_to": [], "source": "https://triplelift.com/user-rights-policy-and-opt-out/"}
+priority: 33

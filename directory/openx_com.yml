@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "OpenX Technologies, Inc. is an advertising technology company. Discover the world of programmatic advertising and how it revolutionizes digital marketing. Explore strategies to maximize your ad spend with OpenX. Its own pages mention job title and employer, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["employment", "online", "social"], "sells_to": [], "source": "https://www.openx.com/privacy-center/"}
+priority: 21

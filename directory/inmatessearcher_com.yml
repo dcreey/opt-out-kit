@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.inmatessearcher.com/api/helper/optOutLight/search"
   blockers: []
+about: {"category": "arrests", "summary": "inmatessearcher.com is a public arrest and court records site. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: advertisers and marketers; the general public (people looking you up).", "tracks": ["name", "address", "phone", "email", "age", "relatives", "employment", "education", "criminal", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers", "public"], "sells_note": "Shine the Light Disclosure: California residents are entitled to ask us for a notice that identifies the categories of Personal Information that we share with our affiliates and/or third parties for marketing purposes, and provides contact ", "source": "https://www.inmatessearcher.com/privacy"}
+priority: 70

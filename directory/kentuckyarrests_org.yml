@@ -16,3 +16,5 @@ search_check:
   status: "undifferentiated"
   candidate: {"method": "GET", "url": "https://www.kentuckyarrests.org/Results?fname={first}&lname={last}&stage=1&rType=Warrant&state={state}&city={city}", "body": null}
   checked: "2026-10-21"
+about: {"category": "arrests", "summary": "kentuckyarrests.org is a public arrest and court records site. Find arrest records in Kentucky. Its own pages mention names and aliases, email addresses, age or birthdate, job title and employer, criminal and court records, devices and online activity. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["name", "email", "age", "employment", "criminal", "online"], "sells_to": ["government"], "source": "https://www.kentuckyarrests.org/privacy"}
+priority: 46

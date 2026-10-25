@@ -23,3 +23,5 @@ live_form:
   found: true
   page: "https://www.usatrace.com/your-privacy/"
   blockers: ["check:a bot check"]
+about: {"category": "people_search", "summary": "usatrace.com is a people-search and public-records site. USA Trace has access to 6.4 billion public records to enable you to trace people, run background checks, marriage checks, criminal checks and more. Its own pages mention names and aliases, phone numbers, job title and employer, property and vehicles, criminal and court records, interests and demographics. Its policy does not name who it sells to.", "tracks": ["name", "phone", "employment", "property", "criminal", "interests", "social"], "sells_to": [], "source": "https://www.usatrace.com/your-privacy/"}
+priority: 49

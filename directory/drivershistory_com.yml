@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "consumer_reporting", "summary": "Drivers History Information Sales, LLC is a background-screening and consumer-reporting company. Its own pages mention age or birthdate, property and vehicles, interests and demographics, devices and online activity, health information, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["age", "property", "interests", "online", "health", "credit"], "sells_to": [], "source": "https://www.transunion.com/consumer-privacy"}
+priority: 46

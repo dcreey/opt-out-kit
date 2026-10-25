@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.rrd.com/opinion-centers/unsubscribe"
   blockers: []
+about: {"category": "healthcare", "summary": "Valassis Communications, Inc. is a healthcare data company. RRD offers the most trusted portfolio of marketing, packaging, print, and supply chain solutions. We transform customer touchpoints into moments of impact. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "property", "purchases", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers", "businesses"], "sells_note": "For example, if we receive a do-not-sell signal through the Internet Advertising Bureau’s (IAB) CCPA Framework, we do not retain any Personal Information for that user.", "source": "https://www.rrd.com/privacy-policy/valassis"}
+priority: 61

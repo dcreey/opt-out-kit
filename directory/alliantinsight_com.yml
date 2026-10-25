@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "Alliant Cooperative Data Solutions LLC is a marketing data provider. Alliant fuels better customer experiences by creating quality, people-based data that unlocks insight into modern consumer behavior. Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["phone", "email", "age", "purchases", "interests", "online", "location", "credit"], "sells_to": ["advertisers", "government"], "sells_note": "We also “sell” or “share” Personal Information and use Personal Information for “targeted advertising” as these terms are defined in applicable U.S.", "source": "https://alliantinsight.com/alliant-privacy-policy/"}
+priority: 61

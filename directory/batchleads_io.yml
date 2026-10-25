@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/23dbbccc-a76c-4410-a68e-f247d70e566c/37b7cf37-7f45-4cac-9ee1-ef6d0ae4f9f2"
   blockers: ["check:a bot check"]
+about: {"category": "real_estate", "summary": "EquiMine Inc. is a property and real-estate data company. Get access to over 100M+ curated properties dedicated on market & off market filters for hassle free real estate investing experience. Its own pages mention phone numbers, income or wealth, property and vehicles. Its policy does not name who it sells to.", "tracks": ["phone", "income", "property"], "sells_to": [], "source": "https://batchleads.io/"}
+priority: 31

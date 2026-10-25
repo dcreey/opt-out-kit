@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "PitchBook Data Inc is a data company. PitchBook provides readers with the best private market data through the PitchBook Platform, a suite of award-winning software applications. Learn more now! Its own pages mention phone numbers, email addresses, job title and employer, education, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; other data brokers and resellers.", "tracks": ["phone", "email", "employment", "education", "interests", "online", "credit"], "sells_to": ["advertisers", "businesses", "brokers"], "sells_note": "In the last 12 months, we’ve also sold individuals’ information to third-party marketing partners.", "source": "https://pitchbook.com/privacy-policy"}
+priority: 35

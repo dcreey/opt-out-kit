@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "Graze Social PBC is a data company. Design, deploy, and grow custom feeds of any complexity on Bluesky with Graze.social. Its own pages mention phone numbers, email addresses, education, income or wealth, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "education", "income", "interests", "online", "location", "health"], "sells_to": ["advertisers"], "sells_note": "California’s Shine the Light Act (Civil Code sections 1798.83-1798.84) entitles California residents to request certain disclosures regarding Personal Data sharing with affiliates and/or third parties for marketing purposes.", "source": "https://www.graze.social/privacy-policy"}
+priority: 43

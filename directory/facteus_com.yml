@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/015c718b-f337-403c-b7dd-23d243a2529e/855ad2f5-c4f0-428d-a407-85d9fc091dd9"
   blockers: ["check:a bot check"]
+about: {"category": "financial", "summary": "Facteus, Inc. is a financial and credit data company. Start exploring the leading US consumer transaction dataset – FREE! Search by company name or discover macro-economic insights by sector. Its own pages mention income or wealth, shopping and purchase behavior, devices and online activity, social media profiles, credit and financial accounts. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["income", "purchases", "online", "social", "credit"], "sells_to": ["advertisers"], "source": "https://facteus.com/"}
+priority: 43

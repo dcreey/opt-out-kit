@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://optout.porchgroupmedia.com/"
   blockers: []
+about: {"category": "marketing_data", "summary": "Datamentors LLC is a marketing data provider. PGM is a industry-leading provider of omnichannel marketing data and technology solutions, agency solutions and the PGM Velocity customer data platform. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online"], "sells_to": [], "source": "https://porchgroupmedia.com/"}
+priority: 38

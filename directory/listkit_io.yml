@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "ListKit LLC is a business-contact and sales-data provider. Execute a cold email campaign from start to finish - domains, inboxes, warmup, leads, verification, scripts, and sending - without leaving the platform once. Simple pricing, everything... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "income", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers", "government"], "sells_note": "Disclosure of Your Information for Third-Party Advertising.", "source": "https://www.listkit.io/privacy"}
+priority: 57

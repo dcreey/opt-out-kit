@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://support.disconetwork.com/hc/en-us/requests/new?ticket_form_id=39667537954075"
   blockers: []
+about: {"category": "other", "summary": "Disco Technology Inc is a data company. Disco is the commerce media network connecting brands to high-intent consumers through AI-powered, personalized offers across 800+ post-purchase and pre-purchase touchpoints. Its own pages mention shopping and purchase behavior, devices and online activity, social media profiles. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms.", "tracks": ["purchases", "online", "social"], "sells_to": ["advertisers", "publishers"], "source": "https://disconetwork.com/"}
+priority: 29

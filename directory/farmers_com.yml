@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/6f9548c9-3a87-4370-a23c-df4855d9b84c/3e27401f-507e-465d-a4cf-0255324eec65"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Lara Agency Inc is a data company. Its own pages mention property and vehicles, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["property", "online", "health"], "sells_to": [], "source": "https://agents.farmers.com/tx/houston/jose-lara/?SourceID=AMPALFGMAG&utm_medium=Local&utm_source=GMB"}
+priority: 21

@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://optout.bookyourdata.com/"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "A Direct Marketing Inc is a marketing data provider. Buy email lists for marketing with a 97% deliverability guarantee. Purchase verified contacts from a 500M+ B2B database, pay as you go. Try 10 free leads. Its own pages mention phone numbers, property and vehicles, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "property", "credit"], "sells_to": [], "source": "https://www.bookyourdata.com/"}
+priority: 40

@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "ACH, Address Clearing House is a data company. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, precise location. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "interests", "location", "health"], "sells_to": [], "source": "https://www.achcoop.com/privacy-policy"}
+priority: 43

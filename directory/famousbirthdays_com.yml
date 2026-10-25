@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Famous Birthdays LLC is a data company. Celebrity birthdays, profiles, rankings, and trivia. Discover actors, singers, athletes, and creators. Its own pages mention age or birthdate, education, interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["age", "education", "interests", "online", "location"], "sells_to": [], "source": "https://www.famousbirthdays.com/privacy/"}
+priority: 24

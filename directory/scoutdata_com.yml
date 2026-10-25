@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "real_estate", "summary": "Scout Data Inc. is a property and real-estate data company. Specialized roof and solar data for sales teams and call centers: old and storm-hit roofs, orphan solar, homes without panels. Every home comes with the owner and phone numbers. Get a... Its own pages mention home addresses, phone numbers, age or birthdate, property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["address", "phone", "age", "property", "purchases"], "sells_to": [], "source": "https://store.scoutdata.com/privacy-rights"}
+priority: 34

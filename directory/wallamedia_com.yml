@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.wallamedia.com/california-rights.html"
   blockers: []
+about: {"category": "adtech", "summary": "Walla Media, LLC is an advertising technology company. Walla Media captures consumer intent signals from browsing behavior and email engagement — transforming them into actionable insights through AI-powered analysis and data orchestration. Its own pages mention phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.wallamedia.com/privacy-policy.html"}
+priority: 37

@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "marketing_data", "summary": "Lead Intelligence Inc. is a marketing data provider. Acquire, Retain and Cross Sell with confidence. Leverage real-time consumer insights to personalize marketing interactions. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests", "online"], "sells_to": [], "source": "https://infutor.com/privacy-center/"}
+priority: 36

@@ -14,3 +14,5 @@ opt_out_form: {"page": "https://www.unifygtm.com/legal/do-not-sell-my-info", "me
 registered_in: [OR, TX]
 signals: [email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "b2b", "summary": "Unify AI Business Corporation is a business-contact and sales-data provider. AI-powered sales platform with agents, B2B data, signals, and sequencing. Research and prospect in 90% less time from a single chat interface. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "interests", "online", "location", "social"], "sells_to": ["businesses", "advertisers"], "sells_note": "This Privacy Policy also does not cover Personal Data we collect, use and disclose solely on behalf of our Customers in connection with the Services.", "source": "https://privacy.unifygtm.com/policies"}
+priority: 48

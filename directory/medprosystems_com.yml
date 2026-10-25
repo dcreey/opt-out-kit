@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "healthcare", "summary": "MedPro Systems, LLC is a healthcare data company. Authoritative HCP and HCO data, global transparency reporting and a team that knows your obligations, in one connected platform for Life Sciences. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: employers and recruiters; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "criminal", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["employers", "advertisers"], "sells_note": "“Share” means disclosing personal information for purposes of cross contextual behavioral advertising regardless of consideration.", "source": "https://www.medprosystems.com/privacy-policy/"}
+priority: 58

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://anteriad.com/privacy-portal"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "Anteriad, LLC is a business-contact and sales-data provider. Anteriad is a full funnel marketing and B2B data solutions provider that offers intent data, demand generation, ABM solutions, analytics, and more. Its own pages mention shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "location"], "sells_to": [], "source": "https://anteriad.com/"}
+priority: 35

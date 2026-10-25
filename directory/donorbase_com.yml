@@ -18,3 +18,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["certify: By submitting, I understand that I may be required to verify my identity to complete this request, and I authorize Data Axle to contact me i"]
+about: {"category": "marketing_data", "summary": "DonorBase, Inc. is a marketing data provider. Data Axle Nonprofit helps charitable and political organizations surpass their goals with quality data, insightful strategy, inspired creative. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online"], "sells_to": [], "source": "https://www.dataaxlenonprofit.com/"}
+priority: 36

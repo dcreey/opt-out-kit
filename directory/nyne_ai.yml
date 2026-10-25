@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://nyne.ai/privacy-request-form/", "method": "post"
 registered_in: [TX]
 signals: [captcha_turnstile, email_contact, email_input, email_only_wording, listing_url_input, name_input, opt_out_form_found, phone_input, phone_verify]
 profiled: "2026-10-22"
+about: {"category": "adtech", "summary": "Nyne.ai Corp is an advertising technology company. Nyne is a research and data company connecting AI labs with human expertise and licensed data through an identity graph of 2.2B people and 380M businesses. Its own pages mention devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["online", "credit"], "sells_to": [], "source": "https://nyne.ai/privacy-choices/"}
+priority: 22

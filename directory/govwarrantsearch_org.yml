@@ -16,3 +16,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "other", "summary": "govwarrantsearch.org is a data company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://govwarrantsearch.org/"}
+priority: 10

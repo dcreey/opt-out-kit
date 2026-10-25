@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "financial", "summary": "Preqin Ltd is a financial and credit data company. Explore Preqin alternative assets data, private markets research, benchmarks and investment intelligence for investors and fund managers. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.preqin.com/"}
+priority: 33

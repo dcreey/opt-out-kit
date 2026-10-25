@@ -19,3 +19,5 @@ live_form:
   found: true
   page: "https://www.maarrests.org/corrections"
   blockers: ["check:a bot check"]
+about: {"category": "arrests", "summary": "maarrests.org is a public arrest and court records site. how to search Massachusetts arrest records and warrants. Access public records via CORI, inmate lookup, and arrest warrants data. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.maarrests.org/"}
+priority: 39

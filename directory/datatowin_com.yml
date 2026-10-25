@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.datatowin.com/do-not-sell-or-share-my-personal-info"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "Data to Win LLC is a business-contact and sales-data provider. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "interests", "online", "location", "credit"], "sells_to": ["advertisers"], "sells_note": "Our Brokered Data (Data We Buy and Sell) is used for the following marketing and advertising purposes.", "source": "https://www.datatowin.com/privacy-policy"}
+priority: 47

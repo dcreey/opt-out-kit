@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "real_estate", "summary": "AGR Marketing Solutions LLC is a property and real-estate data company. Its own pages mention phone numbers, age or birthdate, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "age", "interests"], "sells_to": [], "source": "https://agrmarketingsolutions.com/"}
+priority: 32

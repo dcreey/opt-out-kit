@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://datadesk.io/home"
   blockers: []
+about: {"category": "adtech", "summary": "Datadesk Inc. is an advertising technology company. datadesk.io. Its own pages mention home addresses, phone numbers, email addresses, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "interests", "online", "location"], "sells_to": ["advertisers"], "sells_note": "What Happens When You Opt Out Within 15 business days of receiving your request, we will: Stop using your information for advertising and profiling, and stop selling or sharing it Notify every client and partner that received your informati", "source": "https://datadesk.io/help/do-not-sell-my-personal-info"}
+priority: 37

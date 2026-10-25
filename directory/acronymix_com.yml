@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://acronymix.com/privacy-request"
   blockers: []
+about: {"category": "b2b", "summary": "Acronymix LLC is a business-contact and sales-data provider. Its own pages mention home addresses, phone numbers, email addresses, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "employment", "interests", "online", "location", "health"], "sells_to": ["advertisers", "businesses"], "sells_note": "That licensing may be a “sale” or “sharing” under California law and a sale or targeted-advertising disclosure under other state laws.", "source": "https://acronymix.com/privacy-policy/"}
+priority: 57

@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://redmob.io/"
   blockers: []
+about: {"category": "other", "summary": "Redmob LLC is a data company. We connect in-app publishers directly with advertisers. Publishers earn more per request. Buyers pay only for real people in real apps. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://redmob.io/"}
+priority: 22

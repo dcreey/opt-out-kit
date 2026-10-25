@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.prospectbase.com/ccpa"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "ProspectBase UK Limited is a business-contact and sales-data provider. Demand generation specialists. Target in-market accounts, reach key decision makers and convert more opportunities with prospectBase. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.prospectbase.com/"}
+priority: 22

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-eu.onetrust.com/webform/246426b7-49c6-4bf5-879b-d3fdd4cbc15d/35502283-7b19-4b67-b3e0-ede06d3820c5"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Dstillery, Inc. is an advertising technology company. Multimodal AI that learns from everything. Get custom programmatic audiences in 24-48 hours that refresh daily and activate everywhere. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://dstillery.com/"}
+priority: 19

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://preferences.definitivehc.com/"
   blockers: []
+about: {"category": "healthcare", "summary": "Populi LLC is a healthcare data company. Get the definitive picture of healthcare with robust data and analytics that offer the clarity you need to make smarter, faster, and more strategic decisions. Its own pages mention interests and demographics, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["interests", "online", "health"], "sells_to": [], "source": "https://www.definitivehc.com/"}
+priority: 33

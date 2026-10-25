@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://lightcast.io/legal/privacy-request"
   blockers: []
+about: {"category": "b2b", "summary": "Lightcast, LLC is a business-contact and sales-data provider. Lightcast provides the world's most trusted labor market intelligence, empowering smarter decisions for businesses, education institutions, and governments worldwide. With the world’s... Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, interests and demographics. Its policy names these buyers or recipients: employers and recruiters.", "tracks": ["phone", "email", "age", "employment", "education", "interests", "online", "social"], "sells_to": ["employers"], "sells_note": "Business Contact Information Lightcast processes data so that it may be licensed on a subscription basis to organizations for their sales, marketing, analytical, research, or recruiting purposes, or to other organizations who may license it", "source": "https://legal.lightcast.io/lightcast-legal/privacy-policy"}
+priority: 37

@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "Milestone Marketing Solutions is a data company. Discover Milestone Marketing Solutions, your partner in effective direct mail marketing and data solutions. Elevate your campaigns with our expert services. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "income", "property", "interests", "online", "location"], "sells_to": ["businesses"], "sells_note": "If we believe disclosure is necessary or appropriate to protect the rights, property, or safety of our organization, our customers, or others.", "source": "https://www.milestonemarketingsolutions.com/privacy-policy"}
+priority: 43

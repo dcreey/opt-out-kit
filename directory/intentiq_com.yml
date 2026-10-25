@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "fraud_identity", "summary": "Intent IQ LLC is an identity and fraud-prevention data provider. A Cookieless Advertising solution Delivering 3.5B+ targeted cookieless ads per day. Patented, proprietary technology. Privacy-centric. Its own pages mention email addresses, devices and online activity, precise location, social media profiles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "online", "location", "social"], "sells_to": ["advertisers"], "sells_note": "Opt-out of selling, sharing or targeted advertising with your information & delete your personal information: If you click the buttons below, you will be able to opt-out of the selling, sharing or targeted advertising with the personal info", "source": "https://www.intentiq.com/opt-out/"}
+priority: 43

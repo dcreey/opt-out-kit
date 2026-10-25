@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://captiv8.io/policy/opt-out/"
   blockers: []
+about: {"category": "other", "summary": "Captiv8 Inc. is a data company. Discover creators, track ROI, manage payments, and amplify content within Captiv8's award-winning influencer marketing platform. Its own pages mention phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "interests", "online", "location", "health", "social"], "sells_to": ["businesses", "advertisers"], "sells_note": "We may also disclose your information to our marketing partners who we engage to market Captiv8 products and services to you (for example, to send you messages concerning new Captiv8 features or products or Captiv8 special offers).", "source": "https://captiv8.io/policy/"}
+priority: 42

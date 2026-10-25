@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.datapartners.com/opt-out-request/"
   blockers: []
+about: {"category": "marketing_data", "summary": "Data Partners, Inc. is a marketing data provider. DataPartners delivers high-performance marketing data solutions to help you target the right audience, maximize ROI, and grow your business with precision-driven insights. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["purchases", "online"], "sells_to": ["advertisers"], "sells_note": "OPTING OUT (ALL CONSUMERS ELIGIBLE) If you would like to opt out of the sale of your personal data, targeted advertising, and profiling (i.e., prevent us from selling, sharing, or using your personal information), click HERE (opens in a new", "source": "https://www.datapartners.com/donotsellmyinformation/"}
+priority: 37

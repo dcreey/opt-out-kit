@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "Cadent LLC is an advertising technology company. Cadent connects brands, publishers & consumers through predictive AI that orchestrates outcomes on any platform, across any media, at any stage of the journey. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.cadent.com/"}
+priority: 18

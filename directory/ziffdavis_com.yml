@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/f73513a8-7a10-4a9d-939a-703f8d994839/fba93a14-9b2a-44f8-96bb-7c2233b6c2df"
   blockers: ["check:a bot check"]
+about: {"category": "financial", "summary": "Ziff Davis LLC is a financial and credit data company. Ziff Davis (Nasdaq: ZD) is a vertically focused digital media and internet company whose portfolio includes leading brands in technology, entertainment, shopping, health, cybersecurity,... Its own pages mention criminal and court records, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["criminal", "purchases", "interests"], "sells_to": [], "source": "https://www.ziffdavis.com/"}
+priority: 36

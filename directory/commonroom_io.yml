@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.commonroom.io/demo/?website_attribution=footer--privacy-policy"
   blockers: []
+about: {"category": "b2b", "summary": "Common Room, Inc. is a business-contact and sales-data provider. We identify the buyer first. Outreaching, coaching, forecasting and everything in-between runs on complete buyer intelligence your team trusts and relies on. Its own pages mention phone numbers. Its policy does not name who it sells to.", "tracks": ["phone"], "sells_to": [], "source": "https://app.commonroom.io/remove-my-info"}
+priority: 27

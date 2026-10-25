@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
+about: {"category": "other", "summary": "InMarket Media, LLC is a data company. InMarket is a leader in real-time marketing and measurement. Our mission is to help marketers connect brands with customers, when & where it matters most. Its own pages mention education. Its policy does not name who it sells to.", "tracks": ["education"], "sells_to": [], "source": "https://preferences.inmarket.com/"}
+priority: 14

@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.cotality.com/products/non-agency-residential-mortgage-backed-securities"
   blockers: []
+about: {"category": "real_estate", "summary": "CoreLogic Solutions, LLC is a property and real-estate data company. See the property ecosystem from every angle to reimagine property data as insights that illuminate what’s next. It’s intelligence beyond bounds. Its own pages mention phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "age", "property", "criminal", "purchases", "interests", "online"], "sells_to": ["advertisers"], "sells_note": "When we engage in those activities, we sell personal data (i.e., information from Collection Technologies) to third-party advertisers and analytics companies.", "source": "https://www.cotality.com/legal/privacy-policy"}
+priority: 43

@@ -12,3 +12,5 @@ opt_out_form: {"page": "https://www.collectivedata.io/opt-out-do-not-sell-reques
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_input, mail_option, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "marketing_data", "summary": "Collective Data Solutions, LLC is a marketing data provider. Data enables companies—regardless of size—to outmaneuver and outcompete even their biggest rivals. Imagine what you can do with the right data and insights at. Its own pages mention education, shopping and purchase behavior, interests and demographics, precise location. Its policy does not name who it sells to.", "tracks": ["education", "purchases", "interests", "location"], "sells_to": [], "source": "https://www.collectivedata.io/"}
+priority: 41

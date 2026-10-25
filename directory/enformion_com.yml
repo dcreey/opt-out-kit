@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.enformion.com/opt-out/"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "Enformion, LLC is an identity and fraud-prevention data provider. Using artificial intelligence and machine learning, Enformion provides analytics and data for people, businesses, and their assets. Request a demo today! Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, relatives and household members, job title and employer. Its policy names these buyers or recipients: advertisers and marketers; banks, lenders and insurers.", "tracks": ["address", "phone", "email", "age", "relatives", "employment", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": ["advertisers", "lenders"], "sells_note": "We may disclose your personal information to our professional advisors, such as lawyers, auditors, and insurers, when necessary.", "source": "https://www.enformion.com/privacy-policy/"}
+priority: 59

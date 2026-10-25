@@ -22,3 +22,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "people_search", "summary": "northcarolinaresidentdatabase.com is a people-search and public-records site. Look up people, addresses, households and neighborhoods across North Carolina. Browse by city, county and street. Profiles may include neighbors, reverse phone lookups, and voter... Its own pages mention names and aliases, home addresses, phone numbers, age or birthdate, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "age", "interests", "online"], "sells_to": [], "source": "https://www.northcarolinaresidentdatabase.com/privacy-policy"}
+priority: 46

@@ -23,3 +23,5 @@ search_check:
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "arrests", "summary": "tennesseearrests.org is a public arrest and court records site. Find arrest records in Tennessee. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.tennesseearrests.org/"}
+priority: 39

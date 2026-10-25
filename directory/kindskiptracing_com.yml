@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://kindskiptracing.com/opt-out"
   blockers: []
+about: {"category": "real_estate", "summary": "Kind Skiptracing, Inc is a property and real-estate data company. Real estate list pulling and skip tracing software with 85-90% match rates, 159M+ properties, and 1.1B+ phone numbers. Built for investors, wholesalers, and professionals who need... Its own pages mention phone numbers, age or birthdate, relatives and household members, property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "age", "relatives", "property", "online"], "sells_to": [], "source": "https://kindskiptracing.com/"}
+priority: 34

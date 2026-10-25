@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/c02129bc-bbab-43a6-a0b4-175489cb893e/156ac96a-9d7e-4fe6-bab8-a44df779202b"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "Nexxa Group, Inc. is an identity and fraud-prevention data provider. Nexxa Group is a leading provider of enterprise data intelligence, marketing compliance, identity verification, and fraud prevention solutions that help organizations protect revenue,... Its own pages mention email addresses, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "online", "social"], "sells_to": [], "source": "https://www.nexxagroup.com/corporate-overview/consumer-opt-out/"}
+priority: 31

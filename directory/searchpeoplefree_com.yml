@@ -17,3 +17,5 @@ search_check:
 live_check:
   checked: "2026-10-22"
   blockers: ["certify: I confirm that I am the person associated with this email address and consent to receive an email from Search People FREE. The Information y"]
+about: {"category": "people_search", "summary": "searchpeoplefree.com is a people-search and public-records site. Search over 700 million people online for free and find contact information, address and phone for anyone. Try SearchPeopleFREE.com Today! Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: banks, lenders and insurers; advertisers and marketers.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "education", "property", "criminal", "interests", "online", "location"], "sells_to": ["lenders", "advertisers"], "sells_note": "We may disclose your personal information to our professional advisors, such as lawyers, auditors, and insurers, when necessary.", "source": "https://www.searchpeoplefree.com/privacy"}
+priority: 64

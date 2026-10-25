@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "b2b", "summary": "upcell, LLC is a business-contact and sales-data provider. Reps capture contacts from LinkedIn, your data providers enrich them, and everyone sees who's working each account. One workflow, not five tabs. Its own pages mention phone numbers, shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "purchases", "online", "social"], "sells_to": [], "source": "https://www.upcell.io/data-claim"}
+priority: 34

@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "b2b", "summary": "Guidestar Direct, Corp. is a business-contact and sales-data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "interests", "online"], "sells_to": ["businesses", "advertisers"], "sells_note": "The personal information collected by Carney Direct, for its own use, will not be sold, transferred or traded to any third party for unsolicited marketing purposes.", "source": "https://www.carneydirect.com/privacy-policy/"}
+priority: 46

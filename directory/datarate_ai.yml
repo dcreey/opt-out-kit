@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacy.datarate.ai/request"
   blockers: []
+about: {"category": "adtech", "summary": "DATARATE LLC is an advertising technology company. Datarate transforms scattered data signals into clear, actionable insights using AI. Understand trends, predict behavior, and make smarter business decisions. Its own pages mention shopping and purchase behavior, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["purchases", "online", "location"], "sells_to": ["advertisers"], "sells_note": "Opt-Out Request Ask us to stop selling or sharing your personal information, or to exclude it from targeted advertising.", "source": "https://datarate.ai/my-privacy-choices"}
+priority: 31

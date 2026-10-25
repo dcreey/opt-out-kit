@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "people_search", "summary": "Whitepages, Inc is a people-search and public-records site. Founded in 1997, Whitepages is the largest U.S. directory and trusted source for contact info and property data. Find people, phone numbers, addresses, and emails nationwide. Free and... Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: advertisers and marketers; the general public (people looking you up).", "tracks": ["name", "address", "phone", "email", "age", "relatives", "income", "property", "criminal", "interests", "online", "location", "credit"], "sells_to": ["advertisers", "public"], "sells_note": "We follow the Self-Regulatory Principles for Online Behavioral Advertising (about the collection and use of data for interest-based advertising) and expect third parties to comply with the disclosure and notification program specified by pr", "source": "https://www.whitepages.com/privacy"}
+priority: 83

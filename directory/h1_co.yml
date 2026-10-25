@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "healthcare", "summary": "H1 Insights, Inc. is a healthcare data company. H1 helps life sciences, pharma, health plans and digital health organizations identify key providers and prescribers, accelerate clinical trials, and advance patient care everywhere. Its own pages mention health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["health", "social"], "sells_to": [], "source": "https://h1.com/"}
+priority: 33

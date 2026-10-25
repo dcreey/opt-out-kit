@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://wiland.com/privacy-choices/"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "Wiland, Inc. is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "purchases", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers", "businesses"], "sells_note": "Pursuant to California Civil Code Section 1798.83, we do not disclose information of consumers from whom we directly collect data to third parties for the third parties’ direct marketing purposes if the consumer has opted out, and we provid", "source": "https://wiland.com/privacy-choices/"}
+priority: 65

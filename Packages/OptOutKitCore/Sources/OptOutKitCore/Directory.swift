@@ -184,8 +184,9 @@ public struct BrokerAbout: Codable, Equatable, Hashable, Sendable {
 /// How much a broker matters to remove first, from 0 to 100: what kind of company it is, how sensitive and broad the data it names is,
 /// how many kinds of buyers it names, and how many states list it.
 public enum BrokerPriority {
+    /// A tier is the top tenth of brokers by score (high), the next three tenths (medium), or the rest, from the spread of scores in the directory.
     public static func tier(_ score: Int) -> String {
-        score >= 70 ? L10n.t("High priority") : score >= 50 ? L10n.t("Medium priority") : L10n.t("Lower priority")
+        score >= 60 ? L10n.t("High priority") : score >= 45 ? L10n.t("Medium priority") : L10n.t("Lower priority")
     }
 }
 

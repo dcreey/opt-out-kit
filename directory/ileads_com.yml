@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://ileads.com/submit-request"
   blockers: []
+about: {"category": "real_estate", "summary": "iLeads.com, LLC is a property and real-estate data company. One AI engine reads hundreds of millions of leads and the title, property, demographic and credit records behind them to find the people ready to transact. Its own pages mention phone numbers, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "property", "purchases", "interests"], "sells_to": [], "source": "https://ileads.com/submit-request"}
+priority: 29

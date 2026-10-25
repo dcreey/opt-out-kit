@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-eu.onetrust.com/webform/07a2e8c2-346a-4f58-865f-0d56c9baaff5/e6013ecc-3719-4f58-adb1-5121ea4797f8"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "Consumer Canvas, LLC is a marketing data provider. Best-in-class data enrichment and advanced audiences for activation. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online", "health"], "sells_to": [], "source": "https://www.consumercanvas.net/privacy/"}
+priority: 44

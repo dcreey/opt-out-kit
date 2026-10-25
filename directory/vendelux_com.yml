@@ -17,3 +17,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "b2b", "summary": "Vendelux, Inc. is a business-contact and sales-data provider. Vendelux is the leading event intelligence platform built to turn in-person events into a measurable, scalable growth channel. Vendelux applies real-time attendee data from our database... Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://vendelux.com/"}
+priority: 27

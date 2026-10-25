@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "Swipejobs LLC is a data company. Swipejobs uses AI to match you with jobs that fit your skills, schedule, and location. Find work near you and apply in minutes. Its own pages mention phone numbers, email addresses, job title and employer, devices and online activity, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "online", "health", "social"], "sells_to": [], "source": "https://www.swipejobs.com/privacy-center"}
+priority: 31

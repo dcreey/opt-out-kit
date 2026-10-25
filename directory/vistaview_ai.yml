@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://vistaview.ai/v3/do-not-sell"
   blockers: []
+about: {"category": "real_estate", "summary": "VISTAVIEW REALTY SERVICES LLC is a property and real-estate data company. VistaView is an AI real estate platform for property search, maps, and market context. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.vistaview.ai/privacy/consumer-rights"}
+priority: 25

@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://www.semasio.com/legal/privacy-choices", "method"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, opt_out_form_found]
 profiled: "2026-10-22"
+about: {"category": "adtech", "summary": "Semasio GmbH is an advertising technology company. Semasio is on a mission to power outperformance in a privacy-first world. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, relatives and household members, job title and employer. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; publishers and ad platforms; other data brokers and resellers.", "tracks": ["address", "phone", "email", "age", "relatives", "employment", "income", "interests", "online", "health", "credit"], "sells_to": ["businesses", "advertisers", "publishers", "brokers"], "sells_note": "Section 5 How We Use and Process Personal Data Semasio uses and sells personal data to enable online advertising, including targeted advertising via third party platforms.", "source": "https://www.semasio.com/legal/semasio-privacy-policy"}
+priority: 59

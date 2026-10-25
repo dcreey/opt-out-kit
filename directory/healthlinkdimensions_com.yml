@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://submit-irm.trustarc.com/services/validation/ee84af17-5002-4c6b-843a-dd45637b93bf"
   blockers: ["check:a bot check"]
+about: {"category": "healthcare", "summary": "HealthLink Dimensions is a healthcare data company. Unlock the power of precision with HealthLink Dimensions. Access our database of provider and healthcare facility information – the largest database of its kind in the nation, audited by... Its own pages mention email addresses, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["email", "online", "health"], "sells_to": [], "source": "https://healthlinkdimensions.com/privacy-policy"}
+priority: 37

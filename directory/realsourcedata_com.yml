@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.realsourcedata.com/do-not-sell-my-personal-information"
   blockers: ["check:a bot check"]
+about: {"category": "marketing_data", "summary": "RealSource, Inc is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, interests and demographics, precise location. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "interests", "location"], "sells_to": [], "source": "https://www.realsourcedata.com/privacy-policy"}
+priority: 48

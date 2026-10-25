@@ -19,3 +19,5 @@ live_form:
   found: true
   page: "https://www.lexisnexis.com/global/privacy/privacy-center-us.page"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "LexisNexis Risk Solutions FL Inc. is an identity and fraud-prevention data provider. Provider of legal, government, business and high-tech information sources. Learn more or login to your product now. Its own pages mention home addresses, email addresses, age or birthdate, job title and employer, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "email", "age", "employment", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://risk.lexisnexis.com/state-privacy-act-notice"}
+priority: 47

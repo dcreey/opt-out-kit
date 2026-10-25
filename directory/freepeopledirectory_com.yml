@@ -20,3 +20,5 @@ search_check:
   ignore_location: true
   calibration: {"listed_name": "John Smith"}
   checked: "2026-10-20"
+about: {"category": "people_search", "summary": "freepeopledirectory.com is a people-search and public-records site. Free people directory - find and contact people today. Reverse phone, address lookup & people search. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "property", "criminal", "interests", "online", "social"], "sells_to": ["advertisers"], "source": "https://freepeopledirectory.com/privacy"}
+priority: 61

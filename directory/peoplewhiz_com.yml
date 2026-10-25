@@ -15,3 +15,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "people_search", "summary": "Peoplewhiz, Inc is a people-search and public-records site. Get a comprehensive background report on anyone instantly online. See public records and background checks, criminal arrest records, marriage/divorce records, properties owed,... Its own pages mention names and aliases, home addresses, phone numbers, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "age", "criminal"], "sells_to": [], "source": "https://www.peoplewhiz.com/"}
+priority: 53

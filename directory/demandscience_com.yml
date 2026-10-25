@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyprocessing.com/cgi-bin/unsubscribe.cgi?e=e472cdd6355b6ae710e7a380e4fd8fcd"
   blockers: []
+about: {"category": "b2b", "summary": "Demand Science US, LLC is a business-contact and sales-data provider. DemandScience helps B2B teams identify winnable accounts and activate them across channels—generating more pipeline without legacy ABM platform complexity. Its own pages mention devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["online", "health"], "sells_to": [], "source": "https://demandscience.com/"}
+priority: 31

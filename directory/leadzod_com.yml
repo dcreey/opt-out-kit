@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "b2b", "summary": "MediaZod LLC dba LeadZod is a business-contact and sales-data provider. Its own pages mention home addresses, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["address", "email", "age", "interests", "online"], "sells_to": ["advertisers", "government"], "sells_note": "Be advised that we may be required to disclose your personal information in response to lawful requests by public authorities in the United States, including to meet national security or law enforcement requirements.", "source": "https://www.leadzod.com/privacy-policy"}
+priority: 37

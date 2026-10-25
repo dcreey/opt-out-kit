@@ -12,3 +12,5 @@ opt_out_form: {"page": "https://www.uplead.com/opt-out/", "method": "post", "act
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, name_input, opt_out_form_found, phone_input, phone_verify]
 profiled: "2026-10-22"
+about: {"category": "b2b", "summary": "Uplead LLC is a business-contact and sales-data provider. Access our accurate and real time verified B2B database to drive growth. With built-in email verification, UpLead is the leader in high quality business contact data. Start your free... Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.uplead.com/opt-out/"}
+priority: 31

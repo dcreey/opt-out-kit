@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "people_search", "summary": "UNMASK, LLC is a people-search and public-records site. 100% FREE People Search! Find current contact info, phone numbers, email address, relatives, address history & more for free with UnMask.com. Accurate and instant true people search fast... Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "employment", "education", "income", "property", "criminal", "interests", "social"], "sells_to": [], "source": "https://unmask.com/"}
+priority: 64

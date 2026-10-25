@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://fullenrich.com/optout"
   blockers: []
+about: {"category": "b2b", "summary": "FullEnrich Corp is a business-contact and sales-data provider. #1 Waterfall Enrichment platform with 20+ providers. Find emails and phones of people you want to do business with. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["phone", "email", "age", "employment", "interests", "online", "social", "credit"], "sells_to": ["brokers"], "source": "https://fullenrich.com/privacy-policy"}
+priority: 43

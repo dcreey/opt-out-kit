@@ -43,7 +43,7 @@ struct PlanTaskRow: View {
                 Text(task.title).font(.headline)
                 if task.priority > 0, case .site = task.kind {
                     Text(BrokerPriority.tier(task.priority)).font(.caption.bold())
-                        .foregroundStyle(task.priority >= 70 ? .red : task.priority >= 50 ? .orange : .secondary)
+                        .foregroundStyle(task.priority >= 60 ? .red : task.priority >= 45 ? .orange : .secondary)
                 }
                 if task.kind == .verify { Text(Loc.f("%lld pages, one tap each", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 else if task.kind == .emails { Text(Loc.f("%lld sites by email", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }

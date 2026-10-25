@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.pmg.com/do-not-sell-or-share-my-personal-information"
   blockers: []
+about: {"category": "other", "summary": "PMG Worldwide, LLC is a data company. PMG is a leading independent advertising agency and platform company engineered for impact—uniting strategy, media, data, creative, and technology to drive modern marketing and... Its own pages mention devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "location", "social"], "sells_to": [], "source": "https://www.pmg.com/"}
+priority: 22

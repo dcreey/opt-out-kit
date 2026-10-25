@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.fi-navigator.com/remove/"
   blockers: ["check:a bot check"]
+about: {"category": "financial", "summary": "FI Navigator Corporation is a financial and credit data company. Discover a data analytics platform with new data, insights and benchmarking for the banking vertical including banks, credit unions and their vendor partners. Its own pages mention phone numbers, email addresses, job title and employer, interests and demographics, social media profiles. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["phone", "email", "employment", "interests", "social"], "sells_to": ["businesses"], "sells_note": "Data is provided to our customers or partners subject to restrictive license agreements that limit the use to those specified purposes and prohibits the unauthorized use or transfer of the information.", "source": "https://www.fi-navigator.com/remove/"}
+priority: 43

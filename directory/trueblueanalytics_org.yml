@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://trueblueanalytics.org/dont-sell"
   blockers: []
+about: {"category": "marketing_data", "summary": "True Blue Analytics LLC is a marketing data provider. Empowering progressive organizations and Democratic campaigns with the data they need to win. Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://trueblueanalytics.org/"}
+priority: 39

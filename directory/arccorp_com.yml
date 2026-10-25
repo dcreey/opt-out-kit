@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://my.datasubject.com/Uw03R7mCGS/60313"
   blockers: []
+about: {"category": "arrests", "summary": "Airlines Reporting Corporation is a public arrest and court records site. With leading business solutions built on high-quality data, ARC is the premier driver of air travel intelligence and commerce. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, shopping and purchase behavior. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["name", "address", "phone", "email", "age", "purchases", "interests", "online", "social", "credit"], "sells_to": ["government"], "sells_note": "ARC may be required to disclose Personal Data in response to lawful requests by public authorities, including to meet national security and law enforcement requirements.", "source": "https://www2.arccorp.com/site-privacy-policy/"}
+priority: 57

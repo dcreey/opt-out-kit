@@ -14,3 +14,5 @@ opt_out_form: {"page": "https://klear.com/opt-out/", "method": "get", "action": 
 registered_in: [CA]
 signals: [opt_out_form_found]
 profiled: "2026-10-22"
+about: {"category": "other", "summary": "Meltwater News US, Inc. is a data company. Turn media monitoring, social listening and AI signals into actionable intelligence with Meltwater. Make faster, confident decisions and prove PR impact. Its own pages mention phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "interests", "online", "location", "social"], "sells_to": ["advertisers", "businesses", "government"], "sells_note": "We may disclose all the above categories of personal information to Affiliates, ales Channel Partners and Providers, Service Providers, Advertising Partners, Customers, and other third parties as required by law.", "source": "https://www.meltwater.com/en/privacy"}
+priority: 39

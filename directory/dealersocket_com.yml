@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://globaldsar.solera.com/webform/20bbc57b-6134-4535-8062-a1745b771851/1eafe8e0-f69b-4d39-af7c-6dbf764046fa"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "DealerSocket, LLC (US) is a data company. DealerSocket offers a unified solution for franchise and independent auto dealers including CRM, DMS, inventory management, websites and digital retailing. Its own pages mention email addresses, property and vehicles, shopping and purchase behavior, devices and online activity, precise location, health information. Its policy does not name who it sells to.", "tracks": ["email", "property", "purchases", "online", "location", "health"], "sells_to": [], "source": "https://dealersocket.com/privacy-policy/"}
+priority: 30

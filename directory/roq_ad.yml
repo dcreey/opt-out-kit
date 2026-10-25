@@ -20,3 +20,5 @@ live_form:
   found: true
   page: "https://roq.ad/privacy-form"
   blockers: []
+about: {"category": "adtech", "summary": "Roq.ad Inc. is an advertising technology company. Deterministic identity resolution for Europe. Onboard first-party data, resolve it to real people, and activate across every major DSP. GDPR-aligned, ePrivacy certified. Its own pages mention email addresses, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "purchases", "online"], "sells_to": [], "source": "https://roq.ad/white-papers#optout"}
+priority: 24

@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://illumin.com/opt-out-success/"
   blockers: []
+about: {"category": "adtech", "summary": "illumin Inc. is an advertising technology company. illumin is the only demand side platform that connects planning and buying with actionable insights that deliver measurable impact. See More. Achieve More. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://illumin.com/legalcenter/"}
+priority: 20

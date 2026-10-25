@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://keymarketingadvantage.com/do_not_sell_or_share_m
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "b2b", "summary": "Key Marketing Advantage is a business-contact and sales-data provider. Its own pages mention phone numbers, email addresses, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "interests"], "sells_to": ["advertisers"], "sells_note": "Within thirty days of receiving a request, we will provide a list of the categories of personal information disclosed to third parties for third-party direct marketing purposes during the immediately preceding calendar year, along with the ", "source": "https://keymarketingadvantage.com/privacy_policy"}
+priority: 36

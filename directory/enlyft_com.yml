@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "b2b", "summary": "Enlyft Inc. is a business-contact and sales-data provider. The AI platform for technology partner selling. Enlyft finds the accounts ready to buy, picks the play, identifies the contacts, and drafts the outreach. Its own pages mention phone numbers, email addresses, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "social"], "sells_to": [], "source": "https://enlyft.com/tech/check-email"}
+priority: 28

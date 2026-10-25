@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://healthwisedata.com/compliance-optout/", "method"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, email_input, file_upload, name_input, opt_out_form_found]
 profiled: "2026-10-22"
+about: {"category": "healthcare", "summary": "HealthWise Data is a healthcare data company. Unlock patient insights with HealthWise Data's consumer healthcare database. 2,000+ predictive consumer data points including lifestyle, behavior, and SDOH. Its own pages mention education, interests and demographics, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["education", "interests", "health", "social"], "sells_to": [], "source": "https://healthwisedata.com/"}
+priority: 41

@@ -14,3 +14,5 @@ signals: [email_input, email_only_wording, id_required, listing_url_input, mail_
 profiled: "2026-10-22"
 contact_email: "info@lead-enhance.com"
 contact_email_source: "page"
+about: {"category": "b2b", "summary": "LEAD ENHANCE LLC is a business-contact and sales-data provider. Lead Enhance. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://signin.leadgenesis.info/login"}
+priority: 21

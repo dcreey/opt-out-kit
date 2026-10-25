@@ -15,3 +15,5 @@ profiled: "2026-10-21"
 search_check:
   status: "robots_disallowed"
   checked: "2026-10-20"
+about: {"category": "consumer_reporting", "summary": "publicrecordreports.com is a background-screening and consumer-reporting company. View information about yourself, friends, family, properties and phone numbers that Google can't show you. Start your search with a name, address or phone number. Its own pages mention phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "property", "criminal"], "sells_to": [], "source": "https://www.publicrecordreports.com/help-center/privacy-requests"}
+priority: 42

@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://supplier.io/do-not-sell-my-personal-information"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "Qurium Solutions, Inc. is an identity and fraud-prevention data provider. Supplier data your enterprise can build on. Clean and maintain your vendor master, source small and diverse suppliers, and prove your impact. Its own pages mention email addresses, age or birthdate, job title and employer, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "age", "employment", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://supplier.io/privacy-policy"}
+priority: 37

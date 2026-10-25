@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://communityimpact.com/pflugerville-hutto/transportation/fm-685-median-removal-to-bring-overnight-lane-closures-oct-22/"
   blockers: []
+about: {"category": "healthcare", "summary": "JG Media, Inc. is a healthcare data company. Hyperlocal news covering Austin, Houston, Dallas-Fort Worth, and San Antonio — government, education, business, real estate, and more. Its own pages mention age or birthdate, education, property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "education", "property", "online"], "sells_to": [], "source": "https://communityimpact.com/consumer-rights/"}
+priority: 30

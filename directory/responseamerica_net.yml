@@ -12,3 +12,5 @@ opt_out_form: {"page": "https://responseamerica.net/optout.html", "method": "pos
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
+about: {"category": "fraud_identity", "summary": "Response America, Inc. is an identity and fraud-prevention data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "education", "criminal", "purchases", "interests", "online", "location", "health"], "sells_to": ["government"], "sells_note": "We may process your information where we believe it is necessary for compliance with our legal obligations, such as to cooperate with a law enforcement body or regulatory agency, exercise or defend our legal rights, or disclose your informa", "source": "https://responseamerica.net/privacy_dec.html"}
+priority: 56

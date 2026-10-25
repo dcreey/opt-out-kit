@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "TrueData Solutions, Inc. is an advertising technology company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://truedata.co/"}
+priority: 23

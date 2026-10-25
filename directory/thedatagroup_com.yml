@@ -16,3 +16,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "marketing_data", "summary": "The Data Group, LLC is a marketing data provider. Improve customer intelligence with data append, validation, enrichment, audience data, APIs, and mailing lists starting from $0.02 per record. Its own pages mention home addresses, email addresses, education, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "email", "education", "interests", "online", "social"], "sells_to": [], "source": "https://thedatagroup.com/privacy/california-consumer-privacy-act/"}
+priority: 43

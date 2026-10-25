@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.americantreasurytaxsolutions.com/"
   blockers: []
+about: {"category": "other", "summary": "American Treasury Tax Solutions Inc is a data company. American Treasury Tax Solutions Inc has a decade of experience serving individuals and businesses in Dallas, Texas with their different tax needs. W... Its own pages mention income or wealth, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["income", "credit"], "sells_to": [], "source": "https://www.americantreasurytaxsolutions.com/"}
+priority: 21

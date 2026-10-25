@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "healthcare", "summary": "Swoop.com Inc is a healthcare data company. Transform omnichannel healthcare marketing by engaging DTC and HCP audiences with precision at scale while ensuring 100% privacy compliance. Its own pages mention devices and online activity, health information. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["online", "health"], "sells_to": ["advertisers"], "source": "https://swoop.com/your-privacy-choices/"}
+priority: 35

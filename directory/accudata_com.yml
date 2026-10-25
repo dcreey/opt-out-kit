@@ -22,3 +22,5 @@ run_check:
   date: "2026-10-23"
   result: "failed"
   note: "Deep Sync rejects automatic sends with an invisible bot check"
+about: {"category": "adtech", "summary": "AccuData Integrated Marketing, Inc. is an advertising technology company. Meet the Deep Sync leadership team behind the deterministic identity graph, data expertise, and privacy-first technology powering real-customer marketing. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: other data brokers and resellers; advertisers and marketers; business customers and sales teams; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "property", "purchases", "interests", "online", "location", "health"], "sells_to": ["brokers", "advertisers", "businesses", "government"], "sells_note": "We license Information to customers, partners, and resellers when providing Services.", "source": "https://deepsync.com/privacy-policy/"}
+priority: 53

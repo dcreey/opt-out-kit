@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "adtech", "summary": "PubMatic Inc. is an advertising technology company. Drive measurable advertising performance with PubMatic's AI-powered, agentic platform — built for buyers, publishers, and commerce media across CTV and mobile. Its own pages mention phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms; business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "interests", "online", "location", "health"], "sells_to": ["advertisers", "publishers", "businesses", "government"], "sells_note": "We may disclose cookie values to other advertising technology platforms so that they may match their identifier to our identifier.Fraud Detection & Prevention (Security).", "source": "https://pubmatic.com/legal/privacy-policy/"}
+priority: 56

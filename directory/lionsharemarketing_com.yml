@@ -19,3 +19,5 @@ run_check:
   date: "2026-10-23"
   result: "confirmed"
   note: "thank-you page: allow up to 45 days"
+about: {"category": "healthcare", "summary": "LionShare Marketing, Inc is a healthcare data company. Its own pages mention email addresses, interests and demographics, health information. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["email", "interests", "health"], "sells_to": ["businesses"], "source": "https://www.lionsharemarketing.com/"}
+priority: 40

@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://submit-irm.trustarc.eu/services/validation/ba81b98f-997d-4216-b4cc-d64cf261b082"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "NetWise Data, LLC is a business-contact and sales-data provider. Achieve next level audience intelligence and reach targeted prospects wherever they are when you optimize omnichannel marketing with D&B ID Graph Plus. Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://www.dnb.com/en-us/products/dnb-id-graph-plus.html"}
+priority: 23

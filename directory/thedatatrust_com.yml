@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "adtech", "summary": "DT Client Services, LLC is an advertising technology company. The leading provider of voter and electoral data to Republican and conservative campaigns, parties, and advocacy organizations. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "social"], "sells_to": ["businesses", "government", "advertisers"], "sells_note": "Our clients and business partners: we sell Personal Information to our clients and business partners.", "source": "https://thedatatrust.com/privacy-policy/"}
+priority: 52

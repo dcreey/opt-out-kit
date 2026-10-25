@@ -18,3 +18,5 @@ live_form:
   blockers: ["check:a bot check"]
 contact_email: "jdpowerprivacy@jdpa.com"
 contact_email_source: "browser"
+about: {"category": "financial", "summary": "Autodata Solutions, Inc. is a financial and credit data company. JD Power gives companies the data, analytics, and insights to make smarter, more informed decisions. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online"], "sells_to": [], "source": "https://www.jdpower.com/business/privacypolicy/#california-supplement"}
+priority: 34

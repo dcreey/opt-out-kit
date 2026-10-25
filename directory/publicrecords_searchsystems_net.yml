@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "arrests", "summary": "publicrecords.searchsystems.net is a public arrest and court records site. Plain-English guides to public records for every state, county and city in the United States, reviewed in 2026: arrests, criminal and court records, jail rosters, warrants, property,... Its own pages mention names and aliases, property and vehicles, criminal and court records, interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["name", "property", "criminal", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.searchsystems.net/privacy"}
+priority: 48

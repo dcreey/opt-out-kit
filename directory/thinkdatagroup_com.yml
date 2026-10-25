@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.thinkdatagroup.com/opt-out-option"
   blockers: ["check:a bot check"]
+about: {"category": "healthcare", "summary": "Think Data Group Inc is a healthcare data company. Its own pages mention property and vehicles, social media profiles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["property", "social"], "sells_to": ["advertisers"], "sells_note": "Discover our proprietary Periodic Table of Data Elements™ SKIP TO CONTENT Home Data Sellers Digital Audiences for Marketers Data Buyers & Users Insights About GET IN TOUCH Think Data Group Empowers Businesses with Expert Solutions in Data M", "source": "https://www.thinkdatagroup.com/"}
+priority: 31

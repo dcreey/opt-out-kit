@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/de22df57-d96c-480a-afb0-ac090b928192"
   blockers: []
+about: {"category": "healthcare", "summary": "Blackbaud, Inc is a healthcare data company. Blackbaud delivers AI-powered software for nonprofits, education, foundations, & companies, helping organizations drive greater social impact. Its own pages mention email addresses, job title and employer, education, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "employment", "education", "online"], "sells_to": [], "source": "https://www.blackbaud.com/"}
+priority: 36

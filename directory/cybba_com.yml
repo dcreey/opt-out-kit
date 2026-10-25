@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/97252121-4ff1-4a11-860a-78edbf9798b6"
   blockers: []
+about: {"category": "adtech", "summary": "Cybba Inc. is an advertising technology company. Cybba combines marketing technology, data and programmatic media to turn advertising investments into measurable business outcomes. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://cybba.com/"}
+priority: 24

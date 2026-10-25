@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Taboola, Inc. is an advertising technology company. Reach 600M daily active users and achieve conversions at scale with the world's leading performance platform. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.taboola.com/"}
+priority: 21

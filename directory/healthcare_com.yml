@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "healthcare", "summary": "Healthcare Inc is a healthcare data company. Health Insurance & Medicare Coverage Find reliable health insurance and Medicare plans tailored to your needs. Gain access to top providers and get coverage you can trust. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers; banks, lenders and insurers.", "tracks": ["address", "phone", "email", "age", "income", "purchases", "interests", "online", "location", "health", "social"], "sells_to": ["advertisers", "lenders"], "sells_note": "Our Sharing of Your Information We may share personal information as follow: Affiliate companies: We may share or sell your information with our affiliated entities for the purpose of allowing them to advertise products and services to you.", "source": "https://www.healthcare.com/privacy-policy/"}
+priority: 55

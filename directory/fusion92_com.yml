@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.fusion92.com/privacy-choices"
   blockers: []
+about: {"category": "healthcare", "summary": "Virtual Marketing LLC is a healthcare data company. Elevate your growth potential with Fusion92, the full-service Marketing Transformation Partner renowned for seamlessly combining business consulting, advanced data science, and... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers; business customers and sales teams; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "online", "health", "social"], "sells_to": ["brokers", "businesses", "advertisers"], "sells_note": "“Data Broker” activities, which consist of selling, sharing or licensing personal information to our Customers for their own independent marketing, communications or other business purposes.", "source": "https://www.fusion92.com/privacy-policy"}
+priority: 61

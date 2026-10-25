@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/bc2d3301-11a5-4de5-b15e-ce796187a352/9a049fa1-37af-4598-a87a-d0df2e2d904b.html"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Disqus is a data company. More publishers trust us to engage, grow, and understand their audiences than any other. Build your on-site community with Disqus. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://disqus.com/"}
+priority: 19

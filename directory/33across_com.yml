@@ -15,3 +15,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "other", "summary": "33Across, Inc. is a data company. Its own pages mention email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "interests", "online"], "sells_to": [], "source": "https://udp.33across.com/udp_opt_out"}
+priority: 23

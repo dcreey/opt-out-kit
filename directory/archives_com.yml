@@ -18,3 +18,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "genealogy", "summary": "archives.com is a genealogy and family-records site. Discover your family's history with Archives.com. Access billions of historical records, photos, and genealogical resources with a free trial. Trace your ancestry and build your family... Its own pages mention education. Its policy does not name who it sells to.", "tracks": ["education"], "sells_to": [], "source": "https://www.archives.com/"}
+priority: 17

@@ -16,3 +16,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "people_search", "summary": "411.com is a people-search and public-records site. 411 is a leading white pages directory with phone numbers, people, addresses, and more. Find the person you're looking for and search public records from all 50 states. Its own pages mention names and aliases, phone numbers. Its policy does not name who it sells to.", "tracks": ["name", "phone"], "sells_to": [], "source": "https://www.411.com/"}
+priority: 38

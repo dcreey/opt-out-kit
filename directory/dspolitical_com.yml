@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "adtech", "summary": "DSPolitical, LLC is an advertising technology company. DSPolitical helps progressive campaigns and causes win with precision-targeted digital ads. Trusted by top Democratic consultants. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers", "publishers", "businesses"], "sells_note": "In delivering our Services, we disclose these digital identifiers to advertisers, publishers of digital properties and other third parties with whom we partner in order to deliver our advertising services, including supply side providers, a", "source": "https://www.dspolitical.com/privacy-policy/"}
+priority: 50

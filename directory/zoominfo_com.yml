@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://www.zoominfo.com/trust-center/responsible-ai"
   blockers: []
+about: {"category": "b2b", "summary": "ZoomInfo Technologies, LLC is a business-contact and sales-data provider. ZoomInfo is the #1 GTM Platform: Marketing and sales AI plus the best B2B data. All-in-one lead generation, prospecting, market intelligence , and ABM software. Its own pages mention email addresses, job title and employer, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "employment", "online"], "sells_to": [], "source": "https://www.zoominfo.com/trust-center/your-privacy"}
+priority: 31

@@ -19,3 +19,5 @@ live_form:
   found: true
   page: "https://www.ohioarrests.org/corrections"
   blockers: []
+about: {"category": "arrests", "summary": "ohioarrests.org is a public arrest and court records site. How to search Ohio arrest records, active warrants and county jail rosters — official county and state sources, plus how to request copies. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.ohioarrests.org/"}
+priority: 39

@@ -14,3 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "healthcare", "summary": "HGOnline, LLC is a healthcare data company. Get the name, phone number, and industry of 2,000+ new Texas businesses every week. Dashboard access with search, filter, and export. Try free for 7 days. Its own pages mention home addresses, phone numbers, email addresses, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "social"], "sells_to": [], "source": "https://www.tripwiredata.com/texas-data-broker-notice"}
+priority: 36

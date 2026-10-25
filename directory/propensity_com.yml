@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "b2b", "summary": "Addapptation, Inc. is a business-contact and sales-data provider. Run ABM, contextual, and geofencing campaigns to identify real buyers, generate contact-level insights, and send high-intent leads to sales. Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://www.propensity.com/"}
+priority: 23

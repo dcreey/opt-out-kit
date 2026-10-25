@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://finthrive.com/"
   blockers: ["check:a bot check"]
+about: {"category": "healthcare", "summary": "TSG Holdco, LLC is a healthcare data company. FinThrive, a healthcare RCM company powered by FinThrive Fusion®, uses AI to grow revenue, cut cost to collect, prevent denials and improve patient experience. Its own pages mention phone numbers, job title and employer, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["phone", "employment", "online", "health"], "sells_to": [], "source": "https://finthrive.com/"}
+priority: 42

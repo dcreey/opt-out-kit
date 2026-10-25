@@ -13,3 +13,5 @@ opt_out_form: {"page": "https://ciprinting.com/privacy-request/", "method": "pos
 registered_in: [TX]
 signals: [email_contact, email_input, mail_option, name_input, opt_out_form_found]
 profiled: "2026-10-22"
+about: {"category": "real_estate", "summary": "JJGarrett Holdings LLC dba Community Impact Printing is a property and real-estate data company. Full-service commercial printing and direct mail in Texas. Newspapers, magazines, postcards, posters, and more — design to delivery, shipped nationwide. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "online"], "sells_to": [], "source": "https://ciprinting.com/privacy/"}
+priority: 29

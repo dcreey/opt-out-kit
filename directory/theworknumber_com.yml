@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://myprivacy.equifax.com/opt-in-opt-out/personal-info"
   blockers: ["check:a bot check"]
+about: {"category": "consumer_reporting", "summary": "Equifax Workforce Solutions LLC is a background-screening and consumer-reporting company. Automate income and employment verifications with The Work Number. FCRA-compliant data for lenders, government agencies, and employers. Access Employment Data Reports instantly. Its own pages mention job title and employer, income or wealth, property and vehicles, devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["employment", "income", "property", "online", "credit"], "sells_to": [], "source": "https://www.equifax.com/personal/my-privacy/"}
+priority: 42

@@ -17,3 +17,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "arrests", "summary": "dcarrests.org is a public arrest and court records site. Washington DC Arrest records check. Your best options for details on recent arrests in Washington D.C. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.dcarrests.org/"}
+priority: 39

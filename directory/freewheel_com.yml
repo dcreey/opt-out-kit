@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "other", "summary": "FreeWheel Media Inc is a data company. Directly access streaming video inventory from the world’s leading publishers, boosting your working media by reducing middlemen. Its own pages mention devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["online"], "sells_to": ["advertisers"], "sells_note": "Explore Advertiser Suite For Media Sellers FreeWheel Publisher Suite helps you easily sell your premium video inventory across all screens.", "source": "https://www.freewheel.com/"}
+priority: 20

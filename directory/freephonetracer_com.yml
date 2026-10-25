@@ -16,3 +16,5 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "people_search", "summary": "freephonetracer.com is a people-search and public-records site. Use this reverse phone search tool to trace any number. Search through our extensive directory of cellular and landline numbers, and more! Simply input the number you are searching for... Its own pages mention names and aliases, phone numbers. Its policy does not name who it sells to.", "tracks": ["name", "phone"], "sells_to": [], "source": "https://www.freephonetracer.com/"}
+priority: 38

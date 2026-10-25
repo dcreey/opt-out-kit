@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/1fdd17ee-bd10-4813-a254-de7d5c09360a/a465fd9c-58d4-4793-b5e0-959619d71be7"
   blockers: ["check:a bot check"]
+about: {"category": "fraud_identity", "summary": "Clearview AI, Inc. is an identity and fraud-prevention data provider. Clearview AI is a revolutionary, all-in-one, facial recognition platform designed to support federal, state, and local law enforcement in their shared mission to help keep communities safe. Its own pages mention criminal and court records, interests and demographics. Its policy does not name who it sells to.", "tracks": ["criminal", "interests"], "sells_to": [], "source": "https://www.clearview.ai/privacy-and-requests"}
+priority: 33

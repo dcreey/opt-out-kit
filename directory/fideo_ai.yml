@@ -16,3 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "fraud_identity", "summary": "Fideo Intelligence, Inc. is an identity and fraud-prevention data provider. Fideo connects fragmented identity signals into a unified intelligence layer, helping organizations stop fraud in real time. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "income", "property", "criminal", "interests", "online", "health", "social", "credit"], "sells_to": ["advertisers"], "sells_note": "If Fideo sells your Personal Data for monetary or other valuable consideration, or shares your Personal Data for cross-context behavioral advertising, you have the right to opt-out.", "source": "https://www.fideo.ai/privacy/privacy-policy/"}
+priority: 56

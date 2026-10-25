@@ -760,6 +760,29 @@
     }
    }
   },
+  "Advertisers and marketers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Annonceurs et marketeurs"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Anunciantes y especialistas en marketing"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbetreibende und Marketer"
+     }
+    }
+   }
+  },
   "Advertising ID": {
    "extractionState": "manual",
    "localizations": {
@@ -779,6 +802,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Werbe-ID"
+     }
+    }
+   }
+  },
+  "Advertising technology": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Technologie publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tecnología publicitaria"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbetechnologie"
+     }
+    }
+   }
+  },
+  "Age or birthdate": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Âge ou date de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Edad o fecha de nacimiento"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alter oder Geburtsdatum"
      }
     }
    }
@@ -894,6 +963,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Arkansas"
+     }
+    }
+   }
+  },
+  "Arrest and court records": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dossiers d'arrestation et judiciaires"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Registros de arrestos y judiciales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Festnahme- und Gerichtsakten"
      }
     }
    }
@@ -1128,6 +1220,52 @@
     }
    }
   },
+  "Background screening": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérification des antécédents"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verificación de antecedentes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hintergrundprüfung"
+     }
+    }
+   }
+  },
+  "Banks, lenders and insurers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Banques, prêteurs et assureurs"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bancos, prestamistas y aseguradoras"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Banken, Kreditgeber und Versicherer"
+     }
+    }
+   }
+  },
   "Being considered, not law yet: %@. %@": {
    "extractionState": "manual",
    "localizations": {
@@ -1239,6 +1377,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Business contacts and sales data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Contacts professionnels et données de vente"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Contactos comerciales y datos de ventas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geschäftskontakte und Vertriebsdaten"
+     }
+    }
+   }
+  },
+  "Business customers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Clients professionnels"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Clientes empresariales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geschäftskunden"
      }
     }
    }
@@ -1680,6 +1864,52 @@
     }
    }
   },
+  "Credit and financial accounts": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Crédit et comptes financiers"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Crédito y cuentas financieras"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kredit und Finanzkonten"
+     }
+    }
+   }
+  },
+  "Criminal and court records": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Casier et dossiers judiciaires"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Antecedentes penales y registros judiciales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Straf- und Gerichtsakten"
+     }
+    }
+   }
+  },
   "Current ZIP code": {
    "extractionState": "manual",
    "localizations": {
@@ -1795,6 +2025,29 @@
     }
    }
   },
+  "Devices and online activity": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Appareils et activité en ligne"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dispositivos y actividad en línea"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geräte und Online-Aktivität"
+     }
+    }
+   }
+  },
   "Did not respond": {
    "extractionState": "manual",
    "localizations": {
@@ -1864,6 +2117,29 @@
     }
    }
   },
+  "Education": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Educación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bildung"
+     }
+    }
+   }
+  },
   "Email address": {
    "extractionState": "manual",
    "localizations": {
@@ -1887,6 +2163,29 @@
     }
    }
   },
+  "Email addresses": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresses e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Direcciones de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail-Adressen"
+     }
+    }
+   }
+  },
   "Email or letter only": {
    "extractionState": "manual",
    "localizations": {
@@ -1906,6 +2205,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nur per E-Mail oder Brief"
+     }
+    }
+   }
+  },
+  "Employers and recruiters": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Employeurs et recruteurs"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empleadores y reclutadores"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arbeitgeber und Recruiter"
      }
     }
    }
@@ -1975,6 +2297,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Exponiert"
+     }
+    }
+   }
+  },
+  "Financial and credit data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données financières et de crédit"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos financieros y de crédito"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Finanz- und Kreditdaten"
      }
     }
    }
@@ -2140,6 +2485,29 @@
     }
    }
   },
+  "Genealogy": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Généalogie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Genealogía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ahnenforschung"
+     }
+    }
+   }
+  },
   "General Data Protection Regulation (EU) 2016/679": {
    "extractionState": "manual",
    "localizations": {
@@ -2205,6 +2573,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Geist"
+     }
+    }
+   }
+  },
+  "Government and law enforcement": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gouvernement et forces de l'ordre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gobierno y fuerzas del orden"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Behörden und Strafverfolgung"
      }
     }
    }
@@ -2324,6 +2715,52 @@
     }
    }
   },
+  "Health information": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Informations de santé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Información de salud"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesundheitsdaten"
+     }
+    }
+   }
+  },
+  "Healthcare data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données de santé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos sanitarios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesundheitsdaten-Anbieter"
+     }
+    }
+   }
+  },
   "High priority": {
    "extractionState": "manual",
    "localizations": {
@@ -2347,6 +2784,29 @@
     }
    }
   },
+  "Home addresses": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresses personnelles"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Domicilios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wohnadressen"
+     }
+    }
+   }
+  },
   "Idaho": {
    "extractionState": "manual",
    "localizations": {
@@ -2366,6 +2826,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Idaho"
+     }
+    }
+   }
+  },
+  "Identity and fraud prevention": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Identité et prévention de la fraude"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Identidad y prevención del fraude"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Identität und Betrugsprävention"
      }
     }
    }
@@ -2531,6 +3014,29 @@
     }
    }
   },
+  "Income or wealth": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revenus ou patrimoine"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ingresos o patrimonio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einkommen oder Vermögen"
+     }
+    }
+   }
+  },
   "Indiana": {
    "extractionState": "manual",
    "localizations": {
@@ -2550,6 +3056,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Indiana"
+     }
+    }
+   }
+  },
+  "Interests and demographics": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Centres d'intérêt et démographie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Intereses y demografía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Interessen und Demografie"
      }
     }
    }
@@ -2623,6 +3152,29 @@
     }
    }
   },
+  "Job and employer": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Emploi et employeur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empleo y empleador"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beruf und Arbeitgeber"
+     }
+    }
+   }
+  },
   "Kansas": {
    "extractionState": "manual",
    "localizations": {
@@ -2665,6 +3217,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kentucky"
+     }
+    }
+   }
+  },
+  "Landlords": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Propriétaires bailleurs"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arrendadores"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vermieter"
      }
     }
    }
@@ -3037,6 +3612,29 @@
     }
    }
   },
+  "Marketing data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données marketing"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos de marketing"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marketingdaten"
+     }
+    }
+   }
+  },
   "Maryland": {
    "extractionState": "manual",
    "localizations": {
@@ -3355,6 +3953,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Im Gesetzgebungsverfahren, noch kein Gesetz: %@. %@"
+     }
+    }
+   }
+  },
+  "Names and aliases": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noms et pseudonymes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nombres y alias"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Namen und Aliase"
      }
     }
    }
@@ -4233,6 +4854,52 @@
     }
    }
   },
+  "Other data brokers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autres courtiers en données"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Otros corredores de datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Andere Datenbroker"
+     }
+    }
+   }
+  },
+  "Other data company": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autre entreprise de données"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Otra empresa de datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Anderes Datenunternehmen"
+     }
+    }
+   }
+  },
   "Other family": {
    "extractionState": "manual",
    "localizations": {
@@ -4417,6 +5084,29 @@
     }
    }
   },
+  "People search": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recherche de personnes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Búsqueda de personas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Personensuche"
+     }
+    }
+   }
+  },
   "Phone number": {
    "extractionState": "manual",
    "localizations": {
@@ -4436,6 +5126,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Telefonnummer"
+     }
+    }
+   }
+  },
+  "Phone numbers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Numéros de téléphone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Números de teléfono"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Telefonnummern"
+     }
+    }
+   }
+  },
+  "Precise location": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Localisation précise"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ubicación precisa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Genauer Standort"
      }
     }
    }
@@ -4463,6 +5199,75 @@
     }
    }
   },
+  "Property and real estate": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Propriété et immobilier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Propiedad e inmobiliaria"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Immobilien"
+     }
+    }
+   }
+  },
+  "Property and vehicles": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Biens et véhicules"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Propiedades y vehículos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eigentum und Fahrzeuge"
+     }
+    }
+   }
+  },
+  "Publishers and ad platforms": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Éditeurs et plateformes publicitaires"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Editores y plataformas publicitarias"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verlage und Werbeplattformen"
+     }
+    }
+   }
+  },
   "Ready (dry run, nothing sent)": {
    "extractionState": "manual",
    "localizations": {
@@ -4486,6 +5291,29 @@
     }
    }
   },
+  "Relatives and household": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Proches et foyer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Familiares y hogar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verwandte und Haushalt"
+     }
+    }
+   }
+  },
   "Remaining manual tasks, anywhere": {
    "extractionState": "manual",
    "localizations": {
@@ -4505,6 +5333,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Verbleibende manuelle Aufgaben, überall"
+     }
+    }
+   }
+  },
+  "Researchers and nonprofits": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chercheurs et associations"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Investigadores y organizaciones sin fines de lucro"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Forscher und gemeinnützige Organisationen"
      }
     }
    }
@@ -4808,6 +5659,29 @@
     }
    }
   },
+  "Shopping and purchases": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Achats"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Compras"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einkäufe"
+     }
+    }
+   }
+  },
   "Shows a bot check before anything else": {
    "extractionState": "manual",
    "localizations": {
@@ -4896,6 +5770,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kleinere manuelle Aufgaben für Händler, die bei Ihnen oder in Ihrem Land registriert sind."
+     }
+    }
+   }
+  },
+  "Social media profiles": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Profils de réseaux sociaux"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Perfiles de redes sociales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Social-Media-Profile"
      }
     }
    }
@@ -5448,6 +6345,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Formular verlangt %@, was wir nicht haben."
+     }
+    }
+   }
+  },
+  "The general public": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le grand public"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El público general"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Allgemeinheit"
      }
     }
    }

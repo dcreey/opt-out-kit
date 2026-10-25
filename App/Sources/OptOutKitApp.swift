@@ -307,6 +307,9 @@ final class AppModel: ObservableObject {
     /// Sites with no route to opt out yet. They wait here until a form, page or address is found for them.
     var lockedSites: [DirectoryEntry] { OptOutPlan.locked(plan, entries: directory) }
 
+    /// Every directory entry by its domain, for looking a task's sites up.
+    var entryByDomain: [String: DirectoryEntry] { Dictionary(directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a }) }
+
     var closedSites: [DirectoryEntry] { directory.filter { $0.closed != nil }.sorted { $0.domain < $1.domain } }
 
     // MARK: First-visit guides

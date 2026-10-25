@@ -18,3 +18,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
+about: {"category": "arrests", "summary": "Insightbridge LLC is a public arrest and court records site. Search FREE for Reputation Profiles & Scores in the U.S. - See Court Records | Background Details | Photos | Phone, Address & Email | Reviews | Net Worth. Its own pages mention relatives and household members, education, income or wealth, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["relatives", "education", "income", "property", "criminal"], "sells_to": [], "source": "https://www.mylife.com/"}
+priority: 49

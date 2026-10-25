@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://www.enigma.com/legal/do-not-sell"
   blockers: []
+about: {"category": "b2b", "summary": "Enigma Technologies, Inc. is a business-contact and sales-data provider. Millions of public, private, and proprietary data points on businesses and people linked with precision. Its own pages mention phone numbers, email addresses, age or birthdate, education, devices and online activity, credit and financial accounts. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement; advertisers and marketers.", "tracks": ["phone", "email", "age", "education", "online", "credit"], "sells_to": ["businesses", "government", "advertisers"], "sells_note": "In such a case, fulfillment of such products and Services may necessitate or constitute a disclosure of personal information to our customers, and depending on applicable privacy laws, may also be considered a sale or sharing of personal in", "source": "https://www.enigma.com/legal/privacy-policy"}
+priority: 43

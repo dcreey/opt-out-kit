@@ -21,3 +21,5 @@ run_check:
   date: "2026-10-23"
   result: "confirmed"
   note: "it said Request received"
+about: {"category": "b2b", "summary": "SciLeads Ltd is a business-contact and sales-data provider. Find your ideal biotech, pharma, and academic prospects with tradeshow, funding, and publication intelligence. Its own pages mention phone numbers, email addresses, job title and employer, education, criminal and court records, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "education", "criminal", "interests", "online", "social", "credit"], "sells_to": [], "source": "https://scileads.com/privacy-policy/"}
+priority: 42

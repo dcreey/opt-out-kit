@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "App Science, Inc is an advertising technology company. We empower brands, publishers, and platforms with audience-based analytics and trusted campaign intelligence for strategic planning and activation. Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://www.appscience.ai/"}
+priority: 19

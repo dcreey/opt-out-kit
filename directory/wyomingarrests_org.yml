@@ -19,3 +19,5 @@ search_check:
 live_check:
   checked: "2026-10-22"
   blockers: []
+about: {"category": "arrests", "summary": "wyomingarrests.org is a public arrest and court records site. Find arrest records in Wyoming. Its own pages mention names and aliases, email addresses, age or birthdate, job title and employer, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "email", "age", "employment", "criminal"], "sells_to": [], "source": "https://www.wyomingarrests.org/request-portal/"}
+priority: 42

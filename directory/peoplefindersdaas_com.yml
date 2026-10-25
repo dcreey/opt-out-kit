@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://peoplefindersdaas.com/personal-information/"
   blockers: ["check:a bot check"]
+about: {"category": "b2b", "summary": "PeoplefindersDaaS is a business-contact and sales-data provider. Amplifying your connections through strategic advisory + targeting services We are PeoplefindersDaaS — a B2B-focused data solutions advisory firm that delivers strategic guidance and... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "purchases", "interests", "online", "credit"], "sells_to": ["advertisers"], "source": "https://peoplefindersdaas.com/privacy-policy/"}
+priority: 43

@@ -21,29 +21,38 @@ CATEGORIES = [   # (id, label, pattern); the best-scoring one wins, ties go to t
     ("b2b", "business-contact and sales-data provider", r"\bb2b\b|business contact|sales intelligence|prospect|lead gen|demand gen|account[- ]based|contact data|go-to-market|sales (and|&) marketing teams|business data|firmographic"),
     ("genealogy", "genealogy and family-records site", r"genealog|family tree|ancestry|ancestors"),
 ]
+# Fixed vocabularies: the ids are what the app filters on; the labels are the English words used in the written summary.
+DATA_KINDS = {"name": "names and aliases", "address": "home addresses", "phone": "phone numbers", "email": "email addresses", "age": "age or birthdate",
+              "relatives": "relatives and household members", "employment": "job title and employer", "education": "education", "income": "income or wealth",
+              "property": "property and vehicles", "criminal": "criminal and court records", "purchases": "shopping and purchase behavior",
+              "interests": "interests and demographics", "online": "devices and online activity", "location": "precise location", "health": "health information",
+              "social": "social media profiles", "credit": "credit and financial accounts"}
+BUYER_KINDS = {"advertisers": "advertisers and marketers", "brokers": "other data brokers and resellers", "employers": "employers and recruiters",
+               "landlords": "landlords and property managers", "lenders": "banks, lenders and insurers", "government": "government and law enforcement",
+               "businesses": "business customers and sales teams", "publishers": "publishers and ad platforms", "researchers": "researchers and nonprofits",
+               "public": "the general public (people looking you up)"}
 TRACKS = [
-    ("your name and aliases", r"\bname\b|aliases"), ("home addresses and address history", r"(home|mailing|street|residential|postal) address|address history|previous addresses"),
-    ("phone numbers", r"phone number|telephone number|mobile number|cell ?phone"), ("email addresses", r"e-?mail address"),
-    ("age or birthdate", r"date of birth|birth ?date|\bage range\b|\bage\b"), ("relatives and household members", r"relatives|household (members|composition)|family members|associates"),
-    ("job title and employer", r"job title|employer|employment (history|information)|work history|professional (information|background)"),
-    ("education", r"education(al)? (history|information|background)|\bdegree\b|school"), ("income or wealth", r"household income|\bincome\b|net worth|wealth"),
-    ("property and vehicles", r"property (record|ownership|data)|home ?ownership|vehicle|mortgage|real estate"),
-    ("criminal and court records", r"criminal|arrest|court record|mugshot|conviction|sex offender"),
-    ("shopping and purchase behavior", r"purchase (history|behavior|data)|shopping|transaction data|retail"), ("interests and demographics", r"demographic|lifestyle|interests|marital status|ethnic|political"),
-    ("devices and online activity", r"cookie|device (id|identifier)|ip address|advertising (id|identifier)|browsing|clickstream|pixel|mobile advertising"),
-    ("precise location", r"precise (geo)?location|geolocation|\bgps\b|location data"), ("health information", r"health (information|data|condition)|medical|diagnos|prescription"),
-    ("social media profiles", r"social media (profile|account)|linkedin|facebook"), ("credit and financial accounts", r"credit (score|history)|financial account|bank account|credit card"),
+    ("name", r"\bname\b|aliases"), ("address", r"(home|mailing|street|residential|postal) address|address history|previous addresses"),
+    ("phone", r"phone number|telephone number|mobile number|cell ?phone"), ("email", r"e-?mail address"),
+    ("age", r"date of birth|birth ?date|\bage range\b|\bage\b"), ("relatives", r"relatives|household (members|composition)|family members|associates"),
+    ("employment", r"job title|employer|employment (history|information)|work history|professional (information|background)"),
+    ("education", r"education(al)? (history|information|background)|\bdegree\b|school"), ("income", r"household income|\bincome\b|net worth|wealth"),
+    ("property", r"property (record|ownership|data)|home ?ownership|vehicle|mortgage|real estate"),
+    ("criminal", r"criminal|arrest|court record|mugshot|conviction|sex offender"),
+    ("purchases", r"purchase (history|behavior|data)|shopping|transaction data|retail"), ("interests", r"demographic|lifestyle|interests|marital status|ethnic|political"),
+    ("online", r"cookie|device (id|identifier)|ip address|advertising (id|identifier)|browsing|clickstream|pixel|mobile advertising"),
+    ("location", r"precise (geo)?location|geolocation|\bgps\b|location data"), ("health", r"health (information|data|condition)|medical|diagnos|prescription"),
+    ("social", r"social media (profile|account)|linkedin|facebook"), ("credit", r"credit (score|history)|financial account|bank account|credit card"),
 ]
 BUYERS = [
-    ("advertisers and marketers", r"advertis|marketers|marketing (partners|companies|purposes)|brands"), ("other data brokers and resellers", r"data brokers?|resellers?|data partners|aggregators"),
-    ("employers and recruiters", r"employers|recruit|staffing|human resources"), ("landlords and property managers", r"landlords?|property managers?|tenant"),
-    ("banks, lenders and insurers", r"lenders|banks|financial institutions|insurers|insurance compan"), ("government and law enforcement", r"law enforcement|government (agenc|entit)|public safety"),
-    ("business customers and sales teams", r"business customers|\bb2b\b|sales teams|enterprise|corporate customers|our clients|our customers"), ("publishers and ad platforms", r"publishers|ad exchanges|ad platforms|demand[- ]side"),
-    ("researchers and nonprofits", r"nonprofit|researchers|universities|political campaigns"),
+    ("advertisers", r"advertis|marketers|marketing (partners|companies|purposes)|brands"), ("brokers", r"data brokers?|resellers?|data partners|aggregators"),
+    ("employers", r"employers|recruit|staffing|human resources"), ("landlords", r"landlords?|property managers?|tenant"),
+    ("lenders", r"lenders|banks|financial institutions|insurers|insurance compan"), ("government", r"law enforcement|government (agenc|entit)|public safety"),
+    ("businesses", r"business customers|b2b|sales teams|enterprise|corporate customers|our clients|our customers"), ("publishers", r"publishers|ad exchanges|ad platforms|demand[- ]side"),
+    ("researchers", r"nonprofit|researchers|universities|political campaigns"),
 ]
 NOT_SOLD = re.compile(r"(do|does|will) not sell|don.t sell|never sell|not sold", re.I)
-SENSITIVE = {"criminal and court records": 6, "health information": 6, "precise location": 6, "income or wealth": 4, "relatives and household members": 4, "home addresses and address history": 4,
-             "phone numbers": 3, "email addresses": 2, "age or birthdate": 2, "social media profiles": 2, "credit and financial accounts": 4}
+SENSITIVE = {"criminal": 6, "health": 6, "location": 6, "income": 4, "relatives": 4, "address": 4, "phone": 3, "email": 2, "age": 2, "social": 2, "credit": 4}
 BASE = {"people_search": 34, "arrests": 30, "consumer_reporting": 28, "marketing_data": 26, "healthcare": 22, "financial": 22, "fraud_identity": 20, "real_estate": 20, "b2b": 18, "genealogy": 16, "adtech": 14, "other": 10}
 
 
@@ -63,7 +72,7 @@ def describe(ev):
     best = max(scores)
     cid, label = (best[2], best[3]) if best[0] >= 3 else ("other", "data company")
     tracks = [t for t, pat in TRACKS if re.search(pat, (ptext + " " + htext).lower())]
-    if cid not in ("people_search", "arrests"): tracks = [t for t in tracks if t != "your name and aliases"] or tracks
+    if cid not in ("people_search", "arrests"): tracks = [t for t in tracks if t != "name"] or tracks
     sells, note = [], ""
     for s in sentences(ptext):
         low = s.lower()
@@ -74,15 +83,15 @@ def describe(ev):
             for b in hit:
                 if b not in sells: sells.append(b)
             if not note and re.search(r"\bsell|\bsold|licen[sc]e|disclos", low): note = s[:240]
-    if cid in ("people_search", "arrests", "genealogy") and re.search(r"subscription|membership|premium|pay[- ]per|unlimited (searches|reports)|get (the )?report", htext): sells.append("the general public (paid lookups)")
+    if cid in ("people_search", "arrests", "genealogy") and re.search(r"subscription|membership|premium|pay[- ]per|unlimited (searches|reports)|get (the )?report", htext): sells.append("public")
     says_no_sale = bool(NOT_SOLD.search(ptext)) and not sells
     tagline = re.sub(r"\s+", " ", home.get("description") or "").strip()
     if tagline and len(tagline) > 190: tagline = tagline[:187].rsplit(" ", 1)[0] + "..."
     parts = [f"{name} is {'an' if label[0] in 'aeiou' else 'a'} {label}."]
     if tagline: parts.append(tagline if tagline.endswith((".", "!", "?", "...")) else tagline + ".")
-    if tracks: parts.append("Its own pages mention " + ", ".join(tracks[:6]) + ".")
-    parts.append(("Its policy names these buyers or recipients: " + "; ".join(sells[:5]) + ".") if sells else "Its policy does not name who it sells to.")
-    score = BASE[cid] + min(24, sum(SENSITIVE.get(t, 1) for t in tracks)) + min(15, 3 * len(sells)) + (10 if any(s.startswith("the general public") for s in sells) else 0) \
+    if tracks: parts.append("Its own pages mention " + ", ".join(DATA_KINDS[t] for t in tracks[:6]) + ".")
+    parts.append(("Its policy names these buyers or recipients: " + "; ".join(BUYER_KINDS[b] for b in sells[:5]) + ".") if sells else "Its policy does not name who it sells to.")
+    score = BASE[cid] + min(24, sum(SENSITIVE.get(t, 1) for t in tracks)) + min(15, 3 * len(sells)) + (10 if "public" in sells else 0) \
         + min(9, 3 * len(ev.get("registered_in") or []))
     about = {"category": cid, "summary": " ".join(parts), "tracks": tracks, "sells_to": sells}
     if note: about["sells_note"] = note

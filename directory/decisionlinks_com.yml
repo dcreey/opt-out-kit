@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
+about: {"category": "consumer_reporting", "summary": "DecisionLinks LLC is a background-screening and consumer-reporting company. Grow your business with DecisionLinks' smart data driven solutions. Drive growth with identity graphs, predictive analytics, and real-time audience activation. Its own pages mention property and vehicles, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "interests", "online"], "sells_to": [], "source": "https://www.decisionlinks.com/legal-pages/your-privacy-choices"}
+priority: 40

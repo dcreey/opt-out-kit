@@ -19,3 +19,5 @@ live_form:
   found: true
   page: "https://www.weinform.org/api/helper/optOutLight/search?type=removal"
   blockers: []
+about: {"category": "consumer_reporting", "summary": "We Inform LLC is a background-screening and consumer-reporting company. Its own pages mention phone numbers, relatives and household members, income or wealth, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "relatives", "income", "criminal", "social"], "sells_to": [], "source": "https://www.weinform.org/name_search/landing_page"}
+priority: 53

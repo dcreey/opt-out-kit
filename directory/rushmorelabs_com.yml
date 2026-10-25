@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/94afa614-d9cb-419b-99f1-20c87afaca7f/15a2d192-b093-4c31-9c0d-359cf4394128"
   blockers: ["check:a bot check"]
+about: {"category": "other", "summary": "Rushmore Labs, LLC is a data company. With insights into over 270 million American consumers, Rushmore Labs enhances how businesses understand and engage with target markets across the U.S. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "income", "interests", "online", "location", "health"], "sells_to": ["advertisers"], "sells_note": "We may sell or share for cross-context behavioral advertising purposes (and may have sold or shared during the 12-month period prior to the last updated date of this California Consumer Privacy Notice), we may have shared or sold your perso", "source": "https://rushmorelabs.com/california-privacy-notice/"}
+priority: 46

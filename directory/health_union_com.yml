@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/c402d2db-7536-4212-a23d-ed4a33c1b3b2/e3aec736-7c0a-4313-a3e7-132ff601397a"
   blockers: []
+about: {"category": "healthcare", "summary": "Health Union, LLC is a healthcare data company. Reach & engage millions of people living with chronic conditions through data-driven DTC advertising, custom patient research & clinical services. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://privacyportal.onetrust.com/webform/c402d2db-7536-4212-a23d-ed4a33c1b3b2/e3aec736-7c0a-4313-a3e7-132ff601397a"}
+priority: 28

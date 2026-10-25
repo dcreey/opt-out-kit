@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://clients.accurateappend.com/public/optout/capture"
   blockers: []
+about: {"category": "marketing_data", "summary": "Accurate Append Inc. is a marketing data provider. Accurate Append elevates your marketing and sales with top-quality customer data, giving you the competitive edge to soar above the rest. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement.", "tracks": ["address", "phone", "email", "age", "income", "property", "purchases", "interests", "online", "location", "health", "credit"], "sells_to": ["businesses", "government"], "sells_note": "This information is never sold or incorporated into services that we offer to our customers.", "source": "https://accurateappend.com/privacy-policy/"}
+priority: 65

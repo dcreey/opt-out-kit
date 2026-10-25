@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "real_estate", "summary": "ATTOM Data Solutions LLC is a property and real-estate data company. Unlock trusted property data, AI-powered analytics, and AI Agents. Flexible delivery options including APIs, bulk licensing, cloud platforms, and MCP Server. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "property", "interests", "online", "location", "health"], "sells_to": ["advertisers", "businesses"], "sells_note": "Even though we do not disclose your personal information for these purposes without your consent, if you click on or otherwise interact with an advertisement, the advertiser may assume that you meet its target criteria.", "source": "https://www.attomdata.com/privacy/"}
+priority: 53

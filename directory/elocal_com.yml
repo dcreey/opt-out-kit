@@ -14,3 +14,5 @@ opt_out_form: {"page": "https://www.elocal.com/ccpa/opt_outs/new", "method": "po
 registered_in: [CA]
 signals: [email_input, name_input, opt_out_form_found, phone_verify, search_first]
 profiled: "2026-10-22"
+about: {"category": "people_search", "summary": "eLocal USA, LLC is a people-search and public-records site. Join the leaders in pay-per-call and start getting leads for your business today. We work with home services, legal, insurance, medical, and other verticals. Its own pages mention health information. Its policy names these buyers or recipients: the general public (people looking you up).", "tracks": ["health"], "sells_to": ["public"], "source": "https://www.elocal.com/"}
+priority: 56

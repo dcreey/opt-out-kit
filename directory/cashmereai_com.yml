@@ -16,3 +16,5 @@ live_form:
   found: true
   page: "https://www.cashmereai.com/policy/your-privacy"
   blockers: ["check:a bot check"]
+about: {"category": "financial", "summary": "Pludo Inc is a financial and credit data company. Cashmere weaves internal records and external signals into one living profile of every person, company, and entity you serve. Its own pages mention job title and employer, income or wealth. Its policy does not name who it sells to.", "tracks": ["employment", "income"], "sells_to": [], "source": "https://www.cashmereai.com/"}
+priority: 30

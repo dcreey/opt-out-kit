@@ -17,3 +17,5 @@ live_form:
   found: true
   page: "https://alescodata.com/privacy-center/"
   blockers: []
+about: {"category": "marketing_data", "summary": "The Alesco Group LLC is a marketing data provider. Alesco Data provides targeted data, data solutions, technology and enhancements to marketing agencies, data resellers, companies and brands. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://alescodata.com/"}
+priority: 37

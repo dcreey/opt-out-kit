@@ -17,3 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: ["check: a reCAPTCHA checkbox"]
+about: {"category": "adtech", "summary": "LeadPost LLC is an advertising technology company. Transform your website traffic into actionable leads with LeadPost Website Visitor Identification Solutions and boost your growth. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy names these buyers or recipients: other data brokers and resellers; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "income", "property", "interests", "online", "location", "health"], "sells_to": ["brokers", "advertisers"], "sells_note": "This Comprehensive Notice and Regulatory Addendum (“Notice”) describes in detail how LeadPost, LLC (“Company,” “we,” “us,” or “our”) collects, acquires, uses, sells, shares, discloses, retains, and protects personal data on their own behalf", "source": "https://leadpost.com/privacy-policy/"}
+priority: 53

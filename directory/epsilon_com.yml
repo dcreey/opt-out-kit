@@ -18,3 +18,5 @@ live_form:
   found: true
   page: "https://legal.epsilon.com/abacus/consumer-data-deletion-requests"
   blockers: ["check:a bot check"]
+about: {"category": "adtech", "summary": "Epsilon Data Management, LLC is an advertising technology company. Powering personalized marketing at scale, Epsilon helps brands connect with consumers across paid, owned, and earned channels—delivering measurable results. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://legal.epsilon.com/dsr"}
+priority: 25

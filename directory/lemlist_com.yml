@@ -15,3 +15,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
+about: {"category": "b2b", "summary": "LEMPIRE (TALKUS) is a business-contact and sales-data provider. Know who to target and why now, find verified contacts, and engage across every channel from lemlist, your CRM, or your AI assistant. Its own pages mention phone numbers, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "social"], "sells_to": [], "source": "https://www.lemlist.com/"}
+priority: 26

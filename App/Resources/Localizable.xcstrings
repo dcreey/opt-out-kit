@@ -2393,6 +2393,29 @@
     }
    }
   },
+  "Any data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toutes les données"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquier dato"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beliebige Daten"
+     }
+    }
+   }
+  },
   "Any paragraph nobody has reviewed, including a changed one": {
    "extractionState": "manual",
    "localizations": {
@@ -2412,6 +2435,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jeder Absatz, den niemand geprüft hat, auch ein geänderter"
+     }
+    }
+   }
+  },
+  "Any type": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les types"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquier tipo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beliebiger Typ"
+     }
+    }
+   }
+  },
+  "Anyone": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tout le monde"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquiera"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beliebige"
      }
     }
    }
@@ -3589,6 +3658,29 @@
     }
    }
   },
+  "Clear filters": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Effacer les filtres"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Borrar filtros"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Filter löschen"
+     }
+    }
+   }
+  },
   "Clear the check": {
    "extractionState": "manual",
    "localizations": {
@@ -4298,6 +4390,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Datenbroker verkaufen Ihren Namen, Ihre Adresse und Ihre Angehörigen. Opt-Out Kit führt Sie dabei, sich und alle, die Sie hinzufügen, daraus zu entfernen."
+     }
+    }
+   }
+  },
+  "Data they collect": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données collectées"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos que recopilan"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erfasste Daten"
      }
     }
    }
@@ -5908,6 +6023,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Hawaii"
+     }
+    }
+   }
+  },
+  "High priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité élevée"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad alta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hohe Priorität"
      }
     }
    }
@@ -7545,6 +7683,29 @@
     }
    }
   },
+  "Lower priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité plus faible"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad menor"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Niedrigere Priorität"
+     }
+    }
+   }
+  },
   "Maiden name": {
    "extractionState": "manual",
    "localizations": {
@@ -7794,6 +7955,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ich"
+     }
+    }
+   }
+  },
+  "Medium priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité moyenne"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad media"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mittlere Priorität"
      }
     }
    }
@@ -16097,6 +16281,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Art"
+     }
+    }
+   }
+  },
+  "Type of company": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Type d'entreprise"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tipo de empresa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Art des Unternehmens"
      }
     }
    }
