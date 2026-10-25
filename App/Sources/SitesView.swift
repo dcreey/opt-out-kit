@@ -448,6 +448,7 @@ struct DirectoryInfoView: View {
         Section {
             if let cat = entry.brokerCategory { Label(cat.title, systemImage: "building.2").font(.caption.bold()).foregroundStyle(.tint) }
             Text(about.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            if let cat = entry.brokerCategory { Text(cat.whatItMeans).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true); CaseExamples(category: cat) }
             if let score = entry.priority {
                 Label(Loc.f("%@ (%lld of 100)", BrokerPriority.tier(score), score), systemImage: "flag.fill")
                     .font(.caption.bold()).foregroundStyle(score >= 60 ? .red : score >= 45 ? .orange : .secondary)

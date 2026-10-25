@@ -392,6 +392,29 @@
     }
    }
   },
+  "A bank spots that someone is using your name to open a credit card and blocks it before you ever find out.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une banque repère que quelqu'un utilise votre nom pour ouvrir une carte de crédit et la bloque avant même que vous le sachiez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un banco detecta que alguien usa tu nombre para abrir una tarjeta de crédito y la bloquea antes de que te enteres."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bank bemerkt, dass jemand Ihren Namen für eine Kreditkarte nutzt, und blockiert sie, bevor Sie es überhaupt erfahren."
+     }
+    }
+   }
+  },
   "A bot check (Cloudflare Turnstile)": {
    "extractionState": "manual",
    "localizations": {
@@ -507,6 +530,121 @@
     }
    }
   },
+  "A buyer finds the right person at your company and you get a useful deal or a job lead.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un acheteur trouve la bonne personne dans votre entreprise et vous obtenez une bonne affaire ou une piste d'emploi utile."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un comprador encuentra a la persona adecuada en tu empresa y obtienes un buen trato o una pista de empleo útil."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Käufer findet die richtige Person in Ihrem Unternehmen und Sie erhalten ein nützliches Angebot oder einen Jobhinweis."
+     }
+    }
+   }
+  },
+  "A buyer's agent finds the owner of the house they want and you get a good offer.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un agent d'acheteur trouve le propriétaire de la maison qu'il vise et vous recevez une bonne offre."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un agente de compradores encuentra al dueño de la casa que quiere y recibes una buena oferta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Makler findet den Eigentümer des gewünschten Hauses und Sie erhalten ein gutes Angebot."
+     }
+    }
+   }
+  },
+  "A campaign reaches you with information about issues you care about, or reminds you to vote.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une campagne vous informe sur des sujets qui vous importent ou vous rappelle de voter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una campaña te llega con información sobre temas que te importan o te recuerda votar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Kampagne informiert Sie über Themen, die Ihnen wichtig sind, oder erinnert Sie ans Wählen."
+     }
+    }
+   }
+  },
+  "A charge that was dropped years ago turns up when an employer or landlord searches your name, and you are asked to pay to have it removed.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une accusation abandonnée il y a des années ressort quand un employeur ou un propriétaire cherche votre nom, et on vous demande de payer pour la retirer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un cargo desestimado hace años aparece cuando un empleador o arrendador busca tu nombre, y te piden pagar para retirarlo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine vor Jahren fallengelassene Anschuldigung taucht auf, wenn ein Arbeitgeber oder Vermieter Ihren Namen sucht, und man verlangt Geld für die Entfernung."
+     }
+    }
+   }
+  },
+  "A dealer reminds you your lease is ending, or you are alerted to a safety recall.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un concessionnaire vous rappelle que votre leasing se termine, ou vous êtes alerté d'un rappel de sécurité."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un concesionario te recuerda que tu leasing termina, o te avisan de una revisión de seguridad."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Händler erinnert Sie daran, dass Ihr Leasing endet, oder Sie werden auf einen Sicherheitsrückruf hingewiesen."
+     }
+    }
+   }
+  },
   "A form plus a CAPTCHA that you solve": {
    "extractionState": "manual",
    "localizations": {
@@ -526,6 +664,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein Formular mit einem CAPTCHA, das Sie lösen"
+     }
+    }
+   }
+  },
+  "A guess that you have a condition is sold to marketers and targets you with ads for it, and you cannot see or correct what they think you have.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une supposition selon laquelle vous avez une maladie est vendue aux marketeurs et vous cible avec des publicités, sans que vous puissiez voir ni corriger ce qu'ils pensent de vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una suposición de que tienes una afección se vende a especialistas en marketing y te llegan anuncios sobre ella, sin que puedas ver ni corregir lo que creen de ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Vermutung, dass Sie eine Erkrankung haben, wird an Marketer verkauft und Sie werden mit Werbung dafür angesprochen, ohne zu sehen oder zu korrigieren, was man über Sie denkt."
      }
     }
    }
@@ -572,6 +733,167 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine von Hand geschriebene Anleitung mit %@ Schritten."
+     }
+    }
+   }
+  },
+  "A landlord quickly confirms you pay on time and approves your apartment.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un propriétaire confirme vite que vous payez à temps et approuve votre appartement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un arrendador confirma rápido que pagas a tiempo y aprueba tu apartamento."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Vermieter bestätigt schnell, dass Sie pünktlich zahlen, und genehmigt Ihre Wohnung."
+     }
+    }
+   }
+  },
+  "A lender recognizes you as a good risk and offers a lower rate.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un prêteur vous reconnaît comme un bon risque et propose un taux plus bas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un prestamista te reconoce como buen riesgo y ofrece una tasa más baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Kreditgeber erkennt Sie als gutes Risiko und bietet einen niedrigeren Zins."
+     }
+    }
+   }
+  },
+  "A local shop you use sends a letter about a real sale.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un commerce local que vous fréquentez envoie un courrier sur une vraie promotion."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una tienda local que usas envía una carta sobre una oferta real."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Geschäft vor Ort, das Sie nutzen, schickt einen Brief über ein echtes Angebot."
+     }
+    }
+   }
+  },
+  "A mail house is breached and the list it holds for many brands leaks, and you get junk mail you cannot trace back.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un routeur de courrier est piraté et la liste qu'il détient pour de nombreuses marques fuite ; vous recevez du courrier indésirable dont vous ne trouvez pas l'origine."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una empresa de correo sufre una brecha y la lista que guarda para muchas marcas se filtra; recibes correo basura sin saber de dónde viene."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Mailing-Dienstleister wird gehackt und die Liste, die er für viele Marken hält, gelangt nach außen; Sie bekommen Werbepost, die Sie nicht zurückverfolgen können."
+     }
+    }
+   }
+  },
+  "A mistaken record, such as someone else's debt or crime, appears in your report and costs you a job or a home before you find the error.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un dossier erroné, comme la dette ou le délit de quelqu'un d'autre, apparaît dans votre rapport et vous coûte un emploi ou un logement avant que vous ne trouviez l'erreur."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un registro erróneo, como la deuda o el delito de otra persona, aparece en tu informe y te cuesta un empleo o una vivienda antes de que encuentres el error."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein fehlerhafter Eintrag, etwa die Schulden oder Straftat einer anderen Person, taucht in Ihrem Bericht auf und kostet Sie eine Stelle oder Wohnung, bevor Sie den Fehler finden."
+     }
+    }
+   }
+  },
+  "A neighbor or employer verifies a real, public record before a decision.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un voisin ou un employeur vérifie un dossier public réel avant de prendre une décision."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un vecino o empleador verifica un registro público real antes de decidir."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Nachbar oder Arbeitgeber prüft vor einer Entscheidung einen echten öffentlichen Eintrag."
+     }
+    }
+   }
+  },
+  "A profile of your income, health interests and family is sold on to scammers, who use it to target you or your elderly relatives with convincing fake offers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un profil de vos revenus, de vos centres d'intérêt santé et de votre famille est revendu à des escrocs, qui s'en servent pour vous cibler, vous ou vos proches âgés, avec de fausses offres convaincantes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un perfil de tus ingresos, intereses de salud y familia se revende a estafadores, que lo usan para dirigirte a ti o a tus familiares mayores ofertas falsas convincentes."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Profil Ihres Einkommens, Ihrer Gesundheitsinteressen und Ihrer Familie wird an Betrüger weiterverkauft, die damit Sie oder ältere Verwandte mit überzeugenden Fake-Angeboten ansprechen."
      }
     }
    }
@@ -668,6 +990,75 @@
     }
    }
   },
+  "A recruiter finds you for a real step up in a job without you searching.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un recruteur vous trouve pour un vrai pas en avant sans que vous cherchiez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un reclutador te encuentra para un ascenso real sin que busques."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Recruiter findet Sie für einen echten Karriereschritt, ohne dass Sie suchen."
+     }
+    }
+   }
+  },
+  "A relative or stranger you have avoided finds you through a family tree, or your living relatives' details are exposed.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un proche ou un inconnu que vous évitiez vous retrouve grâce à un arbre généalogique, ou les informations de vos proches vivants sont exposées."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un familiar o desconocido a quien evitabas te encuentra por un árbol genealógico, o se exponen los datos de tus familiares vivos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Verwandter oder Fremder, dem Sie aus dem Weg gehen, findet Sie über einen Stammbaum, oder die Daten Ihrer lebenden Verwandten werden offengelegt."
+     }
+    }
+   }
+  },
+  "A service you chose works better, for example a contacts app that identifies callers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un service que vous avez choisi fonctionne mieux, par exemple une appli de contacts qui identifie les appelants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un servicio que elegiste funciona mejor, por ejemplo una app de contactos que identifica llamadas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Dienst, den Sie gewählt haben, funktioniert besser, zum Beispiel eine Kontakte-App, die Anrufer erkennt."
+     }
+    }
+   }
+  },
   "A simple form and an email link": {
    "extractionState": "manual",
    "localizations": {
@@ -687,6 +1078,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein einfaches Formular und ein E-Mail-Link"
+     }
+    }
+   }
+  },
+  "A stalker or abusive ex finds your new address within minutes of you moving, or a scammer uses your relatives' names to make a convincing call to your parents.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un harceleur ou un ex violent trouve votre nouvelle adresse quelques minutes après votre déménagement, ou un escroc utilise le nom de vos proches pour appeler vos parents de façon convaincante."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un acosador o una expareja abusiva encuentra tu nueva dirección minutos después de mudarte, o un estafador usa los nombres de tus familiares para llamar de forma convincente a tus padres."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Stalker oder gewalttätiger Ex findet Ihre neue Adresse wenige Minuten nach dem Umzug, oder ein Betrüger nutzt die Namen Ihrer Verwandten für einen überzeugenden Anruf bei Ihren Eltern."
      }
     }
    }
@@ -1933,25 +2347,25 @@
     }
    }
   },
-  "Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. They buy data from many sources and sell the checks to banks and online businesses.": {
+  "Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. To do that they buy and keep large identity files, including past addresses and leaked passwords, and sell checks to banks, online shops and investigators.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Entreprises qui rapprochent noms, e-mails, numéros et adresses pour vérifier l'identité de quelqu'un et repérer la fraude. Elles achètent des données de nombreuses sources et vendent les vérifications aux banques et aux entreprises en ligne."
+      "value": "Entreprises qui rapprochent noms, e-mails, numéros et adresses pour vérifier l'identité de quelqu'un et repérer la fraude. Pour cela, elles achètent et conservent de gros fichiers d'identité, y compris anciennes adresses et mots de passe divulgués, et vendent des vérifications aux banques, boutiques en ligne et enquêteurs."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Empresas que cruzan nombres, correos, teléfonos y direcciones para comprobar quién es alguien y detectar fraudes. Compran datos de muchas fuentes y venden las verificaciones a bancos y negocios en línea."
+      "value": "Empresas que cruzan nombres, correos, teléfonos y direcciones para comprobar quién es alguien y detectar fraudes. Para ello compran y guardan grandes expedientes de identidad, incluidas direcciones anteriores y contraseñas filtradas, y venden comprobaciones a bancos, tiendas en línea e investigadores."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Unternehmen, die Namen, E-Mails, Telefonnummern und Adressen abgleichen, um die Identität zu prüfen und Betrug zu erkennen. Sie kaufen Daten aus vielen Quellen und verkaufen die Prüfungen an Banken und Online-Unternehmen."
+      "value": "Unternehmen, die Namen, E-Mails, Telefonnummern und Adressen abgleichen, um die Identität zu prüfen und Betrug zu erkennen. Dafür kaufen und speichern sie große Identitätsdateien, auch frühere Adressen und geleakte Passwörter, und verkaufen Prüfungen an Banken, Onlineshops und Ermittler."
      }
     }
    }
@@ -2416,6 +2830,29 @@
     }
    }
   },
+  "Data you gave one company for one purpose is kept and sold elsewhere without you knowing.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Des données confiées à une entreprise dans un but précis sont conservées et vendues ailleurs à votre insu."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos que diste a una empresa para un fin se guardan y se venden en otro lugar sin que lo sepas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Daten, die Sie einer Firma für einen Zweck gegeben haben, werden behalten und ohne Ihr Wissen anderswo verkauft."
+     }
+    }
+   }
+  },
   "Delaware": {
    "extractionState": "manual",
    "localizations": {
@@ -2504,6 +2941,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Hat nicht geantwortet"
+     }
+    }
+   }
+  },
+  "Disaster agencies see where people are moving to send help, or a traffic app reroutes you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les services de secours voient où les gens se déplacent pour envoyer de l'aide, ou une appli de trafic vous réoriente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los servicios de emergencia ven hacia dónde se mueve la gente para enviar ayuda, o una app de tráfico te reencamina."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Katastrophenschutz sieht, wohin Menschen ziehen, um Hilfe zu schicken, oder eine Verkehrs-App leitet Sie um."
      }
     }
    }
@@ -2941,6 +3401,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Formulare, die die App in einem Durchlauf selbst ausfüllt und sendet."
+     }
+    }
+   }
+  },
+  "Free apps and sites pay for themselves with ads that are somewhat relevant to you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les applis et sites gratuits se financent grâce à des publicités un peu pertinentes pour vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las apps y sitios gratuitos se pagan con anuncios algo relevantes para ti."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kostenlose Apps und Seiten finanzieren sich durch Werbung, die für Sie halbwegs relevant ist."
      }
     }
    }
@@ -3585,6 +4068,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Interessen und Demografie"
+     }
+    }
+   }
+  },
+  "Investors and scammers know who owns which home, when it was bought and how much is owed, and pressure owners, especially older ones, into bad deals; a stalker gets your address.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Investisseurs et escrocs savent qui possède quelle maison, quand elle a été achetée et combien il reste à rembourser, et poussent les propriétaires, surtout âgés, vers de mauvaises affaires ; un harceleur obtient votre adresse."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Inversores y estafadores saben quién es dueño de qué casa, cuándo se compró y cuánto se debe, y presionan a los propietarios, sobre todo mayores, hacia malos tratos; un acosador obtiene tu dirección."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Investoren und Betrüger wissen, wem welches Haus gehört, wann es gekauft wurde und wie viel offen ist, und drängen Eigentümer, besonders ältere, zu schlechten Deals; ein Stalker erhält Ihre Adresse."
      }
     }
    }
@@ -5061,6 +5567,29 @@
     }
    }
   },
+  "One form fill sells your phone number to dozens of companies, and calls and texts follow for months, some from scammers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un seul formulaire vend votre numéro à des dizaines d'entreprises, et les appels et SMS suivent pendant des mois, certains venant d'escrocs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar un solo formulario vende tu teléfono a decenas de empresas, y las llamadas y mensajes siguen durante meses, algunos de estafadores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein einziges Formular verkauft Ihre Nummer an Dutzende Firmen, und Anrufe und SMS folgen monatelang, einige von Betrügern."
+     }
+    }
+   }
+  },
   "One free request that your state or country already runs, reaching every broker registered there. Do this first.": {
    "extractionState": "manual",
    "localizations": {
@@ -5977,6 +6506,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Forscher und gemeinnützige Organisationen"
+     }
+    }
+   }
+  },
+  "Researchers spot a drug side effect sooner from anonymous data, and you get a reminder for a screening you need.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Des chercheurs repèrent plus vite un effet secondaire d'un médicament grâce à des données anonymes, et vous recevez un rappel pour un dépistage nécessaire."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los investigadores detectan antes un efecto secundario de un fármaco con datos anónimos, y recibes un recordatorio de un examen que necesitas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Forscher erkennen eine Nebenwirkung eines Medikaments früher aus anonymen Daten, und Sie erhalten eine Erinnerung an eine nötige Vorsorge."
      }
     }
    }
@@ -7085,6 +7637,29 @@
     }
    }
   },
+  "The same file that helps a bank stop a thief is a prize for a thief, and it can be wrong. Opting out removes some data from their products, but some uses are exempt by law, so you may not be removed from everything.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le même fichier qui aide une banque à arrêter un voleur est un butin pour un voleur, et il peut être faux. Vous retirer supprime certaines données de leurs produits, mais certains usages sont exemptés par la loi : vous ne serez peut-être pas retiré de tout."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El mismo expediente que ayuda a un banco a frenar a un ladrón es un botín para un ladrón, y puede estar equivocado. Darte de baja quita algunos datos de sus productos, pero algunos usos están exentos por ley, así que quizá no te quiten de todo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieselbe Akte, die einer Bank hilft, einen Dieb zu stoppen, ist eine Beute für Diebe und kann falsch sein. Ein Opt-out entfernt einige Daten aus ihren Produkten, aber manche Nutzungen sind gesetzlich ausgenommen, sodass Sie möglicherweise nicht überall entfernt werden."
+     }
+    }
+   }
+  },
   "The same, for brokers registered somewhere in your country.": {
    "extractionState": "manual",
    "localizations": {
@@ -7269,6 +7844,29 @@
     }
    }
   },
+  "Their file leaks or is bought by a stalker or scammer, or a mistake in it flags you as a fraud risk and gets you declined for an account, with no easy way to see or fix why.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Leur fichier fuite ou est acheté par un harceleur ou un escroc, ou une erreur vous classe comme risque de fraude et vous fait refuser un compte, sans moyen simple de savoir pourquoi ni de corriger."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Su expediente se filtra o lo compra un acosador o estafador, o un error te marca como riesgo de fraude y te rechazan una cuenta, sin forma fácil de ver o corregir por qué."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Akte wird geleakt oder von einem Stalker oder Betrüger gekauft, oder ein Fehler stuft Sie als Betrugsrisiko ein und Sie werden bei einem Konto abgelehnt, ohne einfache Möglichkeit, den Grund zu sehen oder zu korrigieren."
+     }
+    }
+   }
+  },
   "Then we look for the site's confirmation.": {
    "extractionState": "manual",
    "localizations": {
@@ -7311,29 +7909,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie können Verwandte und Adressen lebender Personen offenlegen. Ein Opt-out blendet Ihren eigenen Eintrag in Suchen aus."
-     }
-    }
-   }
-  },
-  "They help stop scams but also keep detailed identity files on you. Opting out removes some of your data from their products, though some checks are required by law.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ils aident à stopper les arnaques mais conservent aussi des dossiers d'identité détaillés sur vous. Vous retirer supprime une partie de vos données de leurs produits, même si certaines vérifications sont imposées par la loi."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ayudan a frenar estafas, pero también guardan expedientes de identidad detallados sobre ti. Darte de baja quita algunos de tus datos de sus productos, aunque algunas comprobaciones las exige la ley."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sie helfen gegen Betrug, führen aber auch detaillierte Identitätsakten über Sie. Ein Opt-out entfernt einen Teil Ihrer Daten aus ihren Produkten, obwohl manche Prüfungen gesetzlich vorgeschrieben sind."
      }
     }
    }
@@ -8304,6 +8879,29 @@
     }
    }
   },
+  "You ask for insurance quotes and get several useful offers fast.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous demandez des devis d'assurance et recevez rapidement plusieurs offres utiles."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pides presupuestos de seguros y recibes varias ofertas útiles rápidamente."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie fordern Versicherungsangebote an und erhalten schnell mehrere nützliche Angebote."
+     }
+    }
+   }
+  },
   "You can ask organizations to delete or correct your data in some circumstances, but it is not an absolute right.": {
    "extractionState": "manual",
    "localizations": {
@@ -8442,6 +9040,29 @@
     }
    }
   },
+  "You discover relatives you never knew and trace your family history.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous découvrez des proches que vous ne connaissiez pas et retracez l'histoire de votre famille."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Descubres familiares que no conocías y rastreas la historia de tu familia."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie entdecken Verwandte, die Sie nicht kannten, und erforschen Ihre Familiengeschichte."
+     }
+    }
+   }
+  },
   "You do the steps, but each task handles 10 or more sites, so the effort pays off.": {
    "extractionState": "manual",
    "localizations": {
@@ -8484,6 +9105,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie finden zuerst Ihren Eintrag"
+     }
+    }
+   }
+  },
+  "You get a coupon or offer for something you were about to buy anyway.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous recevez un bon ou une offre pour quelque chose que vous alliez acheter de toute façon."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recibes un cupón u oferta de algo que ibas a comprar de todos modos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie erhalten einen Gutschein oder ein Angebot für etwas, das Sie ohnehin kaufen wollten."
+     }
+    }
+   }
+  },
+  "You look up an old friend, or check a contractor before letting them into your home.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous retrouvez un vieil ami, ou vérifiez un artisan avant de le laisser entrer chez vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscas a un viejo amigo o compruebas a un contratista antes de dejarlo entrar en tu casa."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie suchen einen alten Freund oder prüfen einen Handwerker, bevor Sie ihn ins Haus lassen."
      }
     }
    }
@@ -8580,6 +9247,29 @@
     }
    }
   },
+  "Your browsing, including health or money worries, is traded and used to follow you with ads, or to build a profile that is later sold to people you would never choose.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre navigation, y compris vos soucis de santé ou d'argent, est échangée et sert à vous suivre avec des publicités, ou à bâtir un profil revendu plus tard à des gens que vous n'auriez jamais choisis."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu navegación, incluidas preocupaciones de salud o dinero, se intercambia y sirve para perseguirte con anuncios o crear un perfil que luego se vende a quien jamás elegirías."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Surfen, auch zu Gesundheits- oder Geldsorgen, wird gehandelt und dient dazu, Ihnen mit Werbung zu folgen oder ein Profil zu bauen, das später an Leute verkauft wird, die Sie nie gewählt hätten."
+     }
+    }
+   }
+  },
   "Your car, your address and when you might buy again are shared with dealers and insurers. Opting out reduces targeted offers and some data used in insurance.": {
    "extractionState": "manual",
    "localizations": {
@@ -8599,6 +9289,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihr Auto, Ihre Adresse und wann Sie wieder kaufen könnten, werden mit Händlern und Versicherern geteilt. Ein Opt-out verringert gezielte Angebote und einige in der Versicherung genutzte Daten."
+     }
+    }
+   }
+  },
+  "Your driving or vehicle history is sold to insurers who raise your rates, or dealers learn when you are likely to buy and pressure you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre historique de conduite ou de véhicule est vendu à des assureurs qui augmentent vos tarifs, ou les concessionnaires savent quand vous allez probablement acheter et vous pressent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu historial de conducción o vehículo se vende a aseguradoras que suben tus tarifas, o los concesionarios saben cuándo es probable que compres y te presionan."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Fahr- oder Fahrzeughistorie wird an Versicherer verkauft, die Ihre Beiträge erhöhen, oder Händler wissen, wann Sie wahrscheinlich kaufen, und setzen Sie unter Druck."
      }
     }
    }
@@ -8626,6 +9339,29 @@
     }
    }
   },
+  "Your estimated wealth makes you a target for scam calls and aggressive sales pitches, or a wrong estimate quietly gets you worse offers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre patrimoine estimé fait de vous une cible pour les appels frauduleux et les ventes agressives, ou une estimation fausse vous vaut discrètement de moins bonnes offres."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu patrimonio estimado te convierte en blanco de llamadas de estafa y ventas agresivas, o una estimación errónea te da discretamente peores ofertas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr geschätztes Vermögen macht Sie zum Ziel für Betrugsanrufe und aggressive Verkaufsgespräche, oder eine falsche Schätzung bringt Ihnen unbemerkt schlechtere Angebote."
+     }
+    }
+   }
+  },
   "Your party, voting history and donations, where public, are used to target you with political messages. Opting out limits what is added from commercial sources.": {
    "extractionState": "manual",
    "localizations": {
@@ -8645,6 +9381,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Partei, Wahlhistorie und Spenden werden, soweit öffentlich, genutzt, um Sie mit politischen Botschaften anzusprechen. Ein Opt-out begrenzt, was aus kommerziellen Quellen hinzukommt."
+     }
+    }
+   }
+  },
+  "Your phone's movements show where you live, work, worship or get medical care, and are bought by anyone, including stalkers or authorities, to track you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les déplacements de votre téléphone montrent où vous habitez, travaillez, priez ou vous faites soigner, et sont achetés par n'importe qui, y compris des harceleurs ou des autorités, pour vous suivre."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los movimientos de tu teléfono muestran dónde vives, trabajas, rezas o te atienden médicamente, y los compra cualquiera, incluidos acosadores o autoridades, para seguirte."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Bewegungen Ihres Handys zeigen, wo Sie wohnen, arbeiten, beten oder medizinisch behandelt werden, und werden von jedem gekauft, auch von Stalkern oder Behörden, um Sie zu verfolgen."
      }
     }
    }
@@ -8718,6 +9477,29 @@
     }
    }
   },
+  "Your résumé details are scraped and sold to scammers who post fake job offers to steal your identity or money.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les détails de votre CV sont aspirés et vendus à des escrocs qui publient de fausses offres d'emploi pour voler votre identité ou votre argent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los datos de tu currículum se extraen y se venden a estafadores que publican falsas ofertas de empleo para robar tu identidad o dinero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Lebenslaufdaten werden abgegriffen und an Betrüger verkauft, die falsche Jobangebote posten, um Ihre Identität oder Ihr Geld zu stehlen."
+     }
+    }
+   }
+  },
   "Your résumé details can be found and shared without you applying anywhere. Opting out stops recruiters finding you through them.": {
    "extractionState": "manual",
    "localizations": {
@@ -8741,6 +9523,29 @@
     }
    }
   },
+  "Your voting history and donations are used to target you with misleading messages, or your donor details are shared and you are flooded with solicitations.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre historique de vote et vos dons servent à vous cibler avec des messages trompeurs, ou vos coordonnées de donateur sont partagées et vous êtes inondé de sollicitations."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu historial de voto y donaciones se usan para dirigirte mensajes engañosos, o se comparten tus datos de donante y te inundan de solicitudes."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Wahlhistorie und Spenden werden genutzt, um Sie mit irreführenden Botschaften anzusprechen, oder Ihre Spenderdaten werden geteilt und Sie werden mit Bitten überhäuft."
+     }
+    }
+   }
+  },
   "Your work email and phone number can be bought by salespeople you have never heard of. Opting out cuts cold calls and spam to your work address.": {
    "extractionState": "manual",
    "localizations": {
@@ -8760,6 +9565,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Firmen-E-Mail und Telefonnummer können von Vertrieblern gekauft werden, von denen Sie nie gehört haben. Ein Opt-out verringert Kaltanrufe und Spam an Ihre Arbeitsadresse."
+     }
+    }
+   }
+  },
+  "Your work number and email are sold to hundreds of sales teams and scammers, and you spend your days deleting cold outreach or fending off someone impersonating your boss.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre numéro et votre e-mail professionnels sont vendus à des centaines d'équipes commerciales et d'escrocs, et vous passez vos journées à supprimer des sollicitations ou à repousser quelqu'un qui se fait passer pour votre patron."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu teléfono y correo de trabajo se venden a cientos de equipos de ventas y estafadores, y pasas los días borrando mensajes o esquivando a alguien que se hace pasar por tu jefe."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Arbeitsnummer und E-Mail werden an Hunderte Vertriebsteams und Betrüger verkauft, und Sie löschen tagsüber Kaltansprachen oder wehren jemanden ab, der sich als Ihr Chef ausgibt."
      }
     }
    }

@@ -41,7 +41,7 @@ public extension BrokerCategory {
         case .adtech: return L10n.t("Companies that run the behind-the-scenes auctions for online ads. They track your devices, browsing and apps with cookies and ad IDs, and trade that data with advertisers and publishers in milliseconds.")
         case .healthcare: return L10n.t("Companies that handle data about doctors, patients and health interests, sometimes built from pharmacy, insurance and web activity, and sell it to drug makers, health marketers and researchers.")
         case .financial: return L10n.t("Companies that gather credit, income and wealth information and sell it to lenders, marketers and investors.")
-        case .fraud_identity: return L10n.t("Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. They buy data from many sources and sell the checks to banks and online businesses.")
+        case .fraud_identity: return L10n.t("Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. To do that they buy and keep large identity files, including past addresses and leaked passwords, and sell checks to banks, online shops and investigators.")
         case .real_estate: return L10n.t("Companies that combine property records, ownership and mortgage data and sell it to agents, investors and marketers.")
         case .genealogy: return L10n.t("Family-history sites that draw on public records, censuses and other databases to build family trees, sometimes including living people.")
         case .lead_generation: return L10n.t("Companies that collect your details through quote forms and surveys and sell them as leads to businesses such as insurers, lenders and home contractors.")
@@ -51,6 +51,55 @@ public extension BrokerCategory {
         case .location_data: return L10n.t("Companies that buy location data from apps and devices and sell movement patterns to advertisers, retailers and sometimes governments.")
         case .marketing_services: return L10n.t("Agencies and mail houses that run campaigns for brands and handle large customer lists on their clients' behalf.")
         case .other: return L10n.t("Companies that hold personal data but do not fit the other types, such as software, media and research firms.")
+        }
+    }
+
+
+    /// A realistic good outcome of this kind of company holding your data.
+    var bestCase: String {
+        switch self {
+        case .people_search: return L10n.t("You look up an old friend, or check a contractor before letting them into your home.")
+        case .arrests: return L10n.t("A neighbor or employer verifies a real, public record before a decision.")
+        case .consumer_reporting: return L10n.t("A landlord quickly confirms you pay on time and approves your apartment.")
+        case .marketing_data: return L10n.t("You get a coupon or offer for something you were about to buy anyway.")
+        case .b2b: return L10n.t("A buyer finds the right person at your company and you get a useful deal or a job lead.")
+        case .adtech: return L10n.t("Free apps and sites pay for themselves with ads that are somewhat relevant to you.")
+        case .healthcare: return L10n.t("Researchers spot a drug side effect sooner from anonymous data, and you get a reminder for a screening you need.")
+        case .financial: return L10n.t("A lender recognizes you as a good risk and offers a lower rate.")
+        case .fraud_identity: return L10n.t("A bank spots that someone is using your name to open a credit card and blocks it before you ever find out.")
+        case .real_estate: return L10n.t("A buyer's agent finds the owner of the house they want and you get a good offer.")
+        case .genealogy: return L10n.t("You discover relatives you never knew and trace your family history.")
+        case .lead_generation: return L10n.t("You ask for insurance quotes and get several useful offers fast.")
+        case .political: return L10n.t("A campaign reaches you with information about issues you care about, or reminds you to vote.")
+        case .recruiting: return L10n.t("A recruiter finds you for a real step up in a job without you searching.")
+        case .automotive: return L10n.t("A dealer reminds you your lease is ending, or you are alerted to a safety recall.")
+        case .location_data: return L10n.t("Disaster agencies see where people are moving to send help, or a traffic app reroutes you.")
+        case .marketing_services: return L10n.t("A local shop you use sends a letter about a real sale.")
+        case .other: return L10n.t("A service you chose works better, for example a contacts app that identifies callers.")
+        }
+    }
+
+    /// A realistic bad outcome of this kind of company holding your data.
+    var worstCase: String {
+        switch self {
+        case .people_search: return L10n.t("A stalker or abusive ex finds your new address within minutes of you moving, or a scammer uses your relatives' names to make a convincing call to your parents.")
+        case .arrests: return L10n.t("A charge that was dropped years ago turns up when an employer or landlord searches your name, and you are asked to pay to have it removed.")
+        case .consumer_reporting: return L10n.t("A mistaken record, such as someone else's debt or crime, appears in your report and costs you a job or a home before you find the error.")
+        case .marketing_data: return L10n.t("A profile of your income, health interests and family is sold on to scammers, who use it to target you or your elderly relatives with convincing fake offers.")
+        case .b2b: return L10n.t("Your work number and email are sold to hundreds of sales teams and scammers, and you spend your days deleting cold outreach or fending off someone impersonating your boss.")
+        case .adtech: return L10n.t("Your browsing, including health or money worries, is traded and used to follow you with ads, or to build a profile that is later sold to people you would never choose.")
+        case .healthcare: return L10n.t("A guess that you have a condition is sold to marketers and targets you with ads for it, and you cannot see or correct what they think you have.")
+        case .financial: return L10n.t("Your estimated wealth makes you a target for scam calls and aggressive sales pitches, or a wrong estimate quietly gets you worse offers.")
+        case .fraud_identity: return L10n.t("Their file leaks or is bought by a stalker or scammer, or a mistake in it flags you as a fraud risk and gets you declined for an account, with no easy way to see or fix why.")
+        case .real_estate: return L10n.t("Investors and scammers know who owns which home, when it was bought and how much is owed, and pressure owners, especially older ones, into bad deals; a stalker gets your address.")
+        case .genealogy: return L10n.t("A relative or stranger you have avoided finds you through a family tree, or your living relatives' details are exposed.")
+        case .lead_generation: return L10n.t("One form fill sells your phone number to dozens of companies, and calls and texts follow for months, some from scammers.")
+        case .political: return L10n.t("Your voting history and donations are used to target you with misleading messages, or your donor details are shared and you are flooded with solicitations.")
+        case .recruiting: return L10n.t("Your résumé details are scraped and sold to scammers who post fake job offers to steal your identity or money.")
+        case .automotive: return L10n.t("Your driving or vehicle history is sold to insurers who raise your rates, or dealers learn when you are likely to buy and pressure you.")
+        case .location_data: return L10n.t("Your phone's movements show where you live, work, worship or get medical care, and are bought by anyone, including stalkers or authorities, to track you.")
+        case .marketing_services: return L10n.t("A mail house is breached and the list it holds for many brands leaks, and you get junk mail you cannot trace back.")
+        case .other: return L10n.t("Data you gave one company for one purpose is kept and sold elsewhere without you knowing.")
         }
     }
 
@@ -65,7 +114,7 @@ public extension BrokerCategory {
         case .adtech: return L10n.t("Websites and apps pass your activity to them, so ads follow you across devices. They mostly know a device, not your name, but they can link the two.")
         case .healthcare: return L10n.t("Health-related guesses about you, such as conditions you search for or treat, can be sold for marketing. Opting out limits who can target you using your health.")
         case .financial: return L10n.t("Estimates of what you earn or are worth can change which offers you see, and they are sold without you asking.")
-        case .fraud_identity: return L10n.t("They help stop scams but also keep detailed identity files on you. Opting out removes some of your data from their products, though some checks are required by law.")
+        case .fraud_identity: return L10n.t("The same file that helps a bank stop a thief is a prize for a thief, and it can be wrong. Opting out removes some data from their products, but some uses are exempt by law, so you may not be removed from everything.")
         case .real_estate: return L10n.t("Your address, what you paid and your mortgage are public in many places, and these companies package them so salespeople can find and contact owners.")
         case .genealogy: return L10n.t("They can reveal relatives and addresses of living people. Opting out hides your own record from searches.")
         case .lead_generation: return L10n.t("One quote request can sell your contact details to many companies, which is why calls and emails multiply after you fill in a form.")

@@ -2278,6 +2278,29 @@
     }
    }
   },
+  "Agencies and mail houses that run campaigns for brands and handle large customer lists on their clients' behalf.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Agences et sociétés de routage qui mènent des campagnes pour des marques et gèrent de grands fichiers clients pour leur compte."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Agencias y empresas de correo que realizan campañas para marcas y gestionan grandes listas de clientes en su nombre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Agenturen und Mailing-Dienstleister, die Kampagnen für Marken durchführen und große Kundenlisten in deren Auftrag verwalten."
+     }
+    }
+   }
+  },
   "Alabama": {
    "extractionState": "manual",
    "localizations": {
@@ -2462,6 +2485,29 @@
     }
    }
   },
+  "An old arrest or a dismissed case can follow you for years, and employers, landlords and neighbors can find it. These sites rarely tell you who else copied the record.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une ancienne arrestation ou une affaire classée peut vous suivre pendant des années, et employeurs, propriétaires et voisins peuvent la trouver. Ces sites disent rarement qui d'autre a copié le dossier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un arresto antiguo o un caso archivado puede seguirte durante años, y empleadores, arrendadores y vecinos pueden encontrarlo. Estos sitios rara vez dicen quién más copió el registro."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine alte Festnahme oder ein eingestelltes Verfahren kann Sie jahrelang verfolgen, und Arbeitgeber, Vermieter und Nachbarn können es finden. Diese Seiten sagen selten, wer den Eintrag sonst noch kopiert hat."
+     }
+    }
+   }
+  },
   "Another country": {
    "extractionState": "manual",
    "localizations": {
@@ -2596,6 +2642,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jeder kann genau prüfen, was diese App tut."
+     }
+    }
+   }
+  },
+  "Anyone, including a stranger or an ex, can find where you live, your phone number and your relatives in seconds. Removing yourself here does the most for your safety.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "N'importe qui, y compris un inconnu ou un ex, peut trouver où vous habitez, votre numéro de téléphone et vos proches en quelques secondes. Vous retirer ici est ce qui protège le plus votre sécurité."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquiera, incluso un desconocido o una expareja, puede encontrar dónde vives, tu teléfono y a tus familiares en segundos. Darte de baja aquí es lo que más protege tu seguridad."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jeder, auch ein Fremder oder Ex-Partner, kann in Sekunden herausfinden, wo Sie wohnen, Ihre Telefonnummer und Ihre Verwandten. Sich hier zu entfernen bringt für Ihre Sicherheit am meisten."
      }
     }
    }
@@ -4026,6 +4095,328 @@
     }
    }
   },
+  "Companies that build voter files and donor lists from public voting records and purchased data, then sell targeting to campaigns and causes.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui construisent des fichiers d'électeurs et de donateurs à partir de listes électorales publiques et de données achetées, puis vendent du ciblage aux campagnes et aux causes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que crean padrones de votantes y listas de donantes a partir de registros electorales públicos y datos comprados, y venden segmentación a campañas y causas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die aus öffentlichen Wahlunterlagen und gekauften Daten Wähler- und Spenderdateien aufbauen und Zielgruppenansprache an Kampagnen und Organisationen verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that buy location data from apps and devices and sell movement patterns to advertisers, retailers and sometimes governments.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui achètent des données de localisation à des applications et appareils et vendent des schémas de déplacement aux annonceurs, aux commerçants et parfois aux gouvernements."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que compran datos de ubicación de apps y dispositivos y venden patrones de movimiento a anunciantes, minoristas y a veces gobiernos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Standortdaten von Apps und Geräten kaufen und Bewegungsmuster an Werbetreibende, Händler und manchmal Regierungen verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that collect your details through quote forms and surveys and sell them as leads to businesses such as insurers, lenders and home contractors.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui collectent vos coordonnées via des formulaires de devis et des enquêtes et les vendent comme prospects à des entreprises comme les assureurs, les prêteurs et les artisans."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que recopilan tus datos mediante formularios de presupuesto y encuestas y los venden como clientes potenciales a empresas como aseguradoras, prestamistas y contratistas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Ihre Daten über Angebotsformulare und Umfragen sammeln und als Leads an Firmen wie Versicherer, Kreditgeber und Handwerker verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that combine property records, ownership and mortgage data and sell it to agents, investors and marketers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui combinent registres fonciers, propriété et données hypothécaires et les vendent aux agents, investisseurs et marketeurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que combinan registros de propiedad, titularidad y datos hipotecarios y los venden a agentes, inversores y especialistas en marketing."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Grundbuchdaten, Eigentumsverhältnisse und Hypothekendaten kombinieren und an Makler, Investoren und Marketer verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that combine vehicle registrations, dealer records and driving data and sell them to dealers, insurers and marketers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui combinent immatriculations, dossiers de concessionnaires et données de conduite et les vendent aux concessionnaires, assureurs et marketeurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que combinan matriculaciones, registros de concesionarios y datos de conducción y los venden a concesionarios, aseguradoras y especialistas en marketing."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Fahrzeugzulassungen, Händlerdaten und Fahrdaten kombinieren und an Händler, Versicherer und Marketer verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that compile credit, rental, employment and background history into reports they sell to employers, landlords, lenders and insurers. Many are regulated by the Fair Credit Reporting Act.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui compilent l'historique de crédit, de location, d'emploi et d'antécédents en rapports vendus aux employeurs, propriétaires, prêteurs et assureurs. Beaucoup sont encadrées par la loi américaine sur les rapports de crédit (FCRA)."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que compilan historial de crédito, alquiler, empleo y antecedentes en informes que venden a empleadores, arrendadores, prestamistas y aseguradoras. Muchas están reguladas por la ley FCRA de EE. UU."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Kredit-, Miet-, Beschäftigungs- und Hintergrundhistorie zu Berichten bündeln, die sie an Arbeitgeber, Vermieter, Kreditgeber und Versicherer verkaufen. Viele unterliegen dem US-Gesetz FCRA."
+     }
+    }
+   }
+  },
+  "Companies that compile work history and contact details from public profiles and sell them to recruiters and employers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui compilent des parcours professionnels et des coordonnées à partir de profils publics et les vendent aux recruteurs et aux employeurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que compilan historial laboral y datos de contacto de perfiles públicos y los venden a reclutadores y empleadores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Berufsverläufe und Kontaktdaten aus öffentlichen Profilen zusammenstellen und an Recruiter und Arbeitgeber verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that gather credit, income and wealth information and sell it to lenders, marketers and investors.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui rassemblent des informations de crédit, de revenus et de patrimoine et les vendent aux prêteurs, marketeurs et investisseurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que reúnen información de crédito, ingresos y patrimonio y la venden a prestamistas, especialistas en marketing e inversores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Kredit-, Einkommens- und Vermögensinformationen sammeln und an Kreditgeber, Marketer und Investoren verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that gather your name, address, shopping habits, income estimates and interests from many sources, then rent or sell lists of people like you to advertisers and mailers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui rassemblent votre nom, adresse, habitudes d'achat, estimations de revenus et centres d'intérêt de nombreuses sources, puis louent ou vendent des listes de personnes comme vous aux annonceurs et aux expéditeurs de courrier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que reúnen tu nombre, dirección, hábitos de compra, estimaciones de ingresos e intereses de muchas fuentes y luego alquilan o venden listas de personas como tú a anunciantes y empresas de correo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Ihren Namen, Ihre Adresse, Einkaufsgewohnheiten, Einkommensschätzungen und Interessen aus vielen Quellen sammeln und Listen von Menschen wie Ihnen an Werbetreibende und Mailer vermieten oder verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that handle data about doctors, patients and health interests, sometimes built from pharmacy, insurance and web activity, and sell it to drug makers, health marketers and researchers.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui gèrent des données sur les médecins, les patients et les centres d'intérêt santé, parfois issues de pharmacies, d'assurances et d'activité web, et les vendent aux laboratoires, marketeurs de la santé et chercheurs."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que manejan datos sobre médicos, pacientes e intereses de salud, a veces creados a partir de farmacias, seguros y actividad web, y los venden a farmacéuticas, especialistas en marketing de salud e investigadores."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Daten über Ärzte, Patienten und Gesundheitsinteressen verarbeiten, teils aus Apotheken, Versicherungen und Webaktivität, und sie an Pharmafirmen, Gesundheitsmarketer und Forscher verkaufen."
+     }
+    }
+   }
+  },
+  "Companies that hold personal data but do not fit the other types, such as software, media and research firms.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui détiennent des données personnelles mais n'entrent dans aucun autre type, comme les éditeurs de logiciels, les médias et les instituts de recherche."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que guardan datos personales pero no encajan en los otros tipos, como software, medios y firmas de investigación."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die personenbezogene Daten halten, aber zu keiner anderen Art passen, etwa Software-, Medien- und Forschungsfirmen."
+     }
+    }
+   }
+  },
+  "Companies that match names, emails, phone numbers and addresses to check who someone is and to spot fraud. They buy data from many sources and sell the checks to banks and online businesses.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui rapprochent noms, e-mails, numéros et adresses pour vérifier l'identité de quelqu'un et repérer la fraude. Elles achètent des données de nombreuses sources et vendent les vérifications aux banques et aux entreprises en ligne."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que cruzan nombres, correos, teléfonos y direcciones para comprobar quién es alguien y detectar fraudes. Compran datos de muchas fuentes y venden las verificaciones a bancos y negocios en línea."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Namen, E-Mails, Telefonnummern und Adressen abgleichen, um die Identität zu prüfen und Betrug zu erkennen. Sie kaufen Daten aus vielen Quellen und verkaufen die Prüfungen an Banken und Online-Unternehmen."
+     }
+    }
+   }
+  },
+  "Companies that run the behind-the-scenes auctions for online ads. They track your devices, browsing and apps with cookies and ad IDs, and trade that data with advertisers and publishers in milliseconds.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui gèrent les enchères publicitaires en coulisses. Elles suivent vos appareils, votre navigation et vos applications avec des cookies et des identifiants publicitaires, et échangent ces données avec annonceurs et éditeurs en quelques millisecondes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que gestionan las subastas de anuncios entre bastidores. Rastrean tus dispositivos, navegación y apps con cookies e identificadores publicitarios, e intercambian esos datos con anunciantes y editores en milisegundos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die die Werbeauktionen im Hintergrund betreiben. Sie verfolgen Ihre Geräte, Ihr Surfen und Ihre Apps mit Cookies und Werbe-IDs und tauschen diese Daten in Millisekunden mit Werbetreibenden und Verlagen aus."
+     }
+    }
+   }
+  },
+  "Companies that sell business contact details (name, work email, phone, job title, employer) to sales and recruiting teams. They collect them from public profiles, company websites and other lists.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entreprises qui vendent des coordonnées professionnelles (nom, e-mail pro, téléphone, poste, employeur) aux équipes commerciales et de recrutement. Elles les collectent à partir de profils publics, de sites d'entreprises et d'autres listes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empresas que venden datos de contacto profesional (nombre, correo de trabajo, teléfono, cargo, empleador) a equipos de ventas y reclutamiento. Los recopilan de perfiles públicos, sitios de empresas y otras listas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Unternehmen, die Geschäftskontakte (Name, Firmen-E-Mail, Telefon, Position, Arbeitgeber) an Vertriebs- und Recruiting-Teams verkaufen. Sie sammeln sie aus öffentlichen Profilen, Firmenwebsites und anderen Listen."
+     }
+    }
+   }
+  },
   "Confirm": {
    "extractionState": "manual",
    "localizations": {
@@ -5429,6 +5820,29 @@
     }
    }
   },
+  "Estimates of what you earn or are worth can change which offers you see, and they are sold without you asking.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les estimations de vos revenus ou de votre patrimoine peuvent changer les offres que vous voyez, et elles sont vendues sans que vous l'ayez demandé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las estimaciones de lo que ganas o vales pueden cambiar las ofertas que ves, y se venden sin que lo pidas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schätzungen Ihres Einkommens oder Vermögens können verändern, welche Angebote Sie sehen, und sie werden verkauft, ohne dass Sie gefragt wurden."
+     }
+    }
+   }
+  },
   "European Union": {
    "extractionState": "manual",
    "localizations": {
@@ -5724,6 +6138,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nur Familie. Fügen Sie jemanden hinzu, der Sie darum gebeten hat, oder ein Kind, für das Sie Elternteil oder Vormund sind"
+     }
+    }
+   }
+  },
+  "Family-history sites that draw on public records, censuses and other databases to build family trees, sometimes including living people.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites d'histoire familiale qui s'appuient sur des registres publics, des recensements et d'autres bases pour construire des arbres généalogiques, parfois y compris de personnes vivantes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios de historia familiar que usan registros públicos, censos y otras bases de datos para crear árboles genealógicos, a veces incluyendo a personas vivas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Familienforschungsseiten, die öffentliche Register, Volkszählungen und andere Datenbanken nutzen, um Stammbäume zu erstellen, manchmal auch von lebenden Personen."
      }
     }
    }
@@ -6552,6 +6989,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesundheitsdaten"
+     }
+    }
+   }
+  },
+  "Health-related guesses about you, such as conditions you search for or treat, can be sold for marketing. Opting out limits who can target you using your health.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Des déductions sur votre santé, comme les maladies que vous recherchez ou soignez, peuvent être vendues à des fins marketing. Vous retirer limite qui peut vous cibler à partir de votre santé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las suposiciones sobre tu salud, como afecciones que buscas o tratas, pueden venderse para marketing. Darte de baja limita quién puede segmentarte por tu salud."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesundheitsbezogene Vermutungen über Sie, etwa Erkrankungen, nach denen Sie suchen oder die Sie behandeln, können für Marketing verkauft werden. Ein Opt-out begrenzt, wer Sie anhand Ihrer Gesundheit ansprechen kann."
      }
     }
    }
@@ -10719,6 +11179,29 @@
     }
    }
   },
+  "One quote request can sell your contact details to many companies, which is why calls and emails multiply after you fill in a form.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande de devis peut vendre vos coordonnées à de nombreuses entreprises, d'où les appels et e-mails qui se multiplient après un formulaire."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud de presupuesto puede vender tus datos a muchas empresas, por eso las llamadas y correos se multiplican tras rellenar un formulario."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine einzige Angebotsanfrage kann Ihre Kontaktdaten an viele Firmen verkaufen, weshalb Anrufe und E-Mails nach einem Formular zunehmen."
+     }
+    }
+   }
+  },
   "One request clears %lld sites": {
    "extractionState": "manual",
    "localizations": {
@@ -14238,6 +14721,29 @@
     }
    }
   },
+  "Sites that republish arrest, mugshot and court records from public sources. They earn from ads and, often, from charging people to take a record down. Because they copy records, the same record can sit on many of them.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites qui republient des dossiers d'arrestation, de photos d'identité et de justice issus de sources publiques. Ils gagnent de l'argent avec la publicité et souvent en faisant payer le retrait d'un dossier. Comme ils copient les dossiers, le même dossier peut figurer sur plusieurs d'entre eux."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios que republican registros de arrestos, fichas policiales y judiciales de fuentes públicas. Ganan con anuncios y, a menudo, cobrando por retirar un registro. Como copian los registros, el mismo puede estar en muchos de ellos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seiten, die Festnahme-, Fahndungsfoto- und Gerichtsakten aus öffentlichen Quellen erneut veröffentlichen. Sie verdienen mit Werbung und oft damit, Geld für das Entfernen eines Eintrags zu verlangen. Da sie Einträge kopieren, kann derselbe Eintrag auf vielen davon stehen."
+     }
+    }
+   }
+  },
   "Skip": {
    "extractionState": "manual",
    "localizations": {
@@ -16630,6 +17136,29 @@
     }
    }
   },
+  "They can reveal relatives and addresses of living people. Opting out hides your own record from searches.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ils peuvent révéler les proches et les adresses de personnes vivantes. Vous retirer masque votre propre fiche dans les recherches."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pueden revelar familiares y direcciones de personas vivas. Darte de baja oculta tu propio registro de las búsquedas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können Verwandte und Adressen lebender Personen offenlegen. Ein Opt-out blendet Ihren eigenen Eintrag in Suchen aus."
+     }
+    }
+   }
+  },
   "They earn money from referrals. Search forms and links pay them commissions, and a registration through the site opens a separate third-party paid membership area they do not control. Opt-Out Kit never registers or pays.": {
    "extractionState": "manual",
    "localizations": {
@@ -16672,6 +17201,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie geben keine Sicherheitsgarantie und sagen, nicht für Datenpannen verantwortlich zu sein. Ihre Daten können gespeichert oder in andere Länder verlagert werden."
+     }
+    }
+   }
+  },
+  "They help stop scams but also keep detailed identity files on you. Opting out removes some of your data from their products, though some checks are required by law.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ils aident à stopper les arnaques mais conservent aussi des dossiers d'identité détaillés sur vous. Vous retirer supprime une partie de vos données de leurs produits, même si certaines vérifications sont imposées par la loi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ayudan a frenar estafas, pero también guardan expedientes de identidad detallados sobre ti. Darte de baja quita algunos de tus datos de sus productos, aunque algunas comprobaciones las exige la ley."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie helfen gegen Betrug, führen aber auch detaillierte Identitätsakten über Sie. Ein Opt-out entfernt einen Teil Ihrer Daten aus ihren Produkten, obwohl manche Prüfungen gesetzlich vorgeschrieben sind."
+     }
+    }
+   }
+  },
+  "They hold mailing lists given to them and may add data from brokers. Opting out stops mail and email from their campaigns.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ils détiennent des fichiers d'adresses qu'on leur confie et peuvent y ajouter des données de courtiers. Vous retirer arrête le courrier et les e-mails de leurs campagnes."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Guardan listas de correo que les entregan y pueden añadir datos de corredores. Darte de baja detiene el correo y los emails de sus campañas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie halten Adresslisten, die man ihnen überlässt, und können Daten von Brokern ergänzen. Ein Opt-out stoppt Post und E-Mails aus ihren Kampagnen."
      }
     }
    }
@@ -16971,6 +17546,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das ist die Seite, die die Webseite am Ende zeigte."
+     }
+    }
+   }
+  },
+  "This is why junk mail, calls and ads seem to know you. Opting out means less marketing aimed at you and fewer companies holding a profile of you.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "C'est pourquoi le courrier indésirable, les appels et les publicités semblent vous connaître. Vous retirer signifie moins de marketing vous visant et moins d'entreprises détenant un profil de vous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Por eso el correo basura, las llamadas y los anuncios parecen conocerte. Darte de baja significa menos marketing dirigido a ti y menos empresas con un perfil tuyo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Deshalb scheinen Werbepost, Anrufe und Anzeigen Sie zu kennen. Ein Opt-out bedeutet weniger Marketing für Sie und weniger Firmen mit einem Profil von Ihnen."
      }
     }
    }
@@ -18608,6 +19206,52 @@
     }
    }
   },
+  "Websites and apps pass your activity to them, so ads follow you across devices. They mostly know a device, not your name, but they can link the two.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les sites et applications leur transmettent votre activité, si bien que les publicités vous suivent d'un appareil à l'autre. Ils connaissent surtout un appareil, pas votre nom, mais peuvent relier les deux."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los sitios y apps les pasan tu actividad, así que los anuncios te siguen entre dispositivos. Conocen sobre todo un dispositivo, no tu nombre, pero pueden vincular ambos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Websites und Apps geben Ihre Aktivität an sie weiter, sodass Werbung Ihnen über Geräte hinweg folgt. Sie kennen meist ein Gerät, nicht Ihren Namen, können beides aber verknüpfen."
+     }
+    }
+   }
+  },
+  "Websites that gather public records, phone books and data bought from other brokers into a profile of you, then let anyone search by name, phone number or address. They earn from ads, subscriptions and paid reports.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites qui rassemblent registres publics, annuaires et données achetées à d'autres courtiers dans un profil de vous, puis permettent à quiconque de chercher par nom, numéro ou adresse. Ils gagnent avec la publicité, les abonnements et les rapports payants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios que reúnen registros públicos, guías telefónicas y datos comprados a otros corredores en un perfil tuyo, y permiten a cualquiera buscar por nombre, teléfono o dirección. Ganan con anuncios, suscripciones e informes de pago."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Websites, die öffentliche Register, Telefonbücher und von anderen Brokern gekaufte Daten zu einem Profil von Ihnen bündeln und es jedem erlauben, nach Name, Telefonnummer oder Adresse zu suchen. Sie verdienen mit Werbung, Abos und kostenpflichtigen Berichten."
+     }
+    }
+   }
+  },
   "Welcome to Opt-Out Kit": {
    "extractionState": "manual",
    "localizations": {
@@ -18742,6 +19386,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Was ihre Datenschutzerklärung über Sie sagt"
+     }
+    }
+   }
+  },
+  "What they hold can affect whether you get a job, an apartment or a loan. Opting out stops some marketing uses, but credit and screening reports often stay on file by law.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce qu'ils détiennent peut influencer l'obtention d'un emploi, d'un logement ou d'un prêt. Vous retirer arrête certains usages marketing, mais les rapports de crédit et de vérification restent souvent archivés selon la loi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo que guardan puede influir en que consigas un empleo, una vivienda o un préstamo. Darte de baja detiene algunos usos de marketing, pero los informes de crédito y de verificación suelen conservarse por ley."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was sie speichern, kann beeinflussen, ob Sie eine Stelle, eine Wohnung oder einen Kredit bekommen. Ein Opt-out stoppt manche Marketingnutzung, aber Kredit- und Prüfberichte bleiben gesetzlich oft gespeichert."
+     }
+    }
+   }
+  },
+  "What they hold varies, so read what they say they collect before deciding.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce qu'ils détiennent varie ; lisez ce qu'ils disent collecter avant de décider."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo que guardan varía; lee lo que dicen recopilar antes de decidir."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was sie speichern, ist unterschiedlich; lesen Sie, was sie nach eigenen Angaben erfassen, bevor Sie entscheiden."
      }
     }
    }
@@ -18995,6 +19685,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wo wir das gefunden haben"
+     }
+    }
+   }
+  },
+  "Where you go, such as home, work or a clinic, can be inferred from your phone. This is among the most sensitive data, so opting out here matters.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les lieux où vous allez, comme le domicile, le travail ou une clinique, peuvent être déduits de votre téléphone. C'est l'une des données les plus sensibles : vous retirer ici compte beaucoup."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adónde vas, como casa, trabajo o una clínica, puede deducirse de tu teléfono. Es de los datos más sensibles, así que darte de baja aquí importa mucho."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wohin Sie gehen, etwa nach Hause, zur Arbeit oder in eine Klinik, lässt sich aus Ihrem Handy ableiten. Das sind mit die sensibelsten Daten, daher ist ein Opt-out hier wichtig."
      }
     }
    }
@@ -19873,6 +20586,52 @@
     }
    }
   },
+  "Your address, what you paid and your mortgage are public in many places, and these companies package them so salespeople can find and contact owners.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre adresse, le prix payé et votre hypothèque sont publics à de nombreux endroits, et ces entreprises les regroupent pour que les commerciaux puissent joindre les propriétaires."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu dirección, lo que pagaste y tu hipoteca son públicos en muchos lugares, y estas empresas los empaquetan para que los vendedores puedan contactar a propietarios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Adresse, der Kaufpreis und Ihre Hypothek sind vielerorts öffentlich, und diese Firmen bündeln sie, damit Vertriebler Eigentümer finden und kontaktieren können."
+     }
+    }
+   }
+  },
+  "Your car, your address and when you might buy again are shared with dealers and insurers. Opting out reduces targeted offers and some data used in insurance.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre voiture, votre adresse et le moment où vous pourriez racheter sont partagés avec concessionnaires et assureurs. Vous retirer réduit les offres ciblées et certaines données utilisées en assurance."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu coche, tu dirección y cuándo podrías volver a comprar se comparten con concesionarios y aseguradoras. Darte de baja reduce las ofertas dirigidas y algunos datos usados en seguros."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihr Auto, Ihre Adresse und wann Sie wieder kaufen könnten, werden mit Händlern und Versicherern geteilt. Ein Opt-out verringert gezielte Angebote und einige in der Versicherung genutzte Daten."
+     }
+    }
+   }
+  },
   "Your data stays on this phone": {
    "extractionState": "manual",
    "localizations": {
@@ -20080,6 +20839,29 @@
     }
    }
   },
+  "Your party, voting history and donations, where public, are used to target you with political messages. Opting out limits what is added from commercial sources.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre parti, votre historique de vote et vos dons, lorsqu'ils sont publics, servent à vous cibler avec des messages politiques. Vous retirer limite ce qui s'ajoute depuis des sources commerciales."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu partido, historial de voto y donaciones, cuando son públicos, se usan para dirigirte mensajes políticos. Darte de baja limita lo que se añade desde fuentes comerciales."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Partei, Wahlhistorie und Spenden werden, soweit öffentlich, genutzt, um Sie mit politischen Botschaften anzusprechen. Ein Opt-out begrenzt, was aus kommerziellen Quellen hinzukommt."
+     }
+    }
+   }
+  },
   "Your place's official removal service": {
    "extractionState": "manual",
    "localizations": {
@@ -20218,6 +21000,29 @@
     }
    }
   },
+  "Your résumé details can be found and shared without you applying anywhere. Opting out stops recruiters finding you through them.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les détails de votre CV peuvent être trouvés et partagés sans que vous ayez postulé nulle part. Vous retirer empêche les recruteurs de vous trouver par leur biais."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los datos de tu currículum pueden encontrarse y compartirse sin que te hayas postulado a nada. Darte de baja evita que los reclutadores te encuentren a través de ellos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Lebenslaufdaten können gefunden und weitergegeben werden, ohne dass Sie sich irgendwo beworben haben. Ein Opt-out verhindert, dass Recruiter Sie darüber finden."
+     }
+    }
+   }
+  },
   "Your saved profiles could not be opened on this device (%@). They are untouched.": {
    "extractionState": "manual",
    "localizations": {
@@ -20283,6 +21088,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihr Bundesstaat: %@"
+     }
+    }
+   }
+  },
+  "Your work email and phone number can be bought by salespeople you have never heard of. Opting out cuts cold calls and spam to your work address.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre e-mail et votre téléphone professionnels peuvent être achetés par des commerciaux dont vous n'avez jamais entendu parler. Vous retirer réduit les appels et spams sur votre adresse pro."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu correo y teléfono de trabajo pueden ser comprados por vendedores que nunca has oído nombrar. Darte de baja reduce las llamadas y el spam a tu dirección de trabajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Firmen-E-Mail und Telefonnummer können von Vertrieblern gekauft werden, von denen Sie nie gehört haben. Ein Opt-out verringert Kaltanrufe und Spam an Ihre Arbeitsadresse."
      }
     }
    }

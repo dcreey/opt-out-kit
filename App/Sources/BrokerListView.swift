@@ -239,6 +239,7 @@ struct KindChooserView: View {
                                 }
                                 Text(category.about).font(.footnote).foregroundStyle(.primary)
                                 Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
+                                CaseExamples(category: category)
                             }
                             .fixedSize(horizontal: false, vertical: true)
                         }
@@ -251,5 +252,20 @@ struct KindChooserView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
+    }
+}
+
+
+/// A realistic best and worst outcome of a kind of company holding your data, so the choice is informed.
+struct CaseExamples: View {
+    let category: BrokerCategory
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(category.bestCase, systemImage: "hand.thumbsup.fill").foregroundStyle(.green)
+            Label(category.worstCase, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
+        }
+        .font(.footnote)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
