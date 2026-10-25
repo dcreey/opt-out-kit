@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://dresdendirect.com/"
   blockers: []
-about: {"category": "other", "summary": "Dresden Direct inc. is a data company. Its own pages mention home addresses, phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["address", "phone", "email", "interests", "online"], "sells_to": ["businesses"], "sells_note": "We assure you that we DO NOT… Provide or sell the names and addresses of our customers or site users to outside or third party companies.", "source": "https://dresdendirect.com/"}
+about: {"category": "marketing_services", "summary": "Dresden Direct inc. is a marketing and direct-mail services company. Its own pages mention home addresses, phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["address", "phone", "email", "interests", "online"], "sells_to": ["businesses"], "sells_note": "We assure you that we DO NOT… Provide or sell the names and addresses of our customers or site users to outside or third party companies.", "source": "https://dresdendirect.com/"}
 priority: 27

@@ -13,5 +13,5 @@ opt_out_form: {"page": "https://specialistsmarketingsolutions.com/do-not-sell-or
 registered_in: [OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_contact, email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
-about: {"category": "marketing_data", "summary": "Innovative Data Services, Inc. is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, property and vehicles, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "property", "purchases", "interests", "online", "social"], "sells_to": ["advertisers"], "source": "https://specialistsmarketingsolutions.com/privacy-notice/"}
-priority: 52
+about: {"category": "marketing_services", "summary": "Innovative Data Services, Inc. is a marketing and direct-mail services company. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, property and vehicles, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "property", "purchases", "interests", "online", "social"], "sells_to": ["advertisers"], "source": "https://specialistsmarketingsolutions.com/privacy-notice/"}
+priority: 36

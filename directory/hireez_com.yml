@@ -16,5 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "HireTeamMate, Inc. is a data company. End-to-end agentic recruiting for enterprise teams: EZ Agent sources, reviews, screens and schedules on top of your ATS. Recruiters approve every decision. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://app.hireez.com/policies/databrokerregistration"}
-priority: 20
+about: {"category": "recruiting", "summary": "HireTeamMate, Inc. is a recruiting and workforce data provider. End-to-end agentic recruiting for enterprise teams: EZ Agent sources, reviews, screens and schedules on top of your ATS. Recruiters approve every decision. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://app.hireez.com/policies/databrokerregistration"}
+priority: 26

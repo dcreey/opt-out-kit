@@ -2537,6 +2537,24 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertTrue(g.email?.domains.contains("s35.com") ?? false)
     }
 
+    func testEachBatchIsOneKindOfBrokerAndAnotherBatchTakesTheNextKind() {
+        func kinded(_ i: Int, _ k: String) -> DirectoryEntry {
+            var e = site(i); e.about = BrokerAbout(category: k, summary: "s"); return e
+        }
+        // Interleaved kinds in queue order: 40 ad tech and 30 people search.
+        let entries = (0..<70).map { kinded($0, $0 % 7 < 4 ? "adtech" : "people_search") }
+        let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date()
+        var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
+        XCTAssertEqual(g.themes, ["adtech"])
+        XCTAssertEqual(g.verify.count, 25)
+        let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        XCTAssertTrue(g.verify.allSatisfy { byDomain[$0]?.about?.category == "adtech" }, "a batch is one kind")
+        XCTAssertEqual(g.verify.first, "s0.com", "queue order within the kind")
+        g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, batches: 2, calendar: cal)
+        XCTAssertEqual(g.themes, ["adtech", "adtech"], "ad tech has 40, so the next 15 are still ad tech")
+        XCTAssertEqual(g.verify.count, 40)
+    }
+
     func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
         let entries = [site(0, email: false), site(1)]
         let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])

@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/87c5ee85-893d-4972-ba26-2e82b743d041/d84d9664-facb-4de3-85fd-a2e339b73dbf.html"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "Samba TV, Inc. is a data company. Its own pages mention interests and demographics, devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "location", "social"], "sells_to": [], "source": "https://samba.com/privacy-center/notice-of-right-to-opt-out"}
-priority: 26
+about: {"category": "adtech", "summary": "Samba TV, Inc. is an advertising technology company. Its own pages mention interests and demographics, devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "location", "social"], "sells_to": [], "source": "https://samba.com/privacy-center/notice-of-right-to-opt-out"}
+priority: 30

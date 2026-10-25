@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://sourcepathdigital.com/california-consumer-portal/"
   blockers: ["check:a bot check"]
-about: {"category": "healthcare", "summary": "Source Path Digital is a healthcare data company. Reach the right audience with Source Path Digital. Data-driven campaigns, custom modeling, and AI insights for smarter marketing and measurable results. Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://sourcepathdigital.com/"}
-priority: 34
+about: {"category": "automotive", "summary": "Source Path Digital is an automotive data company. Reach the right audience with Source Path Digital. Data-driven campaigns, custom modeling, and AI insights for smarter marketing and measurable results. Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://sourcepathdigital.com/"}
+priority: 30

@@ -16,5 +16,5 @@ contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "Online Media Group Inc. is a data company. Its own pages mention home addresses, phone numbers, email addresses, job title and employer, education, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "employment", "education", "online", "social"], "sells_to": [], "source": "https://omginc.xyz/privacy"}
-priority: 27
+about: {"category": "recruiting", "summary": "Online Media Group Inc. is a recruiting and workforce data provider. Its own pages mention home addresses, phone numbers, email addresses, job title and employer, education, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "employment", "education", "online", "social"], "sells_to": [], "source": "https://omginc.xyz/privacy"}
+priority: 33

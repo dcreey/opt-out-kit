@@ -14,5 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "Victory Waves Co. is a data company. Get your campaign approved for Meta political ads and target the exact voters who decide your race. $100/mo, no 15% consultant cut. Get approved fast. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.victorywaves.com/legal/privacy-choices"}
-priority: 37
+about: {"category": "political", "summary": "Victory Waves Co. is a political and nonprofit data provider. Get your campaign approved for Meta political ads and target the exact voters who decide your race. $100/mo, no 15% consultant cut. Get approved fast. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.victorywaves.com/legal/privacy-choices"}
+priority: 47

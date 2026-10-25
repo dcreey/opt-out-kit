@@ -12,5 +12,5 @@ opt_out_form: {"page": "https://app.foursquare.com/data-requests", "method": "ge
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, opt_out_form_found]
 profiled: "2026-10-22"
-about: {"category": "adtech", "summary": "Foursquare Labs, Inc. is an advertising technology company. Foursquare is the industry-leading geospatial intelligence platform. Power your business with 100M+ POIs, foot traffic data, and location-based solutions for marketers, developers, and... Its own pages mention devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "location", "social"], "sells_to": [], "source": "https://foursquare.com/"}
-priority: 32
+about: {"category": "location_data", "summary": "Foursquare Labs, Inc. is a device and location data company. Foursquare is the industry-leading geospatial intelligence platform. Power your business with 100M+ POIs, foot traffic data, and location-based solutions for marketers, developers, and... Its own pages mention devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "location", "social"], "sells_to": [], "source": "https://foursquare.com/"}
+priority: 42

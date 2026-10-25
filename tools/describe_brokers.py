@@ -8,6 +8,8 @@ Output: an `about:` and a `priority:` line in each directory/*.yml. Usage: descr
 """
 import argparse, glob, json, os, re
 
+OVERRIDES = json.load(open(os.path.join(os.path.dirname(__file__), "category_overrides.json")))      # categories fixed by reading the site, which win over the keywords
+
 CATEGORIES = [   # (id, label, pattern); the best-scoring one wins, ties go to the earlier one
     ("arrests", "public arrest and court records site", r"arrest records?|mugshots?|inmate|booking|court records?|criminal records? search"),
     ("people_search", "people-search and public-records site", r"people search|find (people|anyone|someone|friends)|background (check|report)s?|public records? search|reverse (phone|address|email)|search (for )?(people|public records)|phone book|white ?pages|find relatives"),
@@ -20,6 +22,12 @@ CATEGORIES = [   # (id, label, pattern); the best-scoring one wins, ties go to t
     ("marketing_data", "marketing data provider", r"direct marketing|mailing list|consumer (data|database)|data append|marketing data|audience data|email append|data cooperative|list rental|consumer insights|household (data|level)"),
     ("b2b", "business-contact and sales-data provider", r"\bb2b\b|business contact|sales intelligence|prospect|lead gen|demand gen|account[- ]based|contact data|go-to-market|sales (and|&) marketing teams|business data|firmographic"),
     ("genealogy", "genealogy and family-records site", r"genealog|family tree|ancestry|ancestors"),
+    ("lead_generation", "lead-generation company", r"lead generation|lead gen\b|connects? consumers|consumer acquisition|ready-to-buy|free quote|get a quote"),
+    ("political", "political and nonprofit data provider", r"voter|democratic|republican|political (campaign|data)|fundrais|campaigns and (causes|organizations)|get out the vote"),
+    ("recruiting", "recruiting and workforce data provider", r"recruit|talent|candidates|hiring|job (search|openings|seekers)|workforce"),
+    ("automotive", "automotive data company", r"dealership|vehicle (history|registration|data)|automotive|\bvin\b|license plate|car (buyers|dealers)"),
+    ("location_data", "device and location data company", r"geolocation|location data|mobility data|device location|ip location"),
+    ("marketing_services", "marketing and direct-mail services company", r"direct mail|marketing agency|marketing services|influencer|media monitoring"),
 ]
 # Fixed vocabularies: the ids are what the app filters on; the labels are the English words used in the written summary.
 DATA_KINDS = {"name": "names and aliases", "address": "home addresses", "phone": "phone numbers", "email": "email addresses", "age": "age or birthdate",
@@ -53,7 +61,7 @@ BUYERS = [
 ]
 NOT_SOLD = re.compile(r"(do|does|will) not sell|don.t sell|never sell|not sold", re.I)
 SENSITIVE = {"criminal": 6, "health": 6, "location": 6, "income": 4, "relatives": 4, "address": 4, "phone": 3, "email": 2, "age": 2, "social": 2, "credit": 4}
-BASE = {"people_search": 34, "arrests": 30, "consumer_reporting": 28, "marketing_data": 26, "healthcare": 22, "financial": 22, "fraud_identity": 20, "real_estate": 20, "b2b": 18, "genealogy": 16, "adtech": 14, "other": 10}
+BASE = {"lead_generation": 22, "political": 20, "recruiting": 16, "automotive": 18, "location_data": 24, "marketing_services": 10, "people_search": 34, "arrests": 30, "consumer_reporting": 28, "marketing_data": 26, "healthcare": 22, "financial": 22, "fraud_identity": 20, "real_estate": 20, "b2b": 18, "genealogy": 16, "adtech": 14, "other": 10}
 
 
 def sentences(text):
@@ -71,6 +79,8 @@ def describe(ev):
         scores.append((n, -i, cid, label))
     best = max(scores)
     cid, label = (best[2], best[3]) if best[0] >= 3 else ("other", "data company")
+    if ev["domain"] in OVERRIDES:
+        cid = OVERRIDES[ev["domain"]]; label = next((l for c, l, _ in CATEGORIES if c == cid), label)
     tracks = [t for t, pat in TRACKS if re.search(pat, (ptext + " " + htext).lower())]
     if cid not in ("people_search", "arrests"): tracks = [t for t in tracks if t != "name"] or tracks
     sells, note = [], ""

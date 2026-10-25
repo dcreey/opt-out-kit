@@ -17,5 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal-cdn.onetrust.com/dsarwebform/591ac1c1-3a1e-496f-9e43-ff4afb5fef85/2b52262e-8ada-4725-b86e-e4b960336f96.html"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "Kloudend, Inc. is a data company. Enterprise IP Location by Kloudend, Inc - built on AWS, trusted by Fortune 500. Geolocation API for JSON, XML in PHP, JS, Java, Python, Node & more. Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://ipapi.co/privacy/"}
-priority: 35
+about: {"category": "location_data", "summary": "Kloudend, Inc. is a device and location data company. Enterprise IP Location by Kloudend, Inc - built on AWS, trusted by Fortune 500. Geolocation API for JSON, XML in PHP, JS, Java, Python, Node & more. Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://ipapi.co/privacy/"}
+priority: 49

@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://www.brandwatch.com/legal/data-subject-access-request/"
   blockers: ["check:a bot check"]
-about: {"category": "b2b", "summary": "Crimson Hexagon is a business-contact and sales-data provider. Brandwatch, a Cision company, is an AI-powered social media management, consumer intelligence, and influencer marketing suite trusted by half of the Forbes 100. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "interests", "online"], "sells_to": ["advertisers"], "source": "https://www.brandwatch.com/legal/user-privacy-policy/"}
-priority: 37
+about: {"category": "marketing_services", "summary": "Crimson Hexagon is a marketing and direct-mail services company. Brandwatch, a Cision company, is an AI-powered social media management, consumer intelligence, and influencer marketing suite trusted by half of the Forbes 100. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "interests", "online"], "sells_to": ["advertisers"], "source": "https://www.brandwatch.com/legal/user-privacy-policy/"}
+priority: 29

@@ -59,11 +59,14 @@ public enum OptOutPlan {
     /// order the step lists them. Shared-form groups are not in it: they are one task each.
     public static func verifyQueue(_ steps: [PlanStep], entries: [DirectoryEntry]) -> [String] {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
-        return steps.filter { $0.kind == .method(.semiAutomatic) }.flatMap(\.tasks).compactMap { t in
+        let eligible: [DirectoryEntry] = steps.filter { $0.kind == .method(.semiAutomatic) }.flatMap(\.tasks).compactMap { t in
             guard case .site = t.kind, t.domains.count == 1, let e = byDomain[t.domains[0]], hasForm(e) else { return nil }
             if let f = e.optOutForm, FormFiller.needsListing(f) { return nil }
-            return e.domain
+            return e
         }
+        // Forms that ask for a typed code come last; otherwise the brokers that matter most come first.
+        func typed(_ e: DirectoryEntry) -> Int { (e.optOutForm.map(FormFiller.hasTypedCode) ?? false) ? 1 : 0 }
+        return eligible.sorted { (typed($0), -($0.priority ?? 0), $0.domain) < (typed($1), -($1.priority ?? 0), $1.domain) }.map(\.domain)
     }
 
     public static func build(entries: [DirectoryEntry], brokers: [Broker], platforms: [Platform],

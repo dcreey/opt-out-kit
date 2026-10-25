@@ -15,5 +15,5 @@ live_form:
   checked: "2026-10-24"
   found: false
   blockers: ["wall"]
-about: {"category": "other", "summary": "CTAM LeadShare Corp. is a data company. Find the best Internet, phone, and television service providers in your neighborhood with SmartMove. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, education, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "education", "interests", "online", "social"], "sells_to": [], "source": "https://www.smartmove.us/company/privacy"}
-priority: 35
+about: {"category": "lead_generation", "summary": "CTAM LeadShare Corp. is a lead-generation company. Find the best Internet, phone, and television service providers in your neighborhood with SmartMove. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, education, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "education", "interests", "online", "social"], "sells_to": [], "source": "https://www.smartmove.us/company/privacy"}
+priority: 47

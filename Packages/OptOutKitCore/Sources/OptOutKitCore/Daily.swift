@@ -15,6 +15,9 @@ public struct DailyGoals: Equatable, Sendable {
     public var emailDone: Int
     /// How many batches have been taken today (1 = the normal 25).
     public var batches: Int
+    /// The kind of broker each batch is made of (`BrokerCategory` ids, in batch order): every site in a batch is the same kind, so a
+    /// day can be "tackle the ad tech brokers".
+    public var themes: [String] = []
 
     public var verifyComplete: Bool { !verify.isEmpty && verifyDone >= verify.count }
     public var emailComplete: Bool { email == nil || emailDone >= (email?.domains.count ?? 0) }
@@ -35,7 +38,23 @@ public struct DailyGoals: Equatable, Sendable {
         let open = queue.compactMap { byDomain[$0] }.filter { e in
             !doneBeforeToday(e.id, attempts[e.id]?.filter(\.wasSubmitted).map(\.date) ?? [])
         }
-        let todays = Array(open.prefix(batchSize * max(1, batches)))
+        // A batch is up to 25 sites of ONE kind, and a kind is finished before the next starts: the kind is that of the last queue site the
+        // person finished (so "ad tech" carries on across days), else that of the first site waiting. Sites finished today stay in `open`,
+        // so the kind does not change while the person works.
+        func kind(_ e: DirectoryEntry) -> String { e.about?.category ?? "other" }
+        let queued = queue.compactMap { byDomain[$0] }
+        let lastDone = queued.compactMap { e -> (Date, DirectoryEntry)? in
+            (attempts[e.id] ?? []).filter(\.wasSubmitted).map(\.date).max().map { ($0, e) }
+        }.max { $0.0 < $1.0 }?.1
+        var remaining = open, todays: [DirectoryEntry] = [], themes: [String] = []
+        var theme = lastDone.map(kind)
+        for _ in 0..<max(1, batches) {
+            guard let first = remaining.first else { break }
+            if theme == nil || !remaining.contains(where: { kind($0) == theme }) { theme = kind(first) }
+            let batch = Array(remaining.filter { kind($0) == theme }.prefix(batchSize))
+            todays += batch; themes.append(theme!)
+            let taken = Set(batch.map(\.id)); remaining.removeAll { taken.contains($0.id) }
+        }
         let verifyDone = todays.filter { e in (attempts[e.id] ?? []).contains { $0.wasSubmitted && calendar.isDate($0.date, inSameDayAs: now) } }.count
 
         // The email covers everything done today, not just the listed batch: a site the person finished any other way (the automatic run,
@@ -45,7 +64,7 @@ public struct DailyGoals: Equatable, Sendable {
         let withAddress = (todays + doneElsewhere).filter { $0.contactEmail != nil }
         let batch = EmailBatch.single(entries: withAddress, maxRecipients: 1000).first
         let emailedToday = withAddress.filter { e in emailedDates(e.id).contains { calendar.isDate($0, inSameDayAs: now) } }.count
-        return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches))
+        return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches), themes: themes)
     }
 
     /// Whole days left to finish a queue of `remaining` sites at one batch a day.

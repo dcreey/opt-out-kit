@@ -16,5 +16,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "Deloitte Consulting LLP is a data company. Discover industry insights and audit, tax, and consulting services that drive impact from Deloitte’s global network of member firms. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://datasubject.deloitte.com/"}
-priority: 22
+about: {"category": "recruiting", "summary": "Deloitte Consulting LLP is a recruiting and workforce data provider. Discover industry insights and audit, tax, and consulting services that drive impact from Deloitte’s global network of member firms. Its own pages mention email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "online"], "sells_to": [], "source": "https://datasubject.deloitte.com/"}
+priority: 28

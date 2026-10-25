@@ -14,5 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "Censia, Inc. is a data company. Censia AI is the context layer for the human and AI enterprise, turning workforce data into the intelligence behind every headcount and org decision. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.censia.com/"}
-priority: 15
+about: {"category": "recruiting", "summary": "Censia, Inc. is a recruiting and workforce data provider. Censia AI is the context layer for the human and AI enterprise, turning workforce data into the intelligence behind every headcount and org decision. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.censia.com/"}
+priority: 21

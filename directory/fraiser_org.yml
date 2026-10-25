@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/991571a9-afd5-406e-b0ac-6fbcb4980df2"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "Fraiser LLC is a data company. Not your average data vendor, Fraiser revolutionizes how progressive campaigns and causes target donors and supporters while ensuring data security. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.fraiser.org/"}
-priority: 16
+about: {"category": "political", "summary": "Fraiser LLC is a political and nonprofit data provider. Not your average data vendor, Fraiser revolutionizes how progressive campaigns and causes target donors and supporters while ensuring data security. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.fraiser.org/"}
+priority: 26

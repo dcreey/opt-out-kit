@@ -19,5 +19,5 @@ live_form:
   found: true
   page: "https://www.peoplesearcher.com/api/helper/optOutLight/search"
   blockers: []
-about: {"category": "other", "summary": "The People Searchers LLC is a data company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.peoplesearcher.com/"}
-priority: 16
+about: {"category": "people_search", "summary": "The People Searchers LLC is a people-search and public-records site. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.peoplesearcher.com/"}
+priority: 40

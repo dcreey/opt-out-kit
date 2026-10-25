@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://www.ethyca.com/janus?utm_source=fides_consent&utm_medium=referral&utm_campaign=cmp_backlinks&utm_term=janus"
   blockers: []
-about: {"category": "adtech", "summary": "Deep Root Analytics, LLC is an advertising technology company. Providing you with the electoral insights needed to drive victory in an ever-changing electorate. Its own pages mention phone numbers, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "online", "social"], "sells_to": [], "source": "https://www.deeprootanalytics.com/"}
-priority: 26
+about: {"category": "political", "summary": "Deep Root Analytics, LLC is a political and nonprofit data provider. Providing you with the electoral insights needed to drive victory in an ever-changing electorate. Its own pages mention phone numbers, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "online", "social"], "sells_to": [], "source": "https://www.deeprootanalytics.com/"}
+priority: 32

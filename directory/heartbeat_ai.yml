@@ -14,5 +14,5 @@ profiled: "2026-10-22"
 live_form:
   checked: "2026-10-24"
   found: false
-about: {"category": "other", "summary": "Heartbeat.AI Inc is a data company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://heartbeat.ai/texas-privacy-rights"}
-priority: 19
+about: {"category": "healthcare", "summary": "Heartbeat.AI Inc is a healthcare data company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://heartbeat.ai/texas-privacy-rights"}
+priority: 31

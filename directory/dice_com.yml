@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://www.dice.com/about/ccpa"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "Dice Career Solutions, Inc. is a data company. Search 70,000+ job openings from tech's hottest employers. Salary estimations, career path tips and Insights to make your next career move the right one. Its own pages mention job title and employer. Its policy does not name who it sells to.", "tracks": ["employment"], "sells_to": [], "source": "https://www.dice.com/about/ccpa"}
-priority: 20
+about: {"category": "recruiting", "summary": "Dice Career Solutions, Inc. is a recruiting and workforce data provider. Search 70,000+ job openings from tech's hottest employers. Salary estimations, career path tips and Insights to make your next career move the right one. Its own pages mention job title and employer. Its policy does not name who it sells to.", "tracks": ["employment"], "sells_to": [], "source": "https://www.dice.com/about/ccpa"}
+priority: 26

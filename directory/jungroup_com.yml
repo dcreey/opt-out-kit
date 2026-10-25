@@ -17,5 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
-about: {"category": "healthcare", "summary": "Jun Group Productions, LLC is a healthcare data company. Jun Group powers media campaigns for the world’s best advertisers with intelligent ad technology engineered for a transparent, privacy-first digital ecosystem. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://jungroup.com/"}
-priority: 27
+about: {"category": "marketing_services", "summary": "Jun Group Productions, LLC is a marketing and direct-mail services company. Jun Group powers media campaigns for the world’s best advertisers with intelligent ad technology engineered for a transparent, privacy-first digital ecosystem. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://jungroup.com/"}
+priority: 15

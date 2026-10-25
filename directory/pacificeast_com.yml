@@ -13,5 +13,5 @@ opt_out_form: {"page": "https://www.pacificeast.com/contact-us-privacy/", "metho
 registered_in: [CA, OR]
 signals: [captcha_turnstile, email_contact, email_input, email_only_wording, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
-about: {"category": "healthcare", "summary": "Pacific East Research Inc is a healthcare data company. Leverage proven solutions designed to fill the gaps in your data and significantly boost your call success rates. Its own pages mention phone numbers, email addresses, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "purchases"], "sells_to": [], "source": "https://www.pacificeast.com/"}
+about: {"category": "lead_generation", "summary": "Pacific East Research Inc is a lead-generation company. Leverage proven solutions designed to fill the gaps in your data and significantly boost your call success rates. Its own pages mention phone numbers, email addresses, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "purchases"], "sells_to": [], "source": "https://www.pacificeast.com/"}
 priority: 34

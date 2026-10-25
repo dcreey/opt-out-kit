@@ -48,7 +48,7 @@ struct BrokerListView: View {
                 if !goals.verify.isEmpty {
                     Section {
                         NavigationLink(value: "daily-verify") {
-                            GoalRow(title: Loc.t("Verify today's sites"), subtitle: Loc.t("Each is filled in; you tick the human check"),
+                            GoalRow(title: goalTitle(goals), subtitle: Loc.t("Each is filled in; you tick the human check"),
                                     done: goals.verifyDone, total: goals.verify.count, symbol: "hand.tap")
                         }.accessibilityIdentifier("goal-verify")
                         if let mail = goals.email {
@@ -177,4 +177,14 @@ struct BrokerListView: View {
 
 extension Broker: Hashable {
     public func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+
+extension BrokerListView {
+    /// "Today: Advertising technology" when the day's batch is one kind of broker (it always is), else the plain title.
+    func goalTitle(_ goals: DailyGoals) -> String {
+        let names = goals.themes.compactMap { BrokerCategory(rawValue: $0)?.title }
+        var seen = Set<String>(); let unique = names.filter { seen.insert($0).inserted }
+        return unique.isEmpty ? Loc.t("Verify today's sites") : Loc.f("Today: %@", unique.joined(separator: ", "))
+    }
 }

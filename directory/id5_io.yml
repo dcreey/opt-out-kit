@@ -17,5 +17,5 @@ live_form:
   found: true
   page: "https://id5-sync.com/privacy/do-not-sell"
   blockers: []
-about: {"category": "other", "summary": "ID5 Technology Ltd is a data company. Turning fragmented signals into a scalable identity framework, making advertising addressable and measurable across channels. Its own pages mention age or birthdate, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "online"], "sells_to": [], "source": "https://id5.io/"}
-priority: 16
+about: {"category": "adtech", "summary": "ID5 Technology Ltd is an advertising technology company. Turning fragmented signals into a scalable identity framework, making advertising addressable and measurable across channels. Its own pages mention age or birthdate, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "online"], "sells_to": [], "source": "https://id5.io/"}
+priority: 20

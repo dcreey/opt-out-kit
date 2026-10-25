@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/f6401002-c86a-46e2-bacc-0a2229316269"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "eXelate, Inc. is a data company. A global leader in media measurement, analytics and insights, Nielsen shapes the future of media with accurate measurement of what people listen to and watch worldwide. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.nielsen.com/"}
-priority: 20
+about: {"category": "adtech", "summary": "eXelate, Inc. is an advertising technology company. A global leader in media measurement, analytics and insights, Nielsen shapes the future of media with accurate measurement of what people listen to and watch worldwide. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.nielsen.com/"}
+priority: 24

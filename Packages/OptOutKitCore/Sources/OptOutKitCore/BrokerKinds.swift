@@ -2,7 +2,7 @@ import Foundation
 
 /// What kind of company a broker is. The ids match `category` in a directory entry's `about:` block (see `tools/describe_brokers.py`).
 public enum BrokerCategory: String, CaseIterable, Sendable {
-    case people_search, arrests, consumer_reporting, marketing_data, b2b, adtech, healthcare, financial, fraud_identity, real_estate, genealogy, other
+    case people_search, arrests, consumer_reporting, marketing_data, b2b, adtech, healthcare, financial, fraud_identity, real_estate, genealogy, lead_generation, political, recruiting, automotive, location_data, marketing_services, other
 
     public var title: String {
         switch self {
@@ -17,6 +17,12 @@ public enum BrokerCategory: String, CaseIterable, Sendable {
         case .fraud_identity: return L10n.t("Identity and fraud prevention")
         case .real_estate: return L10n.t("Property and real estate")
         case .genealogy: return L10n.t("Genealogy")
+        case .lead_generation: return L10n.t("Lead generation")
+        case .political: return L10n.t("Political and nonprofit data")
+        case .recruiting: return L10n.t("Recruiting and workforce data")
+        case .automotive: return L10n.t("Automotive data")
+        case .location_data: return L10n.t("Device and location data")
+        case .marketing_services: return L10n.t("Marketing and direct-mail services")
         case .other: return L10n.t("Other data company")
         }
     }

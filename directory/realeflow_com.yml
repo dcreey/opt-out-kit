@@ -14,5 +14,5 @@ opt_out_form: {"page": "https://data-removal.realeflow.com/submit", "method": "g
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
-about: {"category": "real_estate", "summary": "Realeflow LLC is a property and real-estate data company. 150M property records. 20 years of proprietary data. Over $50B in closed transactions. The #1 white-label AI platform for brokerages, educators, influencers, and tech companies. Its own pages mention property and vehicles. Its policy does not name who it sells to.", "tracks": ["property"], "sells_to": [], "source": "https://www.realeflow.com/"}
-priority: 27
+about: {"category": "marketing_services", "summary": "Realeflow LLC is a marketing and direct-mail services company. 150M property records. 20 years of proprietary data. Over $50B in closed transactions. The #1 white-label AI platform for brokerages, educators, influencers, and tech companies. Its own pages mention property and vehicles. Its policy does not name who it sells to.", "tracks": ["property"], "sells_to": [], "source": "https://www.realeflow.com/"}
+priority: 17

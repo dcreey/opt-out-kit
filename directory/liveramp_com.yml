@@ -16,5 +16,5 @@ family_parent: "rlcdn.com"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, opt_out_form_found]
 profiled: "2026-10-22"
-about: {"category": "other", "summary": "LiveRamp Holdings, Inc. is a data company. Connect every signal, platform, and agent to power and prove intelligent marketing with the data collaboration network for the AI era. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://liveramp.com/"}
-priority: 21
+about: {"category": "adtech", "summary": "LiveRamp Holdings, Inc. is an advertising technology company. Connect every signal, platform, and agent to power and prove intelligent marketing with the data collaboration network for the AI era. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://liveramp.com/"}
+priority: 25

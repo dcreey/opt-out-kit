@@ -17,5 +17,5 @@ profiled: "2026-10-22"
 live_check:
   checked: "2026-10-22"
   blockers: []
-about: {"category": "other", "summary": "ONAUDIENCE LTD is a data company. OnAudience fuels digital campaigns and business solutions through high-quality data with global reach. Privacy-safe & GDPR-compliant data. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "online"], "sells_to": [], "source": "https://onaudience.com/do-not-sell-my-personal-info/"}
-priority: 19
+about: {"category": "adtech", "summary": "ONAUDIENCE LTD is an advertising technology company. OnAudience fuels digital campaigns and business solutions through high-quality data with global reach. Privacy-safe & GDPR-compliant data. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "online"], "sells_to": [], "source": "https://onaudience.com/do-not-sell-my-personal-info/"}
+priority: 23

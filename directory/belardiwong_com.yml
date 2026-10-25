@@ -17,5 +17,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/3d2d5e0c-bd98-46b8-906c-ede68a6f6a80/400f54ed-fcbb-4749-ab5b-32f491c72390"
   blockers: ["check:a bot check"]
-about: {"category": "adtech", "summary": "Belardi Ostroy, ALC, LLC is an advertising technology company. Belardi Wong provides end-to-end solutions for over 300 best-in-class brands and specialty retailers. As #1 in direct-to-consumer marketing, we help brands grow faster and smarter... Its own pages mention shopping and purchase behavior, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "social"], "sells_to": [], "source": "https://belardiwong.com/"}
-priority: 23
+about: {"category": "marketing_services", "summary": "Belardi Ostroy, ALC, LLC is a marketing and direct-mail services company. Belardi Wong provides end-to-end solutions for over 300 best-in-class brands and specialty retailers. As #1 in direct-to-consumer marketing, we help brands grow faster and smarter... Its own pages mention shopping and purchase behavior, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "social"], "sells_to": [], "source": "https://belardiwong.com/"}
+priority: 19

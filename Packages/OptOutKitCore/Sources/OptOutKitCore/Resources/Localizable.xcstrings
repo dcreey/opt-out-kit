@@ -1220,6 +1220,29 @@
     }
    }
   },
+  "Automotive data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données automobiles"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos del automóvil"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fahrzeugdaten"
+     }
+    }
+   }
+  },
   "Background screening": {
    "extractionState": "manual",
    "localizations": {
@@ -2021,6 +2044,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Delaware"
+     }
+    }
+   }
+  },
+  "Device and location data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données d'appareils et de localisation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos de dispositivos y ubicación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geräte- und Standortdaten"
      }
     }
    }
@@ -3267,6 +3313,29 @@
     }
    }
   },
+  "Lead generation": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Génération de prospects"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Generación de clientes potenciales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lead-Generierung"
+     }
+    }
+   }
+  },
   "Legal first name": {
    "extractionState": "manual",
    "localizations": {
@@ -3608,6 +3677,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manuell: Sie finden die Seite selbst"
+     }
+    }
+   }
+  },
+  "Marketing and direct-mail services": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Services de marketing et de publipostage"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Servicios de marketing y correo directo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marketing- und Direktmailing-Dienste"
      }
     }
    }
@@ -5153,6 +5245,29 @@
     }
    }
   },
+  "Political and nonprofit data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Données politiques et associatives"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datos políticos y de organizaciones sin fines de lucro"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Politische und gemeinnützige Daten"
+     }
+    }
+   }
+  },
   "Precise location": {
    "extractionState": "manual",
    "localizations": {
@@ -5287,6 +5402,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bereit (Probelauf, nichts gesendet)"
+     }
+    }
+   }
+  },
+  "Recruiting and workforce data": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recrutement et données sur la main-d'œuvre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reclutamiento y datos laborales"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recruiting- und Arbeitsmarktdaten"
      }
     }
    }

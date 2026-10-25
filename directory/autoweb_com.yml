@@ -18,5 +18,5 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/f84362ef-6901-4a8c-9a52-e7b06dbb4e6b"
   blockers: ["check:a bot check"]
-about: {"category": "other", "summary": "AutoWeb, Inc. is a data company. Autoweb - Free no-obligation new car prices. View hundreds of thousands of cars for sale. Check out our new Car Buying Guide with Car Reviews, Car Pictures, and Car Videos. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.autoweb.com/"}
-priority: 21
+about: {"category": "automotive", "summary": "AutoWeb, Inc. is an automotive data company. Autoweb - Free no-obligation new car prices. View hundreds of thousands of cars for sale. Check out our new Car Buying Guide with Car Reviews, Car Pictures, and Car Videos. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.autoweb.com/"}
+priority: 29

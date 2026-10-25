@@ -16,5 +16,5 @@ live_form:
   found: true
   page: "https://www.datafy.com/opt-out"
   blockers: ["check:a bot check"]
-about: {"category": "arrests", "summary": "Datafy, LLC is a public arrest and court records site. Datafy Home Page. Its own pages mention names and aliases, email addresses, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["name", "email", "purchases", "online"], "sells_to": [], "source": "https://www.datafy.com/opt-out"}
-priority: 41
+about: {"category": "location_data", "summary": "Datafy, LLC is a device and location data company. Datafy Home Page. Its own pages mention email addresses, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "purchases", "online"], "sells_to": [], "source": "https://www.datafy.com/opt-out"}
+priority: 34
