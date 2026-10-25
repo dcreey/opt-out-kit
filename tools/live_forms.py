@@ -46,6 +46,12 @@ WANT_MAIL = re.compile(r"privacy|dpo|optout|opt-out|dsar|rights|ccpa|gdpr|legal|
 BAD_MAIL = re.compile(r"sales@|support@|press@|careers?@|jobs@|billing@|abuse@|noreply|no-reply|example\.|sentry|wixpress|cloudflare|info@", re.I)
 HOSTED_LANDING = r"datasubject\.com|atlassian\.net/servicedesk|submit-irm\.trustarc|privacyengine\.io|trustsuperset\.com"
 # Clicks the first button or empty link whose words are about opting out (marked so it is clicked once); 1 when it clicked something.
+# Opens collapsed sections and "Start" steps whose words are about privacy requests, so the form inside them is on the page when read.
+EXPAND_JS = """() => { const re = /privacy|request|opt.?out|do not sell|delete|rights|submit|exercise|start|begin/i; let n = 0;
+  for (const e of [...document.querySelectorAll('[aria-expanded="false"],summary,button,[role=button]')].slice(0, 80)) {
+    const t = (e.innerText || '').trim(); if (e.dataset.okOpened || !t || t.length > 60 || !re.test(t)) continue;
+    if (e.matches('button,[role=button]') && e.getAttribute('aria-expanded') !== 'false' && !/^(start|begin|continue)\\b/i.test(t)) continue;
+    e.dataset.okOpened = '1'; try { e.click(); n++; } catch (x) {} if (n >= 6) break; } return n; }"""
 CLICK_JS = """() => { const re = /do not sell|don.?t sell|opt.?out|your privacy choices|privacy choices|exercise.*rights|submit (a )?request|make a request/i;
   const el = [...document.querySelectorAll('button,[role=button],a')].find(e => !e.dataset.okClicked && re.test((e.innerText || '').trim()) && (e.innerText || '').trim().length < 60
     && (e.tagName !== 'A' || !e.getAttribute('href') || e.getAttribute('href').startsWith('#') || e.getAttribute('href').startsWith('javascript')));
@@ -91,6 +97,9 @@ async def look(ctx, url):
         resp = await page.goto(url, wait_until="domcontentloaded", timeout=25000); await page.wait_for_timeout(4500)
         await deny_cookies(page); await page.wait_for_timeout(500)
         for y in range(0, 6000, 900): await page.evaluate(f"window.scrollTo(0,{y})"); await page.wait_for_timeout(80)
+        try:
+            if await page.evaluate(EXPAND_JS): await page.wait_for_timeout(1500)
+        except Exception: pass
         forms = await page.evaluate(FORMS_JS)
         if (resp is None or resp.status in (401, 403, 429, 503)) and not forms and WALL.search((await page.evaluate("document.body ? document.body.innerText : ''"))[:600]):
             WALLED.add(urllib.parse.urlsplit(url).netloc.replace("www.", ""))
@@ -151,7 +160,7 @@ async def site(browser, domain, opt_url, sem):
         try:
             own = P.registrable(domain); tried = set(); frontier = [u for u in (opt_url, f"https://{domain}/") if u]
             # Sites built from one template (the arrests and court-records families) keep their removal form at the same path.
-            frontier += [f"https://{domain}/request-portal/", f"https://www.{domain}/request-portal/"]
+            frontier += [f"https://{domain}/request-portal/", f"https://www.{domain}/request-portal/", f"https://www.{domain}/privacy-request-portal", f"https://{domain}/privacy-request-portal"]
             for depth in range(3):
                 nxt = []
                 for u in frontier[:6]:

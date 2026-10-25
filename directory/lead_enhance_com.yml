@@ -12,3 +12,5 @@ opt_out_form: {"page": "https://bathroom-remodel-today.com/privacy/", "method": 
 registered_in: [CA]
 signals: [email_input, email_only_wording, id_required, listing_url_input, mail_option, name_input, opt_out_form_found, phone_input, phone_verify]
 profiled: "2026-10-22"
+contact_email: "info@lead-enhance.com"
+contact_email_source: "page"

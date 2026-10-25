@@ -37,6 +37,9 @@ async def audit(ctx, url):
         resp = await page.goto(url, wait_until="domcontentloaded", timeout=30000); await page.wait_for_timeout(4500)
         await L.deny_cookies(page); await page.wait_for_timeout(500)
         for y in range(0, 6000, 900): await page.evaluate(f"window.scrollTo(0,{y})"); await page.wait_for_timeout(80)
+        try:
+            if await page.evaluate(L.EXPAND_JS): await page.wait_for_timeout(1500)
+        except Exception: pass
         forms = await page.evaluate(L.FORMS_JS)
         for fr in page.frames[1:]:
             try: forms += await fr.evaluate(L.FORMS_JS)
@@ -67,8 +70,8 @@ async def audit(ctx, url):
         bad = [b for b in best["buttons"] if BAD_BUTTON.search(b)]
         if bad and not any(L.OPTOUT.search(b) for b in best["buttons"]): reasons.append("button says " + bad[0])
         ident = sum(1 for f in best["fields"] if L.IDENT.search(f["label"] + " " + f["name"]))
-        optout_page = L.OPTOUT.search(ctxs + " " + best.get("head", "")) and re.search(r"do.?not.?sell|opt.?out|privacy|request|choices|rights", ctxs + " " + best.get("head", "") + " " + text[:300], re.I)
-        if ident < 1 and not (optout_page and len(best["fields"]) >= 1 and any(re.search(r"submit|send|request|continue|opt", b, re.I) for b in best["buttons"])):
+        optout_page = L.OPTOUT.search(ctxs + " " + best.get("head", "") + " " + text[:300]) and re.search(r"do.?not.?sell|opt.?out|privacy|request|choices|rights", ctxs + " " + best.get("head", "") + " " + text[:300], re.I)
+        if ident < 1 and not (optout_page and len(best["fields"]) >= 1 and (any(re.search(r"submit|send|request|continue|opt", b, re.I) for b in best["buttons"]) or re.search(r"rights form|request form|opt.?out form|privacy request", best.get("head", "") + " " + text[:300], re.I))):         # a form that opens as a first step (one menu) is still the form
             reasons.append("no name/email/address fields")
         audit.links = await page.evaluate(L.LINKS_JS)
         return sc, reasons
@@ -100,8 +103,8 @@ async def main():
                         try:
                             await audit(ctx, "https://" + d + "/"); links += audit.links
                         except Exception: pass
-                        cands = L.good_links(url, links, own) + [f"https://{d}/request-portal/", f"https://www.{d}/request-portal/"]
-                        for c in list(dict.fromkeys(cands))[:5]:
+                        cands = L.good_links(url, links, own) + [f"https://{d}/request-portal/", f"https://www.{d}/request-portal/", f"https://www.{d}/privacy-request-portal", f"https://{d}/privacy-request-portal"]
+                        for c in list(dict.fromkeys(cands))[:8]:
                             if c.split("#")[0] == url.split("#")[0]: continue
                             sc2, why2 = await audit(ctx, c)
                             if not why2 and sc2 >= 5: alt = c; break
