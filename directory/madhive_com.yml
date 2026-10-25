@@ -17,6 +17,4 @@ priority: 42
 persistence: {"result": "permanent", "quote": "By opting out via this method, Madhive will attempt to collect the IP address of the computer or device that you are currently using and add it to our suppression list.", "source": "https://www.madhive.com/legal/privacy-policy"}
 live_form:
   checked: "2026-10-25"
-  found: true
-  page: "https://www.madhive.com/user-rights"
-  blockers: ["check:a bot check"]
+  found: false

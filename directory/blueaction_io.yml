@@ -16,6 +16,4 @@ priority: 40
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
   checked: "2026-10-25"
-  found: true
-  page: "https://blueaction.io/do-not-sell/"
-  blockers: ["check:a bot check"]
+  found: false
