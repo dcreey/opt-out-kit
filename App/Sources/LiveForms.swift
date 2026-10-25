@@ -112,7 +112,7 @@ extension WebViewSession {
           // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
           var loose=[].slice.call(document.querySelectorAll('input,select,textarea')).filter(function(e){
             return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e);});
-          if(loose.length>=2&&document.body){
+          if(loose.length>=1&&document.body){
             document.body.setAttribute('data-ook-form','fx'); var lf=[];
             loose.forEach(function(e,j){var type=e.tagName.toLowerCase()==='select'?'select':(e.tagName.toLowerCase()==='textarea'?'textarea':(e.type||'text'));
               var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);

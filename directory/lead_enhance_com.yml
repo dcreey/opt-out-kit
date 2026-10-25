@@ -8,7 +8,6 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://bathroom-remodel-today.com/privacy/"
-opt_out_form: {"page": "https://bathroom-remodel-today.com/privacy/", "method": "post", "action": "https://bathroom-remodel-today.com/terms/revoke_consent.php", "fields": [{"type": "text", "name": "first_name", "label": "FIRST NAME*"}, {"type": "text", "name": "last_name", "label": "LAST NAME*"}, {"type": "text", "name": "phone_number", "label": "PHONE NUMBER*"}, {"type": "email", "name": "email_address", "label": "EMAIL ADDRESS*"}, {"type": "text", "name": "company", "label": "company"}], "hops": 0}
 registered_in: [CA]
 signals: [email_input, email_only_wording, id_required, listing_url_input, mail_option, name_input, opt_out_form_found, phone_input, phone_verify]
 profiled: "2026-10-22"
@@ -17,3 +16,6 @@ contact_email_source: "page"
 about: {"category": "lead_generation", "summary": "LEAD ENHANCE LLC is a lead-generation company. Lead Enhance. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://signin.leadgenesis.info/login"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: false

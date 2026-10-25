@@ -11,11 +11,9 @@ opt_out_url: "https://salesintel.io/opt-out/"
 registered_in: [CA, OR, TX]
 signals: [email_only_wording]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://salesintel.io/opt-out/"
-  blockers: ["check:a bot check"]
 about: {"category": "b2b", "summary": "SalesIntel Research, Inc. is a business-contact and sales-data provider. Turn B2B buying signals into pipeline with 200M AI + Human-verified contacts and AI-agents powering GTM workflows for sales, marketing, and RevOps teams. Its own pages mention phone numbers. Its policy does not name who it sells to.", "tracks": ["phone"], "sells_to": [], "source": "https://salesintel.io/"}
 priority: 30
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

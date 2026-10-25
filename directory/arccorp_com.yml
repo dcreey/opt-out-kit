@@ -12,11 +12,9 @@ contact_email: "privacy@arccorp.com"
 registered_in: [CA]
 signals: [email_contact, id_required, mail_option]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://my.datasubject.com/Uw03R7mCGS/60313"
-  blockers: []
 about: {"category": "other", "summary": "Airlines Reporting Corporation is a public arrest and court records site. With leading business solutions built on high-quality data, ARC is the premier driver of air travel intelligence and commerce. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "age", "purchases", "interests", "online", "social", "credit"], "sells_to": ["government"], "sells_note": "ARC may be required to disclose Personal Data in response to lawful requests by public authorities, including to meet national security and law enforcement requirements.", "source": "https://www2.arccorp.com/site-privacy-policy/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

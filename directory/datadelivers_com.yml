@@ -10,7 +10,6 @@ confidence: "medium"
 opt_out_url: "https://datadelivers.com/do-not-sell-or-share-personal-information/"
 contact_email: "privacy@datadelivers.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://datadelivers.com/do-not-sell-or-share-personal-information/", "method": "post", "action": "https://datadelivers.com/do-not-sell-or-share-personal-information/#gf_10", "fields": [{"type": "text", "name": "input_1.3", "label": "First"}, {"type": "text", "name": "input_1.6", "label": "Last"}, {"type": "email", "name": "input_3", "label": "Email*"}, {"type": "text", "name": "input_4", "label": "Company*"}], "hops": 2}
 family: "trustsuperset_com"
 family_parent: "trustsuperset.com"
 registered_in: [CA, OR, TX]
@@ -19,3 +18,6 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "DataDelivers, LLC is a marketing data provider. The leading CDP for Restaurants, DataDelivers is the only restaurant CDP that reveals the 80% of customers not within your loyalty program. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, relatives and household members, job title and employer. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "relatives", "employment", "education", "property", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["businesses", "advertisers"], "sells_note": "Our clients determine the purposes and means for the usage of the personal information collected, sold, or shared with them.", "source": "https://datadelivers.com/privacy-policy/"}
 priority: 65
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

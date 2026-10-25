@@ -10,7 +10,6 @@ confidence: "low"
 opt_out_url: "https://www.resonate.com/privacy-policy/opt-out-success/"
 contact_email: "privacy@resonate.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://www.resonate.com/privacy-policy/opt-out-success/", "method": "post", "action": "https://www.resonate.com/privacy-policy/opt-out-success/", "fields": [{"type": "text", "name": "input_2", "label": "Comments"}, {"type": "email", "name": "input_1", "label": "Email(Required)"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [email_contact, email_input, opt_out_form_found]
 profiled: "2026-10-22"
@@ -20,3 +19,6 @@ live_check:
 about: {"category": "marketing_data", "summary": "Resonate is a marketing data provider. Resonate's predictive consumer intelligence shows who's about to buy, churn, or spend more, so you can act before it happens. See how. Its own pages mention email addresses, age or birthdate, job title and employer, education, income or wealth, criminal and court records. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "age", "employment", "education", "income", "criminal", "interests", "online", "location", "health", "credit"], "sells_to": ["advertisers"], "sells_note": "How We Use, Sell & Share Information Resonate may sell your Personal Information to third parties or process your Personal Information for targeted advertising.", "source": "https://www.resonate.com/privacy-policy/"}
 priority: 59
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

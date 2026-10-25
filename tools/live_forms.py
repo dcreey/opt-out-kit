@@ -91,6 +91,23 @@ async def deny_cookies(page):
     return False
 
 
+FRAME_NOT_A_PAGE = re.compile(r"js\.hsforms\.net|about:blank|recaptcha|hcaptcha|challenges\.cloudflare|doubleclick|googletagmanager|clym-widget", re.I)
+
+
+async def frame_forms(page):
+    """Forms inside embedded frames (OneTrust, TrustSuperset, HubSpot, Google Forms). Each carries the frame's own address in `_src` when that
+    address can be opened on its own, because the app reads the top page only and cannot reach into another site's frame."""
+    out = []
+    for fr in page.frames[1:]:
+        if not fr.url.startswith("http"): continue
+        try: found = await fr.evaluate(FORMS_JS)
+        except Exception: continue
+        for f in found:
+            if not FRAME_NOT_A_PAGE.search(fr.url): f["_src"] = fr.url
+            out.append(f)
+    return out
+
+
 async def look(ctx, url):
     page = await ctx.new_page()
     try:
@@ -103,9 +120,7 @@ async def look(ctx, url):
         forms = await page.evaluate(FORMS_JS)
         if (resp is None or resp.status in (401, 403, 429, 503)) and not forms and WALL.search((await page.evaluate("document.body ? document.body.innerText : ''"))[:600]):
             WALLED.add(urllib.parse.urlsplit(url).netloc.replace("www.", ""))
-        for fr in page.frames[1:]:                  # forms embedded in frames (HubSpot, Clym, Ketch) are read in their own frame
-            try: forms += await fr.evaluate(FORMS_JS)
-            except Exception: pass
+        forms += await frame_forms(page)
         if resp is not None and resp.status >= 400: forms = []          # an error page is never the opt-out form (its search box is not)
         ctx = (await page.title()) + " " + urllib.parse.urlsplit(page.url).path
         best = max(((score(f, ctx), f) for f in forms), key=lambda x: x[0], default=(-100, None))
@@ -116,10 +131,7 @@ async def look(ctx, url):
                     n = await page.evaluate(CLICK_JS)
                     if not n: break
                     await page.wait_for_timeout(3000)
-                    more = await page.evaluate(FORMS_JS)
-                    for fr in page.frames[1:]:
-                        try: more += await fr.evaluate(FORMS_JS)
-                        except Exception: pass
+                    more = await page.evaluate(FORMS_JS) + await frame_forms(page)
                     cand = max(((score(f, ctx), f) for f in more), key=lambda x: x[0], default=(-100, None))
                     if cand[0] > best[0]: best = cand
                     if best[0] >= 5: break
@@ -130,7 +142,8 @@ async def look(ctx, url):
         # A hosted privacy portal that opens on a choice (location, request type) shows its form only after one, so its landing page counts.
         if best[0] < 5 and re.search(HOSTED_LANDING, page.url): best = (5, best[1])
         blockers = await page.evaluate(BLOCK_JS) if best[0] >= 5 else []
-        return best[0] if best[0] >= 5 else None, blockers, links, page.url
+        final = (best[1] or {}).get("_src") or page.url        # a form that lives in a frame opens at the frame's own address
+        return best[0] if best[0] >= 5 else None, blockers, links, final
     except Exception:
         return None, [], [], url
     finally:
@@ -198,10 +211,11 @@ async def main():
         with open(os.path.join(a.out, "shard-0.tsv"), "w") as out:
             async def guarded(d, u):
                 # A hard limit per site, tried twice, so one hung page can never stall the run.
-                for _ in range(2):
-                    try: return await asyncio.wait_for(site(browser, d, u, sem), timeout=240)
-                    except asyncio.TimeoutError: pass
-                return d, "error:timed out twice", "", ""
+                async with sem:         # wait for a free worker first, then give the site its own time, so queueing never counts against it
+                    for _ in range(2):
+                        try: return await asyncio.wait_for(site(browser, d, u, asyncio.Semaphore(1)), timeout=200)
+                        except asyncio.TimeoutError: pass
+                    return d, "error:timed out twice", "", ""
             for coro in asyncio.as_completed([guarded(d, u) for d, u in targets]):
                 d, r, page, bl = await coro; done += 1
                 mail = next((m for k, m in MAILS.items() if d.endswith(k) or k.endswith(d)), "")

@@ -7,15 +7,13 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "none"
-opt_out_url: null
+opt_out_url: "https://www.zeil.com/data-subject-access-request-form"
 registered_in: [TX]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.zeil.com/data-subject-access-request-form"
-  blockers: ["check:a bot check"]
 about: {"category": "recruiting", "summary": "ZEIL Limited is a recruiting and workforce data provider. Dreaming of a better job? Discover and apply for jobs across New Zealand with ZEIL. Get personalised matches, free AI CV tools, and swipe-to-apply roles in seconds. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "criminal", "purchases", "interests", "online", "location", "health", "social"], "sells_to": ["advertisers"], "sells_note": "Resources Blog Support Explore Careers Companies Volunteering Company Sign In Pricing Help Legal Terms of Use Privacy End User License Agreement Advertiser Terms Search by Region Socials Instagram TikTok LinkedIn Youtube Explore Page with A", "source": "https://zeil.com/privacy"}
 priority: 46
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

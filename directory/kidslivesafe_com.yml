@@ -8,7 +8,6 @@ tier: "B"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.kidslivesafe.com/help-center/privacy-requests"
-opt_out_form: {"page": "https://www.kidslivesafe.com/help-center/privacy-requests", "method": "post", "action": "https://www.kidslivesafe.com/help-center/privacy-requests?", "fields": [{"type": "select", "name": "requesttype", "label": "Request Type*"}, {"type": "text", "name": "customerid", "label": "Customer ID"}, {"type": "text", "name": "firstname", "label": "First Name*"}, {"type": "text", "name": "o4dd819765b2bf7aa", "label": "Last Name*"}, {"type": "text", "name": "city", "label": "City*"}, {"type": "select", "name": "states", "label": "State*"}, {"type": "text", "name": "zip", "label": "ZIP*"}, {"type": "select", "name": "age", "label": "Age*"}, {"type": "email", "name": "email", "label": "Confirmation Email*"}], "hops": 1}
 template: "t_c00e45"
 registered_in: [CA]
 signals: [captcha_turnstile, email_input, name_input, opt_out_form_found]
@@ -19,3 +18,6 @@ search_check:
 about: {"category": "people_search", "summary": "Scalable Commerce LLC is a people-search and public-records site. Identify and monitor threats in your neighborhood, research nearby people, and uncover who is behind unwanted calls and texts with Kids Live Safe now! Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, criminal and court records. Its policy names these buyers or recipients: advertisers and marketers; government and law enforcement.", "tracks": ["name", "address", "phone", "email", "age", "criminal", "online", "location", "social", "credit"], "sells_to": ["advertisers", "government"], "sells_note": "With Whom Do We Disclose Your Information Other than your credit or debit card information (which We will only share with third parties as described below), We may share your Personally Identifiable Information with advertisers and other th", "source": "https://www.kidslivesafe.com/help-center/privacy"}
 priority: 67
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: false

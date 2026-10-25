@@ -12,9 +12,11 @@ contact_email: "privacy.inbox@lob.com"
 registered_in: [CA, OR]
 signals: [captcha_recaptcha, email_contact, email_only_wording, mail_option, phone_verify]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 about: {"category": "marketing_services", "summary": "Lob.com, Inc. is a marketing and direct-mail services company. Automate and personalize direct mail at scale while our nationwide print network speeds delivery, controls postage costs, and keeps every send compliant. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, shopping and purchase behavior. Its policy names these buyers or recipients: other data brokers and resellers; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "purchases", "interests", "online", "health", "social"], "sells_to": ["brokers", "advertisers"], "sells_note": "In some jurisdictions, making such data available from our data partners in this way may qualify as “selling” under applicable laws.", "source": "https://www.lob.com/privacy"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://privacy.lob.com/"
+  blockers: []

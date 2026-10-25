@@ -7,15 +7,13 @@ bucket: "registry"
 tier: null
 automation: "blocked"
 confidence: "n/a"
-opt_out_url: null
+opt_out_url: "https://salutarydata.com/privacy-opt-out-and-disclosure-form/"
 registered_in: [CA, TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://salutarydata.com/privacy-opt-out-and-disclosure-form/"
-  blockers: []
 about: {"category": "b2b", "summary": "Salutary Data LLC. is a business-contact and sales-data provider. Salutary Data offers data enrichment solutions that enhance contacts and company data quality, empowering businesses to make informed decisions and drive growth. Its own pages mention phone numbers. Its policy does not name who it sells to.", "tracks": ["phone"], "sells_to": [], "source": "https://salutarydata.com/"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

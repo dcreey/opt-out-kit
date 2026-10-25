@@ -10,7 +10,6 @@ confidence: "low"
 opt_out_url: "https://datadecisionsgroup.com/preferences/?ketch_show=preferences"
 contact_email: "privacy@datadecisionsgroup.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://datadecisionsgroup.com/preferences/?ketch_show=preferences", "method": "post", "action": "https://datadecisionsgroup.com/preferences/?ketch_show=preferences#gf_7", "fields": [{"type": "text", "name": "input_10", "label": "LinkedIn"}, {"type": "text", "name": "input_1.3", "label": "First"}, {"type": "text", "name": "input_1.6", "label": "Last"}, {"type": "email", "name": "input_3", "label": "Email"}, {"type": "tel", "name": "input_4", "label": "Phone"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
@@ -20,3 +19,6 @@ live_check:
 about: {"category": "marketing_data", "summary": "Data Decisions Group is a marketing data provider. Enhance marketing strategies with DDG's customer data analytics solutions. Unlock actionable insights & optimize campaigns for better ROI. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; other data brokers and resellers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health"], "sells_to": ["advertisers", "businesses", "brokers"], "sells_note": "We may also disclose or share the information we process in connection with our Services with the following recipients and/or under the following circumstances: Business Customers.", "source": "https://datadecisionsgroup.com/privacy-policy/"}
 priority: 68
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false

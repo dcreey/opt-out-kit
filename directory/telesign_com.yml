@@ -11,11 +11,9 @@ opt_out_url: "https://www.telesign.com/privacy-requests"
 registered_in: [CA]
 signals: [phone_verify, portal_osano]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://my.datasubject.com/AzynyfTUd6VXK21cg/24338"
-  blockers: []
 about: {"category": "fraud_identity", "summary": "Telesign Corporation is an identity and fraud-prevention data provider. APIs Delivering Global Verification and Programmable Communications as a service. SMS, Voice, and phone number intelligence solutions. Get started now. Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.telesign.com/privacy-requests"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false
