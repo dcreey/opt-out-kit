@@ -150,6 +150,8 @@ final class AppModel: ObservableObject {
             loadError = Loc.f("Could not load the broker registry: %@", error)
         }
         #if DEBUG
+        // Simulator work: `-reset-daily` forgets today's choice and the once-a-day screens, as if it were a new day.
+        if args.contains("-reset-daily") { for k in ["daily.themes", "daily.day", "daily.batches", "summary.day", "followup.explained"] { defaults.removeObject(forKey: k) } }
         // A complete made-up profile, so screens that need one can be looked at without typing.
         if args.contains("-uitest-seed-profile"), var me = household.people.first(where: { $0.relationship == .me }) {
             me.names = [NameEntry(kind: .legal, name: "Pat Example")]
@@ -648,6 +650,14 @@ final class AppModel: ObservableObject {
 
     /// True the first time the app is opened each day, once there is something to summarize.
     var shouldShowDailySummary: Bool { defaults.string(forKey: Self.summaryDayKey) != Self.dayString(Date()) && !activitySummary.isEmpty }
+
+    /// True when nothing has been chosen or started today, so the day opens on the question of which kind of broker to tackle.
+    var needsKindChoice: Bool { dailyThemes.isEmpty && dailyGoals.verifyDone == 0 && !dailyGoals.verify.isEmpty }
+
+    private static let followUpKey = "followup.explained"
+    /// The first time the person has sent anything, once: why the day ends with an email and what to expect in the inbox.
+    var shouldExplainFollowUp: Bool { !defaults.bool(forKey: Self.followUpKey) && activitySummary.sites > 0 }
+    func markFollowUpExplained() { defaults.set(true, forKey: Self.followUpKey) }
 
     func markDailySummaryShown() { defaults.set(Self.dayString(Date()), forKey: Self.summaryDayKey) }
 

@@ -22,6 +22,8 @@ public struct ActivitySummary: Equatable, Sendable {
     public var lastDayKinds: [KindCount]
     /// How many different days the person has sent requests.
     public var activeDays: Int
+    /// Consecutive days with a request sent, counting back from today (or from yesterday, so a streak is not lost before the day's work).
+    public var streak: Int
     public var isEmpty: Bool { sites == 0 && emails == 0 }
 
     static func sorted(_ counts: [String: Int]) -> [KindCount] {
@@ -30,7 +32,7 @@ public struct ActivitySummary: Equatable, Sendable {
         }
     }
 
-    public static func build(entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], calendar: Calendar = .current) -> ActivitySummary {
+    public static func build(entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(), calendar: Calendar = .current) -> ActivitySummary {
         let byID = Dictionary(entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         var kinds: [String: Int] = [:], sites = 0, emails = 0
         var latest: [(day: Date, kind: String)] = []
@@ -43,10 +45,15 @@ public struct ActivitySummary: Equatable, Sendable {
             sites += 1; kinds[kind, default: 0] += 1
             latest.append((calendar.startOfDay(for: last), kind))
         }
+        let days = Set(latest.map(\.day))
+        var streak = 0
+        var cursor = calendar.startOfDay(for: now)
+        if !days.contains(cursor) { cursor = calendar.date(byAdding: .day, value: -1, to: cursor) ?? cursor }
+        while days.contains(cursor) { streak += 1; cursor = calendar.date(byAdding: .day, value: -1, to: cursor) ?? cursor.addingTimeInterval(-86_400) }
         let lastDay = latest.map(\.day).max()
         var lastKinds: [String: Int] = [:]
         for item in latest where item.day == lastDay { lastKinds[item.kind, default: 0] += 1 }
         return ActivitySummary(sites: sites, emails: emails, byKind: sorted(kinds), lastDay: lastDay, lastDaySites: lastKinds.values.reduce(0, +),
-                               lastDayKinds: sorted(lastKinds), activeDays: Set(latest.map(\.day)).count)
+                               lastDayKinds: sorted(lastKinds), activeDays: days.count, streak: streak)
     }
 }

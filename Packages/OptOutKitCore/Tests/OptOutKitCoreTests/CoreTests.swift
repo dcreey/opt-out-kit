@@ -2728,6 +2728,11 @@ final class DailyResetAndSummaryTests: XCTestCase {
         XCTAssertEqual(s.byKind.first, KindCount(kind: "people_search", count: 2), "most first")
         XCTAssertFalse(s.isEmpty)
         XCTAssertTrue(ActivitySummary.build(entries: entries, attempts: [:], calendar: cal).isEmpty)
+        // Streak: sent yesterday, the day before and three days ago is not unbroken (two days ago is missing); yesterday alone counts as 1 so far.
+        XCTAssertEqual(s.streak, 1, "yesterday only: the gap before it ends the streak, and today has not started")
+        let run: [String: [OptOutAttempt]] = ["s0": [OptOutAttempt(date: now, outcome: "submitted")], "s1": [OptOutAttempt(date: now.addingTimeInterval(-86_400), outcome: "submitted")],
+                                              "s2": [OptOutAttempt(date: now.addingTimeInterval(-2 * 86_400), outcome: "submitted")]]
+        XCTAssertEqual(ActivitySummary.build(entries: entries, attempts: run, now: now, calendar: cal).streak, 3)
         for c in BrokerCategory.allCases { XCTAssertFalse(c.protects.isEmpty) }
     }
 }

@@ -15,6 +15,7 @@ struct BrokerListView: View {
     @State private var showAuto = false
     @State private var chooser: ChooserMode?
     @State private var summary: ActivitySummary?
+    @State private var explainFollowUp = false
 
     var body: some View {
         NavigationStack {
@@ -45,67 +46,40 @@ struct BrokerListView: View {
                         .accessibilityIdentifier("home-auto-working")
                     }
                 }
-                if model.autoSettings.lastAttempted != nil { Section { LastRunRow() } }
                 let goals = model.dailyGoals
-                if !goals.verify.isEmpty {
+                if model.needsKindChoice {
+                    // Every day opens on one question: which kind of broker to tackle.
                     Section {
-                        NavigationLink(value: "daily-verify") {
-                            GoalRow(title: goalTitle(goals), subtitle: Loc.t("Each is filled in; you tick the human check"),
-                                    done: goals.verifyDone, total: goals.verify.count, symbol: "hand.tap")
-                        }.accessibilityIdentifier("goal-verify")
-                        if let mail = goals.email {
-                            NavigationLink(value: "daily-email") {
-                                GoalRow(title: Loc.t("Email the same sites"), subtitle: Loc.t("One message, every address in Bcc, as a safety net"),
-                                        done: goals.emailDone, total: mail.domains.count, symbol: "envelope")
-                            }.accessibilityIdentifier("goal-email")
+                        ForEach(Array(model.remainingKinds.enumerated()), id: \.element.kind) { index, item in
+                            Button { model.chooseFirstKind(item.kind) } label: { KindOption(kind: item.kind, count: item.count, suggested: index == 0) }
+                                .buttonStyle(.plain).accessibilityIdentifier("kind-\(item.kind)")
                         }
-                        if goals.verifyDone == 0 {
-                            Button { chooser = .start } label: { Label("Choose today's kind of broker", systemImage: "square.grid.2x2") }
-                                .accessibilityIdentifier("goal-choose")
-                        }
-                        if goals.allComplete {
-                            Button { chooser = .more } label: { Label("Keep going: take 25 more", systemImage: "forward.fill") }
-                                .accessibilityIdentifier("goal-more")
-                        }
-                    } header: { Text("Today's goals") } footer: {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("About \(DailyGoals.daysLeft(remaining: model.verifyRemaining)) days left at 25 a day. Finish both goals each day and every site is covered in about a month. You can always keep going.")
-                            Text(FollowUpNote.text)
-                        }
-                    }
+                    } header: { Text("What do you want to tackle today?").font(.title3.bold()).textCase(nil).foregroundStyle(.primary) }
+                      footer: { Text("Ranked by how bad the worst case can get and how much opting out helps. Start at the top, or pick any.") }
+                } else if !goals.verify.isEmpty {
+                    TodayCard(goals: goals, change: { chooser = .start }, more: { chooser = .more })
                 }
-                let queue = model.queue
-                let tasks = queue.flatMap(\.tasks)
-                let done = tasks.filter { model.isDone($0) }.count
-                Section {
-                    ProgressView(value: tasks.isEmpty ? 0 : Double(done) / Double(tasks.count)) {
-                        Text("Finished \(tasks.isEmpty ? 0 : done * 100 / tasks.count)%")
-                    }
-                    .accessibilityIdentifier("completion")
-                } footer: {
-                    Text("\(queue.reduce(0) { $0 + $1.siteCount }) sites in \(tasks.count) tasks, ranked: work from the top and each task is the best use of your time that is left.")
+                if !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
+                let firstTasks = model.queue.flatMap(\.tasks).filter { t in
+                    if case .platform = t.kind { return !model.isDone(t) }
+                    return t.kind == .automatic && !model.isDone(t)
                 }
-                let next = tasks.filter { !model.isDone($0) }.prefix(5)
-                Section {
-                    ForEach(Array(next)) { task in
-                        NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("next-\(task.id)")
-                    }
-                } header: { Text("Do these next") }
-                Section {
-                    ForEach(queue) { band in
-                        NavigationLink(value: band.rank.rawValue) { QueueBandHeader(band: band) }
-                            .accessibilityIdentifier("band-\(band.rank.rawValue)")
-                    }
-                } header: { Text("The whole queue, in order") }
+                if !firstTasks.isEmpty {
+                    Section {
+                        ForEach(firstTasks) { task in NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("next-\(task.id)") }
+                    } header: { Text("One-time, do these first") }
+                }
             }
             .accessibilityIdentifier("broker-list")
             .navigationTitle("Opt-Out Kit")
             .sheet(isPresented: Binding(get: { summary != nil }, set: { if !$0 { summary = nil } })) {
-                if let sum = summary { DailySummaryView(summary: sum) { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { chooser = .start } } }
+                if let sum = summary { DailySummaryView(summary: sum) }
             }
             .onAppear {
                 if model.shouldShowDailySummary { summary = model.activitySummary; model.markDailySummaryShown() }
+                else if model.shouldExplainFollowUp { explainFollowUp = true; model.markFollowUpExplained() }
             }
+            .sheet(isPresented: $explainFollowUp) { FollowUpExplainerView() }
             .sheet(item: $chooser) { mode in
                 KindChooserView(mode: mode) { id in
                     switch mode { case .start: model.chooseFirstKind(id); case .more: model.addBatch(kind: id) }
@@ -232,35 +206,11 @@ struct KindChooserView: View {
                     Text(mode == .start ? Loc.t("Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.")
                                         : Loc.t("Nice work. Pick the kind of broker for your next 25."))
                         .font(.subheadline)
-                    Label(FollowUpNote.text, systemImage: "envelope.badge").font(.footnote).foregroundStyle(.secondary)
                 }
                 Section {
                     ForEach(Array(model.remainingKinds.enumerated()), id: \.element.kind) { index, item in
-                        let category = BrokerCategory(rawValue: item.kind) ?? .other
-                        Button { onPick(item.kind); dismiss() } label: {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack(alignment: .firstTextBaseline) {
-                                    Text("\(category.rank)").font(.subheadline.bold()).foregroundStyle(.white)
-                                        .frame(width: 26, height: 26).background(rankColor(category.rank), in: Circle())
-                                    Text(category.title).font(.headline)
-                                    Spacer()
-                                    if index == 0 { Text("Start here").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 2).background(Color.accentColor, in: Capsule()).foregroundStyle(.white) }
-                                    Text(Loc.f("%lld left", item.count)).font(.caption.bold()).foregroundStyle(.tint)
-                                }
-                                HarmMeter(harm: category.harm)
-                                Text(category.rankReason).font(.footnote).foregroundStyle(.secondary)
-                                DisclosureGroup("What they do and what could happen") {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text(category.about).font(.footnote)
-                                        Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
-                                        CaseExamples(category: category)
-                                    }.padding(.top, 4)
-                                }.font(.footnote.bold())
-                            }
-                            .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("kind-\(item.kind)")
+                        Button { onPick(item.kind); dismiss() } label: { KindOption(kind: item.kind, count: item.count, suggested: index == 0) }
+                            .buttonStyle(.plain).accessibilityIdentifier("kind-\(item.kind)")
                     }
                 } header: { Text("In the order we suggest") } footer: { Text("Ranked by how bad the worst case can get and how much opting out helps. Start at the top, or pick any.") }
             }
@@ -321,8 +271,7 @@ struct DailySummaryView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let summary: ActivitySummary
-    let chooseKind: () -> Void
-
+    
     private func title(_ kind: String) -> String { (BrokerCategory(rawValue: kind) ?? .other).title }
 
     private var when: String {
@@ -354,7 +303,6 @@ struct DailySummaryView: View {
                             .fixedSize(horizontal: false, vertical: true)
                         }
                     } header: { Text(summary.lastDaySites == 1 ? Loc.f("%@ you sent 1 request", when) : Loc.f("%@ you sent %lld requests", when, summary.lastDaySites)).textCase(nil).font(.subheadline.bold()) }
-                      footer: { Text(FollowUpNote.text) }
                 }
                 if summary.byKind.count > 1 {
                     Section {
@@ -363,19 +311,143 @@ struct DailySummaryView: View {
                         }
                     } header: { Text("So far, by kind of broker") }
                 }
-                if let next = model.remainingKinds.first {
-                    Section {
-                        let category = BrokerCategory(rawValue: next.kind) ?? .other
-                        Label(Loc.f("Next up: %@, %lld left", category.title, next.count), systemImage: "arrow.forward.circle.fill").font(.headline)
-                        Text(category.rankReason).font(.footnote).foregroundStyle(.secondary)
-                        Button("Choose today's kind of broker") { dismiss(); chooseKind() }.accessibilityIdentifier("summary-choose")
-                    } header: { Text("Today") }
-                }
             }
             .navigationTitle("Welcome back")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Continue") { dismiss() }.accessibilityIdentifier("summary-continue") } }
         }
         .accessibilityIdentifier("daily-summary")
+    }
+}
+
+
+/// One kind of broker as an option: its rank, how bad the worst case is, why it sits here, and what could happen.
+struct KindOption: View {
+    let kind: String
+    let count: Int
+    let suggested: Bool
+
+    var body: some View {
+        let category = BrokerCategory(rawValue: kind) ?? .other
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(category.rank)").font(.subheadline.bold()).foregroundStyle(.white)
+                    .frame(width: 26, height: 26).background(rankColor(category.rank), in: Circle())
+                Text(category.title).font(.headline)
+                Spacer()
+                if suggested { Text("Start here").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 2).background(Color.accentColor, in: Capsule()).foregroundStyle(.white) }
+                Text(Loc.f("%lld left", count)).font(.caption.bold()).foregroundStyle(.tint)
+            }
+            HarmMeter(harm: category.harm)
+            Text(category.rankReason).font(.footnote).foregroundStyle(.secondary)
+            DisclosureGroup("What they do and what could happen") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(category.about).font(.footnote)
+                    Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
+                    CaseExamples(category: category)
+                }.padding(.top, 4)
+            }.font(.footnote.bold())
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .contentShape(Rectangle())
+    }
+}
+
+/// Today's one goal: a ring for today's progress, the two steps (fill in, then email the same sites) and a single button for what is next.
+struct TodayCard: View {
+    let goals: DailyGoals
+    let change: () -> Void
+    let more: () -> Void
+
+    private var verifyTotal: Int { max(goals.verify.count, 1) }
+    private var emailTotal: Int { goals.email?.domains.count ?? 0 }
+    /// Today's progress across both steps, from 0 to 1.
+    private var fraction: Double {
+        let total = Double(verifyTotal + emailTotal)
+        return min(1, Double(goals.verifyDone + min(goals.emailDone, emailTotal)) / total)
+    }
+    private var theme: String { goals.themes.compactMap { BrokerCategory(rawValue: $0)?.title }.first ?? "" }
+
+    var body: some View {
+        Section {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle().stroke(Color.secondary.opacity(0.2), lineWidth: 9)
+                    Circle().trim(from: 0, to: fraction).stroke(goals.allComplete ? Color.green : Color.accentColor, style: StrokeStyle(lineWidth: 9, lineCap: .round)).rotationEffect(.degrees(-90))
+                    if goals.allComplete { Image(systemName: "checkmark").font(.title2.bold()).foregroundStyle(.green) }
+                    else { Text("\(goals.verifyDone)").font(.title2.bold()) + Text(" / \(goals.verify.count)").font(.footnote).foregroundColor(.secondary) }
+                }
+                .frame(width: 72, height: 72)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(Loc.f("Today: %@", theme)).font(.headline)
+                    stepRow(Loc.t("Fill in the sites"), done: goals.verifyComplete, detail: "\(goals.verifyDone) / \(goals.verify.count)")
+                    if emailTotal > 0 { stepRow(Loc.t("Send one email to the same sites"), done: goals.emailComplete, detail: "\(min(goals.emailDone, emailTotal)) / \(emailTotal)") }
+                }
+            }
+            .padding(.vertical, 4)
+            .accessibilityIdentifier("today-card")
+            if !goals.verifyComplete {
+                NavigationLink(value: "daily-verify") { Label(goals.verifyDone == 0 ? Loc.t("Start") : Loc.t("Continue"), systemImage: "play.fill").font(.headline) }
+                    .accessibilityIdentifier("today-continue")
+            } else if !goals.emailComplete {
+                NavigationLink(value: "daily-email") { Label(Loc.t("Send the email"), systemImage: "envelope.fill").font(.headline) }
+                    .accessibilityIdentifier("today-email")
+            } else {
+                Button(action: more) { Label("Keep going: take 25 more", systemImage: "forward.fill").font(.headline) }.accessibilityIdentifier("goal-more")
+            }
+            if goals.verifyDone == 0 {
+                Button(action: change) { Label("Change today's kind of broker", systemImage: "arrow.triangle.2.circlepath").font(.footnote) }
+                    .accessibilityIdentifier("goal-choose")
+            }
+        }
+    }
+
+    private func stepRow(_ title: String, done: Bool, detail: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: done ? "checkmark.circle.fill" : "circle").foregroundStyle(done ? .green : .secondary).font(.footnote)
+            Text(title).font(.footnote)
+            Spacer(minLength: 4)
+            Text(detail).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+}
+
+/// Encouragement that only goes up: a streak of days and the number of requests sent so far, never a share of the whole directory.
+struct ProgressRow: View {
+    let summary: ActivitySummary
+
+    var body: some View {
+        Section {
+            HStack {
+                if summary.streak > 0 {
+                    Label(Loc.f("%lld-day streak", summary.streak), systemImage: "flame.fill").foregroundStyle(.orange)
+                    Spacer()
+                }
+                Label(summary.sites == 1 ? Loc.t("1 request sent so far") : Loc.f("%lld requests sent so far", summary.sites), systemImage: "checkmark.shield.fill").foregroundStyle(.green)
+            }
+            .font(.subheadline.bold())
+            .accessibilityIdentifier("progress-row")
+        }
+    }
+}
+
+/// Shown once, the first time someone has finished tasks: why the day ends with an email, and what to expect in their inbox.
+struct FollowUpExplainerView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Image(systemName: "envelope.badge").font(.system(size: 48)).foregroundStyle(.tint).padding(.top, 28)
+            Text("Why we ask you to send an email").font(.title2.bold()).multilineTextAlignment(.center)
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Some sites ignore forms but honor an email, so the email is a second route to the same result.", systemImage: "arrow.triangle.branch")
+                Label("Some sites will email you afterwards with a link, a code or one more step to finish. Watch your inbox, including spam.", systemImage: "tray.full")
+                Label("We will do our best to complete every opt-out inside the app, and we will show you what is left.", systemImage: "checkmark.circle")
+            }
+            .font(.callout).fixedSize(horizontal: false, vertical: true).padding(.horizontal, 24)
+            Spacer()
+            Button("Got it") { dismiss() }.buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("followup-done").padding(.bottom, 24)
+        }
+        .presentationDetents([.medium, .large])
     }
 }

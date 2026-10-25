@@ -1,6 +1,29 @@
 {
  "sourceLanguage": "en",
  "strings": {
+  " / %lld": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": " / %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": " / %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": " / %lld"
+     }
+    }
+   }
+  },
   "%@ (%@)": {
    "extractionState": "manual",
    "localizations": {
@@ -1013,6 +1036,29 @@
     }
    }
   },
+  "%lld requests sent so far": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld demandes envoyées jusqu'ici"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld solicitudes enviadas hasta ahora"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Anfragen bisher gesendet"
+     }
+    }
+   }
+  },
   "%lld sites by email": {
    "extractionState": "manual",
    "localizations": {
@@ -1243,6 +1289,29 @@
     }
    }
   },
+  "%lld-day streak": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Série de %lld jours"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Racha de %lld días"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Tage in Folge"
+     }
+    }
+   }
+  },
   "%lld. %@": {
    "extractionState": "manual",
    "localizations": {
@@ -1285,6 +1354,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "+%lld Punkte"
+     }
+    }
+   }
+  },
+  "1 request sent so far": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 demande envoyée jusqu'ici"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 solicitud enviada hasta ahora"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 Anfrage bisher gesendet"
      }
     }
    }
@@ -4279,6 +4371,29 @@
     }
    }
   },
+  "Change today's kind of broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Changer le type de courtier du jour"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cambiar el tipo de corredor de hoy"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Heutigen Brokertyp ändern"
+     }
+    }
+   }
+  },
   "Check for %@'s listing": {
    "extractionState": "manual",
    "localizations": {
@@ -7058,6 +7173,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Weniger Firmen können verkaufen, wohin Ihr Handy geht, was schützt, wo Sie wohnen, arbeiten und behandelt werden."
+     }
+    }
+   }
+  },
+  "Fill in the sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Remplir les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar los sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Websites ausfüllen"
      }
     }
    }
@@ -12559,6 +12697,29 @@
     }
    }
   },
+  "One-time, do these first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À faire une seule fois, en premier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola vez, hazlo primero"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einmalig, zuerst erledigen"
+     }
+    }
+   }
+  },
   "Only family members you added are included, and minors and public figures are never searched (opt-out requests still go out for them).": {
    "extractionState": "manual",
    "localizations": {
@@ -15388,6 +15549,29 @@
     }
    }
   },
+  "Send one email to the same sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyer un e-mail aux mêmes sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviar un correo a los mismos sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine E-Mail an dieselben Websites senden"
+     }
+    }
+   }
+  },
   "Send opt-out emails": {
    "extractionState": "manual",
    "localizations": {
@@ -15453,6 +15637,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Opt-out-Anfragen jetzt senden"
+     }
+    }
+   }
+  },
+  "Send the email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyer l'e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviar el correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail senden"
      }
     }
    }
@@ -16561,6 +16768,29 @@
     }
    }
   },
+  "Some sites ignore forms but honor an email, so the email is a second route to the same result.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites ignorent les formulaires mais respectent un e-mail : l'e-mail est donc une seconde voie vers le même résultat."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios ignoran los formularios pero respetan un correo, así que el correo es una segunda vía al mismo resultado."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Websites ignorieren Formulare, beachten aber eine E-Mail, sodass die E-Mail ein zweiter Weg zum selben Ergebnis ist."
+     }
+    }
+   }
+  },
   "Some sites will email you afterwards with a link, a code or one more step to finish the opt-out. Watch your inbox, including spam. We will do our best to complete every opt-out inside the app.": {
    "extractionState": "manual",
    "localizations": {
@@ -16580,6 +16810,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Einige Websites schicken Ihnen danach eine E-Mail mit einem Link, einem Code oder einem weiteren Schritt, um die Abmeldung abzuschließen. Behalten Sie Ihren Posteingang im Blick, auch den Spam-Ordner. Wir tun unser Bestes, jede Abmeldung in der App abzuschließen."
+     }
+    }
+   }
+  },
+  "Some sites will email you afterwards with a link, a code or one more step to finish. Watch your inbox, including spam.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites vous enverront ensuite un e-mail avec un lien, un code ou une étape de plus pour terminer. Surveillez votre boîte de réception, y compris les indésirables."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios te enviarán después un correo con un enlace, un código o un paso más para terminar. Revisa tu bandeja de entrada, incluido el spam."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einige Websites schicken Ihnen danach eine E-Mail mit einem Link, einem Code oder einem weiteren Schritt. Behalten Sie Ihren Posteingang im Blick, auch den Spam-Ordner."
      }
     }
    }
@@ -16718,6 +16971,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ehepartner/in"
+     }
+    }
+   }
+  },
+  "Start": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Commencer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empezar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Starten"
      }
     }
    }
@@ -20839,6 +21115,29 @@
     }
    }
   },
+  "We will do our best to complete every opt-out inside the app, and we will show you what is left.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous ferons de notre mieux pour terminer chaque suppression dans l'app et nous vous montrerons ce qu'il reste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Haremos todo lo posible por completar cada baja dentro de la app y te mostraremos lo que falta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir tun unser Bestes, jede Abmeldung in der App abzuschließen, und zeigen Ihnen, was noch offen ist."
+     }
+    }
+   }
+  },
   "Websites and apps pass your activity to them, so ads follow you across devices. They mostly know a device, not your name, but they can link the two.": {
    "extractionState": "manual",
    "localizations": {
@@ -20996,6 +21295,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Was haben Sie gesehen?"
+     }
+    }
+   }
+  },
+  "What do you want to tackle today?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quel type voulez-vous traiter aujourd'hui ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Qué tipo quieres abordar hoy?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Welche Art möchten Sie heute angehen?"
      }
     }
    }
@@ -21525,6 +21847,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "An wen sie verkaufen"
+     }
+    }
+   }
+  },
+  "Why we ask you to send an email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pourquoi nous vous demandons d'envoyer un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Por qué te pedimos enviar un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Warum wir Sie bitten, eine E-Mail zu senden"
      }
     }
    }
