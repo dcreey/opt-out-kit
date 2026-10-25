@@ -2542,36 +2542,36 @@ final class DailyGoalsTests: XCTestCase {
             var e = site(i); e.about = BrokerAbout(category: k, summary: "s"); return e
         }
         // Interleaved kinds in queue order: 40 ad tech and 30 people search.
-        let entries = (0..<70).map { kinded($0, $0 % 7 < 4 ? "adtech" : "people_search") }
+        let entries = (0..<70).map { kinded($0, $0 % 7 < 4 ? "people_search" : "adtech") }
         let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date()
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
-        XCTAssertEqual(g.themes, ["adtech"])
+        XCTAssertEqual(g.themes, ["people_search"])
         XCTAssertEqual(g.verify.count, 25)
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
-        XCTAssertTrue(g.verify.allSatisfy { byDomain[$0]?.about?.category == "adtech" }, "a batch is one kind")
+        XCTAssertTrue(g.verify.allSatisfy { byDomain[$0]?.about?.category == "people_search" }, "a batch is one kind")
         XCTAssertEqual(g.verify.first, "s0.com", "queue order within the kind")
         g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, batches: 2, calendar: cal)
-        XCTAssertEqual(g.themes, ["adtech", "adtech"], "ad tech has 40, so the next 15 are still ad tech")
+        XCTAssertEqual(g.themes, ["people_search", "people_search"], "people search has 40, so the next 15 are still ad tech")
         XCTAssertEqual(g.verify.count, 40)
     }
 
     func testThePersonChoosesTheKindForEachBatchAndSeesHowManyAreLeft() {
         func kinded(_ i: Int, _ k: String) -> DirectoryEntry { var e = site(i); e.about = BrokerAbout(category: k, summary: "s"); return e }
-        let entries = (0..<60).map { kinded($0, $0 < 30 ? "adtech" : "people_search") }      // ad tech first in the queue
+        let entries = (0..<60).map { kinded($0, $0 < 30 ? "people_search" : "adtech") }      // ad tech first in the queue
         let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date()
         let left = DailyGoals.remainingByKind(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
-        XCTAssertEqual(left.map(\.count), [30, 30]); XCTAssertEqual(Set(left.map(\.kind)), ["adtech", "people_search"])
-        // Default: the first waiting kind. Chosen: people search, even though ad tech is first in the queue.
-        XCTAssertEqual(DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal).themes, ["adtech"])
-        let g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["people_search"], calendar: cal)
-        XCTAssertEqual(g.themes, ["people_search"])
+        XCTAssertEqual(left.map(\.count), [30, 30]); XCTAssertEqual(Set(left.map(\.kind)), ["people_search", "adtech"])
+        // Default: the best-ranked kind with sites left (people search), even though ad tech is first in the queue. Chosen: ad tech.
+        XCTAssertEqual(DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal).themes, ["people_search"])
+        let g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["adtech"], calendar: cal)
+        XCTAssertEqual(g.themes, ["adtech"])
         XCTAssertTrue(g.verify.allSatisfy { Int($0.dropFirst().dropLast(4))! >= 30 })
         // A second batch of a chosen kind: people search then ad tech.
-        let two = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["people_search", "adtech"], calendar: cal)
-        XCTAssertEqual(two.themes, ["people_search", "adtech"]); XCTAssertEqual(two.verify.count, 50)
+        let two = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["adtech", "people_search"], calendar: cal)
+        XCTAssertEqual(two.themes, ["adtech", "people_search"]); XCTAssertEqual(two.verify.count, 50)
         // A chosen kind with nothing left falls back instead of an empty batch.
         let none = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["political"], calendar: cal)
-        XCTAssertEqual(none.themes, ["adtech"])
+        XCTAssertEqual(none.themes, ["people_search"])
     }
 
     func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
@@ -2666,5 +2666,23 @@ final class BrokerKindsTests: XCTestCase {
         XCTAssertTrue(p.matches(category: .people_search, data: .relatives, buyer: nil))
         XCTAssertFalse(p.matches(category: .adtech, data: nil, buyer: nil))
         XCTAssertTrue(p.matches(category: nil, data: nil, buyer: nil))
+    }
+}
+
+
+final class BrokerRankTests: XCTestCase {
+    func testTheEighteenKindsHaveOneRankEachAndHarmScoresStayInRange() {
+        XCTAssertEqual(BrokerCategory.allCases.count, 18)
+        XCTAssertEqual(BrokerCategory.ranked.map(\.rank), Array(1...18))
+        XCTAssertEqual(BrokerCategory.ranked.first, .people_search)
+        XCTAssertEqual(BrokerCategory.ranked.last, .other)
+        for c in BrokerCategory.allCases {
+            let h = c.harm
+            XCTAssertTrue([h.safety, h.money, h.reputation, h.annoyance].allSatisfy { (0...3).contains($0) }, c.rawValue)
+            XCTAssertFalse(c.rankReason.isEmpty); XCTAssertFalse(c.bestCase.isEmpty); XCTAssertFalse(c.worstCase.isEmpty)
+        }
+        // The default order puts physical-safety harms ahead of annoyances.
+        XCTAssertLessThan(BrokerCategory.people_search.rank, BrokerCategory.b2b.rank)
+        XCTAssertLessThan(BrokerCategory.location_data.rank, BrokerCategory.adtech.rank)
     }
 }

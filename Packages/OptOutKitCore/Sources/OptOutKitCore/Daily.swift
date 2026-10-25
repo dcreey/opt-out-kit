@@ -46,13 +46,17 @@ public struct DailyGoals: Equatable, Sendable {
         let lastDone = queued.compactMap { e -> (Date, DirectoryEntry)? in
             (attempts[e.id] ?? []).filter(\.wasSubmitted).map(\.date).max().map { ($0, e) }
         }.max { $0.0 < $1.0 }?.1
+        // With no kind to carry on from, start with the best-ranked kind that still has sites (see `BrokerCategory.rank`).
+        func bestRanked(_ list: [DirectoryEntry]) -> String? {
+            Set(list.map(kind)).min { (BrokerCategory(rawValue: $0)?.rank ?? 99, $0) < (BrokerCategory(rawValue: $1)?.rank ?? 99, $1) }
+        }
         var remaining = open, todays: [DirectoryEntry] = [], themes: [String] = []
         var theme = lastDone.map(kind)
         for i in 0..<max(1, batches, chosen.count) {
             guard let first = remaining.first else { break }
             // A kind the person chose for this batch wins; otherwise carry on with the last kind, else the first site waiting.
             if i < chosen.count, remaining.contains(where: { kind($0) == chosen[i] }) { theme = chosen[i] }
-            else if theme == nil || !remaining.contains(where: { kind($0) == theme }) { theme = kind(first) }
+            else if theme == nil || !remaining.contains(where: { kind($0) == theme }) { theme = bestRanked(remaining) ?? kind(first) }
             let batch = Array(remaining.filter { kind($0) == theme }.prefix(batchSize))
             todays += batch; themes.append(theme!)
             let taken = Set(batch.map(\.id)); remaining.removeAll { taken.contains($0.id) }
@@ -69,7 +73,7 @@ public struct DailyGoals: Equatable, Sendable {
         return DailyGoals(verify: todays.map(\.domain), verifyDone: verifyDone, email: batch, emailDone: emailedToday, batches: max(1, batches, chosen.count), themes: themes)
     }
 
-    /// How many sites still wait in each kind of broker (finished-before-today sites do not count), biggest first. The person picks from these.
+    /// How many sites still wait in each kind of broker (finished-before-today sites do not count), in the default order. The person picks from these.
     public static func remainingByKind(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(), calendar: Calendar = .current) -> [(kind: String, count: Int)] {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         var counts: [String: Int] = [:]
@@ -78,7 +82,7 @@ public struct DailyGoals: Equatable, Sendable {
             let doneBefore = (attempts[e.id] ?? []).contains { $0.wasSubmitted && !calendar.isDate($0.date, inSameDayAs: now) }
             if !doneBefore { counts[e.about?.category ?? "other", default: 0] += 1 }
         }
-        return counts.map { (kind: $0.key, count: $0.value) }.sorted { ($0.count, $1.kind) > ($1.count, $0.kind) }
+        return counts.map { (kind: $0.key, count: $0.value) }.sorted { (BrokerCategory(rawValue: $0.kind)?.rank ?? 99, $0.kind) < (BrokerCategory(rawValue: $1.kind)?.rank ?? 99, $1.kind) }
     }
 
     /// Whole days left to finish a queue of `remaining` sites at one batch a day.

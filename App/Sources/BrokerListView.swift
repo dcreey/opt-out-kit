@@ -228,25 +228,34 @@ struct KindChooserView: View {
                     Label(FollowUpNote.text, systemImage: "envelope.badge").font(.footnote).foregroundStyle(.secondary)
                 }
                 Section {
-                    ForEach(model.remainingKinds, id: \.kind) { item in
+                    ForEach(Array(model.remainingKinds.enumerated()), id: \.element.kind) { index, item in
                         let category = BrokerCategory(rawValue: item.kind) ?? .other
                         Button { onPick(item.kind); dismiss() } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("\(category.rank)").font(.subheadline.bold()).foregroundStyle(.white)
+                                        .frame(width: 26, height: 26).background(rankColor(category.rank), in: Circle())
                                     Text(category.title).font(.headline)
                                     Spacer()
+                                    if index == 0 { Text("Start here").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 2).background(Color.accentColor, in: Capsule()).foregroundStyle(.white) }
                                     Text(Loc.f("%lld left", item.count)).font(.caption.bold()).foregroundStyle(.tint)
                                 }
-                                Text(category.about).font(.footnote).foregroundStyle(.primary)
-                                Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
-                                CaseExamples(category: category)
+                                HarmMeter(harm: category.harm)
+                                Text(category.rankReason).font(.footnote).foregroundStyle(.secondary)
+                                DisclosureGroup("What they do and what could happen") {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(category.about).font(.footnote)
+                                        Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
+                                        CaseExamples(category: category)
+                                    }.padding(.top, 4)
+                                }.font(.footnote.bold())
                             }
                             .fixedSize(horizontal: false, vertical: true)
                         }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("kind-\(item.kind)")
                     }
-                } header: { Text("Kinds of broker") }
+                } header: { Text("In the order we suggest") } footer: { Text("Ranked by how bad the worst case can get and how much opting out helps. Start at the top, or pick any.") }
             }
             .navigationTitle(mode == .start ? Loc.t("Today's kind of broker") : Loc.t("Next 25"))
             .navigationBarTitleDisplayMode(.inline)
@@ -269,3 +278,32 @@ struct CaseExamples: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 }
+
+
+/// The four ways a kind of broker can hurt, each from none to severe, so the worst cases compare at a glance.
+struct HarmMeter: View {
+    let harm: Harm
+
+    var body: some View {
+        HStack(spacing: 14) {
+            cell(Loc.t("Safety"), harm.safety, .red)
+            cell(Loc.t("Money"), harm.money, .orange)
+            cell(Loc.t("Reputation"), harm.reputation, .purple)
+            cell(Loc.t("Annoyance"), harm.annoyance, .gray)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Loc.f("Harm: safety %lld of 3, money %lld of 3, reputation %lld of 3, annoyance %lld of 3", harm.safety, harm.money, harm.reputation, harm.annoyance))
+    }
+
+    private func cell(_ title: String, _ level: Int, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title).font(.caption2).foregroundStyle(.secondary)
+            HStack(spacing: 3) {
+                ForEach(0..<3, id: \.self) { Circle().fill($0 < level ? color : color.opacity(0.18)).frame(width: 9, height: 9) }
+            }
+        }
+    }
+}
+
+/// Darker for the kinds that matter most.
+func rankColor(_ rank: Int) -> Color { rank <= 4 ? .red : rank <= 9 ? .orange : rank <= 14 ? .blue : .gray }

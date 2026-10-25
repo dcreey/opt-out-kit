@@ -28,6 +28,92 @@ public enum BrokerCategory: String, CaseIterable, Sendable {
     }
 }
 
+
+/// How bad the worst case can get for one kind of broker, on four counts, each from 0 (none) to 3 (severe).
+public struct Harm: Equatable, Sendable {
+    public var safety: Int       // physical safety: stalking, harassment, being found
+    public var money: Int        // scams, fraud and higher costs
+    public var reputation: Int   // jobs, housing, relationships and how others see you
+    public var annoyance: Int    // calls, texts, junk mail and spam
+}
+
+public extension BrokerCategory {
+    /// Where this kind sits in the default order, 1 first. Ranked by how severe the worst case is and how much opting out helps.
+    var rank: Int {
+        switch self {
+        case .people_search: return 1
+        case .location_data: return 2
+        case .healthcare: return 3
+        case .arrests: return 4
+        case .marketing_data: return 5
+        case .fraud_identity: return 6
+        case .financial: return 7
+        case .lead_generation: return 8
+        case .real_estate: return 9
+        case .consumer_reporting: return 10
+        case .recruiting: return 11
+        case .political: return 12
+        case .automotive: return 13
+        case .genealogy: return 14
+        case .b2b: return 15
+        case .adtech: return 16
+        case .marketing_services: return 17
+        case .other: return 18
+        }
+    }
+
+    /// The four harms at a glance.
+    var harm: Harm {
+        switch self {
+        case .people_search: return Harm(safety: 3, money: 2, reputation: 2, annoyance: 1)
+        case .location_data: return Harm(safety: 3, money: 1, reputation: 2, annoyance: 0)
+        case .healthcare: return Harm(safety: 1, money: 1, reputation: 3, annoyance: 1)
+        case .arrests: return Harm(safety: 1, money: 1, reputation: 3, annoyance: 0)
+        case .marketing_data: return Harm(safety: 1, money: 3, reputation: 1, annoyance: 3)
+        case .fraud_identity: return Harm(safety: 1, money: 3, reputation: 2, annoyance: 0)
+        case .financial: return Harm(safety: 0, money: 3, reputation: 1, annoyance: 2)
+        case .lead_generation: return Harm(safety: 0, money: 2, reputation: 0, annoyance: 3)
+        case .real_estate: return Harm(safety: 2, money: 2, reputation: 0, annoyance: 2)
+        case .consumer_reporting: return Harm(safety: 0, money: 2, reputation: 3, annoyance: 0)
+        case .recruiting: return Harm(safety: 0, money: 2, reputation: 1, annoyance: 2)
+        case .political: return Harm(safety: 0, money: 0, reputation: 1, annoyance: 3)
+        case .automotive: return Harm(safety: 0, money: 2, reputation: 0, annoyance: 2)
+        case .genealogy: return Harm(safety: 2, money: 0, reputation: 1, annoyance: 0)
+        case .b2b: return Harm(safety: 0, money: 1, reputation: 0, annoyance: 3)
+        case .adtech: return Harm(safety: 0, money: 1, reputation: 1, annoyance: 2)
+        case .marketing_services: return Harm(safety: 0, money: 0, reputation: 0, annoyance: 2)
+        case .other: return Harm(safety: 0, money: 1, reputation: 0, annoyance: 1)
+        }
+    }
+
+    /// Why this kind has the place it has in the order.
+    var rankReason: String {
+        switch self {
+        case .people_search: return L10n.t("Anyone can use it for free, and the worst case is physical: a stalker or abuser finding where you live. Removing yourself here does the most for your safety.")
+        case .location_data: return L10n.t("Where your phone goes reveals your home, work, faith and health care. It is sold in bulk and cannot be taken back once sold.")
+        case .healthcare: return L10n.t("Guesses about your health are the most personal data there is, and you cannot see or correct what they think you have.")
+        case .arrests: return L10n.t("A single old or dropped charge can cost a job or a home, and these sites often charge to remove it. The damage is lasting and public.")
+        case .marketing_data: return L10n.t("The largest pool of profiles, and the one scammers buy to target you and older relatives. Removing it cuts the most junk and scams.")
+        case .fraud_identity: return L10n.t("Detailed identity files are what thieves want and they can be wrong. Some uses are exempt by law, so opting out helps but not completely.")
+        case .financial: return L10n.t("Estimates of your income and wealth attract scams and quietly change the offers you see.")
+        case .lead_generation: return L10n.t("One form fill can sell your phone number to dozens of buyers, which is the main reason spam calls and texts multiply.")
+        case .real_estate: return L10n.t("Your address and what you owe are easy for investors, scammers and stalkers to use, but much of it is public record anyway.")
+        case .consumer_reporting: return L10n.t("They can affect jobs, housing and loans, but credit and screening reports often stay on file by law, so opting out removes less.")
+        case .recruiting: return L10n.t("Your résumé details can be scraped and used for fake job offers, but the harm is usually an annoyance or a scam attempt, not lasting damage.")
+        case .political: return L10n.t("Mostly unwanted messages and solicitations. Voting records are public by law, so opting out limits only the commercial additions.")
+        case .automotive: return L10n.t("Dealers and insurers learn about your car and when you may buy. Costly in rates at worst, rarely dangerous.")
+        case .genealogy: return L10n.t("Few sites, and the exposure is mostly to relatives and addresses of living people. Low volume, so it is lower on the list.")
+        case .b2b: return L10n.t("Mostly cold outreach to your work address. Annoying, and occasionally used to impersonate a boss, but it rarely reaches your home.")
+        case .adtech: return L10n.t("Mostly tied to devices, not names, and there are over a hundred of them, so opting out of one removes little. Lowest value per site of the data-heavy types.")
+        case .marketing_services: return L10n.t("They hold lists given to them by brands. Mostly junk mail, with a small breach risk.")
+        case .other: return L10n.t("Does not fit a type, so read what they collect before deciding.")
+        }
+    }
+
+    /// Every kind in the default order.
+    static var ranked: [BrokerCategory] { allCases.sorted { $0.rank < $1.rank } }
+}
+
 /// A kind of data a broker's own pages say it handles. The ids match `tracks` in the `about:` block.
 public extension BrokerCategory {
     /// What this kind of company does and how it uses and sells data, in plain words.
