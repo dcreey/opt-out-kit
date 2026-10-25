@@ -31,6 +31,7 @@ def targets(only):
 
 
 async def audit(ctx, url):
+    audit.links = []
     page = await ctx.new_page(); reasons = []
     try:
         resp = await page.goto(url, wait_until="domcontentloaded", timeout=30000); await page.wait_for_timeout(4500)
@@ -66,7 +67,10 @@ async def audit(ctx, url):
         bad = [b for b in best["buttons"] if BAD_BUTTON.search(b)]
         if bad and not any(L.OPTOUT.search(b) for b in best["buttons"]): reasons.append("button says " + bad[0])
         ident = sum(1 for f in best["fields"] if L.IDENT.search(f["label"] + " " + f["name"]))
-        if ident < 1: reasons.append("no name/email/address fields")
+        optout_page = L.OPTOUT.search(ctxs + " " + best.get("head", "")) and re.search(r"do.?not.?sell|opt.?out|privacy|request|choices|rights", ctxs + " " + best.get("head", "") + " " + text[:300], re.I)
+        if ident < 1 and not (optout_page and len(best["fields"]) >= 1 and any(re.search(r"submit|send|request|continue|opt", b, re.I) for b in best["buttons"])):
+            reasons.append("no name/email/address fields")
+        audit.links = await page.evaluate(L.LINKS_JS)
         return sc, reasons
     except Exception as e:
         return -100, ["page did not load: " + re.sub(r"\s+", " ", str(e).split("Call log")[0])[:60]]
@@ -82,7 +86,7 @@ async def main():
         async def one(d, src, url):
             # A hard limit per site, tried twice, so one hung page can never stall the run.
             for attempt in (1, 2):
-                try: return await asyncio.wait_for(one_try(d, src, url), timeout=150)
+                try: return await asyncio.wait_for(one_try(d, src, url), timeout=420)
                 except asyncio.TimeoutError: pass
             return d, src, url, "suspect", "timed out twice", -100, ""
         async def one_try(d, src, url):
@@ -91,8 +95,16 @@ async def main():
                 try:
                     sc, reasons = await audit(ctx, url); alt = ""
                     if reasons:
-                        r = await L.site(browser, d, None, asyncio.Semaphore(1))
-                        if r[1] == "form" and r[2] != url: alt = r[2]
+                        # Candidates: the best opt-out links on this page and on the home page, plus the template path; each must pass its own audit.
+                        own = P.registrable(d); links = list(audit.links)
+                        try:
+                            await audit(ctx, "https://" + d + "/"); links += audit.links
+                        except Exception: pass
+                        cands = L.good_links(url, links, own) + [f"https://{d}/request-portal/", f"https://www.{d}/request-portal/"]
+                        for c in list(dict.fromkeys(cands))[:5]:
+                            if c.split("#")[0] == url.split("#")[0]: continue
+                            sc2, why2 = await audit(ctx, c)
+                            if not why2 and sc2 >= 5: alt = c; break
                     return d, src, url, "suspect" if reasons else "ok", "; ".join(reasons), sc, alt
                 finally: await ctx.close()
         done = 0

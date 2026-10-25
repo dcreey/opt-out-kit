@@ -16,6 +16,11 @@ def main():
         if src == "live" and alt:
             s = s.replace(f'  page: "{url}"', f'  page: "{alt}"', 1); moved += 1
             open(path, "w").write(s)
+        elif src == "page" and alt:
+            # The saved form was the wrong one and a better page passed its own audit: use that page instead.
+            s = re.sub(r"\nopt_out_form: \{.*\}\n", "\n", s)
+            s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", "\n", s).rstrip("\n") + f'\nlive_form:\n  checked: "{a.date}"\n  found: true\n  page: "{alt}"\n  blockers: []\n'
+            moved += 1; open(path, "w").write(s)
         elif src == "live" and re.search(r"HTTP 4|no form on the page|page did not load", reasons) and "bot wall" not in reasons:
             s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", f'\nlive_form:\n  checked: "{a.date}"\n  found: false\n', s); dropped += 1
             open(path, "w").write(s)
