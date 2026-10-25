@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "political", "summary": "Sterling Data Company LLC is a political and nonprofit data provider. Unlock the power of data with Sterling AI's cutting-edge data acquisition service. Harness AI technology to drive smarter insights and elevate your business.\". Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["phone", "email", "interests", "online"], "sells_to": ["businesses"], "source": "https://sterling.ai/"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 12}

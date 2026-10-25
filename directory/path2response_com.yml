@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_data", "summary": "Path2Response, LLC is a marketing data provider. Fueled by the power of real-world consumer spending behavior, campaign audiences achieve unparalleled precision and resonate deeply with target audiences. Its own pages mention phone numbers, email addresses. Its policy does not name who it sells to.", "tracks": ["phone", "email"], "sells_to": [], "source": "https://privacyportal-cdn.onetrust.com/dsarwebform/2de26f06-de6f-45a7-8e1d-7d1148a3f301/draft/7a5dc7d1-cc7e-43a8-9f24-702807deb65b.html"}
 priority: 40
+persistence: {"result": "unknown", "reup_months": 12}

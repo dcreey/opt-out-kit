@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "healthcare", "summary": "Veeva Systems Inc. is a healthcare data company. Veeva delivers the industry cloud for life sciences with applications, agents, data, and consulting. Committed to innovation, product excellence, and customer success, Veeva serves more... Its own pages mention interests and demographics, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["interests", "online", "health"], "sells_to": [], "source": "https://www.veeva.com/privacy/"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 12}

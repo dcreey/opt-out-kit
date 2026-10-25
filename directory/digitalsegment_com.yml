@@ -14,3 +14,4 @@ signals: [account_hint, captcha_recaptcha, email_contact, email_input, mail_opti
 profiled: "2026-10-22"
 about: {"category": "marketing_services", "summary": "Digital Segment, LLC is a marketing and direct-mail services company. Digital Segment keeps our clients better connected to their customers and focused on sustainable growth. Our cutting edge solutions are customized to save your company valuable time and... Its own pages mention home addresses, phone numbers, education, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "education", "interests"], "sells_to": [], "source": "https://www.digitalsegment.com/2026/10/19/edge-governance-in-practice-balancing-speed-real-time-data-apis-and-data-privacy/"}
 priority: 22
+persistence: {"result": "unknown", "reup_months": 12}

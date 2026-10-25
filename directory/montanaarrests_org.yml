@@ -21,3 +21,4 @@ live_check:
   blockers: []
 about: {"category": "arrests", "summary": "montanaarrests.org is a public arrest and court records site. Find arrest records in Montana. How to Search warrants, criminal records, conweb inmate search. How to Request Records and more. Its own pages mention names and aliases, age or birthdate, income or wealth, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "income", "criminal"], "sells_to": [], "source": "https://www.montanaarrests.org/"}
 priority: 43
+persistence: {"result": "unknown", "reup_months": 12}

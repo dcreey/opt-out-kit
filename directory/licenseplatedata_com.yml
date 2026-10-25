@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "automotive", "summary": "licenseplatedata.com is an automotive data company. LicensePlateData vehicle data APIs and automotive intelligence. Its own pages mention phone numbers, email addresses, age or birthdate, property and vehicles, devices and online activity, health information. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "property", "online", "health"], "sells_to": ["businesses", "government"], "sells_note": "Legal and Compliance Purposes We may preserve, access, or disclose information when we reasonably believe it is necessary to comply with applicable law, regulation, legal process, subpoena, court order, or governmental request; enforce our ", "source": "https://licenseplatedata.com/privacy-policy"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 12}

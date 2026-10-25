@@ -53,6 +53,17 @@
         "source": { "type": "string" }
       }
     },
+    "persistence": {
+      "type": "object",
+      "required": ["result"],
+      "additionalProperties": false,
+      "properties": {
+        "result": { "enum": ["permanent", "temporary", "unknown"] },
+        "reup_months": { "type": "integer", "minimum": 1, "maximum": 24 },
+        "quote": { "type": "string" },
+        "source": { "type": "string" }
+      }
+    },
     "excluded": {
       "type": "object",
       "required": ["checked", "kind", "reason"],

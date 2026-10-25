@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "Commerce Signals, Inc. is an advertising technology company. Know what's working in under 72 hours. We connect marketing impressions to omnichannel payment data so you can optimize in flight. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online"], "sells_to": [], "source": "https://www.commercesignals.com/"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 6}

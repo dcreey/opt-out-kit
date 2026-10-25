@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "Innovation Brands Corp is an advertising technology company. Connect your store. Get conversion intel. Ship better ads, fast. A step-by-step guide to using Proxima for data-backed creative briefs and audience insights. Its own pages mention income or wealth, shopping and purchase behavior, social media profiles. Its policy does not name who it sells to.", "tracks": ["income", "purchases", "social"], "sells_to": [], "source": "https://www.proxima.ai/"}
 priority: 30
+persistence: {"result": "unknown", "reup_months": 6}

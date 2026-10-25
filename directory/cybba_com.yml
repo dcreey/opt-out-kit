@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "adtech", "summary": "Cybba Inc. is an advertising technology company. Cybba combines marketing technology, data and programmatic media to turn advertising investments into measurable business outcomes. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://cybba.com/"}
 priority: 24
+persistence: {"result": "unknown", "reup_months": 6}

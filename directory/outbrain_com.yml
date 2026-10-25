@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "Teads Holding Co is an advertising technology company. Drive elevated outcomes and monetize your content with Outbrain Direct Response. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://dsr.outbrain.com/recommendations-settings/home/en"}
 priority: 21
+persistence: {"result": "unknown", "reup_months": 6}

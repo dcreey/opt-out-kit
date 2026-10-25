@@ -21,3 +21,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "consumer_reporting", "summary": "LexisNexis Risk Solutions FL Inc. is a background-screening and consumer-reporting company. Provider of legal, government, business and high-tech information sources. Learn more or login to your product now. Its own pages mention home addresses, email addresses, age or birthdate, job title and employer, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "email", "age", "employment", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://risk.lexisnexis.com/state-privacy-act-notice"}
 priority: 55
+persistence: {"result": "unknown", "reup_months": 12}

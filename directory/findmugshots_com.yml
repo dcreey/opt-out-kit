@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "arrests", "summary": "findmugshots.com is a public arrest and court records site. Search for mug shots and arrest records in the USA instantly. FindMugshots.com provides free access to billions of mug shots and criminal records. Start your mugshot search now. Its own pages mention names and aliases, phone numbers, email addresses, education, criminal and court records, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; the general public (people looking you up).", "tracks": ["name", "phone", "email", "education", "criminal", "online"], "sells_to": ["advertisers", "public"], "sells_note": "We may also sell, rent or lease your personal information to our marketing partners, advertisers or other third parties.", "source": "https://www.findmugshots.com/privacy"}
 priority: 60
+persistence: {"result": "unknown", "reup_months": 12}

@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "adtech", "summary": "Jun Group Productions, LLC is an advertising technology company. Jun Group powers media campaigns for the world’s best advertisers with intelligent ad technology engineered for a transparent, privacy-first digital ecosystem. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://jungroup.com/"}
 priority: 19
+persistence: {"result": "unknown", "reup_months": 6}

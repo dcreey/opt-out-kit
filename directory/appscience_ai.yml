@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "App Science, Inc is an advertising technology company. We empower brands, publishers, and platforms with audience-based analytics and trusted campaign intelligence for strategic planning and activation. Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://www.appscience.ai/"}
 priority: 19
+persistence: {"result": "unknown", "reup_months": 6}

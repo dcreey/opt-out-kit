@@ -19,3 +19,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "people_search", "summary": "peoplebyname.com is a people-search and public-records site. Reverse phone lookup with over 1.3 billion records. Identify the owner of any cell phone, unlisted, or unpublished number in the US & Canada. Instant results. Its own pages mention names and aliases, home addresses, phone numbers, age or birthdate, relatives and household members. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "age", "relatives"], "sells_to": [], "source": "https://www.peoplebyname.com/"}
 priority: 48
+persistence: {"result": "unknown", "reup_months": 6}

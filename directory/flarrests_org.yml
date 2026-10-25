@@ -21,3 +21,4 @@ live_check:
   blockers: []
 about: {"category": "arrests", "summary": "flarrests.org is a public arrest and court records site. 20 Reasons to Give Our Warrant and Arrests records Database Search a Try: From finding Outstanding Warrants to Checking Criminal Background, FDLE search, and Inmate locator. Its own pages mention names and aliases, phone numbers, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "age", "criminal"], "sells_to": [], "source": "https://www.flarrests.org/"}
 priority: 42
+persistence: {"result": "unknown", "reup_months": 12}

@@ -21,3 +21,4 @@ run_check:
   note: "reCAPTCHA stalls the send, and its form is only cookie and marketing choices"
 about: {"category": "recruiting", "summary": "AdeptID, Inc. is a recruiting and workforce data provider. Talent matching AI that helps any tool automate candidate sourcing and engagement. To get more people into better jobs, faster. Its own pages mention social media profiles. Its policy does not name who it sells to.", "tracks": ["social"], "sells_to": [], "source": "https://www.adept-id.com/privacy-policy/"}
 priority: 27
+persistence: {"result": "unknown", "reup_months": 12}

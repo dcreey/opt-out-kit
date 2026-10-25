@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "b2b", "summary": "SMARTe Inc is a business-contact and sales-data provider. Actionable Sales Intelligence built over 285M+ global B2B contacts. Access verified mobile numbers and business emails for prospecting, trusted by Sales Leaders. Its own pages mention phone numbers, job title and employer, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "employment", "online", "social"], "sells_to": [], "source": "https://www.smarte.pro/"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 12}

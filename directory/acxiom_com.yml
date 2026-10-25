@@ -23,3 +23,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_data", "summary": "Acxiom LLC is a marketing data provider. Acxiom empowers brands to own their data, identity, and agentic future to maximize the value of their data and technology. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.acxiom.com/privacy/"}
 priority: 37
+persistence: {"result": "unknown", "reup_months": 12}

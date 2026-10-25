@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "eXelate, Inc. is an advertising technology company. A global leader in media measurement, analytics and insights, Nielsen shapes the future of media with accurate measurement of what people listen to and watch worldwide. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.nielsen.com/"}
 priority: 24
+persistence: {"result": "unknown", "reup_months": 6}

@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "healthcare", "summary": "IQVIA Digital Inc. is a healthcare data company. IQVIA Digital empowers marketers to deliver relevant, timely, and tailored brand information to achieve strategic goals and drive better outcomes. Its own pages mention phone numbers, email addresses, health information. Its policy does not name who it sells to.", "tracks": ["phone", "email", "health"], "sells_to": [], "source": "https://privacyportal.onetrust.com/webform/07e8dc4d-6686-403e-9b11-39fe7347d2f4/2f999bd2-c826-498c-a504-894eaf543b6f"}
 priority: 42
+persistence: {"result": "unknown", "reup_months": 12}

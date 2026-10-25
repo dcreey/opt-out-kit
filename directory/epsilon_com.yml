@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_data", "summary": "Epsilon Data Management, LLC is a marketing data provider. Powering personalized marketing at scale, Epsilon helps brands connect with consumers across paid, owned, and earned channels—delivering measurable results. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://legal.epsilon.com/dsr"}
 priority: 37
+persistence: {"result": "unknown", "reup_months": 12}

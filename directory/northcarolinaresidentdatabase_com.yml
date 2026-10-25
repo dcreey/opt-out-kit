@@ -24,3 +24,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "political", "summary": "northcarolinaresidentdatabase.com is a political and nonprofit data provider. Look up people, addresses, households and neighborhoods across North Carolina. Browse by city, county and street. Profiles may include neighbors, reverse phone lookups, and voter... Its own pages mention home addresses, phone numbers, age or birthdate, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "age", "interests", "online"], "sells_to": [], "source": "https://www.northcarolinaresidentdatabase.com/privacy-policy"}
 priority: 31
+persistence: {"result": "unknown", "reup_months": 12}

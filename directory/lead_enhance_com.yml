@@ -16,3 +16,4 @@ contact_email: "info@lead-enhance.com"
 contact_email_source: "page"
 about: {"category": "lead_generation", "summary": "LEAD ENHANCE LLC is a lead-generation company. Lead Enhance. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://signin.leadgenesis.info/login"}
 priority: 25
+persistence: {"result": "unknown", "reup_months": 6}

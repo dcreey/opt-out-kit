@@ -19,3 +19,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "consumer_reporting", "summary": "Datalink Services, Inc is a background-screening and consumer-reporting company. Free TransUnion® credit report & score. Free credit monitoring, alerts and personalized offers. All free, all in 1. No credit card required. Learn more. Its own pages mention property and vehicles, devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["property", "online", "credit"], "sells_to": [], "source": "https://www.transunion.com/?atvy=%7B%22352017%22%3A%22Experience+A%22%7D"}
 priority: 43
+persistence: {"result": "unknown", "reup_months": 12}

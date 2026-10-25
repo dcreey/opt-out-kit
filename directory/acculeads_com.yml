@@ -24,3 +24,4 @@ run_check:
   note: "Deep Sync rejects automatic sends with an invisible bot check"
 about: {"category": "marketing_data", "summary": "Accudata Integrated Marketing, LLC is a marketing data provider. Its own pages mention age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["age", "income", "property", "purchases", "interests"], "sells_to": [], "source": "https://deepsync.com/leadership"}
 priority: 38
+persistence: {"result": "unknown", "reup_months": 12}

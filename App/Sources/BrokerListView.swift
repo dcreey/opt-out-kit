@@ -307,6 +307,12 @@ struct DailySummaryView: View {
                         }
                     } header: { Text(summary.lastDaySites == 1 ? Loc.f("%@ you sent 1 request", when) : Loc.f("%@ you sent %lld requests", when, summary.lastDaySites)).textCase(nil).font(.subheadline.bold()) }
                 }
+                if summary.dueToRenew > 0 {
+                    Section {
+                        Label(summary.dueToRenew == 1 ? Loc.t("1 earlier opt-out is due to be repeated. It is back in your daily batches.") : Loc.f("%lld earlier opt-outs are due to be repeated. They are back in your daily batches.", summary.dueToRenew), systemImage: "arrow.clockwise")
+                            .font(.subheadline).foregroundStyle(.orange)
+                    } footer: { Text("Brokers collect data again over time, so a request does not always last. Some companies say theirs does; we show which.") }
+                }
                 if summary.byKind.count > 1 {
                     Section {
                         ForEach(summary.byKind.prefix(6), id: \.kind) { item in

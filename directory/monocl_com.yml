@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "healthcare", "summary": "Monocl AB is a healthcare data company. Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://privacy.monocl.com/"}
 priority: 34
+persistence: {"result": "unknown", "reup_months": 12}

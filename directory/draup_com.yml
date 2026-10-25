@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "recruiting", "summary": "Draup, Inc. is a recruiting and workforce data provider. Empower HR with AI workforce transformation and equip sales teams with autonomous AI sales agents. Powered by proprietary global labor and market data. Its own pages mention age or birthdate, criminal and court records, interests and demographics, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["age", "criminal", "interests", "online", "health"], "sells_to": [], "source": "https://draup.com/"}
 priority: 35
+persistence: {"result": "unknown", "reup_months": 12}

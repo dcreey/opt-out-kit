@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "fraud_identity", "summary": "Clearview AI, Inc. is an identity and fraud-prevention data provider. Clearview AI is a revolutionary, all-in-one, facial recognition platform designed to support federal, state, and local law enforcement in their shared mission to help keep communities safe. Its own pages mention criminal and court records, interests and demographics. Its policy does not name who it sells to.", "tracks": ["criminal", "interests"], "sells_to": [], "source": "https://www.clearview.ai/privacy-and-requests"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 12}

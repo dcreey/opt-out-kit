@@ -19,3 +19,4 @@ live_form:
   blockers: []
 about: {"category": "marketing_data", "summary": "VentiveIQ LLC is a marketing data provider. VentiveIQ, a pioneer in data analytics, identity resolution, and audience targeting for marketers, empowers effective audience understanding and engagement. Its own pages mention phone numbers, email addresses, property and vehicles, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "property", "interests", "online", "social"], "sells_to": [], "source": "https://ventiveiq.com/"}
 priority: 42
+persistence: {"result": "unknown", "reup_months": 12}

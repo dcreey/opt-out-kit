@@ -18,3 +18,4 @@ live_check:
   blockers: []
 about: {"category": "recruiting", "summary": "Swipejobs LLC is a recruiting and workforce data provider. Swipejobs uses AI to match you with jobs that fit your skills, schedule, and location. Find work near you and apply in minutes. Its own pages mention phone numbers, email addresses, job title and employer, devices and online activity, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "online", "health", "social"], "sells_to": [], "source": "https://www.swipejobs.com/privacy-center"}
 priority: 37
+persistence: {"result": "permanent", "quote": "We add you to a suppression list so your information is not re-added if it appears in a future data refresh.", "source": "https://www.swipejobs.com/privacy-center"}

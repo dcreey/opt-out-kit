@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "adtech", "summary": "MediaWallah Inc is an advertising technology company. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://mediawallah.com/"}
 priority: 21
+persistence: {"result": "unknown", "reup_months": 6}

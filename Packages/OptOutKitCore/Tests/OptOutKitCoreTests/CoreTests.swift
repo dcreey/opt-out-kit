@@ -2736,3 +2736,35 @@ final class DailyResetAndSummaryTests: XCTestCase {
         for c in BrokerCategory.allCases { XCTAssertFalse(c.protects.isEmpty) }
     }
 }
+
+
+final class RenewalTests: XCTestCase {
+    private func entry(_ id: String, _ kind: String, _ persistence: PersistenceInfo?) -> DirectoryEntry {
+        var e = DirectoryEntry(id: id, domain: id + ".com", name: id, bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.about = BrokerAbout(category: kind, summary: "s"); e.persistence = persistence; return e
+    }
+
+    func testAnOptOutIsRepeatedAfterSixToTwelveMonthsUnlessItLasts() {
+        let cal = Calendar(identifier: .gregorian), now = Date()
+        let sent = cal.date(byAdding: .month, value: -7, to: now)!
+        let attempts = ["ps": [OptOutAttempt(date: sent, outcome: "submitted")], "ad": [OptOutAttempt(date: sent, outcome: "submitted")],
+                        "keep": [OptOutAttempt(date: sent, outcome: "submitted")], "pol": [OptOutAttempt(date: sent, outcome: "submitted")]]
+        let people = entry("ps", "people_search", nil)                                              // unknown: people search comes back in 6 months
+        let ad = entry("ad", "marketing_data", nil)                                                 // unknown: 12 months
+        let keep = entry("keep", "b2b", PersistenceInfo(result: "permanent"))                       // the policy says it lasts
+        let pol = entry("pol", "b2b", PersistenceInfo(result: "temporary", reupMonths: 6))          // the policy says repeat
+        XCTAssertEqual(people.reupMonths, 6); XCTAssertEqual(ad.reupMonths, 12); XCTAssertNil(keep.reupMonths); XCTAssertEqual(pol.reupMonths, 6)
+        XCTAssertTrue(people.isDueToRenew(attempts: attempts, now: now, calendar: cal))
+        XCTAssertTrue(ad.isCurrent(attempts: attempts, now: now, calendar: cal), "7 months is inside 12")
+        XCTAssertTrue(keep.isCurrent(attempts: attempts, now: now, calendar: cal), "permanent never comes due")
+        XCTAssertTrue(pol.isDueToRenew(attempts: attempts, now: now, calendar: cal))
+        XCTAssertFalse(people.isCurrent(attempts: [:], now: now, calendar: cal), "never sent")
+        // A site that is due is back in the daily queue; one that still holds stays out (yesterday's work is behind us either way).
+        let entries = [people, ad, keep, pol]
+        let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: attempts, now: now, calendar: cal)
+        XCTAssertEqual(g.verify, ["ps.com"], "people search ranks first, and only the due one is queued")
+        XCTAssertEqual(DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: attempts, now: now, chosen: ["b2b"], calendar: cal).verify, ["pol.com"], "the permanent one stays out")
+        let s = ActivitySummary.build(entries: entries, attempts: attempts, now: now, calendar: cal)
+        XCTAssertEqual(s.dueToRenew, 2)
+    }
+}

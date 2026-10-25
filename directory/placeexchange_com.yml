@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "Place Exchange, Inc. is an advertising technology company. Unified execution, reporting, and attribution for OOH with other programmatic channels. Unmatched scale, full transparency, and guaranteed brand safety. Its own pages mention email addresses, age or birthdate, education, shopping and purchase behavior, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms.", "tracks": ["email", "age", "education", "purchases", "online", "location"], "sells_to": ["advertisers", "publishers"], "sells_note": "In the past twelve (12) months we have sold identifiers (mobile ad identifiers) by making them available to our Advertising Partners as we describe above.", "source": "https://www.placeexchange.com/privacy"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 6}

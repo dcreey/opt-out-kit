@@ -17,3 +17,4 @@ live_check:
   blockers: []
 about: {"category": "other", "summary": "LP Brokering LLC is a data company. Data is our currency. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://privacy.lpbrokering.com/"}
 priority: 16
+persistence: {"result": "unknown", "reup_months": 12}

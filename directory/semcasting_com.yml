@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "Semcasting, Inc. is an advertising technology company. Semcasting connects first-party data to every digital channel through deterministic identity resolution— cookieless, 98% accurate, and built to prove ROAS. Its own pages mention interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "social"], "sells_to": [], "source": "https://privacychoice.com/"}
 priority: 27
+persistence: {"result": "unknown", "reup_months": 6}

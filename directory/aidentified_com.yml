@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "b2b", "summary": "Aidentified, Inc. is a business-contact and sales-data provider. Uncover hidden connections, identify high-value prospects, and prioritize outreach with AI-powered relationship intelligence that helps teams build stronger pipelines and accelerate growth. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "property", "online", "location", "health", "social", "credit"], "sells_to": [], "source": "https://www.aidentified.com/privacy--policy"}
 priority: 51
+persistence: {"result": "unknown", "reup_months": 12}

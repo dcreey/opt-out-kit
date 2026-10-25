@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "automotive", "summary": "AutoWeb, Inc. is an automotive data company. Autoweb - Free no-obligation new car prices. View hundreds of thousands of cars for sale. Check out our new Car Buying Guide with Car Reviews, Car Pictures, and Car Videos. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.autoweb.com/"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 12}

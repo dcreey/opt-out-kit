@@ -18,3 +18,4 @@ search_check:
   checked: "2026-10-21"
 about: {"category": "arrests", "summary": "michiganarrests.org is a public arrest and court records site. Find arrest records in Michigan. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.michiganarrests.org/"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 12}

@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "marketing_data", "summary": "Trelize, LLC is a marketing data provider. Its own pages mention phone numbers, email addresses, property and vehicles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "property"], "sells_to": [], "source": "https://trelize.com/privacy"}
 priority: 35
+persistence: {"result": "unknown", "reup_months": 12}

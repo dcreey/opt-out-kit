@@ -20,3 +20,4 @@ live_form:
   blockers: ["terms"]
 about: {"category": "real_estate", "summary": "DealMachine Operations Inc. is a property and real-estate data company. Find property and owner data with DealMachine. Real estate investors can search properties, skip trace owners, and build lead lists. Explore the tools. Its own pages mention phone numbers, email addresses, property and vehicles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "property"], "sells_to": [], "source": "https://privacyrequest.dealmachine.com/remove"}
 priority: 35
+persistence: {"result": "unknown", "reup_months": 12}

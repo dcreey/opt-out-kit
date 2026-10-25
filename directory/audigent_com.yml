@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "Predictive Pop, Inc. is an advertising technology company. Audigent is the leading data activation, curation and identity platform. Audigent’s pioneering data platform unlocks the power of privacy-safe, first party data to maximize... Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://audigent.com/privacy-center"}
 priority: 20
+persistence: {"result": "unknown", "reup_months": 6}

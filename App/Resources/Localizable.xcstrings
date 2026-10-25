@@ -737,6 +737,29 @@
     }
    }
   },
+  "%lld earlier opt-outs are due to be repeated. They are back in your daily batches.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld anciennes demandes doivent être répétées. Elles sont de retour dans vos lots quotidiens."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld bajas anteriores deben repetirse. Han vuelto a tus lotes diarios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld frühere Opt-outs müssen wiederholt werden. Sie sind wieder in Ihren Tagesblöcken."
+     }
+    }
+   }
+  },
   "%lld left": {
    "extractionState": "manual",
    "localizations": {
@@ -1354,6 +1377,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "+%lld Punkte"
+     }
+    }
+   }
+  },
+  "1 earlier opt-out is due to be repeated. It is back in your daily batches.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 ancienne demande doit être répétée. Elle est de retour dans vos lots quotidiens."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 baja anterior debe repetirse. Ha vuelto a tus lotes diarios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 früheres Opt-out muss wiederholt werden. Es ist wieder in Ihren Tagesblöcken."
      }
     }
    }
@@ -4068,6 +4114,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Brokers collect data again over time, so a request does not always last. Some companies say theirs does; we show which.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les courtiers collectent à nouveau des données avec le temps : une demande ne dure pas toujours. Certaines entreprises disent que la leur dure ; nous l'indiquons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los corredores vuelven a recopilar datos con el tiempo, así que una solicitud no siempre dura. Algunas empresas dicen que la suya sí; lo indicamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Broker erfassen im Lauf der Zeit erneut Daten, daher hält eine Anfrage nicht immer. Manche Firmen sagen, dass ihre hält; wir zeigen es an."
      }
     }
    }
@@ -8281,6 +8350,29 @@
     }
    }
   },
+  "How long an opt-out lasts": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Durée d'un retrait"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cuánto dura una baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wie lange ein Opt-out hält"
+     }
+    }
+   }
+  },
   "How your queue works": {
    "extractionState": "manual",
    "localizations": {
@@ -9358,6 +9450,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Letzter Scan"
+     }
+    }
+   }
+  },
+  "Last sent %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernier envoi le %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Último envío el %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuletzt gesendet am %@."
+     }
+    }
+   }
+  },
+  "Last sent %@. Due to repeat around %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernier envoi le %@. À répéter vers le %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Último envío el %@. A repetir hacia el %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuletzt gesendet am %@. Zu wiederholen etwa am %@."
      }
     }
    }
@@ -18121,6 +18259,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Geburtsdatum weist auf unter 18 hin, daher wird dieses Profil als minderjährig behandelt."
+     }
+    }
+   }
+  },
+  "The company does not say whether it lasts. Most brokers collect data again, so we will ask you to repeat this after %lld months.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'entreprise ne dit pas si cela dure. La plupart des courtiers collectent à nouveau des données : nous vous demanderons de répéter après %lld mois."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La empresa no dice si dura. La mayoría de los corredores vuelve a recopilar datos, así que te pediremos repetirlo tras %lld meses."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Firma sagt nicht, ob es hält. Die meisten Broker erfassen erneut Daten, daher bitten wir Sie, es nach %lld Monaten zu wiederholen."
+     }
+    }
+   }
+  },
+  "The company says it keeps your opt-out, so you should not need to repeat it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'entreprise dit conserver votre retrait : vous ne devriez pas avoir à le répéter."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La empresa dice que mantiene tu baja, así que no deberías tener que repetirla."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Firma sagt, sie behalte Ihr Opt-out, Sie sollten es also nicht wiederholen müssen."
+     }
+    }
+   }
+  },
+  "The company says the data can come back. We will ask you to repeat this every %lld months.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'entreprise dit que les données peuvent revenir. Nous vous demanderons de répéter tous les %lld mois."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La empresa dice que los datos pueden volver. Te pediremos repetirlo cada %lld meses."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Firma sagt, die Daten können zurückkommen. Wir bitten Sie, es alle %lld Monate zu wiederholen."
      }
     }
    }

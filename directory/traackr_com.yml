@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "marketing_services", "summary": "Traackr, Inc. is a marketing and direct-mail services company. Discover Traackr’s AI-powered influencer marketing platform. Find creators, manage campaigns, and measure results with creator intelligence and AI workflows. Its own pages mention phone numbers, email addresses, education, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: banks, lenders and insurers.", "tracks": ["phone", "email", "education", "interests", "online", "location", "social"], "sells_to": ["lenders"], "source": "https://www.traackr.com/legal/privacy-policy"}
 priority: 32
+persistence: {"result": "unknown", "reup_months": 12}

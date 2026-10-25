@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "political", "summary": "Fraiser LLC is a political and nonprofit data provider. Not your average data vendor, Fraiser revolutionizes how progressive campaigns and causes target donors and supporters while ensuring data security. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.fraiser.org/"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 12}

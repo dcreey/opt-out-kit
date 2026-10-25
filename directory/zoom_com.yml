@@ -24,3 +24,4 @@ excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "a video-meeting product site; the opt-out is a general contact route, not a broker removal"
+persistence: {"result": "unknown", "reup_months": 12}

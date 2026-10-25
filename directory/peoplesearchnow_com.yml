@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "people_search", "summary": "peoplesearchnow.com is a people-search and public-records site. Use People Search Now to find people with a name, address, or reverse phone lookup. Our public records search is fast and easy to use. Start free now! Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: banks, lenders and insurers; advertisers and marketers.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "property", "interests", "online", "location"], "sells_to": ["lenders", "advertisers"], "sells_note": "We may disclose your personal information to our professional advisors, such as lawyers, auditors, and insurers, when necessary.", "source": "https://www.peoplesearchnow.com/privacy"}
 priority: 64
+persistence: {"result": "unknown", "reup_months": 6}

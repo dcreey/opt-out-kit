@@ -19,3 +19,4 @@ live_check:
   blockers: ["check: a reCAPTCHA puzzle"]
 about: {"category": "marketing_data", "summary": "Skydeo Inc. is a marketing data provider. Take the guesswork out of finding ideal customers with Skydeo Audience Marketplace (SAM). Explore predictive audience segments built from 1.4 trillion data points. Its own pages mention shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["purchases", "interests"], "sells_to": [], "source": "https://skydeo.com/"}
 priority: 34
+persistence: {"result": "unknown", "reup_months": 12}

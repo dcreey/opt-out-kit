@@ -372,7 +372,7 @@ final class AppModel: ObservableObject {
         switch task.kind {
         case .platform(let id): return progress.isDone(id)
         case .flow(let id): return brokers.first { $0.id == id }.map { household.summary(for: $0).isFinished } ?? false
-        case .site(let id): return progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false
+        case .site(let id): return directory.first(where: { $0.id == id })?.isCurrent(attempts: progress.optOutAttempts) ?? (progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false)
         case .verify:
             let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
             return !ids.isEmpty && ids.allSatisfy { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false }
@@ -672,7 +672,7 @@ final class AppModel: ObservableObject {
     /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
     var verifyRemaining: Int {
         let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let ids = Set(directory.filter { queued.contains($0.domain) }.map(\.id))
-        return ids.filter { !(progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false) }.count
+        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a }); return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count
     }
 
     // MARK: Opt-out emails

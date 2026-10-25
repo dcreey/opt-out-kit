@@ -19,3 +19,4 @@ live_form:
   blockers: []
 about: {"category": "adtech", "summary": "Sovrn, Inc. is an advertising technology company. Thousands of the world’s top publishers trust the Sovrn Platform, a complete set of data and monetization tools, to thrive on the open web. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.sovrn.com/privacy-policy/policy-center/"}
 priority: 18
+persistence: {"result": "temporary", "reup_months": 6, "quote": "Similarly, if you access sites that use Sovrn Commerce from a different browser or device than the browser or device you opted out of tracking on, you will be required to opt-out again.", "source": "https://www.sovrn.com/privacy-policy/policy-center/"}

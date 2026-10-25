@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "marketing_data", "summary": "Ripple Effect Strategies is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "interests", "online", "location"], "sells_to": ["businesses", "government", "advertisers"], "sells_note": "• Data analytics • To market our Services What Personal Information We Disclose and To Whom If you send us correspondence by email or text message, we may disclose the content of such communications to our clients (i.e., various campaigns) ", "source": "https://www.ripple-roi.com/privacy-policy"}
 priority: 57
+persistence: {"result": "unknown", "reup_months": 12}

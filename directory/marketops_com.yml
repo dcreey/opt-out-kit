@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "b2b", "summary": "MarketOps LLC is a business-contact and sales-data provider. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online"], "sells_to": [], "source": "https://marketops.com/privacy-options/"}
 priority: 27
+persistence: {"result": "unknown", "reup_months": 12}

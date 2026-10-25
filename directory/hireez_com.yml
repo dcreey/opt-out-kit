@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "recruiting", "summary": "HireTeamMate, Inc. is a recruiting and workforce data provider. End-to-end agentic recruiting for enterprise teams: EZ Agent sources, reviews, screens and schedules on top of your ATS. Recruiters approve every decision. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://app.hireez.com/policies/databrokerregistration"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 12}

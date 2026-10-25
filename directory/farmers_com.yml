@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "financial", "summary": "Lara Agency Inc is a financial and credit data company. Its own pages mention property and vehicles, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["property", "online", "health"], "sells_to": [], "source": "https://agents.farmers.com/tx/houston/jose-lara/?SourceID=AMPALFGMAG&utm_medium=Local&utm_source=GMB"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 12}

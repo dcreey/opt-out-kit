@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_data", "summary": "Complete Mailing Lists LLC is a marketing data provider. Complete Mailing Lists will help you find and buy business mailing lists and consumer mailing lists for direct marketing campaigns. Its own pages mention home addresses, email addresses, age or birthdate, job title and employer, education, income or wealth. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "email", "age", "employment", "education", "income", "property", "interests", "online", "location", "health", "social"], "sells_to": ["advertisers"], "sells_note": "We do not process data for targeted advertising, but we may sell personal information to third parties who use it for targeted advertising.", "source": "https://www.completemailinglists.com/privacy-policy"}
 priority: 62
+persistence: {"result": "unknown", "reup_months": 12}

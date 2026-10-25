@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "marketing_services", "summary": "Specialists Marketing Services, Inc. is a marketing and direct-mail services company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://sms-inc.com/"}
 priority: 13
+persistence: {"result": "unknown", "reup_months": 12}

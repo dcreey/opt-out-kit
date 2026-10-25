@@ -17,3 +17,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "real_estate", "summary": "Commercial Real Estate Exchange, Inc. is a property and real-estate data company. Buy, sell, or lease commercial real estate, including retail, office, industrial & multifamily properties all over the U.S. Visit Crexi.com to get started. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests"], "sells_to": [], "source": "https://www.crexi.com/"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 12}

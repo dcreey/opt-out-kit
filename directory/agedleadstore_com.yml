@@ -23,3 +23,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "lead_generation", "summary": "NEXT WAVE MARKETING STRATEGIES, INC is a lead-generation company. Stock your sales pipeline with on-demand internet leads from us. We combine and update lead data for high-value, low-cost leads that fuel sales. Its own pages mention email addresses, age or birthdate, income or wealth, property and vehicles, shopping and purchase behavior, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "age", "income", "property", "purchases", "social"], "sells_to": [], "source": "https://agedleadstore.com/"}
 priority: 37
+persistence: {"result": "unknown", "reup_months": 6}

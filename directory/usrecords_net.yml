@@ -18,3 +18,4 @@ search_check:
   checked: "2026-10-21"
 about: {"category": "arrests", "summary": "usrecords.net is a public arrest and court records site. Find the information you need with our comprehensive public records search in the United States. From criminal history to property records, we have the resources to help you access the... Its own pages mention names and aliases, age or birthdate, relatives and household members, job title and employer, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "relatives", "employment", "property", "criminal", "online"], "sells_to": [], "source": "https://www.usrecords.net/privacy-policy"}
 priority: 46
+persistence: {"result": "unknown", "reup_months": 12}

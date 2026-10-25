@@ -23,3 +23,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "fraud_identity", "summary": "Pipl, Inc. is an identity and fraud-prevention data provider. Pipl helps global enterprises make better fraud decisions by turning fragmented identity data into usable, explainable identity intelligence. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://pipl.com/"}
 priority: 30
+persistence: {"result": "unknown", "reup_months": 12}

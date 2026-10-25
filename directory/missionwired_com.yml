@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "political", "summary": "Anne Lewis Strategies LLC is a political and nonprofit data provider. MissionWired helps nonprofits and campaigns grow through connected fundraising, creative, data, technology, and more human supporter experiences. Its own pages mention phone numbers, email addresses. Its policy does not name who it sells to.", "tracks": ["phone", "email"], "sells_to": [], "source": "https://info.missionwired.com/coop-optout"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 12}

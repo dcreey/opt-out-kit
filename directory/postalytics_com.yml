@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "marketing_services", "summary": "Postalytics, Inc. is a marketing and direct-mail services company. Postalytics® is direct mail automation software that sends personalized direct mail from your CRM and analyzes delivery & response. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "property", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": [], "source": "https://www.postalytics.com/legal/privacy-policy/"}
 priority: 37
+persistence: {"result": "unknown", "reup_months": 12}

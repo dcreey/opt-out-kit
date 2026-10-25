@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "other", "summary": "Buildertrend Solutions, Inc. is a property and real-estate data company. Buildertrend is the leading construction project management software for home builders, remodelers and contractors. Talk to our team today. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "criminal", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": ["advertisers"], "source": "https://buildertrend.com/privacy-notice/"}
 priority: 43
+persistence: {"result": "unknown", "reup_months": 12}

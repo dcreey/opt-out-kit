@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "automotive", "summary": "CDK Global, LLC is an automotive data company. Trusted by nearly 15,000 dealer locations, CDK Global connects you to world-class dealership software solutions that work together to help you reach your potential. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["purchases", "online"], "sells_to": ["advertisers"], "source": "https://www.cdkglobal.com/"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 12}

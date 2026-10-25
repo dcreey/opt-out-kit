@@ -17,3 +17,4 @@ live_check:
   blockers: []
 about: {"category": "lead_generation", "summary": "Lead Me Media LLC is a lead-generation company. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://leadmemedia.com/"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 6}

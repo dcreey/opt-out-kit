@@ -16,3 +16,4 @@ search_check:
 live_form:
   checked: "2026-10-24"
   found: false
+persistence: {"result": "unknown", "reup_months": 12}

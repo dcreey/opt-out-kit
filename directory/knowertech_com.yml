@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "Rainbarrel USA LLC is an advertising technology company. Its own pages mention phone numbers, email addresses, age or birthdate, income or wealth, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; government and law enforcement; other data brokers and resellers.", "tracks": ["phone", "email", "age", "income", "interests", "online", "location", "social"], "sells_to": ["businesses", "advertisers", "government", "brokers"], "sells_note": "California Privacy (CCPA/CPRA) Notice Your personal data may be incorporated into the audience products sold to our customers and activated on digital advertising platforms.", "source": "https://www.rbarrel.com/privacy-policy/"}
 priority: 56
+persistence: {"result": "unknown", "reup_months": 6}

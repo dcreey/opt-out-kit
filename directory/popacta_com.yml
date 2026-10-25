@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "b2b", "summary": "Pop Acta Media, LLC is a business-contact and sales-data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, shopping and purchase behavior. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "purchases", "interests", "online", "credit"], "sells_to": ["advertisers", "businesses"], "sells_note": "Third-Party Selling and Sharing We may sell or share (for targeted or cross-context behavioral advertising purposes) your Personal Information with other companies who do not provide services to us (“Third Parties”).", "source": "https://popacta.com/privacy-policy/"}
 priority: 46
+persistence: {"result": "unknown", "reup_months": 12}

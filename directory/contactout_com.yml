@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "b2b", "summary": "ContactOut Limited is a business-contact and sales-data provider. Most accurate email finder for personal and work email outreach. Email lookup, campaign tool, and AI writer. Get 10 credits free - no credit card required. Its own pages mention phone numbers, email addresses, job title and employer, interests and demographics, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "interests", "credit"], "sells_to": [], "source": "https://contactout.com/privacy_data_subjects"}
 priority: 32
+persistence: {"result": "unknown", "reup_months": 12}

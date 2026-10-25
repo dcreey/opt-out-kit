@@ -22,3 +22,4 @@ excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "post-purchase software for retailers; opt-out is for its business customers"
+persistence: {"result": "unknown", "reup_months": 12}

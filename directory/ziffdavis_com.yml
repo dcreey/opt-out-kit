@@ -24,3 +24,4 @@ excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "a media publisher; not a data broker"
+persistence: {"result": "unknown", "reup_months": 12}

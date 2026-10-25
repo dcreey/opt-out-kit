@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "other", "summary": "T-Mobile USA, Inc. is a data company. Discover America's Best Network with T-Mobile! Get unbeatable deals, unlimited 5G plans, and T-Satellite coverage that keeps you connected while saving big. Its own pages mention shopping and purchase behavior, devices and online activity, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "health", "social"], "sells_to": [], "source": "https://www.t-mobile.com/advertising-solutions"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 12}

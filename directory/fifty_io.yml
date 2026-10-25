@@ -14,3 +14,4 @@ signals: [captcha_recaptcha, email_input, email_only_wording, name_input, opt_ou
 profiled: "2026-10-22"
 about: {"category": "adtech", "summary": "Fifty Technology Ltd is an advertising technology company. Fifty. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers; business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "interests", "online", "location", "social"], "sells_to": ["brokers", "businesses", "advertisers"], "source": "https://fifty.io/privacy-policy"}
 priority: 44
+persistence: {"result": "unknown", "reup_months": 6}

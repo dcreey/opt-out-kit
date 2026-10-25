@@ -24,6 +24,8 @@ public struct ActivitySummary: Equatable, Sendable {
     public var activeDays: Int
     /// Consecutive days with a request sent, counting back from today (or from yesterday, so a streak is not lost before the day's work).
     public var streak: Int
+    /// Sites whose last request is old enough that it should be repeated (they are back in the daily queue).
+    public var dueToRenew: Int
     public var isEmpty: Bool { sites == 0 && emails == 0 }
 
     static func sorted(_ counts: [String: Int]) -> [KindCount] {
@@ -34,7 +36,7 @@ public struct ActivitySummary: Equatable, Sendable {
 
     public static func build(entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(), calendar: Calendar = .current) -> ActivitySummary {
         let byID = Dictionary(entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        var kinds: [String: Int] = [:], sites = 0, emails = 0
+        var kinds: [String: Int] = [:], sites = 0, emails = 0, due = 0
         var latest: [(day: Date, kind: String)] = []
         for (id, list) in attempts {
             guard let e = byID[id] else { continue }
@@ -42,6 +44,7 @@ public struct ActivitySummary: Equatable, Sendable {
             let sent = list.filter(\.wasSubmitted).map(\.date)
             guard let last = sent.max() else { continue }
             let kind = e.about?.category ?? "other"
+            if e.isDueToRenew(attempts: attempts, now: now, calendar: calendar) { due += 1 }
             sites += 1; kinds[kind, default: 0] += 1
             latest.append((calendar.startOfDay(for: last), kind))
         }
@@ -54,6 +57,6 @@ public struct ActivitySummary: Equatable, Sendable {
         var lastKinds: [String: Int] = [:]
         for item in latest where item.day == lastDay { lastKinds[item.kind, default: 0] += 1 }
         return ActivitySummary(sites: sites, emails: emails, byKind: sorted(kinds), lastDay: lastDay, lastDaySites: lastKinds.values.reduce(0, +),
-                               lastDayKinds: sorted(lastKinds), activeDays: days.count, streak: streak)
+                               lastDayKinds: sorted(lastKinds), activeDays: days.count, streak: streak, dueToRenew: due)
     }
 }

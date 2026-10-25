@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "other", "summary": "Voxtur Data Services is a property and real-estate data company. An open-source website built with Payload and Next.js. Its own pages mention education, income or wealth, property and vehicles. Its policy does not name who it sells to.", "tracks": ["education", "income", "property"], "sells_to": [], "source": "https://www.benutech.com/"}
 priority: 19
+persistence: {"result": "unknown", "reup_months": 12}

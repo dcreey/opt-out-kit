@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "WURL, LLC is an advertising technology company. We make CTV possible. Wurl delivers solutions to grow viewership, maximize revenue, and strengthen brand value. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.wurl.com/"}
 priority: 18
+persistence: {"result": "unknown", "reup_months": 6}

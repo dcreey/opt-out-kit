@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "healthcare", "summary": "Heartbeat.AI Inc is a healthcare data company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://heartbeat.ai/texas-privacy-rights"}
 priority: 31
+persistence: {"result": "unknown", "reup_months": 12}

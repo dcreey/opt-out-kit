@@ -22,3 +22,4 @@ excluded:
   checked: "2026-10-25"
   kind: "not_a_data_broker"
   reason: "wastewater market data on facilities, not people"
+persistence: {"result": "permanent", "quote": "We will maintain your information on a suppression list to avoid reactivating your profile in the future.", "source": "https://klarifi.io/privacy-center"}

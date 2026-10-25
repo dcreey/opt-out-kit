@@ -21,3 +21,4 @@ live_form:
   blockers: []
 about: {"category": "people_search", "summary": "We Inform LLC is a people-search and public-records site. Its own pages mention names and aliases, phone numbers, relatives and household members, income or wealth, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["name", "phone", "relatives", "income", "criminal", "social"], "sells_to": [], "source": "https://www.weinform.org/name_search/landing_page"}
 priority: 60
+persistence: {"result": "unknown", "reup_months": 6}

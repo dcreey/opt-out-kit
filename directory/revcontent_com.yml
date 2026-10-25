@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "adtech", "summary": "RevContent, LLC is an advertising technology company. RevContent helps publishers and advertisers drive results with high-performing native ads. Grow your revenue and reach the right audiences across premium content environments. Its own pages mention home addresses, email addresses, age or birthdate, property and vehicles, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "email", "age", "property", "interests", "online", "health", "social"], "sells_to": ["advertisers"], "source": "https://www.revcontent.com/policy/privacy-policy#your-privacy-rights-and-choices"}
 priority: 39
+persistence: {"result": "temporary", "reup_months": 6, "quote": "You also must opt out again if you clear your cookies.", "source": "https://www.revcontent.com/policy/privacy-policy#your-privacy-rights-and-choices"}

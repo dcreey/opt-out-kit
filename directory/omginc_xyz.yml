@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "recruiting", "summary": "Online Media Group Inc. is a recruiting and workforce data provider. Its own pages mention home addresses, phone numbers, email addresses, job title and employer, education, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "employment", "education", "online", "social"], "sells_to": [], "source": "https://omginc.xyz/privacy"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 12}

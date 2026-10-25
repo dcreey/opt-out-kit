@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "adtech", "summary": "Chartboost, LLC is an advertising technology company. LoopMe is bringing brands into apps, powered by AI agents. Its own pages mention job title and employer, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["employment", "interests", "online"], "sells_to": [], "source": "https://loopme.ai/chartboost/"}
 priority: 26
+persistence: {"result": "unknown", "reup_months": 6}

@@ -23,3 +23,4 @@ search_check:
   checked: "2026-10-20"
 about: {"category": "people_search", "summary": "Spokeo, Inc. is a people-search and public-records site. Search for free by name, phone, email, or address. Find contact information, public records, social profiles, marital status, and more. Trusted by 350M+ users. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "employment", "property", "criminal", "interests", "online", "location", "social"], "sells_to": ["advertisers"], "source": "https://www.spokeo.com/privacy-policy"}
 priority: 70
+persistence: {"result": "unknown", "reup_months": 6}

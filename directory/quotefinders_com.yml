@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "lead_generation", "summary": "BRIGHT POLICY, LLC is a lead-generation company. QuoteFinders is unavailable. Its own pages mention age or birthdate, property and vehicles, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["age", "property", "online"], "sells_to": ["advertisers"], "sells_note": "Applicable data privacy laws provide residents of certain jurisdictions (or, in some cases, their authorized agents) with the right to opt out of “targeted advertising,” “selling,” or “sharing” of personal information.", "source": "https://www.quotefinders.com/privacy/sharing/index.html"}
 priority: 32
+persistence: {"result": "temporary", "reup_months": 6, "quote": "Also, if you clear your cookies on this browser or use another browser or device, you may need to opt out again.", "source": "https://www.quotefinders.com/privacy/sharing/index.html"}

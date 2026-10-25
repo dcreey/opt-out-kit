@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "marketing_data", "summary": "LogicTree, Inc. is a marketing data provider. Data247 all in-one data solution is a simple, and secure on-demand Data Management Platform that provides businesses with a wide-range of data lookup services. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["address", "phone", "email", "age", "income", "property", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["brokers"], "sells_note": "is a data broker: we collect and sell personal information about consumers with whom we do not have a direct relationship.", "source": "https://www.data247.com/privacy"}
 priority: 56
+persistence: {"result": "unknown", "reup_months": 12}

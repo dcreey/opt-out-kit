@@ -23,3 +23,4 @@ contact_email: "privacy@scarrests.org"
 contact_email_source: "browser"
 about: {"category": "arrests", "summary": "scarrests.org is a public arrest and court records site. How to search South Carolina arrest records online. Learn how to access public records, fees, and what information is included. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.scarrests.org/"}
 priority: 39
+persistence: {"result": "unknown", "reup_months": 12}

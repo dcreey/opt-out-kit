@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "Teads Inc is an advertising technology company. Outbrain and Teads have merged to create the omnichannel outcomes platform for the open internet. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://privacy-policy.teads.com/"}
 priority: 21
+persistence: {"result": "unknown", "reup_months": 6}

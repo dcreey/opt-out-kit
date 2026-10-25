@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "MobileFuse LLC is an advertising technology company. The premier omni in-app brand advertising platform. Putting Your Audience First. With consumers spending 11.5x more time in app environments, including CTV and mobile, it\\'s no wonder... Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://mobilefuse.com/"}
 priority: 25
+persistence: {"result": "unknown", "reup_months": 6}

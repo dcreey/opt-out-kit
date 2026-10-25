@@ -18,3 +18,4 @@ search_check:
   checked: "2026-10-21"
 about: {"category": "arrests", "summary": "iowaarrests.org is a public arrest and court records site. Find arrest records in Iowa. Its own pages mention names and aliases, email addresses, age or birthdate, education, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "email", "age", "education", "criminal"], "sells_to": [], "source": "https://www.iowaarrests.org/request-portal"}
 priority: 42
+persistence: {"result": "unknown", "reup_months": 12}

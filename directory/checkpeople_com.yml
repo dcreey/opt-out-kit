@@ -19,3 +19,4 @@ search_check:
   checked: "2026-10-20"
 about: {"category": "people_search", "summary": "CHECKPEOPLE, LLC is a people-search and public-records site. Instant People Search! Start searching 100% free to find contact information, current addresses, mobile phone numbers, social media profiles, criminal records and more at CheckPeople. Its own pages mention phone numbers, email addresses, criminal and court records, social media profiles. Its policy names these buyers or recipients: the general public (people looking you up).", "tracks": ["phone", "email", "criminal", "social"], "sells_to": ["public"], "source": "https://checkpeople.com/privacy-rights"}
 priority: 66
+persistence: {"result": "unknown", "reup_months": 6}

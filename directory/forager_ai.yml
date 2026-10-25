@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "b2b", "summary": "Forager.ai, LLC is a business-contact and sales-data provider. B2B contact data platform and API: 200M+ verified mobile numbers and 850M+ person and company records at 99% accuracy. Syncs with HubSpot and Salesforce. Its own pages mention phone numbers, email addresses, social media profiles, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "email", "social", "credit"], "sells_to": [], "source": "https://app.forager.ai/privacy"}
 priority: 38
+persistence: {"result": "unknown", "reup_months": 12}

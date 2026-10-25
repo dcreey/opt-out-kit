@@ -19,3 +19,4 @@ live_form:
   blockers: []
 about: {"category": "marketing_services", "summary": "Choreograph LLC is a marketing and direct-mail services company. We help marketers modernize tech infrastructure and harmonize first-party data. Backed by a 25+ year Google alliance, we build solutions for intelligent growth. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.choreograph.com/"}
 priority: 20
+persistence: {"result": "unknown", "reup_months": 12}

@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "marketing_data", "summary": "Facteus, Inc. is a marketing data provider. Start exploring the leading US consumer transaction dataset – FREE! Search by company name or discover macro-economic insights by sector. Its own pages mention income or wealth, shopping and purchase behavior, devices and online activity, social media profiles, credit and financial accounts. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["income", "purchases", "online", "social", "credit"], "sells_to": ["advertisers"], "source": "https://facteus.com/"}
 priority: 47
+persistence: {"result": "unknown", "reup_months": 12}

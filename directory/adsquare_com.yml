@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "adsquare GmbH is an advertising technology company. Adsquare turns real-world behavior into measurable business outcomes — planning, targeting, optimization, validation. 2,500+ brands, 26 markets. Its own pages mention shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "location"], "sells_to": [], "source": "https://adsquare.com/"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 6}

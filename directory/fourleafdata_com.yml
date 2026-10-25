@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "b2b", "summary": "Fourleaf LLC is a business-contact and sales-data provider. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://www.fourleafdata.com/"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 12}

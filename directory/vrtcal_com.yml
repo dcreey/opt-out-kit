@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "VRTCAL Markets Inc. is an advertising technology company. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.vrtcal.com/"}
 priority: 18
+persistence: {"result": "unknown", "reup_months": 6}

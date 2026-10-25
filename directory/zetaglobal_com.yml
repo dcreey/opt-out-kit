@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "marketing_data", "summary": "Zeta Global is a marketing data provider. Zeta Global unifies identity, data and AI in one marketing cloud, so enterprise brands can acquire, grow and retain customers across every channel. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.zetaglobal.com/"}
 priority: 36
+persistence: {"result": "unknown", "reup_months": 12}

@@ -18,3 +18,4 @@ live_check:
   blockers: []
 about: {"category": "marketing_data", "summary": "THE LINEA 1 MKT SL is a marketing data provider. Audience data across 150+ markets and 70+ channels. From demographics and interests to US Hispanic audiences — ready to activate on CTV, mobile, desktop, social, audio and DOOH. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online"], "sells_to": [], "source": "https://www.tl1mkt.com/"}
 priority: 32
+persistence: {"result": "unknown", "reup_months": 12}

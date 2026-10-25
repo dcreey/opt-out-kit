@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "VideoAmp, Inc. is an advertising technology company. A media measurement software company offering powerful audience segmentation for programmatic ads in a more valuable data-driven ecosystem. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://videoamp.com/"}
 priority: 25
+persistence: {"result": "unknown", "reup_months": 6}

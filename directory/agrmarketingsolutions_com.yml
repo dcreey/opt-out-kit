@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "marketing_data", "summary": "AGR Marketing Solutions LLC is a marketing data provider. Its own pages mention phone numbers, age or birthdate, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "age", "interests"], "sells_to": [], "source": "https://agrmarketingsolutions.com/"}
 priority: 38
+persistence: {"result": "unknown", "reup_months": 12}

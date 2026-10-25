@@ -16,3 +16,4 @@ signals: [email_input, name_input, opt_out_form_found, phone_verify, search_firs
 profiled: "2026-10-22"
 about: {"category": "lead_generation", "summary": "eLocal USA, LLC is a lead-generation company. Join the leaders in pay-per-call and start getting leads for your business today. We work with home services, legal, insurance, medical, and other verticals. Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://www.elocal.com/"}
 priority: 31
+persistence: {"result": "unknown", "reup_months": 6}

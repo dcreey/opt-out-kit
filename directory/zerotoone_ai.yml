@@ -19,3 +19,4 @@ live_check:
   blockers: ["check: a reCAPTCHA checkbox"]
 about: {"category": "marketing_services", "summary": "ZeroToOne.AI Inc. is a marketing and direct-mail services company. ZeroToOne is an AI platform built to help the world's largest brands reduce wasted media spend and create tailored customer journeys at-scale. Precise, actionable predictions in... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://www.zerotoone.ai/privacy-policy"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 12}

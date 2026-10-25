@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "recruiting", "summary": "Findem, Inc. is a recruiting and workforce data provider. Findem combines trusted people data and AI to help teams source, hire, develop, and plan their workforce with greater speed and confidence. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://trust.findem.ai/resources?s=n7l858orxkidow6l1kxp9&name=privacy-policy"}
 priority: 20
+persistence: {"result": "unknown", "reup_months": 12}

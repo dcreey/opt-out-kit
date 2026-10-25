@@ -19,3 +19,4 @@ live_form:
   blockers: []
 about: {"category": "b2b", "summary": "WealthFeed, Inc. is a business-contact and sales-data provider. WealthFeed is the end-to-end AI growth engine for financial advisors: surface money in motion, run compliant multi-channel outreach, and convert website visitors around the clock. Its own pages mention income or wealth, social media profiles. Its policy does not name who it sells to.", "tracks": ["income", "social"], "sells_to": [], "source": "https://www.wealthfeed.com/"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 12}

@@ -16,3 +16,4 @@ signals: [captcha_recaptcha, email_input, file_upload, opt_out_form_found, phone
 profiled: "2026-10-22"
 about: {"category": "location_data", "summary": "Cuebiq Group, LLC is a device and location data company. Cuebiq delivers powerful location intelligence for brands, agencies, and researchers—featuring footfall measurement, audiences, and custom data solutions. Its own pages mention email addresses, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["email", "online", "location"], "sells_to": [], "source": "https://cuebiq.com/privacy-request/"}
 priority: 42
+persistence: {"result": "unknown", "reup_months": 6}

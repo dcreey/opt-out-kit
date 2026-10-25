@@ -443,6 +443,25 @@ struct DirectoryInfoView: View {
         }
     }
 
+    /// Whether an opt-out here lasts, from the company's own policy, and when we will ask the person to repeat it.
+    @ViewBuilder private var persistenceSection: some View {
+        let info = entry.persistence
+        let months = entry.reupMonths ?? 12
+        Section {
+            switch info?.result {
+            case "permanent": Label("The company says it keeps your opt-out, so you should not need to repeat it.", systemImage: "infinity").foregroundStyle(.green)
+            case "temporary": Label(Loc.f("The company says the data can come back. We will ask you to repeat this every %lld months.", months), systemImage: "arrow.clockwise").foregroundStyle(.orange)
+            default: Label(Loc.f("The company does not say whether it lasts. Most brokers collect data again, so we will ask you to repeat this after %lld months.", months), systemImage: "questionmark.circle").foregroundStyle(.secondary)
+            }
+            if let q = info?.quote { Text("\u{201C}\(q)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            if let sent = entry.lastSent(in: model.progress.optOutAttempts) {
+                if let due = entry.reupDate(after: sent) {
+                    Text(Loc.f("Last sent %@. Due to repeat around %@.", sent.formatted(date: .abbreviated, time: .omitted), due.formatted(date: .abbreviated, time: .omitted))).font(.footnote)
+                } else { Text(Loc.f("Last sent %@.", sent.formatted(date: .abbreviated, time: .omitted))).font(.footnote) }
+            }
+        } header: { Text("How long an opt-out lasts") }
+    }
+
     /// Who the company is, what it tracks and who it sells to, as its own pages say.
     @ViewBuilder private func aboutSection(_ about: BrokerAbout) -> some View {
         Section {
@@ -470,6 +489,7 @@ struct DirectoryInfoView: View {
     var body: some View {
         List {
             if let about = entry.about { aboutSection(about) }
+            persistenceSection
             Section {
                 GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
                     model.requireProfile { guide = model.guidedRunner(for: entry) }

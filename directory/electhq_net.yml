@@ -13,3 +13,4 @@ contact_email_source: "policy"
 registered_in: [TX]
 signals: [email_input, name_input, phone_input, phone_verify]
 profiled: "2026-10-22"
+persistence: {"result": "unknown", "reup_months": 12}

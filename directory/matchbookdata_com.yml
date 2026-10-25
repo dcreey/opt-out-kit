@@ -15,3 +15,4 @@ signals: [email_contact, email_input, email_only_wording, opt_out_form_found, ph
 profiled: "2026-10-22"
 about: {"category": "adtech", "summary": "Matchbook Data, LLC is an advertising technology company. Matchbook’s identity augmentation technology matches a company’s first-party data to new digital signals, unlocking omnichannel marketing. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, criminal and court records. Its policy names these buyers or recipients: other data brokers and resellers; business customers and sales teams; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "education", "criminal", "purchases", "interests", "online", "location", "social"], "sells_to": ["brokers", "businesses", "advertisers"], "source": "https://www.matchbookdata.com/privacy-policy/"}
 priority: 56
+persistence: {"result": "unknown", "reup_months": 6}

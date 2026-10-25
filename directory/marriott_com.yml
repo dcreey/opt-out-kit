@@ -16,3 +16,4 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/0894cd2c-85ba-4d0b-8ec1-e18f3735e0e0/b03c7f1f-4aca-4502-b5eb-d8d883be4c8c"
   blockers: []
+persistence: {"result": "unknown", "reup_months": 12}

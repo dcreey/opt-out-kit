@@ -18,3 +18,4 @@ search_check:
   checked: "2026-10-20"
 about: {"category": "automotive", "summary": "yellowbook.com is an automotive data company. With these small business resources, we seek to save you time, energy, and money by delivering the information that you need in a clear and concise manner. Its own pages mention age or birthdate. Its policy does not name who it sells to.", "tracks": ["age"], "sells_to": [], "source": "https://yellowbook.com/"}
 priority: 20
+persistence: {"result": "unknown", "reup_months": 12}

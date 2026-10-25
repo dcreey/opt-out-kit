@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "financial", "summary": "AdvisorTarget, LLC is a financial and credit data company. Finsum. Its own pages mention home addresses, phone numbers, email addresses, income or wealth, property and vehicles, devices and online activity. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "income", "property", "online"], "sells_to": ["government"], "sells_note": "Certain New Jersey active and retired law enforcement personnel and other persons covered by Daniel’s Law have the right to request that companies not disclose or re-disclose their home addresses and unpublished telephone numbers on the Int", "source": "https://www.finsum.com/what-we-do/your-privacy-choices"}
 priority: 43
+persistence: {"result": "unknown", "reup_months": 12}

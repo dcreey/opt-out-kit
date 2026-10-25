@@ -19,3 +19,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "location_data", "summary": "Quadrant Global Pte. Ltd. is a device and location data company. Power AI applications, analytics, and location based products with high quality mobile location, Point of Interest, and geospatial data from Quadrant. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, property and vehicles, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "employment", "property", "purchases", "online", "location", "social"], "sells_to": [], "source": "https://www.quadrant.io/privacy-policy"}
 priority: 46
+persistence: {"result": "unknown", "reup_months": 6}

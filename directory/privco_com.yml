@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "b2b", "summary": "PrivCo Holding Inc is a business-contact and sales-data provider. Access 2M+ private company profiles with revenue, EBITDA & executive contacts. The leading database for non-VC backed companies. Sign up free. Its own pages mention home addresses, phone numbers, email addresses, criminal and court records, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "criminal", "interests", "online"], "sells_to": [], "source": "https://www.privco.com/privacy-policy"}
 priority: 41
+persistence: {"result": "unknown", "reup_months": 12}

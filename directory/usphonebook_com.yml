@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "people_search", "summary": "usphonebook.com is a people-search and public-records site. USPhoneBook.com reverse phone lookups are 100% FREE. We search billions of records to provide you with a name and location of any U.S. phone number. Its own pages mention names and aliases, phone numbers, property and vehicles, devices and online activity, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["name", "phone", "property", "online", "credit"], "sells_to": [], "source": "https://www.usphonebook.com/privacy-rights"}
 priority: 44
+persistence: {"result": "unknown", "reup_months": 6}

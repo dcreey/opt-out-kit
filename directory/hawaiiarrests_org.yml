@@ -21,3 +21,4 @@ live_check:
   blockers: []
 about: {"category": "arrests", "summary": "hawaiiarrests.org is a public arrest and court records site. Discover how to search for Hawaii arrest records, warrants, and mugshots using resources like eCrim, Hawaii Criminal Justice Data Center, and our fast records search tool. Its own pages mention names and aliases, age or birthdate, job title and employer, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "employment", "criminal"], "sells_to": [], "source": "https://www.hawaiiarrests.org/"}
 priority: 40
+persistence: {"result": "unknown", "reup_months": 12}

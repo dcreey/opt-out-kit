@@ -16,3 +16,4 @@ signals: [captcha_recaptcha, captcha_turnstile, email_contact, listing_url_input
 profiled: "2026-10-22"
 about: {"category": "b2b", "summary": "PossibleNOW, Inc. is a business-contact and sales-data provider. Established In 2000, we enable your company to enhance personalization & ensure compliance. We offer Preference management, consent management, & compliance with TCPA, DNC, CAN-SPAM. Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.possiblenow.com/privacy-statement-california"}
 priority: 31
+persistence: {"result": "unknown", "reup_months": 12}

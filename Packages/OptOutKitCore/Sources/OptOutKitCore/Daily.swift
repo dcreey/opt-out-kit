@@ -35,8 +35,9 @@ public struct DailyGoals: Equatable, Sendable {
         func doneBeforeToday(_ id: String, _ dates: [Date]) -> Bool { dates.contains { !calendar.isDate($0, inSameDayAs: now) } }
 
         // A site finished on an earlier day is behind us; today's list is the next sites, plus anything finished today.
+        // A request still holds until it is due to be repeated (6 to 12 months, or never for opt-outs that last): once due, the site is back in the queue.
         let open = queue.compactMap { byDomain[$0] }.filter { e in
-            !doneBeforeToday(e.id, attempts[e.id]?.filter(\.wasSubmitted).map(\.date) ?? [])
+            !(doneBeforeToday(e.id, attempts[e.id]?.filter(\.wasSubmitted).map(\.date) ?? []) && e.isCurrent(attempts: attempts, now: now, calendar: calendar))
         }
         // A batch is up to 25 sites of ONE kind. Every day starts fresh: the suggested kind is the highest-ranked one with sites left, unless
         // the person already started work TODAY, in which case it stays on that kind until the batch is done. Sites finished today stay in
@@ -79,8 +80,7 @@ public struct DailyGoals: Equatable, Sendable {
         var counts: [String: Int] = [:]
         for d in queue {
             guard let e = byDomain[d] else { continue }
-            let done = (attempts[e.id] ?? []).contains(where: \.wasSubmitted)
-            if !done { counts[e.about?.category ?? "other", default: 0] += 1 }
+            if !e.isCurrent(attempts: attempts, now: now, calendar: calendar) { counts[e.about?.category ?? "other", default: 0] += 1 }
         }
         return counts.map { (kind: $0.key, count: $0.value) }.sorted { (BrokerCategory(rawValue: $0.kind)?.rank ?? 99, $0.kind) < (BrokerCategory(rawValue: $1.kind)?.rank ?? 99, $1.kind) }
     }

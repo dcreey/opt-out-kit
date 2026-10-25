@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "political", "summary": "DonorBureau LLC is a political and nonprofit data provider. Reach the right supporters, cut wasted outreach, and grow donor value with predictive models built specifically for fundraising. Raise more from every campaign. Its own pages mention shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["purchases", "interests"], "sells_to": [], "source": "https://donorbureau.com/california-privacy-rights"}
 priority: 25
+persistence: {"result": "unknown", "reup_months": 12}

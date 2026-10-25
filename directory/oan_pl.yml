@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "adtech", "summary": "Online Advertising Network sp. z o.o. is an advertising technology company. We deliver 600+ gaming segments globally to help marketers reach target audiences among today's players. Its own pages mention email addresses, age or birthdate, interests and demographics, devices and online activity, precise location, social media profiles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "age", "interests", "online", "location", "social"], "sells_to": ["advertisers"], "sells_note": "The Website is protected by security measures aimed at the protection of personal data processed by Online Advertising Network against their modification, destruction, unauthorized access and disclosure or acquisition or loss, as well as ag", "source": "https://oan.pl/privacy-policy"}
 priority: 34
+persistence: {"result": "unknown", "reup_months": 6}

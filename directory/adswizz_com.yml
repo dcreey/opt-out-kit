@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "AdsWizz, Inc. is an advertising technology company. Publisher Solutions We have created a comprehensive technology stack that includes dynamic ad insertion, campaign management, yield optimization and a programmatic selling platform. We... Its own pages mention interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "social"], "sells_to": [], "source": "https://www.adswizz.com/"}
 priority: 21
+persistence: {"result": "unknown", "reup_months": 6}

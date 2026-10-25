@@ -20,3 +20,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "people_search", "summary": "Digital Safety Products, LLC is a people-search and public-records site. View information about yourself, friends, family, properties and phone numbers that Google can't show you. Start your search with a name, address or phone number. Its own pages mention names and aliases, phone numbers, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "property", "criminal"], "sells_to": [], "source": "https://www.spyfly.com/"}
 priority: 48
+persistence: {"result": "unknown", "reup_months": 6}

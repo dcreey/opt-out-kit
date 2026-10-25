@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "other", "summary": "SuSea, Inc is a data company. The core AI infrastructure you need to maximize accuracy while reducing latency and costs. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://you.com/privacy-requests"}
 priority: 14
+persistence: {"result": "unknown", "reup_months": 12}

@@ -19,3 +19,4 @@ live_check:
   blockers: ["check: a reCAPTCHA checkbox"]
 about: {"category": "recruiting", "summary": "Live Data Technologies, Inc. is a recruiting and workforce data provider. Job-change data on 124 million professionals, captured at the source and re-verified continuously. For investors, revenue teams and talent intelligence. Its own pages mention email addresses, age or birthdate. Its policy does not name who it sells to.", "tracks": ["email", "age"], "sells_to": [], "source": "https://www.livedatatech.com/opt-out"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 12}

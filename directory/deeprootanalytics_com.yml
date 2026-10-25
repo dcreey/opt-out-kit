@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "political", "summary": "Deep Root Analytics, LLC is a political and nonprofit data provider. Providing you with the electoral insights needed to drive victory in an ever-changing electorate. Its own pages mention phone numbers, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "online", "social"], "sells_to": [], "source": "https://www.deeprootanalytics.com/"}
 priority: 32
+persistence: {"result": "unknown", "reup_months": 12}

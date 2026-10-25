@@ -18,3 +18,4 @@ live_form:
   blockers: []
 about: {"category": "marketing_data", "summary": "365DataSolutions, LLC is a marketing data provider. 365 DataSolutions aggregates from trusted sources and delivers compliance-grade data for KYC/AML, collections, mail, public records, and Web3 trust. Its own pages mention phone numbers, email addresses, property and vehicles, criminal and court records, credit and financial accounts. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["phone", "email", "property", "criminal", "credit"], "sells_to": ["brokers"], "sells_note": "Vermont Disclosures 365 is registered as a data broker in Vermont.", "source": "https://365datasolutions.com/privacy"}
 priority: 48
+persistence: {"result": "unknown", "reup_months": 12}

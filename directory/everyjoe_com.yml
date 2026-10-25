@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "people_search", "summary": "everyjoe.com is a people-search and public-records site. Uncover the truth about anyone in seconds! Search millions of public records 100% free to instantly find contact details, family members, and address history. Its own pages mention names and aliases, home addresses, phone numbers, age or birthdate, relatives and household members. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "age", "relatives"], "sells_to": [], "source": "https://www.thisnation.com/"}
 priority: 48
+persistence: {"result": "unknown", "reup_months": 6}

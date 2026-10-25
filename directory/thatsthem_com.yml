@@ -19,3 +19,4 @@ live_form:
   blockers: ["wall"]
 about: {"category": "people_search", "summary": "thatsthem.com is a people-search and public-records site. ThatsThem is a 100% free people search providing phone number, email address, and postal address so you can find the person you're looking for. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, income or wealth. Its policy does not name who it sells to.", "tracks": ["name", "address", "phone", "email", "age", "income", "property", "interests"], "sells_to": [], "source": "https://thatsthem.com/"}
 priority: 52
+persistence: {"result": "unknown", "reup_months": 6}

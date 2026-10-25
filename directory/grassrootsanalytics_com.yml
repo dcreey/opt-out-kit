@@ -20,3 +20,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "political", "summary": "Grassroots Analytics is a political and nonprofit data provider. Grassroots Analytics is a Washington, DC tech company breaking down barriers in fundraising for forward-thinking candidates, causes, and nonprofits. Since our founding in 2017, we have... Its own pages mention home addresses, phone numbers, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "interests"], "sells_to": [], "source": "https://www.grassrootsanalytics.com/california-consumer-privacy-act-ccpa"}
 priority: 37
+persistence: {"result": "unknown", "reup_months": 12}

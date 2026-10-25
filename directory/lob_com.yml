@@ -17,3 +17,4 @@ live_form:
   found: false
 about: {"category": "marketing_services", "summary": "Lob.com, Inc. is a marketing and direct-mail services company. Automate and personalize direct mail at scale while our nationwide print network speeds delivery, controls postage costs, and keeps every send compliant. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, shopping and purchase behavior. Its policy names these buyers or recipients: other data brokers and resellers; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "purchases", "interests", "online", "health", "social"], "sells_to": ["brokers", "advertisers"], "sells_note": "In some jurisdictions, making such data available from our data partners in this way may qualify as “selling” under applicable laws.", "source": "https://www.lob.com/privacy"}
 priority: 45
+persistence: {"result": "unknown", "reup_months": 12}

@@ -16,3 +16,4 @@ live_form:
   found: false
 about: {"category": "adtech", "summary": "AlikeAudience Inc is an advertising technology company. We offer innovative and privacy-compliant data solutions for advertisers to connect with high-value audiences at a global scale. Its own pages mention relatives and household members, devices and online activity. Its policy does not name who it sells to.", "tracks": ["relatives", "online"], "sells_to": [], "source": "https://www.alikeaudience.com/"}
 priority: 28
+persistence: {"result": "unknown", "reup_months": 6}

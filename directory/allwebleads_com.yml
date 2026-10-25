@@ -18,3 +18,4 @@ live_form:
   blockers: ["check:a bot check"]
 about: {"category": "lead_generation", "summary": "AWL Holdings, LLC is a lead-generation company. AWL connects consumers who need insurance with the right agents who can best meet their insurance needs. Grow your business today! Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "purchases"], "sells_to": [], "source": "https://privacyportal-eu.onetrust.com/webform/031dc37f-2093-4055-9d04-22f83329fe9f/a4fb8ed6-8389-4a17-a3be-ca808c6b300e"}
 priority: 36
+persistence: {"result": "unknown", "reup_months": 6}

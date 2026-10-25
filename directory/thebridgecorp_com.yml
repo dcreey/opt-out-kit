@@ -16,3 +16,4 @@ signals: [email_input, name_input, opt_out_form_found, phone_input]
 profiled: "2026-10-22"
 about: {"category": "adtech", "summary": "OWMN, LTD. is an advertising technology company. Bridge offers a simple-yet powerful way to reach actual, verified humans. It's time to run marketing campaigns that work. Its own pages mention home addresses, email addresses, shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "email", "purchases", "online", "social"], "sells_to": [], "source": "https://www.thebridgecorp.com/our-approach-to-data-privacy/"}
 priority: 33
+persistence: {"result": "unknown", "reup_months": 6}

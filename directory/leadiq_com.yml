@@ -18,3 +18,4 @@ live_form:
   found: false
 about: {"category": "b2b", "summary": "LeadIQ, Inc is a business-contact and sales-data provider. LeadIQ is a platform of B2B sales prospecting tools. Find prospect data, track buying signals, & personalize cold outreach for outbound prospecting. Its own pages mention job title and employer, devices and online activity. Its policy does not name who it sells to.", "tracks": ["employment", "online"], "sells_to": [], "source": "https://leadiq.com/privacy-center"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 12}

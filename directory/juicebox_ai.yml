@@ -20,3 +20,4 @@ live_form:
   blockers: []
 about: {"category": "recruiting", "summary": "Juicebox App, Inc. is a recruiting and workforce data provider. Find, verify, and email perfect-fit candidates in one prompt. Search 800M+ profiles across 30+ sources and hire faster with AI. Its own pages mention job title and employer, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["employment", "online", "social"], "sells_to": [], "source": "https://juicebox.ai/"}
 priority: 29
+persistence: {"result": "unknown", "reup_months": 12}

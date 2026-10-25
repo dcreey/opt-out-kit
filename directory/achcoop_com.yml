@@ -19,3 +19,4 @@ live_check:
   blockers: []
 about: {"category": "marketing_data", "summary": "ACH, Address Clearing House is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, precise location. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "interests", "location", "health"], "sells_to": [], "source": "https://www.achcoop.com/privacy-policy"}
 priority: 59
+persistence: {"result": "unknown", "reup_months": 12}
