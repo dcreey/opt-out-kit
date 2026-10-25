@@ -1,0 +1,50 @@
+sms-inc.com	mobile=none  0	desktop=none 
+spglobal.com	mobile=WALL https://spglobal.com/ 0	desktop=WALL https://spglobal.com/
+privco.com	mobile=none  0	desktop=none 
+vendelux.com	mobile=WALL https://vendelux.com/ 0	desktop=WALL https://vendelux.com/privacy
+versium.com	mobile=none  0	desktop=none 
+tripwiredata.com	mobile=FORM https://www.tripwiredata.com/privacy 5	desktop=- 
+digitalvikingmedia.com	mobile=none  0	desktop=none 
+hireez.com	mobile=FORM https://app.hireez.com/ownyourdata 7	desktop=- 
+ispot.tv	mobile=none  0	desktop=none 
+keywordconnects.com	mobile=none  0	desktop=none 
+freepeoplesearch.com	mobile=WALL https://freepeoplesearch.com/ 0	desktop=WALL https://freepeoplesearch.com/
+revenuebase.ai	mobile=none  0	desktop=none 
+verifypublicrecords.com	mobile=none  0	desktop=none 
+archives.com	mobile=none  0	desktop=none 
+whitepages.com	mobile=none  0	desktop=WALL https://www.whitepages.com/privacy
+applovin.com	mobile=none  0	desktop=none 
+heartbeat.ai	mobile=none  0	desktop=none 
+fullcontact.com	mobile=FORM https://platform.fullcontact.com/your-privacy-choices/country 5	desktop=- 
+spyfly.com	mobile=WALL https://www.spyfly.com/help-center/privacy-requests 0	desktop=WALL https://spyfly.com/
+preqin.com	mobile=none  0	desktop=none 
+display-logix.com	mobile=none  0	desktop=none 
+medprosystems.com	mobile=none  0	desktop=none 
+firmable.com	mobile=none  0	desktop=none 
+northcarolinaresidentdatabase.com	mobile=WALL https://www.northcarolinaresidentdatabase.com/opt-out 0	desktop=WALL https://www.northcarolinaresidentdatabase.com/
+peoplelooker.com	mobile=none  0	desktop=none 
+civisanalytics.com	mobile=none  0	desktop=none 
+knowertech.com	mobile=none  0	desktop=none 
+instantcheckmate.com	mobile=WALL https://instantcheckmate.com/ 0	desktop=WALL https://instantcheckmate.com/
+hightouch.com	mobile=none  0	desktop=none 
+beeswax.com	mobile=none  0	desktop=none 
+socialcatfish.com	mobile=FORM https://socialcatfish.com/opt-out/?id=request_optout 10	desktop=- 
+kontextdata.com	mobile=none  0	desktop=none 
+fastbackgroundcheck.com	mobile=none  0	desktop=none 
+visitiq.io	mobile=none  0	desktop=FORM https://visitiq.io/opt-out/
+rocketreach.co	mobile=WALL https://rocketreach.co/ 0	desktop=WALL https://rocketreach.co/
+issgovernance.com	mobile=none  0	desktop=none 
+wednes.day	mobile=none  0	desktop=none 
+growthcode.io	mobile=FORM https://www.growthcode.io/do-not-sell 15	desktop=- 
+strategicdataintelligence.com	mobile=none  0	desktop=none 
+issmarketintelligence.com	mobile=none  0	desktop=none 
+madhive.com	mobile=FORM https://www.madhive.com/user-rights 12	desktop=- 
+convergemarketing.com	mobile=FORM https://my.datasubject.com/FMy59nP1cQ/53694 5	desktop=- 
+dealmachine.com	mobile=none  0	desktop=none 
+peoplebyname.com	mobile=WALL https://peoplebyname.com/ 0	desktop=WALL https://www.peoplebyname.com/
+opensend.com	mobile=none  0	desktop=none 
+coasttechnology.com	mobile=none  0	desktop=none 
+sterling.ai	mobile=none  0	desktop=none 
+findmugshots.com	mobile=none  0	desktop=none 
+victorywaves.com	mobile=none  0	desktop=none 
+semcasting.com	mobile=none  0	desktop=none 

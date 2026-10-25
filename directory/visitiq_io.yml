@@ -11,7 +11,9 @@ opt_out_url: "https://visitiq.io/opt-out/"
 registered_in: [CA]
 signals: [captcha_hcaptcha, captcha_turnstile, email_input, listing_url_input, name_input, phone_input, search_first]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://visitiq.io/opt-out/"
+  blockers: []
