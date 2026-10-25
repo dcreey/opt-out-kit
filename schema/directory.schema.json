@@ -39,6 +39,20 @@
     "registered_in": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}$" } },
     "contact_email": { "type": "string" },
     "contact_email_source": { "enum": ["page", "policy", "browser"] },
+    "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "about": {
+      "type": "object",
+      "required": ["category", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "category": { "type": "string" },
+        "summary": { "type": "string" },
+        "tracks": { "type": "array", "items": { "type": "string" } },
+        "sells_to": { "type": "array", "items": { "type": "string" } },
+        "sells_note": { "type": "string" },
+        "source": { "type": "string" }
+      }
+    },
     "closed": {
       "type": "object",
       "required": ["checked", "evidence"],

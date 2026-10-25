@@ -1,4 +1,5 @@
 import XCTest
+import Yams
 @testable import OptOutKitCore
 
 final class CoreTests: XCTestCase {
@@ -2577,5 +2578,36 @@ final class TypedCodeTests: XCTestCase {
         let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { OptOutMethods.classify($0) }, classifyBroker: { OptOutMethods.classify($0) })
         XCTAssertEqual(steps.flatMap(\.tasks).map(\.title), ["a.example", "b.example"], "typed-code forms come last")
         XCTAssertEqual(OptOutPlan.verifyQueue(steps, entries: entries), ["a.example", "b.example"])
+    }
+}
+
+
+final class BrokerAboutTests: XCTestCase {
+    func testAnAboutBlockAndPriorityDecodeFromTheDirectoryFormat() throws {
+        let yaml = """
+        id: "x_com"
+        domain: "x.com"
+        name: "X"
+        bucket: "registry"
+        automation: "guided"
+        priority: 72
+        about: {"category": "people_search", "summary": "X is a people-search site.", "tracks": ["phone numbers"], "sells_to": ["advertisers and marketers"], "sells_note": "We sell to advertisers.", "source": "https://x.com/privacy"}
+        """
+        let e = try YAMLDecoder().decode(DirectoryEntry.self, from: yaml)
+        XCTAssertEqual(e.priority, 72)
+        XCTAssertEqual(e.about?.sellsTo, ["advertisers and marketers"])
+        XCTAssertEqual(e.about?.category, "people_search")
+        XCTAssertEqual(BrokerPriority.tier(72), "High priority"); XCTAssertEqual(BrokerPriority.tier(55), "Medium priority"); XCTAssertEqual(BrokerPriority.tier(10), "Lower priority")
+    }
+
+    func testWithinABandTheHighestPriorityBrokersComeFirst() {
+        func site(_ d: String, _ p: Int) -> DirectoryEntry {
+            var e = DirectoryEntry(id: d, domain: d + ".com", name: d, bucket: "direct", tier: .B, automation: .guided, optOutURL: URL(string: "https://\(d).com/optout"), signals: [])
+            e.priority = p; return e
+        }
+        let entries = [site("a", 10), site("b", 90), site("c", 50)]
+        let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { _ in MethodVerdict(method: .semiAutomatic, reason: "r") }, classifyBroker: { _ in MethodVerdict(method: .semiAutomatic, reason: "r") })
+        let band = OptOutPlan.queue(steps, local: [], countryHasRegistries: false).flatMap(\.tasks).map(\.title)
+        XCTAssertEqual(band, ["b.com", "c.com", "a.com"])
     }
 }

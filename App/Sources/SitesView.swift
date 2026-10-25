@@ -412,8 +412,31 @@ struct DirectoryInfoView: View {
         }
     }
 
+    /// Who the company is, what it tracks and who it sells to, as its own pages say.
+    @ViewBuilder private func aboutSection(_ about: BrokerAbout) -> some View {
+        Section {
+            Text(about.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            if let score = entry.priority {
+                Label(Loc.f("%@ (%lld of 100)", BrokerPriority.tier(score), score), systemImage: "flag.fill")
+                    .font(.caption.bold()).foregroundStyle(score >= 70 ? .red : score >= 50 ? .orange : .secondary)
+            }
+        } header: { Text("Who they are") }
+        if !about.tracks.isEmpty {
+            Section {
+                ForEach(about.tracks, id: \.self) { Text($0.prefix(1).uppercased() + $0.dropFirst()) }
+            } header: { Text("What they track") } footer: { Text("From the company's own privacy policy and pages.") }
+        }
+        Section {
+            if about.sellsTo.isEmpty { Text("Its policy does not name who it sells to.").foregroundStyle(.secondary) }
+            ForEach(about.sellsTo, id: \.self) { Text($0.prefix(1).uppercased() + $0.dropFirst()) }
+            if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
+        } header: { Text("Who they sell to") }
+    }
+
     var body: some View {
         List {
+            if let about = entry.about { aboutSection(about) }
             Section {
                 GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
                     model.requireProfile { guide = model.guidedRunner(for: entry) }

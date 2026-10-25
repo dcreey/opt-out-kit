@@ -2324,6 +2324,29 @@
     }
    }
   },
+  "High priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité élevée"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad alta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hohe Priorität"
+     }
+    }
+   }
+  },
   "Idaho": {
    "extractionState": "manual",
    "localizations": {
@@ -2922,6 +2945,29 @@
     }
    }
   },
+  "Lower priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité plus faible"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad menor"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Niedrigere Priorität"
+     }
+    }
+   }
+  },
   "Maiden name": {
    "extractionState": "manual",
    "localizations": {
@@ -3102,6 +3148,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ich"
+     }
+    }
+   }
+  },
+  "Medium priority": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Priorité moyenne"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prioridad media"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mittlere Priorität"
      }
     }
    }

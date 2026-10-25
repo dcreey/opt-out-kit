@@ -41,6 +41,10 @@ struct PlanTaskRow: View {
             Image(systemName: model.isDone(task) ? "checkmark.circle.fill" : "circle").foregroundStyle(model.isDone(task) ? .green : .secondary).padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
                 Text(task.title).font(.headline)
+                if task.priority > 0, case .site = task.kind {
+                    Text(BrokerPriority.tier(task.priority)).font(.caption.bold())
+                        .foregroundStyle(task.priority >= 70 ? .red : task.priority >= 50 ? .orange : .secondary)
+                }
                 if task.kind == .verify { Text(Loc.f("%lld pages, one tap each", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 else if task.kind == .emails { Text(Loc.f("%lld sites by email", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }
                 else if task.kind == .automatic { Text(Loc.f("%lld sites in one run", task.siteCount)).font(.caption.bold()).foregroundStyle(.blue) }

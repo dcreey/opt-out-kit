@@ -19,8 +19,10 @@ public struct PlanTask: Identifiable, Equatable, Sendable {
     public var method: OptOutMethod?
     /// Two-letter codes of the states whose broker registry lists any of these sites.
     public var registeredIn: Set<String>
-    public init(kind: Kind, title: String, domains: [String], reason: String, method: OptOutMethod?, registeredIn: Set<String>) {
-        self.kind = kind; self.title = title; self.domains = domains; self.reason = reason; self.method = method; self.registeredIn = registeredIn
+    /// 0-100, the highest `DirectoryEntry.priority` of the sites this task handles; higher is removed first within its band.
+    public var priority: Int
+    public init(kind: Kind, title: String, domains: [String], reason: String, method: OptOutMethod?, registeredIn: Set<String>, priority: Int = 0) {
+        self.priority = priority; self.kind = kind; self.title = title; self.domains = domains; self.reason = reason; self.method = method; self.registeredIn = registeredIn
     }
     public var id: String {
         switch kind { case .platform(let i): return "platform-\(i)"; case .flow(let i): return "flow-\(i)"; case .site(let i): return "site-\(i)"; case .automatic: return "automatic"; case .emails: return "emails"; case .verify: return "verify" }
@@ -147,6 +149,10 @@ public enum OptOutPlan {
             steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation,
                                   tasks: tasks.sorted { (typed($0) ? 1 : 0, $0.title.lowercased()) < (typed($1) ? 1 : 0, $1.title.lowercased()) }))
         }
+        // Each task carries the highest priority among the sites it handles, so the queue can put the brokers that matter most first.
+        for i in steps.indices { for j in steps[i].tasks.indices {
+            steps[i].tasks[j].priority = steps[i].tasks[j].domains.compactMap { byDomain[$0]?.priority }.max() ?? 0
+        } }
         return steps
     }
 }
@@ -225,6 +231,7 @@ public extension OptOutPlan {
             let inBand = ranked.filter { $0.1 == r }.map(\.0).sorted { a, b in
                 let la = a.isRegistered(in: local), lb = b.isRegistered(in: local)
                 if la != lb { return la }
+                if a.priority != b.priority { return a.priority > b.priority }
                 if a.siteCount != b.siteCount { return a.siteCount > b.siteCount }
                 return a.title.lowercased() < b.title.lowercased()
             }

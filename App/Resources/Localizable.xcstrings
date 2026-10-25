@@ -24,6 +24,29 @@
     }
    }
   },
+  "%@ (%lld of 100)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ (%lld sur 100)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ (%lld de 100)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ (%lld von 100)"
+     }
+    }
+   }
+  },
   "%@ (%lld sites)": {
    "extractionState": "manual",
    "localizations": {
@@ -5475,6 +5498,29 @@
     }
    }
   },
+  "From the company's own privacy policy and pages.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tiré de la politique de confidentialité et des pages de l'entreprise."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Según la política de privacidad y las páginas de la propia empresa."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aus der Datenschutzerklärung und den Seiten des Unternehmens selbst."
+     }
+    }
+   }
+  },
   "From year": {
    "extractionState": "manual",
    "localizations": {
@@ -6552,6 +6598,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie zeigt Ihnen die wenigen Schritte, die Sie brauchen: Bot-Prüfungen, E-Mail-Links, Ausweis"
+     }
+    }
+   }
+  },
+  "Its policy does not name who it sells to.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sa politique ne dit pas à qui elle vend."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Su política no dice a quién vende."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Richtlinie nennt nicht, an wen verkauft wird."
      }
     }
    }
@@ -11244,6 +11313,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Lesen auf %@"
+     }
+    }
+   }
+  },
+  "Read their policy": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lire leur politique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Leer su política"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Richtlinie lesen"
      }
     }
    }
@@ -17182,6 +17274,29 @@
     }
    }
   },
+  "What they track": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce qu'ils collectent"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Qué rastrean"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was sie erfassen"
+     }
+    }
+   }
+  },
   "What this means for you": {
    "extractionState": "manual",
    "localizations": {
@@ -17477,6 +17592,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wer"
+     }
+    }
+   }
+  },
+  "Who they are": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Qui ils sont"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quiénes son"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wer sie sind"
+     }
+    }
+   }
+  },
+  "Who they sell to": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À qui ils vendent"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "A quién venden"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "An wen sie verkaufen"
      }
     }
    }
@@ -18742,6 +18903,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "sie@beispiel.de"
+     }
+    }
+   }
+  },
+  "“%@”": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "« %@ »"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "“%@”"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "„%@“"
      }
     }
    }
