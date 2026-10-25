@@ -481,7 +481,6 @@ struct KindBriefingView: View {
                 } footer: { Text(category.about) }
                 Section("Why this matters") {
                     Text(category.rankReason).font(.subheadline)
-                    Label(category.whatItMeans, systemImage: "person.fill.questionmark").font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("Best and worst case") { CaseExamples(category: category) }
                 Section("What opting out does for you") {
