@@ -13,11 +13,11 @@ contact_email_source: "policy"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.growbots.com/do-not-sell-my-info/"
-  blockers: []
 about: {"category": "b2b", "summary": "Bushwick Growbots LLC is a business-contact and sales-data provider. Lead generation that brings ROI for small and medium-sized business. We find your ideal customers, run the campaigns, and hand you qualified leads ready to buy. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://www.growbots.com/"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://docs.google.com/forms/d/e/1FAIpQLSfsJqs7OCQRQv3b1BkcJ5Sc2w0TO7s7D5rxSo_WMPFLQVLjsQ/viewform?embedded=true"
+  blockers: []

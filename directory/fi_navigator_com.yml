@@ -11,11 +11,11 @@ opt_out_url: "https://www.fi-navigator.com:443/remove/"
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.fi-navigator.com/remove/"
-  blockers: ["check:a bot check"]
 about: {"category": "financial", "summary": "FI Navigator Corporation is a financial and credit data company. Discover a data analytics platform with new data, insights and benchmarking for the banking vertical including banks, credit unions and their vendor partners. Its own pages mention phone numbers, email addresses, job title and employer, interests and demographics, social media profiles. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["phone", "email", "employment", "interests", "social"], "sells_to": ["businesses"], "sells_note": "Data is provided to our customers or partners subject to restrictive license agreements that limit the use to those specified purposes and prohibits the unauthorized use or transfer of the information.", "source": "https://www.fi-navigator.com/remove/"}
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://dsr.trustsuperset.com/?orgId=aff4e71a-b6d9-43a4-864e-7351e5ab2b2d"
+  blockers: []

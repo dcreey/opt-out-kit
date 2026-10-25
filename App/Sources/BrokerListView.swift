@@ -486,15 +486,17 @@ struct KindBriefingView: View {
                 Section("What opting out does for you") {
                     Label(category.protects, systemImage: "checkmark.shield.fill").font(.subheadline).foregroundStyle(.green)
                 }
+                // The last thing on the page: reading to the bottom is how the briefing is confirmed.
+                Section {
+                    Button { dismiss() } label: { Text("Let's go").font(.headline).frame(maxWidth: .infinity) }
+                        .buttonStyle(.borderedProminent).controlSize(.large).listRowBackground(Color.clear)
+                        .accessibilityIdentifier("briefing-go")
+                }
             }
             .navigationTitle("Today's briefing")
             .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
-                Button { dismiss() } label: { Text("Let's go").font(.headline).frame(maxWidth: .infinity) }
-                    .buttonStyle(.borderedProminent).controlSize(.large).padding()
-                    .accessibilityIdentifier("briefing-go")
-            }
         }
         .presentationDetents([.large])
+        .interactiveDismissDisabled()
     }
 }

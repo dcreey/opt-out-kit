@@ -10,10 +10,14 @@ confidence: "medium"
 opt_out_url: "https://www.lusha.com/privacy-center/request-removal/"
 contact_email: "privacy@lusha.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://www.lusha.com/privacy-center/request-removal/", "method": "post", "action": "https://www.lusha.com/privacy-center/request-removal/#wpcf7-f31080-p12439-o1", "fields": [{"type": "email", "name": "workemail", "label": "Work email address"}, {"type": "text", "name": "firstname", "label": "First name"}, {"type": "text", "name": "lastname", "label": "Last name"}, {"type": "tel", "name": "phoneapivalidation-cf7it-national", "label": "Phone number"}, {"type": "text", "name": "user_position_text", "label": "What is your current position? (Title)"}, {"type": "select", "name": "sales_form_company_size", "label": "How many employees in your company?"}, {"type": "textarea", "name": "pricing_contact_us_details", "label": "How can we help?"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_input, listing_url_input, name_input, opt_out_form_found, phone_input, phone_verify, portal_onetrust]
 profiled: "2026-10-22"
 about: {"category": "b2b", "summary": "Lusha Systems, Inc is a business-contact and sales-data provider. Verified global B2B data: 515M+ contacts, 132M in the US, and 26 buying signals. Available in Lusha Workspace, Claude, ChatGPT, the API and MCP. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; employers and recruiters.", "tracks": ["address", "phone", "email", "age", "employment", "education", "criminal", "interests", "online", "social", "credit"], "sells_to": ["advertisers", "employers"], "sells_note": "We will not use this data for serving advertisements, selling data, or any other purpose except as set hereinabove or as otherwise permitted in line with Customer-/End User-specific consent.", "source": "https://www.lusha.com/legal/privacy-notice/"}
 priority: 57
 persistence: {"result": "permanent", "quote": "Where Data about you as a Contact is collected and processed by us in the Lusha B2B Database, you may opt-out of the processing here and we will add your Data to our suppression list.", "source": "https://www.lusha.com/legal/privacy-notice/"}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://privacyportal-eu.onetrust.com/webform/ff4ba552-d8f3-4209-8935-155725f93afb/68a5d24e-7467-4bd1-818b-8a8d8da486a2"
+  blockers: []

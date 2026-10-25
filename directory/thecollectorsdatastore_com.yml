@@ -11,11 +11,11 @@ opt_out_url: "https://fanalyticsiq.com/privacy-request/"
 registered_in: [OR, TX]
 signals: [script_rendered_page]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: true
-  page: "https://fanalyticsiq.com/privacy-request/"
-  blockers: []
 about: {"category": "marketing_data", "summary": "Collectors Datastore LLC is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy names these buyers or recipients: business customers and sales teams; other data brokers and resellers; banks, lenders and insurers.", "tracks": ["address", "phone", "email", "age", "income", "property", "purchases", "interests", "online", "location"], "sells_to": ["businesses", "brokers", "lenders"], "sells_note": "CDS licenses personal information collected by Ludex through its apps and websites (such as Ludex.com and the Ludex mobile app) and makes that data available to enterprise partners and data customers.", "source": "https://fanalyticsiq.com/privacy-policy/"}
 priority: 65
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://docs.google.com/forms/d/e/1FAIpQLScb2gw3agfJIpzjTwD_U9hVd3Qd3AEhdwFslhulkOLQtRX01w/viewform?embedded=true"
+  blockers: []

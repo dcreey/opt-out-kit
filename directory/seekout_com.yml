@@ -11,11 +11,11 @@ opt_out_url: "https://www.seekout.com/privacy/choices/"
 registered_in: [CA, OR]
 signals: [portal_osano]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://www.seekout.com/privacy/choices/"
-  blockers: []
 about: {"category": "recruiting", "summary": "ZipStorm, Inc. is a recruiting and workforce data provider. SeekOut is the agentic AI recruiting platform used by 750+ enterprises. Source from 1B+ profiles, screen applicants with AI, and engage candidates at scale. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "education", "criminal", "interests", "online", "social"], "sells_to": ["advertisers", "businesses"], "sells_note": "Some of the activities described in this section may constitute “targeted advertising,” “sharing,” or “selling” under certain state privacy laws.", "source": "https://www.seekout.com/privacy/"}
 priority: 51
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://40ros1.share-na2.hsforms.com/2vQIxZUeERGOPFcRto1AFgw?_hsPageUrl=https%3A%2F%2Fwww.seekout.com%2Fprivacy%2Fchoices%2F&_hsPageTitle=Your%20Privacy%20Choices%20%7C%20SeekOut"
+  blockers: []

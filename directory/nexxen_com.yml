@@ -11,11 +11,11 @@ opt_out_url: "https://nexxen.com/privacy-data-subject-rights-request/"
 registered_in: [CA, OR, TX]
 signals: [portal_onetrust]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: true
-  page: "https://nexxen.com/privacy-data-subject-rights-request/"
-  blockers: ["check:a bot check"]
 about: {"category": "adtech", "summary": "Nexxen Inc is an advertising technology company. Nexxen's advertising technology platform delivers performance powered by unique data and media, to help advertisers and publishers achieve their full-funnel goals. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://nexxen.com/"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://privacyportal.onetrust.com/webform/76394770-3c6c-4d28-a57b-18817b0a8e3f/2bbd01a5-983c-440b-9fd5-fd341c9326a1?cookies="
+  blockers: []

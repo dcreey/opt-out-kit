@@ -10,7 +10,6 @@ confidence: "medium"
 opt_out_url: "https://www.sojern.com/privacy/opt-out-data"
 contact_email: "sojernprivacy@sojern.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://www.sojern.com/privacy/opt-out-data", "method": "get", "action": "https://www.sojern.com/privacy/opt-out-data", "fields": [{"type": "email", "name": "email", "label": "Your Email"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, opt_out_form_found]
 profiled: "2026-10-22"
@@ -20,3 +19,8 @@ live_check:
 about: {"category": "adtech", "summary": "Sojern, Inc is an advertising technology company. Sojern is the #1 travel marketing platform for hotels, attractions, and destinations. Powered by data, we help you find, engage, and convert travelers online. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records, interests and demographics. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["phone", "email", "age", "employment", "criminal", "interests", "online", "health", "credit"], "sells_to": ["government"], "sells_note": "We may access, preserve, and disclose your information if we believe doing so is required or appropriate to: Comply with law enforcement requests and legal process, such as a court order or subpoena; Respond to your requests; Protect your, ", "source": "https://www.sojern.com/privacy/privacy-policy"}
 priority: 47
 persistence: {"result": "temporary", "reup_months": 6, "quote": "We comply with opt-out requests by placing an “opt-out” cookie on your computer or device, so, if you clear your cookies on that computer or device, we are unable to read the “opt-out” cookie.", "source": "https://www.sojern.com/privacy/privacy-policy"}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://privacy.sojern.com/"
+  blockers: []

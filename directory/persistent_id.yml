@@ -9,7 +9,6 @@ automation: "scriptable"
 confidence: "medium"
 opt_out_url: "https://persistent.id/opt-out"
 contact_email: "privacy@persistent.id"
-opt_out_form: {"page": "https://persistent.id/opt-out", "method": "post", "action": "https://persistent.id/", "fields": [{"type": "input", "name": "company-site", "label": "company-site"}, {"type": "text", "name": "first_name", "label": "Enter first name"}, {"type": "text", "name": "last_name", "label": "Enter last name"}, {"type": "email", "name": "email", "label": "Enter email address"}, {"type": "text", "name": "company", "label": "Enter company name"}, {"type": "text", "name": "job_title", "label": "Enter job title"}, {"type": "select", "name": "country", "label": "country"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}, {"type": "radio", "name": "role", "label": "role"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]
 profiled: "2026-10-22"
@@ -19,3 +18,8 @@ live_check:
 about: {"category": "adtech", "summary": "Command Precision Inc. is an advertising technology company. A consented identity graph of 289M+ US shoppers, with five years of purchases and intent behind it, built to find, keep and grow your customers. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: government and law enforcement; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "income", "criminal", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["government", "advertisers"], "sells_note": "We may process your information where we believe it is necessary for compliance with our legal obligations, such as to cooperate with a law enforcement body or regulatory agency, exercise or defend our legal rights, or disclose your informa", "source": "https://persistent.id/privacy-policy"}
 priority: 53
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: true
+  page: "https://dsr.trustsuperset.com/?orgId=7b774bc1-608f-8c4c-bb90-453b1540f48b"
+  blockers: []
