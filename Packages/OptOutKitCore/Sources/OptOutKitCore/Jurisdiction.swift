@@ -90,11 +90,13 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
     public var sources: [String]?
     public var pending: [PendingLaw]?
     public var futureWork: [FutureWork]?
+    /// The state's law makes sites honor the Global Privacy Control signal (sources differ on the full list, so this is the ones most agree on).
+    public var gpc: Bool?
     public var reviewed: String
 
     enum CodingKeys: String, CodingKey {
         case id, code, name, kind, reviewed, bloc, regulator, sources, pending
-        case futureWork = "future_work"
+        case futureWork = "future_work", gpc
         case privacyLaw = "privacy_law", brokerRegistry = "broker_registry"
         case deletionPlatform = "deletion_platform", deletionMechanismNote = "deletion_mechanism_note"
     }

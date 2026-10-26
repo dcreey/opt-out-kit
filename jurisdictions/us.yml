@@ -58,12 +58,7 @@ jurisdictions:
       fetcher: "ca"
       note: "Annual registration by January 31."
     deletion_platform: ca-drop
-    future_work:
-      - kind: opt_out_signal
-        name: "Global Privacy Control"
-        url: "https://globalprivacycontrol.org"
-        note: "A browser setting that tells every site you visit to treat you as opted out of sale and sharing. This state requires sites to honor it. The app could switch it on in its own browser, so no form is needed."
-        sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/california-data-privacy-laws/", "https://cppa.ca.gov/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-co
@@ -77,12 +72,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: required
     broker_registry: null
-    future_work:
-      - kind: opt_out_signal
-        name: "Global Privacy Control"
-        url: "https://globalprivacycontrol.org"
-        note: "A browser setting that tells every site you visit to treat you as opted out of sale and sharing. This state requires sites to honor it. The app could switch it on in its own browser, so no form is needed."
-        sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/colorado-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-ct
@@ -107,11 +97,7 @@ jurisdictions:
         url: "https://www.pandectes.io/blog/data-broker-compliance-in-2026-a-guide-to-california-connecticut-new-jersey-and-beyond/"
         note: "Registration provisions became active on 1 October 2026. Once the state publishes the list we can pull it."
         sourced: true
-      - kind: opt_out_signal
-        name: "Global Privacy Control"
-        url: "https://globalprivacycontrol.org"
-        note: "A browser setting that tells every site you visit to treat you as opted out of sale and sharing. This state requires sites to honor it. The app could switch it on in its own browser, so no form is needed."
-        sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/connecticut-data-privacy-laws/", "https://www.cga.ct.gov/2026/act/Pa/pdf/2026PA-00064-R00SB-00004-PA.PDF", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
     pending:
@@ -134,6 +120,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: required
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/delaware-data-privacy-laws/", "https://legis.delaware.gov/BillDetail/143105", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
     pending:
@@ -280,6 +267,7 @@ jurisdictions:
       universal_opt_out: reported
       note: "Applies to processing from 2026-04-01."
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/maryland-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-ma
@@ -322,6 +310,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: required
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/minnesota-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-ms
@@ -349,6 +338,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: required
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/montana-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-ne
@@ -362,6 +352,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: reported
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/nebraska-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-nv
@@ -382,6 +373,7 @@ jurisdictions:
       opt_out_of_sale: true
       universal_opt_out: required
     broker_registry: null
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-hampshire-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-nj
@@ -405,6 +397,7 @@ jurisdictions:
         url: "https://www.faegredrinker.com/en/insights/publications/2026/7/new-jersey-enacts-sweeping-data-broker-and-data-collector-registration-law"
         note: "Law enacted 30 June 2026. Registration starts 27 March 2027 and the state plans to launch the registry in spring 2027. When it is public we can pull its brokers like the other states."
         sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-jersey-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-nm
@@ -490,12 +483,7 @@ jurisdictions:
       url: "https://dfr.oregon.gov/business/licensing/data-broker-registry/pages/index.aspx"
       fetcher: "or"
       note: "The public file has names and addresses but no websites."
-    future_work:
-      - kind: opt_out_signal
-        name: "Global Privacy Control"
-        url: "https://globalprivacycontrol.org"
-        note: "A browser setting that tells every site you visit to treat you as opted out of sale and sharing. This state requires sites to honor it. The app could switch it on in its own browser, so no form is needed."
-        sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/oregon-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-pa
@@ -568,12 +556,7 @@ jurisdictions:
       url: "https://texas-sos.appianportalsgov.com/data-broker-registry"
       fetcher: "tx"
       note: "Applies to businesses whose principal revenue is licensing third-party data."
-    future_work:
-      - kind: opt_out_signal
-        name: "Global Privacy Control"
-        url: "https://globalprivacycontrol.org"
-        note: "A browser setting that tells every site you visit to treat you as opted out of sale and sharing. This state requires sites to honor it. The app could switch it on in its own browser, so no form is needed."
-        sourced: true
+    gpc: true
     reviewed: 2026-10-22
     sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/texas-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
   - id: us-ut

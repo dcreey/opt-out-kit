@@ -2255,6 +2255,29 @@
     }
    }
   },
+  "A setting in your browser that tells every site you visit: do not sell or share my data, and do not use it for targeted ads. It works by sending one extra line with each page request, so you set it once instead of clicking opt-out on every site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un réglage de votre navigateur qui dit à chaque site visité : ne vendez ni ne partagez mes données, et ne les utilisez pas pour de la publicité ciblée. Il envoie une ligne de plus avec chaque requête de page : vous le réglez une fois au lieu de cliquer sur « refuser » sur chaque site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un ajuste de su navegador que dice a cada sitio que visita: no venda ni comparta mis datos, ni los use para publicidad dirigida. Envía una línea extra con cada petición de página, así que lo configura una vez en lugar de pulsar «excluirme» en cada sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Browsereinstellung, die jeder besuchten Seite mitteilt: Verkaufen oder teilen Sie meine Daten nicht und nutzen Sie sie nicht für gezielte Werbung. Sie sendet mit jeder Seitenanfrage eine zusätzliche Zeile, Sie stellen es also einmal ein, statt auf jeder Seite Opt-out zu klicken."
+     }
+    }
+   }
+  },
   "A simple form and an email link": {
    "extractionState": "manual",
    "localizations": {
@@ -4344,6 +4367,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Brave and DuckDuckGo: already on by default.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave et DuckDuckGo : déjà activé par défaut."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave y DuckDuckGo: ya viene activado por defecto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave und DuckDuckGo: standardmäßig bereits aktiv."
      }
     }
    }
@@ -7315,6 +7361,29 @@
     }
    }
   },
+  "Every opt-out page this app opens sends the signal, for everyone, wherever they live.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque page de retrait ouverte par l'app envoie le signal, pour tout le monde, où que l'on vive."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada página de baja que abre esta app envía la señal, para todos, vivan donde vivan."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Opt-out-Seite, die diese App öffnet, sendet das Signal, für alle, egal wo sie wohnen."
+     }
+    }
+   }
+  },
   "Every site stays on the list. This only moves brokers registered where you live, or have lived, to the top and marks them, because a broker anywhere may still list you.": {
    "extractionState": "manual",
    "localizations": {
@@ -7959,6 +8028,29 @@
     }
    }
   },
+  "Firefox: Settings, Privacy and Security, then \"Tell websites not to sell or share my data\".": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Firefox : Réglages, Vie privée et sécurité, puis « Dire aux sites de ne pas vendre ni partager mes données »."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Firefox: Ajustes, Privacidad y seguridad, y «Decir a los sitios web que no vendan ni compartan mis datos»."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Firefox: Einstellungen, Datenschutz & Sicherheit, dann „Websites mitteilen, meine Daten nicht zu verkaufen oder weiterzugeben“."
+     }
+    }
+   }
+  },
   "First name": {
    "extractionState": "manual",
    "localizations": {
@@ -8346,6 +8438,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Geist"
+     }
+    }
+   }
+  },
+  "Global Privacy Control": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control"
      }
     }
    }
@@ -9339,6 +9454,29 @@
     }
    }
   },
+  "In this app": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans cette app"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En esta app"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In dieser App"
+     }
+    }
+   }
+  },
   "Income or wealth": {
    "extractionState": "manual",
    "localizations": {
@@ -9473,6 +9611,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Es gilt nur für sehr große Plattformen und erreicht Datenbroker daher selten."
+     }
+    }
+   }
+  },
+  "It does not delete anything, and it does not reach data brokers that already hold your details, because those never see your browser. It is a good habit next to the opt-outs in this app, not a replacement.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il ne supprime rien et n'atteint pas les courtiers qui détiennent déjà vos données, car ils ne voient jamais votre navigateur. C'est une bonne habitude en plus des retraits de cette app, pas un remplacement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No borra nada y no llega a los corredores que ya tienen sus datos, porque nunca ven su navegador. Es un buen hábito junto a las bajas de esta app, no un sustituto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es löscht nichts und erreicht keine Datenhändler, die Ihre Daten schon haben, weil diese Ihren Browser nie sehen. Es ist eine gute Ergänzung zu den Opt-outs in dieser App, kein Ersatz."
      }
     }
    }
@@ -14652,6 +14813,29 @@
     }
    }
   },
+  "Outside these states": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hors de ces États"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fuera de estos estados"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Außerhalb dieser Bundesstaaten"
+     }
+    }
+   }
+  },
   "Page %lld of %lld": {
    "extractionState": "manual",
    "localizations": {
@@ -16212,6 +16396,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jetzt starten"
+     }
+    }
+   }
+  },
+  "Safari has no built-in switch, so use one of those browsers for everyday browsing.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Safari n'a pas de réglage intégré : utilisez l'un de ces navigateurs au quotidien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Safari no tiene un interruptor integrado, así que use uno de esos navegadores a diario."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Safari hat keinen eingebauten Schalter, nutzen Sie im Alltag einen dieser Browser."
      }
     }
    }
@@ -18125,6 +18332,29 @@
     }
    }
   },
+  "Sources disagree on the full list and it is growing, so a state missing here may still require it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les sources divergent sur la liste complète, qui s'allonge : un État absent ici peut quand même l'exiger."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las fuentes no coinciden en la lista completa y crece, así que un estado ausente aquí puede exigirlo igualmente."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Quellen sind sich über die vollständige Liste uneinig und sie wächst; ein hier fehlender Bundesstaat kann es trotzdem verlangen."
+     }
+    }
+   }
+  },
   "South Carolina": {
    "extractionState": "manual",
    "localizations": {
@@ -18305,6 +18535,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bundesstaat"
+     }
+    }
+   }
+  },
+  "States that require sites to honor it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "États qui obligent les sites à le respecter"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estados que obligan a los sitios a respetarla"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bundesstaaten, die Websites zur Beachtung verpflichten"
      }
     }
    }
@@ -19547,6 +19800,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Der größte Profilpool, den Betrüger kaufen, um Sie und ältere Verwandte anzusprechen. Ein Opt-out verringert am meisten Werbung und Betrug."
+     }
+    }
+   }
+  },
+  "The law in %@ makes sites honor this signal.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La loi de %@ oblige les sites à respecter ce signal."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La ley de %@ obliga a los sitios a respetar esta señal."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Gesetz in %@ verpflichtet Websites, dieses Signal zu beachten."
      }
     }
    }
@@ -21667,6 +21943,29 @@
     }
    }
   },
+  "Turn it on in your browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'activer dans votre navigateur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Actívela en su navegador"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Ihrem Browser aktivieren"
+     }
+    }
+   }
+  },
   "Turn off": {
    "extractionState": "manual",
    "localizations": {
@@ -23185,6 +23484,52 @@
     }
    }
   },
+  "What it does not do": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce qu'il ne fait pas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo que no hace"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was es nicht tut"
+     }
+    }
+   }
+  },
+  "What it is": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce que c'est"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Qué es"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was es ist"
+     }
+    }
+   }
+  },
   "What opting out does for you": {
    "extractionState": "manual",
    "localizations": {
@@ -24193,6 +24538,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie können der Direktwerbung jederzeit widersprechen."
+     }
+    }
+   }
+  },
+  "You can switch it on anywhere. Only the states below make sites obey it; elsewhere it is a request that some sites honor anyway and others ignore.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez l'activer partout. Seuls les États ci-dessous obligent les sites à l'appliquer ; ailleurs c'est une demande que certains sites respectent et d'autres ignorent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puede activarla en cualquier lugar. Solo los estados siguientes obligan a los sitios a obedecerla; en otros lugares es una petición que algunos sitios respetan y otros ignoran."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie können es überall einschalten. Nur die unten genannten Bundesstaaten verpflichten Websites dazu; anderswo ist es eine Bitte, die manche Seiten beachten und andere ignorieren."
      }
     }
    }

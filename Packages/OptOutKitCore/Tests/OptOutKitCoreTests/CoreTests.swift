@@ -2377,7 +2377,7 @@ final class RunCheckTests: XCTestCase {
         XCTAssertEqual(work("country-fr").first?.name, "Bloctel")
         XCTAssertTrue(work("country-gb").contains { $0.kind == "central_register" })
         XCTAssertTrue(work("us-nj").contains { $0.kind == "broker_registry" })
-        XCTAssertTrue(work("us-ca").contains { $0.kind == "opt_out_signal" })
+        XCTAssertTrue(all.filter { $0.gpc == true }.map(\.id).contains("us-ca") && all.filter { $0.gpc == true }.count == 12, "the twelve states most sources agree require GPC")
         for j in all { for w in j.futureWork ?? [] { XCTAssertFalse(w.note.isEmpty, "\(j.id) \(w.name)") } }
     }
 

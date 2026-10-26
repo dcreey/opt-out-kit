@@ -69,6 +69,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     private override init() {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
+        // Global Privacy Control: every page the app opens is told, in script too, that this person opts out of sale and sharing.
+        config.userContentController.addUserScript(WKUserScript(source: "try{Object.defineProperty(Navigator.prototype,'globalPrivacyControl',{get:function(){return true;},configurable:true});}catch(e){}",
+                                                                injectionTime: .atDocumentStart, forMainFrameOnly: false))
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
         webView.navigationDelegate = self
@@ -171,6 +174,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     func load(_ request: URLRequest) async throws {
         // Ask for the site in the language the person chose, so a site that has its terms and forms in that language shows them.
         var request = request
+        request.setValue("1", forHTTPHeaderField: "Sec-GPC")
         if request.value(forHTTPHeaderField: "Accept-Language") == nil {
             request.setValue("\(Loc.language),en;q=0.5", forHTTPHeaderField: "Accept-Language")
         }

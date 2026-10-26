@@ -12,7 +12,7 @@ live or in their country, and so on). Outside the US the app has no local regist
 | One-stop deletion | California | DROP: one request to every registered broker. Brokers had to start on 2026-08-01. | **Already in the app** |
 | Broker registry | New Jersey | Law enacted 2026-06-30; registration from 2027-03-27, registry spring 2027 | Future |
 | Broker registry | Connecticut | Registration active from 2026-10-01; list not yet pulled | Future |
-| Opt-out signal | CA, CO, CT, OR, TX (about a dozen states in all) | Global Privacy Control must be honored; the app could switch it on in its own browser | Future |
+| Opt-out signal | CA, CO, CT, DE, MD, MN, MT, NE, NH, NJ, OR, TX | Global Privacy Control must be honored. **Now sent by the app's own browser for everyone**; About explains how to turn it on in a person's own browser | Done (app side) |
 | Central register | UK | Telephone and Mailing Preference Services | Future |
 | Central register | Canada | National Do Not Call List | Future |
 | Central register | Australia | Do Not Call Register | Future |
