@@ -45,9 +45,10 @@ public enum Regions {
     /// The places a person's own country covers, "US" when it is not known (the directory is a US one).
     public static func labels(forCountry code: String?) -> Set<String> { labels(forCountry: code ?? "US") }
 
-    /// Whether a site collects data about people in this country. A site with no tag counts as US.
+    /// Whether a site collects data about people in this country. A site with no tag counts as US; one tagged GLOBAL (worldwide) reaches everyone.
     public static func reaches(_ entry: DirectoryEntry, country: String?) -> Bool {
-        !Set(entry.regions?.list ?? ["US"]).isDisjoint(with: labels(forCountry: country ?? "US"))
+        let list = Set(entry.regions?.list ?? ["US"])
+        return list.contains("GLOBAL") || !list.isDisjoint(with: labels(forCountry: country ?? "US"))
     }
 
     /// Splits sites into those that reach the person's country and those that do not. The two always add up to the input.

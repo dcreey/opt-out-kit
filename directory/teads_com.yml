@@ -20,6 +20,6 @@ live_form:
   found: true
   page: "https://submit-irm.trustarc.com/services/validation/11bc4513-fc39-4d64-bcf3-ae603d2bd140"
   blockers: ["code"]
-regions: {"list": ["US", "EU", "UK", "DE", "FR", "IT", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Teads France SAS; its pages mention UK GDPR; offers its site in German; offers its site in French; offers its site in Italian; offers its site in Japanese", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "DE", "FR", "IT", "JP", "GLOBAL"], "evidence": "listed on the IAB Europe TCF vendor list as Teads France SAS; its pages mention UK GDPR; offers its site in German; offers its site in French; offers its site in Italian; offers its site in Japanese; it was found in 6 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to teads.com", "privacy_page": null, "region": "BR", "url": "https://teads.com.br/"}]
 languages: {"list": ["de", "en", "es", "fr", "it", "ja", "zh"], "pages": {}, "checked": "2026-10-26"}

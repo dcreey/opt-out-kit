@@ -19,5 +19,5 @@ priority: 53
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "dataprotection@applovin.com"
 contact_email_source: "page"
-regions: {"list": ["US", "EU", "UK", "JP", "KR", "VN"], "evidence": "its pages mention residents of the EU; its pages mention United Kingdom; offers its site in Japanese; offers its site in Korean; offers its site in Vietnamese", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "JP", "KR", "VN", "GLOBAL"], "evidence": "its pages mention residents of the EU; its pages mention United Kingdom; offers its site in Japanese; offers its site in Korean; offers its site in Vietnamese; it was found in 5 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en", "ja", "ko", "vi", "zh"], "pages": {"en": "https://applovin.com/en", "ja": "https://applovin.com/ja", "ko": "https://applovin.com/ko", "vi": "https://applovin.com/vi", "zh": "https://applovin.com/zh"}, "checked": "2026-10-26"}

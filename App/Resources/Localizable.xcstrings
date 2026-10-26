@@ -17780,6 +17780,29 @@
     }
    }
   },
+  "Serves people worldwide": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sert des personnes dans le monde entier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Atiende a personas en todo el mundo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bedient Menschen weltweit"
+     }
+    }
+   }
+  },
   "Set up Global Privacy Control": {
    "extractionState": "manual",
    "localizations": {

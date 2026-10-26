@@ -23,5 +23,5 @@ live_form:
   found: true
   page: "https://dsr.trustsuperset.com/?orgId=7b774bc1-608f-8c4c-bb90-453b1540f48b"
   blockers: []
-regions: {"list": ["US", "EU", "UK", "AU", "ZA", "NZ"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention Privacy Act 1988; its pages mention POPIA; its pages mention Privacy Act 2020", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "AU", "ZA", "NZ", "GLOBAL"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention Privacy Act 1988; its pages mention POPIA; its pages mention Privacy Act 2020; it was found in 5 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

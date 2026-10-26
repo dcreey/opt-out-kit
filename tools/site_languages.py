@@ -92,11 +92,16 @@ def main(cmd):
         m = re.search(r"^regions: (\{.*\})$", s, re.M)
         if m:
             r = json.loads(m.group(1))
-            for code in (res["list"] if len(res["list"]) <= 15 else []):   # a picker with dozens of languages says little about where the broker operates
+            for code in (res["list"] if len(res["list"]) <= 15 else []):   # a picker with dozens of languages is a worldwide signal (GLOBAL below), not a list of countries
                 c = ONE_COUNTRY.get(code)
                 if c and c not in r["list"] and ("EU" not in r["list"] or True):
                     r["list"].append(c); tagged += 1
                     r["evidence"] = (r.get("evidence", "") + "; offers its site in " + NAMES[code]).lstrip("; ")
+            # Many languages, or many regions, together suggest the broker serves people everywhere, not in one place.
+            others = [x for x in r["list"] if x not in ("US", "GLOBAL")]
+            if "GLOBAL" not in r["list"] and (len(res["list"]) >= 8 or len(others) >= 4):
+                why = ("its site is offered in %d languages" % len(res["list"])) if len(res["list"]) >= 8 else ("it was found in %d regions besides the US" % len(others))
+                r["list"].append("GLOBAL"); r["evidence"] = (r.get("evidence", "") + "; " + why + ", which suggests it serves people worldwide").lstrip("; ")
             s = s[:m.start()] + "regions: " + json.dumps(r, ensure_ascii=False) + s[m.end():]
         open(f, "w").write(s); n += 1
     print("updated", n, "sites; region tags added from languages:", tagged)

@@ -20,5 +20,5 @@ live_form:
   found: true
   page: "https://preferences.cbinsights.com/"
   blockers: []
-regions: {"list": ["US", "UK", "EU", "CA", "BR"], "evidence": "on the UK ICO register of fee payers as CB Information Services, Inc. (ref ZB898660); its pages mention GDPR; its pages mention PIPEDA; its pages mention Lei Geral", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU", "CA", "BR", "GLOBAL"], "evidence": "on the UK ICO register of fee payers as CB Information Services, Inc. (ref ZB898660); its pages mention GDPR; its pages mention PIPEDA; its pages mention Lei Geral; it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -19,5 +19,5 @@ priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@verisk.com"
 contact_email_source: "browser"
-regions: {"list": ["US", "DK", "DE", "FR", "NO", "SE"], "evidence": "registered with a US state; nothing found for other places; offers its site in Danish; offers its site in German; offers its site in French; offers its site in Norwegian; offers its site in Swedish", "checked": "2026-10-26"}
+regions: {"list": ["US", "DK", "DE", "FR", "NO", "SE", "GLOBAL"], "evidence": "registered with a US state; nothing found for other places; offers its site in Danish; offers its site in German; offers its site in French; offers its site in Norwegian; offers its site in Swedish; it was found in 5 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["da", "de", "en", "fr", "nb", "no", "sv"], "pages": {"da": "https://www.verisk.com/da-dk/", "de": "https://www.verisk.com/de-de/", "en": "https://www.verisk.com/en-gb/", "fr": "https://www.verisk.com/fr-ca/", "nb": "https://www.verisk.com/nb-no/", "no": "https://www.verisk.com/en-no/", "sv": "https://www.verisk.com/sv-se/"}, "checked": "2026-10-26"}

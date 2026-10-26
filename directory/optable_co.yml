@@ -19,6 +19,6 @@ priority: 54
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@optable.co"
 contact_email_source: "page"
-regions: {"list": ["US", "EU", "UK", "CA", "FR"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Quebec; has a FR site at https://fr.optable.co/ (country subdomain)", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA", "FR", "GLOBAL"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Quebec; has a FR site at https://fr.optable.co/ (country subdomain); it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "country subdomain", "privacy_page": "https://fr.optable.co/platform-overview", "region": "FR", "url": "https://fr.optable.co/"}]
 languages: {"list": ["en", "fr"], "pages": {"en": "https://www.optable.co/", "fr": "https://fr.optable.co/"}, "checked": "2026-10-26"}

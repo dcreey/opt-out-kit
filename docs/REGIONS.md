@@ -61,3 +61,10 @@ parameter, and opens language menus (buttons labelled Language, globes, a curren
 After it ran, 78 sites are offered in a language other than English and 60 have a translated opt-out page. It found real ones: OneTrust webforms with a language
 switcher, and translated privacy pages on criteo.com. Translated pages on a tracker or analytics host are dropped, and a picker with more than 15 languages adds no
 region tags. A menu that opens only after a hover, or sits behind a bot check, is still missed.
+
+### Worldwide brokers
+
+A broker offered in 8 or more languages, or found in 4 or more regions besides the US, is tagged `GLOBAL` (worldwide): many languages say it serves people everywhere, not
+in one place. A `GLOBAL` site reaches every country in the region filter, so someone outside the US sees it with their own region's sites. 68 sites are tagged this
+way. It is a signal, not proof: a site builder's language pack can inflate a count, so the evidence is stored and shown, and the earlier cap that ignored very long
+language lists is gone.

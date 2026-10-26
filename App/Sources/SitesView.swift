@@ -502,9 +502,11 @@ struct DirectoryInfoView: View {
             if let about = entry.about { aboutSection(about) }
             persistenceSection
             let others = (entry.languages?.list ?? []).filter { $0 != "en" }
-            let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" }
-            if !others.isEmpty || !places.isEmpty {
+            let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" && $0 != "GLOBAL" }
+            let worldwide = entry.regions?.list.contains("GLOBAL") == true
+            if !others.isEmpty || !places.isEmpty || worldwide {
                 Section("Where it operates") {
+                    if worldwide { Label("Serves people worldwide", systemImage: "globe") }
                     if !places.isEmpty { Text(Loc.f("Collects data about people in: %@", places.joined(separator: ", "))) }
                     if !others.isEmpty { Text(Loc.f("Its site is offered in: %@", others.map(Regions.languageName).joined(separator: ", "))) }
                     if let note = entry.regions?.evidence, !note.isEmpty { Text(note).font(.footnote).foregroundStyle(.secondary) }

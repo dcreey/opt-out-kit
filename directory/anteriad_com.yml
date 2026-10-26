@@ -20,5 +20,5 @@ live_form:
 about: {"category": "b2b", "summary": "Anteriad, LLC is a business-contact and sales-data provider. Anteriad is a full funnel marketing and B2B data solutions provider that offers intent data, demand generation, ABM solutions, analytics, and more. Its own pages mention shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "location"], "sells_to": [], "source": "https://anteriad.com/"}
 priority: 35
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU", "UK", "CA", "IN", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Anteriad, LLC; on the UK ICO register of fee payers as Anteriad Global Limited (ref ZA229110); its pages mention CASL; its pages mention DPDP; its pages mention APPI", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA", "IN", "JP", "GLOBAL"], "evidence": "listed on the IAB Europe TCF vendor list as Anteriad, LLC; on the UK ICO register of fee payers as Anteriad Global Limited (ref ZA229110); its pages mention CASL; its pages mention DPDP; its pages mention APPI; it was found in 5 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

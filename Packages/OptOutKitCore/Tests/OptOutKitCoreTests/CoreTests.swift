@@ -2390,9 +2390,11 @@ final class RunCheckTests: XCTestCase {
         XCTAssertEqual(us.inRegion.count, entries.count); XCTAssertTrue(us.elsewhere.isEmpty)
         for split in [fr, gb] { XCTAssertEqual(split.inRegion.count + split.elsewhere.count, entries.count) }
         XCTAssertTrue(fr.inRegion.count > 0 && fr.inRegion.count < entries.count, "a French resident sees only the sites that reach the EU")
-        XCTAssertTrue(fr.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["EU", "FR"]) })
-        XCTAssertTrue(gb.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["UK", "GB"]) })
+        XCTAssertTrue(fr.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["EU", "FR", "GLOBAL"]) })
+        XCTAssertTrue(gb.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["UK", "GB", "GLOBAL"]) })
         XCTAssertEqual(Regions.labels(forCountry: "DE"), ["DE", "EU"])
+        XCTAssertTrue(entries.contains { $0.regions?.list.contains("GLOBAL") == true }, "worldwide brokers are tagged")
+        for e in entries where e.regions?.list.contains("GLOBAL") == true { XCTAssertTrue(Regions.reaches(e, country: "BR") && Regions.reaches(e, country: "JP"), e.domain) }
     }
 
     func testABrokersOwnSiteForAnotherCountryIsUsedForThatCountryOnly() throws {

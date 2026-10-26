@@ -19,5 +19,5 @@ live_form:
 about: {"category": "b2b", "summary": "Preqin Ltd is a business-contact and sales-data provider. Explore Preqin alternative assets data, private markets research, benchmarks and investment intelligence for investors and fund managers. Its own pages mention property and vehicles, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "online"], "sells_to": [], "source": "https://www.preqin.com/"}
 priority: 29
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU", "UK", "JP", "KR"], "evidence": "its pages mention EEA; its pages mention United Kingdom; offers its site in Japanese; offers its site in Korean", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "JP", "KR", "GLOBAL"], "evidence": "its pages mention EEA; its pages mention United Kingdom; offers its site in Japanese; offers its site in Korean; it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en", "ja", "ko", "zh"], "pages": {"en": "https://preqin.com/policies/privacy-policy", "ja": "https://preqin.com/jp/policies/privacy-policy", "ko": "https://preqin.com/kr", "zh": "https://www.preqin.net.cn/policies/privacy-policy"}, "checked": "2026-10-26"}
