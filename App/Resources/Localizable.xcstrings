@@ -20540,6 +20540,29 @@
     }
    }
   },
+  "This page only needs your confirmation. Read it, then press \"%@\" yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette page n'a besoin que de votre confirmation. Lisez-la, puis appuyez vous-même sur « %@ »."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta página solo necesita tu confirmación. Léela y pulsa tú mismo «%@»."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite braucht nur Ihre Bestätigung. Lesen Sie sie und drücken Sie dann selbst „%@“."
+     }
+    }
+   }
+  },
   "This searches each site for %@ the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.": {
    "extractionState": "manual",
    "localizations": {
@@ -21571,6 +21594,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir gehen auch über das Register Ihres Bundesstaats hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (%@), mit weiteren bekannten Brokern – insgesamt %@ Websites, egal in welchem Bundesstaat oder Land sie registriert sind."
+     }
+    }
+   }
+  },
+  "We chose \"%@\" for you. Read the page and confirm with its own button.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons choisi « %@ » pour vous. Lisez la page et confirmez avec son propre bouton."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hemos elegido «%@» por ti. Lee la página y confirma con su propio botón."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben „%@“ für Sie gewählt. Lesen Sie die Seite und bestätigen Sie mit ihrer eigenen Schaltfläche."
      }
     }
    }

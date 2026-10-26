@@ -174,7 +174,7 @@ public enum FormFiller {
                 }
             }
             // A subject or message box: the same plain request every time, stating only what the person already sends.
-            if field.label.lowercased().range(of: "^\\s*(subject|topic|regarding)\\b", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
+            if field.label.lowercased().range(of: "^\\s*(subject|topic|regarding)\\s*(\\*|:|\\(required\\))?\\s*$", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
             if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
                 put([FormFiller.standardRequest(for: person)], L10n.noun("Message")); continue
             }

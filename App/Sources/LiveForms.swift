@@ -128,7 +128,7 @@ extension WebViewSession {
     /// Privacy portals that open on a choice of requests ("Start Access Request", "Start Deletion Request", "Start Opt Out Request"): clicks the one a
     /// person asking to be removed wants, so the form behind it is on the page. Opt-out of sale or sharing first, then deletion; never access, transfer,
     /// correction or update. Repeats once for a second step. Returns what it clicked, or nil when the page has no such choice.
-    func advanceToRequestForm() async -> String? {
+    func advanceToRequestForm(loose: Bool = false) async -> String? {
         var clicked: String?
         for _ in 0..<2 {
             let js = #"""
@@ -136,7 +136,7 @@ extension WebViewSession {
               var pref=[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
               var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
                 var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete my (user )?data)$/i.test(t))&&r.width>0&&r.height>0&&e.children.length<=2;});
+                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete my (user )?data)$/i.test(t)||(\#(loose ? "true" : "false")&&e.tagName!=='A'&&/^(opt.?out|do not sell( or share)?( my (personal )?(information|data))?|delete( my (data|information|account))?|remove me)$/i.test(t)))&&r.width>0&&r.height>0&&e.children.length<=2;});
               for(var p=0;p<pref.length;p++){for(var i=0;i<els.length;i++){var t=(els[i].innerText||'').trim();
                 if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
               return '';})();
@@ -151,12 +151,17 @@ extension WebViewSession {
 
     /// Fills the values the plan chose, finding each field by its token.
     /// Fills the form; menus that fill in after another choice (a state list that waits for the country) get a second pass.
-    func fillLive(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
+    func fillLive(_ values: [FieldValue], keepExisting: Bool = false) async -> (filled: Int, unmatchedRequired: [String]) {
+        keepExistingValues = keepExisting
         let first = await fillLiveOnce(values)
         guard !first.unmatchedRequired.isEmpty else { return first }
         try? await Task.sleep(nanoseconds: 900_000_000)
         return await fillLiveOnce(values)
     }
+
+    /// When set, a text box that already holds something (a link from an email pre-fills the name and email) is left as it is.
+    private static var keep: Bool = false
+    private var keepExistingValues: Bool { get { Self.keep } set { Self.keep = newValue } }
 
     private func fillLiveOnce(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
         let normal = values.filter { $0.type != FormFiller.confirmIdentityType }
@@ -184,7 +189,8 @@ extension WebViewSession {
                   if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
-            } else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,v.candidates[0]);filled++;}});
+            } else if(\#(keepExistingValues ? "true" : "false")&&(el.value||'').trim()!==''){filled++;}
+            else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,v.candidates[0]);filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (try? await webView.evaluateJavaScript(js)) as? String, let d = out.data(using: .utf8),
@@ -273,6 +279,19 @@ extension WebViewSession {
             var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!(e.value||'').trim();
             if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
           return '';})(\#(Self.liveLiteral(token)));
+        """#
+        let out = (try? await webView.evaluateJavaScript(js)) as? String
+        return (out?.isEmpty ?? true) ? nil : out
+    }
+
+    /// The label of a confirmation button on the page ("Confirm request", "Verify my email"), scrolled into view, or nil. It is only found, never pressed:
+    /// confirming is the person's own tap.
+    func confirmButtonLabel() async -> String? {
+        let js = #"""
+        (function(){var bs=[].slice.call(document.querySelectorAll('button,a,[role=button],input[type=submit]')).filter(function(b){
+          var t=((b.innerText||b.value||'')+'').replace(/\s+/g,' ').trim(), r=b.getBoundingClientRect();
+          return r.width>0&&r.height>0&&/^(confirm( my)?( request| email| opt.?out)?|verify( my)?( request| email)?|complete( my)?( request)?|yes,? (confirm|opt out|delete))$/i.test(t);});
+          if(!bs.length) return ''; bs[0].scrollIntoView({block:'center'}); return ((bs[0].innerText||bs[0].value||'')+'').trim();})();
         """#
         let out = (try? await webView.evaluateJavaScript(js)) as? String
         return (out?.isEmpty ?? true) ? nil : out

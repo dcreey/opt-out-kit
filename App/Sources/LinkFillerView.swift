@@ -38,10 +38,18 @@ final class LinkFiller: ObservableObject {
         guard let s = session else { return }
         busy = true; defer { busy = false }
         status = Loc.t("Filling in your details…")
-        _ = await s.advanceToRequestForm()
-        let forms = await s.discoverForms()
+        // A form already on the page is filled as it is. Only a page with no form gets its request chosen (plain "Opt Out" and "Delete" buttons, never links).
+        var step: String?
+        var forms = await s.discoverForms()
+        if LiveFormPicker.pick(forms, pageContext: await s.pageContext()) == nil {
+            step = await s.advanceToRequestForm(loose: true)
+            forms = await s.discoverForms()
+        }
         guard let form = LiveFormPicker.pick(forms, pageContext: await s.pageContext()) else {
-            status = Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again."); return
+            if let confirm = await s.confirmButtonLabel() { status = Loc.f("This page only needs your confirmation. Read it, then press \"%@\" yourself.", confirm); return }
+            status = step != nil ? Loc.f("We chose \"%@\" for you. Read the page and confirm with its own button.", step ?? "")
+                                 : Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.")
+            return
         }
         s.chosenForm = form.token
         let plan = FormFiller.plan(for: form.asOptOutForm(page: webView?.url ?? URL(string: "https://invalid.example")!), signals: nil, person: person)
@@ -50,7 +58,7 @@ final class LinkFiller: ObservableObject {
         case .needsData(let what): status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return
         case .needsYou(let why): status = why; return
         }
-        let fill = await s.fillLive(plan.values)
+        let fill = await s.fillLive(plan.values, keepExisting: true)
         _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
         _ = await s.chooseCustomMenus()
         await s.scrollFormIntoView(form.token)
