@@ -21,4 +21,5 @@ live_form:
   checked: "2026-10-25"
   found: false
   blockers: ["business"]
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK residents", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CN"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK residents; has a CN site at https://hunter.io/zh-CN (hreflang zh-CN)", "checked": "2026-10-26"}
+regional_sites: [{"has_form": true, "how": "hreflang zh-CN", "privacy_page": "https://hunter.io/privacy-policy", "region": "CN", "url": "https://hunter.io/zh-CN"}]

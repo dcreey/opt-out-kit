@@ -18,3 +18,4 @@ about: {"category": "marketing_data", "summary": "Catalina Marketing Corporation
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Catalina Marketing UK Limited (ref Z8268399)", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to catalina.com", "privacy_page": null, "region": "GB", "url": "https://catalina.co.uk/"}, {"has_form": false, "how": "probed country domain that links back to catalina.com", "privacy_page": null, "region": "AU", "url": "https://www.catalina.com.au/"}]

@@ -16,3 +16,4 @@ about: {"category": "marketing_services", "summary": "Quad Graphics, Inc. is a m
 priority: 51
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to quad.com", "privacy_page": null, "region": "AU", "url": "https://www.quad.com.au/"}]

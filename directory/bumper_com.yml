@@ -25,3 +25,4 @@ persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@bumper.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention UK GDPR", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to bumper.com", "privacy_page": "https://www.bumper.com/privacy-policy/", "region": "CA", "url": "https://www.bumper.ca/"}, {"has_form": false, "how": "probed country domain that links back to bumper.com", "privacy_page": null, "region": "BR", "url": "https://bumper.com.br/"}]

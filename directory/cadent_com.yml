@@ -20,3 +20,4 @@ about: {"category": "adtech", "summary": "Cadent, LLC is an advertising technolo
 priority: 23
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to cadent.com", "privacy_page": "https://cadent.au/privacy", "region": "AU", "url": "https://cadent.au/"}, {"has_form": false, "how": "probed country domain that links back to cadent.com", "privacy_page": null, "region": "BR", "url": "https://cadent.com.br/"}]

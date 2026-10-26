@@ -1,0 +1,2381 @@
+{
+ "01advertising.com": [],
+ "33across.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to 33across.com",
+   "privacy_page": "https://udp.33across.com/udp_opt_out",
+   "region": "GB",
+   "url": "https://www.33across.co.uk/"
+  }
+ ],
+ "33mileradius.com": [],
+ "360mediadirect.com": [],
+ "365datasolutions.com": [],
+ "411.com": [],
+ "5x5data.com": [],
+ "6sense.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to 6sense.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://6sense.com.au/"
+  }
+ ],
+ "abovedata.io": [],
+ "accudata.com": [],
+ "acculeads.com": [],
+ "accurateappend.com": [],
+ "achcoop.com": [],
+ "acronymix.com": [],
+ "activimpact.ai": [],
+ "acxiom.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to acxiom.com",
+   "privacy_page": "https://www.acxiom.de/datenschutzanfragen/",
+   "region": "DE",
+   "url": "https://www.acxiom.de/"
+  }
+ ],
+ "adagio.io": [],
+ "adept-id.com": [],
+ "adprime.com": [],
+ "adsquare.com": [],
+ "adstradata.com": [],
+ "adswizz.com": [],
+ "adttribution.com": [],
+ "advancedbackgroundchecks.com": [],
+ "affinity.solutions": [],
+ "affinityanswers.com": [],
+ "affordablebackgroundchecks.com": [],
+ "agedleadstore.com": [],
+ "aggknowledge.ai": [],
+ "agile-ed.com": [],
+ "agrmarketingsolutions.com": [],
+ "aidentified.com": [],
+ "alabamaarrests.org": [],
+ "alabamacourtrecords.us": [],
+ "alaskaarrests.org": [],
+ "alaskacourtrecords.us": [],
+ "alescodata.com": [],
+ "alikeaudience.com": [],
+ "allantgroup.com": [],
+ "alliantinsight.com": [],
+ "allwebleads.com": [],
+ "alphonso.tv": [],
+ "altairdata.com": [],
+ "altrata.com": [],
+ "americaphonebook.com": [],
+ "amerilist.com": [],
+ "amplemarket.com": [],
+ "analytics-iq.com": [],
+ "analyticsiq.com": [],
+ "analyzecorp.com": [],
+ "anchorcomputer.com": [],
+ "aniline.ai": [],
+ "anteriad.com": [],
+ "apollo.io": [],
+ "apollointeractive.com": [],
+ "applovin.com": [],
+ "appscience.ai": [],
+ "arccorp.com": [],
+ "archives.com": [
+  {
+   "has_form": false,
+   "how": "hreflang en-gb",
+   "privacy_page": "https://www.ancestry.co.uk/c/legal/privacystatement?hideHeader=1",
+   "region": "GB",
+   "url": "https://www.archives.com/uk/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-ie",
+   "privacy_page": "https://www.ancestry.co.uk/c/legal/privacystatement?hideHeader=1",
+   "region": "IE",
+   "url": "https://www.archives.com/uk/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-au",
+   "privacy_page": "https://www.ancestry.com.au/c/legal/privacystatement?hideHeader=1",
+   "region": "AU",
+   "url": "https://www.archives.com/au/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-nz",
+   "privacy_page": "https://www.ancestry.com.au/c/legal/privacystatement?hideHeader=1",
+   "region": "NZ",
+   "url": "https://www.archives.com/au/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-ca",
+   "privacy_page": "https://www.ancestry.ca/c/legal/privacystatement?hideHeader=1",
+   "region": "CA",
+   "url": "https://www.archives.com/ca/"
+  }
+ ],
+ "aristotle.com": [],
+ "arizonaarrests.org": [],
+ "arizonacourtrecords.us": [],
+ "arkansasarrests.org": [],
+ "arkansascourtrecords.us": [],
+ "arrestwarrant.org": [],
+ "astoriacompany.com": [],
+ "atdata.com": [],
+ "atmospherik.ai": [],
+ "attomdata.com": [],
+ "attribits.com": [],
+ "atxteaparty.com": [],
+ "audienceacuity.com": [],
+ "audiencemix.net": [],
+ "audigent.com": [],
+ "autoweb.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to autoweb.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://autoweb.com.br/"
+  }
+ ],
+ "aviato.co": [
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to aviato.co",
+   "privacy_page": "https://aviato.com.br/politica-de-privacidade/",
+   "region": "BR",
+   "url": "https://aviato.com.br/"
+  }
+ ],
+ "awl.com": [],
+ "azerion.com": [],
+ "azira.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.azira.com/fr/politique-de-confidentialite",
+   "region": "FR",
+   "url": "https://www.azira.com/fr"
+  }
+ ],
+ "babelstreet.com": [],
+ "backgroundcheckers.net": [],
+ "backgroundcheckme.org": [],
+ "backgroundchecks.me": [],
+ "backgroundchecks.org": [],
+ "batchleads.io": [],
+ "bbdirect.com": [],
+ "bdex.com": [],
+ "beaconterritory.com": [],
+ "becausal.com": [],
+ "beenverified.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to beenverified.com",
+   "privacy_page": "https://www.beenverified.co.uk/faq/privacy/",
+   "region": "GB",
+   "url": "https://www.beenverified.co.uk/"
+  }
+ ],
+ "beeswax.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to beeswax.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://beeswax.com.au/"
+  }
+ ],
+ "belardiwong.com": [],
+ "benutech.com": [],
+ "bestpickreports.com": [],
+ "big-village.com": [],
+ "bigdbm.com": [],
+ "biointelli.com": [],
+ "biscred.com": [],
+ "blackbaud.com": [],
+ "blackpearl.com": [],
+ "blis.com": [],
+ "blueaction.io": [],
+ "bluedatalead.com": [],
+ "bluefireleads.com": [],
+ "blueprintaudiences.com": [],
+ "boam.ai": [],
+ "bombora.com": [],
+ "bookyourdata.com": [],
+ "brandwatch.com": [],
+ "bridg.com": [],
+ "brooksim.com": [],
+ "buildertrend.com": [],
+ "bumper.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to bumper.com",
+   "privacy_page": "https://www.bumper.com/privacy-policy/",
+   "region": "CA",
+   "url": "https://www.bumper.ca/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to bumper.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://bumper.com.br/"
+  }
+ ],
+ "businessregistry.com": [],
+ "buxtonco.com": [],
+ "buyerlink.co": [],
+ "cadent.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to cadent.com",
+   "privacy_page": "https://cadent.au/privacy",
+   "region": "AU",
+   "url": "https://cadent.au/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to cadent.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://cadent.com.br/"
+  }
+ ],
+ "cadent.tv": [],
+ "californiaarrests.org": [],
+ "californiacourtrecords.us": [],
+ "campaigner.com": [],
+ "candl.app": [],
+ "captifytechnologies.com": [],
+ "captiv8.io": [],
+ "careerbuilder.com": [],
+ "carneydirect.com": [],
+ "cashmereai.com": [],
+ "catalina.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to catalina.com",
+   "privacy_page": null,
+   "region": "GB",
+   "url": "https://catalina.co.uk/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to catalina.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.catalina.com.au/"
+  }
+ ],
+ "catalist.us": [],
+ "catchlight.ai": [],
+ "cbinsights.com": [],
+ "cdkglobal.com": [],
+ "censia.com": [],
+ "checkpeople.com": [],
+ "checksecrets.com": [],
+ "choreograph.com": [],
+ "cinqdi.com": [],
+ "ciprinting.com": [],
+ "circana.com": [
+  {
+   "has_form": false,
+   "how": "hreflang it-it",
+   "privacy_page": null,
+   "region": "IT",
+   "url": "https://www.circana.com/it-it"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-za",
+   "privacy_page": null,
+   "region": "ZA",
+   "url": "https://www.circana.com/za"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang nl-nl",
+   "privacy_page": null,
+   "region": "NL",
+   "url": "https://www.circana.com/nl-nl"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang pt-br",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.circana.com/pt-br"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang ja-jp",
+   "privacy_page": null,
+   "region": "JP",
+   "url": "https://www.circana.com/ja-jp"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang es-es",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://www.circana.com/es-es"
+  }
+ ],
+ "cision.com": [
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.cision.ca/contact-us/opt-out/",
+   "region": "CA",
+   "url": "https://www.cision.ca"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.cision.fr/mentions-legales/declaration-de-confidentialite-cision-france/",
+   "region": "FR",
+   "url": "https://www.cision.fr"
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://www.cision.de"
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": "https://www.cision.com/contact-us/opt-out/",
+   "region": "IT",
+   "url": "https://www.cision.it"
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": "https://www.cision.com/contact-us/opt-out/",
+   "region": "ES",
+   "url": "https://www.cision.es"
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": null,
+   "region": "SE",
+   "url": "https://www.cision.se"
+  }
+ ],
+ "citydata.ai": [],
+ "civicelement.com": [],
+ "civisanalytics.com": [],
+ "claritas.com": [],
+ "clay.com": [],
+ "clearcompany.com": [],
+ "clearview.ai": [],
+ "clickagy.com": [],
+ "clientcommand.com": [],
+ "clustal.org": [],
+ "coasttechnology.com": [],
+ "cognism.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://www.cognism.com/de/compliance",
+   "region": "DE",
+   "url": "https://www.cognism.com/de/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://www.cognism.com/fr/politique-de-confidentialite",
+   "region": "FR",
+   "url": "https://www.cognism.com/fr/"
+  }
+ ],
+ "collectivedata.io": [],
+ "coloradoarrests.org": [],
+ "coloradocourtrecords.us": [],
+ "commercesignals.com": [],
+ "complementics.com": [],
+ "completemailinglists.com": [],
+ "completemedicallists.com": [],
+ "comscore.com": [
+  {
+   "has_form": true,
+   "how": "hreflang de-de",
+   "privacy_page": "https://www.comscore.com/ger/Ueber-Uns/Privacy",
+   "region": "DE",
+   "url": "https://www.comscore.com/ger"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang es-es",
+   "privacy_page": "https://www.comscore.com/lat/Sobre-comScore/Privacy",
+   "region": "ES",
+   "url": "https://www.comscore.com/lat"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang es-mx",
+   "privacy_page": "https://www.comscore.com/esl/Sobre-comScore/Privacy",
+   "region": "MX",
+   "url": "https://www.comscore.com/esl"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang fr-fr",
+   "privacy_page": "https://www.comscore.com/fre/A-propos-de-Comscore/Privacy",
+   "region": "FR",
+   "url": "https://www.comscore.com/fre"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang it-it",
+   "privacy_page": "https://www.comscore.com/ita/Chi-siamo/Privacy",
+   "region": "IT",
+   "url": "https://www.comscore.com/ita"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang pt-br",
+   "privacy_page": "https://www.comscore.com/por/Sobre/Privacy",
+   "region": "BR",
+   "url": "https://www.comscore.com/por"
+  }
+ ],
+ "connectedinvestors.com": [],
+ "connecticutcourtrecords.us": [],
+ "connectionholdings.com": [],
+ "consumercanvas.net": [],
+ "contactout.com": [],
+ "convergemarketing.com": [],
+ "convex.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to convex.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.convex.com.br/"
+  }
+ ],
+ "costar.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to costar.com",
+   "privacy_page": "https://costar.com.au/privacypolicy/",
+   "region": "AU",
+   "url": "https://costar.com.au/"
+  }
+ ],
+ "cotality.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.cotality.com/uk/legal/privacy-policy",
+   "region": "GB",
+   "url": "https://www.cotality.com/uk"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.cotality.com/au/legal/privacy-policy",
+   "region": "AU",
+   "url": "https://www.cotality.com/au"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.cotality.com/fr-ca/legal/politique-de-confidentialite",
+   "region": "CA",
+   "url": "https://www.cotality.com/fr-ca"
+  }
+ ],
+ "countshark.net": [],
+ "courtcasefinder.com": [],
+ "courtrecords.us": [],
+ "coxautoinc.com": [],
+ "crexi.com": [],
+ "criminaldatacheck.com": [],
+ "criteo.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.criteo.com/de/trust-center/",
+   "region": "DE",
+   "url": "https://www.criteo.com/de/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.criteo.com/es/trust-center/",
+   "region": "ES",
+   "url": "https://www.criteo.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.criteo.com/fr/trust-center/",
+   "region": "FR",
+   "url": "https://www.criteo.com/fr/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.criteo.com/it/trust-center/",
+   "region": "IT",
+   "url": "https://www.criteo.com/it/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.criteo.com/br/trust-center/",
+   "region": "BR",
+   "url": "https://www.criteo.com/br/"
+  }
+ ],
+ "crosspixel.net": [],
+ "crunchbase.com": [],
+ "ctarrests.org": [],
+ "cuebiq.com": [],
+ "cybba.com": [
+  {
+   "has_form": true,
+   "how": "hreflang pt-br",
+   "privacy_page": "https://cybba.com/privacy-policy/",
+   "region": "BR",
+   "url": "https://cybba.com/?lang=pt-br"
+  }
+ ],
+ "cyberbackgroundchecks.com": [],
+ "data-axle.com": [],
+ "data247.com": [],
+ "datadecisionsgroup.com": [],
+ "datadelivers.com": [],
+ "datadesk.io": [],
+ "datadojo.ai": [],
+ "datafy.com": [],
+ "datalane.com": [],
+ "datalilnedata.com": [],
+ "datalinedata.com": [],
+ "datamangroup.com": [],
+ "datamasters.org": [],
+ "datanyze.com": [],
+ "datapartners.com": [],
+ "datarate.ai": [],
+ "datasys.com": [],
+ "datatowin.com": [],
+ "date-detective.app": [],
+ "datonics.com": [],
+ "dcarrests.org": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://www.dcarrests.org/privacy",
+   "region": "ES",
+   "url": "https://www.dcarrests.org/es/"
+  }
+ ],
+ "dcsinfosys.com": [],
+ "dealersocket.com": [],
+ "dealerx.com": [],
+ "dealmachine.com": [],
+ "decide.co": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to decide.co",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://decide.com.br/"
+  }
+ ],
+ "decisionlinks.com": [],
+ "deeprootanalytics.com": [],
+ "deepsync.com": [],
+ "definitivehc.com": [],
+ "deimos-signals.com": [],
+ "delawarecourtrecords.us": [],
+ "demandbase.com": [],
+ "demandscience.com": [],
+ "dewarrants.org": [],
+ "dice.com": [
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to dice.com",
+   "privacy_page": "https://www.dice.com.br/politica-de-privacidade",
+   "region": "BR",
+   "url": "https://www.dice.com.br/"
+  }
+ ],
+ "digitalmediasolutions.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to digitalmediasolutions.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://digitalmediasolutions.com.br/"
+  }
+ ],
+ "digitalsegment.com": [],
+ "digitalvikingmedia.com": [],
+ "disconetwork.com": [],
+ "display-logix.com": [],
+ "disqus.com": [],
+ "dnb.com": [],
+ "dobsearch.com": [],
+ "donorbase.com": [],
+ "donorbureau.com": [],
+ "draup.com": [],
+ "dresdendirect.com": [],
+ "drivershistory.com": [],
+ "dspolitical.com": [],
+ "dstillery.com": [],
+ "dtn.com": [],
+ "eab.com": [],
+ "edvisors.com": [],
+ "electhq.net": [],
+ "elocal.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to elocal.com",
+   "privacy_page": "https://www.elocal.ca/privacy/",
+   "region": "CA",
+   "url": "https://www.elocal.ca/"
+  }
+ ],
+ "eltoro.com": [],
+ "emailtracer.com": [],
+ "endgame.io": [],
+ "enformion.com": [],
+ "enigma.com": [],
+ "enlyft.com": [],
+ "enrichlayer.com": [],
+ "eprodirect.com": [],
+ "epsilon.com": [],
+ "equifax.com": [
+  {
+   "has_form": true,
+   "how": "hreflang en-CA",
+   "privacy_page": "https://www.equifax.ca/privacy/",
+   "region": "CA",
+   "url": "https://www.equifax.ca/personal/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-GB",
+   "privacy_page": "https://www.equifax.co.uk/privacy-hub",
+   "region": "GB",
+   "url": "https://www.equifax.co.uk/ "
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.equifax.com.br/"
+  },
+  {
+   "has_form": false,
+   "how": "country domain",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://soluciones.equifax.es/"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.equifax.com.au/privacy",
+   "region": "AU",
+   "url": "https://www.equifax.com.au/"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.equifax.co.nz/privacy",
+   "region": "NZ",
+   "url": "https://www.equifax.co.nz/"
+  }
+ ],
+ "erepublic.com": [],
+ "everleads.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to everleads.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://everleads.com.au/"
+  }
+ ],
+ "evertrue.com": [],
+ "everyjoe.com": [],
+ "evorra.com": [],
+ "exactcustomer.com": [],
+ "exactdata.com": [],
+ "exactmatchmarketing.com": [],
+ "experian.com": [
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to experian.com",
+   "privacy_page": "https://www.experian.co.uk/privacy/consumer-information-portal/",
+   "region": "GB",
+   "url": "https://www.experian.co.uk/"
+  },
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to experian.com",
+   "privacy_page": "https://www.experian.in/privacy-policy/",
+   "region": "IN",
+   "url": "https://www.experian.in/"
+  },
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to experian.com",
+   "privacy_page": "https://experianacademy.com/privacy-policy/",
+   "region": "PL",
+   "url": "https://experianacademy.com/"
+  }
+ ],
+ "experience.com": [],
+ "exploreatlas.io": [],
+ "explorium.ai": [],
+ "eyeota.com": [],
+ "facteus.com": [],
+ "factori.ai": [],
+ "familytreenow.com": [],
+ "famousbirthdays.com": [
+  {
+   "has_form": false,
+   "how": "country subdomain",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://es.famousbirthdays.com"
+  },
+  {
+   "has_form": false,
+   "how": "country subdomain",
+   "privacy_page": null,
+   "region": "FR",
+   "url": "https://fr.famousbirthdays.com"
+  },
+  {
+   "has_form": false,
+   "how": "country subdomain",
+   "privacy_page": null,
+   "region": "IT",
+   "url": "https://it.famousbirthdays.com"
+  },
+  {
+   "has_form": false,
+   "how": "country subdomain",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://de.famousbirthdays.com"
+  }
+ ],
+ "faraday.ai": [],
+ "farmers.com": [],
+ "fastbackgroundcheck.com": [],
+ "fastpeoplesearch.com": [],
+ "fetch.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to fetch.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.fetch.com.br/"
+  }
+ ],
+ "fi-navigator.com": [],
+ "fideo.ai": [],
+ "fifty.io": [],
+ "findem.ai": [],
+ "findmugshots.com": [],
+ "finsum.com": [],
+ "finthrive.com": [],
+ "firmable.com": [
+  {
+   "has_form": false,
+   "how": "hreflang en-au",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://firmable.ai/au/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-nz",
+   "privacy_page": null,
+   "region": "NZ",
+   "url": "https://firmable.ai/nz/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-sg",
+   "privacy_page": null,
+   "region": "SG",
+   "url": "https://firmable.ai/sg/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-my",
+   "privacy_page": null,
+   "region": "MY",
+   "url": "https://firmable.ai/my/"
+  }
+ ],
+ "firstdirectmarketing.com": [],
+ "firstorion.com": [],
+ "fivestarrated.com": [],
+ "flarrests.org": [],
+ "floridacourtrecords.us": [],
+ "floridaresidentsdirectory.com": [],
+ "focus-usa.com": [],
+ "fogdatascience.com": [],
+ "forager.ai": [],
+ "forddirect.com": [],
+ "forewarn.com": [],
+ "forian.com": [],
+ "fourcornerhome.com": [],
+ "fourleafdata.com": [],
+ "foursquare.com": [],
+ "fourthwall.tv": [],
+ "fraiser.org": [],
+ "freepeopledirectory.com": [],
+ "freepeoplesearch.com": [],
+ "freephonetracer.com": [],
+ "freewheel.com": [],
+ "fullcontact.com": [],
+ "fullenrich.com": [],
+ "fusable.com": [],
+ "fushiamedia.com": [],
+ "fusion92.com": [],
+ "gatewaydata.io": [],
+ "gatheranalytics.co": [],
+ "georgiaarrests.org": [],
+ "georgiacourtrecords.us": [],
+ "getelevar.com": [],
+ "getliminal.com": [],
+ "getrev.ai": [],
+ "giantpartners.com": [],
+ "gm.com": [],
+ "govarrestrecords.org": [],
+ "govregistry.us": [],
+ "govwarrantsearch.org": [],
+ "graph8.com": [],
+ "grassrootsanalytics.com": [],
+ "grayhairsoftware.com": [],
+ "graze.social": [],
+ "greatlakeslists.com": [],
+ "greenwich.com": [],
+ "groundtruth.com": [],
+ "growbots.com": [],
+ "growinglibraries.com": [],
+ "growthcode.io": [],
+ "gsdsi.com": [],
+ "h1.co": [],
+ "hawaiiarrests.org": [],
+ "hawaiicourtrecords.us": [],
+ "health-union.com": [],
+ "healthcare.com": [],
+ "healthlinkdimensions.com": [],
+ "healthwisedata.com": [],
+ "heartbeat.ai": [],
+ "helixcampaigns.com": [],
+ "hightouch.com": [],
+ "hireez.com": [],
+ "hunter.io": [
+  {
+   "has_form": true,
+   "how": "hreflang zh-CN",
+   "privacy_page": "https://hunter.io/privacy-policy",
+   "region": "CN",
+   "url": "https://hunter.io/zh-CN"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://hunter.io/privacy-policy",
+   "region": "FR",
+   "url": "https://hunter.io/fr"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://hunter.io/privacy-policy",
+   "region": "ES",
+   "url": "https://hunter.io/es"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://hunter.io/privacy-policy",
+   "region": "DE",
+   "url": "https://hunter.io/de"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://hunter.io/privacy-policy",
+   "region": "IT",
+   "url": "https://hunter.io/it"
+  }
+ ],
+ "i-360.com": [],
+ "id5.io": [],
+ "idahoarrests.org": [],
+ "idahocourtrecords.us": [],
+ "idatabasesolutions.com": [],
+ "ididata.com": [],
+ "idmap.ai": [],
+ "ileads.com": [],
+ "illinoisarrests.org": [],
+ "illinoiscourtrecords.us": [],
+ "illumin.com": [],
+ "inboundinsight.com": [],
+ "indexexchange.com": [
+  {
+   "has_form": true,
+   "how": "hreflang fr-fr",
+   "privacy_page": "https://www.indexexchange.com/privacy/",
+   "region": "FR",
+   "url": "https://www.indexexchange.com/fr/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang de-de",
+   "privacy_page": "https://www.indexexchange.com/privacy/",
+   "region": "DE",
+   "url": "https://www.indexexchange.com/de/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang it-it",
+   "privacy_page": "https://www.indexexchange.com/privacy/",
+   "region": "IT",
+   "url": "https://www.indexexchange.com/it/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang es-es",
+   "privacy_page": "https://www.indexexchange.com/privacy/",
+   "region": "ES",
+   "url": "https://www.indexexchange.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang ja-jp",
+   "privacy_page": "https://www.indexexchange.com/privacy/",
+   "region": "JP",
+   "url": "https://www.indexexchange.com/ja/"
+  }
+ ],
+ "indianaarrests.org": [],
+ "indianacourtrecords.us": [],
+ "infillion.com": [],
+ "infopay.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to infopay.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://infopay.com.br/"
+  }
+ ],
+ "informatechtarget.com": [
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.informatechtarget.com/privacy-policy-fr/",
+   "region": "FR",
+   "url": "https://www.informatechtarget.fr/"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://www.informatechtarget.com/privacy-policy-de/",
+   "region": "DE",
+   "url": "https://www.informatechtarget.de/"
+  }
+ ],
+ "information.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to information.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://information.com.au/"
+  }
+ ],
+ "infotracer.com": [
+  {
+   "has_form": false,
+   "how": "hreflang en-AU",
+   "privacy_page": "https://infotracer.com/privacy/",
+   "region": "AU",
+   "url": "https://au.infotracer.com/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-CA",
+   "privacy_page": "https://infotracer.com/privacy/",
+   "region": "CA",
+   "url": "https://ca.infotracer.com/"
+  }
+ ],
+ "infutor.com": [],
+ "inmar.com": [],
+ "inmarket.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to inmarket.com",
+   "privacy_page": "https://inmarket.com.au/privacy-policy/?v=1.97.316.20261021163504",
+   "region": "AU",
+   "url": "https://inmarket.com.au/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to inmarket.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://inmarket.com.br/"
+  }
+ ],
+ "inmatessearcher.com": [],
+ "instantcheckmate.com": [],
+ "instantly.ai": [],
+ "intalytics.com": [],
+ "intelius.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to intelius.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.intelius.com.br/"
+  }
+ ],
+ "intentiq.com": [],
+ "intentsify.io": [],
+ "internetbrands.com": [],
+ "iowaarrests.org": [],
+ "iowacourtrecords.us": [],
+ "ipapi.co": [],
+ "iqviadigital.com": [],
+ "irys.us": [],
+ "ispot.tv": [],
+ "issgovernance.com": [],
+ "issmarketintelligence.com": [],
+ "jdmlistservices.com": [],
+ "jdpower.com": [],
+ "jmr-media.com": [],
+ "juicebox.ai": [],
+ "jungroup.com": [],
+ "jwx.com": [],
+ "kansasarrests.org": [],
+ "kansascourtrecords.us": [],
+ "kargo.com": [],
+ "kbsynergy.com": [],
+ "kentuckyarrests.org": [],
+ "kentuckycourtrecords.us": [],
+ "keymarketingadvantage.com": [],
+ "keywordconnects.com": [],
+ "kidslivesafe.com": [],
+ "kindsight.io": [],
+ "kindskiptracing.com": [],
+ "knowertech.com": [],
+ "koddi.com": [],
+ "komodohealth.com": [],
+ "kontextdata.com": [],
+ "l2-data.com": [],
+ "lead-enhance.com": [],
+ "lead411.com": [],
+ "leadfeeder.com": [
+  {
+   "has_form": false,
+   "how": "hreflang de-DE",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://www.leadfeeder.com/de/"
+  }
+ ],
+ "leadiq.com": [],
+ "leadmemedia.com": [],
+ "leadpost.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to leadpost.com",
+   "privacy_page": "https://leadpost.com.au/privacy",
+   "region": "AU",
+   "url": "https://leadpost.com.au/"
+  }
+ ],
+ "leadspace.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to leadspace.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://leadspace.com.br/"
+  }
+ ],
+ "leadzod.com": [],
+ "learnmore.com": [],
+ "leidosiq.com": [],
+ "lemlist.com": [],
+ "leveragedigital.ai": [],
+ "lexisnexis.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to lexisnexis.com",
+   "privacy_page": null,
+   "region": "GB",
+   "url": "https://www.lexisnexis.co.uk/"
+  }
+ ],
+ "licenseplatedata.com": [],
+ "liftbasedata.com": [],
+ "liftengine.com": [],
+ "lightboxre.com": [],
+ "lightcast.io": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://lightcast.io/legal/privacy-request",
+   "region": "GB",
+   "url": "https://lightcast.io/uk"
+  }
+ ],
+ "lionsharemarketing.com": [],
+ "listkit.io": [],
+ "livedatatechnologies.com": [],
+ "liveintent.com": [],
+ "liveramp.com": [
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://liveramp.com/au/about/data-ethics-and-privacy",
+   "region": "AU",
+   "url": "https://liveramp.com.au/"
+  },
+  {
+   "how": "country domain",
+   "region": "DE",
+   "url": "https://liveramp.de/"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://liveramp.es/privacy/",
+   "region": "ES",
+   "url": "https://liveramp.es/"
+  },
+  {
+   "has_form": true,
+   "how": "country domain",
+   "privacy_page": "https://liveramp.fr/politique-de-confidentialite-de-nos-produits-et-services-2/",
+   "region": "FR",
+   "url": "https://liveramp.fr/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://liveramp.com/uk/about/data-ethics-and-privacy",
+   "region": "GB",
+   "url": "https://liveramp.com/uk"
+  }
+ ],
+ "lizdev.com": [],
+ "lob.com": [],
+ "lookify.io": [],
+ "loopme.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to loopme.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.loopme.com.au/"
+  }
+ ],
+ "louisianaarrests.org": [],
+ "louisianacourtrecords.us": [],
+ "lpbrokering.com": [],
+ "lsmapps.com": [],
+ "lusha.com": [
+  {
+   "has_form": true,
+   "how": "hreflang fr-CA",
+   "privacy_page": "https://www.lusha.com/trust-center/",
+   "region": "CA",
+   "url": "https://www.lusha.com/fr/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang pt-BR",
+   "privacy_page": "https://www.lusha.com/trust-center/",
+   "region": "BR",
+   "url": "https://www.lusha.com/pt/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.lusha.com/trust-center/",
+   "region": "ES",
+   "url": "https://www.lusha.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.lusha.com/trust-center/",
+   "region": "FR",
+   "url": "https://www.lusha.com/fr/"
+  }
+ ],
+ "m1-data.com": [],
+ "maarrests.org": [],
+ "madhive.com": [],
+ "magnite.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.magnite.com/legal/magnite-website-privacy-policy/",
+   "region": "FR",
+   "url": "https://www.magnite.com/fr/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.magnite.com/legal/magnite-website-privacy-policy/",
+   "region": "DE",
+   "url": "https://www.magnite.com/de/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.magnite.com/legal/magnite-website-privacy-policy/",
+   "region": "IT",
+   "url": "https://www.magnite.com/it/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.magnite.com/legal/magnite-website-privacy-policy/",
+   "region": "ES",
+   "url": "https://www.magnite.com/es/"
+  }
+ ],
+ "mailinglists.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to mailinglists.com",
+   "privacy_page": "https://mailinglists.com.au/guide/building-your-own-mailing-list-the-ethical-way",
+   "region": "AU",
+   "url": "https://mailinglists.com.au/"
+  }
+ ],
+ "mainearrests.org": [],
+ "mainecourtrecords.us": [],
+ "malvernmedia.com": [],
+ "marketingarchitects.com": [],
+ "marketops.com": [],
+ "marriott.com": [],
+ "marylandarrests.org": [],
+ "marylandcourtrecords.us": [],
+ "massachusettscourtrecords.us": [],
+ "matchbookdata.com": [],
+ "maxmind.com": [],
+ "meadleybrothers.com": [],
+ "media.net": [],
+ "mediawallah.com": [],
+ "medprosystems.com": [],
+ "meettie.com": [],
+ "melissa.com": [
+  {
+   "has_form": true,
+   "how": "hreflang bg-bg",
+   "privacy_page": "https://apps.melissa.com/user/consumerprivacy.aspx",
+   "region": "BG",
+   "url": "https://www.melissa.com/bg-bg/"
+  },
+  {
+   "has_form": true,
+   "how": "hreflang cs-cz",
+   "privacy_page": "https://apps.melissa.com/user/consumerprivacy.aspx",
+   "region": "CZ",
+   "url": "https://www.melissa.com/cs-cz/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang de-de",
+   "privacy_page": "https://www.melissa.com/de-de/datenschutz",
+   "region": "DE",
+   "url": "https://www.melissa.com/de-de/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-au",
+   "privacy_page": "https://www.melissa.com/en-au/privacy-center",
+   "region": "AU",
+   "url": "https://www.melissa.com/en-au/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-ca",
+   "privacy_page": "https://www.melissa.com/en-ca/privacy",
+   "region": "CA",
+   "url": "https://www.melissa.com/en-ca/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang en-gb",
+   "privacy_page": "https://www.melissa.com/en-gb/privacy",
+   "region": "GB",
+   "url": "https://www.melissa.com/en-gb/"
+  }
+ ],
+ "meltwater.com": [],
+ "menstoppingviolence.org": [],
+ "merkle.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://www.merkle.com/es/home.html"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://www.merkle.com/de/privacy-policy.html",
+   "region": "DE",
+   "url": "https://www.merkle.com/de/home.html"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to merkle.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://merkle.com.au/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to merkle.com",
+   "privacy_page": "https://www.merkle.com.br/politica-de-privacidade",
+   "region": "BR",
+   "url": "https://www.merkle.com.br/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to merkle.com",
+   "privacy_page": "https://www.merkle.com/en/privacy-policy.html",
+   "region": "SE",
+   "url": "https://www.merkle.se/"
+  }
+ ],
+ "messagedigital.com": [],
+ "michiganarrests.org": [],
+ "michigancourtrecords.us": [],
+ "milestonemarketingsolutions.com": [],
+ "minerva.io": [],
+ "mineva.io": [],
+ "minnesotaarrests.org": [],
+ "minnesotacourtrecords.us": [],
+ "missionwired.com": [],
+ "mississippicourtrecords.us": [],
+ "missouriarrests.org": [],
+ "missouricourtrecords.us": [],
+ "mobiityglobal.com": [],
+ "mobilefuse.com": [],
+ "mobilewalla.com": [],
+ "mobilityglobal.com": [],
+ "modigie.com": [],
+ "moneybot5000.com": [],
+ "monitorbase.com": [],
+ "monocl.com": [],
+ "montanaarrests.org": [],
+ "montanacourtrecords.us": [],
+ "moodys.com": [
+  {
+   "has_form": false,
+   "how": "hreflang fr-fr",
+   "privacy_page": "https://www.moodys.com/web/en/us/legal/privacy-policy.html",
+   "region": "FR",
+   "url": "https://www.moodys.com/web/fr/fr.html"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang de-de",
+   "privacy_page": "https://www.moodys.com/web/en/us/legal/privacy-policy.html",
+   "region": "DE",
+   "url": "https://www.moodys.com/web/de/de.html"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang es-es",
+   "privacy_page": "https://www.moodys.com/web/en/us/legal/privacy-policy.html",
+   "region": "ES",
+   "url": "https://www.moodys.com/web/es/es.html"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang zh-cn",
+   "privacy_page": "https://www.moodys.com/web/en/us/legal/privacy-policy.html",
+   "region": "CN",
+   "url": "https://www.moodys.com/web/zh/cn.html"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang ja-jp",
+   "privacy_page": "https://www.moodys.com/web/ja/jp/legal/privacy-policy.html",
+   "region": "JP",
+   "url": "https://www.moodys.com/web/ja/jp.html"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang nl-nl",
+   "privacy_page": "https://www.moodys.com/web/en/us/legal/privacy-policy.html",
+   "region": "NL",
+   "url": "https://www.moodys.com/web/nl/nl.html"
+  }
+ ],
+ "mrginc.com": [],
+ "mrss.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to mrss.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://mrss.com.br/"
+  }
+ ],
+ "msarrests.org": [],
+ "mugshotlook.com": [],
+ "multimedialists.com": [],
+ "mylife.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to mylife.com",
+   "privacy_page": "https://mylife.com.au/home",
+   "region": "AU",
+   "url": "https://mylife.com.au/"
+  }
+ ],
+ "n-focus.com": [],
+ "nationalopinioninstitute.com": [],
+ "nationalpublicdata.com": [],
+ "ncarrests.org": [],
+ "ndarrests.org": [],
+ "nebraskaarrests.org": [],
+ "nebraskacourtrecords.us": [],
+ "neighborwho.com": [],
+ "neptuneops.com": [],
+ "netwisedata.com": [],
+ "networx.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to networx.com",
+   "privacy_page": "https://networx.com.au/privacy-policy/",
+   "region": "AU",
+   "url": "https://networx.com.au/"
+  }
+ ],
+ "nevadaarrests.org": [],
+ "nevadacourtrecords.us": [],
+ "newhampshirecourtrecords.us": [],
+ "newjerseycourtrecords.us": [],
+ "newmexicocourtrecords.us": [],
+ "newmexicodatainsights.com": [],
+ "newyorkcourtrecords.us": [],
+ "nextroll.com": [],
+ "nexxagroup.com": [],
+ "nexxen.com": [],
+ "nharrests.org": [],
+ "nielsen.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.nielsen.com/es/legal/privacy-principles/",
+   "region": "ES",
+   "url": "https://www.nielsen.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.nielsen.com/it/legal/privacy-principles/",
+   "region": "IT",
+   "url": "https://www.nielsen.com/it/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.nielsen.com/de/legal/privacy-principles/",
+   "region": "DE",
+   "url": "https://www.nielsen.com/de/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.nielsen.com/fr/legal/privacy-principles/",
+   "region": "FR",
+   "url": "https://www.nielsen.com/fr/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to nielsen.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://nielsen.com.au/"
+  }
+ ],
+ "njarrests.org": [],
+ "nmarrests.org": [],
+ "nordicdataresources.com": [],
+ "northcarolinacourtrecords.us": [],
+ "northcarolinaresidentdatabase.com": [],
+ "northdakotacourtrecords.us": [],
+ "numberguru.com": [],
+ "numlookup.com": [],
+ "nuwber.com": [],
+ "nyarrests.org": [],
+ "nyne.ai": [],
+ "oan.pl": [],
+ "occulytics.com": [],
+ "ocean.io": [],
+ "ogury.com": [],
+ "ohioarrests.org": [],
+ "ohiocourtrecords.us": [],
+ "ohioresidentdatabase.com": [],
+ "oklahomaarrests.org": [],
+ "oklahomacourtrecords.us": [],
+ "omginc.xyz": [],
+ "onaudience.com": [],
+ "onspotdata.com": [],
+ "open-public-records.com": [],
+ "opensend.com": [],
+ "openx.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to openx.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://www.open-x.com.br/"
+  }
+ ],
+ "optable.co": [
+  {
+   "has_form": true,
+   "how": "country subdomain",
+   "privacy_page": "https://fr.optable.co/platform-overview",
+   "region": "FR",
+   "url": "https://fr.optable.co/"
+  }
+ ],
+ "oregonarrest.org": [],
+ "oregoncourtrecords.us": [],
+ "oregonpublicrecords.org": [],
+ "outbrain.com": [],
+ "outkeep.com": [],
+ "outlogic.io": [],
+ "outwardmedia.com": [],
+ "ownerly.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to ownerly.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://ownerly.com.au/"
+  }
+ ],
+ "pacificeast.com": [],
+ "paramountdirectmarketing.com": [],
+ "path2response.com": [],
+ "paynetonline.com": [],
+ "pebblepost.com": [],
+ "penlink.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.penlink.com/fr/privacy-policy/",
+   "region": "FR",
+   "url": "https://www.penlink.com/fr/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.penlink.com/es/privacy-policy/",
+   "region": "ES",
+   "url": "https://www.penlink.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.penlink.com/de/privacy-policy/",
+   "region": "DE",
+   "url": "https://www.penlink.com/de/"
+  }
+ ],
+ "pennsylvaniaarrests.org": [],
+ "pennsylvaniacourtrecords.us": [],
+ "peoplebyname.com": [],
+ "peopledatalabs.com": [],
+ "peoplefinders.com": [
+  {
+   "has_form": true,
+   "how": "probed country domain that links back to peoplefinders.com",
+   "privacy_page": "https://houseofpeoplefinders.com/privacy-statement/",
+   "region": "NL",
+   "url": "https://houseofpeoplefinders.com/"
+  }
+ ],
+ "peoplefindersdaas.com": [],
+ "peoplelooker.com": [],
+ "peoplesearch123.com": [],
+ "peoplesearcher.com": [],
+ "peoplesearchnow.com": [],
+ "peoplesearchusa.org": [],
+ "peoplesmart.com": [],
+ "peoplewhiz.com": [],
+ "perion.com": [],
+ "persistent.id": [],
+ "personsearchers.com": [],
+ "phantomdata.io": [],
+ "pipl.com": [],
+ "pitchbook.com": [],
+ "placeexchange.com": [],
+ "plug-industries.com": [],
+ "plungedigital.com": [],
+ "pmg.com": [],
+ "podscribe.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to podscribe.com",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://podscribe.de/"
+  }
+ ],
+ "policeconduct.org": [],
+ "polk.com": [],
+ "popacta.com": [],
+ "porchgroupmedia.com": [],
+ "possiblenow.com": [],
+ "postalytics.com": [],
+ "postie.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to postie.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://postie.com.br/"
+  }
+ ],
+ "postpilot.com": [],
+ "precisely.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "FR",
+   "url": "https://www.precisely.com/fr/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://www.precisely.com/de/"
+  }
+ ],
+ "predactiv.com": [],
+ "preqin.com": [],
+ "privaterecords.net": [],
+ "privatereports.com": [],
+ "privco.com": [],
+ "propbotusa.com": [],
+ "propensity.com": [],
+ "propertyradar.com": [],
+ "propertyreach.com": [
+  {
+   "how": "country path",
+   "region": "IN",
+   "url": "https://www.propertyreach.com/in"
+  },
+  {
+   "how": "country path",
+   "region": "AR",
+   "url": "https://www.propertyreach.com/ar"
+  },
+  {
+   "how": "country path",
+   "region": "CA",
+   "url": "https://www.propertyreach.com/ca"
+  },
+  {
+   "how": "country path",
+   "region": "DE",
+   "url": "https://www.propertyreach.com/de"
+  }
+ ],
+ "prospectbase.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to prospectbase.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://prospectbase.com.au/"
+  }
+ ],
+ "proxima.ai": [],
+ "publicdatacheck.com": [],
+ "publicinfoservices.com": [],
+ "publicrecord.com": [],
+ "publicrecordreports.com": [],
+ "publicrecords.searchsystems.net": [],
+ "publicrecordscenter.org": [],
+ "publicrecordsreviews.com": [],
+ "publicsearcher.com": [],
+ "pubmatic.com": [],
+ "pulsepoint.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to pulsepoint.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.pulsepoint.com.au/"
+  }
+ ],
+ "quad.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.quad.com/es/legal/privacy-policy",
+   "region": "ES",
+   "url": "https://www.quad.com/es"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to quad.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.quad.com.au/"
+  }
+ ],
+ "quadrant.io": [],
+ "quickpeopletrace.com": [],
+ "quickpublicrecords.com": [],
+ "quorum.inc": [],
+ "quotefinders.com": [],
+ "rampedup.io": [],
+ "rayinsights.com": [],
+ "realeflow.com": [],
+ "realintent.co": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to realintent.co",
+   "privacy_page": null,
+   "region": "GB",
+   "url": "https://realintent.co.uk/"
+  }
+ ],
+ "realsourcedata.com": [],
+ "recordsfinder.com": [],
+ "recruitbot.com": [],
+ "redidata.com": [],
+ "redmob.io": [],
+ "reklaimyours.com": [],
+ "relpro.com": [],
+ "remodeling.com": [],
+ "resonate.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to resonate.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.resonate.com.au/"
+  }
+ ],
+ "responseamerica.net": [],
+ "retention.com": [],
+ "reunion.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to reunion.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.reunion.com.au/"
+  }
+ ],
+ "revcontent.com": [],
+ "revealmobile.com": [],
+ "reveliolabs.com": [],
+ "revenuebase.ai": [],
+ "reversephone.com": [],
+ "reversephonecheck.com": [],
+ "revoptimal.com": [],
+ "rgrmarketing.com": [],
+ "rhodeislandcourtrecords.us": [],
+ "riarrests.org": [],
+ "richmediallc.com": [],
+ "ripple-fx.com": [],
+ "rocketreach.co": [],
+ "roq.ad": [],
+ "rorpartners.com": [],
+ "roundsky.com": [],
+ "rrd.com": [],
+ "rushmorelabs.com": [],
+ "sabioctv.com": [],
+ "saleseer.com": [],
+ "salesintel.io": [],
+ "salutarydata.com": [],
+ "samba.tv": [],
+ "sbfe.org": [],
+ "scarrests.org": [],
+ "scileads.com": [],
+ "scoutdata.com": [],
+ "sdarrests.org": [],
+ "sealedrecords.net": [],
+ "seamless.ai": [],
+ "searchpeoplefree.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.searchpeoplefree.com/es/opt-out",
+   "region": "ES",
+   "url": "https://www.searchpeoplefree.com/es"
+  }
+ ],
+ "searchpublicrecords.com": [],
+ "searchquarry.com": [],
+ "searchusapeople.com": [
+  {
+   "has_form": false,
+   "how": "hreflang es-mx",
+   "privacy_page": null,
+   "region": "MX",
+   "url": "https://www.searchusapeople.com/es/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://www.searchusapeople.com/es/"
+  }
+ ],
+ "secondchanceapartments.com": [],
+ "secretinfo.org": [],
+ "seekout.com": [],
+ "semantiqhealth.com": [],
+ "semasio.com": [],
+ "semcasting.com": [],
+ "sg360.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to sg360.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://sg360.com.br/"
+  }
+ ],
+ "sharelocalmedia.com": [],
+ "sharethrough.com": [],
+ "sheerid.com": [],
+ "sheriffsdepartment.net": [],
+ "simiocloud.com": [],
+ "siteimpact.com": [],
+ "skydeo.com": [],
+ "slashdotmedia.com": [],
+ "smartbackgroundchecks.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://www.smartbackgroundchecks.com/es/privacy",
+   "region": "ES",
+   "url": "https://www.smartbackgroundchecks.com/es/"
+  }
+ ],
+ "smarte.pro": [],
+ "smartmove.us": [
+  {
+   "has_form": false,
+   "how": "hreflang es-mx",
+   "privacy_page": null,
+   "region": "MX",
+   "url": "https://www.smartmove.us/es"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://www.smartmove.us/es"
+  }
+ ],
+ "sms-inc.com": [],
+ "snov.io": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://snov.io/br/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://snov.io/es/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://snov.io/security-center",
+   "region": "DE",
+   "url": "https://snov.io/de/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://snov.io/privacy-policy",
+   "region": "FR",
+   "url": "https://snov.io/fr/"
+  }
+ ],
+ "socialcatfish.com": [],
+ "socialgist.ai": [],
+ "sojern.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.sojern.com/privacy/privacy-policy",
+   "region": "FR",
+   "url": "https://www.sojern.com/fr"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.sojern.com/privacy/privacy-policy",
+   "region": "IT",
+   "url": "https://www.sojern.com/it"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.sojern.com/privacy/privacy-policy",
+   "region": "DE",
+   "url": "https://www.sojern.com/de"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.sojern.com/privacy/privacy-policy",
+   "region": "MX",
+   "url": "https://www.sojern.com/es-mx"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.sojern.com/privacy/privacy-policy",
+   "region": "ES",
+   "url": "https://www.sojern.com/es-es"
+  }
+ ],
+ "sourcepathdigital.com": [],
+ "southcarolinacourtrecords.us": [],
+ "southdakotacourtrecords.us": [],
+ "sovrainsight.com": [],
+ "sovrn.com": [],
+ "specialistsmarketingsolutions.com": [],
+ "speedeondata.com": [],
+ "spglobal.com": [],
+ "spokeo.com": [],
+ "sportsilab.com": [],
+ "spycloud.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://spycloud.com/legal/privacy-policy/",
+   "region": "ES",
+   "url": "https://spycloud.com/es/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://spycloud.com/legal/privacy-policy/",
+   "region": "DE",
+   "url": "https://spycloud.com/de/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to spycloud.com",
+   "privacy_page": null,
+   "region": "NL",
+   "url": "https://spycloud.nl/"
+  }
+ ],
+ "spydialer.com": [],
+ "spyfly.com": [],
+ "stackadapt.com": [],
+ "statara.com": [],
+ "staterecords.org": [],
+ "statsocial.com": [],
+ "steppingblocks.com": [],
+ "sterling.ai": [],
+ "stirista.com": [],
+ "strategicdataintelligence.com": [],
+ "subgraph.tech": [],
+ "suppression.peopleconnect.us": [],
+ "swipejobs.com": [],
+ "swoop.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to swoop.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://www.swoop.com.au/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to swoop.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://swoop.com.br/"
+  }
+ ],
+ "swordfish.ai": [],
+ "t-mobile.com": [],
+ "taboola.com": [
+  {
+   "has_form": false,
+   "how": "hreflang zh-CN",
+   "privacy_page": null,
+   "region": "CN",
+   "url": "https://www.taboola.com/zh-hans/"
+  },
+  {
+   "has_form": false,
+   "how": "hreflang zh-TW",
+   "privacy_page": null,
+   "region": "TW",
+   "url": "https://www.taboola.com/zh-hant/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://policies.taboola.com/es/privacy-policy/",
+   "region": "ES",
+   "url": "https://www.taboola.com/es/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://policies.taboola.com/fr/privacy-policy/",
+   "region": "FR",
+   "url": "https://www.taboola.com/fr/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://policies.taboola.com/de/privacy-policy/",
+   "region": "DE",
+   "url": "https://www.taboola.com/de/"
+  }
+ ],
+ "targetsmart.com": [],
+ "tauxbe.com": [],
+ "teads.com": [
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://privacy-policy.teads.com/",
+   "region": "FR",
+   "url": "https://www.teads.com/fr/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://privacy-policy.teads.com/",
+   "region": "DE",
+   "url": "https://www.teads.com/de/"
+  },
+  {
+   "has_form": false,
+   "how": "country path",
+   "privacy_page": "https://privacy-policy.teads.com/",
+   "region": "ES",
+   "url": "https://www.teads.com/es/"
+  },
+  {
+   "how": "country path",
+   "region": "IT",
+   "url": "https://www.teads.com/it/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to teads.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://teads.com.br/"
+  }
+ ],
+ "telephonelists.biz": [],
+ "telesign.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.telesign.com/privacy-notice",
+   "region": "ES",
+   "url": "https://www.telesign.com/es"
+  }
+ ],
+ "tennesseearrests.org": [],
+ "tennesseecourtrecords.us": [],
+ "texasarrests.org": [],
+ "texasarrestwarrants.org": [],
+ "texascourtrecords.us": [],
+ "texaswarrantroundup.org": [],
+ "thatsthem.com": [],
+ "thebridgecorp.com": [],
+ "thecollectorsdatastore.com": [],
+ "thedatagroup.com": [],
+ "thedatatrust.com": [],
+ "theorg.com": [],
+ "theswarm.com": [],
+ "theworknumber.com": [],
+ "thinkdatagroup.com": [],
+ "thomsonreuters.com": [],
+ "tl1mkt.com": [],
+ "top4backgroundchecks.com": [],
+ "torusvotersystems.com": [],
+ "traackr.com": [],
+ "tracerfy.com": [],
+ "transunion.com": [],
+ "trelize.com": [],
+ "trestleiq.com": [],
+ "triplelift.com": [],
+ "tripwiredata.com": [],
+ "trueblueanalytics.org": [],
+ "truedata.co": [],
+ "truepeoplesearch.com": [],
+ "truthed.com": [],
+ "truthfinder.com": [],
+ "truthrecord.org": [],
+ "truthviewer.com": [],
+ "tunnldata.com": [],
+ "unacast.com": [],
+ "unearthcampaigns.com": [],
+ "unifygtm.com": [],
+ "unitedstatesphonebook.com": [],
+ "unmask.com": [],
+ "upcell.io": [],
+ "uplead.com": [],
+ "upscapital.com": [],
+ "urbanscience.com": [
+  {
+   "has_form": false,
+   "how": "hreflang zh-CN",
+   "privacy_page": "https://www.urbanscience.com/zh/career-site-privacy-policy/",
+   "region": "CN",
+   "url": "https://www.urbanscience.com/zh/"
+  }
+ ],
+ "usa-people-search.com": [],
+ "usadata.com": [],
+ "usatrace.com": [],
+ "usdatacorporation.com": [],
+ "usmarketinggrp.com": [],
+ "uspeoplesearch.com": [],
+ "usphonebook.com": [],
+ "usrecords.net": [],
+ "uswarrants.org": [],
+ "utaharrests.org": [],
+ "utahcourtrecords.us": [],
+ "vector.co": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to vector.co",
+   "privacy_page": "https://www.vector.com/de/company/get-info/privacy-policy/",
+   "region": "DE",
+   "url": "https://www.vector.com/de/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to vector.co",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://vector.com.br/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to vector.co",
+   "privacy_page": "https://vector.co.nz/privacy-statement",
+   "region": "NZ",
+   "url": "https://vector.co.nz/"
+  }
+ ],
+ "veeva.com": [
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.veeva.com/br/privacy/",
+   "region": "BR",
+   "url": "https://www.veeva.com/br/"
+  }
+ ],
+ "vendelux.com": [],
+ "venntel.com": [],
+ "ventiveiq.com": [],
+ "veraset.com": [],
+ "verifypublicrecords.com": [],
+ "verifyrecords.com": [],
+ "veripages.com": [],
+ "verisk.com": [],
+ "vermontcourtrecords.us": [],
+ "versium.com": [],
+ "vetiveiq.com": [],
+ "vi.co": [],
+ "viantinc.com": [],
+ "victorywaves.com": [],
+ "videoamp.com": [],
+ "virginiaarrests.org": [],
+ "virginiacourtrecords.us": [],
+ "visitiq.io": [],
+ "vistarmedia.com": [
+  {
+   "has_form": true,
+   "how": "hreflang ja-jp",
+   "privacy_page": "https://www.vistarmedia.com/privacy-website",
+   "region": "JP",
+   "url": "https://www.vistarmedia.com/ja-jp/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.vistarmedia.com/privacy-website",
+   "region": "DE",
+   "url": "https://www.vistarmedia.com/de/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.vistarmedia.com/privacy-website",
+   "region": "ES",
+   "url": "https://www.vistarmedia.com/es/"
+  },
+  {
+   "has_form": true,
+   "how": "country path",
+   "privacy_page": "https://www.vistarmedia.com/privacy-website",
+   "region": "FR",
+   "url": "https://www.vistarmedia.com/fr/"
+  }
+ ],
+ "vistaview.ai": [],
+ "visualvisitor.com": [],
+ "vizio.com": [],
+ "vrtcal.com": [],
+ "vtarrests.org": [],
+ "wallamedia.com": [],
+ "warmly.ai": [],
+ "washingtonarrests.org": [],
+ "washingtoncourtrecords.us": [],
+ "wealthfeed.com": [],
+ "webbula.com": [],
+ "wednes.day": [],
+ "weinform.org": [],
+ "westvirginiacourtrecords.us": [],
+ "whitepages.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "FR",
+   "url": "https://whitepages.fr/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "DE",
+   "url": "https://whitepages.de/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "ES",
+   "url": "https://whitepages.es/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "IT",
+   "url": "https://whitepages.it/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "IE",
+   "url": "https://whitepages.ie/"
+  },
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to whitepages.com",
+   "privacy_page": null,
+   "region": "BR",
+   "url": "https://whitepages.com.br/"
+  }
+ ],
+ "wiland.com": [],
+ "windfall.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to windfall.com",
+   "privacy_page": null,
+   "region": "AU",
+   "url": "https://windfall.com.au/"
+  }
+ ],
+ "winrdata.com": [],
+ "wisconsinarrests.org": [],
+ "wisconsincourtrecords.us": [],
+ "wiza.com": [],
+ "worldwideinformation.com": [],
+ "wunderkind.co": [],
+ "wurl.com": [
+  {
+   "has_form": false,
+   "how": "probed country domain that links back to wurl.com",
+   "privacy_page": "https://wurl.com.au/privacy-policy/",
+   "region": "AU",
+   "url": "https://wurl.com.au/"
+  }
+ ],
+ "wvarrests.org": [],
+ "www.collective": [],
+ "www360mediadirect.com": [],
+ "wyomingarrests.org": [],
+ "wyomingcourtrecords.us": [],
+ "xcelerated.com": [],
+ "yellowbook.com": [],
+ "yieldmo.com": [],
+ "yobi.ai": [],
+ "you.com": [],
+ "zeeto.io": [],
+ "zeil.com": [
+  {
+   "has_form": false,
+   "how": "hreflang en-AU",
+   "privacy_page": "https://www.zeil.com/privacy",
+   "region": "AU",
+   "url": "https://www.zeil.com/au/"
+  }
+ ],
+ "zerotoone.ai": [],
+ "zetaglobal.com": [],
+ "zoominfo.com": []
+}

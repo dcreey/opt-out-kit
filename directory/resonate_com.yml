@@ -23,3 +23,4 @@ live_form:
   checked: "2026-10-25"
   found: false
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Resonate-Ucc Holdings Ltd (ref ZA543564)", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to resonate.com", "privacy_page": null, "region": "AU", "url": "https://www.resonate.com.au/"}]

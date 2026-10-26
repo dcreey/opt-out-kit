@@ -20,3 +20,4 @@ about: {"category": "fraud_identity", "summary": "SpyCloud Inc. is an identity a
 priority: 47
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Spycloud Uk Limited (ref ZB130463); its pages mention European Economic Area", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to spycloud.com", "privacy_page": null, "region": "NL", "url": "https://spycloud.nl/"}]

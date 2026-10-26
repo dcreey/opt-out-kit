@@ -18,3 +18,4 @@ about: {"category": "lead_generation", "summary": "Digital Media Solutions, LLC 
 priority: 61
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to digitalmediasolutions.com", "privacy_page": null, "region": "BR", "url": "https://digitalmediasolutions.com.br/"}]

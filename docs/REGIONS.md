@@ -26,3 +26,16 @@ found from other sources (policies naming Ley 25.326, LGPD, LFPDPPP, Ley 1581, a
 The app now fills forms and writes request text for the person's own country: the country field, the postal code and region, and wording that cites the
 law that applies (GDPR Articles 17 and 21, UK GDPR, PIPEDA, LGPD, Ley 25.326, the Privacy Act). The person's country is set on their profile address.
 Forms are filled as for US residents otherwise, so non-US automation is new and has had no real sends yet.
+
+## Regional sites (found 2026-10-26)
+
+`tools/regional_sites.py` looks on each broker's home page for its own sites for other countries: hreflang alternates that name a region (en-GB, fr-FR),
+links to the same brand under another country domain (example.co.uk) or subdomain (uk.example.com), and region-coded paths (/en-gb/, /uk/). Language-only paths
+(/fr/, /de/) are ignored because a language is not a country. Each regional site is crawled for a privacy or opt-out page and whether it has a form.
+
+- 85 regional sites for 82 brokers were found this way; 60 have a privacy or opt-out page and 37 a form. Each one adds its region tag, with the link as evidence.
+- The tool also probed the same name under the main country domains (example.fr, example.de, ...). 68 answered and link back to the broker, but a link back is
+  not proof of the same company (several look like parked or unrelated domains), so they are kept as leads in the `regional_sites` list with `how: probed ...`
+  and are used for neither tags nor routing.
+- A person outside the US who has a strong regional site for their country is sent to it instead of the US page, and its form, when it has one, is found on
+  the live page. A US resident always uses the main site.

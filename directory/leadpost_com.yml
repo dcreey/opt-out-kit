@@ -21,3 +21,4 @@ about: {"category": "lead_generation", "summary": "LeadPost LLC is a lead-genera
 priority: 61
 persistence: {"result": "permanent", "quote": "Maintaining suppression lists, responding to consumer privacy requests, fulfilling statutory and regulatory obligations, and conducting risk assessments and audits.", "source": "https://leadpost.com/privacy-policy/"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to leadpost.com", "privacy_page": "https://leadpost.com.au/privacy", "region": "AU", "url": "https://leadpost.com.au/"}]

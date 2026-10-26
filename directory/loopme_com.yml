@@ -20,3 +20,4 @@ live_form:
   page: "https://m.loopme.me/opt-out.html"
   blockers: []
 regions: {"list": ["US", "EU", "UK", "AU", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as LoopMe Limited; its pages mention United Kingdom; its pages mention Privacy Act 1988; its pages mention APPI", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to loopme.com", "privacy_page": null, "region": "AU", "url": "https://www.loopme.com.au/"}]

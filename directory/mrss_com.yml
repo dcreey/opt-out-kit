@@ -21,3 +21,4 @@ persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@mrss.com"
 contact_email_source: "browser"
 regions: {"list": ["US", "EU"], "evidence": "its pages mention EU residents", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to mrss.com", "privacy_page": null, "region": "BR", "url": "https://mrss.com.br/"}]

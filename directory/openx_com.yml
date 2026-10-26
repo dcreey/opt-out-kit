@@ -20,3 +20,4 @@ about: {"category": "adtech", "summary": "OpenX Technologies, Inc. is an adverti
 priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as OpenX; its pages mention United Kingdom", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to openx.com", "privacy_page": null, "region": "BR", "url": "https://www.open-x.com.br/"}]

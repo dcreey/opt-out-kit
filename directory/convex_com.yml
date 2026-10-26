@@ -24,3 +24,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you for your message, we will get in touch."
 regions: {"list": ["US", "CA"], "evidence": "its pages mention residents of Canada", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to convex.com", "privacy_page": null, "region": "BR", "url": "https://www.convex.com.br/"}]

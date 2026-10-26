@@ -18,3 +18,4 @@ about: {"category": "lead_generation", "summary": "eLocal USA, LLC is a lead-gen
 priority: 31
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to elocal.com", "privacy_page": "https://www.elocal.ca/privacy/", "region": "CA", "url": "https://www.elocal.ca/"}]

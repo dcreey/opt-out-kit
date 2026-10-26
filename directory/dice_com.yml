@@ -20,3 +20,4 @@ about: {"category": "recruiting", "summary": "Dice Career Solutions, Inc. is a r
 priority: 26
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": true, "how": "probed country domain that links back to dice.com", "privacy_page": "https://www.dice.com.br/politica-de-privacidade", "region": "BR", "url": "https://www.dice.com.br/"}]

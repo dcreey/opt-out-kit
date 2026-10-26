@@ -21,3 +21,4 @@ about: {"category": "people_search", "summary": "INFORMATION.COM, LLC is a peopl
 priority: 62
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to information.com", "privacy_page": null, "region": "AU", "url": "https://information.com.au/"}]

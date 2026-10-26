@@ -21,3 +21,4 @@ live_form:
   page: "https://submit-irm.trustarc.com/services/validation/11bc4513-fc39-4d64-bcf3-ae603d2bd140"
   blockers: ["code"]
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Teads France SAS; its pages mention UK GDPR", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to teads.com", "privacy_page": null, "region": "BR", "url": "https://teads.com.br/"}]

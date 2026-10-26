@@ -21,3 +21,4 @@ about: {"category": "adtech", "summary": "PulsePoint, Inc. is an advertising tec
 priority: 53
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Cookie-based opt-outs are browser- and device-specific.", "source": "https://www.pulsepoint.com/legal/platform-privacy-policy"}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as PulsePoint, Inc.; on the UK ICO register of fee payers as Pulsepoint Ltd (ref ZB676911)", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to pulsepoint.com", "privacy_page": null, "region": "AU", "url": "https://www.pulsepoint.com.au/"}]

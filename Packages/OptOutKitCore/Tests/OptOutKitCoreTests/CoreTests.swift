@@ -2390,9 +2390,24 @@ final class RunCheckTests: XCTestCase {
         XCTAssertEqual(us.inRegion.count, entries.count); XCTAssertTrue(us.elsewhere.isEmpty)
         for split in [fr, gb] { XCTAssertEqual(split.inRegion.count + split.elsewhere.count, entries.count) }
         XCTAssertTrue(fr.inRegion.count > 0 && fr.inRegion.count < entries.count, "a French resident sees only the sites that reach the EU")
-        XCTAssertTrue(fr.inRegion.allSatisfy { $0.regions?.list.contains("EU") == true })
-        XCTAssertTrue(gb.inRegion.allSatisfy { $0.regions?.list.contains("UK") == true })
+        XCTAssertTrue(fr.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["EU", "FR"]) })
+        XCTAssertTrue(gb.inRegion.allSatisfy { !Set($0.regions?.list ?? []).isDisjoint(with: ["UK", "GB"]) })
         XCTAssertEqual(Regions.labels(forCountry: "DE"), ["DE", "EU"])
+    }
+
+    func testABrokersOwnSiteForAnotherCountryIsUsedForThatCountryOnly() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir).filter { $0.excluded == nil }
+        let withSites = entries.filter { !($0.regionalSites ?? []).isEmpty }
+        XCTAssertTrue(withSites.count > 50, "the crawl found regional sites for many brokers")
+        for e in withSites {
+            for site in e.regionalSites ?? [] where site.isStrong {
+                XCTAssertTrue(e.regions?.list.contains(site.region == "GB" ? "UK" : site.region) == true, "\(e.domain) has a \(site.region) site, so it is tagged for it")
+                XCTAssertNotNil(Regions.regionalSite(for: e, country: site.region), e.domain)
+            }
+            XCTAssertNil(Regions.regionalSite(for: e, country: "US"), "a US resident always uses the main site")
+        }
     }
 
     func testTheReviewedRunIsInTheDirectory() throws {

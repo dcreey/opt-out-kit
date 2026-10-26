@@ -26,3 +26,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you! We are processing your request."
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to everleads.com", "privacy_page": null, "region": "AU", "url": "https://everleads.com.au/"}]

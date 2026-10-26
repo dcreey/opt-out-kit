@@ -18,3 +18,4 @@ about: {"category": "consumer_reporting", "summary": "Experian Information Solut
 priority: 48
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": true, "how": "probed country domain that links back to experian.com", "privacy_page": "https://www.experian.co.uk/privacy/consumer-information-portal/", "region": "GB", "url": "https://www.experian.co.uk/"}, {"has_form": true, "how": "probed country domain that links back to experian.com", "privacy_page": "https://www.experian.in/privacy-policy/", "region": "IN", "url": "https://www.experian.in/"}, {"has_form": true, "how": "probed country domain that links back to experian.com", "privacy_page": "https://experianacademy.com/privacy-policy/", "region": "PL", "url": "https://experianacademy.com/"}]

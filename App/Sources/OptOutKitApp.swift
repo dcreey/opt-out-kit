@@ -855,8 +855,14 @@ final class AppModel: ObservableObject {
 
     /// The directory entry with any link the app healed on this device swapped in, so every flow uses the working address.
     func resolved(_ entry: DirectoryEntry) -> DirectoryEntry {
-        guard let healed = household.healedLink(for: entry.id) else { return entry }
-        var e = entry; e.optOutForm = healed.form; e.optOutURL = healed.form.page
+        var e = entry
+        if let healed = household.healedLink(for: entry.id) { e.optOutForm = healed.form; e.optOutURL = healed.form.page }
+        // Someone outside the US is sent to the broker's own site for their country when it has one, and its form is found on the live page.
+        if let site = Regions.regionalSite(for: entry, country: ownerCountry), let page = (site.privacyPage ?? site.url) as String?, URL(string: page) != nil {
+            e.optOutForm = nil; e.optOutURL = URL(string: page)
+            e.liveForm = LiveFormCheck(checked: e.liveForm?.checked ?? "", found: site.hasForm ?? false, page: page, blockers: [])
+            e.runCheck = nil
+        }
         return e
     }
 

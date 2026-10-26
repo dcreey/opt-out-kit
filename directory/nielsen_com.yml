@@ -22,3 +22,4 @@ about: {"category": "adtech", "summary": "eXelate, Inc. is an advertising techno
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Nielsen International SA", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to nielsen.com", "privacy_page": null, "region": "AU", "url": "https://nielsen.com.au/"}]

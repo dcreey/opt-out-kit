@@ -24,3 +24,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you, your information has been submitted."
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to networx.com", "privacy_page": "https://networx.com.au/privacy-policy/", "region": "AU", "url": "https://networx.com.au/"}]

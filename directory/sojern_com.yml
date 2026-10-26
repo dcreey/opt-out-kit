@@ -24,4 +24,5 @@ live_form:
   found: true
   page: "https://privacy.sojern.com/"
   blockers: []
-regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Sojern, Inc.; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "MX", "ES"], "evidence": "listed on the IAB Europe TCF vendor list as Sojern, Inc.; its pages mention United Kingdom; has a MX site at https://www.sojern.com/es-mx (country path); has a ES site at https://www.sojern.com/es-es (country path)", "checked": "2026-10-26"}
+regional_sites: [{"has_form": true, "how": "country path", "privacy_page": "https://www.sojern.com/privacy/privacy-policy", "region": "MX", "url": "https://www.sojern.com/es-mx"}, {"has_form": true, "how": "country path", "privacy_page": "https://www.sojern.com/privacy/privacy-policy", "region": "ES", "url": "https://www.sojern.com/es-es"}]

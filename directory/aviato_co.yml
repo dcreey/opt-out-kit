@@ -18,3 +18,4 @@ about: {"category": "b2b", "summary": "Bachmanity, Inc. is a business-contact an
 priority: 55
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regional_sites: [{"has_form": true, "how": "probed country domain that links back to aviato.co", "privacy_page": "https://aviato.com.br/politica-de-privacidade/", "region": "BR", "url": "https://aviato.com.br/"}]

@@ -9,6 +9,19 @@ public struct RegionScope: Codable, Equatable, Hashable, Sendable {
     public init(list: [String], evidence: String? = nil, checked: String? = nil) { self.list = list; self.evidence = evidence; self.checked = checked }
 }
 
+/// A broker's site for another country or region (example.co.uk, fr.example.com, example.com/de/), with the opt-out or privacy page found on it.
+public struct RegionalSite: Codable, Equatable, Hashable, Sendable {
+    public var region: String            // ISO country code ("GB", "FR")
+    public var url: String
+    public var how: String               // hreflang, country domain, country subdomain, country path, probed country domain
+    public var privacyPage: String?
+    public var hasForm: Bool?
+    enum CodingKeys: String, CodingKey { case region, url, how, privacyPage = "privacy_page", hasForm = "has_form" }
+    /// A site reached by a link or a language alternate on the broker's own page. A probed country domain is only a lead.
+    public var isStrong: Bool { !how.hasPrefix("probed") }
+    public init(region: String, url: String, how: String, privacyPage: String? = nil, hasForm: Bool? = nil) { self.region = region; self.url = url; self.how = how; self.privacyPage = privacyPage; self.hasForm = hasForm }
+}
+
 public enum Regions {
     static let eu: Set<String> = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO"]
 
@@ -53,5 +66,11 @@ public enum Regions {
             if eu.contains(c) { return "the GDPR (including Articles 17 and 21)" }
             return "the data protection laws that apply to me"
         }
+    }
+
+    /// The broker's own site for this person's country, when it has one: a French resident uses the broker's French site, not its US one.
+    public static func regionalSite(for entry: DirectoryEntry, country: String?) -> RegionalSite? {
+        guard let c = country?.uppercased(), c != "US" else { return nil }
+        return entry.regionalSites?.first { $0.isStrong && $0.region.uppercased() == c }
     }
 }

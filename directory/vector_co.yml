@@ -23,3 +23,4 @@ live_form:
   found: false
   blockers: ["business"]
 regions: {"list": ["US", "EU", "UK", "CA", "AU", "CH"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention PIPEDA; its pages mention Australian Privacy Principles; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}
+regional_sites: [{"has_form": false, "how": "probed country domain that links back to vector.co", "privacy_page": "https://www.vector.com/de/company/get-info/privacy-policy/", "region": "DE", "url": "https://www.vector.com/de/"}, {"has_form": false, "how": "probed country domain that links back to vector.co", "privacy_page": null, "region": "BR", "url": "https://vector.com.br/"}, {"has_form": false, "how": "probed country domain that links back to vector.co", "privacy_page": "https://vector.co.nz/privacy-statement", "region": "NZ", "url": "https://vector.co.nz/"}]
