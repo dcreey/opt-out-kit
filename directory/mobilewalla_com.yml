@@ -21,3 +21,4 @@ about: {"category": "location_data", "summary": "Mobilewalla, Inc. is a device a
 priority: 33
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Mobilewalla, Inc.; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

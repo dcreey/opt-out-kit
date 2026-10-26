@@ -19,3 +19,4 @@ about: {"category": "marketing_services", "summary": "GrayHair Software LLC is a
 priority: 31
 persistence: {"result": "temporary", "reup_months": 12, "quote": "If you delete your cookies or use a different browser or mobile device, you may need to renew your opt-out choices exercised through the DAA Webchoices tool.", "source": "https://grayhairsoftware.com/privacy-policy/"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

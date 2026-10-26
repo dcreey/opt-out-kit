@@ -20,3 +20,4 @@ about: {"category": "lead_generation", "summary": "ZeetoGroup, LLC is a lead-gen
 priority: 61
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention residents of the European Union; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

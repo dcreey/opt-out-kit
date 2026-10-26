@@ -2410,6 +2410,20 @@ final class RunCheckTests: XCTestCase {
         }
     }
 
+    func testASitesOptOutPageIsShownInThePersonsLanguageWhenItHasOne() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir).filter { $0.excluded == nil }
+        XCTAssertTrue(entries.contains { !($0.languages?.list ?? []).filter { $0 != "en" }.isEmpty }, "the crawl recorded languages")
+        var e = entries[0]
+        e.languages = SiteLanguages(list: ["en", "fr"], pages: ["fr-CA": "https://x.example/ca/optout", "fr-FR": "https://x.example/fr/optout", "de": "https://x.example/de/optout"])
+        XCTAssertEqual(Regions.localizedPage(for: e, language: "fr", country: "FR")?.absoluteString, "https://x.example/fr/optout")
+        XCTAssertEqual(Regions.localizedPage(for: e, language: "fr", country: "CA")?.absoluteString, "https://x.example/ca/optout")
+        XCTAssertEqual(Regions.localizedPage(for: e, language: "de", country: nil)?.absoluteString, "https://x.example/de/optout")
+        XCTAssertNil(Regions.localizedPage(for: e, language: "en", country: "US"), "English uses the recorded page")
+        XCTAssertNil(Regions.localizedPage(for: e, language: "es", country: "ES"), "no Spanish page: the recorded page is used")
+    }
+
     func testTheReviewedRunIsInTheDirectory() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")

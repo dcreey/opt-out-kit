@@ -22,3 +22,4 @@ about: {"category": "b2b", "summary": "ZoomInfo Technologies, LLC is a business-
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as ZoomInfo Technologies, LLC (ref ZC105504); its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

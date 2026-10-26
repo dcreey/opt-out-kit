@@ -21,3 +21,4 @@ about: {"category": "recruiting", "summary": "Live Data Technologies, Inc. is a 
 priority: 29
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Live Data Technologies Ltd (ref ZB770821); its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

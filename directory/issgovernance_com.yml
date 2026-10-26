@@ -19,3 +19,4 @@ about: {"category": "b2b", "summary": "Institutional Shareholder Services Inc. i
 priority: 54
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Institutional Shareholder Services UK Limited (ref Z2610359); its pages mention EEA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

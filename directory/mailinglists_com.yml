@@ -20,3 +20,4 @@ priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to mailinglists.com", "privacy_page": "https://mailinglists.com.au/guide/building-your-own-mailing-list-the-ethical-way", "region": "AU", "url": "https://mailinglists.com.au/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

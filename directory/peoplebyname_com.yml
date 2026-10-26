@@ -21,3 +21,4 @@ about: {"category": "people_search", "summary": "peoplebyname.com is a people-se
 priority: 48
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -18,3 +18,4 @@ about: {"category": "lead_generation", "summary": "Healthcare Inc is a lead-gene
 priority: 55
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Additionally, opt-outs are browser- and device-specific, so you will need to opt out on each browser and device you use, and you may need to renew your opt-out preferences if you clear your cookies.", "source": "https://www.healthcare.com/privacy-policy/"}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as UK Healthcare Corporation Limited (ref ZA210624)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

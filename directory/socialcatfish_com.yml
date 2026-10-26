@@ -18,3 +18,4 @@ live_form:
   checked: "2026-10-25"
   found: false
 regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://socialcatfish.com", "es": "https://es.socialcatfish.com"}, "checked": "2026-10-26"}

@@ -22,3 +22,4 @@ about: {"category": "adtech", "summary": "StackAdapt Inc. is an advertising tech
 priority: 26
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "CH"], "evidence": "listed on the IAB Europe TCF vendor list as StackAdapt Inc.; on the UK ICO register of fee payers as StackAdapt UK Limited (ref ZB665844); its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

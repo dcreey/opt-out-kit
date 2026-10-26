@@ -18,3 +18,4 @@ about: {"category": "other", "summary": "MH Sub I, LLC is a healthcare data comp
 priority: 40
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

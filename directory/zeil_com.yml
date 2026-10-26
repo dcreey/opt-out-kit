@@ -21,3 +21,4 @@ contact_email: "privacy@zeil.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU", "UK", "AU", "NZ"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom; its pages mention Privacy Act 1988; its pages mention New Zealand Privacy Act", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "hreflang en-AU", "privacy_page": "https://www.zeil.com/privacy", "region": "AU", "url": "https://www.zeil.com/au/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

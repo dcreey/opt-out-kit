@@ -18,3 +18,4 @@ about: {"category": "b2b", "summary": "Forager.ai, LLC is a business-contact and
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "CA", "BR"], "evidence": "its pages mention GDPR; its pages mention PIPEDA; its pages mention LGPD", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

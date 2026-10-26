@@ -21,3 +21,4 @@ about: {"category": "other", "summary": "Institute for Police Conduct is a data 
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "AU", "ZA", "NZ"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention Privacy Act 1988; its pages mention POPIA; its pages mention Privacy Act 2020", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

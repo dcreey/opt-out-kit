@@ -22,3 +22,4 @@ live_form:
   page: "https://tally.so/embed/xX7g0k?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&originPage=%2Fdo-not-sell-my-personal-information"
   blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -21,5 +21,6 @@ live_form:
   found: true
   page: "https://privacyportal-eu.onetrust.com/webform/ff4ba552-d8f3-4209-8935-155725f93afb/68a5d24e-7467-4bd1-818b-8a8d8da486a2"
   blockers: []
-regions: {"list": ["US", "EU", "UK", "CA", "BR"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention CASL; has a BR site at https://www.lusha.com/pt/ (hreflang pt-BR)", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA", "BR", "FR"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention CASL; has a BR site at https://www.lusha.com/pt/ (hreflang pt-BR); offers its site in French", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "hreflang fr-CA", "privacy_page": "https://www.lusha.com/trust-center/", "region": "CA", "url": "https://www.lusha.com/fr/"}, {"has_form": true, "how": "hreflang pt-BR", "privacy_page": "https://www.lusha.com/trust-center/", "region": "BR", "url": "https://www.lusha.com/pt/"}]
+languages: {"list": ["en", "es", "fr", "pt"], "pages": {}, "checked": "2026-10-26"}

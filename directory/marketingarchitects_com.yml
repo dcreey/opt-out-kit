@@ -26,3 +26,4 @@ run_check:
   result: "confirmed"
   note: "it said Request has been successfully submitted."
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

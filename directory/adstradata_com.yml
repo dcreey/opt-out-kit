@@ -21,3 +21,4 @@ about: {"category": "marketing_data", "summary": "Adstra LLC is a marketing data
 priority: 60
 persistence: {"result": "temporary", "reup_months": 12, "quote": "When you opt-out, our partners, will drop an opt-out cookie that tells our Technology not to deliver targeted advertising to that particular browser or device.", "source": "https://www.adstradata.com/privacy-policy/"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

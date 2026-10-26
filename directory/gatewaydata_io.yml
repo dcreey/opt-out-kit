@@ -23,3 +23,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you! Your submission has been received!"
 regions: {"list": ["US", "EU", "CA"], "evidence": "its pages mention General Data Protection Regulation; its pages mention CASL", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

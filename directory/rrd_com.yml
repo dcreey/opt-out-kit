@@ -20,3 +20,4 @@ about: {"category": "marketing_services", "summary": "Valassis Communications, I
 priority: 49
 persistence: {"result": "temporary", "reup_months": 12, "quote": "When you opt out in this manner, we will place an opt-out cookie on your browser.", "source": "https://www.rrd.com/privacy-policy/valassis"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

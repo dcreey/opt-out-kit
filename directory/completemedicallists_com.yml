@@ -18,3 +18,4 @@ about: {"category": "healthcare", "summary": "Complete Medical Lists, Inc. is a 
 priority: 58
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

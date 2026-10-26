@@ -20,3 +20,4 @@ run_check:
   result: "confirmed"
   note: "it said Your request has been successfully submitted, allow up to 15 days."
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as StatSocial, Inc (ref ZC052981); its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

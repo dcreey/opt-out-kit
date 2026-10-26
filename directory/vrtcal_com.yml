@@ -18,3 +18,4 @@ about: {"category": "adtech", "summary": "VRTCAL Markets Inc. is an advertising 
 priority: 18
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as VRTCAL Markets Inc", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

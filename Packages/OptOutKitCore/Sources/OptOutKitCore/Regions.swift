@@ -22,6 +22,14 @@ public struct RegionalSite: Codable, Equatable, Hashable, Sendable {
     public init(region: String, url: String, how: String, privacyPage: String? = nil, hasForm: Bool? = nil) { self.region = region; self.url = url; self.how = how; self.privacyPage = privacyPage; self.hasForm = hasForm }
 }
 
+/// The languages a broker's site is offered in (two-letter codes), and its opt-out page in each, when the page says where its translations are.
+public struct SiteLanguages: Codable, Equatable, Hashable, Sendable {
+    public var list: [String]
+    public var pages: [String: String]    // language tag ("fr", "fr-FR") -> address of the opt-out page in that language
+    public var checked: String?
+    public init(list: [String], pages: [String: String] = [:], checked: String? = nil) { self.list = list; self.pages = pages; self.checked = checked }
+}
+
 public enum Regions {
     static let eu: Set<String> = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO"]
 
@@ -73,4 +81,16 @@ public enum Regions {
         guard let c = country?.uppercased(), c != "US" else { return nil }
         return entry.regionalSites?.first { $0.isStrong && $0.region.uppercased() == c }
     }
+
+    /// The opt-out page in the person's language, when the site says where it is. A tag for their own country wins ("fr-CA" for someone in Canada).
+    public static func localizedPage(for entry: DirectoryEntry, language: String, country: String?) -> URL? {
+        let lang = language.lowercased().split(separator: "-").first.map(String.init) ?? language.lowercased()
+        guard lang != "en", let pages = entry.languages?.pages else { return nil }
+        let matches = pages.filter { $0.key.lowercased().split(separator: "-").first.map(String.init) == lang }
+        let pick = matches.first { $0.key.lowercased().hasSuffix("-" + (country ?? "").lowercased()) } ?? matches.sorted { $0.key < $1.key }.first
+        return pick.flatMap { URL(string: $0.value) }
+    }
+
+    /// The name of a language for display, in English.
+    public static func languageName(_ code: String) -> String { Locale(identifier: "en_US").localizedString(forLanguageCode: code) ?? code }
 }

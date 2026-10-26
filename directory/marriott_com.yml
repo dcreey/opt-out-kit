@@ -18,3 +18,4 @@ live_form:
   blockers: []
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "CA", "BR", "SG"], "evidence": "its pages mention United Kingdom; its pages mention Quebec; its pages mention LGPD; its pages mention PDPA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

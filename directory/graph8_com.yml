@@ -25,3 +25,4 @@ live_form:
 contact_email: "privacy@graph8.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention CASL", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

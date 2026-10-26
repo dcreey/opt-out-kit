@@ -24,3 +24,4 @@ about: {"category": "marketing_data", "summary": "Above Data, Inc. is a marketin
 priority: 46
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention EEA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

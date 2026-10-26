@@ -22,3 +22,4 @@ about: {"category": "automotive", "summary": "DealerX Partners LLC is an automot
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

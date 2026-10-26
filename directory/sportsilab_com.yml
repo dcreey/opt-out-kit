@@ -20,3 +20,4 @@ about: {"category": "adtech", "summary": "Sports Innovation Lab, inc. is an adve
 priority: 50
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

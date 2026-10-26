@@ -24,3 +24,4 @@ run_check:
   result: "confirmed"
   note: "it said to check the inbox for a link to the Secure Privacy Portal: the person taps it to finish."
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as LiveIntent Inc.; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

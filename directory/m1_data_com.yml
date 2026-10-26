@@ -24,3 +24,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you for your request, we will unsubscribe you."
 regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

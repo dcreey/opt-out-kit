@@ -17,3 +17,4 @@ about: {"category": "b2b", "summary": "Key Marketing Advantage is a business-con
 priority: 36
 persistence: {"result": "permanent", "quote": "If that Consumer is on our Database we will delete their record and if not, in both of these scenarios we will add their Name and Address to our global suppression file so that we will have the ability to delete the record in the future In ", "source": "https://keymarketingadvantage.com/privacy_policy"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["es"], "pages": {}, "checked": "2026-10-26"}

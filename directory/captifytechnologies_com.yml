@@ -19,3 +19,4 @@ about: {"category": "adtech", "summary": "Captify Technologies is an advertising
 priority: 22
 persistence: {"result": "temporary", "reup_months": 6, "quote": "If you delete or clear your cookies, you will need to opt out again.", "source": "https://www.captifytechnologies.com/data-subject-rights-request/"}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Captify Technologies Limited; on the UK ICO register of fee payers as Captify Technologies Ltd (ref ZA350311)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -20,3 +20,4 @@ about: {"category": "lead_generation", "summary": "BRIGHT POLICY, LLC is a lead-
 priority: 32
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Also, if you clear your cookies on this browser or use another browser or device, you may need to opt out again.", "source": "https://www.quotefinders.com/privacy/sharing/index.html"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

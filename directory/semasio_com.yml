@@ -17,3 +17,4 @@ about: {"category": "adtech", "summary": "Semasio GmbH is an advertising technol
 priority: 59
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Semasio GmbH; on the UK ICO register of fee payers as Semasio GMBH (ref ZB560701)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

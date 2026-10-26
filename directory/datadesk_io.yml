@@ -20,3 +20,4 @@ live_form:
 contact_email: "privacy@datadesk.io"
 contact_email_source: "page"
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as DataDesk Inc.", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -26,3 +26,4 @@ about: {"category": "marketing_data", "summary": "AccuData Integrated Marketing,
 priority: 65
 persistence: {"result": "permanent", "quote": "Upon completion of the above process, we will send you a notice that explains the categories of personal information or specific pieces of information we were able to locate about you, whether we (1) deleted, (2) de-identified, or (3) retai", "source": "https://deepsync.com/privacy-policy/"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

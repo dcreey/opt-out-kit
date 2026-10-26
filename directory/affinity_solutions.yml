@@ -22,3 +22,4 @@ about: {"category": "marketing_data", "summary": "Affinity Solutions Inc. is a m
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Affinity Solutions (ref ZA554136); its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

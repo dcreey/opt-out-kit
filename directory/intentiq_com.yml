@@ -22,3 +22,4 @@ live_form:
   checked: "2026-10-25"
   found: false
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Intent IQ LLC; on the UK ICO register of fee payers as Intent IQ LLC (ref ZB935696)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

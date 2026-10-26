@@ -20,3 +20,4 @@ about: {"category": "political", "summary": "Sterling Data Company LLC is a poli
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Hetherington Projects Ltd (ref ZC277896)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

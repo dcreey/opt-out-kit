@@ -21,3 +21,4 @@ about: {"category": "political", "summary": "Blackbaud, Inc is a political and n
 priority: 34
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "CA", "SG"], "evidence": "its pages mention United Kingdom; its pages mention PIPEDA; its pages mention PDPA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

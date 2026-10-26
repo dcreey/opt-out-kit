@@ -21,3 +21,4 @@ about: {"category": "b2b", "summary": "MediaZod LLC dba LeadZod is a business-co
 priority: 37
 persistence: {"result": "temporary", "reup_months": 12, "quote": "Note that cookie-based opt-outs must be performed on each device and browser that you wish to have opted out.", "source": "https://www.leadzod.com/privacy-policy"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

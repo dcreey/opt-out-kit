@@ -21,3 +21,4 @@ about: {"category": "marketing_services", "summary": "Belardi Ostroy, ALC, LLC i
 priority: 19
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

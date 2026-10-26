@@ -23,3 +23,4 @@ live_form:
   page: "https://forms.blackpearl.com/danblock/form/Donotsellorsharemypersonalinformation/formperma/jE1sIwvtGDJ2TjX-tU7KP5szoX1D1Lly7kkkeqRlOvs"
   blockers: []
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom; its pages mention Quebec", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

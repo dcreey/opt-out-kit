@@ -21,3 +21,4 @@ live_form:
   page: "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/991571a9-afd5-406e-b0ac-6fbcb4980df2"
   blockers: ["check:a bot check"]
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Triple Lift, Inc.; on the UK ICO register of fee payers as Triplelift UK Limited (ref ZA509270)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -25,3 +25,4 @@ about: {"category": "lead_generation", "summary": "NEXT WAVE MARKETING STRATEGIE
 priority: 37
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention CASL", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

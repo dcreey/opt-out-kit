@@ -19,3 +19,4 @@ about: {"category": "people_search", "summary": "Mississippi Tornado Alley LLC i
 priority: 67
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://www.usa-people-search.com/removal"}, "checked": "2026-10-26"}

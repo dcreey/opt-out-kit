@@ -20,5 +20,6 @@ live_check:
 about: {"category": "b2b", "summary": "Snovio Inc is a business-contact and sales-data provider. Snov.io is trusted by 300,000 companies in 180+ countries to find leads, enrich them with verified emails and phone numbers, and automate cold outreach. Try for free. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online", "health", "social"], "sells_to": [], "source": "https://snov.io/do-not-sell-my-personal-information"}
 priority: 42
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU", "BR"], "evidence": "its pages mention GDPR; its pages mention LGPD", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "BR", "DE", "FR", "PL"], "evidence": "its pages mention GDPR; its pages mention LGPD; offers its site in German; offers its site in French; offers its site in Polish", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "country path", "privacy_page": null, "region": "BR", "url": "https://snov.io/br/"}]
+languages: {"list": ["de", "en", "es", "fr", "pl", "pt", "uk", "zh"], "pages": {"en": "https://snov.io/do-not-sell-my-personal-information"}, "checked": "2026-10-26"}

@@ -18,3 +18,4 @@ about: {"category": "b2b", "summary": "Connection Holdings is a business-contact
 priority: 25
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Connection Holdings Limited (ref ZB736498)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

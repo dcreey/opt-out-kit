@@ -20,3 +20,4 @@ about: {"category": "marketing_data", "summary": "Data Partners, Inc. is a marke
 priority: 37
 persistence: {"result": "permanent", "quote": "INFORMATION DELETION REQUESTS (RESIDENTS OF CERTAIN STATES ONLY) If you are a resident of a state whose laws require us to delete consumer information and would like us to permanently delete your personal information from our databases, cli", "source": "https://www.datapartners.com/donotsellmyinformation/"}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

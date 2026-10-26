@@ -24,3 +24,4 @@ about: {"category": "adtech", "summary": "Roq.ad Inc. is an advertising technolo
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Roq.ad GmbH; on the UK ICO register of fee payers as Roq.ad UK Ltd (ref ZB684510)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

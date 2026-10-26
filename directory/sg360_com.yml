@@ -22,3 +22,4 @@ priority: 23
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to sg360.com", "privacy_page": null, "region": "BR", "url": "https://sg360.com.br/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

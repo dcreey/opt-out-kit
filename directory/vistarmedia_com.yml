@@ -20,5 +20,6 @@ live_form:
 about: {"category": "adtech", "summary": "Vistar Media Inc. is an advertising technology company. Turn to Vistar Media for all things out of home advertising and DOOH. We work with enterprise brands, agencies, & media owners across the world. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.vistarmedia.com/"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US", "EU", "UK", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Vistar Media EMEA BV; its pages mention United Kingdom; has a JP site at https://www.vistarmedia.com/ja-jp/ (hreflang ja-jp)", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "JP", "DE", "FR"], "evidence": "listed on the IAB Europe TCF vendor list as Vistar Media EMEA BV; its pages mention United Kingdom; has a JP site at https://www.vistarmedia.com/ja-jp/ (hreflang ja-jp); offers its site in German; offers its site in French", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "hreflang ja-jp", "privacy_page": "https://www.vistarmedia.com/privacy-website", "region": "JP", "url": "https://www.vistarmedia.com/ja-jp/"}]
+languages: {"list": ["de", "en", "es", "fr", "ja"], "pages": {}, "checked": "2026-10-26"}

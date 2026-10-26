@@ -21,3 +21,4 @@ about: {"category": "adtech", "summary": "Evorra Ltd is an advertising technolog
 priority: 48
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Evorra Ltd; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -24,3 +24,4 @@ about: {"category": "other", "summary": "West Publishing Corp is an identity and
 priority: 49
 persistence: {"result": "temporary", "reup_months": 12, "quote": "Please note that some of the options described above are browser specific or device specific, so you may need to opt out again if you use a different device or change browsers.", "source": "https://www.thomsonreuters.com/en/privacy-statement"}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

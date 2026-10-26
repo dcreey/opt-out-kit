@@ -21,3 +21,4 @@ live_form:
   page: "https://dsr.trustsuperset.com/?orgId=b46e7184-11fe-4a94-a0b4-1dce265848b0"
   blockers: []
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as LEVERAGE DIGITAL LIMITED (ref ZC124696)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

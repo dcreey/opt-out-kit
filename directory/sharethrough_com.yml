@@ -19,4 +19,5 @@ persistence: {"result": "unknown", "reup_months": 6}
 live_form:
   checked: "2026-10-25"
   found: false
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Sharethrough, Inc", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "FR"], "evidence": "listed on the IAB Europe TCF vendor list as Sharethrough, Inc; offers its site in French", "checked": "2026-10-26"}
+languages: {"list": ["en", "fr"], "pages": {"en": "https://www.equativ.com/contact", "fr": "https://www.equativ.com/fr/contactez-nous"}, "checked": "2026-10-26"}

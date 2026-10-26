@@ -24,3 +24,4 @@ live_form:
   page: "https://www.indianaarrests.org/the-privacy-request-portal/"
   blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

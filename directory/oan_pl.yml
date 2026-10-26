@@ -21,3 +21,4 @@ about: {"category": "adtech", "summary": "Online Advertising Network sp. z o.o. 
 priority: 34
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Online Advertising Network Sp. z o.o.", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

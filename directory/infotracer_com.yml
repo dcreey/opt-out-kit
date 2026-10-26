@@ -24,3 +24,4 @@ priority: 64
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "AU", "CA"], "evidence": "registered with a US state; nothing found for other places; has a AU site at https://au.infotracer.com/ (hreflang en-AU); has a CA site at https://ca.infotracer.com/ (hreflang en-CA)", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "hreflang en-AU", "privacy_page": "https://infotracer.com/privacy/", "region": "AU", "url": "https://au.infotracer.com/"}, {"has_form": false, "how": "hreflang en-CA", "privacy_page": "https://infotracer.com/privacy/", "region": "CA", "url": "https://ca.infotracer.com/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

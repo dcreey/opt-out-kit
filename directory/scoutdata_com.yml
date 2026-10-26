@@ -23,3 +23,4 @@ live_form:
 contact_email: "privacy@scoutdata.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

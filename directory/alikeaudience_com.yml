@@ -18,3 +18,4 @@ about: {"category": "adtech", "summary": "AlikeAudience Inc is an advertising te
 priority: 28
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as ALIKEAUDIENCE PTE. LTD.", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

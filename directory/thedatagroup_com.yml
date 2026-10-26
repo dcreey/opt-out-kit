@@ -20,3 +20,4 @@ about: {"category": "marketing_data", "summary": "The Data Group, LLC is a marke
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as The Data Company Group Limited (ref ZB408647)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

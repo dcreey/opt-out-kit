@@ -20,3 +20,4 @@ about: {"category": "marketing_data", "summary": "THE LINEA 1 MKT SL is a market
 priority: 32
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as THE LINEA 1 MKT SL", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

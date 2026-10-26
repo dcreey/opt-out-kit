@@ -19,4 +19,5 @@ live_form:
   found: false
 contact_email: "privacy@penlink.com"
 contact_email_source: "page"
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "DE", "FR"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; offers its site in German; offers its site in French", "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr", "pt"], "pages": {"de": "https://www.penlink.com/de/your-privacy-choices/", "en": "https://www.penlink.com/your-privacy-choices/", "es": "https://www.penlink.com/es/your-privacy-choices/", "fr": "https://www.penlink.com/fr/your-privacy-choices/", "pt": "https://www.penlink.com/pt/your-privacy-choices/"}, "checked": "2026-10-26"}

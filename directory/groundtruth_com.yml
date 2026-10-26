@@ -21,3 +21,4 @@ about: {"category": "adtech", "summary": "xAd, Inc. is an advertising technology
 priority: 44
 persistence: {"result": "temporary", "reup_months": 6, "quote": "In addition, note that if you use a different browser or device, erase cookies from your browser, or reset your platform ad identifier, you may need to renew your opt-out choice.", "source": "https://www.groundtruth.com/privacy-policy/"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

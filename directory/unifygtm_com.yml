@@ -18,3 +18,4 @@ about: {"category": "b2b", "summary": "Unify AI Business Corporation is a busine
 priority: 48
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "CH"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

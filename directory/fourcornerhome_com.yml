@@ -19,3 +19,4 @@ about: {"category": "lead_generation", "summary": "Four Corner Media Corp is a l
 priority: 42
 persistence: {"result": "permanent", "quote": "Information you provide in an opt-out request is used only to review and honor that request, including keeping your contact details on our suppression list so the opt-out stays in effect.", "source": "https://fourcornerhome.com/privacy-policy/"}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

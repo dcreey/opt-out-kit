@@ -27,3 +27,4 @@ run_check:
   result: "confirmed"
   note: "it said an email was sent to complete the opt-out: the person taps the link to finish."
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

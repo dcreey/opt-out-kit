@@ -21,3 +21,4 @@ priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "CA", "BR", "SG"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention PIPEDA; its pages mention LGPD; its pages mention PDPA", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "hreflang pt-br", "privacy_page": "https://cybba.com/privacy-policy/", "region": "BR", "url": "https://cybba.com/?lang=pt-br"}]
+languages: {"list": ["en", "es", "pt"], "pages": {}, "checked": "2026-10-26"}

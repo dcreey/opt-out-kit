@@ -21,3 +21,4 @@ about: {"category": "people_search", "summary": "searchpeoplefree.com is a peopl
 priority: 64
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://www.searchpeoplefree.com/opt-out", "es": "https://www.searchpeoplefree.com/es/opt-out"}, "checked": "2026-10-26"}

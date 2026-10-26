@@ -21,3 +21,4 @@ about: {"category": "financial", "summary": "Catchlight Insights LLC is a financ
 priority: 52
 persistence: {"result": "temporary", "reup_months": 12, "quote": "You'll need to opt out again if you visit our applicable Websites/Apps from a different device or browser, change your browser settings, or clear your cookies.", "source": "https://catchlight.ai/privacy"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

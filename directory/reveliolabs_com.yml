@@ -18,3 +18,4 @@ about: {"category": "recruiting", "summary": "Revelio Labs, Inc. is a recruiting
 priority: 46
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

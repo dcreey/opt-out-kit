@@ -18,3 +18,4 @@ about: {"category": "other", "summary": "Gigabite Inc is a data company. Its pol
 priority: 19
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -21,3 +21,4 @@ about: {"category": "political", "summary": "DSPolitical, LLC is a political and
 priority: 56
 persistence: {"result": "temporary", "reup_months": 12, "quote": "This means that if you delete your cookies or upgrade your browser after having opted out, you will need to opt-out again.", "source": "https://www.dspolitical.com/privacy-policy/"}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -17,3 +17,4 @@ about: {"category": "marketing_data", "summary": "Anchor Computer Inc. is a mark
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "CA"], "evidence": "its pages mention Quebec", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

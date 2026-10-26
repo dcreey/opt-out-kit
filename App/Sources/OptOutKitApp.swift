@@ -837,9 +837,15 @@ final class AppModel: ObservableObject {
             guard set.contains(entry.domain) else { return nil }
             // A form the crawl could not read but a real page load found: the live page decides what is filled, so a stand-in form is enough.
             guard let form = entry.optOutForm ?? entry.liveForm?.page.flatMap(URL.init(string:)).map({ OptOutForm(page: $0, method: "post", action: nil, fields: [], hops: 1) }) else { return nil }
+            // Shown in the person's language when the site offers its opt-out page in it; the original page is the fallback.
+            var shown = form, fallback: OptOutForm?
+            if let local = Regions.localizedPage(for: entry, language: Loc.language, country: ownerCountry), local != form.page {
+                fallback = form
+                shown = OptOutForm(page: local, method: form.method, action: nil, fields: [], hops: form.hops)
+            }
             if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
             let plan = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: Date()).plan ?? FillPlan(values: [], verdict: .ready)
-            return AssistedRunner.Item(entry: entry, form: form, plan: plan)
+            return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback)
         }
     }
 
@@ -869,7 +875,10 @@ final class AppModel: ObservableObject {
     func healedLink(for siteID: String) -> HealedLink? { household.healedLink(for: siteID) }
 
     /// The address to use for a site's opt-out page: a link the app healed on this device, else the recorded one.
-    func effectiveURL(for entry: DirectoryEntry) -> URL? { household.healedLink(for: entry.id)?.form.page ?? entry.optOutForm?.page ?? entry.optOutURL }
+    func effectiveURL(for entry: DirectoryEntry) -> URL? {
+        // The page in the person's language when the site has one, else the recorded address.
+        household.healedLink(for: entry.id)?.form.page ?? Regions.localizedPage(for: entry, language: Loc.language, country: ownerCountry) ?? entry.optOutForm?.page ?? entry.optOutURL
+    }
     func effectiveURL(for broker: Broker) -> URL? { household.healedLink(for: broker.id)?.form.page ?? broker.steps.compactMap(\.open).first }
 
     func makeInspector() -> PageInspector {

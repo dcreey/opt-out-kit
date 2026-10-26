@@ -21,3 +21,4 @@ about: {"category": "political", "summary": "Helix Campaigns LLC is a political 
 priority: 59
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

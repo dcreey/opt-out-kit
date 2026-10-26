@@ -21,3 +21,4 @@ about: {"category": "location_data", "summary": "Kloudend, Inc. is a device and 
 priority: 49
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "BR", "CH"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Lei Geral; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -39,3 +39,16 @@ links to the same brand under another country domain (example.co.uk) or subdomai
   and are used for neither tags nor routing.
 - A person outside the US who has a strong regional site for their country is sent to it instead of the US page, and its form, when it has one, is found on
   the live page. A US resident always uses the main site.
+
+## Languages (2026-10-26)
+
+`tools/site_languages.py` records the languages each site is offered in (the page's `lang`, `hreflang` alternates) and the translated address of its opt-out
+page, when the page lists its translations. 42 sites declare a language other than English; 25 opt-out pages list translations. A language tied to one country
+(French, German, Italian, Dutch, Polish, Swedish, Japanese, Korean, ...) adds that region tag, with the evidence; English, Spanish, Portuguese, Chinese, Arabic and
+Russian are recorded but add no region, since too many countries speak them. 75 tags were added this way.
+
+When the person's app language is not English and a site lists its opt-out page in that language, the assisted flow opens that page (the tag for their own country
+wins, e.g. fr-CA for Canada) and falls back to the original page if no form can be filled on it. Every page is also requested with the person's language in
+`Accept-Language`, which many sites honor on their own.
+
+Order to re-run everything: `tag_regions.py apply`, then `regional_sites.py apply`, then `site_languages.py apply` (the first rewrites the tags, the others add to them).

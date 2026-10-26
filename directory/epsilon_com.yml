@@ -22,3 +22,4 @@ about: {"category": "marketing_data", "summary": "Epsilon Data Management, LLC i
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Epsilon International UK Ltd; its pages mention United Kingdom", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

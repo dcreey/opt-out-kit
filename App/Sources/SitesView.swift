@@ -501,6 +501,15 @@ struct DirectoryInfoView: View {
             }
             if let about = entry.about { aboutSection(about) }
             persistenceSection
+            let others = (entry.languages?.list ?? []).filter { $0 != "en" }
+            let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" }
+            if !others.isEmpty || !places.isEmpty {
+                Section("Where it operates") {
+                    if !places.isEmpty { Text(Loc.f("Collects data about people in: %@", places.joined(separator: ", "))) }
+                    if !others.isEmpty { Text(Loc.f("Its site is offered in: %@", others.map(Regions.languageName).joined(separator: ", "))) }
+                    if let note = entry.regions?.evidence, !note.isEmpty { Text(note).font(.footnote).foregroundStyle(.secondary) }
+                }
+            }
             Section {
                 GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
                     model.requireProfile { guide = model.guidedRunner(for: entry) }

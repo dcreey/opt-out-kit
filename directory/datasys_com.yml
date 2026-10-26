@@ -20,3 +20,4 @@ about: {"category": "marketing_data", "summary": "Datasys Group, Inc. is a marke
 priority: 62
 persistence: {"result": "temporary", "reup_months": 12, "quote": "When you're marked as \"Do Not Share,\" we'll know that you didn't want your information shared in case your information is later resubmitted.", "source": "https://datasys.com/privacy-policy"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

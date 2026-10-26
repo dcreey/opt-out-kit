@@ -21,3 +21,4 @@ about: {"category": "people_search", "summary": "Lookify.io is a people-search a
 priority: 58
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention European Economic Area", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

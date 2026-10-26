@@ -20,3 +20,4 @@ live_form:
   page: "https://docs.google.com/forms/d/e/1FAIpQLScb2gw3agfJIpzjTwD_U9hVd3Qd3AEhdwFslhulkOLQtRX01w/viewform?embedded=true"
   blockers: ["other"]
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

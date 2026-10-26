@@ -124,6 +124,8 @@ final class AssistedRunner: ObservableObject {
         let entry: DirectoryEntry
         let form: OptOutForm
         let plan: FillPlan
+        /// The page in English, tried when the translated one has no form we can fill.
+        var fallbackForm: OptOutForm?
         var id: String { entry.id }
     }
 
@@ -169,7 +171,11 @@ final class AssistedRunner: ObservableObject {
     private func prepare(_ i: Int) {
         guard items.indices.contains(i), preparing[i] == nil else { return }
         let item = items[i]
-        preparing[i] = Task { await driver.prepare(item.form, plan: item.plan) }
+        preparing[i] = Task {
+            if let page = await driver.prepare(item.form, plan: item.plan) { return page }
+            if let fallback = item.fallbackForm { return await driver.prepare(fallback, plan: item.plan) }
+            return nil
+        }
     }
 
     func run() async {

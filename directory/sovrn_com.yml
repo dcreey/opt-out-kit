@@ -19,3 +19,4 @@ live_form:
   checked: "2026-10-25"
   found: false
 regions: {"list": ["US", "EU", "UK", "CA", "BR"], "evidence": "listed on the IAB Europe TCF vendor list as Sovrn, Inc.; its pages mention United Kingdom; its pages mention PIPEDA; its pages mention LGPD", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

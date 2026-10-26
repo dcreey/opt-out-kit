@@ -25,3 +25,4 @@ priority: 76
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to beenverified.com", "privacy_page": "https://www.beenverified.co.uk/faq/privacy/", "region": "GB", "url": "https://www.beenverified.co.uk/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

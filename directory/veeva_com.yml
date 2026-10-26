@@ -23,3 +23,4 @@ priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "CA", "BR", "SG"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Quebec; its pages mention LGPD; its pages mention PDPA", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "country path", "privacy_page": "https://www.veeva.com/br/privacy/", "region": "BR", "url": "https://www.veeva.com/br/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

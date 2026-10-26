@@ -21,3 +21,4 @@ live_form:
   found: false
   blockers: []
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Datonics LLC; on the UK ICO register of fee payers as DATONICS LLC (ref ZC075048)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

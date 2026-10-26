@@ -18,4 +18,5 @@ live_form:
 about: {"category": "adtech", "summary": "Teads Holding Co is an advertising technology company. Drive elevated outcomes and monetize your content with Outbrain Direct Response. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://dsr.outbrain.com/recommendations-settings/home/en"}
 priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Zemanta Inc.; its pages mention UK GDPR", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "DE", "FR", "IT", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Zemanta Inc.; its pages mention UK GDPR; offers its site in German; offers its site in French; offers its site in Italian; offers its site in Japanese", "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr", "it", "ja", "pt"], "pages": {}, "checked": "2026-10-26"}

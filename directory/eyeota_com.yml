@@ -20,3 +20,4 @@ about: {"category": "adtech", "summary": "Eyeota Pte Ltd is an advertising techn
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Eyeota Pte Ltd; on the UK ICO register of fee payers as Eyeota Pte Ltd (ref ZA452233)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

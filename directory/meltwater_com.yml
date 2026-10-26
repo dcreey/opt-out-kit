@@ -18,3 +18,4 @@ about: {"category": "marketing_services", "summary": "Meltwater News US, Inc. is
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "JP", "ZA"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention APPI; its pages mention POPIA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

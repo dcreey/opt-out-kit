@@ -19,3 +19,4 @@ about: {"category": "other", "summary": "Graze Social PBC is a data company. Des
 priority: 43
 persistence: {"result": "permanent", "quote": "Graze may permanently delete, deidentify, or aggregate Personal Data in response to a request for deletion.", "source": "https://www.graze.social/privacy-policy"}
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom; its pages mention PIPEDA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

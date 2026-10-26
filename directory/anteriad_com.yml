@@ -21,3 +21,4 @@ about: {"category": "b2b", "summary": "Anteriad, LLC is a business-contact and s
 priority: 35
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "CA", "IN", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Anteriad, LLC; on the UK ICO register of fee payers as Anteriad Global Limited (ref ZA229110); its pages mention CASL; its pages mention DPDP; its pages mention APPI", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

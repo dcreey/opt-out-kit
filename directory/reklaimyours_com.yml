@@ -17,3 +17,4 @@ about: {"category": "other", "summary": "Reklaim Ltd. is a financial and credit 
 priority: 58
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "CA"], "evidence": "its pages mention Canadian residents", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

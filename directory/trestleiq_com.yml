@@ -21,3 +21,4 @@ live_form:
   page: "https://dsr.trustsuperset.com/?orgId=534137b6-168c-406b-99e2-c48a9389f2c3"
   blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

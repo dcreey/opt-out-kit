@@ -19,3 +19,4 @@ about: {"category": "adtech", "summary": "Ogury Ltd is an advertising technology
 priority: 42
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "CH"], "evidence": "listed on the IAB Europe TCF vendor list as Ogury Ltd; its pages mention United Kingdom; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://www.ogury.com/user-choice-portal/"}, "checked": "2026-10-26"}

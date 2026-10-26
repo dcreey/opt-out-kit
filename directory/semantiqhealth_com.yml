@@ -26,3 +26,4 @@ run_check:
   result: "confirmed"
   note: "it said Thank you! Your submission has been received."
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as SEMANTIQ LTD (ref ZC081281); its pages mention European Economic Area", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
