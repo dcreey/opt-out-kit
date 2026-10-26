@@ -2790,6 +2790,12 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "first"), ["Pat"], "First / Middle Name(s) is the first name, not a middle-name field to skip")
     }
 
+    func testAOneBoxAddressAndARelationshipFieldAreFilled() {
+        let p = plan([("text", "a", "Street Address, City, State, Zip *"), ("text", "r", "Data subject's relationship with Lob"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "a"), ["1 Main St, Springfield, IL 62701"])
+        XCTAssertEqual(v(p, "r"), ["Consumer, no business relationship"])
+    }
+
     func testATypedSignatureIsTheLegalNameAndAFileUploadIsNot() {
         let p = plan([("text", "sig", "* Signature"), ("text", "es", "E-Signature"), ("file", "f", "Select a File"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "sig"), ["Pat Example"]); XCTAssertEqual(v(p, "es"), ["Pat Example"])

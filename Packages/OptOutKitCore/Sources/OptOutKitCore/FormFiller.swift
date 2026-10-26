@@ -145,6 +145,16 @@ public enum FormFiller {
                 let now = Date(); let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX")
                 put(["yyyy-MM-dd", "MM/dd/yyyy", "MMMM d, yyyy"].map { f.dateFormat = $0; return f.string(from: now) }, L10n.noun("Date")); continue
             }
+            // One box for the whole address ("Street Address, City, State, Zip").
+            if has("street.{0,12}city.{0,12}state") {
+                if let a = address, let street = a.street { put(["\(street), \(a.city), \(a.state) \(a.zip ?? "")".trimmingCharacters(in: .whitespaces)], L10n.noun("Street address")) }
+                else if required { missing.append(L10n.noun("Street address")) }
+                continue
+            }
+            // "Data subject's relationship with <the company>": a person only asking to be removed has none.
+            if has("relationship (with|to)|relation to|data subject.?s relationship") {
+                put(["Consumer, no business relationship"], L10n.noun("Relationship")); continue
+            }
             // A typed signature or e-signature: the person's legal name, typed. (A drawn signature or an uploaded file stays with the person.)
             if has("e-?sign|signature|sign here|typed name|type your (full )?name") && field.type != "file" && field.type != "canvas" {
                 put([legal], L10n.noun("Signature")); continue

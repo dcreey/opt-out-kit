@@ -7108,6 +7108,29 @@
     }
    }
   },
+  "Relationship": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Relation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Relación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beziehung"
+     }
+    }
+   }
+  },
   "Relatives and household": {
    "extractionState": "manual",
    "localizations": {

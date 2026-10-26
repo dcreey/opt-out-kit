@@ -125,6 +125,30 @@ extension WebViewSession {
         return (try? JSONDecoder().decode([LiveForm].self, from: data)) ?? []
     }
 
+    /// Privacy portals that open on a choice of requests ("Start Access Request", "Start Deletion Request", "Start Opt Out Request"): clicks the one a
+    /// person asking to be removed wants, so the form behind it is on the page. Opt-out of sale or sharing first, then deletion; never access, transfer,
+    /// correction or update. Repeats once for a second step. Returns what it clicked, or nil when the page has no such choice.
+    func advanceToRequestForm() async -> String? {
+        var clicked: String?
+        for _ in 0..<2 {
+            let js = #"""
+            (function(){
+              var pref=[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
+              var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
+                var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
+                return /^start .{3,50} request$/i.test(t)&&r.width>0&&r.height>0&&e.children.length<=2;});
+              for(var p=0;p<pref.length;p++){for(var i=0;i<els.length;i++){var t=(els[i].innerText||'').trim();
+                if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
+              return '';})();
+            """#
+            guard let t = (try? await webView.evaluateJavaScript(js)) as? String, !t.isEmpty else { break }
+            clicked = t
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            await settlePage(maxWait: 5)
+        }
+        return clicked
+    }
+
     /// Fills the values the plan chose, finding each field by its token.
     /// Fills the form; menus that fill in after another choice (a state list that waits for the country) get a second pass.
     func fillLive(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
@@ -254,6 +278,53 @@ extension WebViewSession {
         return (out?.isEmpty ?? true) ? nil : out
     }
 
+    /// Custom drop-down menus that are not <select> elements (Material UI and similar): opens each empty one that asks about the person's relationship
+    /// to the company or their state, and picks a consumer-style answer ("Consumer", "None", "Other", the person's state). Never picks employee,
+    /// customer, vendor or business answers. Returns how many it set.
+    func chooseCustomMenus() async -> Int {
+        var set = 0
+        for _ in 0..<3 {
+            let open = #"""
+            (function(){
+              var els=[].slice.call(document.querySelectorAll('[role=combobox],[aria-haspopup=listbox],.MuiSelect-select')).filter(function(e){
+                var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&!e.getAttribute('data-ook-menu')&&((e.innerText||e.value||'').replace(/[\u200b\s]/g,'')==='');});
+              if(!els.length) return '';
+              var e=els[0]; e.setAttribute('data-ook-menu','1'); e.scrollIntoView({block:'center'});
+              ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
+              return ((e.closest('div[class*=FormControl],div')||e).innerText||'').replace(/\s+/g,' ').slice(0,120)||'menu';})();
+            """#
+            guard let label = (try? await webView.evaluateJavaScript(open)) as? String, !label.isEmpty else { break }
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            let pick = #"""
+            (function(){
+              var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=menuitem],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
+              var bad=/employee|customer|client|vendor|partner|supplier|business|contractor|applicant|agent|representative|former|prospect/i;
+              var good=[/^\s*illinois\b/i,/consumer|individual|myself|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
+              for(var g=0;g<good.length;g++){for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim(); if(good[g].test(t)&&!bad.test(t)){opts[i].click(); return t;}}}
+              if(opts.length){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
+              document.body.click(); return '';})();
+            """#
+            if let t = (try? await webView.evaluateJavaScript(pick)) as? String, !t.isEmpty { set += 1 }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+        }
+        return set
+    }
+
+    /// After a form's first button ("Review Request"), the page often shows a summary with its own final button ("Submit Request", "Confirm"): presses
+    /// that one. Only when the page says it is a review or confirmation step, so a form is never sent twice. Returns whether it pressed something.
+    func pressConfirmStep() async -> Bool {
+        let js = #"""
+        (function(){
+          var text=(document.body?document.body.innerText:'').toLowerCase();
+          if(!/review (your )?(request|information|details)|please (review|confirm)|confirm your (request|submission)|check your (details|information)/.test(text)) return false;
+          var bs=[].slice.call(document.querySelectorAll('button,input[type=submit],[role=button]')).filter(function(b){
+            var t=((b.innerText||b.value||'')+'').replace(/\s+/g,' ').trim(), r=b.getBoundingClientRect();
+            return r.width>0&&r.height>0&&/^(submit( request)?|confirm( request)?|send( request)?|yes,? submit)$/i.test(t);});
+          if(!bs.length) return false; bs[bs.length-1].scrollIntoView({block:'center'}); bs[bs.length-1].click(); return true;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+    }
+
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.
     func pressLiveSubmit(form token: String) async -> Bool {
         let js = #"""
@@ -353,6 +424,7 @@ extension FormRun {
         if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
 
+        _ = await session.advanceToRequestForm()
         let forms = await session.discoverForms()
         let context = await session.pageContext()
         guard let form = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
@@ -368,6 +440,7 @@ extension FormRun {
         if let miss = fill.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
         let beforeFill = await session.visibleText()
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+        _ = await session.chooseCustomMenus()
         // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         let earlyText = await session.visibleText()
@@ -394,6 +467,7 @@ extension FormRun {
         let stateBefore = await session.formState(form.token)
         guard await session.pressLiveSubmit(form: form.token) else { return .failed("no submit button found") }
         await session.settlePage(maxWait: maxWait)
+        if await session.pressConfirmStep() { await session.settlePage(maxWait: maxWait) }          // a review step with its own final button
         if let why = await session.visibleChallenge() { return .challenged(why) }
         await session.scrollFormIntoView(form.token)
         let after = await session.visibleText()

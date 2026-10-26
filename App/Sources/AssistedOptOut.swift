@@ -49,6 +49,7 @@ struct WebAssistedDriver: AssistedDriver {
         await session.hideConsentOverlays()
         let page = WebAssistedPage(session: session, plan: plan)
         if let person {
+            _ = await session.advanceToRequestForm()
             guard let live = LiveFormPicker.pick(await session.discoverForms(), pageContext: await session.pageContext()) else { session.close(); return nil }
             let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person, advertisingID: advertisingID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
@@ -89,6 +90,7 @@ final class WebAssistedPage: AssistedPage {
         if let liveForm {
             _ = await session.fillLive(plan.values)
             _ = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
+            _ = await session.chooseCustomMenus()
         } else { _ = await session.fillFields(plan.values) }
     }
 
@@ -98,6 +100,7 @@ final class WebAssistedPage: AssistedPage {
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed("no submit button found") }
         await session.settlePage(maxWait: 20)
+        if await session.pressConfirmStep() { await session.settlePage(maxWait: 20) }
         if let why = await session.visibleChallenge() { return .challenged(why) }
         return WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
     }

@@ -154,6 +154,7 @@ enum FormAudit {
         site.finalURL = session.webView.url?.absoluteString ?? ""
         if await session.pageLooksMissing() { site.outcome = "page missing (error page)"; return site }
         if await session.hasTermsPrompt() { site.blockers.append("terms prompt") }
+        if let step = await session.advanceToRequestForm() { site.blockers.append("step: " + step) }
         let forms = await session.discoverForms()
         let context = await session.pageContext()
         guard let form = LiveFormPicker.pick(forms, pageContext: context) else { site.outcome = "no opt-out form found on the page (\(forms.count) forms seen)"; return site }
@@ -168,6 +169,7 @@ enum FormAudit {
         }
         let fill = await session.fillLive(plan.values)
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: true)
+        _ = await session.chooseCustomMenus()
         try? await Task.sleep(nanoseconds: 1_000_000_000)
         site.typedCodeBox = await session.emptyCodeField()
         if let c = await session.pendingCertification() { site.blockers.append("certify: " + c.prefix(60)) }
