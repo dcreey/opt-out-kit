@@ -64,6 +64,16 @@
         "source": { "type": "string" }
       }
     },
+    "caution": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["biometric"] },
+        "note": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "excluded": {
       "type": "object",
       "required": ["checked", "kind", "reason"],

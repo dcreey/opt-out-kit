@@ -2832,3 +2832,16 @@ final class UnlockLaterNotInTheQueueTests: XCTestCase {
         XCTAssertTrue(business.allSatisfy { OptOutMethods.classify($0, confirmingIdentity: true).method == .guided })
     }
 }
+
+
+final class CautionTests: XCTestCase {
+    func testClearviewIsFlaggedAndNeverAutomated() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        let cv = try XCTUnwrap(entries.first { $0.domain == "clearview.ai" })
+        XCTAssertEqual(cv.caution?.kind, "biometric")
+        XCTAssertFalse(cv.caution?.sources.isEmpty ?? true)
+        XCTAssertEqual(OptOutMethods.classify(cv, confirmingIdentity: true).method, .guided, "a face photo is never uploaded for the person")
+        XCTAssertTrue(cv.caution?.summary.contains("never uploads a photo") ?? false)
+    }
+}

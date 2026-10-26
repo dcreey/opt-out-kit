@@ -7016,6 +7016,29 @@
     }
    }
   },
+  "Read this first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À lire d'abord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Léelo primero"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuerst lesen"
+     }
+    }
+   }
+  },
   "Ready (dry run, nothing sent)": {
    "extractionState": "manual",
    "localizations": {
@@ -7544,6 +7567,9 @@
      }
     }
    }
+  },
+  "Signature": {
+   "extractionState": "manual"
   },
   "Sites that republish arrest, mugshot and court records from public sources. They earn from ads and, often, from charging people to take a record down. Because they copy records, the same record can sit on many of them.": {
    "extractionState": "manual",
@@ -9036,6 +9062,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieses Gesetz gibt kein allgemeines Recht auf Löschung Ihrer Daten. Sie können in der Regel Ihre Einwilligung widerrufen."
+     }
+    }
+   }
+  },
+  "This opt-out asks for a photo of your face and your consent to biometric data. The company says it uses the photo only to block your face from its search results, but you hand a face photo to the company you want to be removed from. Privacy guides are divided on whether it is worth it. The app never uploads a photo for you: this one you do yourself, if you decide to.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce retrait demande une photo de votre visage et votre consentement à des données biométriques. L'entreprise dit n'utiliser la photo que pour bloquer votre visage dans ses résultats de recherche, mais vous remettez une photo de votre visage à l'entreprise dont vous voulez être retiré. Les guides de confidentialité sont partagés sur son intérêt. L'app ne téléverse jamais de photo à votre place : celui-ci, vous le faites vous-même, si vous le décidez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta baja pide una foto de tu rostro y tu consentimiento para datos biométricos. La empresa dice que usa la foto solo para bloquear tu rostro en sus resultados de búsqueda, pero entregas una foto de tu cara a la empresa de la que quieres salir. Las guías de privacidad están divididas sobre si vale la pena. La app nunca sube una foto por ti: esta la haces tú mismo, si decides hacerlo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Opt-out verlangt ein Foto Ihres Gesichts und Ihre Einwilligung in biometrische Daten. Die Firma sagt, sie nutze das Foto nur, um Ihr Gesicht in ihren Suchergebnissen zu sperren, aber Sie geben ein Gesichtsfoto an die Firma, aus der Sie raus wollen. Datenschutzratgeber sind uneins, ob es sich lohnt. Die App lädt nie ein Foto für Sie hoch: Diesen Schritt machen Sie selbst, wenn Sie sich dafür entscheiden."
+     }
+    }
+   }
+  },
+  "This opt-out asks for something sensitive in return. Read what it asks for before you start.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce retrait demande en échange quelque chose de sensible. Lisez ce qu'il demande avant de commencer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta baja pide algo sensible a cambio. Lee lo que pide antes de empezar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Opt-out verlangt dafür etwas Sensibles. Lesen Sie, was es verlangt, bevor Sie beginnen."
      }
     }
    }

@@ -488,6 +488,17 @@ struct DirectoryInfoView: View {
 
     var body: some View {
         List {
+            if let caution = entry.caution {
+                Section {
+                    Label(caution.title, systemImage: "exclamationmark.triangle.fill").font(.headline).foregroundStyle(.orange)
+                    Text(caution.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+                    if let note = caution.note { Text(note).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+                    ForEach(caution.sources, id: \.self) { src in
+                        if let url = URL(string: src) { Link(destination: url) { Text(url.host ?? src).font(.caption) } }
+                    }
+                }
+                .accessibilityIdentifier("caution")
+            }
             if let about = entry.about { aboutSection(about) }
             persistenceSection
             Section {

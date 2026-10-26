@@ -190,6 +190,28 @@ public enum BrokerPriority {
     }
 }
 
+/// A warning to show before a person starts this site's opt-out, because the opt-out itself asks for something sensitive in return.
+/// The words shown come from `kind`, so they are translated; `note` and `sources` are the site-specific facts and where they came from.
+public struct CautionInfo: Codable, Equatable, Hashable, Sendable {
+    public var kind: String          // biometric
+    public var note: String?
+    public var sources: [String]
+    public init(kind: String, note: String? = nil, sources: [String] = []) { self.kind = kind; self.note = note; self.sources = sources }
+    enum CodingKeys: String, CodingKey { case kind, note, sources }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try c.decode(String.self, forKey: .kind); note = try c.decodeIfPresent(String.self, forKey: .note); sources = try c.decodeIfPresent([String].self, forKey: .sources) ?? []
+    }
+
+    public var title: String { L10n.t("Read this first") }
+    public var summary: String {
+        switch kind {
+        case "biometric": return L10n.t("This opt-out asks for a photo of your face and your consent to biometric data. The company says it uses the photo only to block your face from its search results, but you hand a face photo to the company you want to be removed from. Privacy guides are divided on whether it is worth it. The app never uploads a photo for you: this one you do yourself, if you decide to.")
+        default: return L10n.t("This opt-out asks for something sensitive in return. Read what it asks for before you start.")
+        }
+    }
+}
+
 /// Why a site is kept out of the app: its only way to opt out is for a business (a sales or contact form asking for a company and title,
 /// a signup, a login), or it is not a company that holds personal data about people. These sites are never shown; they are documented in
 /// docs/EXCLUDED_SITES.md so they are not added back.
@@ -236,6 +258,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var about: BrokerAbout?        // who it is, what it tracks, who it buys and sells
     public var priority: Int?             // 0-100: how much it matters to opt out of first
     public var persistence: PersistenceInfo?   // whether an opt-out here lasts, or has to be repeated
+    public var caution: CautionInfo?      // a warning shown before the opt-out starts (it asks for something sensitive in return)
     public var excluded: ExcludedCheck?   // kept out of the app: its opt-out is for businesses, or it is not a data broker
     public var closed: ClosedCheck?       // evidence that the site no longer responds, so there is nothing to opt out of
     public var liveForm: LiveFormCheck?   // an opt-out form found on the live page when the crawl could not read one
@@ -247,17 +270,17 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, liveForm: LiveFormCheck? = nil, closed: ClosedCheck? = nil, excluded: ExcludedCheck? = nil, persistence: PersistenceInfo? = nil, about: BrokerAbout? = nil, priority: Int? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, liveForm: LiveFormCheck? = nil, closed: ClosedCheck? = nil, excluded: ExcludedCheck? = nil, caution: CautionInfo? = nil, persistence: PersistenceInfo? = nil, about: BrokerAbout? = nil, priority: Int? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.liveForm = liveForm; self.closed = closed; self.excluded = excluded; self.persistence = persistence; self.about = about; self.priority = priority; self.contactEmail = contactEmail; self.registeredIn = registeredIn
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.liveForm = liveForm; self.closed = closed; self.excluded = excluded; self.caution = caution; self.persistence = persistence; self.about = about; self.priority = priority; self.contactEmail = contactEmail; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
-        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, persistence, about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
+        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, caution, persistence, about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
     }
 }

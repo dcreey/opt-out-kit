@@ -41,6 +41,9 @@ struct PlanTaskRow: View {
             Image(systemName: model.isDone(task) ? "checkmark.circle.fill" : "circle").foregroundStyle(model.isDone(task) ? .green : .secondary).padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
                 Text(task.title).font(.headline)
+                if let e = model.entryByDomain[task.domains.first ?? ""], e.caution != nil {
+                    Label("Read this first", systemImage: "exclamationmark.triangle.fill").font(.caption.bold()).foregroundStyle(.orange)
+                }
                 if task.priority > 0, case .site = task.kind {
                     Text(BrokerPriority.tier(task.priority)).font(.caption.bold())
                         .foregroundStyle(task.priority >= 60 ? .red : task.priority >= 45 ? .orange : .secondary)

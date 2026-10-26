@@ -14813,6 +14813,29 @@
     }
    }
   },
+  "Read this first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À lire d'abord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Léelo primero"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuerst lesen"
+     }
+    }
+   }
+  },
   "Ready (dry run, nothing sent)": {
    "extractionState": "manual",
    "localizations": {
