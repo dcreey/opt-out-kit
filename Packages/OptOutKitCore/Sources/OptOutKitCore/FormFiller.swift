@@ -164,7 +164,7 @@ public enum FormFiller {
                 if let age = person.age() { put([String(age)], L10n.noun("Age")) } else if required { missing.append(L10n.noun("Birthdate")) }
                 continue
             }
-            if let b = person.birthdate, b.count == 10, has("birth|dob|born") || has("^(month|day|year)\\b|\\b(month|day|year)\\b") {
+            if let b = person.birthdate, b.count == 10, (has("birth|dob|born") && !has("street|address")) || has("^(month|day|year)\\b|\\b(month|day|year)\\b") {
                 let p = b.split(separator: "-").map(String.init)
                 if p.count == 3, let y = Int(p[0]), let m = Int(p[1]), let d = Int(p[2]) {
                     let months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -194,7 +194,7 @@ public enum FormFiller {
             }
             else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }
             else if has("phone|t[ée]l[ée]phone|tel[ée]fono|telefon|handy") || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
-            else if has("birth|dob|naissance|nacimiento|geburt") { put([person.birthdate], L10n.noun("Birthdate")) }
+            else if has("birth|dob|naissance|nacimiento|geburt") && !has("street|address") { put([person.birthdate], L10n.noun("Birthdate")) }
             else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }
             // A required menu of request choices ("Privacy Choice", "Choose an option") is chosen on the live page, from its own options.
             else if required, field.type != "select" { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }

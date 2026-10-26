@@ -62,6 +62,11 @@ final class LinkFiller: ObservableObject {
         _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
         _ = await s.chooseCustomMenus()
         await s.scrollFormIntoView(form.token)
+        #if DEBUG
+        // Simulator work: what every visible field held after the fill, written to Documents/linkfill.json.
+        if let json = try? await s.webView.evaluateJavaScript("JSON.stringify([...document.querySelectorAll('input,select,textarea')].filter(e=>e.getBoundingClientRect().width>0&&!['hidden','submit','button'].includes(e.type)).map(e=>({label:((e.id&&document.querySelector('label[for=\"'+e.id+'\"]')||e.closest('label')||{}).innerText||e.placeholder||e.name||'').trim().slice(0,50),type:e.type,value:(e.tagName==='SELECT'?(e.options[e.selectedIndex]||{}).text:e.type==='checkbox'?String(e.checked):e.value)||''})))") as? String,
+           let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first { try? json.write(to: docs.appendingPathComponent("linkfill.json"), atomically: true, encoding: .utf8) }
+        #endif
         status = fill.filled == 0 ? Loc.t("The form's fields could not be filled in. Fill it in the page yourself.")
             : Loc.f("Filled in %lld fields. Check them, solve any check, then press the page's own button to send.", fill.filled)
     }
@@ -112,7 +117,19 @@ struct LinkFillerView: View {
         }
         .navigationTitle("Finish from an email")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { if !startLink.isEmpty, text.isEmpty { text = startLink; if let url = LinkFiller.normalized(startLink) { Task { await filler.open(url) } } } }
+        .onAppear {
+            if !startLink.isEmpty, text.isEmpty {
+                text = startLink
+                if let url = LinkFiller.normalized(startLink) {
+                    Task {
+                        await filler.open(url)
+                        #if DEBUG
+                        if ProcessInfo.processInfo.arguments.contains("-auto-fill"), let me = model.selectedPerson { await filler.fill(person: model.formPerson(me)) }
+                        #endif
+                    }
+                }
+            }
+        }
         .onDisappear { filler.close() }
     }
 }

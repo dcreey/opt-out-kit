@@ -27,6 +27,7 @@ struct RootView: View {
                 let parts = args[i + 1].split(separator: "-").compactMap { Int($0) }
                 if parts.count == 2 { await FormAudit.run(domains: FormAudit.range(from: parts[0], to: parts[1], model: model), model: model) }
             }
+            if args.contains("-audit-semi") { await FormAudit.run(domains: FormAudit.semi(model: model), model: model) }
             if args.contains("-audit-all") {
                 await FormAudit.run(domains: FormAudit.all(model: model), model: model)
             } else if let i = args.firstIndex(of: "-audit-first-per-kind"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {

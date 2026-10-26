@@ -107,6 +107,9 @@ enum FormAudit {
         return out
     }
 
+    /// Every site in the semi-automated queue.
+    static func semi(model: AppModel) -> [String] { OptOutPlan.verifyQueue(model.plan, entries: model.directory) }
+
     static func run(domains: [String], model: AppModel) async {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("audit")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

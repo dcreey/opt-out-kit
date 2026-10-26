@@ -2802,6 +2802,17 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "s"), ["pat@example.com"], "the data subject's email is the person's email")
     }
 
+    func testAStreetFieldThatMentionsTheBirthDateIsNotTheBirthDate() {
+        let p = plan([("text", "st", "Street address (required if no date of birth)"), ("date", "d", "Date of birth (required if no street address)"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "st"), ["1 Main St"])
+    }
+
+    func testAStarredSubjectLabelGetsTheSubjectLine() {
+        let p = plan([("text", "t", "Subject*"), ("text", "u", "Subject *"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "t"), ["Privacy opt-out and deletion request"])
+        XCTAssertEqual(v(p, "u"), ["Privacy opt-out and deletion request"])
+    }
+
     func testATypedSignatureIsTheLegalNameAndAFileUploadIsNot() {
         let p = plan([("text", "sig", "* Signature"), ("text", "es", "E-Signature"), ("file", "f", "Select a File"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "sig"), ["Pat Example"]); XCTAssertEqual(v(p, "es"), ["Pat Example"])
