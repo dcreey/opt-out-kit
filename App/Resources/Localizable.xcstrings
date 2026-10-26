@@ -19850,6 +19850,29 @@
     }
    }
   },
+  "This form has questions the app cannot read, so we take you to the page and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire pose des questions que l'app ne peut pas lire : nous vous emmenons sur la page et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario tiene preguntas que la app no puede leer, así que te llevamos a la página y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular hat Fragen, die die App nicht lesen kann, daher führen wir Sie zur Seite und begleiten Sie."
+     }
+    }
+   }
+  },
   "This form needs the link to your listing on the site, which you find there first.": {
    "extractionState": "manual",
    "localizations": {
@@ -19869,6 +19892,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieses Formular braucht den Link zu Ihrem Eintrag auf der Website, den Sie zuerst dort finden."
+     }
+    }
+   }
+  },
+  "This form's menu does not offer every state, so we take you to the page and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le menu de ce formulaire ne propose pas tous les États : nous vous emmenons sur la page et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El menú de este formulario no ofrece todos los estados, así que te llevamos a la página y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Menü dieses Formulars bietet nicht alle Bundesstaaten an, daher führen wir Sie zur Seite und begleiten Sie."
      }
     }
    }
@@ -23503,6 +23549,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Angaben sind eingetragen."
+     }
+    }
+   }
+  },
+  "Your details are filled in. Pick \"%@\" in the form below, then we will send it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont remplies. Choisissez « %@ » dans le formulaire ci-dessous, puis nous l'enverrons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están rellenos. Elige «%@» en el formulario de abajo y lo enviaremos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind ausgefüllt. Wählen Sie unten im Formular „%@“; dann senden wir es."
+     }
+    }
+   }
+  },
+  "Your details are filled in. Pick the option the form asks for below, then we will send it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont remplies. Choisissez ci-dessous l'option demandée par le formulaire, puis nous l'enverrons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están rellenos. Elige abajo la opción que pide el formulario y lo enviaremos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind ausgefüllt. Wählen Sie unten die Option, die das Formular verlangt; dann senden wir es."
      }
     }
    }

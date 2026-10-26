@@ -5,7 +5,7 @@ import OptOutKitCore
 // MARK: Pages the runner drives
 
 /// What stands between a prepared form and sending it, which only the person can clear.
-enum AssistedBlocker: Equatable { case terms, check(String), certify(String) }
+enum AssistedBlocker: Equatable { case terms, check(String), certify(String), choose(String) }
 
 /// One site's opt-out page, loaded and filled in, ready to be sent once the person has dealt with any blockers.
 @MainActor
@@ -80,6 +80,8 @@ final class WebAssistedPage: AssistedPage {
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
         if let why = await session.visibleChallenge() { out.append(.check(why)) }
         if await session.emptyCodeField() { out.append(.check("a code to type")) }
+        // A required menu or box the app had no value for (a state list that does not offer the person's state, a request type): the person picks.
+        if let liveForm, let what = await session.emptyRequiredChoice(form: liveForm) { out.append(.choose(what)) }
         return out
     }
 
@@ -122,6 +124,7 @@ final class AssistedRunner: ObservableObject {
         case waitingForTerms
         case waitingForCertification
         case waitingForCheck
+        case waitingForChoice(String)   // a required menu we could not fill: the person picks, then we go on
         case sending
         case sent(awaitingEmail: Bool)
         case needsMore(String)        // sent, but no confirmation: the site wants another step from the person
@@ -181,6 +184,7 @@ final class AssistedRunner: ObservableObject {
                     if blockers.isEmpty { break }
                     if blockers.contains(.terms) { phase = .waitingForTerms }
                     else if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { phase = .waitingForCertification }
+                    else if let pick = blockers.compactMap({ if case .choose(let what) = $0 { return what } else { return nil } }).first { phase = .waitingForChoice(pick) }
                     else { phase = .waitingForCheck }
                     try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
                     waited += pollInterval
@@ -307,6 +311,7 @@ struct AssistedOptOutView: View {
         case .waitingForTerms: return Loc.t("Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after.")
         case .waitingForCertification: return Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
         case .waitingForCheck: return Loc.t("Your details are filled in. Solve the check below and we will send it.")
+        case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)
         case .sending: return "Sending…"
         case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : "Sent."
         case .needsMore(let why): return Loc.f("Sent, but the site did not confirm (%@). It may need one more step from you here. Tap Next site when you are done.", why)
@@ -317,7 +322,7 @@ struct AssistedOptOutView: View {
     private var icon: String {
         switch runner.phase {
         case .sent: return "checkmark.circle.fill"
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck: return "hand.point.up.left"
+        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
         case .needsMore, .timedOut: return "exclamationmark.triangle"
         default: return "hourglass"
         }
@@ -326,7 +331,7 @@ struct AssistedOptOutView: View {
     private var tint: Color {
         switch runner.phase {
         case .sent: return .green
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .needsMore, .timedOut: return .orange
+        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return .orange
         default: return .secondary
         }
     }

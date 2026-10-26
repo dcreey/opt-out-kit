@@ -20,4 +20,4 @@ persistence: {"result": "permanent", "quote": "The opt-out action effectively re
 live_form:
   checked: "2026-10-25"
   found: false
-  blockers: ["state"]
+  blockers: []

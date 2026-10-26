@@ -8994,29 +8994,6 @@
     }
    }
   },
-  "This form's menu does not offer every state, so we take you to the page and walk you through it.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Le menu de ce formulaire ne propose pas tous les États : nous vous emmenons sur la page et vous guidons."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "El menú de este formulario no ofrece todos los estados, así que te llevamos a la página y te guiamos."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Das Menü dieses Formulars bietet nicht alle Bundesstaaten an, daher führen wir Sie zur Seite und begleiten Sie."
-     }
-    }
-   }
-  },
   "This is why junk mail, calls and ads seem to know you. Opting out means less marketing aimed at you and fewer companies holding a profile of you.": {
    "extractionState": "manual",
    "localizations": {

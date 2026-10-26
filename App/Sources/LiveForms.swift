@@ -192,8 +192,12 @@ extension WebViewSession {
           var chosen=0, unresolved=[];
           var groups={};
           f.querySelectorAll('input[type=radio]').forEach(function(r){(groups[r.name||('g'+Math.random())]=groups[r.name||'']||[]).push(r);});
+          var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
           Object.keys(groups).forEach(function(k){var rs=groups[k]; if(rs.some(function(r){return r.checked;})) return;
             var pick=null;
+            // "Are you an authorized agent / acting on behalf of someone?": the person is asking for themselves, so the answer is No.
+            var ctx=((rs[0].closest('fieldset')||rs[0].closest('div')||{innerText:''}).innerText||'').slice(0,200)+' '+(rs[0].name||'');
+            if(agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)) pick=rs[i];}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(yesOrOptOut(t)||isDecl(t)) pick=rs[i];}
             if(pick){pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
@@ -207,7 +211,9 @@ extension WebViewSession {
             if(/state|country|province|region/.test(l)||s.options.length>=40) return;
             if(s.selectedIndex>0 && s.value) return;
             var best=-1,bestScore=0;
+            var isAgentQ=agentQ.test(l+' '+near);
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
+              if(isAgentQ&&/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(t)) sc=5;
               if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=3;
               if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,2);
               if(/\b(consumer|individual|personal|myself|resident|person|the (person|individual|subject)|data subject|yourself|owner|me)\b/i.test(t)&&!/business|agent|deceased|on behalf|representative/i.test(t)) sc=Math.max(sc,1);
@@ -223,6 +229,26 @@ extension WebViewSession {
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return (0, []) }
         return (obj["chosen"] as? Int ?? 0, obj["unresolved"] as? [String] ?? [])
+    }
+
+    /// The label of the first required menu, text box or choice in the form that is still empty, or nil when all are filled. A person is asked to
+    /// fill it in: a state list without their state, a request type the app could not pick. Boxes that only certify something are left to their own rule.
+    func emptyRequiredChoice(form token: String) async -> String? {
+        let js = #"""
+        (function(token){var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return '';
+          var label=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
+            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.name||'';
+            return t.replace(/\s+/g,' ').replace(/\*|\(required\)/gi,'').trim().slice(0,60);};
+          var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea'));
+          for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
+            var req=e.required||e.getAttribute('aria-required')==='true'||/\*/.test(label(e)+(e.closest('label')?e.closest('label').innerText:''));
+            if(!req) continue;
+            var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!(e.value||'').trim();
+            if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
+          return '';})(\#(Self.liveLiteral(token)));
+        """#
+        let out = (try? await webView.evaluateJavaScript(js)) as? String
+        return (out?.isEmpty ?? true) ? nil : out
     }
 
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.

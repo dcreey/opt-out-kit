@@ -43,7 +43,6 @@ public enum OptOutMethods {
         if let live = e.liveForm {
             if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
             if live.blockers.contains("agent") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for an authorized agent's details, so we take you to the page and walk you through it.")) }
-            if live.blockers.contains("state") { return MethodVerdict(method: .guided, reason: L10n.t("This form's menu does not offer every state, so we take you to the page and walk you through it.")) }
             if live.blockers.contains("other") { return MethodVerdict(method: .guided, reason: L10n.t("This form has questions the app cannot read, so we take you to the page and walk you through it.")) }
             if live.blockers.contains("file") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
         }
