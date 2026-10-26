@@ -62,6 +62,38 @@ enum FormAudit {
             .sorted { (rank[$0.about?.category ?? "other"] ?? 99, -($0.priority ?? 0), $0.domain) < (rank[$1.about?.category ?? "other"] ?? 99, -($1.priority ?? 0), $1.domain) }.map(\.domain)
     }
 
+    /// Simulator only: really SENDS each site's form for the owner's profile on this device, through the same live path a run uses, and records what
+    /// the site showed with a picture of the page after sending. Writes Documents/real-send/results.json (resumes) and a .jpg per site.
+    static func realSend(domains: [String], model: AppModel) async {
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("real-send")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let file = dir.appendingPathComponent("results.json")
+        var rows: [[String: String]] = (try? Data(contentsOf: file)).flatMap { try? JSONDecoder().decode([[String: String]].self, from: $0) } ?? []
+        let done = Set(rows.compactMap { $0["domain"] })
+        guard let me = model.people.first(where: { $0.relationship == .me }) else { return }
+        let person = model.formPerson(me)
+        for d in domains where !done.contains(d) {
+            guard let entry = model.directory.first(where: { $0.domain == d }).map(model.resolved) else { continue }
+            let page = entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL
+            guard let page else { continue }
+            let report = await FormRun.runLive(url: page, html: nil, person: person, dryRun: false, maxWait: 25, capture: true)
+            if let shot = report.screenshot { try? shot.write(to: dir.appendingPathComponent(d + ".jpg")) }
+            let label: String, stored: String?
+            switch report.outcome {
+            case .submitted(let email): label = email ? "confirmed, awaiting an email" : "confirmed"; stored = email ? "submitted_email" : "submitted"
+            case .challenged(let why): label = "check: \(why)"; stored = "challenged"
+            case .rejected(let why): label = "rejected: \(why)"; stored = "rejected"
+            case .failed(let why): label = "failed: \(why)"; stored = "failed"
+            case .filledNotSubmitted: label = "filled, not sent"; stored = nil
+            }
+            if let stored { model.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: stored, detail: label), site: entry.id) }
+            rows.append(["domain": d, "kind": entry.about?.category ?? "other", "page": page.absoluteString, "result": label])
+            if let data = try? JSONEncoder().encode(rows) { try? data.write(to: file) }
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+        }
+        try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
+    }
+
     static func run(domains: [String], model: AppModel) async {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("audit")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

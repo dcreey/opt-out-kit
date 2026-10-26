@@ -21,3 +21,7 @@ live_form:
   found: true
   page: "https://www.inmar.com/about/privacy-policy/owneriq/optout/email"
   blockers: []
+run_check:
+  date: "2026-10-26"
+  result: "confirmed"
+  note: "it said the email address was submitted to be opted out, allow 3 days."

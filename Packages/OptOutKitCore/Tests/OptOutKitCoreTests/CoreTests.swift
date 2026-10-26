@@ -2359,7 +2359,7 @@ final class RunCheckTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
         let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
-        XCTAssertEqual(confirmed, ["abovedata.io", "apollo.io", "lionsharemarketing.com", "scileads.com"])
+        XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "apollo.io", "draup.com", "everleads.com", "getliminal.com", "inmar.com", "lionsharemarketing.com", "liveintent.com", "networx.com", "scileads.com", "semantiqhealth.com", "stirista.com", "subgraph.tech", "torusvotersystems.com"])
         // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
         // unticked choices) and were fixed, so the next real run decides.
         XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a bot check")
@@ -2843,5 +2843,32 @@ final class CautionTests: XCTestCase {
         XCTAssertFalse(cv.caution?.sources.isEmpty ?? true)
         XCTAssertEqual(OptOutMethods.classify(cv, confirmingIdentity: true).method, .guided, "a face photo is never uploaded for the person")
         XCTAssertTrue(cv.caution?.summary.contains("never uploads a photo") ?? false)
+    }
+}
+
+
+final class LiveFormAutomaticTests: XCTestCase {
+    func testALiveFormWithAReviewedConfirmedRunIsAutomaticUnlessAPersonMustClearSomething() {
+        var e = DirectoryEntry(id: "x_com", domain: "x.com", name: "X", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.liveForm = LiveFormCheck(checked: "2026-10-26", found: true, page: "https://x.com/optout", blockers: [])
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, "no reviewed run yet")
+        e.runCheck = RunCheck(date: "2026-10-26", result: "confirmed", note: "it said thank you")
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
+        e.liveForm?.blockers = ["check:a bot check"]
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, "a bot check on the page keeps it with the person")
+        e.liveForm?.blockers = []
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true, challengedBefore: true).method, .semiAutomatic)
+    }
+
+    func testTheBackgroundRunPicksUpLiveFormSites() async {
+        struct Recorder: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+        }
+        var e = DirectoryEntry(id: "x_com", domain: "x.com", name: "X", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.liveForm = LiveFormCheck(checked: "2026-10-26", found: true, page: "https://x.com/optout", blockers: [])
+        let person = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main", city: "X", state: "IL", zip: "60601")], emails: ["pat@example.com"])
+        let results = await AutoOptOut(submitter: Recorder(), minInterval: 0, spacing: 0).run(entries: [e], person: person, progress: Progress())
+        XCTAssertEqual(results.count, 1)
+        if case .submitted = results[0].1 {} else { XCTFail("a live-form site is sent by the background run: \(results[0].1)") }
     }
 }

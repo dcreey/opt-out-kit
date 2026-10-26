@@ -19,3 +19,7 @@ live_form:
 about: {"category": "lead_generation", "summary": "Networx Systems Inc. is a lead-generation company. Find local contractors & home improvement professionals with Networx. Get a free quote today! Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "employment", "criminal", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": [], "source": "https://www.networx.com/privacy"}
 priority: 49
 persistence: {"result": "unknown", "reup_months": 6}
+run_check:
+  date: "2026-10-26"
+  result: "confirmed"
+  note: "it said Thank you, your information has been submitted."

@@ -203,7 +203,10 @@ extension WebViewSession {
             if(pick){pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
             else if(rs.some(function(r){return r.required;})) unresolved.push(label(rs[0])||k);});
           f.querySelectorAll('input[type=checkbox]').forEach(function(c){var t=label(c);
-            if(c.checked||!t) return; if(yesOrOptOut(t)||isDecl(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
+            if(c.checked||!t) return;
+            // "I am submitting this request for myself" (next to "...on behalf of someone else"): the person is asking for themselves.
+            if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
+            if(yesOrOptOut(t)||isDecl(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
           f.querySelectorAll('select').forEach(function(s){
             var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
             var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);

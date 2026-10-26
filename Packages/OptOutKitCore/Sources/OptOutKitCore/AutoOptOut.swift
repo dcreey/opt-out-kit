@@ -102,6 +102,7 @@ public struct AutoOptOut: Sendable {
         if let look = progress.latestSiteCheck(entry.id), look.result == .removed, now.timeIntervalSince(look.date) < 30 * 86_400 {
             return (.skippedNotListed, nil)
         }
+        if form.fields.isEmpty, entry.liveForm?.found == true { return (nil, FillPlan(values: [], verdict: .ready)) }        // the live page decides what is filled
         let plan = FormFiller.plan(for: form, signals: entry.signals, person: person)
         switch plan.verdict {
         case .ready: return (nil, plan)
@@ -114,7 +115,12 @@ public struct AutoOptOut: Sendable {
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
                     holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
                     evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
-        let targets = entries.filter { $0.optOutForm != nil }
+        // Forms read from the page, and forms found on the live page (a stand-in form carries the page; the live run decides what is filled).
+        func standIn(_ e: DirectoryEntry) -> DirectoryEntry {
+            guard e.optOutForm == nil, let page = e.liveForm?.page.flatMap(URL.init(string:)), e.liveForm?.found == true else { return e }
+            var copy = e; copy.optOutForm = OptOutForm(page: page, method: "post", action: nil, fields: [], hops: 1); return copy
+        }
+        let targets = entries.map(standIn).filter { $0.optOutForm != nil }
         var out: [(DirectoryEntry, AutoOptOutResult)] = []
         // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture.
         var sent: [String: (AutoOptOutResult, Data?)] = [:]

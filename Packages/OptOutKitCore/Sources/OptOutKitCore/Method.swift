@@ -49,6 +49,11 @@ public enum OptOutMethods {
         guard let form = e.optOutForm else {
             if let live = e.liveForm, live.found {
                 if e.runCheck?.result == "failed" { return MethodVerdict(method: .guided, reason: L10n.t("A real run did not go through, so you do this one with a guide.")) }
+                // A form found on the live page that a reviewed real run showed to be confirmed, with nothing on it a person must clear.
+                let mustClear = live.blockers.contains { $0.hasPrefix("check") || $0.hasPrefix("certify") || $0.hasPrefix("terms") || $0 == "code" }
+                if let run = e.runCheck, run.result == "confirmed", !failedBefore, !challengedBefore, !mustClear {
+                    return MethodVerdict(method: .automatic, reason: L10n.f("A real run on %@ showed this site's confirmation.", run.date))
+                }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
             }
             if let mail = e.contactEmail {

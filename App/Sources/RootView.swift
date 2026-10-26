@@ -15,6 +15,13 @@ struct RootView: View {
         #if DEBUG
         .task {
             let args = ProcessInfo.processInfo.arguments
+            // Simulator work: `-real-run -only-domains a.com,b.com` SENDS the requests for the owner's profile on this device and records what each site showed.
+            if args.contains("-real-run"), let me = model.people.first(where: { $0.relationship == .me }) {
+                await model.runAutoOptOut(for: me, dryRun: false, automaticOnly: false)
+            }
+            if args.contains("-real-send"), let i = args.firstIndex(of: "-real-send-domains"), args.indices.contains(i + 1) {
+                await FormAudit.realSend(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
+            }
             if args.contains("-audit-all") {
                 await FormAudit.run(domains: FormAudit.all(model: model), model: model)
             } else if let i = args.firstIndex(of: "-audit-first-per-kind"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {
