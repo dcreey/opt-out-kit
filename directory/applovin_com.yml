@@ -7,13 +7,15 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://applovin.com/en"
+# The recorded opt-out page (https://applovin.com/en) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-24"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 about: {"category": "adtech", "summary": "AppLovin Corporation is an advertising technology company. Reach over a billion daily users in mobile games. AppLovin helps consumer brands and gaming apps scale their business profitably. Its own pages mention home addresses, phone numbers, email addresses, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; publishers and ad platforms; government and law enforcement.", "tracks": ["address", "phone", "email", "purchases", "interests", "online", "health"], "sells_to": ["advertisers", "businesses", "publishers", "government"], "sells_note": "In certain situations, AppLovin may be required to disclose personal data in response to lawful requests by public authorities, including to meet national security or law enforcement requirements.", "source": "https://legal.applovin.com/privacy/"}
 priority: 53
 persistence: {"result": "unknown", "reup_months": 6}

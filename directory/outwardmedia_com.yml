@@ -7,7 +7,8 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "medium"
-opt_out_url: "https://outwardmedia.com/privacypolicy"
+# The recorded opt-out page (https://outwardmedia.com/privacypolicy) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@outwardmedia.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]
@@ -19,7 +20,8 @@ about: {"category": "b2b", "summary": "Outward Media Inc. is a business-contact 
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
-  checked: "2026-10-25"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

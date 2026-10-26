@@ -7,10 +7,10 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.d1.sc.omtrdc.net/optout.html?omniture=1&popup=1&locale=en_US&second=1&second_has_cookie=0"
+# The recorded opt-out page (https://www.d1.sc.omtrdc.net/optout.html?omniture=1&popup=1&locale=en_US&second=1&second_has_cookie=0) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@internetbrands.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://www.d1.sc.omtrdc.net/optout.html?omniture=1&popup=1&locale=en_US&second=1&second_has_cookie=0", "method": "get", "action": "https://www.d1.sc.omtrdc.net/optout.html?Omniture=1&locale=en-US&popup=1", "fields": [{"type": "select", "name": "locale", "label": "Select language"}], "hops": 2}
 registered_in: [CA]
 signals: [opt_out_form_found]
 profiled: "2026-10-22"
@@ -19,3 +19,7 @@ priority: 40
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "GLOBAL"], "evidence": "its pages mention General Data Protection Regulation; its site is offered in 27 languages, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["ar", "bg", "cs", "da", "de", "el", "en", "es", "fi", "fr", "he", "id", "it", "ja", "ko", "nb", "nl", "pl", "pt", "ro", "ru", "sk", "sv", "th", "tr", "vi", "zh"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-26"
+  found: false
+  blockers: []

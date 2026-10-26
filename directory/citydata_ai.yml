@@ -7,15 +7,17 @@ bucket: "registry"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://blog.citydata.ai/is-it-legal-to-use-a-wi-fi-sniffer-to-count-people/"
+# The recorded opt-out page (https://blog.citydata.ai/is-it-legal-to-use-a-wi-fi-sniffer-to-count-people/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@citydata.ai"
 contact_email_source: "policy"
 registered_in: [CA]
 signals: [email_input, phone_verify]
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-24"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 about: {"category": "location_data", "summary": "CITYDATA Inc. is a device and location data company. CityData.AI creates urban digital twins with big data and AI for civic innovation: parks and recreation visitation, trails, events and festivals attendance, economic development,... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, income or wealth, property and vehicles. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "income", "property", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": [], "source": "https://www.citydata.ai/privacy/"}
 priority: 51
 persistence: {"result": "unknown", "reup_months": 6}

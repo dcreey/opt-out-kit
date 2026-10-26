@@ -7,10 +7,10 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-opt_out_url: "https://mediawallah.com/donotsell/"
+# The recorded opt-out page (https://mediawallah.com/donotsell/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@mediawallah.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://mediawallah.com/donotsell/", "method": "post", "action": "https://mediawallah.com/donotsell/", "fields": [{"type": "email", "name": "email", "label": "Email address"}, {"type": "text", "name": "_mc4wp_honeypot", "label": "_mc4wp_honeypot"}], "hops": 1}
 registered_in: [CA, OR]
 signals: [email_input, opt_out_form_found, portal_onetrust]
 profiled: "2026-10-22"
@@ -22,3 +22,7 @@ priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-26"
+  found: false
+  blockers: []

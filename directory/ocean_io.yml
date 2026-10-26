@@ -7,13 +7,15 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.ocean.io/"
+# The recorded opt-out page (https://www.ocean.io/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-24"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 about: {"category": "b2b", "summary": "Ocean Global Inc is a business-contact and sales-data provider. Ocean.io learns your ICP from the deals you already won, then ranks every company in your market against it. Its own pages mention shopping and purchase behavior. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["purchases"], "sells_to": ["businesses"], "sells_note": "Company Sells to enterprise?", "source": "https://www.ocean.io/"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 12}

@@ -7,10 +7,10 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://skydeo.com/opt-out/"
+# The recorded opt-out page (https://skydeo.com/opt-out/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@skydeo.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://skydeo.com/opt-out/", "method": "get", "action": "https://skydeo.com/opt-out/", "fields": [{"type": "email", "name": "email", "label": "Your email"}, {"type": "text", "name": "website_url", "label": "website_url"}], "hops": 1}
 registered_in: [CA, TX]
 signals: [captcha_turnstile, email_input, listing_url_input, opt_out_form_found]
 profiled: "2026-10-22"
@@ -22,3 +22,7 @@ priority: 34
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention EEA", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-26"
+  found: false
+  blockers: []

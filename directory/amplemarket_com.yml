@@ -7,7 +7,8 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-opt_out_url: "https://www.amplemarket.com/legal/do-not-sell-my-info"
+# The recorded opt-out page (https://www.amplemarket.com/legal/do-not-sell-my-info) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@amplemarket.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, opt_out_form_found]
@@ -16,8 +17,9 @@ live_check:
   checked: "2026-10-22"
   blockers: []
 live_form:
-  checked: "2026-10-24"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 about: {"category": "b2b", "summary": "Tagis Inc is a business-contact and sales-data provider. AI agents find your next buyers while your team sells. Get 200M+ B2B profiles, buying signals, multichannel outreach and deliverability in one sales platform. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, devices and online activity, social media profiles. Its policy names these buyers or recipients: advertisers and marketers; other data brokers and resellers; business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "employment", "online", "social"], "sells_to": ["advertisers", "brokers", "businesses", "government"], "sells_note": "Our business consists of; ‘Data Broker’ activities, consisting of selling, sharing or licensing personal information to our Customers for their own independent marketing, communications or other business purposes, and;‍ ‘Business Services’ ", "source": "https://www.amplemarket.com/legal/privacy"}
 priority: 50
 persistence: {"result": "unknown", "reup_months": 12}

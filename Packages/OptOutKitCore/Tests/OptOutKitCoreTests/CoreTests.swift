@@ -2426,6 +2426,19 @@ final class RunCheckTests: XCTestCase {
         XCTAssertNil(Regions.localizedPage(for: e, language: "es", country: "ES"), "no Spanish page: the recorded page is used")
     }
 
+    /// The 2026-10-26 survey of every opt-out page found these pointing at a newsletter, trial, search or contact form: none may be filled by the app.
+    func testSitesTheSurveyFoundPointingAtSignUpFormsAreNeverFilled() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com attomdata.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai finsum.com finthrive.com firmable.com idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com mediawallah.com ocean.io outwardmedia.com pitchbook.com pmg.com seamless.ai skydeo.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
+        for d in flagged {
+            guard let e = entries.first(where: { $0.domain == d }) else { XCTFail("\(d) is missing"); continue }
+            let m = OptOutMethods.classify(e).method
+            XCTAssertTrue(m == .guided || m == .manual, "\(d) must not be automatic or semi-automatic, is \(m)"); XCTAssertNil(e.optOutForm, d)
+        }
+    }
+
     func testTheReviewedRunIsInTheDirectory() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")

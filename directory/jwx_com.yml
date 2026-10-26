@@ -7,15 +7,17 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://jwx.com/"
+# The recorded opt-out page (https://jwx.com/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@jwx.com"
 contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"
 live_form:
-  checked: "2026-10-24"
+  checked: "2026-10-26"
   found: false
+  blockers: []
 about: {"category": "adtech", "summary": "Connatix Native Exchange Inc. is an advertising technology company. JWX helps streamers, publishers, and advertisers create, deliver, and monetize video with one intelligent workflow - built for speed, scale, and results. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://jwx.com/"}
 priority: 23
 persistence: {"result": "unknown", "reup_months": 6}

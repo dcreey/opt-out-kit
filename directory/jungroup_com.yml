@@ -7,10 +7,10 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-opt_out_url: "https://jungroup.com/optout"
+# The recorded opt-out page (https://jungroup.com/optout) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
+opt_out_url: null
 contact_email: "privacy@jungroup.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://jungroup.com/optout", "method": "post", "action": "https://jungroup.com/optout#gf_2", "fields": [{"type": "email", "name": "input_1", "label": "Email(Required)"}, {"type": "text", "name": "input_2", "label": "Email"}], "hops": 1}
 registered_in: [CA]
 signals: [email_input, opt_out_form_found]
 profiled: "2026-10-22"
@@ -22,3 +22,7 @@ priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "BR"], "evidence": "listed on the IAB Europe TCF vendor list as Jun Group Productions, LLC; its pages mention United Kingdom; its pages mention LGPD", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-26"
+  found: false
+  blockers: []
