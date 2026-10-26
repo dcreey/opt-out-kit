@@ -19,3 +19,4 @@ live_form:
   found: false
 contact_email: "privacy@eab.com"
 contact_email_source: "page"
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

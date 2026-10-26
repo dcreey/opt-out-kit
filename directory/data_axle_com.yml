@@ -19,3 +19,4 @@ live_check:
 about: {"category": "marketing_data", "summary": "Data Axle Inc. is a marketing data provider. See your audience clearly. Data Axle turns trusted business, consumer, and market data into AI-powered insights built for your industry. Its own pages mention phone numbers, job title and employer, income or wealth, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "employment", "income", "purchases", "interests", "online"], "sells_to": [], "source": "https://www.data-axle.com/"}
 priority: 46
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
   found: true
   page: "https://40ros1.share-na2.hsforms.com/2vQIxZUeERGOPFcRto1AFgw?_hsPageUrl=https%3A%2F%2Fwww.seekout.com%2Fprivacy%2Fchoices%2F&_hsPageTitle=Your%20Privacy%20Choices%20%7C%20SeekOut"
   blockers: []
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}

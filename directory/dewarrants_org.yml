@@ -20,3 +20,4 @@ live_form:
 about: {"category": "arrests", "summary": "dewarrants.org is a public arrest and court records site. If you want to know about arrests warrants from DE or need an arrest report, going to the police may not help. Read more about accessing arrest records. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.dewarrants.org/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

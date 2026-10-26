@@ -19,3 +19,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Melissa Data Corporation is a marketing data provider. Try our easy to-use APIs & CRM data cleansing tools to improve your data quality and marketing ROI. Free Trial Available. Its own pages mention devices and online activity. Its policy names these buyers or recipients: other data brokers and resellers.", "tracks": ["online"], "sells_to": ["brokers"], "sells_note": "As a licensed data broker, Melissa maintains a comprehensive information security program of administrative, technical and physical safeguard measures, which are independently verified through third-party audits to verify process security, ", "source": "https://www.melissa.com/privacy"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}

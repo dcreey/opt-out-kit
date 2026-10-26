@@ -21,3 +21,4 @@ live_form:
 about: {"category": "real_estate", "summary": "EquiMine Inc. is a property and real-estate data company. Get access to over 100M+ curated properties dedicated on market & off market filters for hassle free real estate investing experience. Its own pages mention phone numbers, income or wealth, property and vehicles. Its policy does not name who it sells to.", "tracks": ["phone", "income", "property"], "sells_to": [], "source": "https://batchleads.io/"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

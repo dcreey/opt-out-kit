@@ -21,3 +21,4 @@ priority: 63
 persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@publicrecordscenter.org"
 contact_email_source: "page"
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -20,3 +20,4 @@ priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@6sense.com"
 contact_email_source: "browser"
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as 6Sense Insights, Inc.", "checked": "2026-10-26"}

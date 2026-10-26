@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "Koddi, Inc is an advertising technology company. Koddi is an enterprise commerce media platform powering onsite, offsite, in-store, and programmatic retail media with full data control and AI optimization. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online"], "sells_to": [], "source": "https://koddi.com/"}
 priority: 20
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
   found: false
 contact_email: "privacy@fifty.io"
 contact_email_source: "page"
+regions: {"list": ["US", "EU", "UK", "BR"], "evidence": "listed on the IAB Europe TCF vendor list as Fifty Technology Limited; its pages mention United Kingdom; its pages mention Lei Geral", "checked": "2026-10-26"}

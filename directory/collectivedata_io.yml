@@ -15,3 +15,4 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "Collective Data Solutions, LLC is a marketing data provider. Data enables companies—regardless of size—to outmaneuver and outcompete even their biggest rivals. Imagine what you can do with the right data and insights at. Its own pages mention education, shopping and purchase behavior, interests and demographics, precise location. Its policy does not name who it sells to.", "tracks": ["education", "purchases", "interests", "location"], "sells_to": [], "source": "https://www.collectivedata.io/"}
 priority: 41
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -18,3 +18,4 @@ live_check:
 about: {"category": "real_estate", "summary": "Best Pick Reports, LLC is a property and real-estate data company. Best Pick Reports is an annual home service directory and homeowner resource produced by Best Pick Reports, LLC, an independent research firm founded in 1997. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.bestpickreports.com/"}
 priority: 23
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -56,7 +56,7 @@ struct WebAssistedDriver: AssistedDriver {
             var adID = advertisingID
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
             let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, advertisingID: adID)
-            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
+            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { session.close(); return nil }
         }
         await page.refill()
         await session.scrollChallengeIntoView()
@@ -70,11 +70,12 @@ final class WebAssistedPage: AssistedPage {
     private var plan: FillPlan
     private var liveForm: String?
     private var ownerMayConfirm = false
+    private var stateName: String?
     private var shown: WKWebView?
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
 
-    func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm }
+    func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
 
     var webView: WKWebView? { shown }
     func present() { if shown == nil { shown = session.presentable() } }
@@ -94,7 +95,7 @@ final class WebAssistedPage: AssistedPage {
         if let liveForm {
             _ = await session.fillLive(plan.values)
             _ = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
-            _ = await session.chooseCustomMenus()
+            _ = await session.chooseCustomMenus(state: stateName)
         } else { _ = await session.fillFields(plan.values) }
     }
 

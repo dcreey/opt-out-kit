@@ -21,3 +21,4 @@ live_form:
   found: true
   page: "https://www.forgetmenaut.com/rtbf/unjVFFNnmFvsZ17Fnk3Tap6U"
   blockers: []
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

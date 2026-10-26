@@ -17,3 +17,4 @@ profiled: "2026-10-22"
 about: {"category": "lead_generation", "summary": "Apollo Interactive, LLC is a lead-generation company. Boost your revenue and increase the margin with ready-to-buy consumers delivered to your sales team. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, education, property and vehicles. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "education", "property", "interests", "online", "location", "health", "social"], "sells_to": ["advertisers"], "sells_note": "Apollo discloses personal information to third parties for their own direct marketing purposes.", "source": "https://www.apollointeractive.com/privacy-policy.php"}
 priority: 55
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -58,6 +58,18 @@ struct BrokerListView: View {
                 } else if let place = model.ownerJurisdiction, !(place.futureWork ?? []).isEmpty {
                     Section { NavigationLink { FutureWorkView(place: place) } label: { Label("Coming later for your state", systemImage: "clock.badge") } }
                 }
+                if !model.regionSplit.elsewhere.isEmpty {
+                    Section {
+                        if model.offerOtherRegions {
+                            Label(Loc.f("You finished the sites that reach your country. %lld more collect data in other regions.", model.regionSplit.elsewhere.count), systemImage: "checkmark.circle")
+                            Button("Do those too") { model.setIncludeOtherRegions(true) }
+                        } else {
+                            Toggle(isOn: Binding(get: { model.includesOtherRegions() }, set: { model.setIncludeOtherRegions($0) })) {
+                                Text(Loc.f("Also show sites from other regions (%lld)", model.regionSplit.elsewhere.count))
+                            }
+                        }
+                    } footer: { Text("These sites collect data about people elsewhere. We start with the ones that reach where you live.") }
+                }
                 let goals = model.dailyGoals
                 if model.needsKindChoice {
                     // Every day opens on one question: which kind of broker to tackle.

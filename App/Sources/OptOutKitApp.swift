@@ -39,6 +39,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var termsLibrary: TermsLibrary?
     @Published private(set) var household = Household() { didSet { planCache = nil } }
     @Published private(set) var selectedID: UUID { didSet { planCache = nil } }
+    @Published private var regionTick = 0 { didSet { planCache = nil } }
     @Published var loadError: String?
     /// Set when saved data exists but cannot be opened. Saving is paused so it is never overwritten by accident.
     @Published private(set) var storageProblem: String?
@@ -350,10 +351,32 @@ final class AppModel: ObservableObject {
         return built
     }
 
+    // MARK: Regions
+
+    private func otherRegionsKey(_ id: UUID) -> String { "regions.other.\(id.uuidString)" }
+
+    /// Whether this person asked to see the sites that do not reach their country too (off until they say so).
+    func includesOtherRegions(for id: UUID? = nil) -> Bool { _ = regionTick; return defaults.bool(forKey: otherRegionsKey(id ?? selectedID)) }
+    func setIncludeOtherRegions(_ on: Bool) { defaults.set(on, forKey: otherRegionsKey(selectedID)); regionTick += 1 }
+
+    /// The sites that collect data about people in the owner's country, and those that do not (the two always add up to every open site).
+    var regionSplit: (inRegion: [DirectoryEntry], elsewhere: [DirectoryEntry]) { Regions.partition(directory, country: ownerCountry) }
+
+    /// The sites the plan and every count work from for this person: their own region, plus the others once they ask.
+    private func scopedDirectory(for person: Person?) -> [DirectoryEntry] {
+        let split = regionSplit
+        return split.elsewhere.isEmpty || (person.map { includesOtherRegions(for: $0.id) } ?? false) ? directory : split.inRegion
+    }
+
+    /// True when everything in the person's own region is done and sites elsewhere are waiting, so we can ask whether to carry on.
+    var offerOtherRegions: Bool {
+        !includesOtherRegions() && !regionSplit.elsewhere.isEmpty && remainingKinds.isEmpty && activitySummary.sites > 0
+    }
+
     /// The plan for any one person (the selected one is cached by `plan`).
     func buildPlan(for person: Person?) -> [PlanStep] {
         let eligible: [Platform] = person.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
-        return OptOutPlan.build(entries: directory.filter { $0.closed == nil }, brokers: brokers, platforms: eligible,
+        return OptOutPlan.build(entries: scopedDirectory(for: person).filter { $0.closed == nil }, brokers: brokers, platforms: eligible,
                                 classifyEntry: { method(for: $0, person: person) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
     }
 
@@ -506,8 +529,14 @@ final class AppModel: ObservableObject {
     /// semi-automated, a failure or refusal to a guide.
     func method(for entry: DirectoryEntry, person: Person?) -> MethodVerdict {
         let last = person.flatMap { household.progress(for: $0.id).optOutAttempts[entry.id]?.last?.outcome }
-        return OptOutMethods.classify(resolved(entry), confirmingIdentity: person?.mayConfirmOwnIdentity() ?? false, challengedBefore: last == "challenged",
-                                      failedBefore: last == "failed" || last == "rejected")
+        let verdict = OptOutMethods.classify(resolved(entry), confirmingIdentity: person?.mayConfirmOwnIdentity() ?? false, challengedBefore: last == "challenged",
+                                             failedBefore: last == "failed" || last == "rejected")
+        // The forms and request wording here are written for US residents. Until they are checked for other places, someone outside the US
+        // is walked through each site instead of having a form filled in for them.
+        if (ownerCountry ?? "US") != "US", verdict.method == .automatic || verdict.method == .semiAutomatic {
+            return MethodVerdict(method: .guided, reason: L10n.t("This site's form is written for US residents, so we take you to it and walk you through it."))
+        }
+        return verdict
     }
     var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
 

@@ -17,3 +17,4 @@ live_form:
   found: true
   page: "https://visitiq.io/opt-out/"
   blockers: []
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as DrivenIQ Corporation", "checked": "2026-10-26"}

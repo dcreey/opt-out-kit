@@ -20,3 +20,4 @@ live_form:
 about: {"category": "adtech", "summary": "ID5 Technology Ltd is an advertising technology company. Turning fragmented signals into a scalable identity framework, making advertising addressable and measurable across channels. Its own pages mention age or birthdate, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "online"], "sells_to": [], "source": "https://id5.io/"}
 priority: 20
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as ID5 Technology SAS; its pages mention United Kingdom", "checked": "2026-10-26"}

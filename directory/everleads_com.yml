@@ -25,3 +25,4 @@ run_check:
   date: "2026-10-26"
   result: "confirmed"
   note: "it said Thank you! We are processing your request."
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}

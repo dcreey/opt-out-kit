@@ -22,3 +22,4 @@ live_form:
 about: {"category": "people_search", "summary": "Private Records LLC is a people-search and public-records site. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://www.privaterecords.net/"}
 priority: 40
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "adtech", "summary": "TrueData Solutions, Inc. is an advertising technology company. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://truedata.co/"}
 priority: 23
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as TrueData Solutions, Inc.", "checked": "2026-10-26"}

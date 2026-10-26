@@ -60,7 +60,7 @@ final class LinkFiller: ObservableObject {
         }
         let fill = await s.fillLive(plan.values, keepExisting: true)
         _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
-        _ = await s.chooseCustomMenus()
+        _ = await s.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
         await s.scrollFormIntoView(form.token)
         #if DEBUG
         // Simulator work: what every visible field held after the fill, written to Documents/linkfill.json.

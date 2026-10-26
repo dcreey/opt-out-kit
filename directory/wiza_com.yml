@@ -21,3 +21,4 @@ live_form:
 about: {"category": "b2b", "summary": "Wiza, Inc. is a business-contact and sales-data provider. Discover 850M+ contacts with real-time verified emails, mobile numbers, and more. Trusted by 500k+ GTM professionals. Get started for free. Its own pages mention phone numbers, email addresses, job title and employer, social media profiles, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "email", "employment", "social", "credit"], "sells_to": [], "source": "https://wiza.co/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

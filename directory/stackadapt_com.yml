@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "StackAdapt Inc. is an advertising technology company. StackAdapt is the AI advertising platform that helps marketers orchestrate audiences, creative, channels, and measurement from one platform with AI built into every stage of advertising. Its own pages mention shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "online"], "sells_to": [], "source": "https://www.stackadapt.com/"}
 priority: 26
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as StackAdapt Inc.", "checked": "2026-10-26"}

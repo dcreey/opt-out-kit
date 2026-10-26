@@ -19,3 +19,4 @@ live_form:
 about: {"category": "financial", "summary": "Altrata, Inc. is a financial and credit data company. Engage the exceptional. Altrata helps the worlds leading organizations connect with business leaders, alumni and wealthy individuals. Its own pages mention income or wealth, devices and online activity. Its policy does not name who it sells to.", "tracks": ["income", "online"], "sells_to": [], "source": "https://altrata.com/privacy-policy"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "Samba TV, Inc. is an advertising technology company. Its own pages mention interests and demographics, devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "location", "social"], "sells_to": [], "source": "https://samba.com/privacy-center/notice-of-right-to-opt-out"}
 priority: 30
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

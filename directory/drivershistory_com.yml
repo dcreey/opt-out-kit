@@ -19,3 +19,4 @@ live_form:
 about: {"category": "automotive", "summary": "Drivers History Information Sales, LLC is an automotive data company. Its own pages mention age or birthdate, property and vehicles, interests and demographics, devices and online activity, health information, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["age", "property", "interests", "online", "health", "credit"], "sells_to": [], "source": "https://www.transunion.com/consumer-privacy"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

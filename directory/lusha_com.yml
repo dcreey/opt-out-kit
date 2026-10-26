@@ -21,3 +21,4 @@ live_form:
   found: true
   page: "https://privacyportal-eu.onetrust.com/webform/ff4ba552-d8f3-4209-8935-155725f93afb/68a5d24e-7467-4bd1-818b-8a8d8da486a2"
   blockers: []
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}

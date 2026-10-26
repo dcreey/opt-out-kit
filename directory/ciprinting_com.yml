@@ -16,3 +16,4 @@ profiled: "2026-10-22"
 about: {"category": "marketing_services", "summary": "JJGarrett Holdings LLC dba Community Impact Printing is a marketing and direct-mail services company. Full-service commercial printing and direct mail in Texas. Newspapers, magazines, postcards, posters, and more — design to delivery, shipped nationwide. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "online"], "sells_to": [], "source": "https://ciprinting.com/privacy/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

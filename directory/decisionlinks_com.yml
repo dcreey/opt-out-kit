@@ -18,3 +18,4 @@ live_check:
 about: {"category": "automotive", "summary": "DecisionLinks LLC is an automotive data company. Grow your business with DecisionLinks' smart data driven solutions. Drive growth with identity graphs, predictive analytics, and real-time audience activation. Its own pages mention property and vehicles, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "interests", "online"], "sells_to": [], "source": "https://www.decisionlinks.com/legal-pages/your-privacy-choices"}
 priority: 30
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

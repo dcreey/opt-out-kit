@@ -19,3 +19,4 @@ priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@opensend.com"
 contact_email_source: "browser"
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

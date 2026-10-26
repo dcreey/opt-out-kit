@@ -21,3 +21,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Epsilon Data Management, LLC is a marketing data provider. Powering personalized marketing at scale, Epsilon helps brands connect with consumers across paid, owned, and earned channels—delivering measurable results. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://legal.epsilon.com/dsr"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Epsilon International UK Ltd; its pages mention United Kingdom", "checked": "2026-10-26"}

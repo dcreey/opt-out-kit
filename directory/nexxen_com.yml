@@ -19,3 +19,4 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/76394770-3c6c-4d28-a57b-18817b0a8e3f/2bbd01a5-983c-440b-9fd5-fd341c9326a1?cookies="
   blockers: []
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Nexxen Group LLC", "checked": "2026-10-26"}

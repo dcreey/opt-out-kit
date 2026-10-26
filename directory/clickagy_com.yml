@@ -17,3 +17,4 @@ profiled: "2026-10-22"
 about: {"category": "adtech", "summary": "Clickagy LLC is an advertising technology company. Clickagy is a data intelligence company that works with leading marketers to anonymously identify and segment audiences based on their real-time digital behaviors. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.clickagy.com/privacy-center/"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Clickagy LLC", "checked": "2026-10-26"}

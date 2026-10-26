@@ -19,3 +19,4 @@ live_form:
 about: {"category": "people_search", "summary": "reunion.com is a people-search and public-records site. People Finder for relatives, friends, associates & professionals. Reconnect and view their address, phone, email, properties, income, net worth & more! Its own pages mention relatives and household members, income or wealth, devices and online activity. Its policy does not name who it sells to.", "tracks": ["relatives", "income", "online"], "sells_to": [], "source": "https://www.reunion.com/"}
 priority: 43
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

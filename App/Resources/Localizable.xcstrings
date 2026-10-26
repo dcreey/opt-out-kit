@@ -3290,6 +3290,29 @@
     }
    }
   },
+  "Also show sites from other regions (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Afficher aussi les sites d'autres régions (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrar también sitios de otras regiones (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auch Seiten aus anderen Regionen anzeigen (%lld)"
+     }
+    }
+   }
+  },
   "Also worth doing": {
    "extractionState": "manual",
    "localizations": {
@@ -6713,6 +6736,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Als Nächstes erledigen"
+     }
+    }
+   }
+  },
+  "Do those too": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Faire aussi ceux-là"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hacer esos también"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese auch erledigen"
      }
     }
    }
@@ -20563,6 +20609,29 @@
     }
    }
   },
+  "These sites collect data about people elsewhere. We start with the ones that reach where you live.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces sites collectent des données sur des personnes ailleurs. Nous commençons par ceux qui touchent votre lieu de vie."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos sitios recogen datos de personas de otros lugares. Empezamos por los que llegan adonde usted vive."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seiten sammeln Daten über Menschen anderswo. Wir beginnen mit denen, die Ihren Wohnort erreichen."
+     }
+    }
+   }
+  },
   "These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.": {
    "extractionState": "manual",
    "localizations": {
@@ -21571,6 +21640,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Seite nimmt Opt-outs per E-Mail an: schreiben Sie an %@. Wir bereiten die Nachricht für Sie vor."
+     }
+    }
+   }
+  },
+  "This site's form is written for US residents, so we take you to it and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire de ce site est écrit pour les résidents américains : nous vous y emmenons et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario de este sitio está pensado para residentes de EE. UU., así que le llevamos a él y le guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Formular dieser Seite ist für US-Einwohner geschrieben, deshalb führen wir Sie hin und begleiten Sie."
      }
     }
    }
@@ -24676,6 +24768,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie finden zuerst Ihren Eintrag"
+     }
+    }
+   }
+  },
+  "You finished the sites that reach your country. %lld more collect data in other regions.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez terminé les sites qui touchent votre pays. %lld autres collectent des données dans d'autres régions."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminó los sitios que llegan a su país. %lld más recogen datos en otras regiones."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben die Seiten erledigt, die Ihr Land erreichen. %lld weitere sammeln Daten in anderen Regionen."
      }
     }
    }

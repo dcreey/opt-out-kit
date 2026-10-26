@@ -20,3 +20,4 @@ live_form:
 about: {"category": "arrests", "summary": "texasarrestwarrants.org is a public arrest and court records site. Learn how to conduct a Texas arrest records and warrant search. This comprehensive guide covers arrest warrants, public records, and inmate searches to help you access vital legal... Its own pages mention age or birthdate, criminal and court records, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "criminal", "interests", "online"], "sells_to": [], "source": "https://texasarrestwarrants.org/privacy-policy"}
 priority: 40
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

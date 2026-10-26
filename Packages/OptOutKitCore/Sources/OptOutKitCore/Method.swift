@@ -27,6 +27,7 @@ public struct MethodVerdict: Equatable, Sendable {
     public var method: OptOutMethod
     /// The reason in plain words, for the site page and the pipeline report.
     public var reason: String
+    public init(method: OptOutMethod, reason: String) { self.method = method; self.reason = reason }
 }
 
 public enum OptOutMethods {

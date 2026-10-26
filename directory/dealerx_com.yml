@@ -21,3 +21,4 @@ live_form:
 about: {"category": "automotive", "summary": "DealerX Partners LLC is an automotive data company. DealerX is the premium provider of marketing, data and AI for the automotive vertical, serving thousands of automotive dealerships, regional advertising groups, marketing agencies, OEMs,... Its own pages mention home addresses, phone numbers, email addresses, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "property", "purchases", "interests", "online"], "sells_to": [], "source": "https://dealerx.com/privacy-options/"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}

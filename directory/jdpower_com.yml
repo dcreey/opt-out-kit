@@ -21,3 +21,4 @@ contact_email_source: "browser"
 about: {"category": "marketing_data", "summary": "Autodata Solutions, Inc. is a marketing data provider. JD Power gives companies the data, analytics, and insights to make smarter, more informed decisions. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online"], "sells_to": [], "source": "https://www.jdpower.com/business/privacypolicy/#california-supplement"}
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

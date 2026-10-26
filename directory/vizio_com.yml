@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "VIZIO Services, LLC is an advertising technology company. Explore VIZIO's latest Smart TVs and Soundbars designed to bring entertainment to life with stunning picture quality and immersive audio. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://privacyportal-cdn.onetrust.com/dsarwebform/41aebd10-58ee-4c98-9dd5-aa66c9be664a/0099df9c-c0aa-4bf7-bd5f-7f4ff46768f6.html"}
 priority: 17
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "adtech", "summary": "Walla Media, LLC is an advertising technology company. Walla Media captures consumer intent signals from browsing behavior and email engagement — transforming them into actionable insights through AI-powered analysis and data orchestration. Its own pages mention phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "interests", "online", "location", "social"], "sells_to": [], "source": "https://www.wallamedia.com/privacy-policy.html"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

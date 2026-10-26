@@ -19,3 +19,4 @@ live_form:
 about: {"category": "b2b", "summary": "Pludo Inc is a business-contact and sales-data provider. Cashmere weaves internal records and external signals into one living profile of every person, company, and entity you serve. Its own pages mention job title and employer, income or wealth. Its policy does not name who it sells to.", "tracks": ["employment", "income"], "sells_to": [], "source": "https://www.cashmereai.com/"}
 priority: 26
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

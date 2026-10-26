@@ -20,3 +20,4 @@ live_form:
 about: {"category": "people_search", "summary": "INFORMATION.COM, LLC is a people-search and public-records site. Information.com people search is fast and efficient. Find phone numbers, addresses, contact information and perform a true background check on anyone. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, relatives and household members, education. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "relatives", "education", "criminal", "interests", "social"], "sells_to": [], "source": "https://information.com/privacy-rights/"}
 priority: 62
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

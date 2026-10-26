@@ -19,3 +19,4 @@ live_form:
 about: {"category": "b2b", "summary": "Agile Education Marketing, LLC is a business-contact and sales-data provider. Find the districts that are ready to buy. Agile Ed gives companies that sell into education the verified data and market intelligence to move first. Its own pages mention job title and employer, education, devices and online activity. Its policy does not name who it sells to.", "tracks": ["employment", "education", "online"], "sells_to": [], "source": "https://agile-ed.com/california-privacy-rights/"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

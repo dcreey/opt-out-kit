@@ -17,3 +17,4 @@ profiled: "2026-10-22"
 about: {"category": "political", "summary": "Simio Cloud, LLC is a political and nonprofit data provider. SimioCloud creates donor intelligence that engages donors and improves your fundraising across all channels. Right message, right channel, right time. Its own pages mention relatives and household members, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["relatives", "online", "social"], "sells_to": [], "source": "https://simiocloud.com/simiocloud-products-services-privacy-policy/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

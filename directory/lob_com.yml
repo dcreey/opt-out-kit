@@ -20,3 +20,4 @@ live_form:
   found: true
   page: "https://privacy.lob.com/"
   blockers: []
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

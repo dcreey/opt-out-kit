@@ -23,3 +23,4 @@ live_form:
 about: {"category": "adtech", "summary": "Roq.ad Inc. is an advertising technology company. Deterministic identity resolution for Europe. Onboard first-party data, resolve it to real people, and activate across every major DSP. GDPR-aligned, ePrivacy certified. Its own pages mention email addresses, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "purchases", "online"], "sells_to": [], "source": "https://roq.ad/white-papers#optout"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Roq.ad GmbH", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "people_search", "summary": "LearnMore, LLC is a people-search and public-records site. Do you need to find out more about someone in your life? Our reverse people lookup will give you a complete background check when you search their name. Its own pages mention names and aliases, phone numbers, age or birthdate, relatives and household members, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["name", "phone", "age", "relatives", "criminal", "social"], "sells_to": [], "source": "https://learnmore.com/privacy-rights/"}
 priority: 58
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

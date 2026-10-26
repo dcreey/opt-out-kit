@@ -19,3 +19,4 @@ live_form:
   found: true
   page: "https://dsar.fullenrich.com/?lang=en&embedded=1"
   blockers: ["business"]
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -20,3 +20,4 @@ live_form:
 about: {"category": "marketing_services", "summary": "e.Republic, LLC is a marketing and direct-mail services company. e.Republic connects public-sector leaders and private-sector innovators via media, events, and insights to advance government and education. Its own pages mention names and aliases. Its policy does not name who it sells to.", "tracks": ["name"], "sells_to": [], "source": "https://erepublic.my.salesforce-sites.com/PrivacyRequest/"}
 priority: 17
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

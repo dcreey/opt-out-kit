@@ -20,3 +20,4 @@ live_form:
   found: true
   page: "https://dsr.trustsuperset.com/?orgId=b46e7184-11fe-4a94-a0b4-1dce265848b0"
   blockers: []
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "b2b", "summary": "Dun and Bradstreet Inc. is a business-contact and sales-data provider. Verified business data and persistent identity help you reduce risk, improve decisions, and drive growth across your organization. Its own pages mention home addresses, relatives and household members, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "relatives", "interests", "online"], "sells_to": [], "source": "https://www.dnb.com/en-us/why-dnb/data-transparency.html"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

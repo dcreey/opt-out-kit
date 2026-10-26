@@ -20,3 +20,4 @@ live_form:
 about: {"category": "other", "summary": "Ray CDP, Inc. is a data company. Delivering growth by accelerating the transformation of your business with technology, design and data. Find out more about Ray Insights by clicking the images below! Its own pages mention email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "age", "interests", "online"], "sells_to": ["advertisers"], "sells_note": "We may also aggregate such information to create statistical data and sell or otherwise share it with potential advertisers, partners, affiliates and other third parties.", "source": "https://www.rayinsights.com/privacy-policy/"}
 priority: 22
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -20,3 +20,4 @@ live_form:
 about: {"category": "people_search", "summary": "clustal.org is a people-search and public-records site. Find people fast with our free people search engine. Access public records, white pages, and reverse phone lookup to find contact info, addresses, and relatives instantly. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, relatives and household members, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "relatives", "criminal"], "sells_to": [], "source": "https://www.clustal.org/"}
 priority: 52
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "adtech", "summary": "Connatix Native Exchange Inc. is an advertising technology company. JWX helps streamers, publishers, and advertisers create, deliver, and monetize video with one intelligent workflow - built for speed, scale, and results. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://jwx.com/"}
 priority: 23
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

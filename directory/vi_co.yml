@@ -20,3 +20,4 @@ live_check:
 about: {"category": "healthcare", "summary": "Vi Technologies, Inc. is a healthcare data company. VI helps health organizations leverage AI to maximize member health outcomes and financial returns. Its own pages mention interests and demographics, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["interests", "online", "health"], "sells_to": [], "source": "https://vi.co/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

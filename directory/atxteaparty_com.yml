@@ -16,3 +16,4 @@ profiled: "2026-10-22"
 about: {"category": "other", "summary": "Greenstein Property Tax LLC is a property and real-estate data company. Taxation without representation. Four in five Texas homes let the county's number stand last year. We file your homestead exemption free and represent you against the county's number... Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, property and vehicles, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "property", "interests", "online", "location", "health", "credit"], "sells_to": [], "source": "https://atxteaparty.com/privacy"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

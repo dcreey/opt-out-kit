@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "ATMOSPHERIK INC. is an advertising technology company. We create the customers your stack can't see. Operated by Rik Works, measured on incremental net-new customers. Its own pages mention email addresses, devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["email", "online", "health"], "sells_to": [], "source": "https://atmospherik.ai/privacy-choices"}
 priority: 26
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

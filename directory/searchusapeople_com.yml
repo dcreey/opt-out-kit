@@ -26,3 +26,4 @@ live_form:
 about: {"category": "people_search", "summary": "searchusapeople.com is a people-search and public-records site. A USA people search service with access to billions of public documents. Find someone! InfoTracer provides addresses, phone numbers, income and more! Its own pages mention names and aliases, phone numbers, age or birthdate, education, income or wealth, property and vehicles. Its policy names these buyers or recipients: advertisers and marketers; the general public (people looking you up).", "tracks": ["name", "phone", "age", "education", "income", "property", "criminal", "interests", "online", "location", "health", "social", "credit"], "sells_to": ["advertisers", "public"], "source": "https://www.searchusapeople.com/cpra-privacy/"}
 priority: 74
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

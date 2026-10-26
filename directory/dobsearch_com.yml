@@ -21,3 +21,4 @@ live_form:
 about: {"category": "people_search", "summary": "dobsearch.com is a people-search and public-records site. We help you perform searches on people, phone numbers, addresses, email addresses, vehicles, background check, and more. Find information on anyone and anything. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, relatives and household members, property and vehicles. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "relatives", "property", "criminal", "interests", "online", "social", "credit"], "sells_to": [], "source": "https://www.dobsearch.com/privacy-policy/"}
 priority: 58
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

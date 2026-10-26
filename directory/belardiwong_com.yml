@@ -20,3 +20,4 @@ live_form:
 about: {"category": "marketing_services", "summary": "Belardi Ostroy, ALC, LLC is a marketing and direct-mail services company. Belardi Wong provides end-to-end solutions for over 300 best-in-class brands and specialty retailers. As #1 in direct-to-consumer marketing, we help brands grow faster and smarter... Its own pages mention shopping and purchase behavior, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "social"], "sells_to": [], "source": "https://belardiwong.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

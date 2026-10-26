@@ -19,3 +19,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Speedeon Data LLC is a marketing data provider. Speedeon is a company helping businesses with customer acquisition, lead generation and growth through data-driven digital marketing solutions. Its own pages mention age or birthdate, social media profiles. Its policy does not name who it sells to.", "tracks": ["age", "social"], "sells_to": [], "source": "https://speedeondata.com/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

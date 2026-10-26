@@ -17,3 +17,4 @@ live_form:
 about: {"category": "recruiting", "summary": "Censia, Inc. is a recruiting and workforce data provider. Censia AI is the context layer for the human and AI enterprise, turning workforce data into the intelligence behind every headcount and org decision. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.censia.com/"}
 priority: 21
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

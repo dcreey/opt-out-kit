@@ -20,3 +20,4 @@ live_form:
 about: {"category": "adtech", "summary": "Dstillery, Inc. is an advertising technology company. Multimodal AI that learns from everything. Get custom programmatic audiences in 24-48 hours that refresh daily and activate everywhere. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://dstillery.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

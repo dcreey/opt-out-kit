@@ -20,3 +20,4 @@ live_form:
   found: true
   page: "https://dsr.trustsuperset.com/?orgId=fb7c9f78-c27f-4932-b7a9-8ac1429c128d"
   blockers: []
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}

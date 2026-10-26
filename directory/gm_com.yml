@@ -16,3 +16,4 @@ live_form:
   found: false
   blockers: ["wall"]
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention European Economic Area", "checked": "2026-10-26"}

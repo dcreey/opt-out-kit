@@ -19,3 +19,4 @@ live_form:
   found: true
   page: "https://docs.google.com/forms/d/e/1FAIpQLSe97ktl_72k3zQBng391lnV_Dl-1TPzZEWE_LJti76NJQ928g/viewform?embedded=true"
   blockers: ["other"]
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}

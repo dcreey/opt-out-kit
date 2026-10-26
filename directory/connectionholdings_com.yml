@@ -17,3 +17,4 @@ live_form:
 about: {"category": "b2b", "summary": "Connection Holdings is a business-contact and sales-data provider. Its own pages mention income or wealth. Its policy does not name who it sells to.", "tracks": ["income"], "sells_to": [], "source": "https://connectionholdings.com/"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

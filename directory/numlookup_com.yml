@@ -19,3 +19,4 @@ live_form:
 about: {"category": "people_search", "summary": "NumLookup LLC. is a people-search and public-records site. Perform a free reverse phone lookup. Find full name, address, social media and more using a phone number. #1 Phone Number Lookup for US. Find out who called for free. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records. Its policy names these buyers or recipients: the general public (people looking you up).", "tracks": ["name", "phone", "email", "age", "property", "criminal", "interests", "online", "location", "credit"], "sells_to": ["public"], "source": "https://www.numlookup.com/privacy-policy"}
 priority: 77
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

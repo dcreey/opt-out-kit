@@ -18,3 +18,4 @@ search_check:
 about: {"category": "people_search", "summary": "publicrecordreports.com is a people-search and public-records site. View information about yourself, friends, family, properties and phone numbers that Google can't show you. Start your search with a name, address or phone number. Its own pages mention names and aliases, phone numbers, email addresses, age or birthdate, property and vehicles, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "age", "property", "criminal"], "sells_to": [], "source": "https://www.publicrecordreports.com/help-center/privacy-requests"}
 priority: 49
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

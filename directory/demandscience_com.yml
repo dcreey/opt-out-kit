@@ -21,3 +21,4 @@ live_form:
 about: {"category": "b2b", "summary": "Demand Science US, LLC is a business-contact and sales-data provider. DemandScience helps B2B teams identify winnable accounts and activate them across channels—generating more pipeline without legacy ABM platform complexity. Its own pages mention devices and online activity, health information. Its policy does not name who it sells to.", "tracks": ["online", "health"], "sells_to": [], "source": "https://demandscience.com/"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Demand Science US, LLC; its pages mention United Kingdom", "checked": "2026-10-26"}

@@ -21,3 +21,4 @@ live_form:
 about: {"category": "political", "summary": "True Blue Analytics LLC is a political and nonprofit data provider. Empowering progressive organizations and Democratic campaigns with the data they need to win. Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://trueblueanalytics.org/"}
 priority: 33
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

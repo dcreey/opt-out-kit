@@ -21,3 +21,4 @@ live_form:
 about: {"category": "healthcare", "summary": "ROR Partners, LLC is a healthcare data company. Transform your health and lifestyle brand with ROR's data-driven marketing solutions. Stay ahead in the active lifestyle industry with our innovative strategies and expert team. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "education", "interests", "online", "location", "health"], "sells_to": [], "source": "https://rorpartners.com/privacy-policy"}
 priority: 55
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "CA", "BR", "SG"], "evidence": "its pages mention PIPEDA; its pages mention LGPD; its pages mention PDPA", "checked": "2026-10-26"}

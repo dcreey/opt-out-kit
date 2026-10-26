@@ -16,3 +16,4 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "Anchor Computer Inc. is a marketing data provider. Improve campaign performance with Anchor Computer’s marketing data services. Clean, enrich, and analyze your data to effectively target the right audience. Its own pages mention shopping and purchase behavior, interests and demographics, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "interests", "health", "social"], "sells_to": [], "source": "https://www.anchorcomputer.com/"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "CA"], "evidence": "its pages mention Quebec", "checked": "2026-10-26"}

@@ -23,3 +23,4 @@ run_check:
 about: {"category": "marketing_data", "summary": "ASL Marketing is a marketing data provider. Deep Sync is the AI-driven identity data company that resolves fragmented customer data into real people for accurate targeting, activation, and measurement. Its own pages mention property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "interests"], "sells_to": [], "source": "https://deepsync.com/"}
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

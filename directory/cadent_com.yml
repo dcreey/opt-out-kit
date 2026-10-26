@@ -19,3 +19,4 @@ live_form:
 about: {"category": "adtech", "summary": "Cadent, LLC is an advertising technology company. Cadent connects brands, publishers & consumers through predictive AI that orchestrates outcomes on any platform, across any media, at any stage of the journey. Its own pages mention email addresses, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "online"], "sells_to": ["advertisers"], "sells_note": "Specifically, in relation to our advertising platform, you may request the following in relation to our advertising technology platform: (1) access to your personal information, (2) deletion of your personal information, and (3) opt-out of ", "source": "https://www.cadent.com/your-privacy-choices"}
 priority: 23
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -21,3 +21,4 @@ persistence: {"result": "unknown", "reup_months": 6}
 live_form:
   checked: "2026-10-25"
   found: false
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

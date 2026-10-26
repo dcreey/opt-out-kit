@@ -19,3 +19,4 @@ priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@perion.com"
 contact_email_source: "browser"
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Vidazoo Ltd", "checked": "2026-10-26"}

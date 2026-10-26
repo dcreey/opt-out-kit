@@ -15,3 +15,4 @@ profiled: "2026-10-22"
 about: {"category": "b2b", "summary": "Uplead LLC is a business-contact and sales-data provider. Access our accurate and real time verified B2B database to drive growth. With built-in email verification, UpLead is the leader in high quality business contact data. Start your free... Its own pages mention phone numbers, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "online"], "sells_to": [], "source": "https://www.uplead.com/opt-out/"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

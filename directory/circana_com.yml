@@ -20,3 +20,4 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/8b6288db-dcf1-460a-a6ed-0092e82d3215"
   blockers: ["check:a bot check"]
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

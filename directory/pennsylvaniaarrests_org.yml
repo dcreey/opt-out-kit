@@ -21,3 +21,4 @@ live_check:
 about: {"category": "arrests", "summary": "pennsylvaniaarrests.org is a public arrest and court records site. Find arrest records in Pennsylvania. Its own pages mention names and aliases, age or birthdate, criminal and court records, health information. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal", "health"], "sells_to": [], "source": "https://www.pennsylvaniaarrests.org/"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

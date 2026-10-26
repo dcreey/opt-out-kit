@@ -22,3 +22,4 @@ live_form:
   found: true
   page: "https://dsr.trustsuperset.com/?orgId=cf72da3d-e829-46e5-a71e-6d15b95c06ad"
   blockers: []
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention UK GDPR", "checked": "2026-10-26"}

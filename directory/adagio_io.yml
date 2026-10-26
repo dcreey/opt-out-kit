@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "Onfocus SAS is an advertising technology company. Adagio demand optimization solutions help publishers leverage unlimited demand sources at unprecedented revenue levels, while improving user experience, SPO, and reducing carbon footprint. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://adagio.io/"}
 priority: 17
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Onfocus (Adagio)", "checked": "2026-10-26"}

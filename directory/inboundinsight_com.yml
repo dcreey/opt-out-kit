@@ -21,3 +21,4 @@ live_form:
 about: {"category": "b2b", "summary": "Inbound Insight, LLC is a business-contact and sales-data provider. Improve marketing performance with better prospect audiences, customer data enrichment, predictive modeling, and campaign analytics from Inbound Insight. Its own pages mention home addresses, email addresses, age or birthdate, education, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["address", "email", "age", "education", "purchases", "interests", "online", "location", "health", "social", "credit"], "sells_to": [], "source": "https://inboundinsight.com/ccpa"}
 priority: 48
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

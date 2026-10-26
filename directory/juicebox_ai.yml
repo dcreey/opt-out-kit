@@ -21,3 +21,4 @@ live_form:
   found: true
   page: "https://forms.withsurface.com/s/cmlzimrw1004jjy0bo5q71h2q"
   blockers: ["other"]
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

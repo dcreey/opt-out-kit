@@ -2381,6 +2381,20 @@ final class RunCheckTests: XCTestCase {
         for j in all { for w in j.futureWork ?? [] { XCTAssertFalse(w.note.isEmpty, "\(j.id) \(w.name)") } }
     }
 
+    func testRegionsSplitTheDirectoryByWhoseDataASiteCollects() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir).filter { $0.excluded == nil }
+        XCTAssertTrue(entries.allSatisfy { $0.regions?.list.contains("US") == true }, "every site came from a US registry and is tagged for it")
+        let us = Regions.partition(entries, country: "US"), fr = Regions.partition(entries, country: "FR"), gb = Regions.partition(entries, country: "GB")
+        XCTAssertEqual(us.inRegion.count, entries.count); XCTAssertTrue(us.elsewhere.isEmpty)
+        for split in [fr, gb] { XCTAssertEqual(split.inRegion.count + split.elsewhere.count, entries.count) }
+        XCTAssertTrue(fr.inRegion.count > 0 && fr.inRegion.count < entries.count, "a French resident sees only the sites that reach the EU")
+        XCTAssertTrue(fr.inRegion.allSatisfy { $0.regions?.list.contains("EU") == true })
+        XCTAssertTrue(gb.inRegion.allSatisfy { $0.regions?.list.contains("UK") == true })
+        XCTAssertEqual(Regions.labels(forCountry: "DE"), ["DE", "EU"])
+    }
+
     func testTheReviewedRunIsInTheDirectory() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")

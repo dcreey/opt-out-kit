@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "AdsWizz, Inc. is an advertising technology company. Publisher Solutions We have created a comprehensive technology stack that includes dynamic ad insertion, campaign management, yield optimization and a programmatic selling platform. We... Its own pages mention interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["interests", "online", "social"], "sells_to": [], "source": "https://www.adswizz.com/"}
 priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Adswizz INC", "checked": "2026-10-26"}

@@ -17,3 +17,4 @@ live_form:
 about: {"category": "other", "summary": "Hunt Club Inc is a data company. Made in Notion, the connected workspace where AI agents and teams organize docs, projects and knowledge together. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, interests and demographics, devices and online activity. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "age", "interests", "online", "social"], "sells_to": ["government"], "source": "https://www.huntclub.com/privacy"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}

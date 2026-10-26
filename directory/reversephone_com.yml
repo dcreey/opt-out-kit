@@ -24,3 +24,4 @@ priority: 67
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@reversephone.com"
 contact_email_source: "page"
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention UK GDPR", "checked": "2026-10-26"}

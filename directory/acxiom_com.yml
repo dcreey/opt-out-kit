@@ -24,3 +24,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Acxiom LLC is a marketing data provider. Acxiom empowers brands to own their data, identity, and agentic future to maximize the value of their data and technology. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.acxiom.com/privacy/"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Acxiom; its pages mention United Kingdom", "checked": "2026-10-26"}

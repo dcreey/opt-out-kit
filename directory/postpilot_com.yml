@@ -21,3 +21,4 @@ live_form:
   found: true
   page: "https://forms.clickup.com/14183078/f/dgun6-8670/VB0MNG9ZT6Q7J0CUXJ"
   blockers: ["business"]
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

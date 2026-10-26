@@ -21,3 +21,4 @@ live_check:
 about: {"category": "arrests", "summary": "nyarrests.org is a public arrest and court records site. Get instant access to New York Arrest Records and Warrant Search using our online public record tool. Find all the relevant information now! Start your search today. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.nyarrests.org/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

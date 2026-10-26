@@ -20,3 +20,4 @@ live_form:
   checked: "2026-10-25"
   found: false
   blockers: []
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Datonics LLC", "checked": "2026-10-26"}

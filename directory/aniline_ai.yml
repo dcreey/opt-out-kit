@@ -18,3 +18,4 @@ live_form:
 about: {"category": "b2b", "summary": "Aniline, Inc. is a business-contact and sales-data provider. SAIQ is the governed deal intelligence layer that turns fragmented CRM and revenue signals into one living map — built for any LLM, any CRM. Its own pages mention age or birthdate, devices and online activity. Its policy does not name who it sells to.", "tracks": ["age", "online"], "sells_to": [], "source": "https://salesassistiq.ai/about/"}
 priority: 24
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -23,3 +23,4 @@ run_check:
   date: "2026-10-26"
   result: "confirmed"
   note: "it said the privacy request was received and a confirmation link will follow by email."
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

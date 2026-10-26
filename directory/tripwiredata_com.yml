@@ -17,3 +17,4 @@ live_form:
 about: {"category": "b2b", "summary": "HGOnline, LLC is a business-contact and sales-data provider. Get the name, phone number, and industry of 2,000+ new Texas businesses every week. Dashboard access with search, filter, and export. Try free for 7 days. Its own pages mention home addresses, phone numbers, email addresses, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "social"], "sells_to": [], "source": "https://www.tripwiredata.com/texas-data-broker-notice"}
 priority: 32
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

@@ -19,3 +19,4 @@ live_form:
 about: {"category": "lead_generation", "summary": "iLeads.com, LLC is a lead-generation company. One AI engine reads hundreds of millions of leads and the title, property, demographic and credit records behind them to find the people ready to transact. Its own pages mention phone numbers, property and vehicles, shopping and purchase behavior, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "property", "purchases", "interests"], "sells_to": [], "source": "https://ileads.com/submit-request"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

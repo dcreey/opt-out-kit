@@ -20,3 +20,4 @@ live_form:
 about: {"category": "people_search", "summary": "backgroundchecks.org is a people-search and public-records site. Instant Background Check - How to run a free Background Check: Use Background Checks.org's free database of online public records to find federal and state criminal, arrest, driving,... Its own pages mention names and aliases, phone numbers, criminal and court records, social media profiles. Its policy names these buyers or recipients: the general public (people looking you up).", "tracks": ["name", "phone", "criminal", "social"], "sells_to": ["public"], "source": "https://backgroundchecks.org/"}
 priority: 59
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

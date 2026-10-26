@@ -20,3 +20,4 @@ live_form:
 about: {"category": "location_data", "summary": "Kloudend, Inc. is a device and location data company. Enterprise IP Location by Kloudend, Inc - built on AWS, trusted by Fortune 500. Geolocation API for JSON, XML in PHP, JS, Java, Python, Node & more. Its own pages mention phone numbers, email addresses, age or birthdate, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "purchases", "interests", "online", "location"], "sells_to": [], "source": "https://ipapi.co/privacy/"}
 priority: 49
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU", "UK", "BR"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Lei Geral", "checked": "2026-10-26"}

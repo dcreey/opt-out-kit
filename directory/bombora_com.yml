@@ -21,3 +21,4 @@ live_form:
   found: true
   page: "https://preferences.bombora.com/?locale=en"
   blockers: []
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Bombora Inc.", "checked": "2026-10-26"}

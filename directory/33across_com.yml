@@ -18,3 +18,4 @@ live_form:
 about: {"category": "adtech", "summary": "33Across, Inc. is an advertising technology company. Its own pages mention email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "interests", "online"], "sells_to": [], "source": "https://udp.33across.com/udp_opt_out"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

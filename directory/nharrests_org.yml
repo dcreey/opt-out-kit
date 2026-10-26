@@ -22,3 +22,4 @@ live_check:
 about: {"category": "arrests", "summary": "nharrests.org is a public arrest and court records site. Search New Hampshire arrest records and active warrants. Access public records to check criminal history and warrant status quickly and easily. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.nharrests.org/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

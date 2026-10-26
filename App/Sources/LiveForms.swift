@@ -304,7 +304,8 @@ extension WebViewSession {
     /// Custom drop-down menus that are not <select> elements (Material UI and similar): opens each empty one that asks about the person's relationship
     /// to the company or their state, and picks a consumer-style answer ("Consumer", "None", "Other", the person's state). Never picks employee,
     /// customer, vendor or business answers. Returns how many it set.
-    func chooseCustomMenus() async -> Int {
+    /// `state` is the person's own state or region name: a menu that lists places picks that one, and never another.
+    func chooseCustomMenus(state: String? = nil) async -> Int {
         var set = 0
         for _ in 0..<3 {
             let open = #"""
@@ -322,9 +323,9 @@ extension WebViewSession {
             (function(){
               var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=menuitem],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
               var bad=/employee|customer|client|vendor|partner|supplier|business|contractor|applicant|agent|representative|former|prospect/i;
-              var good=[/^\s*illinois\b/i,/consumer|individual|myself|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
+              var good=[\#(state.flatMap { $0.isEmpty ? nil : "/^\\s*" + NSRegularExpression.escapedPattern(for: $0) + "\\b/i," } ?? "")/consumer|individual|myself|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
               for(var g=0;g<good.length;g++){for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim(); if(good[g].test(t)&&!bad.test(t)){opts[i].click(); return t;}}}
-              if(opts.length){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
+              if(opts.length&&opts.length<40){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
               document.body.click(); return '';})();
             """#
             if let t = (try? await webView.evaluateJavaScript(pick)) as? String, !t.isEmpty { set += 1 }
@@ -468,7 +469,7 @@ extension FormRun {
         if let miss = fill.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
         let beforeFill = await session.visibleText()
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
-        _ = await session.chooseCustomMenus()
+        _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
         // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         let earlyText = await session.visibleText()

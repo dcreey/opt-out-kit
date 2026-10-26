@@ -21,3 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "Viant US LLC is an advertising technology company. Viant, a pioneer in people-based digital advertising on the open web, empowers marketers with cookieless targeting, measurement and innovative analytics tools. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.viantinc.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Viant Technology Inc", "checked": "2026-10-26"}

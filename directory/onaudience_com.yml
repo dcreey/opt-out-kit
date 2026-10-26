@@ -22,3 +22,4 @@ persistence: {"result": "temporary", "reup_months": 6, "quote": "Follow us Produ
 live_form:
   checked: "2026-10-25"
   found: false
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as OnAudience Ltd", "checked": "2026-10-26"}

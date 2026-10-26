@@ -17,3 +17,4 @@ live_form:
 about: {"category": "adtech", "summary": "VRTCAL Markets Inc. is an advertising technology company. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.vrtcal.com/"}
 priority: 18
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as VRTCAL Markets Inc", "checked": "2026-10-26"}

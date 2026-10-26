@@ -20,3 +20,4 @@ live_form:
   checked: "2026-10-25"
   found: false
   blockers: ["business"]
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}

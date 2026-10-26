@@ -53,6 +53,7 @@
         "source": { "type": "string" }
       }
     },
+    "regions": {"type": "object", "required": ["list"], "properties": {"list": {"type": "array", "items": {"type": "string"}}, "evidence": {"type": "string"}, "checked": {"type": "string"}}},
     "persistence": {
       "type": "object",
       "required": ["result"],

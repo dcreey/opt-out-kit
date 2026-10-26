@@ -21,3 +21,4 @@ live_form:
 about: {"category": "b2b", "summary": "Modigie Inc is a business-contact and sales-data provider. AI-ready GTM data platform with real-time contact verification, enrichment, identity graphs, and CRM integration—fueling AI agents, outbound sales, and revenue growth. Its own pages mention home addresses, phone numbers, email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "interests", "online"], "sells_to": [], "source": "https://modigie.com/privacy-policy/"}
 priority: 32
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

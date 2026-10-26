@@ -20,3 +20,4 @@ live_check:
 about: {"category": "arrests", "summary": "riarrests.org is a public arrest and court records site. Arrest records in Rhode Island differ from other types of criminal history information, often causing confusion. Although arrest records and warrants both perta. Its own pages mention names and aliases, email addresses, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "email", "age", "criminal"], "sells_to": [], "source": "https://www.riarrests.org/request-portal/"}
 priority: 41
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

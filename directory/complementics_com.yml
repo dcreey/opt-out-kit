@@ -20,3 +20,4 @@ live_check:
 about: {"category": "location_data", "summary": "eContext.ai LLC is a device and location data company. Complementics is the mobile data layer for business: location, POI visitation, audience, app, identity, and consumer data feeds, configured to your spec. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, education, property and vehicles. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["phone", "email", "age", "employment", "education", "property", "purchases", "online", "location", "social"], "sells_to": ["advertisers", "businesses"], "source": "https://complementics.com/optout-donotsell"}
 priority: 59
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

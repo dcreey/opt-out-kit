@@ -19,3 +19,4 @@ live_form:
 about: {"category": "lead_generation", "summary": "UPS Capital Corporation is a lead-generation company. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "social"], "sells_to": [], "source": "https://upscapital.com/contact-us"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

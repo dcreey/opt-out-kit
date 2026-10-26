@@ -19,3 +19,4 @@ priority: 50
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@predactiv.com"
 contact_email_source: "page"
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}

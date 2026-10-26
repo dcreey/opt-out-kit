@@ -23,3 +23,4 @@ run_check:
   date: "2026-10-26"
   result: "confirmed"
   note: "it said a confirmation link was emailed: the person taps it to finish."
+regions: {"list": ["US", "EU", "UK", "AU"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention Privacy Act 1988", "checked": "2026-10-26"}

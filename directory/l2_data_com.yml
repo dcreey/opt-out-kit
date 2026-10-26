@@ -19,3 +19,4 @@ live_form:
 about: {"category": "political", "summary": "Labels & Lists, Inc is a political and nonprofit data provider. L2-Data offers a robust data platform to support successful outreach, prospecting, and analysis. Pull contact lists and refine your universe from over 600 demographic, psychographic, and... Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://l2-data.com/"}
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

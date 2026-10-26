@@ -22,3 +22,4 @@ live_check:
 about: {"category": "arrests", "summary": "washingtonarrests.org is a public arrest and court records site. Find arrest records in Washington. Its own pages mention names and aliases, email addresses, age or birthdate, criminal and court records, devices and online activity. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["name", "email", "age", "criminal", "online"], "sells_to": ["government"], "source": "https://www.washingtonarrests.org/privacy"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

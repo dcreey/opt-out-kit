@@ -20,3 +20,4 @@ live_form:
 about: {"category": "people_search", "summary": "backgroundcheckme.org is a people-search and public-records site. Search millions of public records instantly — criminal history, arrest records, court filings, addresses & more. Powered by TruthFinder. All 50 states. Its own pages mention home addresses, phone numbers, property and vehicles, criminal and court records, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "phone", "property", "criminal", "social"], "sells_to": [], "source": "https://backgroundcheckme.org/"}
 priority: 50
 persistence: {"result": "unknown", "reup_months": 6}
+regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
