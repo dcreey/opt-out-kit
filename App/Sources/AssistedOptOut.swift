@@ -51,7 +51,11 @@ struct WebAssistedDriver: AssistedDriver {
         if let person {
             _ = await session.advanceToRequestForm()
             guard let live = LiveFormPicker.pick(await session.discoverForms(), pageContext: await session.pageContext()) else { session.close(); return nil }
-            let livePlan = FormFiller.plan(for: live.asOptOutForm(page: form.page), signals: nil, person: person, advertisingID: advertisingID)
+            // Only a form that asks for the phone's advertising ID makes the app ask the person (once) for permission to read it.
+            let liveForm = live.asOptOutForm(page: form.page)
+            var adID = advertisingID
+            if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
+            let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, advertisingID: adID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity()) } else { session.close(); return nil }
         }
         await page.refill()

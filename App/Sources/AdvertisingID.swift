@@ -15,6 +15,11 @@ enum AdvertisingID {
         return id.uuidString == "00000000-0000-0000-0000-000000000000" ? nil : id.uuidString
     }
 
+    /// Whether one form's fields ask for it.
+    static func isAsked(by fields: [FormField]) -> Bool {
+        fields.contains { f in (f.name + " " + f.label).range(of: "\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad|device.?(id|identifier)", options: [.regularExpression, .caseInsensitive]) != nil }
+    }
+
     /// Whether any form we are about to send asks for the advertising ID.
     static func isAsked(by entries: [DirectoryEntry]) -> Bool {
         entries.contains { e in e.optOutForm?.fields.contains { f in

@@ -300,6 +300,29 @@
     }
    }
   },
+  "%@ is not a site in your list, so it may not be from an opt-out you started. Only open it if you are sure.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ ne figure pas dans votre liste ; ce lien ne vient peut-être pas d'un retrait que vous avez lancé. Ne l'ouvrez que si vous en êtes sûr."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ no está en su lista, así que quizá no provenga de una baja que usted inició. Ábralo solo si está seguro."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ steht nicht in Ihrer Liste, der Link stammt also vielleicht nicht von einem Opt-out, das Sie gestartet haben. Öffnen Sie ihn nur, wenn Sie sicher sind."
+     }
+    }
+   }
+  },
   "%@ is on the %@ broker registry.": {
    "extractionState": "manual",
    "localizations": {
@@ -2140,6 +2163,29 @@
     }
    }
   },
+  "A request to %@ was finished on %@. You usually do not need this link again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une demande à %@ a été terminée le %@. Vous n'avez généralement plus besoin de ce lien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una solicitud a %@ se terminó el %@. Normalmente ya no necesita este enlace."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Anfrage an %@ wurde am %@ abgeschlossen. Sie brauchen diesen Link normalerweise nicht mehr."
+     }
+    }
+   }
+  },
   "A service you chose works better, for example a contacts app that identifies callers.": {
    "extractionState": "manual",
    "localizations": {
@@ -2918,6 +2964,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nach dem Senden an jede Seite speichern wir einen Screenshot der angezeigten Seite, damit Sie prüfen können, was passiert ist."
+     }
+    }
+   }
+  },
+  "After you send a request, some sites email you a link to confirm it or to finish a form. Until you open that link, the request is not done. The app keeps a list of the ones waiting.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Après l'envoi d'une demande, certains sites vous envoient par e-mail un lien pour la confirmer ou finir un formulaire. Tant que vous n'ouvrez pas ce lien, la demande n'est pas terminée. L'app garde la liste de celles en attente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tras enviar una solicitud, algunos sitios le envían un enlace por correo para confirmarla o terminar un formulario. Hasta que abra ese enlace, la solicitud no está terminada. La app guarda la lista de las pendientes."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nach dem Senden einer Anfrage schicken manche Seiten Ihnen einen Link per E-Mail, um sie zu bestätigen oder ein Formular fertigzustellen. Solange Sie den Link nicht öffnen, ist die Anfrage nicht abgeschlossen. Die App führt eine Liste der wartenden."
      }
     }
    }
@@ -4670,6 +4739,29 @@
     }
    }
   },
+  "Check the link": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vérifier le lien"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comprobar el enlace"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link prüfen"
+     }
+    }
+   }
+  },
   "Checked %@": {
    "extractionState": "manual",
    "localizations": {
@@ -5563,6 +5655,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kopieren"
+     }
+    }
+   }
+  },
+  "Copy the link from the email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiez le lien depuis l'e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copie el enlace del correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kopieren Sie den Link aus der E-Mail"
      }
     }
    }
@@ -6487,6 +6602,29 @@
     }
    }
   },
+  "Don't open": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne pas ouvrir"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No abrir"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht öffnen"
+     }
+    }
+   }
+  },
   "Done": {
    "extractionState": "manual",
    "localizations": {
@@ -6782,6 +6920,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "E-Mail-Adressen"
+     }
+    }
+   }
+  },
+  "Email links": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Liens d'e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enlaces de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail-Links"
      }
     }
    }
@@ -8626,6 +8787,29 @@
     }
    }
   },
+  "How this works": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comment ça marche"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cómo funciona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "So funktioniert es"
+     }
+    }
+   }
+  },
   "How your queue works": {
    "extractionState": "manual",
    "localizations": {
@@ -8645,6 +8829,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "So funktioniert Ihre Warteschlange"
+     }
+    }
+   }
+  },
+  "I finished this request": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "J'ai terminé cette demande"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminé esta solicitud"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ich habe diese Anfrage abgeschlossen"
      }
     }
    }
@@ -10692,6 +10899,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Als erledigt markieren"
+     }
+    }
+   }
+  },
+  "Marked as finished.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marquée comme terminée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marcada como terminada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als abgeschlossen markiert."
      }
     }
    }
@@ -13456,6 +13686,52 @@
     }
    }
   },
+  "Open it again": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir à nouveau"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir de nuevo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erneut öffnen"
+     }
+    }
+   }
+  },
+  "Open it anyway": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir quand même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir de todos modos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trotzdem öffnen"
+     }
+    }
+   }
+  },
   "Open source": {
    "extractionState": "manual",
    "localizations": {
@@ -13521,6 +13797,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie die E-Mail und klicken Sie auf den Link. Wir können Ihr Postfach nicht lesen."
+     }
+    }
+   }
+  },
+  "Open the email, press and hold the button or link, and choose Copy Link. Then come back here and tap Paste.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez l'e-mail, maintenez le doigt sur le bouton ou le lien, puis choisissez Copier le lien. Revenez ici et touchez Coller."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abra el correo, mantenga pulsado el botón o enlace y elija Copiar enlace. Vuelva aquí y toque Pegar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die E-Mail, halten Sie die Schaltfläche oder den Link gedrückt und wählen Sie „Link kopieren“. Kommen Sie dann hierher zurück und tippen Sie auf Einfügen."
      }
     }
    }
@@ -15066,6 +15365,29 @@
     }
    }
   },
+  "Read the page, clear any check, and press its own button. We never send it for you. Tap \"I finished this request\" when you are done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lisez la page, passez la vérification éventuelle et appuyez sur son propre bouton. Nous n'envoyons jamais à votre place. Touchez « J'ai terminé cette demande » quand vous avez fini."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lea la página, resuelva cualquier verificación y pulse su propio botón. Nunca lo enviamos por usted. Toque «Terminé esta solicitud» cuando acabe."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lesen Sie die Seite, lösen Sie eventuelle Prüfungen und drücken Sie die eigene Schaltfläche. Wir senden nie für Sie. Tippen Sie auf „Ich habe diese Anfrage abgeschlossen“, wenn Sie fertig sind."
+     }
+    }
+   }
+  },
   "Read their policy": {
    "extractionState": "manual",
    "localizations": {
@@ -16354,6 +16676,29 @@
     }
    }
   },
+  "Sent %@; look for their email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyée le %@ ; attendez leur e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviada el %@; busque su correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet am %@; achten Sie auf ihre E-Mail"
+     }
+    }
+   }
+  },
   "Sent %lld of %lld sites. %lld need you.": {
    "extractionState": "manual",
    "localizations": {
@@ -17297,6 +17642,29 @@
     }
    }
   },
+  "Some opt-outs end with an email: a link to confirm or to finish a form. Copy that link from the email, paste it here, and we check it and fill in your details.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains retraits se terminent par un e-mail : un lien pour confirmer ou finir un formulaire. Copiez ce lien depuis l'e-mail, collez-le ici, et nous le vérifions et remplissons vos informations."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunas bajas terminan con un correo: un enlace para confirmar o terminar un formulario. Copie ese enlace del correo, péguelo aquí y lo comprobamos y rellenamos sus datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Opt-outs enden mit einer E-Mail: ein Link zum Bestätigen oder zum Fertigstellen eines Formulars. Kopieren Sie den Link aus der E-Mail und fügen Sie ihn hier ein; wir prüfen ihn und füllen Ihre Angaben aus."
+     }
+    }
+   }
+  },
   "Some opt-outs end with an email: a link to confirm or to finish a form. Paste that link here and we load the page and fill in your details. Only open links from emails you asked for.": {
    "extractionState": "manual",
    "localizations": {
@@ -17316,6 +17684,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manche Opt-outs enden mit einer E-Mail: ein Link zum Bestätigen oder zum Abschließen eines Formulars. Fügen Sie ihn hier ein, wir laden die Seite und füllen Ihre Angaben aus. Öffnen Sie nur Links aus E-Mails, die Sie angefordert haben."
+     }
+    }
+   }
+  },
+  "Some opt-outs finish by email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains retraits finissent par e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunas bajas terminan por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Opt-outs enden per E-Mail"
      }
     }
    }
@@ -19758,6 +20149,29 @@
     }
    }
   },
+  "These sites said they would email you with more to do. Paste the link from that email above, or tap Done if you finished it another way.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces sites ont dit qu'ils vous enverraient un e-mail avec la suite. Collez ci-dessus le lien de cet e-mail, ou touchez Terminé si vous avez fini autrement."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos sitios dijeron que le enviarían un correo con más pasos. Pegue arriba el enlace de ese correo, o toque Hecho si lo terminó de otra forma."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seiten haben angekündigt, Ihnen eine E-Mail mit weiteren Schritten zu schicken. Fügen Sie oben den Link aus dieser E-Mail ein oder tippen Sie auf Fertig, wenn Sie es anders erledigt haben."
+     }
+    }
+   }
+  },
   "They and their advertisers may set tracking cookies that follow purchases and target ads. Opt-Out Kit's browser keeps no cookies between visits and turns down cookie banners.": {
    "extractionState": "manual",
    "localizations": {
@@ -20448,6 +20862,29 @@
     }
    }
   },
+  "This link is not from a site in your list. Be careful what you enter.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce lien ne vient pas d'un site de votre liste. Faites attention à ce que vous saisissez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este enlace no es de un sitio de su lista. Tenga cuidado con lo que introduce."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Link stammt nicht von einer Seite in Ihrer Liste. Seien Sie vorsichtig mit Ihren Eingaben."
+     }
+    }
+   }
+  },
   "This link looks broken. Looking for the new page…": {
    "extractionState": "manual",
    "localizations": {
@@ -20467,6 +20904,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieser Link scheint defekt. Die neue Seite wird gesucht …"
+     }
+    }
+   }
+  },
+  "This link matches %@, a site in your list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce lien correspond à %@, un site de votre liste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este enlace coincide con %@, un sitio de su lista."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Link passt zu %@, einer Seite in Ihrer Liste."
      }
     }
    }
@@ -21529,6 +21989,29 @@
     }
    }
   },
+  "Waiting on an email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En attente d'un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esperando un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Warten auf eine E-Mail"
+     }
+    }
+   }
+  },
   "Walk through each data broker, one step at a time.": {
    "extractionState": "manual",
    "localizations": {
@@ -21594,6 +22077,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir gehen auch über das Register Ihres Bundesstaats hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (%@), mit weiteren bekannten Brokern – insgesamt %@ Websites, egal in welchem Bundesstaat oder Land sie registriert sind."
+     }
+    }
+   }
+  },
+  "We check it first": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous le vérifions d'abord"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Primero lo comprobamos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir prüfen ihn zuerst"
      }
     }
    }
@@ -21801,6 +22307,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir haben die Regeln Ihres Landes noch nicht. Die Opt-out-Formulare dieser App funktionieren von überall, wo ein Broker Anfragen annimmt, und wir ergänzen mit der Zeit Gesetze einzelner Länder."
+     }
+    }
+   }
+  },
+  "We do not recognize this link": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous ne reconnaissons pas ce lien"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No reconocemos este enlace"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir erkennen diesen Link nicht"
      }
     }
    }
@@ -22031,6 +22560,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir haben dieses Formular noch nicht auf einer echten Seite geladen, eine Prüfung könnte erscheinen. Sie lösen sie, falls ja."
+     }
+    }
+   }
+  },
+  "We make sure the link is from a site in your list and tell you if it is not, or if you already finished that site. Then we load the page and fill in your details.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous vérifions que le lien vient d'un site de votre liste et vous prévenons sinon, ou si vous avez déjà fini ce site. Puis nous chargeons la page et remplissons vos informations."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Comprobamos que el enlace sea de un sitio de su lista y le avisamos si no lo es, o si ya terminó ese sitio. Luego cargamos la página y rellenamos sus datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir prüfen, ob der Link von einer Seite in Ihrer Liste stammt, und warnen Sie, falls nicht oder falls Sie diese Seite schon erledigt haben. Dann laden wir die Seite und füllen Ihre Angaben aus."
      }
     }
    }
@@ -23254,6 +23806,29 @@
     }
    }
   },
+  "You already finished %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez déjà terminé %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ya terminó %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben %@ bereits abgeschlossen"
+     }
+    }
+   }
+  },
   "You are agreeing to those terms through this app. If you would rather read each site's terms yourself, leave this off.": {
    "extractionState": "manual",
    "localizations": {
@@ -23710,6 +24285,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie müssen es selbst absenden"
+     }
+    }
+   }
+  },
+  "You press the last button": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous appuyez sur le dernier bouton"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Usted pulsa el último botón"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie drücken den letzten Knopf"
      }
     }
    }

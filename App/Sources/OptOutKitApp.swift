@@ -654,6 +654,25 @@ final class AppModel: ObservableObject {
     /// True when nothing has been chosen or started today, so the day opens on the question of which kind of broker to tackle.
     var needsKindChoice: Bool { dailyThemes.isEmpty && dailyGoals.verifyDone == 0 && !dailyGoals.verify.isEmpty }
 
+    // MARK: Email follow-ups and pasted links
+
+    /// Sites that were sent but said an email would follow with more to do, oldest first.
+    var pendingFollowUps: [(entry: DirectoryEntry, since: Date)] {
+        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        return FollowUps.pending(progress.optOutAttempts).compactMap { p in byID[p.id].map { ($0, p.since) } }
+    }
+
+    func markFollowUpDone(_ entryID: String) {
+        household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(OptOutAttempt(date: Date(), outcome: "email_done"), site: entryID) }
+        save()
+    }
+
+    func checkLink(_ url: URL) -> LinkCheck { LinkCheck.check(url, entries: directory, attempts: progress.optOutAttempts) }
+
+    private static let linkTourKey = "linkfiller.toured"
+    var shouldTourLinkFiller: Bool { !defaults.bool(forKey: Self.linkTourKey) }
+    func markLinkFillerToured() { defaults.set(true, forKey: Self.linkTourKey) }
+
     private static let followUpKey = "followup.explained"
     /// The first time the person has sent anything, once: why the day ends with an email and what to expect in the inbox.
     var shouldExplainFollowUp: Bool { !defaults.bool(forKey: Self.followUpKey) && activitySummary.sites > 0 }

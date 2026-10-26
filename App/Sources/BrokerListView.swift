@@ -65,10 +65,6 @@ struct BrokerListView: View {
                     if case .platform = t.kind { return !model.isDone(t) }
                     return t.kind == .automatic && !model.isDone(t)
                 }
-                Section {
-                    NavigationLink { LinkFillerView() } label: { Label("Finish a request from an email", systemImage: "envelope.open") }
-                        .accessibilityIdentifier("link-filler")
-                } footer: { Text("Paste a link from an email and we fill in the form on it.") }
                 if !firstTasks.isEmpty {
                     Section {
                         ForEach(firstTasks) { task in NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("next-\(task.id)") }

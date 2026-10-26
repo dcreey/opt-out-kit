@@ -11,7 +11,8 @@ struct RootView: View {
         TabView(selection: $tab) {
             BrokerListView().tabItem { Label("Queue", systemImage: "list.bullet") }.tag(0)
             SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }.tag(1)
-            AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(2)
+            LinkFillerView(startLink: debugLink ?? "").tabItem { Label("Email links", systemImage: "envelope.open") }.badge(model.pendingFollowUps.count).tag(2)
+            AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(3)
         }
         #if DEBUG
         .task {
@@ -35,12 +36,9 @@ struct RootView: View {
             } else if let i = args.firstIndex(of: "-audit-domains"), args.indices.contains(i + 1) {
                 await FormAudit.run(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
             }
-            if let i = args.firstIndex(of: "-open-link-filler"), args.indices.contains(i + 1) { debugLink = args[i + 1] }
+            if let i = args.firstIndex(of: "-open-link-filler"), args.indices.contains(i + 1) { debugLink = args[i + 1]; tab = 2 }
             if args.contains("-uitest-demo-run") { await model.runDemoOptOut() }
             if args.contains("-uitest-demo-review") { await model.runDemoOptOut(); model.runReport = nil; showDemoReview = true }
-        }
-        .sheet(isPresented: Binding(get: { debugLink != nil }, set: { if !$0 { debugLink = nil } })) {
-            NavigationStack { LinkFillerView(startLink: debugLink ?? "") }
         }
         .sheet(isPresented: $showDemoReview) {
             if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
