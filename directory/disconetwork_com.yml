@@ -21,4 +21,4 @@ live_form:
 about: {"category": "adtech", "summary": "Disco Technology Inc is an advertising technology company. Disco is the commerce media network connecting brands to high-intent consumers through AI-powered, personalized offers across 800+ post-purchase and pre-purchase touchpoints. Its own pages mention shopping and purchase behavior, devices and online activity, social media profiles. Its policy names these buyers or recipients: advertisers and marketers; publishers and ad platforms.", "tracks": ["purchases", "online", "social"], "sells_to": ["advertisers", "publishers"], "source": "https://disconetwork.com/"}
 priority: 33
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

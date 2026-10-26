@@ -17,4 +17,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Catalina Marketing Corporation is a marketing data provider. Catalina's open ecosystem of solutions helps retailers, CPG brands, and agencies turn shoppers into buyers and buyers into fans. Its own pages mention shopping and purchase behavior, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["purchases", "online", "social"], "sells_to": [], "source": "https://www.catalina.com/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Catalina Marketing UK Limited (ref Z8268399)", "checked": "2026-10-26"}

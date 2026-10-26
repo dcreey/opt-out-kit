@@ -19,4 +19,4 @@ live_form:
 about: {"category": "people_search", "summary": "criminaldatacheck.com is a people-search and public-records site. Its own pages mention names and aliases, phone numbers, email addresses, relatives and household members, criminal and court records, devices and online activity. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "relatives", "criminal", "online", "health"], "sells_to": [], "source": "https://criminaldatacheck.com/privacy-education/medical-health-records/"}
 priority: 57
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

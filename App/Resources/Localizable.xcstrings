@@ -15664,6 +15664,29 @@
     }
    }
   },
+  "Postal code": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Code postal"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Código postal"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Postleitzahl"
+     }
+    }
+   }
+  },
   "Precise location": {
    "extractionState": "manual",
    "localizations": {
@@ -16281,6 +16304,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Recruiting- und Arbeitsmarktdaten"
+     }
+    }
+   }
+  },
+  "Region (optional)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Région (facultatif)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Región (opcional)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Region (optional)"
      }
     }
    }
@@ -22036,27 +22082,7 @@
    }
   },
   "This site's form is written for US residents, so we take you to it and walk you through it.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Le formulaire de ce site est écrit pour les résidents américains : nous vous y emmenons et vous guidons."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "El formulario de este sitio está pensado para residentes de EE. UU., así que le llevamos a él y le guiamos."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Das Formular dieser Seite ist für US-Einwohner geschrieben, deshalb führen wir Sie hin und begleiten Sie."
-     }
-    }
-   }
+   "extractionState": "manual"
   },
   "This site's opt-out page had moved. We found the new one on %@.": {
    "extractionState": "manual",

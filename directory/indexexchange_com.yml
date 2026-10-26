@@ -21,4 +21,4 @@ live_form:
   found: true
   page: "https://sar.indexexchange.com/"
   blockers: []
-regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Index Exchange Inc. ; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Index Exchange Inc. ; on the UK ICO register of fee payers as Index Exchange Limited (ref ZA244724)", "checked": "2026-10-26"}

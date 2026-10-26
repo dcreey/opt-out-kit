@@ -20,4 +20,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Webbula, LLC is a marketing data provider. Protect performance with accurate, validated data. Eliminate hidden risks and ensure every campaign is built on truth. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://webbula.com/privacy-center/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}

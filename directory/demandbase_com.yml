@@ -20,4 +20,4 @@ live_form:
   found: true
   page: "https://demandbase.privacyportal.co/"
   blockers: ["check:a bot check"]
-regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Demandbase, Inc.; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Demandbase, Inc.; on the UK ICO register of fee payers as Demandbase Limited (ref ZB321215)", "checked": "2026-10-26"}

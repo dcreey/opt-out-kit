@@ -22,4 +22,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Irys, Inc is a marketing data provider. Its own pages mention property and vehicles, shopping and purchase behavior, devices and online activity, precise location. Its policy does not name who it sells to.", "tracks": ["property", "purchases", "online", "location"], "sells_to": [], "source": "https://irys.us/do-not-sell-ccpa"}
 priority: 44
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}

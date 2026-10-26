@@ -17,4 +17,4 @@ live_form:
 about: {"category": "marketing_data", "summary": "Baron App, Inc. is a marketing data provider. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: government and law enforcement; advertisers and marketers.", "tracks": ["address", "phone", "email", "age", "employment", "education", "purchases", "interests", "online", "location", "social"], "sells_to": ["government", "advertisers"], "sells_note": "We will disclose your personal information to our legal and other advisors, consultants, and law enforcement or other government entities.", "source": "https://legal.cameo.com/privacypolicy"}
 priority: 59
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Baron App, Inc. (ref ZC111494); its pages mention EEA", "checked": "2026-10-26"}

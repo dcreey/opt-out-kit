@@ -20,4 +20,4 @@ live_form:
 about: {"category": "people_search", "summary": "Lookify.io is a people-search and public-records site. Instantly identify unknown calls or texts, find the owner of any phone number. Get detailed caller information, location data, risk assessment, and more. Its own pages mention names and aliases, phone numbers, email addresses, job title and employer, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["name", "phone", "email", "employment", "location", "social"], "sells_to": [], "source": "https://lookify.io/"}
 priority: 58
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention European Economic Area", "checked": "2026-10-26"}

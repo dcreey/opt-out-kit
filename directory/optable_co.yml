@@ -19,4 +19,4 @@ priority: 54
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@optable.co"
 contact_email_source: "page"
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention Quebec", "checked": "2026-10-26"}

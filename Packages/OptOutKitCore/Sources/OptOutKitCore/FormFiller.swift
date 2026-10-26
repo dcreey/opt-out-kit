@@ -181,7 +181,10 @@ public enum FormFiller {
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
             if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { continue }
             if has("country|\\bpays\\b|pa[ií]s\\b") {
-                if let a = address, USStates.code(for: a.state) != nil { put(["United States", "United States of America", "USA", "US"], L10n.noun("Country")) }
+                if let code = person.countryCode {
+                    if code == "US" { put(["United States", "United States of America", "USA", "US"], L10n.noun("Country")) }
+                    else { put([Regions.englishName(code), code, code == "GB" ? "UK" : nil, code == "GB" ? "United Kingdom of Great Britain and Northern Ireland" : nil], L10n.noun("Country")) }
+                }
                 continue
             }
             if field.type == "email" || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
@@ -210,6 +213,11 @@ public enum FormFiller {
 
     /// The request text for a free-text box: plain, the same for everyone, and only what the form already receives.
     public static func standardRequest(for person: Person) -> String {
+        let country = person.countryCode ?? "US"
+        if country != "US" {
+            let place = Regions.englishName(country).map { " resident of \($0)" } ?? ""
+            return "I am an individual\(place). Under \(Regions.law(forCountry: country)), please stop using my personal information for marketing, profiling and sale, delete the personal information you hold about me, and keep me on your suppression list so it is not collected again. Please confirm by email."
+        }
         let state = person.addresses.first.flatMap { USStates.name(for: $0.state) } ?? ""
         let where_ = state.isEmpty ? "" : " and a resident of \(state)"
         return "I am an individual\(where_). Please stop selling or sharing my personal information, delete the personal information you hold about me, and keep me on your suppression list so it is not collected again. Please confirm by email."

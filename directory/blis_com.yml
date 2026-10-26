@@ -19,4 +19,4 @@ priority: 25
 persistence: {"result": "unknown", "reup_months": 6}
 contact_email: "privacy@blis.com"
 contact_email_source: "browser"
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Blis Global Limited", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Blis Global Limited; on the UK ICO register of fee payers as Blis Global Ltd (ref ZA113120)", "checked": "2026-10-26"}

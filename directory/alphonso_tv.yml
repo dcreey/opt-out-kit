@@ -25,4 +25,4 @@ run_check:
   date: "2026-10-26"
   result: "confirmed"
   note: "it said Your request is confirmed."
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Alphonso Inc. ", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Alphonso Inc. ; on the UK ICO register of fee payers as Alphonso Uk Limited (ref ZB394929)", "checked": "2026-10-26"}

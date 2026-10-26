@@ -531,11 +531,6 @@ final class AppModel: ObservableObject {
         let last = person.flatMap { household.progress(for: $0.id).optOutAttempts[entry.id]?.last?.outcome }
         let verdict = OptOutMethods.classify(resolved(entry), confirmingIdentity: person?.mayConfirmOwnIdentity() ?? false, challengedBefore: last == "challenged",
                                              failedBefore: last == "failed" || last == "rejected")
-        // The forms and request wording here are written for US residents. Until they are checked for other places, someone outside the US
-        // is walked through each site instead of having a form filled in for them.
-        if (ownerCountry ?? "US") != "US", verdict.method == .automatic || verdict.method == .semiAutomatic {
-            return MethodVerdict(method: .guided, reason: L10n.t("This site's form is written for US residents, so we take you to it and walk you through it."))
-        }
         return verdict
     }
     var confirmingIdentityForSelected: Bool { selectedPerson?.mayConfirmOwnIdentity() ?? false }
@@ -739,7 +734,7 @@ final class AppModel: ObservableObject {
         guard let p = selectedPerson else { return "" }
         let a = p.currentAddress
         let street = [a?.street, a?.city, [a?.state, a?.zip].compactMap { $0 }.joined(separator: " ")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
-        return batch.body(name: p.legalName, email: formEmail ?? "", address: street)
+        return batch.body(name: p.legalName, email: formEmail ?? "", address: street, country: p.countryCode)
     }
 
     /// The link that opens `app`'s compose screen with the message ready: you as the To address, every company in Bcc.

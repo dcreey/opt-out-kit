@@ -19,4 +19,4 @@ live_form:
   found: false
 contact_email: "privacyoffice@telesign.com"
 contact_email_source: "browser"
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA", "AR", "MX"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention Law 25; its pages mention Agencia de Acceso a la Informaci; its pages mention LFPDPPP", "checked": "2026-10-26"}

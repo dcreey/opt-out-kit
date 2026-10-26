@@ -19,4 +19,4 @@ live_check:
 about: {"category": "marketing_data", "summary": "The Data Group, LLC is a marketing data provider. Improve customer intelligence with data append, validation, enrichment, audience data, APIs, and mailing lists starting from $0.02 per record. Its own pages mention home addresses, email addresses, education, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["address", "email", "education", "interests", "online", "social"], "sells_to": [], "source": "https://thedatagroup.com/privacy/california-consumer-privacy-act/"}
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as The Data Company Group Limited (ref ZB408647)", "checked": "2026-10-26"}

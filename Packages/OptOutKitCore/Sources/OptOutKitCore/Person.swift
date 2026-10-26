@@ -8,9 +8,11 @@ public struct Address: Codable, Equatable, Sendable {
     public var zip: String?
     public var fromYear: Int?
     public var toYear: Int?
+    /// Two-letter country code. Empty means the United States, which is what every address before this field was.
+    public var country: String?
 
-    public init(street: String? = nil, city: String, state: String, zip: String? = nil, fromYear: Int? = nil, toYear: Int? = nil) {
-        self.street = street; self.city = city; self.state = state; self.zip = zip
+    public init(street: String? = nil, city: String, state: String, zip: String? = nil, fromYear: Int? = nil, toYear: Int? = nil, country: String? = nil) {
+        self.street = street; self.city = city; self.state = state; self.zip = zip; self.country = country
         self.fromYear = fromYear; self.toYear = toYear
     }
 }
@@ -145,6 +147,12 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
 
     /// The current address: the first one. Previous addresses follow it.
     public var currentAddress: Address? { addresses.first }
+    /// The country the person lives in: the current address's, else the United States when its state is one, else unknown.
+    public var countryCode: String? {
+        guard let a = currentAddress else { return nil }
+        if let c = a.country, !c.isEmpty { return c.uppercased() }
+        return USStates.code(for: a.state) != nil || a.state.isEmpty ? "US" : nil
+    }
 
     /// What is still missing from the details every profile needs: a legal first and last name, and a current street, city and state.
     /// Empty when the profile is complete.
@@ -155,7 +163,7 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         let a = currentAddress
         if (a?.street ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current street address")) }
         if (a?.city ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current city")) }
-        if (a?.state ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current state")) }
+        if (a?.state ?? "").trimmingCharacters(in: .whitespaces).isEmpty, (countryCode ?? "US") == "US" { out.append(L10n.noun("Current state")) }
         if (a?.zip ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current ZIP code")) }
         // A previous address that has been started needs its ZIP code too.
         for (i, p) in addresses.enumerated() where i > 0 {

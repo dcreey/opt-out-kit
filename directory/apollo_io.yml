@@ -24,4 +24,4 @@ run_check:
 about: {"category": "b2b", "summary": "Zenleads, Inc. is a business-contact and sales-data provider. Apollo is the AI sales platform rebuilt as one connected AI GTM system: data, intelligence, and execution for the entire go-to-market motion. Its own pages mention phone numbers, social media profiles, credit and financial accounts. Its policy does not name who it sells to.", "tracks": ["phone", "social", "credit"], "sells_to": [], "source": "https://www.apollo.io/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention CASL", "checked": "2026-10-26"}

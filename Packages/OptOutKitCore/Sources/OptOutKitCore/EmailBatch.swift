@@ -41,12 +41,13 @@ public struct EmailBatch: Identifiable, Equatable, Sendable {
 
     /// The message, always in English and the same for every company: who is asking and what they ask for, with the details a company needs
     /// to find the record. It does not name the company or its sites, so it can go to any of them.
-    public func body(name: String, email: String, address street: String) -> String { Self.genericBody(name: name, email: email, address: street) }
+    public func body(name: String, email: String, address street: String, country: String? = nil) -> String { Self.genericBody(name: name, email: email, address: street, country: country) }
 
-    public static func genericBody(name: String, email: String, address street: String) -> String {
-        [
+    public static func genericBody(name: String, email: String, address street: String, country: String? = nil) -> String {
+        let law = (country ?? "US").uppercased() == "US" ? "the privacy laws that apply to me (including the CCPA/CPRA and other state privacy laws, and the GDPR where it applies)" : Regions.law(forCountry: country)
+        return [
             "To the privacy team,", "",
-            "I am a consumer asking you to act on my personal information under the privacy laws that apply to me (including the CCPA/CPRA and other state privacy laws, and the GDPR where it applies).", "",
+            "I am a consumer asking you to act on my personal information under \(law).", "",
             "1. Opt me out of the sale and sharing of my personal information, and of targeted advertising and profiling.",
             "2. Delete the personal information you hold about me, and tell any service providers and third parties you have shared it with to do the same.",
             "3. Stop collecting, selling or sharing my personal information in future.", "",

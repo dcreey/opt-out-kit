@@ -20,4 +20,4 @@ live_form:
 about: {"category": "fraud_identity", "summary": "First Orion Corp is an identity and fraud-prevention data provider. Stop spam labels & boost answer rates with branded calling solutions. Caller ID, call protection & STIR/SHAKEN authentication. Get started today! Its own pages mention health information. Its policy does not name who it sells to.", "tracks": ["health"], "sells_to": [], "source": "https://firstorion.com/"}
 priority: 35
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU", "CH"], "evidence": "on the UK ICO register of fee payers as First Orion UK Limited (ref ZA187384); its pages mention European Economic Area; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}

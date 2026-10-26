@@ -19,4 +19,4 @@ priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@zetaglobal.com"
 contact_email_source: "browser"
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Zeta Global Corp.", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Zeta Global Corp.; on the UK ICO register of fee payers as Zeta Global Ltd. (ref ZB693344)", "checked": "2026-10-26"}

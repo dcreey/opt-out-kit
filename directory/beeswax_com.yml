@@ -18,4 +18,4 @@ live_form:
 about: {"category": "adtech", "summary": "Beeswax is an advertising technology company. Beeswax, a part of FreeWheel, offers buy-side bidder solutions that help advertisers and buyers transact with the programmatic ecosystem. Its own pages mention interests and demographics, devices and online activity. Its policy names these buyers or recipients: landlords and property managers.", "tracks": ["interests", "online"], "sells_to": ["landlords"], "source": "https://www.beeswax.com/"}
 priority: 22
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as BeeswaxIO Corporation", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as BeeswaxIO Corporation; its pages mention UK GDPR", "checked": "2026-10-26"}

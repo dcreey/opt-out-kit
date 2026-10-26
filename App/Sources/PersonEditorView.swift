@@ -138,11 +138,20 @@ struct PersonEditorView: View {
                     person.addresses[0].street = v.isEmpty ? nil : v
                 }))
                 .accessibilityIdentifier("current-street")
+            Picker("Country", selection: Binding(
+                get: { person.countryCode ?? model.ownerCountry ?? "US" },
+                set: { code in
+                    if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
+                    person.addresses[0].country = code
+                    if code != "US" { person.addresses[0].state = "" }
+                })) {
+                ForEach(model.countryOptions, id: \.code) { Text($0.name).tag($0.code) }
+            }.accessibilityIdentifier("current-country")
             HStack {
                 TextField("City", text: currentAddress(\.city, default: "")).accessibilityIdentifier("current-city")
-                TextField("State", text: currentAddress(\.state, default: "")).frame(maxWidth: 70).accessibilityIdentifier("current-state")
+                TextField((person.countryCode ?? "US") == "US" ? "State" : "Region (optional)", text: currentAddress(\.state, default: "")).frame(maxWidth: (person.countryCode ?? "US") == "US" ? 70 : 150).accessibilityIdentifier("current-state")
             }
-            TextField("ZIP code", text: Binding(
+            TextField((person.countryCode ?? "US") == "US" ? "ZIP code" : "Postal code", text: Binding(
                 get: { person.addresses.first?.zip ?? "" },
                 set: { v in
                     if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }

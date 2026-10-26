@@ -20,4 +20,4 @@ live_form:
 about: {"category": "adtech", "summary": "Sabio Inc is an advertising technology company. Sabio is a leading CTV advertising platform built to help brands reach, engage, and validate streaming audiences at scale. Its own pages mention interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["interests", "online"], "sells_to": [], "source": "https://www.sabioctv.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Sabio London Limited", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Sabio London Limited; its pages mention United Kingdom", "checked": "2026-10-26"}

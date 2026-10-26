@@ -23,4 +23,4 @@ live_check:
 about: {"category": "marketing_data", "summary": "Consumerbase, LLC is a marketing data provider. Exact Data is a leader in multichannel direct marketing, specializing in email marketing, postal, and telemarketing lists. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, income or wealth, interests and demographics. Its policy does not name who it sells to.", "tracks": ["phone", "email", "age", "employment", "income", "interests", "online", "credit"], "sells_to": [], "source": "https://www.exactdata.com/"}
 priority: 47
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

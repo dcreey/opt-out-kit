@@ -18,4 +18,4 @@ live_check:
 about: {"category": "marketing_data", "summary": "Fushia Media, LLC is a marketing data provider. Fuchsia Media specializes in data enhancement, analytics, and customized marketing solutions. Leverage over 600 demographic attributes and cutting-edge analytics tools to empower your... Its own pages mention email addresses, age or birthdate, property and vehicles, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "age", "property", "purchases", "interests", "online"], "sells_to": [], "source": "https://fushiamedia.com/privacy"}
 priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}

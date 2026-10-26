@@ -40,6 +40,7 @@ jurisdictions:
       status: live
       kind: databases
       agency: "Agency for Access to Public Information (AAIP)"
+      note: "Searchable by the controller's CUIT only; no bulk file was found, so it cannot be pulled (see docs/REGIONS.md)."
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=AR"]
   - id: country-au
@@ -1079,7 +1080,12 @@ jurisdictions:
     regulator:
       name: "Information Commissioner's Office (ICO)"
       url: "https://ico.org.uk"
-    broker_registry: null
+    broker_registry:
+      status: live
+      kind: controllers
+      agency: "Information Commissioner's Office (ICO)"
+      url: "https://ico.org.uk/about-the-ico/what-we-do/register-of-fee-payers/download-the-register/"
+      note: "Lists every organisation that pays the data protection fee, not brokers. Used only to confirm by name that a broker is present in the UK (see docs/REGIONS.md)."
     future_work:
       - kind: central_register
         name: "Telephone Preference Service and Mailing Preference Service"

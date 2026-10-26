@@ -21,4 +21,4 @@ live_form:
   found: true
   page: "https://privacyportal.onetrust.com/webform/f8f92a39-69a1-4fd9-b11e-c1a105cfb5ae/090f97f4-8f8d-4ec8-896a-5f56d4832244?px=&oneTrustWebform=CAI&abc="
   blockers: []
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as Cox Automotive UK Limited (ref Z2121735)", "checked": "2026-10-26"}

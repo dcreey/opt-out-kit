@@ -2819,6 +2819,19 @@ final class FormFillerMoreFieldsTests: XCTestCase {
     }
     private func v(_ p: FillPlan, _ name: String) -> [String]? { p.values.first { $0.name == name }?.candidates }
 
+    func testAPersonOutsideTheUSGetsTheirCountryAndTheirOwnLawInTheRequest() {
+        let marie = Person(displayName: "Marie", relationship: .me, names: [NameEntry(kind: .legal, name: "Marie Dupont")],
+                           addresses: [Address(street: "1 rue de la Paix", city: "Paris", state: "", zip: "75002", country: "FR")], emails: ["marie@example.fr"])
+        let p = plan([("select", "c", "Country *"), ("textarea", "m", "Message (required)"), ("text", "z", "Postal code *")], person: marie)
+        XCTAssertEqual(v(p, "c")?.first, "France")
+        XCTAssertTrue(v(p, "m")?.first?.contains("GDPR") == true && v(p, "m")?.first?.contains("resident of France") == true)
+        XCTAssertFalse(v(p, "m")?.first?.contains("Illinois") == true)
+        XCTAssertEqual(marie.countryCode, "FR"); XCTAssertEqual(pat.countryCode, "US")
+        XCTAssertEqual(Regions.law(forCountry: "GB"), "the UK GDPR and the Data Protection Act 2018 (including Articles 17 and 21)")
+        XCTAssertTrue(EmailBatch.genericBody(name: "Marie", email: "m@x.fr", address: "Paris", country: "FR").contains("the GDPR (including Articles 17 and 21)"))
+        XCTAssertTrue(EmailBatch.genericBody(name: "Pat", email: "p@x.com", address: "IL").contains("CCPA/CPRA"), "US wording is unchanged")
+    }
+
     func testAgeBirthPartsTodaysDateAndTheStateOfResidenceAreFilled() {
         let p = plan([("text", "age", "Age*"), ("text", "m", "Birth month *"), ("text", "d", "Day *"), ("text", "y", "Year *"), ("text", "td", "Today's Date"),
                       ("select", "res", "Resident of (required)"), ("text", "first", "First / Middle Name(s) *")])

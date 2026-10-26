@@ -19,4 +19,4 @@ profiled: "2026-10-22"
 about: {"category": "adtech", "summary": "LiveRamp Holdings, Inc. is an advertising technology company. Connect every signal, platform, and agent to power and prove intelligent marketing with the data collaboration network for the AI era. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://liveramp.com/"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention EEA; its pages mention United Kingdom", "checked": "2026-10-26"}

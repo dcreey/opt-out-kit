@@ -22,4 +22,4 @@ live_form:
   checked: "2026-10-25"
   found: false
   blockers: ["business"]
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "CA", "AU", "CH"], "evidence": "its pages mention General Data Protection Regulation; its pages mention UK GDPR; its pages mention PIPEDA; its pages mention Australian Privacy Principles; its pages mention Swiss Federal Act on Data Protection", "checked": "2026-10-26"}

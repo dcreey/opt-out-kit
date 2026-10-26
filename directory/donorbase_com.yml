@@ -21,4 +21,4 @@ live_check:
 about: {"category": "political", "summary": "DonorBase, Inc. is a political and nonprofit data provider. Data Axle Nonprofit helps charitable and political organizations surpass their goals with quality data, insightful strategy, inspired creative. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "interests", "online"], "sells_to": [], "source": "https://www.dataaxlenonprofit.com/"}
 priority: 30
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}

@@ -35,4 +35,23 @@ public enum Regions {
         for e in entries { if reaches(e, country: country) { a.append(e) } else { b.append(e) } }
         return (a, b)
     }
+
+    /// The English name of a country, as a form asks for it ("France", "United Kingdom").
+    public static func englishName(_ code: String) -> String? { Locale(identifier: "en_US").localizedString(forRegionCode: code.uppercased()) }
+
+    /// The law a person in this country invokes, named the way the request should name it.
+    public static func law(forCountry code: String?) -> String {
+        let c = (code ?? "US").uppercased()
+        switch c {
+        case "US": return "the privacy laws that apply to me (including the CCPA/CPRA and other state privacy laws)"
+        case "GB": return "the UK GDPR and the Data Protection Act 2018 (including Articles 17 and 21)"
+        case "CA": return "PIPEDA, and Quebec's Law 25 where it applies"
+        case "BR": return "the LGPD (Lei Geral de Prote\u{E7}\u{E3}o de Dados, Article 18)"
+        case "AR": return "Ley 25.326 de Protecci\u{F3}n de los Datos Personales (Articles 16 and 27)"
+        case "AU": return "the Privacy Act 1988 and the Australian Privacy Principles"
+        default:
+            if eu.contains(c) { return "the GDPR (including Articles 17 and 21)" }
+            return "the data protection laws that apply to me"
+        }
+    }
 }

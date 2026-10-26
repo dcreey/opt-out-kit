@@ -16,4 +16,4 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "Pacific East Research Inc is a marketing data provider. Leverage proven solutions designed to fill the gaps in your data and significantly boost your call success rates. Its own pages mention phone numbers, email addresses, shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["phone", "email", "purchases"], "sells_to": [], "source": "https://www.pacificeast.com/"}
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention EEA", "checked": "2026-10-26"}

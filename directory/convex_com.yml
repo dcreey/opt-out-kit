@@ -23,4 +23,4 @@ run_check:
   date: "2026-10-26"
   result: "confirmed"
   note: "it said Thank you for your message, we will get in touch."
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "CA"], "evidence": "its pages mention residents of Canada", "checked": "2026-10-26"}

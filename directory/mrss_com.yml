@@ -20,4 +20,4 @@ priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
 contact_email: "privacy@mrss.com"
 contact_email_source: "browser"
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU"], "evidence": "its pages mention EU residents", "checked": "2026-10-26"}

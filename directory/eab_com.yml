@@ -19,4 +19,4 @@ live_form:
   found: false
 contact_email: "privacy@eab.com"
 contact_email_source: "page"
-regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as EAB Global Inc. (ref ZA455169); its pages mention General Data Protection Regulation", "checked": "2026-10-26"}

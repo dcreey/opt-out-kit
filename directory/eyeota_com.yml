@@ -19,4 +19,4 @@ live_form:
 about: {"category": "adtech", "summary": "Eyeota Pte Ltd is an advertising technology company. Engage your best customers with trusted audience data | enrich insights, enhance personalization and transform audience targeting. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://www.eyeota.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Eyeota Pte Ltd", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Eyeota Pte Ltd; on the UK ICO register of fee payers as Eyeota Pte Ltd (ref ZA452233)", "checked": "2026-10-26"}

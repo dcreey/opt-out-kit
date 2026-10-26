@@ -21,4 +21,4 @@ live_form:
 about: {"category": "marketing_services", "summary": "PMG Worldwide, LLC is a marketing and direct-mail services company. PMG is a leading independent advertising agency and platform company engineered for impact—uniting strategy, media, data, creative, and technology to drive modern marketing and... Its own pages mention devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "location", "social"], "sells_to": [], "source": "https://www.pmg.com/"}
 priority: 22
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "UK"], "evidence": "its pages mention United Kingdom", "checked": "2026-10-26"}
+regions: {"list": ["US", "EU", "UK", "AU", "NZ"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention Privacy Act 1988; its pages mention New Zealand Privacy Act", "checked": "2026-10-26"}

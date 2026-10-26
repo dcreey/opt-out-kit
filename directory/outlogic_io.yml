@@ -16,4 +16,4 @@ profiled: "2026-10-22"
 about: {"category": "location_data", "summary": "Outlogic, LLC is a device and location data company. Its own pages mention email addresses, devices and online activity, precise location. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "online", "location"], "sells_to": ["advertisers"], "sells_note": "If Outlogic receives such a “flag,” we will honor it by not using or selling your advertising ID or any information we have associated with it.", "source": "https://outlogic.io/opt-out-form/"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 6}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Outlogic, LLC (ref ZB892577); its pages mention European Economic Area", "checked": "2026-10-26"}
