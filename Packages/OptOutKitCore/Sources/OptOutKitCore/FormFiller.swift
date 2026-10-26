@@ -145,6 +145,10 @@ public enum FormFiller {
                 let now = Date(); let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX")
                 put(["yyyy-MM-dd", "MM/dd/yyyy", "MMMM d, yyyy"].map { f.dateFormat = $0; return f.string(from: now) }, L10n.noun("Date")); continue
             }
+            // A typed signature or e-signature: the person's legal name, typed. (A drawn signature or an uploaded file stays with the person.)
+            if has("e-?sign|signature|sign here|typed name|type your (full )?name") && field.type != "file" && field.type != "canvas" {
+                put([legal], L10n.noun("Signature")); continue
+            }
             // Age, or the parts of the birthdate, from the birthdate the person gave.
             if has("\\bage\\b") && !has("manage|message|usage|page|image|stage|average") {
                 if let age = person.age() { put([String(age)], L10n.noun("Age")) } else if required { missing.append(L10n.noun("Birthdate")) }

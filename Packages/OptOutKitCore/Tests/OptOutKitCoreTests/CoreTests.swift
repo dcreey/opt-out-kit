@@ -2790,6 +2790,12 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "first"), ["Pat"], "First / Middle Name(s) is the first name, not a middle-name field to skip")
     }
 
+    func testATypedSignatureIsTheLegalNameAndAFileUploadIsNot() {
+        let p = plan([("text", "sig", "* Signature"), ("text", "es", "E-Signature"), ("file", "f", "Select a File"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "sig"), ["Pat Example"]); XCTAssertEqual(v(p, "es"), ["Pat Example"])
+        XCTAssertNil(v(p, "f"), "a file is never filled")
+    }
+
     func testASubjectAndAMessageBoxGetThePlainRequestAndABusinessFormIsNotPersonal() {
         let p = plan([("text", "s", "Subject*"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "s"), ["Privacy opt-out and deletion request"])

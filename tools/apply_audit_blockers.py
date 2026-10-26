@@ -13,7 +13,7 @@ import argparse, json, os, re
 
 RULES = [("business", r"company|organi[sz]ation|job|title|industry|role|department|purpose|relationship|division|how did you hear|research|your needs"),
          ("other", r"^your answer$"),
-         ("agent", r"agent|on behalf|authori[sz]ed"), ("file", r"\bfile\b|upload|attach|signature|e-?sign"),
+         ("agent", r"agent|on behalf|authori[sz]ed"), ("file", r"\bfile\b|upload|attach"),
          ("code", r"captcha|enter the (numbers|code|characters)|math|equation|five plus|verification code|security (code|check)")]
 
 
