@@ -19,3 +19,7 @@ live_form:
 about: {"category": "automotive", "summary": "M1 Data & Analytics, LLC is an automotive data company. M1 Data & Analytics delivers GDPR & CCPA-compliant, first-party audience data — no cookies, no guesswork. Powering smarter campaigns for marketing agencies in automotive, retail, health,... Its own pages mention email addresses, age or birthdate, criminal and court records, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "age", "criminal", "purchases", "interests", "online", "health"], "sells_to": [], "source": "https://m1-data.com/privacy-policy/"}
 priority: 43
 persistence: {"result": "permanent", "quote": "Personal Data includes Sensitive Personal Data and Pseudonymized Personal Data but excludes anonymous data or data that has had the identity of an individual permanently removed or scrubbed.", "source": "https://m1-data.com/privacy-policy/"}
+run_check:
+  date: "2026-10-26"
+  result: "confirmed"
+  note: "it said Thank you for your request, we will unsubscribe you."
