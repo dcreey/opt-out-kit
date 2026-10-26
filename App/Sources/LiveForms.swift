@@ -21,6 +21,8 @@ struct LiveForm: Decodable, Equatable {
     var fields: [LiveField]
     var buttons: [String]
     var text: String
+    /// The words around the form's inputs (the nearest block of text that holds them): a newsletter box says so there, whatever its button says.
+    var ctx: String?
 
     /// The form as the filler understands it. Each field is named by its token, and its label carries the page's own name for it, so the
     /// same synonyms that read a stored form read this one.
@@ -35,6 +37,9 @@ enum LiveFormPicker {
     private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
     private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
+    /// Newsletter and marketing language in the words around a form's inputs.
+    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|subscribe|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
+    private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
@@ -47,6 +52,11 @@ enum LiveFormPicker {
         let heading = f.text
         // A sign-up, demo or contact form is refused outright unless its own button says opt-out ("Unsubscribe" is one); the page's privacy wording does not rescue it.
         if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) { return -100 }
+        // The words around the inputs say "newsletter" or "delivered to your inbox": a subscription box, whatever its button says.
+        let ctx = f.ctx ?? ""
+        if has(signupContext, ctx) && !has(strongOptOut, ctx + " " + buttons) { return -100 }
+        // A form of one input (just an email) needs something that says it is a privacy request, not only a page that mentions privacy.
+        if fields.count <= 1 && !has(optOut, buttons + " " + heading + " " + ctx) { return -100 }
         var s = 0
         if has(optOut, buttons) { s += 4 }
         if has(optOut, heading) { s += 2 }
@@ -88,8 +98,61 @@ extension WebViewSession {
         return (try? await webView.evaluateJavaScript(js)) as? String
     }
 
-    /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
+    /// Evaluates in the frame the chosen form lives in (a page inside the page), else in the page itself.
+    func evalLive(_ js: String) async -> Any? {
+        if let f = activeFrame { return try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page) }
+        return try? await webView.evaluateJavaScript(js)
+    }
+
+    /// The forms on the page, and when the page itself shows none that looks like an opt-out form, the forms inside its frames (privacy portals are
+    /// often embedded from another site). When a frame's form is the one, every later step runs in that frame.
     func discoverForms() async -> [LiveForm] {
+        activeFrame = nil
+        let main = await discoverFormsIn()
+        let context = await pageContext()
+        if LiveFormPicker.pick(main, pageContext: context) != nil { return main }
+        if frames.isEmpty, ((try? await webView.evaluateJavaScript("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
+            try? await Task.sleep(nanoseconds: 2_500_000_000)        // a frame reports itself only once it has loaded
+        }
+        for frame in frames {
+            activeFrame = frame.info
+            let inside = await discoverFormsIn()
+            if LiveFormPicker.pick(inside, pageContext: context) != nil { await scrollFrameIntoView(frame.href); return inside }
+        }
+        activeFrame = nil
+        return main
+    }
+
+    /// Brings the frame a form is in to the middle of the screen, so the person sees it.
+    func scrollFrameIntoView(_ href: String) async {
+        let js = "(function(h){var fs=[].slice.call(document.querySelectorAll('iframe')); var f=fs.filter(function(x){return x.src&&(h.indexOf(x.src)===0||x.src.indexOf(h)===0);})[0]||fs[0]; if(f) f.scrollIntoView({block:'center'});})(\(Self.liveLiteral(href)));"
+        _ = try? await webView.evaluateJavaScript(js)
+    }
+
+    /// Opens a privacy request that hides behind a link or button on the page ("Submit a privacy request", "Your Privacy Choices") when no form shows,
+    /// then looks again. Only a link that opens something in the page (no address, `#` or a script) is clicked, never one that writes an email.
+    func discoverFormsDeep() async -> [LiveForm] {
+        let first = await discoverForms()
+        if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
+        let js = #"""
+        (function(){
+          var re=/^\s*(submit (a |your )?(privacy|data|consumer)( rights?)? request|(make|file|start) (a |your )?(privacy|data) request|your privacy choices|privacy (request|choices|center|preferences)|data subject( access)? request|do not (sell|share)( or (sell|share))?( my (personal )?(information|info|data))?|exercise your (privacy )?rights|manage (my )?privacy( settings| choices)?)\s*[.:]?\s*$/i;
+          var els=[].slice.call(document.querySelectorAll('a,button,[role=button],li,span,div,p')).filter(function(e){
+            var t=(e.innerText||'').trim(); if(t.length>60||!re.test(t)) return false; if(e.children.length>2) return false;
+            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) return false;
+            var a=e.closest('a'); var h=a?(a.getAttribute('href')||''):''; return !/^mailto:/i.test(h);});
+          els.sort(function(a,b){var ha=(a.closest('a')||a).getAttribute('href')||'', hb=(b.closest('a')||b).getAttribute('href')||''; var ma=(ha===''||ha==='#'||/^javascript:/i.test(ha))?0:1, mb=(hb===''||hb==='#'||/^javascript:/i.test(hb))?0:1; return ma-mb;});
+          if(!els.length) return null; var e=els[0]; e.scrollIntoView({block:'center'});
+          ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
+          return (e.innerText||'').trim();})();
+        """#
+        guard let clicked = (try? await webView.evaluateJavaScript(js)) as? String, !clicked.isEmpty else { return first }
+        try? await Task.sleep(nanoseconds: 2_500_000_000)
+        return await discoverForms()
+    }
+
+    /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
+    func discoverFormsIn() async -> [LiveForm] {
         let js = #"""
         (function(){
           var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none';};
@@ -100,6 +163,7 @@ extension WebViewSession {
             if(!t&&e.previousElementSibling) t=e.previousElementSibling.innerText||'';
             if(!t&&e.parentElement) t=(e.parentElement.innerText||'').slice(0,60);
             return t.replace(/\s+/g,' ').trim().slice(0,90);};
+          var ctxEl=function(e){var n=e; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var t=(n.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>=25&&t.length<=700) return n;} return e.parentElement||e;};
           var out=[];
           document.querySelectorAll('form').forEach(function(f,i){
             var ftoken='f'+i; f.setAttribute('data-ook-form',ftoken);
@@ -112,7 +176,7 @@ extension WebViewSession {
             var buttons=[]; f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]').forEach(function(b){
               if(vis(b)) buttons.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
             out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
-                      text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240)});});
+                      text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});});
           // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
           var loose=[].slice.call(document.querySelectorAll('input,select,textarea')).filter(function(e){
             return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e);});
@@ -121,11 +185,13 @@ extension WebViewSession {
             loose.forEach(function(e,j){var type=e.tagName.toLowerCase()==='select'?'select':(e.tagName.toLowerCase()==='textarea'?'textarea':(e.type||'text'));
               var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);
               lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true});});
-            var lb=[]; document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(document.body.innerText||'').replace(/\s+/g,' ').trim().slice(0,240)});}
+            // The buttons that belong to these inputs: those in the same block of the page, else every button.
+            var box=ctxEl(loose[0]); var lb=[]; box.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
+            if(!lb.length) document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
+            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(document.body.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});}
           return JSON.stringify(out);})();
         """#
-        guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8) else { return [] }
+        guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8) else { return [] }
         return (try? JSONDecoder().decode([LiveForm].self, from: data)) ?? []
     }
 
@@ -145,7 +211,7 @@ extension WebViewSession {
                 if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
               return '';})();
             """#
-            guard let t = (try? await webView.evaluateJavaScript(js)) as? String, !t.isEmpty else { break }
+            guard let t = (await evalLive(js)) as? String, !t.isEmpty else { break }
             clicked = t
             try? await Task.sleep(nanoseconds: 2_500_000_000)
             await settlePage(maxWait: 5)
@@ -197,7 +263,7 @@ extension WebViewSession {
             else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,v.candidates[0]);filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
-        guard let out = (try? await webView.evaluateJavaScript(js)) as? String, let d = out.data(using: .utf8),
+        guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
         return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
     }
@@ -263,7 +329,7 @@ extension WebViewSession {
             else if(s.required&&placeholder) unresolved.push((near.split('\n')[0]||l||'a menu').slice(0,60));});
           return JSON.stringify({chosen:chosen,unresolved:unresolved});})(\#(Self.liveLiteral(token)));
         """#
-        guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8),
+        guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return (0, []) }
         return (obj["chosen"] as? Int ?? 0, obj["unresolved"] as? [String] ?? [])
     }
@@ -284,7 +350,7 @@ extension WebViewSession {
             if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
           return '';})(\#(Self.liveLiteral(token)));
         """#
-        let out = (try? await webView.evaluateJavaScript(js)) as? String
+        let out = (await evalLive(js)) as? String
         return (out?.isEmpty ?? true) ? nil : out
     }
 
@@ -297,7 +363,7 @@ extension WebViewSession {
           return r.width>0&&r.height>0&&/^(confirm( my)?( request| email| opt.?out)?|verify( my)?( request| email)?|complete( my)?( request)?|yes,? (confirm|opt out|delete))$/i.test(t);});
           if(!bs.length) return ''; bs[0].scrollIntoView({block:'center'}); return ((bs[0].innerText||bs[0].value||'')+'').trim();})();
         """#
-        let out = (try? await webView.evaluateJavaScript(js)) as? String
+        let out = (await evalLive(js)) as? String
         return (out?.isEmpty ?? true) ? nil : out
     }
 
@@ -317,7 +383,7 @@ extension WebViewSession {
               ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
               return ((e.closest('div[class*=FormControl],div')||e).innerText||'').replace(/\s+/g,' ').slice(0,120)||'menu';})();
             """#
-            guard let label = (try? await webView.evaluateJavaScript(open)) as? String, !label.isEmpty else { break }
+            guard let label = (await evalLive(open)) as? String, !label.isEmpty else { break }
             try? await Task.sleep(nanoseconds: 700_000_000)
             let pick = #"""
             (function(){
@@ -328,7 +394,7 @@ extension WebViewSession {
               if(opts.length&&opts.length<40){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
               document.body.click(); return '';})();
             """#
-            if let t = (try? await webView.evaluateJavaScript(pick)) as? String, !t.isEmpty { set += 1 }
+            if let t = (await evalLive(pick)) as? String, !t.isEmpty { set += 1 }
             try? await Task.sleep(nanoseconds: 400_000_000)
         }
         return set
@@ -346,7 +412,7 @@ extension WebViewSession {
             return r.width>0&&r.height>0&&/^(submit( request)?|confirm( request)?|send( request)?|yes,? submit)$/i.test(t);});
           if(!bs.length) return false; bs[bs.length-1].scrollIntoView({block:'center'}); bs[bs.length-1].click(); return true;})();
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.
@@ -368,7 +434,7 @@ extension WebViewSession {
           if([].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).some(refuse)) return false;
           if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})(\#(Self.liveLiteral(token)));
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// The page's address path and title: a form on a page about opting out is more likely the opt-out form.
@@ -387,13 +453,13 @@ extension WebViewSession {
             if(re.test(l)&&!e.value) return true;}
           return false;})();
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Whether the chosen form is still on the page and visible, and the page's address.
     func formState(_ token: String) async -> (visible: Bool, url: String) {
         let js = "(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); var v=false; if(f){var r=f.getBoundingClientRect(),s=getComputedStyle(f); v=r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';} return JSON.stringify({v:v,u:location.href});})();"
-        guard let out = (try? await webView.evaluateJavaScript(js)) as? String, let d = out.data(using: .utf8),
+        guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (true, "") }
         return (o["v"] as? Bool ?? true, o["u"] as? String ?? "")
     }
@@ -412,12 +478,12 @@ extension WebViewSession {
           document.querySelectorAll('[id*="axeptio" i],[class*="axeptio" i],[id*="cookie" i][style*="fixed"]').forEach(function(e){if(!e.querySelector('form')){e.style.setProperty('display','none','important');n++;}});
           document.documentElement.style.setProperty('overflow','auto','important'); document.body.style.setProperty('overflow','auto','important'); return n;})();
         """#
-        _ = try? await webView.evaluateJavaScript(js)
+        _ = await evalLive(js)
     }
 
     /// Scrolls the chosen form to the top of the view, so the picture shows the form and what the site said about it.
     func scrollFormIntoView(_ token: String) async {
-        _ = try? await webView.evaluateJavaScript("(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); if(f) f.scrollIntoView({block:'start'}); else window.scrollTo(0,0);})();")
+        _ = await evalLive("(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); if(f) f.scrollIntoView({block:'start'}); else window.scrollTo(0,0);})();")
     }
 
     fileprivate static func liveLiteral(_ s: String) -> String {
@@ -454,7 +520,7 @@ extension FormRun {
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
 
         _ = await session.advanceToRequestForm()
-        let forms = await session.discoverForms()
+        let forms = await session.discoverFormsDeep()
         let context = await session.pageContext()
         guard let form = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
         session.chosenForm = form.token

@@ -171,7 +171,7 @@ enum FormAudit {
         if await session.pageLooksMissing() { site.outcome = "page missing (error page)"; return site }
         if await session.hasTermsPrompt() { site.blockers.append("terms prompt") }
         if let step = await session.advanceToRequestForm() { site.blockers.append("step: " + step) }
-        let forms = await session.discoverForms()
+        let forms = await session.discoverFormsDeep()
         let context = await session.pageContext()
         guard let form = LiveFormPicker.pick(forms, pageContext: context) else { site.outcome = "no opt-out form found on the page (\(forms.count) forms seen)"; return site }
         site.formFound = true; session.chosenForm = form.token
@@ -202,7 +202,7 @@ enum FormAudit {
               else if(type==='checkbox'||type==='radio'){v=el.checked?'checked':'';} else {v=el.value||'';}
               return {t:t,found:true,v:v,req:!!(el.required||el.getAttribute('aria-required')==='true')};}));})(\#(json));
             """#
-            if let out = (try? await session.webView.evaluateJavaScript(js)) as? String, let d = out.data(using: .utf8),
+            if let out = (await session.evalLive(js)) as? String, let d = out.data(using: .utf8),
                let arr = try? JSONSerialization.jsonObject(with: d) as? [[String: Any]] {
                 for item in arr where (item["found"] as? Bool) == true {
                     guard let f = form.fields.first(where: { $0.token == item["t"] as? String }) else { continue }

@@ -50,6 +50,10 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     /// The token of the form a live run chose, so the final picture is cropped around it.
     var chosenForm: String?
     private var loadContinuation: CheckedContinuation<Void, Error>?
+    /// Frames (pages inside the page) that reported forms or fields, and the one the chosen form lives in, when it is not the page itself.
+    var frames: [(info: WKFrameInfo, href: String)] = []
+    var activeFrame: WKFrameInfo?
+    private let reporter = FrameReporter()
 
     /// The HTTP status of the last page the web view loaded.
     var httpStatus: Int { status }
@@ -72,8 +76,12 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         // Global Privacy Control: every page the app opens is told, in script too, that this person opts out of sale and sharing.
         config.userContentController.addUserScript(WKUserScript(source: "try{Object.defineProperty(Navigator.prototype,'globalPrivacyControl',{get:function(){return true;},configurable:true});}catch(e){}",
                                                                 injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        // Every frame that has inputs tells the session, so a form inside a frame from another site can be read and filled.
+        config.userContentController.add(reporter, contentWorld: .page, name: "ookFrame")
+        config.userContentController.addUserScript(WKUserScript(source: "(function(){if(window.top===window)return; function r(){try{var n=document.querySelectorAll('input,select,textarea').length; if(n>0) webkit.messageHandlers.ookFrame.postMessage({n:n,href:location.href});}catch(e){}} if(document.readyState==='complete') setTimeout(r,800); else window.addEventListener('load',function(){setTimeout(r,800);}); setTimeout(r,3000);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: false))
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
+        reporter.session = self
         webView.navigationDelegate = self
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
         webView.alpha = 0.01
@@ -420,7 +428,11 @@ extension WebViewSession {
     func pageTitle() async -> String { (try? await webView.evaluateJavaScript("document.title")) as? String ?? "" }
 
     func visibleText() async -> String {
-        (try? await webView.evaluateJavaScript("document.title + '\\n' + (document.body ? document.body.innerText : '')")) as? String ?? ""
+        let page = (try? await webView.evaluateJavaScript("document.title + '\\n' + (document.body ? document.body.innerText : '')")) as? String ?? ""
+        // The answer a site gives after sending often appears inside the frame the form was in.
+        guard let f = activeFrame else { return page }
+        let inside = (try? await webView.evaluateJavaScript("document.body ? document.body.innerText : ''", in: f, contentWorld: .page)) as? String ?? ""
+        return inside.isEmpty ? page : page + "\n" + inside
     }
 
     /// A bot check a person has to act on, as opposed to an invisible one that passes by itself. Never solved here.
@@ -598,4 +610,19 @@ extension WebViewSession {
         return PageSnapshot(url: (o["url"] as? String).flatMap(URL.init(string:)) ?? fallbackURL, status: httpStatus,
                             title: o["title"] as? String ?? "", text: o["text"] as? String ?? "", links: links, forms: forms)
     }
+}
+
+
+/// Receives the report each frame with inputs sends, and hands its frame handle to the session.
+private final class FrameReporter: NSObject, WKScriptMessageHandler {
+    weak var session: WebViewSession?
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard !message.frameInfo.isMainFrame, let body = message.body as? [String: Any], let href = body["href"] as? String else { return }
+        let info = message.frameInfo
+        Task { @MainActor in self.session?.noteFrameFromReporter(info, href: href) }
+    }
+}
+
+extension WebViewSession {
+    @MainActor func noteFrameFromReporter(_ info: WKFrameInfo, href: String) { frames.removeAll { $0.href == href }; frames.append((info, href)) }
 }
