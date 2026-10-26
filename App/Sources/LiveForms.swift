@@ -149,6 +149,11 @@ extension WebViewSession {
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
                 for(var i=0;i<el.options.length;i++){var o=el.options[i];
                   if(o.value.toLowerCase()===want||o.text.trim().toLowerCase()===want){el.value=o.value;done=true;break;}}}
+              // Options such as "IL - Illinois" or "Illinois (IL)": a state name inside the text, or the two-letter code as a whole word.
+              for(var c2=0;c2<v.candidates.length&&!done;c2++){var w2=(v.candidates[c2]||'').toLowerCase(); if(!w2) continue;
+                for(var i2=0;i2<el.options.length;i2++){var o2=el.options[i2], tx=o2.text.trim().toLowerCase(); if(!o2.value&&!tx) continue;
+                  var hit=w2.length>2?tx.indexOf(w2)>=0:new RegExp('(^|[^a-z])'+w2+'([^a-z]|$)').test(tx);
+                  if(hit&&!/other|not listed|outside/.test(tx)){el.value=o2.value;done=true;break;}}}
               if(!done&&/state|province|region/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||''))){
                 // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
                 for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();

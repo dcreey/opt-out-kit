@@ -8741,6 +8741,52 @@
     }
    }
   },
+  "This form asks for a file or a signature, so we take you to the page and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande un fichier ou une signature : nous vous emmenons sur la page et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide un archivo o una firma, así que te llevamos a la página y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt eine Datei oder Unterschrift, daher führen wir Sie zur Seite und begleiten Sie."
+     }
+    }
+   }
+  },
+  "This form asks for an authorized agent's details, so we take you to the page and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande les coordonnées d'un mandataire : nous vous emmenons sur la page et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide datos de un representante autorizado, así que te llevamos a la página y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular fragt nach den Angaben eines Bevollmächtigten, daher führen wir Sie zur Seite und begleiten Sie."
+     }
+    }
+   }
+  },
   "This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.": {
    "extractionState": "manual",
    "localizations": {
@@ -8760,6 +8806,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieses Formular fragt nach Geschäftsangaben („%@“); es ist ein Geschäftskontaktformular und kein persönliches Opt-out."
+     }
+    }
+   }
+  },
+  "This form asks for business details, so we take you to the page and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande des informations professionnelles : nous vous emmenons sur la page et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide datos de empresa, así que te llevamos a la página y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular fragt nach Geschäftsangaben, daher führen wir Sie zur Seite und begleiten Sie."
      }
     }
    }

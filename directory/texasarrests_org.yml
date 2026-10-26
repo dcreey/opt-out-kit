@@ -22,7 +22,7 @@ live_form:
   checked: "2026-10-23"
   found: true
   page: "https://www.texasarrests.org/the-privacy-request-portal/"
-  blockers: ["check:a bot check"]
+  blockers: ["check:a bot check", "code"]
 about: {"category": "arrests", "summary": "texasarrests.org is a public arrest and court records site. Find arrest records in Texas. Its own pages mention names and aliases, age or birthdate, criminal and court records. Its policy does not name who it sells to.", "tracks": ["name", "age", "criminal"], "sells_to": [], "source": "https://www.texasarrests.org/"}
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}

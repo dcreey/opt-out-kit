@@ -21299,6 +21299,29 @@
     }
    }
   },
+  "We found the opt-out page, but the app cannot fill in its form for you, so we take you there and walk you through it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons trouvé la page de retrait, mais l'app ne peut pas remplir son formulaire à votre place : nous vous y emmenons et vous guidons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encontramos la página de baja, pero la app no puede rellenar su formulario por ti, así que te llevamos allí y te guiamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben die Opt-out-Seite gefunden, aber die App kann ihr Formular nicht für Sie ausfüllen. Wir führen Sie hin und begleiten Sie Schritt für Schritt."
+     }
+    }
+   }
+  },
   "We go beyond any one country's registry: our list combines every registry we can read (US states so far) with other known brokers, %@ sites in all. Many of them are US companies that may not have to follow your country's law, but most accept opt-out requests from anyone and this app sends them.": {
    "extractionState": "manual",
    "localizations": {

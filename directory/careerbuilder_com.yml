@@ -17,5 +17,5 @@ live_form:
   checked: "2026-10-24"
   found: true
   page: "https://www.careerbuilder.com/privacy/"
-  blockers: []
+  blockers: ["business"]
 persistence: {"result": "unknown", "reup_months": 12}

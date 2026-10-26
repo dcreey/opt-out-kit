@@ -65,7 +65,7 @@ public enum OptOutPlan {
             return e
         }
         // Forms that ask for a typed code come last; otherwise the brokers that matter most come first.
-        func typed(_ e: DirectoryEntry) -> Int { (e.optOutForm.map(FormFiller.hasTypedCode) ?? false) ? 1 : 0 }
+        func typed(_ e: DirectoryEntry) -> Int { ((e.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (e.liveForm?.blockers.contains("code") ?? false)) ? 1 : 0 }
         return eligible.sorted { (typed($0), -($0.priority ?? 0), $0.domain) < (typed($1), -($1.priority ?? 0), $1.domain) }.map(\.domain)
     }
 
@@ -148,7 +148,7 @@ public enum OptOutPlan {
                                   method: .automatic, registeredIn: states(domains))]
             }
             // Forms that ask the person to type a code take the most effort, so they come last in the semi-automated step.
-            func typed(_ t: PlanTask) -> Bool { m == .semiAutomatic && (byDomain[t.domains.first ?? ""]?.optOutForm.map(FormFiller.hasTypedCode) ?? false) }
+            func typed(_ t: PlanTask) -> Bool { m == .semiAutomatic && ((byDomain[t.domains.first ?? ""]?.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (byDomain[t.domains.first ?? ""]?.liveForm?.blockers.contains("code") ?? false)) }
             steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation,
                                   tasks: tasks.sorted { (typed($0) ? 1 : 0, $0.title.lowercased()) < (typed($1) ? 1 : 0, $1.title.lowercased()) }))
         }

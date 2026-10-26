@@ -2805,3 +2805,24 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         if case .needsData(let what) = plan([("text", "age", "Age*"), ("text", "fn", "First Name"), ("email", "e", "Email")], person: nobirth).verdict { XCTAssertFalse(what.isEmpty) } else { XCTFail("needs the birthdate") }
     }
 }
+
+
+final class UnlockLaterNotInTheQueueTests: XCTestCase {
+    func testASiteWithNoFormNoEmailAndNoPageIsNeverATaskAndSitesWithRealBlockersAreGuided() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory")).filter { $0.closed == nil && $0.excluded == nil }
+        let brokers = try Registry.load(directory: dir.appendingPathComponent("brokers"))
+        let steps = OptOutPlan.build(entries: entries, brokers: brokers, platforms: [], classifyEntry: { OptOutMethods.classify($0, confirmingIdentity: true) },
+                                     classifyBroker: { OptOutMethods.classify($0, in: entries) })
+        let planned = Set(steps.flatMap { $0.tasks.flatMap(\.domains) })
+        let covered = Set(brokers.flatMap { $0.covers ?? [] })
+        let nothing = entries.filter { $0.optOutForm == nil && $0.liveForm?.found != true && $0.contactEmail == nil && $0.optOutURL == nil && $0.family == nil && $0.template == nil && !covered.contains($0.domain) }        // a family or template member is handled by its group
+        XCTAssertGreaterThan(nothing.count, 50)
+        XCTAssertTrue(nothing.allSatisfy { !planned.contains($0.domain) }, "sites with no route yet must not be tasks: \(nothing.filter { planned.contains($0.domain) }.map(\.domain))")
+        XCTAssertTrue(OptOutPlan.locked(steps, entries: entries).contains { nothing.map(\.domain).contains($0.domain) })
+        // A live form whose real page asked only a person's business details is guided, not semi-automated.
+        let business = entries.filter { $0.liveForm?.found == true && ($0.liveForm?.blockers.contains("business") ?? false) }
+        XCTAssertFalse(business.isEmpty)
+        XCTAssertTrue(business.allSatisfy { OptOutMethods.classify($0, confirmingIdentity: true).method == .guided })
+    }
+}

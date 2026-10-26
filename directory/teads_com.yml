@@ -19,4 +19,4 @@ live_form:
   checked: "2026-10-25"
   found: true
   page: "https://submit-irm.trustarc.com/services/validation/11bc4513-fc39-4d64-bcf3-ae603d2bd140"
-  blockers: []
+  blockers: ["code"]

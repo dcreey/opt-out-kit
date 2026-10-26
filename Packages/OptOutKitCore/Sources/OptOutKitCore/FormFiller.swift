@@ -175,7 +175,7 @@ public enum FormFiller {
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }
             else if has("full|\\bname\\b|\\bnom\\b|\\bnombre\\b") { put([legal], L10n.noun("Full name")) }
             else if has("city|\\bville\\b|ciudad|\\bstadt\\b|\\bort\\b") { put([address?.city], L10n.noun("City")) }
-            else if has("state|province|resident|reside|residency|residence|\\bregion\\b|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
+            else if has("state|province|jurisdiction|resident|reside|residency|residence|\\bregion\\b|\\b[ée]tat\\b|\\bestado\\b|bundesland") {
                 put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
             else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }

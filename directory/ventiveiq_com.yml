@@ -16,7 +16,7 @@ live_form:
   checked: "2026-10-23"
   found: true
   page: "https://privacyportal.privacypillar.com/dsar/form?orgid=0c31c814-ea86-461f-8ccb-294f05bc74c3&propid=cc95835d-7719-4336-b0c4-18146e5d000a&formid=4348f332-6917-4566-8c56-6fc9eb57097f&status=publish"
-  blockers: []
+  blockers: ["code"]
 about: {"category": "marketing_data", "summary": "VentiveIQ LLC is a marketing data provider. VentiveIQ, a pioneer in data analytics, identity resolution, and audience targeting for marketers, empowers effective audience understanding and engagement. Its own pages mention phone numbers, email addresses, property and vehicles, interests and demographics, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["phone", "email", "property", "interests", "online", "social"], "sells_to": [], "source": "https://ventiveiq.com/"}
 priority: 42
 persistence: {"result": "unknown", "reup_months": 12}
