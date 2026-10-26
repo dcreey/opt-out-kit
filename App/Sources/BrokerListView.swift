@@ -105,7 +105,7 @@ struct BrokerListView: View {
                 }
             }
             .accessibilityIdentifier("broker-list")
-            .navigationTitle("Opt-Out Kit")
+            .navigationTitle("Exnay: Opt Out Kit")
             .sheet(isPresented: Binding(get: { summary != nil }, set: { if !$0 { summary = nil } })) {
                 if let sum = summary { DailySummaryView(summary: sum) }
             }

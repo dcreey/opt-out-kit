@@ -268,7 +268,7 @@ struct GuidedFlowView: View {
     }
 }
 
-/// The guide, kept small: a slim coloured band that names Opt-Out Kit and the step (its content sits below the status bar and the
+/// The guide, kept small: a slim coloured band that names Exnay and the step (its content sits below the status bar and the
 /// camera cut-out), the current step in full (scrolling if it is long), and the controls. It is on top, away from the home
 /// indicator, and framed so it cannot be mistaken for part of the site below.
 struct GuidedPanel: View {
@@ -288,7 +288,7 @@ struct GuidedPanel: View {
             HStack(spacing: 8) {
                 Button("Cancel") { runner.cancel() }.font(.footnote.bold()).foregroundStyle(.white).accessibilityIdentifier("guided-cancel")
                 Spacer(minLength: 4)
-                Label("Opt-Out Kit · Guide", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.white).lineLimit(1)
+                Label("Exnay · Guide", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.white).lineLimit(1)
                     .accessibilityIdentifier("guided-banner")
                 Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
                     .accessibilityIdentifier("guided-progress")

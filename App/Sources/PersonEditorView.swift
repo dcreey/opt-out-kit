@@ -89,7 +89,7 @@ struct PersonEditorView: View {
         } header: {
             Text("Searching")
         } footer: {
-            Text("Several people-search sites' terms don't allow searching for minors, public officials or celebrities. For these profiles Opt-Out Kit won't search sites or accept terms; opt-out forms still work.")
+            Text("Several people-search sites' terms don't allow searching for minors, public officials or celebrities. For these profiles Exnay won't search sites or accept terms; opt-out forms still work.")
         }
     }
 

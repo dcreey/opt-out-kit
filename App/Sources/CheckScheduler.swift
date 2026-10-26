@@ -57,7 +57,7 @@ enum CheckScheduler {
         if sent > 0 { parts.append("sent \(sent) opt-out request\(sent == 1 ? "" : "s")") }
         if needYou > 0 { parts.append("\(needYou) site\(needYou == 1 ? " needs" : "s need") you") }
         let content = UNMutableNotificationContent()
-        content.title = "Opt-Out Kit"
+        content.title = "Exnay"
         content.body = parts.joined(separator: ", ").prefix(1).uppercased() + parts.joined(separator: ", ").dropFirst()
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))
     }
@@ -82,7 +82,7 @@ enum CheckScheduler {
         if verified > 0 { parts.append("\(verified) opt-out\(verified == 1 ? "" : "s") confirmed") }
         if relisted > 0 { parts.append("\(relisted) listing\(relisted == 1 ? "" : "s") back online") }
         let content = UNMutableNotificationContent()
-        content.title = "Opt-Out Kit"
+        content.title = "Exnay"
         content.body = parts.joined(separator: ", ")
         UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))

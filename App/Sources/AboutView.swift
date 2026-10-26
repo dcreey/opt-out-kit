@@ -17,7 +17,7 @@ struct AboutView: View {
                     Text("Brokers re-list people, so check back on opted-out sites.")
                 }
                 Section("Privacy") {
-                    Text("Your information never leaves this phone, except to the sites you opt out of. There is no Opt-Out Kit server, no account, no analytics and no tracking.")
+                    Text("Your information never leaves this phone, except to the sites you opt out of. There is no Exnay server, no account, no analytics and no tracking.")
                     Text("What you enter is stored encrypted on this phone. If you lose your phone without a backup, it is gone. A normal iPhone backup carries it.")
                 }
                 Section { NavigationLink { GPCSetupView() } label: { Label(model.gpcSetupDone ? "Global Privacy Control: done" : "Set up Global Privacy Control", systemImage: model.gpcSetupDone ? "checkmark.circle.fill" : "hand.raised.square") }
@@ -48,10 +48,10 @@ struct AboutView: View {
                 } header: {
                     Text("Also worth doing")
                 } footer: {
-                    Text("California's DROP, run by the state's privacy agency, sends one deletion request to every broker registered in California. It needs identity verification through the state, which Opt-Out Kit cannot do for you.")
+                    Text("California's DROP, run by the state's privacy agency, sends one deletion request to every broker registered in California. It needs identity verification through the state, which Exnay cannot do for you.")
                 }
                 Section("Good to know") {
-                    Text("Opt-Out Kit is not affiliated with any data broker and is not legal advice. Broker pages change often, so a step may need updating.")
+                    Text("Exnay is not affiliated with any data broker and is not legal advice. Broker pages change often, so a step may need updating.")
                 }
             }
             .accessibilityIdentifier("about-list")
@@ -86,7 +86,7 @@ extension AboutView {
             if model.termsActive, let approval = model.termsApproval {
                 Label("On, since \(Loc.date(approval.approvedAt))", systemImage: "checkmark.shield")
                     .accessibilityIdentifier("terms-status")
-                Text("Opt-Out Kit presses \"I agree\" for you only when every paragraph of a site's terms is on a list a person reviewed.")
+                Text("Exnay presses \"I agree\" for you only when every paragraph of a site's terms is on a list a person reviewed.")
                     .font(.footnote)
                 NavigationLink("Acceptance log (\(model.consentLog.count))") { ConsentLogView() }
                 Button("Turn off", role: .destructive) { model.revokeTerms() }.accessibilityIdentifier("terms-off")
@@ -115,7 +115,7 @@ struct TermsApprovalView: View {
         NavigationStack {
             List {
                 Section {
-                    Text("Some people-search sites show an \"I agree to our terms\" prompt before results. If you allow this, Opt-Out Kit presses that button for you, but only when every paragraph of the prompt and of the terms pages it links to is on a list that a person has read and judged acceptable.")
+                    Text("Some people-search sites show an \"I agree to our terms\" prompt before results. If you allow this, Exnay presses that button for you, but only when every paragraph of the prompt and of the terms pages it links to is on a list that a person has read and judged acceptable.")
                     Text("Reviewed paragraphs: \(model.termsReviewedCount) of \(model.termsLibrary?.paragraphs.count ?? 0)").font(.footnote)
                 }
                 Section {

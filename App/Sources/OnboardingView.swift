@@ -27,10 +27,10 @@ struct OnboardingView: View {
 
     private let pages: [Page] = [
         Page(id: 0, symbol: "bolt.shield", title: Loc.t("We find and remove your data for you"),
-             body: Loc.t("Opt-Out Kit scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person."),
+             body: Loc.t("Exnay scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person."),
              bullets: [Loc.t("Every day it checks the sites it can for you"), Loc.t("Every week it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: bot checks, email links, ID")]),
         Page(id: 1, symbol: "lock.shield", title: Loc.t("Your data stays on this phone"),
-             body: Loc.t("There is no Opt-Out Kit server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
+             body: Loc.t("There is no Exnay server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
              bullets: [Loc.t("Open source: anyone can audit the code"), Loc.t("Lost phone with no backup means lost data; a normal iPhone backup carries it"), Loc.t("Each site sees only the details its form needs")]),
         Page(id: 2, symbol: "person.2", title: Loc.t("Set up people once"),
              body: Loc.t("Tap Profile to enter your legal name and current address (both required), plus any other names and past addresses. Add family members as extra people with the account switcher."),

@@ -43,10 +43,10 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleDisplayName: "Opt-Out Kit"
+        CFBundleDisplayName: "Exnay"
         UILaunchScreen: {}
         UIBackgroundModes: [fetch, processing]
-        NSUserTrackingUsageDescription: "Some data brokers opt your phone out using its advertising ID. Opt-Out Kit reads it only to give it to those brokers when you opt out, and never stores it."
+        NSUserTrackingUsageDescription: "Some data brokers opt your phone out using its advertising ID. Exnay reads it only to give it to those brokers when you opt out, and never stores it."
         LSApplicationQueriesSchemes: [googlegmail, ms-outlook, ymail, readdle-spark, protonmail]
         BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck, dev.optoutkit.app.scan, dev.optoutkit.app.optout]
     settings:

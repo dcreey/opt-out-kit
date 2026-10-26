@@ -22,7 +22,7 @@ final class GuidedFlowUITests: XCTestCase {
         XCTAssertTrue(progress.waitForExistence(timeout: 10))
         XCTAssertTrue(progress.label.contains("of 6"), "the total number of steps is shown: \(progress.label)")
         let screen = app.windows.firstMatch.frame
-        XCTAssertTrue(app.staticTexts["guided-banner"].exists, "a coloured band names Opt-Out Kit and the guide")
+        XCTAssertTrue(app.staticTexts["guided-banner"].exists, "a coloured band names Exnay and the guide")
         let next = app.buttons["guided-next"]
         XCTAssertLessThan(next.frame.maxY, screen.height * 0.6, "the guide and its buttons are on top, nothing is cut off at the bottom")
         let title = app.staticTexts["guided-step-title"]
