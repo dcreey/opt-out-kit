@@ -23,6 +23,10 @@ struct RootView: View {
             if args.contains("-real-send"), let i = args.firstIndex(of: "-real-send-domains"), args.indices.contains(i + 1) {
                 await FormAudit.realSend(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
             }
+            if let i = args.firstIndex(of: "-audit-range"), args.indices.contains(i + 1) {
+                let parts = args[i + 1].split(separator: "-").compactMap { Int($0) }
+                if parts.count == 2 { await FormAudit.run(domains: FormAudit.range(from: parts[0], to: parts[1], model: model), model: model) }
+            }
             if args.contains("-audit-all") {
                 await FormAudit.run(domains: FormAudit.all(model: model), model: model)
             } else if let i = args.firstIndex(of: "-audit-first-per-kind"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {

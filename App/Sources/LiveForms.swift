@@ -136,7 +136,7 @@ extension WebViewSession {
               var pref=[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
               var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
                 var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-                return /^start .{3,50} request$/i.test(t)&&r.width>0&&r.height>0&&e.children.length<=2;});
+                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete my (user )?data)$/i.test(t))&&r.width>0&&r.height>0&&e.children.length<=2;});
               for(var p=0;p<pref.length;p++){for(var i=0;i<els.length;i++){var t=(els[i].innerText||'').trim();
                 if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
               return '';})();

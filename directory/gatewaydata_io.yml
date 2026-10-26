@@ -18,3 +18,7 @@ live_check:
 about: {"category": "b2b", "summary": "Aluum LLC d/b/a Gateway Data is a business-contact and sales-data provider. Meet the #1 alumni intelligence platform built for U.S. universities to unlock their alumni data. Join today to scale your advancement and athletics campaigns. Its own pages mention email addresses, age or birthdate, income or wealth, criminal and court records, interests and demographics, devices and online activity. Its policy names these buyers or recipients: business customers and sales teams.", "tracks": ["email", "age", "income", "criminal", "interests", "online", "health", "credit"], "sells_to": ["businesses"], "sells_note": "Licensee’s enterprise account may have multiple Authorized User accounts associated with it.", "source": "https://www.gatewaydata.io/privacy-policy-terms-conditions"}
 priority: 48
 persistence: {"result": "unknown", "reup_months": 12}
+run_check:
+  date: "2026-10-26"
+  result: "confirmed"
+  note: "it said Thank you! Your submission has been received!"

@@ -94,6 +94,19 @@ enum FormAudit {
         try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
     }
 
+    /// Sites `from` to `to` (counting from 1) of each kind in the daily order, semi-automated queue only.
+    static func range(from: Int, to: Int, model: AppModel) -> [String] {
+        let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)
+        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        var out: [String] = []
+        for kind in BrokerCategory.ranked {
+            let ofKind = queue.filter { byDomain[$0]?.about?.category == kind.rawValue }
+            guard ofKind.count >= from else { continue }
+            out += ofKind[(from - 1)..<min(to, ofKind.count)]
+        }
+        return out
+    }
+
     static func run(domains: [String], model: AppModel) async {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("audit")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

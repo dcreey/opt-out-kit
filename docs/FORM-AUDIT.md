@@ -34,3 +34,18 @@ background run). The classifier's label was checked against the pictures, and it
 - Most failures were a Cloudflare "Verify you are human" box that appears after the form is filled (about a dozen sites), a multi-step portal that needs
   a request tile clicked first (bridg.com, lob.com, minerva.io, forian.com, definitivehc.com, cbinsights.com), a form that wants a work email
   (juicebox.ai, evertrue.com), or the wrong form on the page (agedleadstore.com picked a newsletter box).
+
+## Multi-step portals, the link filler and the second ten (2026-10-26)
+
+- **Request tiles.** Portals built on DataGrail and similar (lob.com, minerva.io, forian.com, definitivehc.com, cbinsights.com) open on a choice of requests.
+  The live path now clicks "Start Opt Out Request" (or "Start Deletion Request" when there is no opt-out tile, never access, transfer or correction),
+  picks a consumer answer in Material-UI drop-downs that are not real `<select>`s (relationship to the company, state), fills a one-box address, and presses
+  the final "Submit Request" on the review step. Four of the five now stop at an hCaptcha, which is a check the person solves, so they stay semi-automated.
+  `bridg.com` says "Unsupported Location" for Illinois and is guided.
+- **Link filler.** Home has "Finish a request from an email": paste a link, the page loads (https only, the address is shown), and "Fill in my details" fills
+  the form on it. The person solves any check and presses the page's own button.
+- **Sites 11 to 20 of each kind** (`-audit-range 11-20`): only eight kinds have more than ten semi-automated sites, so 59 were audited. 55 fill cleanly. Of the
+  23 that showed no barrier at load and were sent for real, 5 genuinely confirmed (`donorbureau.com`, `gatewaydata.io`, `attribits.com`, `statsocial.com`,
+  `marketingarchitects.com`) and now carry `run_check: confirmed`. The rest hit a Cloudflare box after filling, a business-email requirement
+  (`enigma.com`), an account login (`l2-data.com`), a contact form (`inboundinsight.com`), the wrong form on the page (`learnmore.com` picked its
+  "Right to Know" form), or a wrong page (`decide.co`).
