@@ -18,3 +18,7 @@ live_check:
 about: {"category": "lead_generation", "summary": "Edvisors Network, Inc. is a lead-generation company. Edvisors provides financial solutions for young adults including expert advice on planning and paying for college and money management tips. Easily compare private student loan lenders,... Its own pages mention email addresses, education, devices and online activity, health information, credit and financial accounts. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["email", "education", "online", "health", "credit"], "sells_to": ["advertisers"], "sells_note": "Skip Navigation Advertiser Disclosure After Navigation Home » Your Privacy Choices Opt Out Preferences Certain states have provided their residents, subject to various legal limitations and exceptions, with specific comprehensive privacy ri", "source": "https://www.edvisors.com/your-privacy-choices/"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 6}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["state"]

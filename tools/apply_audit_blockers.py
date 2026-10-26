@@ -28,7 +28,10 @@ def main():
         path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", x["domain"].lower()).strip("_") + ".yml")
         if not found or not os.path.exists(path): continue
         s = open(path).read(); m = re.search(r"(\nlive_form:\n(?:[ \t]+.*\n?)*)", s)
-        if not m or "found: true" not in m.group(1): continue
+        if not m:   # a form read from the page has no live block yet: add one that only carries what the audit saw
+            import datetime
+            s = s.rstrip("\n") + f'\nlive_form:\n  checked: "{datetime.date.today()}"\n  found: false\n'; open(path, "w").write(s)
+            m = re.search(r"(\nlive_form:\n(?:[ \t]+.*\n?)*)", s)
         block = m.group(1); b = re.search(r"  blockers: \[(.*)\]", block)
         have = [t.strip().strip('"') for t in b.group(1).split(",") if t.strip()] if b else []
         merged = have + [f for f in found if f not in have]

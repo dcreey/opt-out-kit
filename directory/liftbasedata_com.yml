@@ -17,3 +17,7 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "Blue Hill Marketing Solutions, Inc is a marketing data provider. LiftBase is a source of customer intelligence and acquisition for hundreds of clients. Its own pages mention email addresses, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["email", "interests", "online"], "sells_to": [], "source": "https://www.liftbasedata.com/privacy-policy/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["agent"]

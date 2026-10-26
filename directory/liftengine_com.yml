@@ -17,3 +17,7 @@ profiled: "2026-10-22"
 about: {"category": "marketing_data", "summary": "Blue Hill Marketing Solutions, Inc. d/b/a LiftEngine is a marketing data provider. For more than ten years our mission has been laser-focused: help clients understand and connect with their most responsive prospects and customers. Online and offline, over 400 companies... Its own pages mention home addresses, email addresses, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy does not name who it sells to.", "tracks": ["address", "email", "purchases", "interests", "online"], "sells_to": [], "source": "https://www.liftengine.com/privacy-policy/"}
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["agent"]

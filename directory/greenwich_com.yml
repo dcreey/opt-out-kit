@@ -18,3 +18,7 @@ live_check:
 about: {"category": "financial", "summary": "Crisil Irvena US LLC is a financial and credit data company. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, income or wealth. Its policy does not name who it sells to.", "tracks": ["address", "phone", "email", "age", "employment", "income", "criminal", "purchases", "interests", "online", "health", "credit"], "sells_to": [], "source": "https://www.crisil.com/en/home/crisil-privacy-notice.html"}
 priority: 49
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["business"]

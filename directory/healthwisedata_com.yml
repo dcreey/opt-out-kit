@@ -16,3 +16,7 @@ profiled: "2026-10-22"
 about: {"category": "healthcare", "summary": "HealthWise Data is a healthcare data company. Unlock patient insights with HealthWise Data's consumer healthcare database. 2,000+ predictive consumer data points including lifestyle, behavior, and SDOH. Its own pages mention education, interests and demographics, health information, social media profiles. Its policy does not name who it sells to.", "tracks": ["education", "interests", "health", "social"], "sells_to": [], "source": "https://healthwisedata.com/"}
 priority: 41
 persistence: {"result": "unknown", "reup_months": 12}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["code"]

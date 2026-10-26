@@ -38,14 +38,17 @@ public enum OptOutMethods {
     /// `confirmingIdentity` is true for the account owner when they have allowed "I am this person" boxes to be ticked for them.
     public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false, failedBefore: Bool = false) -> MethodVerdict {
         let signals = e.signals ?? []
+        // What a real page load showed that only the person can answer (a business field, an agent, a file, a state menu without their state,
+        // questions the app cannot read). These hold whether the form was read from the page or found live.
+        if let live = e.liveForm {
+            if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("agent") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for an authorized agent's details, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("state") { return MethodVerdict(method: .guided, reason: L10n.t("This form's menu does not offer every state, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("other") { return MethodVerdict(method: .guided, reason: L10n.t("This form has questions the app cannot read, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("file") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
+        }
         guard let form = e.optOutForm else {
             if let live = e.liveForm, live.found {
-                // What a real page load showed that only the person can answer: a business form, an agent or file field. Those are guided.
-                if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
-                if live.blockers.contains("agent") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for an authorized agent's details, so we take you to the page and walk you through it.")) }
-                if live.blockers.contains("state") { return MethodVerdict(method: .guided, reason: L10n.t("This form's menu does not offer every state, so we take you to the page and walk you through it.")) }
-                if live.blockers.contains("other") { return MethodVerdict(method: .guided, reason: L10n.t("This form has questions the app cannot read, so we take you to the page and walk you through it.")) }
-                if live.blockers.contains("file") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
                 if e.runCheck?.result == "failed" { return MethodVerdict(method: .guided, reason: L10n.t("A real run did not go through, so you do this one with a guide.")) }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
             }

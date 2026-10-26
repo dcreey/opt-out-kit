@@ -16,3 +16,7 @@ profiled: "2026-10-22"
 about: {"category": "b2b", "summary": "Warmly, Inc. is a business-contact and sales-data provider. Warmly identifies anonymous website visitors, enriches them with intent data, and engages buyers through AI chat and email. Pipeline impact in weeks. Its own pages mention email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity, precise location. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; government and law enforcement.", "tracks": ["email", "age", "employment", "interests", "online", "location", "health", "social"], "sells_to": ["businesses", "advertisers", "government"], "sells_note": "Our customers and licensees.", "source": "https://www.warmly.ai/p/privacy-policy"}
 priority: 54
 persistence: {"result": "temporary", "reup_months": 12, "quote": "Opt-out cookies only work on the internet browser and device they are downloaded onto.", "source": "https://www.warmly.ai/p/privacy-policy"}
+live_form:
+  checked: "2026-10-25"
+  found: false
+  blockers: ["file"]
