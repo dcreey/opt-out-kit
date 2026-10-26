@@ -14,3 +14,18 @@ draup.com and contactout.com), "Get started" headings over a real request form (
 (forewarn.com, ididata.com), and forms behind a frame the survey cannot read (windfall.com). About 20 flagged sites with only an "I am human" box or an unclear
 single field (allantgroup.com, versium.com, visitiq.io, magnite.com, ispot.tv, vector.co, demandbase.com, thedatagroup.com, videoamp.com, ogury.com) still need a person to
 look. One site redirected to a sign-in page; 2 pages would not open.
+
+## Hand check of the 34 demoted sites
+
+I opened every demoted page and looked at it. 15 of the 34 had been demoted wrongly: the survey read a newsletter or search box in the page footer, while the page itself is a real
+privacy-choices page, or its page links to one. They are back as guides (the app opens the page, the person completes it; nothing is filled for them):
+`intentiq.com`, `jungroup.com` (a HyprMX privacy center), `mediawallah.com`, `outwardmedia.com`, `skydeo.com`, `swoop.com`, `firmable.com` (profile removal request),
+`amplemarket.com` (opt out by email to privacy@amplemarket.com, now recorded), `coasttechnology.com`, and re-pointed to the real page: `seamless.ai`, `convergemarketing.com`
+(its DataSubject portal), `fideo.ai`, `finsum.com`, `idatabasesolutions.com`, `whitepages.com`.
+
+The other 19 stay unlock-later, and the check agrees with the survey: the page is a home page, product page, blog post, search box, trial or sign-up (`applovin.com`, `archives.com`,
+`bluedatalead.com`, `citydata.ai`, `enrichlayer.com`, `ocean.io`, `pitchbook.com`, `spycloud.com`, `verisk.com`, `agedleadstore.com`), a plain privacy policy with no
+request form on it (`attomdata.com`, `cotality.com`, `evertrue.com`, `finthrive.com`, `dresdendirect.com`), a sign-in (`lead-enhance.com`), another company's page
+(`internetbrands.com` is Adobe's analytics opt-out, `pmg.com` is the Texas attorney general's), or a third party's opt-out (`jwx.com` links to Connatix).
+
+Lesson: the survey flags forms it can see, and many privacy forms sit behind a modal or a frame, so a flag means look, not demote.

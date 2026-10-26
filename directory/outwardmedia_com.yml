@@ -7,8 +7,8 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "medium"
-# The recorded opt-out page (https://outwardmedia.com/privacypolicy) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
-opt_out_url: null
+# Checked by hand 2026-10-26: https://outwardmedia.com/privacypolicy is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
+opt_out_url: "https://outwardmedia.com/privacypolicy"
 contact_email: "privacy@outwardmedia.com"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, name_input, opt_out_form_found]

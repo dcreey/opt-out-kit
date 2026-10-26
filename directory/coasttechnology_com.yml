@@ -7,8 +7,8 @@ bucket: "registry"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-# The recorded opt-out page (https://www.coasttechnology.com/privacy/california) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
-opt_out_url: null
+# Checked by hand 2026-10-26: https://www.coasttechnology.com/privacy/california is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
+opt_out_url: "https://www.coasttechnology.com/privacy/california"
 contact_email: "privacy@coasttech.ai"
 contact_email_source: "policy"
 registered_in: [CA]
