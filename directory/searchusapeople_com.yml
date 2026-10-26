@@ -28,4 +28,4 @@ priority: 74
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "CA", "BR", "ZA", "MX"], "evidence": "its pages mention GDPR; its pages mention PIPEDA; its pages mention LGPD; its pages mention POPIA; has a MX site at https://www.searchusapeople.com/es/ (hreflang es-mx)", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "hreflang es-mx", "privacy_page": null, "region": "MX", "url": "https://www.searchusapeople.com/es/"}]
-languages: {"list": ["en", "es"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://www.searchusapeople.com/", "es": "https://www.searchusapeople.com/es/"}, "checked": "2026-10-26"}

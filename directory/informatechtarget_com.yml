@@ -22,4 +22,4 @@ priority: 53
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU", "CA", "BR", "FR", "DE"], "evidence": "on the UK ICO register of fee payers as TechTarget, Inc. (ref ZA760915); its pages mention GDPR; its pages mention Canadian residents; its pages mention LGPD; has a FR site at https://www.informatechtarget.fr/ (country domain); has a DE site at https://www.informatechtarget.de/ (country domain)", "checked": "2026-10-26"}
 regional_sites: [{"has_form": true, "how": "country domain", "privacy_page": "https://www.informatechtarget.com/privacy-policy-fr/", "region": "FR", "url": "https://www.informatechtarget.fr/"}, {"has_form": true, "how": "country domain", "privacy_page": "https://www.informatechtarget.com/privacy-policy-de/", "region": "DE", "url": "https://www.informatechtarget.de/"}]
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "fr"], "pages": {}, "checked": "2026-10-26"}

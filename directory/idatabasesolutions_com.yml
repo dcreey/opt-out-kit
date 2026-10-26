@@ -20,3 +20,4 @@ about: {"category": "marketing_data", "summary": "Innovative Database Solutions,
 priority: 53
 persistence: {"result": "permanent", "quote": "While IDS does not own or maintain any marketing databases, we do maintain a suppression file of individuals who have requested not to be included in any campaigns that pass through our services.", "source": "https://idatabasesolutions.com/privacy/"}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention EU residents", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -22,4 +22,4 @@ about: {"category": "adtech", "summary": "RevContent, LLC is an advertising tech
 priority: 39
 persistence: {"result": "temporary", "reup_months": 6, "quote": "You also must opt out again if you clear your cookies.", "source": "https://www.revcontent.com/policy/privacy-policy#your-privacy-rights-and-choices"}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Revcontent, LLC; its pages mention United Kingdom", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es", "pt"], "pages": {"en": "https://www.revcontent.com/legal/optout/en", "es": "https://www.revcontent.com/legal/optout/es", "pt": "https://www.revcontent.com/legal/optout/pt"}, "checked": "2026-10-26"}

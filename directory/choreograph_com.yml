@@ -21,4 +21,4 @@ about: {"category": "marketing_services", "summary": "Choreograph LLC is a marke
 priority: 20
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Choreograph Limited (ref ZA844032); its pages mention European Economic Area", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["ar", "cs", "da", "de", "en", "es", "fr", "hr", "hu", "it", "ja", "ko", "lv", "nb", "nl", "pl", "pt", "sk", "sv", "tr", "zh"], "pages": {}, "checked": "2026-10-26"}

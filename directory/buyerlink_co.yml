@@ -20,4 +20,4 @@ about: {"category": "lead_generation", "summary": "Buyerlink Inc. is a lead-gene
 priority: 33
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/en-us", "es": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/es"}, "checked": "2026-10-26"}

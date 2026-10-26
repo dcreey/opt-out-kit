@@ -18,3 +18,4 @@ about: {"category": "marketing_data", "summary": "Baron App, Inc. is a marketing
 priority: 59
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Baron App, Inc. (ref ZC111494); its pages mention EEA", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

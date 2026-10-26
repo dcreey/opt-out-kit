@@ -19,5 +19,5 @@ live_form:
 about: {"category": "marketing_services", "summary": "Crimson Hexagon is a marketing and direct-mail services company. Brandwatch, a Cision company, is an AI-powered social media management, consumer intelligence, and influencer marketing suite trusted by half of the Forbes 100. Its own pages mention phone numbers, email addresses, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["phone", "email", "interests", "online"], "sells_to": ["advertisers"], "source": "https://www.brandwatch.com/legal/user-privacy-policy/"}
 priority: 29
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Crimson Hexagon Ltd (ref ZA547447); its pages mention European Economic Area", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+regions: {"list": ["US", "UK", "EU", "DE", "FR", "IT"], "evidence": "on the UK ICO register of fee payers as Crimson Hexagon Ltd (ref ZA547447); its pages mention European Economic Area; offers its site in German; offers its site in French; offers its site in Italian", "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr", "it"], "pages": {"de": "https://www.brandwatch.com/de/", "en": "https://www.brandwatch.com/legal/data-subject-access-request/", "es": "https://www.brandwatch.com/es/", "fr": "https://www.brandwatch.com/fr/", "it": "https://www.brandwatch.com/p/italy/"}, "checked": "2026-10-26"}

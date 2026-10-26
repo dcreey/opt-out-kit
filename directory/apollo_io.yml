@@ -25,4 +25,4 @@ about: {"category": "b2b", "summary": "Zenleads, Inc. is a business-contact and 
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; its pages mention CASL", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es", "pt"], "pages": {"en": "https://www.apollo.io/privacy-policy/remove"}, "checked": "2026-10-26"}

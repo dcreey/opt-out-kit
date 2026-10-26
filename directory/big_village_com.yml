@@ -21,4 +21,4 @@ about: {"category": "marketing_services", "summary": "BV Insights LLC is a marke
 priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention General Data Protection Regulation; its pages mention United Kingdom", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://privacyportal.onetrust.com/webform/c932354f-213d-43fb-8919-af488348bf01/en-us"}, "checked": "2026-10-26"}

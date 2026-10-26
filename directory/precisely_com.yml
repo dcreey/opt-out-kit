@@ -19,5 +19,5 @@ live_form:
 about: {"category": "marketing_services", "summary": "PlaceIQ, Inc. is a marketing and direct-mail services company. Unlock trust across your enterprise with data integrity software built to scale, deliver accurate AI-ready data, and power confident business decisions. Its own pages mention home addresses, email addresses, age or birthdate, job title and employer, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["address", "email", "age", "employment", "interests", "online", "location", "social"], "sells_to": ["advertisers"], "sells_note": "How to Exercise Your Rights To make a request to opt-out of the sale or sharing of your personal information for cross-context behavioral advertising purposes, or to request to limit the use or disclosure of your sensitive personal informat", "source": "https://www.precisely.com/legal/placeiq-california-notice-at-collection-and-privacy-notice/"}
 priority: 41
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+regions: {"list": ["US", "DE", "FR", "JP"], "evidence": "registered with a US state; nothing found for other places; offers its site in German; offers its site in French; offers its site in Japanese", "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "fr", "ja"], "pages": {}, "checked": "2026-10-26"}

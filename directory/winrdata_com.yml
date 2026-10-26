@@ -19,3 +19,4 @@ about: {"category": "fraud_identity", "summary": "WINR Data Pty Ltd is an identi
 priority: 51
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "UK"], "evidence": "on the UK ICO register of fee payers as WINR Data Pty Ltd (ref ZC160035)", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

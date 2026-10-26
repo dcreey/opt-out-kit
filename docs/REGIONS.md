@@ -52,3 +52,12 @@ wins, e.g. fr-CA for Canada) and falls back to the original page if no form can 
 `Accept-Language`, which many sites honor on their own.
 
 Order to re-run everything: `tag_regions.py apply`, then `regional_sites.py apply`, then `site_languages.py apply` (the first rewrites the tags, the others add to them).
+
+### Script-based language pickers
+
+Most language menus are built by scripts, so the first pass (page tags only) found 42 sites. `tools/site_languages_browser.py` opens each home page and opt-out page in a
+headless browser, looks in the rendered page for links and options named in a language's own name (Francais, Deutsch, ...) or carrying a language path or `?lang=`
+parameter, and opens language menus (buttons labelled Language, globes, a current-language code) to see what is inside. It is merged into the same list (adds only).
+After it ran, 78 sites are offered in a language other than English and 60 have a translated opt-out page. It found real ones: OneTrust webforms with a language
+switcher, and translated privacy pages on criteo.com. Translated pages on a tracker or analytics host are dropped, and a picker with more than 15 languages adds no
+region tags. A menu that opens only after a hover, or sits behind a bot check, is still missed.

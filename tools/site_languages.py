@@ -83,11 +83,16 @@ def main(cmd):
         if not res or not res["list"]: continue
         s = open(f).read()
         s = re.sub(r"^languages: .*\n", "", s, flags=re.M)
-        s = s.rstrip("\n") + "\nlanguages: " + json.dumps({"list": res["list"], "pages": res["pages"], "checked": "2026-10-26"}, ensure_ascii=False) + "\n"
+        # Translations of the opt-out page must live on the site itself or on a privacy portal, not on a tracker or analytics host.
+        def same(u):
+            h = urllib.parse.urlparse(u).hostname or ""
+            return h.endswith(dom.split(".", 1)[-1] if dom.count(".") > 1 else dom) or dom.rsplit(".", 1)[0].split(".")[-1] in h or re.search(r"onetrust|trustarc|datasubject|ketch|transcend|osano|securiti|zendesk|force\.com", h)
+        pages = {k: v for k, v in res["pages"].items() if same(v)}
+        s = s.rstrip("\n") + "\nlanguages: " + json.dumps({"list": res["list"], "pages": pages, "checked": "2026-10-26"}, ensure_ascii=False) + "\n"
         m = re.search(r"^regions: (\{.*\})$", s, re.M)
         if m:
             r = json.loads(m.group(1))
-            for code in res["list"]:
+            for code in (res["list"] if len(res["list"]) <= 15 else []):   # a picker with dozens of languages says little about where the broker operates
                 c = ONE_COUNTRY.get(code)
                 if c and c not in r["list"] and ("EU" not in r["list"] or True):
                     r["list"].append(c); tagged += 1

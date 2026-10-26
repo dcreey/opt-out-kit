@@ -19,5 +19,5 @@ search_check:
 about: {"category": "automotive", "summary": "yellowbook.com is an automotive data company. With these small business resources, we seek to save you time, energy, and money by delivering the information that you need in a clear and concise manner. Its own pages mention age or birthdate. Its policy does not name who it sells to.", "tracks": ["age"], "sells_to": [], "source": "https://yellowbook.com/"}
 priority: 20
 persistence: {"result": "unknown", "reup_months": 12}
-regions: {"list": ["US", "DE"], "evidence": "registered with a US state; nothing found for other places; offers its site in German", "checked": "2026-10-26"}
-languages: {"list": ["de", "en"], "pages": {"de": "https://wingify.com/de/opt-out/", "en": "https://wingify.com/opt-out/"}, "checked": "2026-10-26"}
+regions: {"list": ["US", "DE", "FR"], "evidence": "registered with a US state; nothing found for other places; offers its site in German; offers its site in French", "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr"], "pages": {}, "checked": "2026-10-26"}

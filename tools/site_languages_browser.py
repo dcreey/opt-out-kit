@@ -95,7 +95,10 @@ async def main():
     async with async_playwright() as pw:
         browser = await pw.chromium.launch()
         ctx = await browser.new_context(user_agent=UA, viewport={"width": 390, "height": 844}, ignore_https_errors=True)
-        tasks = [asyncio.create_task(one(ctx, e, sem)) for e in todo]
+        async def bounded(e):
+            try: return await asyncio.wait_for(one(ctx, e, sem), 90)
+            except Exception: return e[1], {"list": [], "pages": {}}
+        tasks = [asyncio.create_task(bounded(e)) for e in todo]
         for i, t in enumerate(asyncio.as_completed(tasks)):
             dom, res = await t
             done[dom] = res

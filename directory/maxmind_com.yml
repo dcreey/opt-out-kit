@@ -17,4 +17,4 @@ about: {"category": "fraud_identity", "summary": "MaxMind, Inc. is an identity a
 priority: 62
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "BR"], "evidence": "its pages mention residents of the EU; its pages mention United Kingdom; its pages mention LGPD", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://www.maxmind.com/en/home"}, "checked": "2026-10-26"}

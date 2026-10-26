@@ -23,4 +23,4 @@ priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "DE", "FR", "ID", "IT", "JP", "KR", "PL", "TH"], "evidence": "listed on the IAB Europe TCF vendor list as Nielsen International SA; offers its site in German; offers its site in French; offers its site in Indonesian; offers its site in Italian; offers its site in Japanese; offers its site in Korean; offers its site in Polish; offers its site in Thai", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to nielsen.com", "privacy_page": null, "region": "AU", "url": "https://nielsen.com.au/"}]
-languages: {"list": ["de", "en", "es", "fr", "id", "it", "ja", "ko", "pl", "pt", "th", "zh"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr", "id", "it", "ja", "ko", "pl", "pt", "th", "zh"], "pages": {"en": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/en-us", "es": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/es"}, "checked": "2026-10-26"}

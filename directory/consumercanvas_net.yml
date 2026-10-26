@@ -22,4 +22,4 @@ about: {"category": "marketing_data", "summary": "Consumer Canvas, LLC is a mark
 priority: 44
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://privacyportal-eu.onetrust.com/webform/07a2e8c2-346a-4f58-865f-0d56c9baaff5/en-us"}, "checked": "2026-10-26"}

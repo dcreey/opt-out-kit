@@ -18,3 +18,4 @@ live_form:
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to intelius.com", "privacy_page": null, "region": "BR", "url": "https://www.intelius.com.br/"}]
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

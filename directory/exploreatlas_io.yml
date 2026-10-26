@@ -18,3 +18,4 @@ about: {"category": "other", "summary": "Hunt Club Inc is a data company. Made i
 priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

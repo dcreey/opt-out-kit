@@ -19,4 +19,4 @@ about: {"category": "adtech", "summary": "Teads Holding Co is an advertising tec
 priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU", "UK", "DE", "FR", "IT", "JP"], "evidence": "listed on the IAB Europe TCF vendor list as Zemanta Inc.; its pages mention UK GDPR; offers its site in German; offers its site in French; offers its site in Italian; offers its site in Japanese", "checked": "2026-10-26"}
-languages: {"list": ["de", "en", "es", "fr", "it", "ja", "pt"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["de", "en", "es", "fr", "it", "ja", "pt"], "pages": {"en": "https://www.outbrain.com/privacy/"}, "checked": "2026-10-26"}

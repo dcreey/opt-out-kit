@@ -1,10 +1,14 @@
 {
  "01advertising.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "33across.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "33mileradius.com": {
@@ -15,7 +19,8 @@
  },
  "360mediadirect.com": {
   "list": [
-   "en"
+   "en",
+   "id"
   ],
   "pages": {}
  },
@@ -33,12 +38,15 @@
  },
  "5x5data.com": {
   "list": [
-   "en"
+   "en",
+   "hr"
   ],
   "pages": {}
  },
  "6sense.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "abovedata.io": {
@@ -85,7 +93,10 @@
  },
  "acxiom.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "zh"
   ],
   "pages": {}
  },
@@ -172,7 +183,9 @@
   "pages": {}
  },
  "agrmarketingsolutions.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "aidentified.com": {
@@ -252,7 +265,9 @@
   "pages": {}
  },
  "americaphonebook.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "amerilist.com": {
@@ -305,19 +320,35 @@
  },
  "apollo.io": {
   "list": [
-   "en"
+   "en",
+   "es",
+   "pt"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.apollo.io/privacy-policy/remove"
+  }
  },
  "apollointeractive.com": {
-  "list": [],
-  "pages": {}
- },
- "applovin.com": {
   "list": [
    "en"
   ],
   "pages": {}
+ },
+ "applovin.com": {
+  "list": [
+   "en",
+   "ja",
+   "ko",
+   "vi",
+   "zh"
+  ],
+  "pages": {
+   "en": "https://applovin.com/en",
+   "ja": "https://applovin.com/ja",
+   "ko": "https://applovin.com/ko",
+   "vi": "https://applovin.com/vi",
+   "zh": "https://applovin.com/zh"
+  }
  },
  "appscience.ai": {
   "list": [
@@ -428,15 +459,33 @@
  },
  "audigent.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "tr",
+   "vi"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/de",
+   "en": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/es",
+   "fr": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/fr",
+   "it": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/it",
+   "tr": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/tr",
+   "vi": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/vi"
+  }
  },
  "autoweb.com": {
   "list": [
-   "en"
+   "en",
+   "es"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/es"
+  }
  },
  "aviato.co": {
   "list": [
@@ -465,9 +514,44 @@
  },
  "babelstreet.com": {
   "list": [
-   "en"
+   "cs",
+   "da",
+   "de",
+   "el",
+   "en",
+   "es",
+   "fi",
+   "fr",
+   "hr",
+   "hu",
+   "it",
+   "ja",
+   "ko",
+   "nl",
+   "pl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "cs": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/cs",
+   "da": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/da",
+   "de": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/de",
+   "el": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/el",
+   "en": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/es",
+   "fi": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/fi",
+   "fr": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/fr",
+   "hr": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/hr",
+   "hu": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/hu",
+   "it": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/it",
+   "ko": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/ko",
+   "nl": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/nl",
+   "pl": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/pl",
+   "pt": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/pt",
+   "ro": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/43f52ed9-df36-44dc-94b6-ce2f8458ca29/sv"
+  }
  },
  "backgroundcheckers.net": {
   "list": [
@@ -537,9 +621,13 @@
  },
  "belardiwong.com": {
   "list": [
-   "en"
+   "en",
+   "es"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/3d2d5e0c-bd98-46b8-906c-ede68a6f6a80/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/3d2d5e0c-bd98-46b8-906c-ede68a6f6a80/es"
+  }
  },
  "benutech.com": {
   "list": [],
@@ -555,7 +643,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/c932354f-213d-43fb-8919-af488348bf01/en-us"
+  }
  },
  "bigdbm.com": {
   "list": [
@@ -577,9 +667,29 @@
  },
  "blackbaud.com": {
   "list": [
-   "en"
+   "da",
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "da": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/da",
+   "de": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/de",
+   "en": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/en-us",
+   "es": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/es",
+   "fr": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/fr",
+   "it": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/it",
+   "nl": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/nl",
+   "pt": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/pt",
+   "ro": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/ro",
+   "sv": "https://blackbaud-privacy.my.onetrust.com/webform/170c909c-5ed2-49f1-a59c-2a44be2f6f27/sv"
+  }
  },
  "blackpearl.com": {
   "list": [
@@ -588,7 +698,9 @@
   "pages": {}
  },
  "blis.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "blueaction.io": {
@@ -635,9 +747,19 @@
  },
  "brandwatch.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://www.brandwatch.com/de/",
+   "en": "https://www.brandwatch.com/legal/data-subject-access-request/",
+   "es": "https://www.brandwatch.com/es/",
+   "fr": "https://www.brandwatch.com/fr/",
+   "it": "https://www.brandwatch.com/p/italy/"
+  }
  },
  "bridg.com": {
   "list": [
@@ -655,7 +777,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://play.google.com/store/apps/details?id=com.BuilderTREND.btMobileApp&hl=en_US&gl=US&pli=1"
+  }
  },
  "bumper.com": {
   "list": [
@@ -677,9 +801,13 @@
  },
  "buyerlink.co": {
   "list": [
-   "en"
+   "en",
+   "es"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/27aa5d67-8136-4a08-ae4b-9860992e2375/es"
+  }
  },
  "cadent.com": {
   "list": [
@@ -712,7 +840,9 @@
   "pages": {}
  },
  "candl.app": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "captifytechnologies.com": {
@@ -793,7 +923,27 @@
  },
  "choreograph.com": {
   "list": [
-   "en"
+   "ar",
+   "cs",
+   "da",
+   "de",
+   "en",
+   "es",
+   "fr",
+   "hr",
+   "hu",
+   "it",
+   "ja",
+   "ko",
+   "lv",
+   "nb",
+   "nl",
+   "pl",
+   "pt",
+   "sk",
+   "sv",
+   "tr",
+   "zh"
   ],
   "pages": {}
  },
@@ -812,15 +962,26 @@
  "circana.com": {
   "list": [
    "de",
+   "el",
    "en",
    "es",
    "fr",
    "it",
    "ja",
    "nl",
+   "pl",
    "pt"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/de",
+   "el": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/el",
+   "en": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/es",
+   "fr": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/fr",
+   "it": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/it",
+   "nl": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/nl",
+   "pl": "https://privacyportal.onetrust.com/webform/95580356-b46a-4234-8f47-d824de4dbbc6/pl"
+  }
  },
  "cision.com": {
   "list": [
@@ -842,17 +1003,24 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "claritas.com": {
   "list": [
-   "en"
+   "en",
+   "es"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/68582716-6ce4-4f6e-bf08-78371b5f3292/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/68582716-6ce4-4f6e-bf08-78371b5f3292/es"
+  }
  },
  "clay.com": {
   "list": [
-   "en"
+   "en",
+   "fr"
   ],
   "pages": {}
  },
@@ -917,7 +1085,9 @@
   "pages": {}
  },
  "commercesignals.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "complementics.com": {
@@ -948,12 +1118,18 @@
    "pt"
   ],
   "pages": {
+   "de": "https://www.comscore.com/ger/Ueber-Uns/Privacy/Datensubjekt-Rechte/Data-Subject-Rights-Tagging",
    "de-de": "https://www.comscore.com/ger/Ueber-Uns/Privacy/Datensubjekt-Rechte/Data-Subject-Rights-Tagging",
+   "en": "https://www.comscore.com.master-7rqtwti-vpdlfifrnepj6.us-2.platformsh.site/About/Privacy/Data-Subject-Rights/Data-Subject-Rights-Tagging",
    "en-us": "https://www.comscore.com.master-7rqtwti-vpdlfifrnepj6.us-2.platformsh.site/About/Privacy/Data-Subject-Rights/Data-Subject-Rights-Tagging",
+   "es": "https://www.comscore.com/lat/Sobre-Comscore/Privacy/Derechos-del-interesado/Data-Subject-Rights-Tagging",
    "es-es": "https://www.comscore.com/lat/Sobre-Comscore/Privacy/Derechos-del-interesado/Data-Subject-Rights-Tagging",
    "es-mx": "https://www.comscore.com/esl/Sobre-Comscore/Privacy/Derechos-del-interesado/Data-Subject-Rights-Tagging",
+   "fr": "https://www.comscore.com/fre/A-propos-de-Comscore/Privacy/Droits-en-tant-que-personne-concernee/Data-Subject-Rights-Tagging",
    "fr-fr": "https://www.comscore.com/fre/A-propos-de-Comscore/Privacy/Droits-en-tant-que-personne-concernee/Data-Subject-Rights-Tagging",
+   "it": "https://www.comscore.com/ita/Chi-siamo/Privacy/Diritti-dell-interessato/Data-Subject-Rights-Tagging",
    "it-it": "https://www.comscore.com/ita/Chi-siamo/Privacy/Diritti-dell-interessato/Data-Subject-Rights-Tagging",
+   "pt": "https://www.comscore.com/por/Sobre/Privacy/Direitos-do-Titular-dos-Dados/Data-Subject-Rights-Tagging",
    "pt-br": "https://www.comscore.com/por/Sobre/Privacy/Direitos-do-Titular-dos-Dados/Data-Subject-Rights-Tagging"
   }
  },
@@ -979,7 +1155,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal-eu.onetrust.com/webform/07a2e8c2-346a-4f58-865f-0d56c9baaff5/en-us"
+  }
  },
  "contactout.com": {
   "list": [
@@ -1014,6 +1192,7 @@
    "en-CA": "https://www.cotality.com/en-ca/legal/privacy-policy",
    "en-GB": "https://www.cotality.com/uk/legal/privacy-policy",
    "en-NZ": "https://www.cotality.com/nz/legal/privacy-policy",
+   "fr": "https://www.cotality.com/fr-ca/legal/politique-de-confidentialite",
    "fr-CA": "https://www.cotality.com/fr-ca/legal/politique-de-confidentialite"
   }
  },
@@ -1073,13 +1252,16 @@
    "it": "https://www.criteo.com/it/privacy/ccpa-privacy-policy/",
    "ja": "https://www.criteo.com/jp/privacy/ccpa-privacy-policy/",
    "ko": "https://www.criteo.com/kr/privacy/ccpa-privacy-policy/",
+   "pl": "https://www.criteo.com/pl/",
    "pt": "https://www.criteo.com/br/privacy/ccpa-privacy-policy/",
    "ru": "https://www.criteo.com/ru/privacy/ccpa-privacy-policy/",
    "zh": "https://www.criteo.com/cn/privacy/ccpa-privacy-policy/"
   }
  },
  "crosspixel.net": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "crunchbase.com": {
@@ -1102,14 +1284,34 @@
  },
  "cybba.com": {
   "list": [
+   "da",
+   "de",
    "en",
    "es",
-   "pt"
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "da": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/da",
+   "de": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/de",
+   "en": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/en-us",
+   "es": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/es",
+   "fr": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/fr",
+   "it": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/it",
+   "nl": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/nl",
+   "pt": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/pt",
+   "ro": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/ro",
+   "sv": "https://cybba-requests.my.onetrust.com/webform/a4a1351e-d293-4305-bde4-b9cf8f5c0989/sv"
+  }
  },
  "cyberbackgroundchecks.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "data-axle.com": {
@@ -1132,7 +1334,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "datadesk.io": {
   "list": [
@@ -1141,7 +1345,9 @@
   "pages": {}
  },
  "datadojo.ai": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "datafy.com": {
@@ -1179,7 +1385,9 @@
   "pages": {}
  },
  "datanyze.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "datapartners.com": {
@@ -1263,7 +1471,8 @@
  },
  "deepsync.com": {
   "list": [
-   "en"
+   "en",
+   "ko"
   ],
   "pages": {}
  },
@@ -1274,7 +1483,9 @@
   "pages": {}
  },
  "deimos-signals.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "delawarecourtrecords.us": {
@@ -1369,7 +1580,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://draup.com/dns-request-access"
+  }
  },
  "dresdendirect.com": {
   "list": [
@@ -1399,7 +1612,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://play.google.com/store/apps/developer?id=DTN,+LLC&hl=en_US"
+  }
  },
  "eab.com": {
   "list": [
@@ -1423,7 +1638,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://twitter.com/eLocal?lang=en"
+  }
  },
  "eltoro.com": {
   "list": [
@@ -1442,7 +1659,9 @@
   "pages": {}
  },
  "enformion.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "enigma.com": {
@@ -1540,10 +1759,14 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.experience.com"
+  }
  },
  "exploreatlas.io": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "explorium.ai": {
@@ -1571,7 +1794,9 @@
   "pages": {}
  },
  "familytreenow.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "famousbirthdays.com": {
@@ -1593,7 +1818,9 @@
   "pages": {}
  },
  "fastbackgroundcheck.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "fastpeoplesearch.com": {
@@ -1624,7 +1851,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "findem.ai": {
   "list": [
@@ -1655,6 +1884,7 @@
    "en"
   ],
   "pages": {
+   "en": "https://firmable.ai/au/profile-removal-request/",
    "en-au": "https://firmable.ai/au/profile-removal-request/",
    "en-my": "https://firmable.ai/my/profile-removal-request/",
    "en-nz": "https://firmable.ai/nz/profile-removal-request/",
@@ -1667,6 +1897,7 @@
    "en"
   ],
   "pages": {
+   "en": "https://firstdirectmarketing.com/",
    "en-US": "https://firstdirectmarketing.com/"
   }
  },
@@ -1695,7 +1926,9 @@
   "pages": {}
  },
  "floridaresidentsdirectory.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "focus-usa.com": {
@@ -1729,7 +1962,9 @@
   "pages": {}
  },
  "forian.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "fourcornerhome.com": {
@@ -1782,9 +2017,27 @@
  },
  "fraiser.org": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/de",
+   "en": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/es",
+   "fr": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/fr",
+   "it": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/it",
+   "nl": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/nl",
+   "pt": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/pt",
+   "ro": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/sv"
+  }
  },
  "freepeopledirectory.com": {
   "list": [
@@ -1793,7 +2046,9 @@
   "pages": {}
  },
  "freepeoplesearch.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "freephonetracer.com": {
@@ -1816,7 +2071,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://dsar.fullenrich.com/?lang=en"
+  }
  },
  "fusable.com": {
   "list": [
@@ -1831,8 +2088,12 @@
   "pages": {}
  },
  "fusion92.com": {
-  "list": [],
-  "pages": {}
+  "list": [
+   "en"
+  ],
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "gatewaydata.io": {
   "list": [
@@ -2022,7 +2283,9 @@
  },
  "hightouch.com": {
   "list": [
-   "en"
+   "en",
+   "es",
+   "fr"
   ],
   "pages": {}
  },
@@ -2045,11 +2308,13 @@
   ],
   "pages": {
    "de": "https://hunter.io/de/claim",
+   "en": "https://hunter.io/blog/",
    "es": "https://hunter.io/es/claim",
    "fr": "https://hunter.io/fr/claim",
    "it": "https://hunter.io/it/claim",
    "ja": "https://hunter.io/ja/claim",
    "pt": "https://hunter.io/pt/claim",
+   "zh": "https://hunter.io/zh-CN/claim",
    "zh-CN": "https://hunter.io/zh-CN/claim"
   }
  },
@@ -2078,7 +2343,9 @@
   "pages": {}
  },
  "idatabasesolutions.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "ididata.com": {
@@ -2115,7 +2382,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "inboundinsight.com": {
   "list": [
@@ -2148,9 +2417,29 @@
  },
  "infillion.com": {
   "list": [
-   "en"
+   "da",
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "da": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/da",
+   "de": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/de",
+   "en": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/es",
+   "fr": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/fr",
+   "it": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/it",
+   "nl": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/nl",
+   "pt": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/pt",
+   "ro": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/f7e3f6db-ed65-4759-a3f5-3b5c8b7e9bff/draft/sv"
+  }
  },
  "infopay.com": {
   "list": [
@@ -2160,7 +2449,9 @@
  },
  "informatechtarget.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "fr"
   ],
   "pages": {}
  },
@@ -2201,7 +2492,9 @@
   "pages": {}
  },
  "instantcheckmate.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "instantly.ai": {
@@ -2217,7 +2510,9 @@
   "pages": {}
  },
  "intelius.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "intentiq.com": {
@@ -2234,9 +2529,63 @@
  },
  "internetbrands.com": {
   "list": [
-   "en"
+   "ar",
+   "bg",
+   "cs",
+   "da",
+   "de",
+   "el",
+   "en",
+   "es",
+   "fi",
+   "fr",
+   "he",
+   "id",
+   "it",
+   "ja",
+   "ko",
+   "nb",
+   "nl",
+   "pl",
+   "pt",
+   "ro",
+   "ru",
+   "sk",
+   "sv",
+   "th",
+   "tr",
+   "vi",
+   "zh"
   ],
-  "pages": {}
+  "pages": {
+   "ar": "https://www.d1.sc.omtrdc.net/ar-SA",
+   "bg": "https://www.d1.sc.omtrdc.net/bg-BG",
+   "cs": "https://www.d1.sc.omtrdc.net/cs-CZ",
+   "da": "https://www.d1.sc.omtrdc.net/da-DK",
+   "de": "https://www.d1.sc.omtrdc.net/de-DE",
+   "el": "https://www.d1.sc.omtrdc.net/el-GR",
+   "en": "https://www.d1.sc.omtrdc.net/en-US",
+   "es": "https://www.d1.sc.omtrdc.net/es-ES",
+   "fi": "https://www.d1.sc.omtrdc.net/fi-FI",
+   "fr": "https://www.d1.sc.omtrdc.net/fr-FR",
+   "he": "https://www.d1.sc.omtrdc.net/he-IL",
+   "id": "https://www.d1.sc.omtrdc.net/id-ID",
+   "it": "https://www.d1.sc.omtrdc.net/it-IT",
+   "ja": "https://www.d1.sc.omtrdc.net/ja-JP",
+   "ko": "https://www.d1.sc.omtrdc.net/ko-KR",
+   "nb": "https://www.d1.sc.omtrdc.net/nb-NO",
+   "nl": "https://www.d1.sc.omtrdc.net/nl-NL",
+   "pl": "https://www.d1.sc.omtrdc.net/pl-PL",
+   "pt": "https://www.d1.sc.omtrdc.net/pt-BR",
+   "ro": "https://www.d1.sc.omtrdc.net/ro-RO",
+   "ru": "https://www.d1.sc.omtrdc.net/ru-RU",
+   "sk": "https://www.d1.sc.omtrdc.net/sk-SK",
+   "sv": "https://www.d1.sc.omtrdc.net/sv-SE",
+   "th": "https://www.d1.sc.omtrdc.net/th-TH",
+   "tr": "https://www.d1.sc.omtrdc.net/tr-TR",
+   "vi": "https://www.d1.sc.omtrdc.net/vi-VN",
+   "zh": "https://www.d1.sc.omtrdc.net/zh-CN"
+  }
  },
  "iowaarrests.org": {
   "list": [
@@ -2340,9 +2689,27 @@
  },
  "kargo.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/de",
+   "en": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/es",
+   "fr": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/fr",
+   "it": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/it",
+   "nl": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/nl",
+   "pt": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/pt",
+   "ro": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/sv"
+  }
  },
  "kbsynergy.com": {
   "list": [
@@ -2406,9 +2773,29 @@
  },
  "komodohealth.com": {
   "list": [
-   "en"
+   "da",
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "da": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/da",
+   "de": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/de",
+   "en": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/en-us",
+   "es": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/es",
+   "fr": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/fr",
+   "it": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/it",
+   "nl": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/nl",
+   "pt": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/pt",
+   "ro": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/ro",
+   "sv": "https://komodohealth-privacy.my.onetrust.com/webform/5c3cf8b1-3cf1-422d-84d5-618844b7316f/sv"
+  }
  },
  "kontextdata.com": {
   "list": [
@@ -2417,7 +2804,9 @@
   "pages": {}
  },
  "l2-data.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "lead-enhance.com": {
@@ -2430,14 +2819,19 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "leadfeeder.com": {
   "list": [
    "de",
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacycockpit.leadfeeder.com/de-DE",
+   "en": "https://privacycockpit.leadfeeder.com/en-US"
+  }
  },
  "leadiq.com": {
   "list": [
@@ -2483,9 +2877,17 @@
  },
  "lemlist.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://www.lemlist.com/de/legal/privacy-policy",
+   "en": "https://www.lemlist.com/legal/privacy-policy",
+   "es": "https://www.lemlist.com/es/legal/privacy-policy",
+   "fr": "https://www.lemlist.com/fr/legal/privacy-policy"
+  }
  },
  "leveragedigital.ai": {
   "list": [
@@ -2527,7 +2929,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://lightcast.io/legal/privacy-request"
+  }
  },
  "lionsharemarketing.com": {
   "list": [
@@ -2686,9 +3090,17 @@
  },
  "marriott.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/0894cd2c-85ba-4d0b-8ec1-e18f3735e0e0/de",
+   "en": "https://privacyportal.onetrust.com/webform/0894cd2c-85ba-4d0b-8ec1-e18f3735e0e0/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/0894cd2c-85ba-4d0b-8ec1-e18f3735e0e0/es",
+   "fr": "https://privacyportal.onetrust.com/webform/0894cd2c-85ba-4d0b-8ec1-e18f3735e0e0/fr"
+  }
  },
  "marylandarrests.org": {
   "list": [
@@ -2712,13 +3124,17 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "maxmind.com": {
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.maxmind.com/en/home"
+  }
  },
  "meadleybrothers.com": {
   "list": [
@@ -2733,7 +3149,9 @@
   "pages": {}
  },
  "mediawallah.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "medprosystems.com": {
@@ -2771,12 +3189,17 @@
  },
  "meltwater.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "fr",
+   "ja"
   ],
   "pages": {}
  },
  "menstoppingviolence.org": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "merkle.com": {
@@ -2866,7 +3289,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://support.apple.com/en-us/HT201265"
+  }
  },
  "mobilewalla.com": {
   "list": [
@@ -2876,9 +3301,27 @@
  },
  "mobilityglobal.com": {
   "list": [
-   "en"
+   "da",
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "da": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/da",
+   "de": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/de",
+   "en": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/es",
+   "fr": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/fr",
+   "it": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/it",
+   "nl": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/nl",
+   "ro": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/87c0b060-447b-4c56-a99e-6fc89bd3c7e4/sv"
+  }
  },
  "modigie.com": {
   "list": [
@@ -2890,7 +3333,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.tiktok.com/@moneybot5000?lang=en"
+  }
  },
  "monitorbase.com": {
   "list": [
@@ -2961,7 +3406,9 @@
   "pages": {}
  },
  "mylife.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "n-focus.com": {
@@ -2975,7 +3422,9 @@
   "pages": {}
  },
  "nationalpublicdata.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "ncarrests.org": {
@@ -3080,7 +3529,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal.onetrust.com/webform/76394770-3c6c-4d28-a57b-18817b0a8e3f/en-us"
+  }
  },
  "nharrests.org": {
   "list": [
@@ -3103,7 +3554,10 @@
    "th",
    "zh"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/en-us",
+   "es": "https://privacyportal-de.onetrust.com/webform/70b0083d-d519-4ad2-84ca-96b7c5f8e1a9/es"
+  }
  },
  "njarrests.org": {
   "list": [
@@ -3214,7 +3668,9 @@
   "pages": {}
  },
  "ohioresidentdatabase.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "oklahomaarrests.org": {
@@ -3269,6 +3725,7 @@
    "fr"
   ],
   "pages": {
+   "en": "https://www.optable.co/",
    "fr": "https://fr.optable.co/"
   }
  },
@@ -3285,7 +3742,9 @@
   "pages": {}
  },
  "oregonpublicrecords.org": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "outbrain.com": {
@@ -3298,7 +3757,9 @@
    "ja",
    "pt"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.outbrain.com/privacy/"
+  }
  },
  "outkeep.com": {
   "list": [
@@ -3310,7 +3771,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "outwardmedia.com": {
   "list": [
@@ -3393,7 +3856,9 @@
   "pages": {}
  },
  "peoplefinders.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "peoplefindersdaas.com": {
@@ -3421,7 +3886,9 @@
   "pages": {}
  },
  "peoplesearchnow.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "peoplesearchusa.org": {
@@ -3437,14 +3904,18 @@
   "pages": {}
  },
  "peoplewhiz.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "perion.com": {
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "persistent.id": {
   "list": [
@@ -3554,7 +4025,10 @@
  },
  "precisely.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "fr",
+   "ja"
   ],
   "pages": {}
  },
@@ -3566,9 +4040,17 @@
  },
  "preqin.com": {
   "list": [
-   "en"
+   "en",
+   "ja",
+   "ko",
+   "zh"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://preqin.com/policies/privacy-policy",
+   "ja": "https://preqin.com/jp/policies/privacy-policy",
+   "ko": "https://preqin.com/kr",
+   "zh": "https://www.preqin.net.cn/policies/privacy-policy"
+  }
  },
  "privaterecords.net": {
   "list": [
@@ -3628,7 +4110,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.tiktok.com/@publicdatacheck?lang=en"
+  }
  },
  "publicinfoservices.com": {
   "list": [
@@ -3685,7 +4169,8 @@
  },
  "quad.com": {
   "list": [
-   "en"
+   "en",
+   "es"
   ],
   "pages": {}
  },
@@ -3760,7 +4245,9 @@
   "pages": {}
  },
  "redidata.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "redmob.io": {
@@ -3806,14 +4293,22 @@
   "pages": {}
  },
  "reunion.com": {
-  "list": [],
-  "pages": {}
- },
- "revcontent.com": {
   "list": [
    "en"
   ],
   "pages": {}
+ },
+ "revcontent.com": {
+  "list": [
+   "en",
+   "es",
+   "pt"
+  ],
+  "pages": {
+   "en": "https://www.revcontent.com/legal/optout/en",
+   "es": "https://www.revcontent.com/legal/optout/es",
+   "pt": "https://www.revcontent.com/legal/optout/pt"
+  }
  },
  "revealmobile.com": {
   "list": [
@@ -3880,7 +4375,9 @@
   "pages": {}
  },
  "rocketreach.co": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "roq.ad": {
@@ -3932,7 +4429,9 @@
   "pages": {}
  },
  "salutarydata.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "samba.tv": {
@@ -4010,7 +4509,10 @@
    "en",
    "es"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.searchusapeople.com/",
+   "es": "https://www.searchusapeople.com/es/"
+  }
  },
  "secondchanceapartments.com": {
   "list": [
@@ -4062,8 +4564,11 @@
  },
  "sharethrough.com": {
   "list": [
+   "de",
    "en",
-   "fr"
+   "es",
+   "fr",
+   "ru"
   ],
   "pages": {
    "en": "https://www.equativ.com/contact",
@@ -4115,7 +4620,11 @@
  },
  "smarte.pro": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "nl",
+   "pt"
   ],
   "pages": {}
  },
@@ -4125,7 +4634,9 @@
    "es"
   ],
   "pages": {
+   "en": "https://www.smartmove.us/",
    "en-us": "https://www.smartmove.us/",
+   "es": "https://www.smartmove.us/es",
    "es-mx": "https://www.smartmove.us/es"
   }
  },
@@ -4254,7 +4765,9 @@
   "pages": {}
  },
  "spyfly.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "stackadapt.com": {
@@ -4424,7 +4937,9 @@
   "pages": {}
  },
  "thatsthem.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "thebridgecorp.com": {
@@ -4510,11 +5025,14 @@
    "en"
   ],
   "pages": {
+   "en": "https://www.tracerfy.com/privacy-choices",
    "en-US": "https://www.tracerfy.com/privacy-choices"
   }
  },
  "transunion.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "trelize.com": {
@@ -4531,9 +5049,27 @@
  },
  "triplelift.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "nl",
+   "pt",
+   "ro",
+   "sv"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/de",
+   "en": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/es",
+   "fr": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/fr",
+   "it": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/it",
+   "nl": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/nl",
+   "pt": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/pt",
+   "ro": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/ro",
+   "sv": "https://privacyportal.onetrust.com/webform/7665c53e-aae8-4a03-9dd3-66fb6bce8f55/sv"
+  }
  },
  "tripwiredata.com": {
   "list": [],
@@ -4550,15 +5086,21 @@
   "pages": {}
  },
  "truepeoplesearch.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "truthed.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "truthfinder.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "truthrecord.org": {
@@ -4596,7 +5138,9 @@
   "pages": {}
  },
  "unitedstatesphonebook.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "unmask.com": {
@@ -4652,11 +5196,15 @@
   "pages": {}
  },
  "usatrace.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "usdatacorporation.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "usmarketinggrp.com": {
@@ -4664,11 +5212,14 @@
    "en"
   ],
   "pages": {
+   "en": "https://usmarketinggrp.com/",
    "en-us": "https://usmarketinggrp.com/"
   }
  },
  "uspeoplesearch.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "usphonebook.com": {
@@ -4707,9 +5258,23 @@
  },
  "veeva.com": {
   "list": [
-   "en"
+   "de",
+   "en",
+   "es",
+   "fr",
+   "it",
+   "tr",
+   "vi"
   ],
-  "pages": {}
+  "pages": {
+   "de": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/de",
+   "en": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/en-us",
+   "es": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/es",
+   "fr": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/fr",
+   "it": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/it",
+   "tr": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/tr",
+   "vi": "https://privacyportal.onetrust.com/webform/3d676ed2-16b1-4c48-97f8-a911923a3adf/vi"
+  }
  },
  "vendelux.com": {
   "list": [
@@ -4752,8 +5317,24 @@
   "pages": {}
  },
  "verisk.com": {
-  "list": [],
-  "pages": {}
+  "list": [
+   "da",
+   "de",
+   "en",
+   "fr",
+   "nb",
+   "no",
+   "sv"
+  ],
+  "pages": {
+   "da": "https://www.verisk.com/da-dk/",
+   "de": "https://www.verisk.com/de-de/",
+   "en": "https://www.verisk.com/en-gb/",
+   "fr": "https://www.verisk.com/fr-ca/",
+   "nb": "https://www.verisk.com/nb-no/",
+   "no": "https://www.verisk.com/en-no/",
+   "sv": "https://www.verisk.com/sv-se/"
+  }
  },
  "vermontcourtrecords.us": {
   "list": [
@@ -4775,7 +5356,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.cookiebot.com/en/what-is-behind-powered-by-cookiebot/?utm_source=banner_cb&utm_medium=referral&utm_content=v2"
+  }
  },
  "viantinc.com": {
   "list": [
@@ -4924,7 +5507,9 @@
   "pages": {}
  },
  "winrdata.com": {
-  "list": [],
+  "list": [
+   "en"
+  ],
   "pages": {}
  },
  "wisconsinarrests.org": {
@@ -4998,11 +5583,15 @@
  "yellowbook.com": {
   "list": [
    "de",
-   "en"
+   "en",
+   "es",
+   "fr"
   ],
   "pages": {
    "de": "https://wingify.com/de/opt-out/",
-   "en": "https://wingify.com/opt-out/"
+   "en": "https://wingify.com/opt-out/",
+   "es": "https://wingify.com/es/#locale_lang",
+   "fr": "https://wingify.com/fr/#locale_lang"
   }
  },
  "yieldmo.com": {
@@ -5033,7 +5622,9 @@
   "list": [
    "en"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.instagram.com/zeilapp/?hl=en"
+  }
  },
  "zerotoone.ai": {
   "list": [
@@ -5043,9 +5634,15 @@
  },
  "zetaglobal.com": {
   "list": [
-   "en"
+   "en",
+   "es",
+   "fr"
   ],
-  "pages": {}
+  "pages": {
+   "en": "https://www.zetaglobal.com/",
+   "es": "https://www.zetaglobal.com/es/",
+   "fr": "https://www.zetaglobal.com/fr/"
+  }
  },
  "zoominfo.com": {
   "list": [

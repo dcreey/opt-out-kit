@@ -22,4 +22,4 @@ about: {"category": "marketing_data", "summary": "Claritas LLC is a marketing da
 priority: 68
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Claritas LLC", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://privacyportal.onetrust.com/webform/68582716-6ce4-4f6e-bf08-78371b5f3292/en-us", "es": "https://privacyportal.onetrust.com/webform/68582716-6ce4-4f6e-bf08-78371b5f3292/es"}, "checked": "2026-10-26"}

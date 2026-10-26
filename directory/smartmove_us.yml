@@ -20,4 +20,4 @@ priority: 47
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "MX"], "evidence": "registered with a US state; nothing found for other places; has a MX site at https://www.smartmove.us/es (hreflang es-mx)", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "hreflang es-mx", "privacy_page": null, "region": "MX", "url": "https://www.smartmove.us/es"}]
-languages: {"list": ["en", "es"], "pages": {"en-us": "https://www.smartmove.us/", "es-mx": "https://www.smartmove.us/es"}, "checked": "2026-10-26"}
+languages: {"list": ["en", "es"], "pages": {"en": "https://www.smartmove.us/", "en-us": "https://www.smartmove.us/", "es": "https://www.smartmove.us/es", "es-mx": "https://www.smartmove.us/es"}, "checked": "2026-10-26"}

@@ -21,3 +21,4 @@ about: {"category": "adtech", "summary": "MediaWallah Inc is an advertising tech
 priority: 21
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

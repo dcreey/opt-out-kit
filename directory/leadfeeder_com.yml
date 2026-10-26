@@ -23,4 +23,4 @@ priority: 54
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "DE"], "evidence": "its pages mention GDPR; has a DE site at https://www.leadfeeder.com/de/ (hreflang de-DE)", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "hreflang de-DE", "privacy_page": null, "region": "DE", "url": "https://www.leadfeeder.com/de/"}]
-languages: {"list": ["de", "en"], "pages": {}, "checked": "2026-10-26"}
+languages: {"list": ["de", "en"], "pages": {"de": "https://privacycockpit.leadfeeder.com/de-DE", "en": "https://privacycockpit.leadfeeder.com/en-US"}, "checked": "2026-10-26"}

@@ -16,4 +16,4 @@ about: {"category": "real_estate", "summary": "Tracerfy LLC is a property and re
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
-languages: {"list": ["en"], "pages": {"en-US": "https://www.tracerfy.com/privacy-choices"}, "checked": "2026-10-26"}
+languages: {"list": ["en"], "pages": {"en": "https://www.tracerfy.com/privacy-choices", "en-US": "https://www.tracerfy.com/privacy-choices"}, "checked": "2026-10-26"}
