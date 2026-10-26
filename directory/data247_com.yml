@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.data247.com/"
+opt_out_url: null
 registered_in: [TX]
 signals: [mail_option, phone_verify]
 profiled: "2026-10-22"

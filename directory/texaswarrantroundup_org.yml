@@ -7,7 +7,7 @@ bucket: "direct"
 tier: "D"
 automation: "guided"
 confidence: "low"
-opt_out_url: "https://texaswarrantroundup.org/"
+opt_out_url: null
 signals: [email_contact, email_only_wording, name_input]
 profiled: "2026-10-21"
 search_check:

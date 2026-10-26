@@ -7,7 +7,7 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.issmarketintelligence.com/"
+opt_out_url: null
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

@@ -9385,25 +9385,25 @@
     }
    }
   },
-  "We found the opt-out page but could not read a form on it, so we take you there.": {
+  "We found the opt-out page, but the app cannot fill in its form for you, so we take you there and walk you through it.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nous avons trouvé la page de retrait mais n'avons pas pu y lire de formulaire : nous vous y emmenons."
+      "value": "Nous avons trouvé la page de retrait, mais l'app ne peut pas remplir son formulaire à votre place : nous vous y emmenons et vous guidons."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Encontramos la página de baja pero no pudimos leer un formulario en ella, así que te llevamos allí."
+      "value": "Encontramos la página de baja, pero la app no puede rellenar su formulario por ti, así que te llevamos allí y te guiamos."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Wir haben die Opt-out-Seite gefunden, konnten dort aber kein Formular lesen, daher bringen wir Sie hin."
+      "value": "Wir haben die Opt-out-Seite gefunden, aber die App kann ihr Formular nicht für Sie ausfüllen. Wir führen Sie hin und begleiten Sie Schritt für Schritt."
      }
     }
    }

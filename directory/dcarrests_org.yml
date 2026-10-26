@@ -7,7 +7,7 @@ bucket: "indirect"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.dcarrests.org/"
+opt_out_url: null
 signals: [email_contact, id_required, mail_option, name_input]
 profiled: "2026-10-21"
 search_check:

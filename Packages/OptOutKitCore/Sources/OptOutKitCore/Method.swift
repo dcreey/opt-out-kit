@@ -46,7 +46,7 @@ public enum OptOutMethods {
             if let mail = e.contactEmail {
                 return MethodVerdict(method: .guided, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
             }
-            if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page but could not read a form on it, so we take you there.")) }
+            if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page, but the app cannot fill in its form for you, so we take you there and walk you through it.")) }
             switch e.automation {
             case .blocked: return MethodVerdict(method: .manual, reason: L10n.t("The site refuses automated visits, so we could not find its opt-out page."))
             case .needsBrowser: return MethodVerdict(method: .manual, reason: L10n.t("The site is built so that we could not read it to find the opt-out page."))

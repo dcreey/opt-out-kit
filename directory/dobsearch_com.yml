@@ -7,7 +7,7 @@ bucket: "indirect"
 tier: "A"
 automation: "scriptable"
 confidence: "low"
-opt_out_url: "https://www.dobsearch.com/"
+opt_out_url: null
 family: "beenverified_com"
 family_parent: "beenverified.com"
 signals: [email_input, phone_input]

@@ -2922,6 +2922,29 @@
     }
    }
   },
+  "Age": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Âge"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Edad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alter"
+     }
+    }
+   }
+  },
   "Age or birthdate": {
    "extractionState": "manual",
    "localizations": {
@@ -4022,6 +4045,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Große manuelle Aufgaben bei Ihnen oder in Ihrem Land"
+     }
+    }
+   }
+  },
+  "Birth day": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jour de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Día de nacimiento"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geburtstag"
+     }
+    }
+   }
+  },
+  "Birth month": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mois de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mes de nacimiento"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geburtsmonat"
+     }
+    }
+   }
+  },
+  "Birth year": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Année de naissance"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Año de nacimiento"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geburtsjahr"
      }
     }
    }
@@ -5931,6 +6023,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Daten, die Sie einer Firma für einen Zweck gegeben haben, werden behalten und ohne Ihr Wissen anderswo verkauft."
+     }
+    }
+   }
+  },
+  "Date": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Date"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fecha"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Datum"
      }
     }
    }
@@ -10646,6 +10761,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Erwähnt das Senden eines Antrags per Post"
+     }
+    }
+   }
+  },
+  "Message": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Message"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mensaje"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nachricht"
      }
     }
    }
@@ -17596,6 +17734,29 @@
     }
    }
   },
+  "Subject": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Objet"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Asunto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Betreff"
+     }
+    }
+   }
+  },
   "Submit it": {
    "extractionState": "manual",
    "localizations": {
@@ -19478,6 +19639,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieser Ablauf wurde noch nicht durch einen echten Durchlauf geprüft. Die Schritte können veraltet sein."
+     }
+    }
+   }
+  },
+  "This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande des informations professionnelles (« %@ ») : c'est un formulaire de contact pour entreprises, pas un retrait personnel."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide datos de empresa (\"%@\"), así que es un formulario de contacto comercial y no una baja personal."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular fragt nach Geschäftsangaben („%@“); es ist ein Geschäftskontaktformular und kein persönliches Opt-out."
      }
     }
    }

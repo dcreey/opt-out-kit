@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.forager.ai/"
+opt_out_url: null
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, email_contact, login_required]
 profiled: "2026-10-22"

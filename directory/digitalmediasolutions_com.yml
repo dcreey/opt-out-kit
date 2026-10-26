@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://digitalmediasolutions.com/"
+opt_out_url: null
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input]
 profiled: "2026-10-22"
