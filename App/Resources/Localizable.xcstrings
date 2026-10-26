@@ -1450,6 +1450,75 @@
     }
    }
   },
+  "1. Use a browser that sends it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1. Utilisez un navigateur qui l'envoie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1. Use un navegador que la envíe"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1. Nutzen Sie einen Browser, der es sendet"
+     }
+    }
+   }
+  },
+  "2. Make it your default browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "2. Faites-en votre navigateur par défaut"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "2. Hágalo su navegador predeterminado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "2. Machen Sie ihn zu Ihrem Standardbrowser"
+     }
+    }
+   }
+  },
+  "3. Check that it works": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "3. Vérifiez que cela fonctionne"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "3. Compruebe que funciona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "3. Prüfen Sie, ob es funktioniert"
+     }
+    }
+   }
+  },
   "A bank spots that someone is using your name to open a credit card and blocks it before you ever find out.": {
    "extractionState": "manual",
    "localizations": {
@@ -3658,6 +3727,29 @@
     }
    }
   },
+  "Apps on iPhone cannot change another browser's settings, so we walk you through it. The setting then applies to every site you browse, not only the ones in this app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une app sur iPhone ne peut pas modifier les réglages d'un autre navigateur ; nous vous guidons donc. Le réglage s'applique ensuite à tous les sites que vous visitez, pas seulement à ceux de cette app."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una app en iPhone no puede cambiar los ajustes de otro navegador, así que le guiamos. El ajuste se aplica luego a todos los sitios que visite, no solo a los de esta app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apps auf dem iPhone können die Einstellungen eines anderen Browsers nicht ändern, deshalb führen wir Sie durch. Die Einstellung gilt dann für alle Seiten, die Sie besuchen, nicht nur für die in dieser App."
+     }
+    }
+   }
+  },
   "Arizona": {
    "extractionState": "manual",
    "localizations": {
@@ -4390,6 +4482,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Blockiert automatische Anfragen"
+     }
+    }
+   }
+  },
+  "Brave and DuckDuckGo send the signal by default. Safari does not have a switch for it. Install one of them from the App Store.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave et DuckDuckGo envoient le signal par défaut. Safari n'a pas de réglage pour cela. Installez l'un d'eux depuis l'App Store."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave y DuckDuckGo envían la señal por defecto. Safari no tiene un interruptor para ello. Instale uno de ellos desde la App Store."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave und DuckDuckGo senden das Signal standardmäßig. Safari hat dafür keinen Schalter. Installieren Sie einen von beiden aus dem App Store."
      }
     }
    }
@@ -8465,6 +8580,52 @@
     }
    }
   },
+  "Get Brave": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obtenir Brave"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obtener Brave"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Brave holen"
+     }
+    }
+   }
+  },
+  "Get DuckDuckGo": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obtenir DuckDuckGo"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obtener DuckDuckGo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "DuckDuckGo holen"
+     }
+    }
+   }
+  },
   "Ghost": {
    "extractionState": "manual",
    "localizations": {
@@ -8507,6 +8668,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Global Privacy Control"
+     }
+    }
+   }
+  },
+  "Global Privacy Control: done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control : fait"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control: hecho"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control: erledigt"
      }
     }
    }
@@ -9128,6 +9312,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ich habe nur diesen Hinweis gelesen, nicht die vollständigen Bedingungen dieser Website."
+     }
+    }
+   }
+  },
+  "I turned it on": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Je l'ai activé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo activé"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ich habe es eingeschaltet"
      }
     }
    }
@@ -11198,6 +11405,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Als erledigt markieren"
+     }
+    }
+   }
+  },
+  "Marked as done. Tap to undo.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marqué comme fait. Touchez pour annuler."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marcado como hecho. Toque para deshacer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als erledigt markiert. Tippen zum Rückgängigmachen."
      }
     }
    }
@@ -13295,6 +13525,29 @@
     }
    }
   },
+  "On a computer, Firefox has a setting for it: Settings, Privacy and Security, then \"Tell websites not to sell or share my data\".": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sur ordinateur, Firefox a un réglage : Réglages, Vie privée et sécurité, puis « Dire aux sites de ne pas vendre ni partager mes données »."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En ordenador, Firefox tiene un ajuste: Ajustes, Privacidad y seguridad, y «Decir a los sitios web que no vendan ni compartan mis datos»."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Am Computer hat Firefox eine Einstellung dafür: Einstellungen, Datenschutz & Sicherheit, dann „Websites mitteilen, meine Daten nicht zu verkaufen oder weiterzugeben“."
+     }
+    }
+   }
+  },
   "On forms we use %@": {
    "extractionState": "manual",
    "localizations": {
@@ -13732,6 +13985,29 @@
     }
    }
   },
+  "One setting in your browser, about 5 minutes. It tells every site you visit not to sell or share your data.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un réglage dans votre navigateur, environ 5 minutes. Il dit à chaque site visité de ne pas vendre ni partager vos données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un ajuste en su navegador, unos 5 minutos. Dice a cada sitio que visita que no venda ni comparta sus datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Einstellung in Ihrem Browser, etwa 5 Minuten. Sie sagt jeder besuchten Seite, Ihre Daten nicht zu verkaufen oder weiterzugeben."
+     }
+    }
+   }
+  },
   "One task can handle many sites. A site is never listed twice.": {
    "extractionState": "manual",
    "localizations": {
@@ -13751,6 +14027,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine Aufgabe kann viele Seiten erledigen. Keine Seite steht zweimal da."
+     }
+    }
+   }
+  },
+  "One-time setting": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Réglage unique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajuste único"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einmalige Einstellung"
      }
     }
    }
@@ -14100,6 +14399,52 @@
     }
    }
   },
+  "Open the check page": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir la page de vérification"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir la página de comprobación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prüfseite öffnen"
+     }
+    }
+   }
+  },
+  "Open the check page in that browser. It tells you whether the signal is being sent.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez la page de vérification dans ce navigateur. Elle indique si le signal est envoyé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abra la página de comprobación en ese navegador. Le dice si se envía la señal."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die Prüfseite in diesem Browser. Sie zeigt, ob das Signal gesendet wird."
+     }
+    }
+   }
+  },
   "Open the email and click its link. We cannot read your inbox.": {
    "extractionState": "manual",
    "localizations": {
@@ -14142,6 +14487,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie die E-Mail, halten Sie die Schaltfläche oder den Link gedrückt und wählen Sie „Link kopieren“. Kommen Sie dann hierher zurück und tippen Sie auf Einfügen."
+     }
+    }
+   }
+  },
+  "Open the iPhone Settings app, find the browser in the list of apps, and choose it under Default Browser App. Links from other apps then open in it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez Réglages sur l'iPhone, trouvez le navigateur dans la liste des apps et choisissez-le sous App de navigation par défaut. Les liens d'autres apps s'y ouvriront."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abra Ajustes en el iPhone, busque el navegador en la lista de apps y elíjalo en App de navegador predeterminada. Los enlaces de otras apps se abrirán en él."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnen Sie die iPhone-Einstellungen, suchen Sie den Browser in der App-Liste und wählen Sie ihn unter „Standard-Browser-App“. Links aus anderen Apps öffnen sich dann darin."
      }
     }
    }
@@ -17316,6 +17684,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesendet; bestätigen Sie die E-Mail, die man Ihnen geschickt hat"
+     }
+    }
+   }
+  },
+  "Set up Global Privacy Control": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Configurer Global Privacy Control"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Configurar Global Privacy Control"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control einrichten"
      }
     }
    }
@@ -22104,6 +22495,29 @@
     }
    }
   },
+  "Turn on Global Privacy Control": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Activer Global Privacy Control"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Activar Global Privacy Control"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Global Privacy Control einschalten"
+     }
+    }
+   }
+  },
   "Turn on and start": {
    "extractionState": "manual",
    "localizations": {
@@ -23618,6 +24032,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Was es ist"
+     }
+    }
+   }
+  },
+  "What it is and who has to honor it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce que c'est et qui doit le respecter"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Qué es y quién debe respetarla"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was es ist und wer es beachten muss"
      }
     }
    }

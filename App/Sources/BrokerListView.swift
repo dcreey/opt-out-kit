@@ -70,6 +70,16 @@ struct BrokerListView: View {
                         }
                     } footer: { Text("These sites collect data about people elsewhere. We start with the ones that reach where you live.") }
                 }
+                if !model.gpcSetupDone {
+                    Section {
+                        NavigationLink { GPCSetupView() } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Label("Turn on Global Privacy Control", systemImage: "hand.raised.square").font(.headline)
+                                Text("One setting in your browser, about 5 minutes. It tells every site you visit not to sell or share your data.").font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }.accessibilityIdentifier("gpc-setup-task")
+                    } header: { Text("One-time setting") }
+                }
                 let goals = model.dailyGoals
                 if model.needsKindChoice {
                     // Every day opens on one question: which kind of broker to tackle.

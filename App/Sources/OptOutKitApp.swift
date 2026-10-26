@@ -702,6 +702,12 @@ final class AppModel: ObservableObject {
     var shouldTourLinkFiller: Bool { !defaults.bool(forKey: Self.linkTourKey) }
     func markLinkFillerToured() { defaults.set(true, forKey: Self.linkTourKey) }
 
+    private static let gpcKey = "gpc.setup.done"
+    /// Whether the person said they turned on the Global Privacy Control in the browser they use. It is a one-time setting task, not a site: it
+    /// is not in the plan, so it never counts toward the day's sites, requests sent or the streak.
+    var gpcSetupDone: Bool { _ = regionTick; return defaults.bool(forKey: Self.gpcKey) }
+    func setGPCSetupDone(_ on: Bool) { defaults.set(on, forKey: Self.gpcKey); regionTick += 1 }
+
     private static let followUpKey = "followup.explained"
     /// The first time the person has sent anything, once: why the day ends with an email and what to expect in the inbox.
     var shouldExplainFollowUp: Bool { !defaults.bool(forKey: Self.followUpKey) && activitySummary.sites > 0 }

@@ -20,7 +20,8 @@ struct AboutView: View {
                     Text("Your information never leaves this phone, except to the sites you opt out of. There is no Opt-Out Kit server, no account, no analytics and no tracking.")
                     Text("What you enter is stored encrypted on this phone. If you lose your phone without a backup, it is gone. A normal iPhone backup carries it.")
                 }
-                Section { NavigationLink { GlobalPrivacyControlView() } label: { Label("Global Privacy Control", systemImage: "hand.raised.square") }.accessibilityIdentifier("gpc-link") }
+                Section { NavigationLink { GPCSetupView() } label: { Label(model.gpcSetupDone ? "Global Privacy Control: done" : "Set up Global Privacy Control", systemImage: model.gpcSetupDone ? "checkmark.circle.fill" : "hand.raised.square") }
+                    NavigationLink { GlobalPrivacyControlView() } label: { Label("Global Privacy Control", systemImage: "hand.raised.square") }.accessibilityIdentifier("gpc-link") }
                 Section {
                     if let j = model.ownerJurisdiction {
                         NavigationLink("Your place: \(j.displayName)") {
@@ -208,13 +209,46 @@ struct GlobalPrivacyControlView: View {
                 Text("You can switch it on anywhere. Only the states below make sites obey it; elsewhere it is a request that some sites honor anyway and others ignore.")
             }
             Section("Turn it on in your browser") {
-                Text("Firefox: Settings, Privacy and Security, then \"Tell websites not to sell or share my data\".")
+                Text("On a computer, Firefox has a setting for it: Settings, Privacy and Security, then \"Tell websites not to sell or share my data\".")
                 Text("Brave and DuckDuckGo: already on by default.")
                 Text("Safari has no built-in switch, so use one of those browsers for everyday browsing.")
             }
             Section("States that require sites to honor it") {
                 Text(states.map(\.displayName).joined(separator: ", ")).font(.footnote)
                 Text("Sources disagree on the full list and it is growing, so a state missing here may still require it.").font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Global Privacy Control")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+
+/// A walkthrough for turning the Global Privacy Control on. An app cannot change another browser's settings, so the person does each step.
+struct GPCSetupView: View {
+    @EnvironmentObject var model: AppModel
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        List {
+            Section { Text("Apps on iPhone cannot change another browser's settings, so we walk you through it. The setting then applies to every site you browse, not only the ones in this app.").font(.footnote).foregroundStyle(.secondary) }
+            Section("1. Use a browser that sends it") {
+                Text("Brave and DuckDuckGo send the signal by default. Safari does not have a switch for it. Install one of them from the App Store.")
+                Button("Get Brave") { openURL(URL(string: "https://brave.com/download/")!) }
+                Button("Get DuckDuckGo") { openURL(URL(string: "https://duckduckgo.com/app")!) }
+            }
+            Section("2. Make it your default browser") {
+                Text("Open the iPhone Settings app, find the browser in the list of apps, and choose it under Default Browser App. Links from other apps then open in it.")
+            }
+            Section("3. Check that it works") {
+                Text("Open the check page in that browser. It tells you whether the signal is being sent.")
+                Button("Open the check page") { openURL(URL(string: "https://globalprivacycontrol.org")!) }
+            }
+            Section {
+                Button { model.setGPCSetupDone(!model.gpcSetupDone) } label: {
+                    Label(model.gpcSetupDone ? "Marked as done. Tap to undo." : "I turned it on", systemImage: model.gpcSetupDone ? "checkmark.circle.fill" : "circle")
+                }.accessibilityIdentifier("gpc-done")
+                NavigationLink("What it is and who has to honor it") { GlobalPrivacyControlView() }
             }
         }
         .navigationTitle("Global Privacy Control")
