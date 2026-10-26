@@ -34,7 +34,7 @@ enum LiveFormPicker {
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
     private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
-    private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
+    private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
@@ -353,13 +353,18 @@ extension WebViewSession {
         let js = #"""
         (function(token){var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return false;
           var bad=/agree|accept|cancel|clear|reset|back|add another|^\+|subscribe/i;
+          // A sign-up, demo or contact button is never pressed, whatever the form around it says (an "unsubscribe" or opt-out button is fine).
+          var signup=/subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\bjoin\b|waitlist|\bdemo\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|get in touch|send message|contact us|book a/i, optout=/opt.?out|unsubscribe|do not sell|remove|delete|privacy/i;
+          var refuse=function(b){var t=((b.innerText||b.value||'')+'').trim(); return signup.test(t)&&!optout.test(t);};
           var bs=[].slice.call(f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')).filter(function(b){
             var t=((b.innerText||b.value||'')+'').trim(); var r=b.getBoundingClientRect(); return r.width>0&&r.height>0&&!bad.test(t);});
           var pick=null;
           for(var i=0;i<bs.length&&!pick;i++){var ty=(bs[i].getAttribute('type')||'').toLowerCase(); if(ty==='submit') pick=bs[i];}
           for(var i=0;i<bs.length&&!pick;i++){if(/submit|send|opt|continue|request|go|confirm|remove|delete/i.test((bs[i].innerText||bs[i].value||''))) pick=bs[i];}
           if(!pick&&bs.length) pick=bs[bs.length-1];
+          if(pick&&refuse(pick)) return false;
           if(pick){pick.scrollIntoView({block:'center'}); pick.click(); return true;}
+          if([].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).some(refuse)) return false;
           if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})(\#(Self.liveLiteral(token)));
         """#
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false

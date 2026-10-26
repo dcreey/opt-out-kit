@@ -47,6 +47,17 @@ struct BrokerListView: View {
                         .accessibilityIdentifier("home-auto-working")
                     }
                 }
+                if let place = model.ownerJurisdiction, (model.ownerCountry ?? "US") != "US" {
+                    // Outside the US the app has no local opt-outs yet; the person is told, and shown what their country runs that we will add.
+                    Section {
+                        Label(Loc.f("Opt-outs for %@ are coming later. We are unlocking them country by country.", place.displayName), systemImage: "globe.europe.africa")
+                        if !(place.futureWork ?? []).isEmpty { NavigationLink { FutureWorkView(place: place) } label: { Text("What we plan to add for you") } }
+                    }
+                } else if (model.ownerCountry ?? "US") != "US" {
+                    Section { Label("Opt-outs for your country are coming later. We are unlocking them country by country.", systemImage: "globe.europe.africa") }
+                } else if let place = model.ownerJurisdiction, !(place.futureWork ?? []).isEmpty {
+                    Section { NavigationLink { FutureWorkView(place: place) } label: { Label("Coming later for your state", systemImage: "clock.badge") } }
+                }
                 let goals = model.dailyGoals
                 if model.needsKindChoice {
                     // Every day opens on one question: which kind of broker to tackle.
@@ -498,5 +509,39 @@ struct KindBriefingView: View {
         }
         .presentationDetents([.large])
         .interactiveDismissDisabled()
+    }
+}
+
+
+/// The lists and mechanisms a place's law or government runs that the app does not use yet.
+struct FutureWorkView: View {
+    let place: Jurisdiction
+
+    private func title(_ kind: String) -> String {
+        switch kind {
+        case "broker_registry": return Loc.t("A list of data brokers")
+        case "central_register": return Loc.t("A national opt-out register")
+        case "one_stop_deletion": return Loc.t("One request to every broker")
+        case "opt_out_signal": return Loc.t("An automatic opt-out signal")
+        default: return kind
+        }
+    }
+
+    var body: some View {
+        List {
+            Section { Text("These are lists your place runs or requires. We are not using them yet, and we will tell you when we do. Your other opt-outs work as usual.").font(.footnote).foregroundStyle(.secondary) }
+            ForEach(place.futureWork ?? []) { item in
+                Section {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title(item.kind)).font(.caption).foregroundStyle(.secondary)
+                        Text(item.name).font(.headline)
+                        Text(item.note).font(.footnote)
+                        if let u = item.url.flatMap({ URL(string: $0) }) { Link(u.host ?? "", destination: u).font(.footnote) }
+                    }
+                }
+            }
+        }
+        .navigationTitle(place.displayName)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

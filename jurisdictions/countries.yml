@@ -55,6 +55,12 @@ jurisdictions:
       name: "Office of the Australian Information Commissioner (OAIC)"
       url: "https://www.oaic.gov.au"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Do Not Call Register"
+        url: "https://www.donotcall.gov.au"
+        note: "Run by the ACMA under the Do Not Call Register Act 2006 for phone and fax marketing."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=AU"]
     pending:
@@ -99,6 +105,11 @@ jurisdictions:
       name: "Belgian Data Protection Authority"
       url: "https://www.dataprotectionauthority.be"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Robinson list"
+        note: "A national marketing opt-out list. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-br
@@ -151,6 +162,12 @@ jurisdictions:
       status: live
       kind: agents
       agency: "Commission d'accès à l'information du Québec"
+    future_work:
+      - kind: central_register
+        name: "National Do Not Call List"
+        url: "https://lnnte-dncl.gc.ca"
+        note: "Run by the CRTC for telemarketing calls. Charities, pollsters and some others are exempt."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=CA", "https://www.priv.gc.ca"]
     pending:
@@ -308,6 +325,11 @@ jurisdictions:
       name: "Office of the Data Protection Ombudsman"
       url: "https://tietosuoja.fi"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Finnish mail and phone marketing bans"
+        note: "Finland has combined mail and phone marketing opt-out services. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-fr
@@ -326,6 +348,12 @@ jurisdictions:
       name: "Commission nationale de l'informatique et des libertés (CNIL)"
       url: "https://www.cnil.fr"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Bloctel"
+        url: "https://www.bloctel.gouv.fr"
+        note: "The state telemarketing opt-out list. Companies must check it before calling."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-de
@@ -344,6 +372,11 @@ jurisdictions:
       name: "Federal Commissioner for Data Protection and Freedom of Information (BfDI) and the state authorities"
       url: "https://www.bfdi.bund.de"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Robinsonliste"
+        note: "An industry-run list, not a statutory register. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-gr
@@ -378,6 +411,11 @@ jurisdictions:
       name: "Office of the Privacy Commissioner for Personal Data (PCPD)"
       url: "https://www.pcpd.org.hk"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Do-Not-Call registers"
+        note: "Hong Kong’s registers under the Unsolicited Electronic Messages Ordinance. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=HK"]
   - id: country-hu
@@ -429,6 +467,11 @@ jurisdictions:
     regulator:
       name: "Data Protection Board of India"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "National Customer Preference Register (TRAI)"
+        note: "India’s do-not-disturb register for commercial calls and texts. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=IN"]
     pending:
@@ -509,6 +552,12 @@ jurisdictions:
       name: "Garante per la protezione dei dati personali"
       url: "https://www.garanteprivacy.it"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Registro Pubblico delle Opposizioni"
+        url: "https://www.registrodelleopposizioni.it"
+        note: "A public register to stop telemarketing and paper-mail marketing from the lists the law covers."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-jp
@@ -648,6 +697,12 @@ jurisdictions:
     regulator:
       name: "Secretaría Anticorrupción y Buen Gobierno"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "REPEP (Registro Público para Evitar Publicidad)"
+        url: "https://repep.profeco.gob.mx"
+        note: "Free Profeco register to stop marketing calls and texts. Businesses must stop within 30 days of registration."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=MX"]
   - id: country-nl
@@ -666,6 +721,11 @@ jurisdictions:
       name: "Dutch Data Protection Authority (Autoriteit Persoonsgegevens)"
       url: "https://www.autoriteitpersoonsgegevens.nl"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Bel-me-niet Register"
+        note: "The Dutch do-not-call register. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-nz
@@ -682,6 +742,11 @@ jurisdictions:
       name: "Office of the Privacy Commissioner"
       url: "https://www.privacy.org.nz"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Name Removal Service (marketing lists)"
+        note: "A national service to be removed from addressed marketing lists. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=NZ"]
   - id: country-ng
@@ -826,6 +891,12 @@ jurisdictions:
       name: "Personal Data Protection Commission (PDPC)"
       url: "https://www.pdpc.gov.sg"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Do Not Call Registry"
+        url: "https://www.dnc.gov.sg"
+        note: "Singapore’s registry for marketing calls, texts and faxes. Needs checking against the operator’s current site."
+        sourced: false
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=SG"]
   - id: country-sk
@@ -912,6 +983,12 @@ jurisdictions:
       name: "Spanish Data Protection Agency (AEPD)"
       url: "https://www.aepd.es"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Lista Robinson"
+        url: "https://www.listarobinson.es"
+        note: "A register of people who do not want advertising by email, SMS, post or phone, overseen by the data protection agency."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
   - id: country-se
@@ -981,6 +1058,12 @@ jurisdictions:
       status: live
       kind: controllers
       agency: "Personal Data Protection Authority (VERBIS)"
+    future_work:
+      - kind: central_register
+        name: "İYS (Message Management System)"
+        url: "https://iys.org.tr"
+        note: "A central system run by the Ministry of Trade. No marketing message may be sent to a person who has no consent recorded there, and opt-outs are passed to it within three days. The sources date from 2020 to 2021, so deadlines need checking."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=TR"]
   - id: country-gb
@@ -997,6 +1080,12 @@ jurisdictions:
       name: "Information Commissioner's Office (ICO)"
       url: "https://ico.org.uk"
     broker_registry: null
+    future_work:
+      - kind: central_register
+        name: "Telephone Preference Service and Mailing Preference Service"
+        url: "https://www.tpsonline.org.uk"
+        note: "Free registers for unwanted sales calls (TPS, backed by law and overseen by the ICO) and addressed mail (MPS). Marketers must check them. No data broker registry exists."
+        sourced: true
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=GB", "https://ico.org.uk"]
   - id: country-uy

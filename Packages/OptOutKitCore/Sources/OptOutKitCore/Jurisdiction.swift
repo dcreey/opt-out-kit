@@ -67,6 +67,16 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
         public var note: String?
     }
 
+    /// A list or mechanism a law or government runs that the app does not use yet. Kept as future work, with where it was found.
+    public struct FutureWork: Decodable, Equatable, Sendable, Identifiable {
+        public var kind: String              // broker_registry | central_register | one_stop_deletion | opt_out_signal
+        public var name: String
+        public var url: String?
+        public var note: String
+        public var sourced: Bool?            // false when only the name is known and the details still need checking
+        public var id: String { kind + name }
+    }
+
     public var id: String
     public var code: String                  // "CA"
     public var name: String
@@ -79,10 +89,12 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
     public var regulator: Regulator?
     public var sources: [String]?
     public var pending: [PendingLaw]?
+    public var futureWork: [FutureWork]?
     public var reviewed: String
 
     enum CodingKeys: String, CodingKey {
         case id, code, name, kind, reviewed, bloc, regulator, sources, pending
+        case futureWork = "future_work"
         case privacyLaw = "privacy_law", brokerRegistry = "broker_registry"
         case deletionPlatform = "deletion_platform", deletionMechanismNote = "deletion_mechanism_note"
     }

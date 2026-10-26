@@ -1887,6 +1887,29 @@
     }
    }
   },
+  "A list of data brokers": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une liste de courtiers en données"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una lista de corredores de datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Liste von Datenhändlern"
+     }
+    }
+   }
+  },
   "A local shop you use sends a letter about a real sale.": {
    "extractionState": "manual",
    "localizations": {
@@ -1952,6 +1975,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein fehlerhafter Eintrag, etwa die Schulden oder Straftat einer anderen Person, taucht in Ihrem Bericht auf und kostet Sie eine Stelle oder Wohnung, bevor Sie den Fehler finden."
+     }
+    }
+   }
+  },
+  "A national opt-out register": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un registre national d'opposition"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un registro nacional de exclusión"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein nationales Widerspruchsregister"
      }
     }
    }
@@ -3240,6 +3286,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Außerdem sinnvoll"
+     }
+    }
+   }
+  },
+  "An automatic opt-out signal": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un signal de refus automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una señal de exclusión automática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein automatisches Widerspruchssignal"
      }
     }
    }
@@ -5080,6 +5149,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Kommen Sie später zurück und prüfen Sie, ob Sie entfernt geblieben sind"
+     }
+    }
+   }
+  },
+  "Coming later for your state": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bientôt pour votre État"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Próximamente para su estado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bald für Ihren Bundesstaat"
      }
     }
    }
@@ -13387,6 +13479,29 @@
     }
    }
   },
+  "One request to every broker": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande à tous les courtiers"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud a todos los corredores"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Anfrage an alle Datenhändler"
+     }
+    }
+   }
+  },
   "One run fills in and sends all %@ opt-out forms. You only handle a check or an email link if a site asks.": {
    "extractionState": "manual",
    "localizations": {
@@ -14280,6 +14395,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Opt-out-Formulare verwenden die E-Mail-Adresse Ihres eigenen Profils. Tragen Sie sie zuerst dort ein."
+     }
+    }
+   }
+  },
+  "Opt-outs for %@ are coming later. We are unlocking them country by country.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les retraits pour %@ arrivent plus tard. Nous les débloquons pays par pays."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las bajas para %@ llegarán más adelante. Las desbloqueamos país por país."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-outs für %@ folgen später. Wir schalten sie Land für Land frei."
+     }
+    }
+   }
+  },
+  "Opt-outs for your country are coming later. We are unlocking them country by country.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les retraits pour votre pays arrivent plus tard. Nous les débloquons pays par pays."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las bajas para su país llegarán más adelante. Las desbloqueamos país por país."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-outs für Ihr Land folgen später. Wir schalten sie Land für Land frei."
      }
     }
    }
@@ -20103,6 +20264,29 @@
     }
    }
   },
+  "These are lists your place runs or requires. We are not using them yet, and we will tell you when we do. Your other opt-outs work as usual.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce sont des listes que votre région gère ou exige. Nous ne les utilisons pas encore et vous préviendrons. Vos autres retraits fonctionnent comme d'habitude."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Son listas que su lugar gestiona o exige. Aún no las usamos y le avisaremos cuando lo hagamos. Sus demás bajas funcionan como siempre."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das sind Listen, die Ihr Ort führt oder vorschreibt. Wir nutzen sie noch nicht und sagen Bescheid, wenn es so weit ist. Ihre anderen Opt-outs funktionieren wie gewohnt."
+     }
+    }
+   }
+  },
   "These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.": {
    "extractionState": "manual",
    "localizations": {
@@ -23250,6 +23434,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Was uns aufgefallen ist"
+     }
+    }
+   }
+  },
+  "What we plan to add for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce que nous prévoyons d'ajouter pour vous"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo que planeamos añadir para usted"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was wir für Sie hinzufügen wollen"
      }
     }
    }

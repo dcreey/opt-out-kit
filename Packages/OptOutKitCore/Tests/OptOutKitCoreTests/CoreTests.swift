@@ -2354,6 +2354,33 @@ final class RunCheckTests: XCTestCase {
                        "a later check still moves it")
     }
 
+    /// A form that signs someone up (a demo, a newsletter, an account) is never filled in by the app: not in the background, not for the person.
+    func testNoSignUpFormIsFilledForTheirOwnSakeInTheDirectory() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries = try Registry.loadDirectory(dir)
+        let signup = try NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|activation|log.?in|sign.?in|password", options: .caseInsensitive)
+        for e in entries where e.excluded == nil {
+            guard let form = e.optOutForm else { continue }
+            let text = form.fields.map { $0.name + " " + $0.label }.joined(separator: " ")
+            guard signup.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { continue }
+            let m = OptOutMethods.classify(e).method
+            XCTAssertTrue(m == .guided || m == .manual, "\(e.domain) has a form with sign-up wording (\(text.prefix(120))) but is \(m)")
+        }
+    }
+
+    func testFutureWorkIsRecordedForPlacesWithTheirOwnLists() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("jurisdictions")
+        let all = try JurisdictionLoader.load(directory: dir)
+        func work(_ id: String) -> [Jurisdiction.FutureWork] { all.first { $0.id == id }?.futureWork ?? [] }
+        XCTAssertEqual(work("country-fr").first?.name, "Bloctel")
+        XCTAssertTrue(work("country-gb").contains { $0.kind == "central_register" })
+        XCTAssertTrue(work("us-nj").contains { $0.kind == "broker_registry" })
+        XCTAssertTrue(work("us-ca").contains { $0.kind == "opt_out_signal" })
+        for j in all { for w in j.futureWork ?? [] { XCTAssertFalse(w.note.isEmpty, "\(j.id) \(w.name)") } }
+    }
+
     func testTheReviewedRunIsInTheDirectory() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
