@@ -28,6 +28,7 @@ The app shows only opt-outs that a person can use for their own personal data. T
 | `affinity.co` | Not a data broker | CRM software for investment firms; privacy form is for its business users |
 | `americantreasurytaxsolutions.com` | Not a data broker | a tax-services firm serving individuals and businesses; it does not sell data about people |
 | `bdo.com` | Not a data broker | accounting and advisory firm; its pages are for business clients, not a data broker |
+| `clarivate.com` | Not a data broker | research-analytics company; its privacy form is for healthcare professionals and business users |
 | `commonroom.io` | Business-only opt-out | sales-intelligence software; its only form is a demo request for business buyers |
 | `communityimpact.com` | Not a data broker | a local news publisher; not a data broker |
 | `deloitte.com` | Not a data broker | consulting firm; its pages are for business clients, not a data broker |

@@ -5,12 +5,15 @@ puts a typed-code form last) before anything is opened.
   business  a required field asks for a company, job title, industry, role or relationship to the company
   agent     a required field asks for an authorized agent's details
   file      a required file upload or signature
+  state     a required state menu that does not offer the person's state
+  other     questions the app cannot read (a Google Form whose fields are all "Your answer")
   code      a required typed code or puzzle (the form stays semi-automated, but goes last)
 
 Input is the audit's results.json. Usage: apply_audit_blockers.py RESULTS.json [--dir directory]"""
 import argparse, json, os, re
 
-RULES = [("business", r"company|organi[sz]ation|job|title|industry|role|department|purpose|relationship|division|how did you hear"),
+RULES = [("business", r"company|organi[sz]ation|job|title|industry|role|department|purpose|relationship|division|how did you hear|research|your needs"),
+         ("state", r"\bstate\b|resident|jurisdiction|reside|residency"), ("other", r"^your answer$"),
          ("agent", r"agent|on behalf|authori[sz]ed"), ("file", r"\bfile\b|upload|attach|signature|e-?sign"),
          ("code", r"captcha|enter the (numbers|code|characters)|math|equation|five plus|verification code|security (code|check)")]
 

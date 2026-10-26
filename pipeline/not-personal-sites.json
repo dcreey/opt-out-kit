@@ -11,6 +11,10 @@
   "kind": "not_a_data_broker",
   "reason": "accounting and advisory firm; its pages are for business clients, not a data broker"
  },
+ "clarivate.com": {
+  "kind": "not_a_data_broker",
+  "reason": "research-analytics company; its privacy form is for healthcare professionals and business users"
+ },
  "commonroom.io": {
   "kind": "business_only",
   "reason": "sales-intelligence software; its only form is a demo request for business buyers"

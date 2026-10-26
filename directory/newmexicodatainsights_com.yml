@@ -15,7 +15,7 @@ live_form:
   checked: "2026-10-23"
   found: true
   page: "https://www.newmexicodatainsights.com/"
-  blockers: []
+  blockers: ["business"]
 about: {"category": "real_estate", "summary": "New Mexico Data Insights is a property and real-estate data company. Expert-led property research and analysis for real estate professionals, investors, and institutions nationwide. Its own pages mention email addresses, property and vehicles. Its policy does not name who it sells to.", "tracks": ["email", "property"], "sells_to": [], "source": "https://www.newmexicodatainsights.com/"}
 priority: 29
 persistence: {"result": "unknown", "reup_months": 12}

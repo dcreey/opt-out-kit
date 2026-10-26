@@ -203,13 +203,14 @@ extension WebViewSession {
           f.querySelectorAll('select').forEach(function(s){
             var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
             var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);
-            if(/state|country|province|region/.test(l)||/state of|country/.test(near)) return;
+            // A menu of states or countries is filled by value; a request-type menu that merely sits near the word "state" is not one.
+            if(/state|country|province|region/.test(l)||s.options.length>=40) return;
             if(s.selectedIndex>0 && s.value) return;
             var best=-1,bestScore=0;
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
               if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=3;
               if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,2);
-              if(/\b(consumer|individual|myself|resident|person|the (person|individual|subject)|data subject|yourself|owner|me)\b/i.test(t)&&!/business|agent|deceased|on behalf|representative/i.test(t)) sc=Math.max(sc,1);
+              if(/\b(consumer|individual|personal|myself|resident|person|the (person|individual|subject)|data subject|yourself|owner|me)\b/i.test(t)&&!/business|agent|deceased|on behalf|representative/i.test(t)) sc=Math.max(sc,1);
               // "Relationship with us" menus: a person who is only asking to be removed is a consumer, not a customer, employee or partner.
               if(/relationship|how do we know|are you a|i am/i.test(l+' '+near)&&/\b(consumer|individual|none of the above|not a (customer|client|user)|no relationship|general public|just a consumer|other)\b/i.test(t)&&!/business|agent|employee|partner|client of|vendor/i.test(t)) sc=Math.max(sc,1);
               if(/access|know|correct|update|portab/i.test(t)) sc=0;

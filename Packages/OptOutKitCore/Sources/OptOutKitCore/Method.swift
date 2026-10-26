@@ -43,6 +43,8 @@ public enum OptOutMethods {
                 // What a real page load showed that only the person can answer: a business form, an agent or file field. Those are guided.
                 if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
                 if live.blockers.contains("agent") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for an authorized agent's details, so we take you to the page and walk you through it.")) }
+                if live.blockers.contains("state") { return MethodVerdict(method: .guided, reason: L10n.t("This form's menu does not offer every state, so we take you to the page and walk you through it.")) }
+                if live.blockers.contains("other") { return MethodVerdict(method: .guided, reason: L10n.t("This form has questions the app cannot read, so we take you to the page and walk you through it.")) }
                 if live.blockers.contains("file") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
                 if e.runCheck?.result == "failed" { return MethodVerdict(method: .guided, reason: L10n.t("A real run did not go through, so you do this one with a guide.")) }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
