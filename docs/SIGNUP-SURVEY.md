@@ -29,3 +29,16 @@ request form on it (`attomdata.com`, `cotality.com`, `evertrue.com`, `finthrive.
 (`internetbrands.com` is Adobe's analytics opt-out, `pmg.com` is the Texas attorney general's), or a third party's opt-out (`jwx.com` links to Connatix).
 
 Lesson: the survey flags forms it can see, and many privacy forms sit behind a modal or a frame, so a flag means look, not demote.
+
+## Frames and modals (2026-10-26)
+
+The app now reads forms inside frames and behind modal triggers. Every frame with inputs tells the page's web view, so a form embedded from another site (a Google Form, a privacy
+portal) can be read, filled and sent, and the steps after it run in that frame. When no opt-out form shows, the app also opens a request that hides behind a link or button
+("Submit a privacy request", "Your Privacy Choices", "Do Not Share or Sell My Personal Information") and looks again; it never clicks a mail link.
+
+Doing this exposed a worse problem: with single inputs counted as forms, the app had been picking newsletter boxes (jungroup.com, swoop.com, skydeo.com and firmable.com all
+have one) and would have filled and sent the person's email. A form is now refused when the words around its inputs say newsletter or "delivered to your inbox" (only for forms of
+three or fewer inputs), and a lone email box needs privacy wording near it. Re-audited: the newsletter boxes are gone and the real forms were found (jungroup's HyprMX form in a frame,
+firmable's removal request, skydeo's opt-out, mediawallah's form, outwardmedia's request modal). Across the 266 semi-automatic sites re-audited, 9 stopped showing a form; 4 came back
+after fixing the word "unsubscribe" and "Contact Us Form" headings being read as sign-up wording. Still lost: open-public-records.com (not an opt-out), groundtruth.com,
+videoamp.com (a lone box), buildertrend.com and thedatagroup.com (cause not found). Still not found: windfall.com, intentiq.com, coasttechnology.com. Results in `docs/audits/frames-and-modals/`.

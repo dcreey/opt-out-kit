@@ -38,7 +38,7 @@ enum LiveFormPicker {
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
     private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
     /// Newsletter and marketing language in the words around a form's inputs.
-    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|subscribe|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
+    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscribe|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
     private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
@@ -51,10 +51,11 @@ enum LiveFormPicker {
         let buttons = f.buttons.joined(separator: " ")
         let heading = f.text
         // A sign-up, demo or contact form is refused outright unless its own button says opt-out ("Unsubscribe" is one); the page's privacy wording does not rescue it.
-        if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) { return -100 }
+        if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) && !has(strongOptOut, heading) { return -100 }
         // The words around the inputs say "newsletter" or "delivered to your inbox": a subscription box, whatever its button says.
         let ctx = f.ctx ?? ""
-        if has(signupContext, ctx) && !has(strongOptOut, ctx + " " + buttons) { return -100 }
+        // (A subscription box is small; a form with four or more inputs is not one, whatever sits near it.)
+        if fields.count <= 3 && has(signupContext, ctx) && !has(strongOptOut, ctx + " " + buttons) { return -100 }
         // A form of one input (just an email) needs something that says it is a privacy request, not only a page that mentions privacy.
         if fields.count <= 1 && !has(optOut, buttons + " " + heading + " " + ctx) { return -100 }
         var s = 0
