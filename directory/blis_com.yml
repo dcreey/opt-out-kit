@@ -17,3 +17,5 @@ live_form:
 about: {"category": "adtech", "summary": "Blis Global Ltd is an advertising technology company. The only omnichannel DSP to combine T-Mobile app data with real-world movement & spending habits. Unlock incremental audiences to deliver precision at scale. Its own pages mention email addresses, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "online", "social"], "sells_to": [], "source": "https://blis.com/us/"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 6}
+contact_email: "privacy@blis.com"
+contact_email_source: "browser"

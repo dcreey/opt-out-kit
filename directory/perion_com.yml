@@ -17,3 +17,5 @@ live_form:
 about: {"category": "adtech", "summary": "Hivestack Technologies Inc. is an advertising technology company. AI-native execution infrastructure that connects data, creative, and channels to optimize media performance. Its own pages mention shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["purchases", "online"], "sells_to": [], "source": "https://perion.com/"}
 priority: 19
 persistence: {"result": "unknown", "reup_months": 6}
+contact_email: "privacy@perion.com"
+contact_email_source: "browser"

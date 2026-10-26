@@ -22,3 +22,5 @@ persistence: {"result": "unknown", "reup_months": 12}
 live_form:
   checked: "2026-10-25"
   found: false
+contact_email: "privacy@graph8.com"
+contact_email_source: "page"

@@ -18,3 +18,5 @@ live_form:
 about: {"category": "b2b", "summary": "6sense Insights, Inc. is a business-contact and sales-data provider. Reinvent your pipeline with our ABM platform. Use powerful account based marketing tools and agency insights to reveal revenue and eliminate guesswork. Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://6sense.com/"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
+contact_email: "privacy@6sense.com"
+contact_email_source: "browser"

@@ -17,3 +17,5 @@ live_form:
 about: {"category": "adtech", "summary": "AppLovin Corporation is an advertising technology company. Reach over a billion daily users in mobile games. AppLovin helps consumer brands and gaming apps scale their business profitably. Its own pages mention home addresses, phone numbers, email addresses, shopping and purchase behavior, interests and demographics, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams; publishers and ad platforms; government and law enforcement.", "tracks": ["address", "phone", "email", "purchases", "interests", "online", "health"], "sells_to": ["advertisers", "businesses", "publishers", "government"], "sells_note": "In certain situations, AppLovin may be required to disclose personal data in response to lawful requests by public authorities, including to meet national security or law enforcement requirements.", "source": "https://legal.applovin.com/privacy/"}
 priority: 53
 persistence: {"result": "unknown", "reup_months": 6}
+contact_email: "dataprotection@applovin.com"
+contact_email_source: "page"
