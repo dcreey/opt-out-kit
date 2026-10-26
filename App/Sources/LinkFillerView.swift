@@ -1,0 +1,110 @@
+import SwiftUI
+import WebKit
+import OptOutKitCore
+
+/// Finish a request from an email: the person pastes the link, the page loads, and the form on it is filled in from their details. The person checks the
+/// page, solves any check and presses the page's own button; nothing is sent for them.
+@MainActor
+final class LinkFiller: ObservableObject {
+    @Published var status = ""
+    @Published var webView: WKWebView?
+    @Published var host = ""
+    @Published var busy = false
+    private var session: WebViewSession?
+
+    /// A web address from pasted text: https only (an http link is upgraded), with a real host.
+    static func normalized(_ text: String) -> URL? {
+        var t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return nil }
+        if !t.contains("://") { t = "https://" + t }
+        guard var c = URLComponents(string: t), let host = c.host, host.contains(".") else { return nil }
+        if c.scheme == "http" { c.scheme = "https" }
+        return c.scheme == "https" ? c.url : nil
+    }
+
+    func open(_ url: URL) async {
+        close(); busy = true; host = url.host ?? ""
+        status = Loc.t("Loading the page…")
+        let s = WebViewSession.make(); session = s
+        do { try await s.load(URLRequest(url: url)) } catch { status = Loc.t("The page would not load. Check the link and try again."); busy = false; return }
+        await s.settlePage(maxWait: 10)
+        _ = await s.denyCookies()
+        webView = s.presentable()
+        status = Loc.t("The page is loaded. Check the address above, then tap \"Fill in my details\".")
+        busy = false
+    }
+
+    func fill(person: Person) async {
+        guard let s = session else { return }
+        busy = true; defer { busy = false }
+        status = Loc.t("Filling in your details…")
+        _ = await s.advanceToRequestForm()
+        let forms = await s.discoverForms()
+        guard let form = LiveFormPicker.pick(forms, pageContext: await s.pageContext()) else {
+            status = Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again."); return
+        }
+        s.chosenForm = form.token
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: webView?.url ?? URL(string: "https://invalid.example")!), signals: nil, person: person)
+        switch plan.verdict {
+        case .ready: break
+        case .needsData(let what): status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return
+        case .needsYou(let why): status = why; return
+        }
+        let fill = await s.fillLive(plan.values)
+        _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+        _ = await s.chooseCustomMenus()
+        await s.scrollFormIntoView(form.token)
+        status = fill.filled == 0 ? Loc.t("The form's fields could not be filled in. Fill it in the page yourself.")
+            : Loc.f("Filled in %lld fields. Check them, solve any check, then press the page's own button to send.", fill.filled)
+    }
+
+    func close() { session?.close(); session = nil; webView = nil; host = "" }
+}
+
+struct LinkFillerView: View {
+    @EnvironmentObject var model: AppModel
+    @StateObject private var filler = LinkFiller()
+    @State private var text = ""
+    var startLink: String = ""
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if filler.webView == nil { Form {
+                Section {
+                    Text("Some opt-outs end with an email: a link to confirm or to finish a form. Paste that link here and we load the page and fill in your details. Only open links from emails you asked for.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    HStack {
+                        TextField("Paste the link from the email", text: $text)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+                            .accessibilityIdentifier("link-field")
+                        Button("Paste") { if let s = UIPasteboard.general.string { text = s } }.buttonStyle(.bordered)
+                    }
+                    Button { if let url = LinkFiller.normalized(text) { Task { await filler.open(url) } } } label: { Label("Open the page", systemImage: "link") }
+                        .disabled(LinkFiller.normalized(text) == nil || filler.busy).accessibilityIdentifier("link-open")
+                }
+            } }
+            if let web = filler.webView {
+                HStack {
+                    Image(systemName: "lock.fill").foregroundStyle(.green)
+                    Text(filler.host).font(.subheadline.bold()).lineLimit(1)
+                    Spacer()
+                    Button("Change link") { filler.close() }.font(.subheadline)
+                }.padding(.horizontal).padding(.vertical, 8).background(.bar)
+                WebViewHost(webView: web)
+                VStack(spacing: 8) {
+                    Text(filler.status).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    Button {
+                        if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me)) } } }
+                    } label: { Label("Fill in my details", systemImage: "square.and.pencil").frame(maxWidth: .infinity) }
+                        .buttonStyle(.borderedProminent).controlSize(.large).disabled(filler.busy).accessibilityIdentifier("link-fill")
+                }.padding()
+            } else if !filler.status.isEmpty {
+                Text(filler.status).font(.footnote).foregroundStyle(.secondary).padding()
+            }
+        }
+        .navigationTitle("Finish from an email")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear { if !startLink.isEmpty, text.isEmpty { text = startLink; if let url = LinkFiller.normalized(startLink) { Task { await filler.open(url) } } } }
+        .onDisappear { filler.close() }
+    }
+}

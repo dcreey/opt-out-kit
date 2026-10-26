@@ -4555,6 +4555,29 @@
     }
    }
   },
+  "Change link": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Changer de lien"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cambiar enlace"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link ändern"
+     }
+    }
+   }
+  },
   "Change today's kind of broker": {
    "extractionState": "manual",
    "localizations": {
@@ -7384,6 +7407,29 @@
     }
    }
   },
+  "Fill in my details": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Remplir mes informations"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar mis datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meine Angaben ausfüllen"
+     }
+    }
+   }
+  },
   "Fill in the sites": {
    "extractionState": "manual",
    "localizations": {
@@ -7403,6 +7449,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites ausfüllen"
+     }
+    }
+   }
+  },
+  "Filled in %lld fields. Check them, solve any check, then press the page's own button to send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld champs remplis. Vérifiez-les, résolvez toute vérification, puis appuyez sur le bouton de la page pour envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld campos rellenos. Revísalos, resuelve cualquier verificación y pulsa el botón de la página para enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld Felder ausgefüllt. Prüfen Sie sie, lösen Sie jede Prüfung und drücken Sie dann die Schaltfläche der Seite zum Senden."
+     }
+    }
+   }
+  },
+  "Filling in your details…": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Remplissage de vos informations…"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenando tus datos…"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben werden ausgefüllt…"
      }
     }
    }
@@ -7541,6 +7633,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Fertig"
+     }
+    }
+   }
+  },
+  "Finish a request from an email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminer une demande depuis un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminar una solicitud desde un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Anfrage aus einer E-Mail abschließen"
+     }
+    }
+   }
+  },
+  "Finish from an email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminer depuis un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminar desde un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aus einer E-Mail abschließen"
      }
     }
    }
@@ -10190,6 +10328,29 @@
     }
    }
   },
+  "Loading the page…": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chargement de la page…"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cargando la página…"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite wird geladen…"
+     }
+    }
+   }
+  },
   "Loading…": {
    "extractionState": "manual",
    "localizations": {
@@ -11846,6 +12007,29 @@
     }
    }
   },
+  "No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun formulaire trouvé sur cette page. S'il faut d'abord cliquer, faites-le dans la page, puis appuyez de nouveau sur Remplir mes informations."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No se encontró ningún formulario en esta página. Si hay que pulsar algo antes, hazlo en la página y vuelve a pulsar Rellenar mis datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auf dieser Seite wurde kein Formular gefunden. Falls zuerst ein Klick nötig ist, tun Sie das auf der Seite und tippen Sie dann erneut auf Meine Angaben ausfüllen."
+     }
+    }
+   }
+  },
   "No listing found": {
    "extractionState": "manual",
    "localizations": {
@@ -13433,6 +13617,29 @@
     }
    }
   },
+  "Open the page": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir la page"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir la página"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite öffnen"
+     }
+    }
+   }
+  },
   "Open the site": {
    "extractionState": "manual",
    "localizations": {
@@ -14142,6 +14349,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Beschlossen, aber noch nicht in Kraft (tritt am %@ in Kraft): %@. %@"
+     }
+    }
+   }
+  },
+  "Paste": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Coller"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pegar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einfügen"
+     }
+    }
+   }
+  },
+  "Paste a link from an email and we fill in the form on it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Collez un lien d'un e-mail et nous remplissons le formulaire qu'il ouvre."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pega un enlace de un correo y rellenamos el formulario."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fügen Sie einen Link aus einer E-Mail ein, und wir füllen das Formular aus."
+     }
+    }
+   }
+  },
+  "Paste the link from the email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Collez le lien de l'e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pega el enlace del correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link aus der E-Mail einfügen"
      }
     }
    }
@@ -17021,6 +17297,29 @@
     }
    }
   },
+  "Some opt-outs end with an email: a link to confirm or to finish a form. Paste that link here and we load the page and fill in your details. Only open links from emails you asked for.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains retraits se terminent par un e-mail : un lien pour confirmer ou finir un formulaire. Collez ce lien ici : nous chargeons la page et remplissons vos informations. N'ouvrez que des liens d'e-mails que vous avez demandés."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunas bajas terminan con un correo: un enlace para confirmar o terminar un formulario. Pega ese enlace aquí y cargamos la página y rellenamos tus datos. Abre solo enlaces de correos que hayas pedido."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Opt-outs enden mit einer E-Mail: ein Link zum Bestätigen oder zum Abschließen eines Formulars. Fügen Sie ihn hier ein, wir laden die Seite und füllen Ihre Angaben aus. Öffnen Sie nur Links aus E-Mails, die Sie angefordert haben."
+     }
+    }
+   }
+  },
   "Some people-search sites show an \"I agree to our terms\" prompt before results. If you allow this, Opt-Out Kit presses that button for you, but only when every paragraph of the prompt and of the terms pages it links to is on a list that a person has read and judged acceptable.": {
    "extractionState": "manual",
    "localizations": {
@@ -18585,6 +18884,52 @@
     }
    }
   },
+  "The form asks for %@, which we do not hold. Add it to your profile.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire demande %@, que nous n'avons pas. Ajoutez-le à votre profil."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario pide %@, que no tenemos. Añádelo a tu perfil."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Formular verlangt %@, was uns fehlt. Fügen Sie es Ihrem Profil hinzu."
+     }
+    }
+   }
+  },
+  "The form's fields could not be filled in. Fill it in the page yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les champs du formulaire n'ont pas pu être remplis. Remplissez-le vous-même dans la page."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No se pudieron rellenar los campos del formulario. Rellénalo tú en la página."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Felder des Formulars konnten nicht ausgefüllt werden. Füllen Sie es selbst auf der Seite aus."
+     }
+    }
+   }
+  },
   "The general public": {
    "extractionState": "manual",
    "localizations": {
@@ -18769,6 +19114,29 @@
     }
    }
   },
+  "The page is loaded. Check the address above, then tap \"Fill in my details\".": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page est chargée. Vérifiez l'adresse ci-dessus, puis appuyez sur « Remplir mes informations »."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La página está cargada. Comprueba la dirección de arriba y pulsa «Rellenar mis datos»."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite ist geladen. Prüfen Sie die Adresse oben und tippen Sie dann auf „Meine Angaben ausfüllen“."
+     }
+    }
+   }
+  },
   "The page looked different than expected": {
    "extractionState": "manual",
    "localizations": {
@@ -18834,6 +19202,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Seite oder der Link ist defekt"
+     }
+    }
+   }
+  },
+  "The page would not load. Check the link and try again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page n'a pas pu se charger. Vérifiez le lien et réessayez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No se pudo cargar la página. Comprueba el enlace e inténtalo de nuevo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite ließ sich nicht laden. Prüfen Sie den Link und versuchen Sie es erneut."
      }
     }
    }
