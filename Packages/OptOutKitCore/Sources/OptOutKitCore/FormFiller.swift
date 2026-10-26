@@ -187,6 +187,15 @@ public enum FormFiller {
                 }
                 continue
             }
+            // The visible label wins over a field's code name: a postal-code box named "Region-State-Province-2" is still the postal code.
+            let labelOnly = field.label.lowercased()
+            if labelOnly.range(of: "\\b(zip|postal)\\b|code postal|c[óo]digo postal|\\bplz\\b", options: .regularExpression) != nil, labelOnly.range(of: "state|province|region|country", options: .regularExpression) == nil {
+                put([address?.zip], L10n.noun("Zip code")); continue
+            }
+            // A menu beside a phone box is its country-code list ("United States +1"), not the number.
+            if field.type == "select", has("phone|mobile|tel\\b|ph.?ext|t[ée]l[ée]phone") {
+                put(person.countryCode == "US" || person.countryCode == nil ? ["United States", "United States (+1)", "+1", "US", "USA"] : [Regions.englishName(person.countryCode ?? "")], L10n.noun("Country code")); continue
+            }
             if field.type == "email" || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
             else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }

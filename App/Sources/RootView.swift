@@ -28,6 +28,10 @@ struct RootView: View {
                 let parts = args[i + 1].split(separator: "-").compactMap { Int($0) }
                 if parts.count == 2 { await FormAudit.run(domains: FormAudit.range(from: parts[0], to: parts[1], model: model), model: model) }
             }
+            if args.contains("-dump-semi-order"), let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                // Simulator work: the semi-automatic sites in queue order, as Documents/semi-order.json.
+                try? JSONSerialization.data(withJSONObject: FormAudit.semi(model: model)).write(to: docs.appendingPathComponent("semi-order.json"))
+            }
             if args.contains("-audit-semi") { await FormAudit.run(domains: FormAudit.semi(model: model), model: model) }
             if args.contains("-audit-all") {
                 await FormAudit.run(domains: FormAudit.all(model: model), model: model)

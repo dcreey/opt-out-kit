@@ -2876,6 +2876,13 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertTrue(EmailBatch.genericBody(name: "Pat", email: "p@x.com", address: "IL").contains("CCPA/CPRA"), "US wording is unchanged")
     }
 
+    func testAPostalBoxNamedForTheStateIsStillThePostalCodeAndAPhoneMenuIsACountryCode() {
+        let p = plan([("text", "Region-State-Province", "Region/State/Province"), ("text", "Region-State-Province-2", "Postal / Zip code"), ("select", "phone_ext-9adf", "phone_ext-9adf"), ("tel", "ph", "Phone"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "Region-State-Province-2"), ["62701"], "the label says postal code")
+        XCTAssertEqual(v(p, "Region-State-Province")?.first, "IL")
+        XCTAssertEqual(v(p, "phone_ext-9adf")?.first, "United States", "a menu beside a phone box is its country code")
+    }
+
     func testAgeBirthPartsTodaysDateAndTheStateOfResidenceAreFilled() {
         let p = plan([("text", "age", "Age*"), ("text", "m", "Birth month *"), ("text", "d", "Day *"), ("text", "y", "Year *"), ("text", "td", "Today's Date"),
                       ("select", "res", "Resident of (required)"), ("text", "first", "First / Middle Name(s) *")])
