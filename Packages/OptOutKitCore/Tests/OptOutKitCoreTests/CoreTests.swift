@@ -2359,7 +2359,7 @@ final class RunCheckTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
         let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
-        XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "alphonso.tv", "apollo.io", "attribits.com", "convex.com", "donorbureau.com", "draup.com", "everleads.com", "findem.ai", "gatewaydata.io", "getliminal.com", "inmar.com", "lionsharemarketing.com", "liveintent.com", "m1-data.com", "marketingarchitects.com", "networx.com", "popacta.com", "scileads.com", "semantiqhealth.com", "statsocial.com", "stirista.com", "subgraph.tech", "torusvotersystems.com", "upcell.io"])
+        XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "alphonso.tv", "apollo.io", "attribits.com", "convex.com", "donorbureau.com", "draup.com", "everleads.com", "gatewaydata.io", "getliminal.com", "inmar.com", "lionsharemarketing.com", "liveintent.com", "m1-data.com", "marketingarchitects.com", "networx.com", "popacta.com", "scileads.com", "semantiqhealth.com", "statsocial.com", "stirista.com", "subgraph.tech", "torusvotersystems.com", "upcell.io"])
         // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
         // unticked choices) and were fixed, so the next real run decides.
         XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a bot check")

@@ -18,4 +18,4 @@ live_form:
   checked: "2026-10-25"
   found: true
   page: "https://realintent.fillout.com/t/mkg26nYjCdus"
-  blockers: []
+  blockers: ["other"]

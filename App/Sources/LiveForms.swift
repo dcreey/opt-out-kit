@@ -33,6 +33,8 @@ struct LiveForm: Decodable, Equatable {
 enum LiveFormPicker {
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
     private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
+    /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
+    private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
@@ -43,6 +45,8 @@ enum LiveFormPicker {
         guard !fields.isEmpty else { return -100 }       // a form wrapper can have no size while its fields show; only the fields count
         let buttons = f.buttons.joined(separator: " ")
         let heading = f.text
+        // A sign-up, demo or contact form is refused outright unless its own button says opt-out ("Unsubscribe" is one); the page's privacy wording does not rescue it.
+        if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) { return -100 }
         var s = 0
         if has(optOut, buttons) { s += 4 }
         if has(optOut, heading) { s += 2 }
