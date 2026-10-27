@@ -3,7 +3,7 @@
 Batch 3 was the next 50 sites in queue order, batch 4 the last 11 (`docs/audits/real-send-batch3/`, `docs/audits/real-send-batch4/`). With these, every semi-automatic site in the queue
 (266, not counting 6 that use the "Report an Error" form) has had one real send attempt.
 
-Batch 3 (50): 26 stopped at a check (16 reCAPTCHA checkbox, 4 Cloudflare, 3 reCAPTCHA puzzle, 2 certification boxes, 1 hCaptcha), 23 failed, 1 rejected by the site (`thinkdatagroup.com` showed an error after sending),
+Batch 3 (50): 26 stopped at a check (16 reCAPTCHA checkbox, 4 Cloudflare, 3 reCAPTCHA puzzle, 2 certification boxes, 1 hCaptcha), 22 failed, 1 rejected by the site (`thinkdatagroup.com` showed an error after sending),
 1 called "confirmed" by the classifier (`disconetwork.com`; its screenshot shows the filled Zendesk "Submit a request" form with "Data Opt Out/Deletion Request" chosen, not an answer, so not marked).
 Batch 4 (11): 3 stopped at a reCAPTCHA checkbox, 8 failed. Nothing in either batch has a verified confirmation.
 
