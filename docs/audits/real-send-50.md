@@ -21,3 +21,14 @@ Bugs the real data showed, both fixed with a test:
 - `growinglibraries.com` has a menu beside the phone box (its country-code list); the app tried to pick the phone number in it. A menu beside a phone box is now its country code.
 
 The `yobi.ai` request, and the four "nothing changed" sites, may or may not have gone through; their screenshots show the filled form and no answer.
+
+## Why the 13 failed, and what was fixed afterwards
+
+- **`growinglibraries.com`** (phone number sent to a country-code menu) and **`occulytics.com`** (state code in the postal box): fixed earlier the same day.
+- **`occulytics.com`, second cause:** its "Street Address Line 2" is a required box the app left empty, so the form could not send. A required second address line now gets "N/A"; an optional one stays empty.
+  The form's required marks (the page's `required` attribute, not only an asterisk in the label) are now passed to the filler, so a required box with nothing to fill stops the run instead of failing silently.
+- **`babelstreet.com`:** the form needs two choices made by pressing buttons ("I am a(n)" and "Select request type"), which the app did not press. It now picks "Other" or the plain consumer answer, and the opt-out or deletion request, never access, update or transfer.
+- **Not fixable by the app:** a bot check or certify box (`connectedinvestors.com`, `monitorbase.com`, `completemailinglists.com`, `pipl.com`'s math question) and the phone's advertising ID (`quadrant.io`, `fogdatascience.com`, `veraset.com`, `complementics.com`). A person clears them, and the advertising ID is read only on a phone that allows it.
+- **Still open:** `ididata.com` asks "have you lived here for more than 6 months?", a fact only the person knows; `buildertrend.com` shows no form since the newsletter rules went in.
+
+Re-audit after these changes (266 sites, dry run): no site lost its form, none got more unfilled required boxes, and five got fewer (`occulytics.com`, `datapartners.com`, `thinkdatagroup.com`, `disconetwork.com`, `maarrests.org`). Results in `docs/audits/after-fixes-2026-10-26/`.

@@ -96,6 +96,7 @@ final class WebAssistedPage: AssistedPage {
             _ = await session.fillLive(plan.values)
             _ = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
             _ = await session.chooseCustomMenus(state: stateName)
+            _ = await session.chooseTileButtons()
         } else { _ = await session.fillFields(plan.values) }
     }
 

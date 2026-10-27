@@ -2877,10 +2877,15 @@ final class FormFillerMoreFieldsTests: XCTestCase {
     }
 
     func testAPostalBoxNamedForTheStateIsStillThePostalCodeAndAPhoneMenuIsACountryCode() {
-        let p = plan([("text", "Region-State-Province", "Region/State/Province"), ("text", "Region-State-Province-2", "Postal / Zip code"), ("select", "phone_ext-9adf", "phone_ext-9adf"), ("tel", "ph", "Phone"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        let p = plan([("text", "Region-State-Province", "Region/State/Province"), ("text", "Region-State-Province-2", "Postal / Zip code | Region-State-Province-2"), ("select", "phone_ext-9adf", "phone_ext-9adf"), ("tel", "ph", "Phone"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "Region-State-Province-2"), ["62701"], "the label says postal code")
         XCTAssertEqual(v(p, "Region-State-Province")?.first, "IL")
         XCTAssertEqual(v(p, "phone_ext-9adf")?.first, "United States", "a menu beside a phone box is its country code")
+    }
+
+    func testARequiredSecondAddressLineGetsNAAndAnOptionalOneStaysEmpty() {
+        let p = plan([("text", "a1", "Street Address *"), ("text", "a2", "Street Address Line 2 *"), ("text", "b2", "Address Line 2"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "a2"), ["N/A"]); XCTAssertNil(v(p, "b2"))
     }
 
     func testAgeBirthPartsTodaysDateAndTheStateOfResidenceAreFilled() {

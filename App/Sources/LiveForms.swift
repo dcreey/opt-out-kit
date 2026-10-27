@@ -28,7 +28,7 @@ struct LiveForm: Decodable, Equatable {
     /// same synonyms that read a stored form read this one.
     func asOptOutForm(page: URL) -> OptOutForm {
         OptOutForm(page: page, method: method.lowercased(), action: URL(string: action),
-                   fields: fields.filter { $0.visible }.map { FormField(type: $0.type, name: $0.token, label: ($0.label + " " + $0.name).trimmingCharacters(in: .whitespaces)) }, hops: 1)
+                   fields: fields.filter { $0.visible }.map { FormField(type: $0.type, name: $0.token, label: ($0.label + ($0.required && !$0.label.contains("*") ? " *" : "") + ($0.name.isEmpty ? "" : " | " + $0.name)).trimmingCharacters(in: .whitespaces)) }, hops: 1)
     }
 }
 
@@ -272,6 +272,28 @@ extension WebViewSession {
     /// Chooses, inside one form, the options an opt-out needs: "this request is for myself", the opt-out and deletion choices, and a
     /// request-type menu. It never ticks access, correction or marketing choices, and never picks "authorized agent" or "deceased".
     /// Returns what it chose, and the names of required choices it could not make.
+    /// Pages that ask "I am a(n)" or "Select request type" with a row of buttons instead of radio boxes: picks the plain consumer or "other" answer, and the
+    /// opt-out or deletion request (never access, update, correction or transfer). Returns how many it pressed.
+    func chooseTileButtons() async -> Int {
+        let js = #"""
+        (function(){
+          var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
+          var n=0;
+          document.querySelectorAll('label,legend,h2,h3,h4,p,span,div').forEach(function(h){
+            var t=(h.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>60||h.children.length>1) return;
+            var who=/^\*?\s*I am an?\b/i.test(t), what=/^\*?\s*(select )?(the )?(request type|right to exercise|type of request)/i.test(t);
+            if(!who&&!what) return;
+            var box=h.parentElement; var btns=[].slice.call(box.querySelectorAll('button,[role=button],[role=radio],label')).filter(function(b){return vis(b)&&(b.innerText||'').trim().length>1&&(b.innerText||'').trim().length<80;});
+            if(btns.length<2||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
+            var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
+            var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i];
+            for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); btns[i].click(); n++; return;}}}
+          });
+          return n;})();
+        """#
+        return (await evalLive(js)) as? Int ?? 0
+    }
+
     func chooseRequestOptions(form token: String, ownerMayConfirm: Bool = false) async -> (chosen: Int, unresolved: [String]) {
         let js = #"""
         (function(token){
@@ -537,6 +559,7 @@ extension FormRun {
         let beforeFill = await session.visibleText()
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
         _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
+        _ = await session.chooseTileButtons()
         // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         let earlyText = await session.visibleText()

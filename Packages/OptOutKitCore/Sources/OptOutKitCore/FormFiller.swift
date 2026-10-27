@@ -92,6 +92,8 @@ public enum FormFiller {
         for field in form.fields {
             let key = (field.name + " " + field.label).lowercased()
             if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
+            // A live form carries the page's own label first, then " | " and the field's code name; rules about what the box says use the label alone.
+            let visibleLabel = field.label.components(separatedBy: " | ").first ?? field.label
             let required = field.label.contains("*") || field.label.lowercased().contains("(required)")
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }
@@ -174,12 +176,13 @@ public enum FormFiller {
                 }
             }
             // A subject or message box: the same plain request every time, stating only what the person already sends.
-            if field.label.lowercased().range(of: "^\\s*(subject|topic|regarding)\\s*(\\*|:|\\(required\\))?\\s*$", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
+            if visibleLabel.lowercased().range(of: "^\\s*(subject|topic|regarding)\\s*(\\*|:|\\(required\\))?\\s*$", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
             if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
                 put([FormFiller.standardRequest(for: person)], L10n.noun("Message")); continue
             }
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
-            if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { continue }
+            // (A form that insists on it gets "N/A": an empty required box stops the form from sending.)
+            if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { if required { put(["N/A"], L10n.noun("Address line 2")) }; continue }
             if has("country|\\bpays\\b|pa[ií]s\\b") {
                 if let code = person.countryCode {
                     if code == "US" { put(["United States", "United States of America", "USA", "US"], L10n.noun("Country")) }
@@ -188,7 +191,7 @@ public enum FormFiller {
                 continue
             }
             // The visible label wins over a field's code name: a postal-code box named "Region-State-Province-2" is still the postal code.
-            let labelOnly = field.label.lowercased()
+            let labelOnly = visibleLabel.lowercased()
             if labelOnly.range(of: "\\b(zip|postal)\\b|code postal|c[óo]digo postal|\\bplz\\b", options: .regularExpression) != nil, labelOnly.range(of: "state|province|region|country", options: .regularExpression) == nil {
                 put([address?.zip], L10n.noun("Zip code")); continue
             }

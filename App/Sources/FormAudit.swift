@@ -186,6 +186,7 @@ enum FormAudit {
         let fill = await session.fillLive(plan.values)
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: true)
         _ = await session.chooseCustomMenus(state: "Illinois")
+        _ = await session.chooseTileButtons()
         try? await Task.sleep(nanoseconds: 1_000_000_000)
         site.typedCodeBox = await session.emptyCodeField()
         if let c = await session.pendingCertification() { site.blockers.append("certify: " + c.prefix(60)) }
