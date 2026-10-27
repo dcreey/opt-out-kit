@@ -66,7 +66,10 @@ public enum FormFiller {
     /// A field that wants the address of the person's own listing on the site ("Enter URL here", "Link to your listing").
     static func isListingField(_ field: FormField) -> Bool {
         let key = (field.name + " " + field.label).lowercased()
-        return field.type != "email" && key.range(of: "\\burl\\b|listing|profile.?link|\\blink\\b", options: .regularExpression) != nil
+        // The person's own listing: a text or address box that says so. A "link" mentioned in a help sentence, a LinkedIn address or a cookie ID is not it.
+        guard field.type == "text" || field.type == "url" || field.type == "textarea" else { return false }
+        if key.range(of: "linkedin|cookie|facebook|twitter|instagram|website|company|domain", options: .regularExpression) != nil { return false }
+        return key.range(of: "(your|my|own|the)[^a-z]{0,3}(listing|profile)|(listing|profile)[^a-z]{0,3}(url|link|address)|link to (your|my|the)|url of (your|my)|\\bpaste (the |your )?(url|link)|\\benter url\\b", options: .regularExpression) != nil
     }
 
     /// Whether the form can only be completed with the address of the person's own listing on the site.
@@ -155,7 +158,7 @@ public enum FormFiller {
             }
             // "Data subject's relationship with <the company>": a person only asking to be removed has none.
             if has("relationship (with|to)|relation to|data subject.?s relationship") {
-                put(["Consumer, no business relationship"], L10n.noun("Relationship")); continue
+                put(["Consumer, no business relationship", "Consumer", "No relationship", "None", "Individual", "Other", "Not applicable", "N/A"], L10n.noun("Relationship")); continue
             }
             // A typed signature or e-signature: the person's legal name, typed. (A drawn signature or an uploaded file stays with the person.)
             if has("e-?sign|signature|sign here|typed name|type your (full )?name") && field.type != "file" && field.type != "canvas" {

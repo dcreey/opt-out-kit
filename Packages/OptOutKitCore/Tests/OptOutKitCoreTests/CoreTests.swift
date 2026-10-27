@@ -2888,6 +2888,18 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "a2"), ["N/A"]); XCTAssertNil(v(p, "b2"))
     }
 
+    func testOnlyABoxThatAsksForTheListingIsAListingField() {
+        let p = plan([("text", "c", "Eyeota Cookie ID (optional, see details link below)"), ("url", "l", "LinkedIn URL"), ("text", "u", "Link to your listing on the site *"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(FormFiller.needsListing(OptOutForm(page: URL(string: "https://x.example/")!, method: "post", action: nil, fields: [FormField(type: "text", name: "c", label: "Eyeota Cookie ID (optional, see details link below)"), FormField(type: "url", name: "l", label: "LinkedIn URL")], hops: 1)), false)
+        XCTAssertEqual(FormFiller.needsListing(OptOutForm(page: URL(string: "https://x.example/")!, method: "post", action: nil, fields: [FormField(type: "text", name: "u", label: "Link to your listing on the site *")], hops: 1)), true)
+        _ = p
+    }
+
+    func testARelationshipMenuGetsAPlainAnswerAmongSeveral() {
+        let p = plan([("select", "r", "Select relationship to Health Union:"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "r")?.first, "Consumer, no business relationship"); XCTAssertTrue(v(p, "r")?.contains("Consumer") == true && v(p, "r")?.contains("None") == true)
+    }
+
     func testAgeBirthPartsTodaysDateAndTheStateOfResidenceAreFilled() {
         let p = plan([("text", "age", "Age*"), ("text", "m", "Birth month *"), ("text", "d", "Day *"), ("text", "y", "Year *"), ("text", "td", "Today's Date"),
                       ("select", "res", "Resident of (required)"), ("text", "first", "First / Middle Name(s) *")])
@@ -2903,7 +2915,7 @@ final class FormFillerMoreFieldsTests: XCTestCase {
     func testAOneBoxAddressAndARelationshipFieldAreFilled() {
         let p = plan([("text", "a", "Street Address, City, State, Zip *"), ("text", "r", "Data subject's relationship with Lob"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "a"), ["1 Main St, Springfield, IL 62701"])
-        XCTAssertEqual(v(p, "r"), ["Consumer, no business relationship"])
+        XCTAssertEqual(v(p, "r")?.first, "Consumer, no business relationship")
     }
 
     func testTheSubjectsEmailIsNotASubjectLine() {
