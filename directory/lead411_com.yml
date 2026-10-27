@@ -17,3 +17,8 @@ priority: 37
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.lead411.com/your-privacy-choices/"
+  blockers: ["certify: I Agree", "check: a reCAPTCHA checkbox"]

@@ -15,6 +15,8 @@ about: {"category": "political", "summary": "Data to Win LLC is a political and 
 priority: 49
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
-  checked: "2026-10-25"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.datatowin.com/privacy-requests"
+  blockers: ["check: a reCAPTCHA puzzle"]
 regions: {"list": ["US", "EU"], "evidence": "its pages mention European Economic Area", "checked": "2026-10-26"}

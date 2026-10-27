@@ -17,8 +17,9 @@ about: {"category": "adtech", "summary": "Datonics LLC is an advertising technol
 priority: 27
 persistence: {"result": "unknown", "reup_months": 6}
 live_form:
-  checked: "2026-10-25"
-  found: false
-  blockers: []
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.datonics.com/privacy/privacy-choices"
+  blockers: ["check: a reCAPTCHA checkbox", "choices we cannot make: resident of (required)", "menu without our value: IL"]
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Datonics LLC; on the UK ICO register of fee payers as DATONICS LLC (ref ZC075048)", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

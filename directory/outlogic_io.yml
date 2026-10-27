@@ -18,3 +18,8 @@ priority: 45
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "UK", "EU"], "evidence": "on the UK ICO register of fee payers as Outlogic, LLC (ref ZB892577); its pages mention European Economic Area", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://outlogic.io/opt-out-form/"
+  blockers: []

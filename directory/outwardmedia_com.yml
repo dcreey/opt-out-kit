@@ -20,8 +20,9 @@ about: {"category": "b2b", "summary": "Outward Media Inc. is a business-contact 
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
-  checked: "2026-10-26"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://outwardmedia.com/privacypolicy"
   blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

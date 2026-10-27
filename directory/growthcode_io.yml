@@ -16,7 +16,9 @@ about: {"category": "adtech", "summary": "GrowthCode, LLC is an advertising tech
 priority: 35
 persistence: {"result": "unknown", "reup_months": 6}
 live_form:
-  checked: "2026-10-25"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.growthcode.io/do-not-sell"
+  blockers: ["check: a reCAPTCHA puzzle"]
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention UK residents", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

@@ -18,3 +18,8 @@ priority: 18
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://nyne.ai/privacy-request-form/"
+  blockers: ["certify: I agree to receive a one-time verification code by text mess", "check: a Cloudflare check"]

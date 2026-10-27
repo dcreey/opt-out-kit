@@ -16,3 +16,8 @@ about: {"category": "political", "summary": "Aristotle International, Inc. is a 
 priority: 47
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.aristotle.com/privacy/daniels-law-law-enforcement-judicial-opt-out-form/"
+  blockers: ["menu without our value: IL"]

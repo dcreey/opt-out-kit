@@ -17,3 +17,8 @@ priority: 39
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention GDPR", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.datamangroup.com/privacy-request-form/"
+  blockers: ["choices we cannot make: No, Agree"]

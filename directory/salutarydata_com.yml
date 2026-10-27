@@ -15,8 +15,10 @@ about: {"category": "b2b", "summary": "Salutary Data LLC. is a business-contact 
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
-  checked: "2026-10-25"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://salutarydata.com/privacy-opt-out-and-disclosure-form/"
+  blockers: ["check: a reCAPTCHA puzzle"]
 contact_email: "privacy@salutarydata.com"
 contact_email_source: "browser"
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}

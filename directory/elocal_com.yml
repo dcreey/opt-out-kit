@@ -20,3 +20,8 @@ persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to elocal.com", "privacy_page": "https://www.elocal.ca/privacy/", "region": "CA", "url": "https://www.elocal.ca/"}]
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.elocal.com/ccpa/opt_outs/new"
+  blockers: []

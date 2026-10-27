@@ -14,9 +14,10 @@ profiled: "2026-10-22"
 contact_email: "privacy@vendelux.com"
 contact_email_source: "browser"
 live_form:
-  checked: "2026-10-24"
-  found: false
-  blockers: ["wall"]
+  checked: "2026-10-27"
+  found: true
+  page: "https://vendelux.com/privacy"
+  blockers: ["menu without our value: Privacy opt-out and deletion request"]
 about: {"category": "b2b", "summary": "Vendelux, Inc. is a business-contact and sales-data provider. Vendelux is the leading event intelligence platform built to turn in-person events into a measurable, scalable growth channel. Vendelux applies real-time attendee data from our database... Its policy does not name who it sells to.", "tracks": [], "sells_to": [], "source": "https://vendelux.com/"}
 priority: 27
 persistence: {"result": "unknown", "reup_months": 12}

@@ -16,7 +16,9 @@ about: {"category": "other", "summary": "KB Synergy Inc is a data company. KB Sy
 priority: 46
 persistence: {"result": "unknown", "reup_months": 12}
 live_form:
-  checked: "2026-10-25"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://kbsynergy.com/privacy-policy-ccpa-do-not-sell-my-information/"
+  blockers: []
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}

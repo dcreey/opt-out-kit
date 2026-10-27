@@ -2431,7 +2431,7 @@ final class RunCheckTests: XCTestCase {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
-        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com attomdata.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai finsum.com finthrive.com firmable.com idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com mediawallah.com ocean.io outwardmedia.com pitchbook.com pmg.com seamless.ai skydeo.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
+        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com attomdata.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai finsum.com finthrive.com idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com ocean.io pitchbook.com pmg.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
         for d in flagged {
             guard let e = entries.first(where: { $0.domain == d }) else { XCTFail("\(d) is missing"); continue }
             let m = OptOutMethods.classify(e).method

@@ -17,3 +17,8 @@ priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {"en": "https://www.tracerfy.com/privacy-choices", "en-US": "https://www.tracerfy.com/privacy-choices"}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.tracerfy.com/privacy-choices"
+  blockers: ["check: a Cloudflare check"]

@@ -15,7 +15,9 @@ about: {"category": "adtech", "summary": "Decide Technologies Inc. is an adverti
 priority: 46
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Please note that to accomplish this, we will still be placing an opt-out cookie and a general account cookie on your device.", "source": "https://decide.co/privacy"}
 live_form:
-  checked: "2026-10-26"
-  found: false
+  checked: "2026-10-27"
+  found: true
+  page: "https://decide.co/"
+  blockers: ["business"]
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to decide.co", "privacy_page": null, "region": "BR", "url": "https://decide.com.br/"}]
