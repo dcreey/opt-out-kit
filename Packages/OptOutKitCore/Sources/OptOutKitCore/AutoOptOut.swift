@@ -78,7 +78,7 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
 /// Rules it keeps: it never solves a bot check or accepts terms; it sends nothing to a site where a recent look found no
 /// listing; it sends each site at most once per `minInterval`; and a person's details go only to forms that ask for them.
 public struct AutoOptOut: Sendable {
-    public static let defaultMinInterval: TimeInterval = 7 * 86_400
+    public static let defaultMinInterval: TimeInterval = 30 * 86_400
     private let submitter: FormSubmitter
     private let minInterval: TimeInterval
     private let spacing: TimeInterval
@@ -186,7 +186,7 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var lastNeedYou: Int?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
-    public static let optOutEvery: TimeInterval = 7 * 86_400      // weekly
+    public static let optOutEvery: TimeInterval = 30 * 86_400     // monthly
 
     public init() {}
 
@@ -195,6 +195,6 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var hasDecided: Bool { decidedAt != nil }
 
     /// Turns both on at the person's first-run approval. Either can be switched off later.
-    public mutating func turnOnBoth(now: Date = Date()) { decidedAt = now; scanEnabled = true; optOutEnabled = true }
+    public mutating func turnOnBoth(now: Date = Date()) { decidedAt = now; scanEnabled = false; optOutEnabled = true }       // nothing scans yet, so only the opt-out turns on
     public mutating func declineForNow(now: Date = Date()) { decidedAt = now; scanEnabled = false; optOutEnabled = false }
 }

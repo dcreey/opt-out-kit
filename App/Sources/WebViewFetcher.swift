@@ -86,7 +86,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
         webView.alpha = 0.01
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
-        (scene?.keyWindow ?? scene?.windows.first)?.addSubview(webView)
+        // Behind everything else in the window, so even a moment of full opacity is covered by the app.
+        (scene?.keyWindow ?? scene?.windows.first)?.insertSubview(webView, at: 0)
     }
 
     static func run(maxWait: TimeInterval, terms: TermsPolicy? = nil, domain: String = "",
@@ -388,7 +389,8 @@ extension WebViewSession {
         // A snapshot taller than about 8000 pixels comes out blank, so a long page is cropped to a window around the form.
         let capHeight: CGFloat = 2400
         let fullHeight = min(max(800, CGFloat(pageHeight)), 6000)
-        webView.frame = CGRect(x: 0, y: 0, width: originalFrame.width, height: fullHeight)
+        // Resized and made opaque only while off the screen, so the person never sees the page flash up behind the app.
+        webView.frame = CGRect(x: -10_000, y: 0, width: originalFrame.width, height: fullHeight)
         defer { webView.frame = originalFrame }
         try? await Task.sleep(nanoseconds: 400_000_000)
         var top: CGFloat = 0

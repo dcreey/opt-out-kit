@@ -11,7 +11,7 @@ private struct Page: Identifiable {
 
 /// First-install walkthrough, also reachable from About. Explains what the app does and how to use it.
 struct OnboardingView: View {
-    /// Called with the person's answers to the automatic-protection page (daily scan, weekly opt-out).
+    /// Called with the person's answers to the automatic-protection page (scan is always false: nothing scans yet; monthly opt-out).
     var onDecide: ((Bool, Bool) -> Void)?
     let onFinish: () -> Void
     @EnvironmentObject var model: AppModel
@@ -23,22 +23,24 @@ struct OnboardingView: View {
     @State private var emailDraft = ""
     private var emailValid: Bool { ContactEmail.isValid(emailDraft.trimmingCharacters(in: .whitespaces)) }
     private func commitEmail() { if emailDraft != model.contactEmail { model.setContactEmail(emailDraft) } }
-    @State private var autoScan = true
     @State private var autoOptOut = true
 
     private var placeKey: String? { model.ownerJurisdiction?.id ?? (model.ownerCountry == "OTHER" ? "other" : nil) }
     private var rulesRead: Bool { placeKey == nil || placeRead == placeKey }
+    /// The "accept site terms" page is only shown when there is something to accept (reviewed terms exist); otherwise it would ask for what cannot be given.
+    private var showsTerms: Bool { model.termsReviewedCount > 0 }
+    private var autoIndex: Int { pages.count + (showsTerms ? 3 : 2) }
 
     private let pages: [Page] = [
-        Page(id: 0, symbol: "bolt.shield", title: Loc.t("We find and remove your data for you"),
-             body: Loc.t("Exnay scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person."),
-             bullets: [Loc.t("Every day it checks the sites it can for you"), Loc.t("Every week it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: bot checks, email links, ID")]),
+        Page(id: 0, symbol: "bolt.shield", title: Loc.t("We remove your data for you"),
+             body: Loc.t("Exnay sends opt-out requests to data brokers on its own, from as many websites as it can. You only step in where a site needs a person."),
+             bullets: [Loc.t("Every month it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: bot checks, email links, ID")]),
         Page(id: 1, symbol: "lock.shield", title: Loc.t("Your data stays on this phone"),
              body: Loc.t("There is no Exnay server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
              bullets: [Loc.t("Open source: anyone can audit the code"), Loc.t("Lost phone with no backup means lost data; a normal iPhone backup carries it"), Loc.t("Each site sees only the details its form needs")]),
-        Page(id: 2, symbol: "person.2", title: Loc.t("Set up people once"),
-             body: Loc.t("Tap Profile to enter your legal name and current address (both required), plus any other names and past addresses. Add family members as extra people with the account switcher."),
-             bullets: [Loc.t("Nicknames and old names find more listings"), Loc.t("Each person has their own progress"), Loc.t("Family only. Add someone who asked you to, or a child you are the parent or guardian of")]),
+        Page(id: 2, symbol: "person.crop.circle", title: Loc.t("Set up your profile"),
+             body: Loc.t("Tap Profile to enter your legal name and current address (both required), plus any other names and past addresses."),
+             bullets: [Loc.t("Nicknames and old names find more listings"), Loc.t("Past addresses find more listings, because brokers keep old ones on file")]),
     ]
 
     var body: some View {
@@ -109,45 +111,53 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(pages.count + 1)
-                ScrollView { TermsOnboardingPage().padding(.horizontal, 28) }
-                    .tag(pages.count + 2)
+                if showsTerms {
+                    ScrollView { TermsOnboardingPage().padding(.horizontal, 28) }
+                        .tag(pages.count + 2)
+                }
                 ScrollView {
                     VStack(spacing: 16) {
                         Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Automatic protection").font(.title.bold())
                         AutoExplainer()
-                        VStack { AutoToggles(scan: $autoScan, optOut: $autoOptOut) }
+                        VStack { AutoToggles(scan: .constant(false), optOut: $autoOptOut) }
+                        if autoOptOut {
+                            Label("To start, we need your legal name and current address. We ask for them next.", systemImage: "person.crop.circle.badge.checkmark")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
                     }
                     .padding(.horizontal, 28)
                 }
-                .tag(pages.count + 3)
+                .tag(autoIndex)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {
-                ForEach(0..<(pages.count + 4), id: \.self) { i in
+                ForEach(0...autoIndex, id: \.self) { i in
                     Circle().fill(i == index ? Color.accentColor : Color.secondary.opacity(0.35)).frame(width: 8, height: 8)
                 }
             }
             .padding(.top, 8)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Page \(index + 1) of \(pages.count + 4)")
+            .accessibilityLabel("Page \(index + 1) of \(autoIndex + 1)")
             .accessibilityIdentifier("onboarding-page-dots")
 
             HStack {
                 // The email is required, so Skip goes to it instead of leaving.
                 Button("Skip") { withAnimation { index = max(index, pages.count) } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
-                if index < pages.count + 3 {
+                if index < autoIndex {
                     Button("Next") { commitEmail(); withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
                         .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))
                 } else {
-                    Button((autoScan || autoOptOut) ? Loc.t("Turn on and start") : "Start") {
+                    Button(autoOptOut ? Loc.t("Turn on and start") : "Start") {
                         commitEmail()
-                        onDecide?(autoScan, autoOptOut)
+                        onDecide?(false, autoOptOut)
                         onFinish()
+                        // They said yes: ask for what is missing now, instead of leaving automatic opt-out switched on but waiting.
+                        if autoOptOut { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { model.requireProfile { } } }
                     }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
                     .disabled(!emailValid || !rulesRead)

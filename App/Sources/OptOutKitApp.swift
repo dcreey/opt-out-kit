@@ -24,6 +24,9 @@ struct OptOutKitApp: App {
 
 /// Holds the broker queue and everyone the app runs opt-outs for.
 /// The household is one encrypted file on the device; the key lives in the Keychain (KeychainKey.swift).
+/// Features switched off for now. Other people's profiles (family) are hidden until they are ready again.
+enum Features { static let otherProfiles = false }
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var brokers: [Broker] = [] { didSet { planCache = nil } }
@@ -500,7 +503,7 @@ final class AppModel: ObservableObject {
     func profileGateFinished(completed: Bool) {
         showProfileGate = false
         let next = afterProfile; afterProfile = nil
-        if completed { next?() }
+        if completed { next?(); Task { await runDueAutomation() } }
     }
 
     /// Why nothing automatic runs for the selected person yet: a profile without its legal name and current address.
@@ -523,6 +526,8 @@ final class AppModel: ObservableObject {
     struct AutoOptOutRow: Identifiable, Equatable { let id: String; let domain: String; let result: AutoOptOutResult }
 
     var autoSettings: AutoSettings { household.autoSettings }
+    /// Whether the automatic opt-out has begun (or run before): the "let the app do these for you" card is then replaced by its status.
+    var autoOptOutStarted: Bool { household.autoSettings.lastOptOut != nil || autoBusy == "optout" }
 
     /// The person's answer to the first-run question, or a later change in Settings.
     /// Whether the account owner allowed "I am this person" boxes to be ticked for them. Never applies to family profiles.
@@ -999,7 +1004,8 @@ final class AppModel: ObservableObject {
 
     /// Runs whatever is due: the daily scan and the weekly opt-out, for everyone in the family. Does nothing until the person has said yes.
     func runDueAutomation(now: Date = Date()) async {
-        guard storageProblem == nil, autoBusy == nil else { return }
+        // Not while the person is still filling in their profile: the run would start before they finish adding previous addresses.
+        guard storageProblem == nil, autoBusy == nil, !showProfileGate else { return }
         let settings = household.autoSettings
         if settings.scanDue(now: now) {
             autoBusy = "scan"

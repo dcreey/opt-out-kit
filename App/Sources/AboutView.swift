@@ -64,19 +64,15 @@ extension AboutView {
     @ViewBuilder
     fileprivate var autoSection: some View {
         Section {
-            Toggle("Check for listings every day", isOn: Binding(
-                get: { model.autoSettings.scanEnabled },
-                set: { model.setAuto(scan: $0, optOut: model.autoSettings.optOutEnabled) }))
-                .accessibilityIdentifier("settings-scan-toggle")
-            Toggle("Send opt-out requests every week", isOn: Binding(
+            Toggle("Send opt-out requests every month", isOn: Binding(
                 get: { model.autoSettings.optOutEnabled },
-                set: { model.setAuto(scan: model.autoSettings.scanEnabled, optOut: $0) }))
+                set: { model.setAuto(scan: false, optOut: $0) }))
                 .accessibilityIdentifier("settings-optout-toggle")
             NavigationLink("Activity and run now") { AutoActivityView() }.accessibilityIdentifier("auto-activity")
         } header: {
             Text("Automatic protection")
         } footer: {
-            Text("Scans run daily and opt-out requests weekly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.")
+            Text("Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.")
         }
     }
 

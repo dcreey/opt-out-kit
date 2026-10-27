@@ -1115,15 +1115,15 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(again[0].1, .submitted(awaitingEmail: false))
     }
 
-    func testEachSiteIsSentAtMostOncePerWeek() async {
+    func testEachSiteIsSentAtMostOncePerMonth() async {
         let e = entry("x", form: form([("email", "email", "Email")]))
         var p = OptOutKitCore.Progress()
         p.recordOptOutAttempt(OptOutAttempt(date: t0 - 2 * day, outcome: "submitted"), site: "x")
         let sub = Recording(outcome: .submitted(awaitingEmail: false))
         let soon = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0)
         guard case .tooSoon = soon[0].1 else { return XCTFail("expected tooSoon, got \(soon[0].1)") }
-        let later = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0 + 6 * day)
-        XCTAssertEqual(later[0].1, .submitted(awaitingEmail: false), "a week after the last send it goes again")
+        let later = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: p, now: t0 + 29 * day)
+        XCTAssertEqual(later[0].1, .submitted(awaitingEmail: false), "a month after the last send it goes again")
         // a failed or challenged attempt does not count as sent
         var q = OptOutKitCore.Progress(); q.recordOptOutAttempt(OptOutAttempt(date: t0 - day, outcome: "challenged"), site: "x")
         let retry = await AutoOptOut(submitter: sub, spacing: 0).run(entries: [e], person: pat, progress: q, now: t0)
@@ -1158,16 +1158,16 @@ final class AutoOptOutTests: XCTestCase {
 
     // MARK: schedule
 
-    func testScanIsDailyAndOptOutIsWeeklyAndBothStartOffUntilThePersonDecides() {
+    func testOptOutIsMonthlyNothingScansAndBothStartOffUntilThePersonDecides() {
         var a = AutoSettings()
         XCTAssertFalse(a.hasDecided)
         XCTAssertFalse(a.scanDue(now: t0)); XCTAssertFalse(a.optOutDue(now: t0), "nothing runs before the person says yes")
         a.turnOnBoth(now: t0)
         XCTAssertTrue(a.hasDecided)
-        XCTAssertTrue(a.scanDue(now: t0)); XCTAssertTrue(a.optOutDue(now: t0), "first run is due straight away")
-        a.lastScan = t0; a.lastOptOut = t0
-        XCTAssertFalse(a.scanDue(now: t0 + 23 * 3600)); XCTAssertTrue(a.scanDue(now: t0 + day))
-        XCTAssertFalse(a.optOutDue(now: t0 + 6 * day)); XCTAssertTrue(a.optOutDue(now: t0 + 7 * day))
+        XCTAssertFalse(a.scanDue(now: t0), "nothing scans yet, so turning protection on does not turn scanning on")
+        XCTAssertTrue(a.optOutDue(now: t0), "first run is due straight away")
+        a.lastOptOut = t0
+        XCTAssertFalse(a.optOutDue(now: t0 + 29 * day)); XCTAssertTrue(a.optOutDue(now: t0 + 30 * day))
         a.optOutEnabled = false
         XCTAssertFalse(a.optOutDue(now: t0 + 30 * day), "switching it off stops it")
     }

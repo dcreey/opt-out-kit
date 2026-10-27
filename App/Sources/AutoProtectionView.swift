@@ -5,11 +5,10 @@ import OptOutKitCore
 struct AutoExplainer: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Every day, it checks the sites it can for your name.", systemImage: "dot.radiowaves.left.and.right")
-            Label("Every week, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.", systemImage: "paperplane")
+            Label("Every month, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.", systemImage: "paperplane")
             Label("It never solves a CAPTCHA, never makes an account or pays, and leaves anything that needs a login, ID, a phone call or a certification to you. Some sites email you a link to confirm; that click is yours.", systemImage: "hand.raised")
             Label("Most sites guard their forms with bot checks, so expect many to need you. The app tells you which.", systemImage: "info.circle")
-            Label("It runs when the app is open and, when iOS allows, in the background. You can turn either off any time.", systemImage: "switch.2")
+            Label("It runs when the app is open and, when iOS allows, in the background. You can turn it off any time.", systemImage: "switch.2")
         }
         .font(.footnote)
     }
@@ -21,8 +20,7 @@ struct AutoToggles: View {
     @Binding var optOut: Bool
 
     var body: some View {
-        Toggle("Check for my listings every day", isOn: $scan).accessibilityIdentifier("auto-scan-toggle")
-        Toggle("Send opt-out requests every week", isOn: $optOut).accessibilityIdentifier("auto-optout-toggle")
+        Toggle("Send opt-out requests every month", isOn: $optOut).accessibilityIdentifier("auto-optout-toggle")
     }
 }
 
@@ -42,12 +40,12 @@ struct AutoProtectionView: View {
                     AutoToggles(scan: $scan, optOut: $optOut)
                 }
                 Section {
-                    Button("Turn on") { model.setAuto(scan: scan, optOut: optOut); dismiss() }
+                    Button("Turn on") { model.setAuto(scan: false, optOut: optOut); dismiss() }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("auto-turn-on")
                     Button("Not now") { model.setAuto(scan: false, optOut: false); dismiss() }
                         .accessibilityIdentifier("auto-not-now")
                 } footer: {
-                    Text("Only family members you added are included, and minors and public figures are never searched (opt-out requests still go out for them).")
+                    Text("Minors and public figures are never searched (opt-out requests still go out for them).")
                 }
             }
             .navigationTitle("Automatic protection")

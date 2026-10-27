@@ -27,7 +27,7 @@ struct BrokerListView: View {
                         Button { showAuto = true } label: {
                             Label("Turn on automatic protection", systemImage: "bolt.shield")
                         }.accessibilityIdentifier("auto-banner")
-                    } footer: { Text("A daily scan and weekly opt-out requests, run for you in the background.") }
+                    } footer: { Text("Opt-out requests, sent for you every month in the background.") }
                 }
                 if let problem = model.storageProblem {
                     Section {
@@ -37,14 +37,28 @@ struct BrokerListView: View {
                 }
                 if model.autoBusy == "optout" {
                     Section {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label("Opting you out in the background", systemImage: "bolt.fill").font(.headline)
-                            if let p = model.autoProgress {
-                                ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
-                                Text("\(p.done) of \(p.total) sites. We will only ask you about the ones that need you.").font(.footnote).foregroundStyle(.secondary)
+                        // Tapping it opens the status of the run: what is done and what needs you.
+                        NavigationLink { AutoActivityView() } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Label("Opting you out in the background", systemImage: "bolt.fill").font(.headline)
+                                if let p = model.autoProgress {
+                                    ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                                    Text("\(p.done) of \(p.total) sites. We will only ask you about the ones that need you.").font(.footnote).foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .accessibilityIdentifier("home-auto-working")
+                    }
+                } else if model.autoOptOutStarted, let last = model.autoSettings.lastOptOut {
+                    Section {
+                        NavigationLink { AutoActivityView() } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Label("Automatic opt-out", systemImage: "bolt.fill").font(.headline)
+                                Text(Loc.f("Last run %@: %lld sent, %lld need you.", Loc.date(last, time: false), model.autoSettings.lastSent ?? 0, model.autoSettings.lastNeedYou ?? 0))
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityIdentifier("home-auto-status")
                     }
                 }
                 if let place = model.ownerJurisdiction, (model.ownerCountry ?? "US") != "US" {
@@ -96,7 +110,7 @@ struct BrokerListView: View {
                 if !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
                     if case .platform = t.kind { return !model.isDone(t) }
-                    return t.kind == .automatic && !model.isDone(t)
+                    return t.kind == .automatic && !model.isDone(t) && !model.autoOptOutStarted
                 }
                 if !firstTasks.isEmpty {
                     Section {
@@ -143,7 +157,7 @@ struct BrokerListView: View {
                     .accessibilityIdentifier("profile-button")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
+                    if Features.otherProfiles { Menu {
                         ForEach(model.people) { person in
                             Button { model.select(person.id) } label: {
                                 Label(person.displayName,
@@ -155,7 +169,7 @@ struct BrokerListView: View {
                     } label: {
                         Label(model.selectedPerson?.displayName ?? "Me", systemImage: "person.2")
                     }
-                    .accessibilityIdentifier("account-switcher")
+                    .accessibilityIdentifier("account-switcher") }
                 }
             }
             .alert(Loc.t("Add a person"), isPresented: $addingPerson) {
