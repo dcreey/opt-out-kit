@@ -15273,6 +15273,29 @@
     }
    }
   },
+  "Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les demandes de retrait partent chaque mois, quand l'app est ouverte et quand iOS la laisse tourner en arrière-plan. Elle ne résout jamais de CAPTCHA et n'accepte jamais de conditions sans votre accord séparé. Quand vous vous retirez vous-même, elle coche une simple case disant que vous êtes la personne concernée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Las solicitudes de baja se envían cada mes, con la app abierta y cuando iOS la deja ejecutarse en segundo plano. Nunca resuelve un CAPTCHA ni acepta términos sin su aprobación aparte. Cuando se da de baja usted mismo, marca una casilla simple que dice que es la persona a la que se refiere la solicitud."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opt-out-Anfragen laufen monatlich, wenn die App geöffnet ist und iOS ihr im Hintergrund Zeit gibt. Sie löst nie ein CAPTCHA und akzeptiert nie Bedingungen ohne Ihre gesonderte Zustimmung. Wenn Sie sich selbst austragen, hakt sie ein einfaches Kästchen ab, dass Sie die betroffene Person sind."
+     }
+    }
+   }
+  },
   "Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.": {
    "extractionState": "manual",
    "localizations": {
@@ -16925,6 +16948,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Pflichtangabe. Diese eine Adresse steht in jedem Opt-out-Formular und jedem Löschantrag, für Sie und Ihre Familie."
+     }
+    }
+   }
+  },
+  "Required. This one address goes on every opt-out form and every data-deletion request.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obligatoire. Cette adresse figure sur chaque formulaire de retrait et chaque demande de suppression de données."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Obligatorio. Esta dirección va en cada formulario de baja y en cada solicitud de eliminación de datos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erforderlich. Diese eine Adresse steht auf jedem Opt-out-Formular und jeder Löschanfrage."
      }
     }
    }
@@ -24219,6 +24265,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese eine Adresse tragen wir genau so, wie Sie sie eingegeben haben, in jedes Opt-out- und Löschformular ein, für Sie und alle, die Sie hinzufügen. Viele Seiten suchen Sie mit genau dieser Adresse, deshalb ändern wir sie nie. Antworten und Bestätigungslinks kommen in Ihrem normalen Posteingang an."
+     }
+    }
+   }
+  },
+  "We put this one address, exactly as you typed it, on every opt-out form and data-deletion request. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous mettons cette adresse, exactement telle que vous l'avez saisie, sur chaque formulaire de retrait et demande de suppression de données. Beaucoup de sites vous recherchent par cette adresse exacte, nous ne la modifions donc jamais. Les réponses et les liens de confirmation arrivent dans votre boîte habituelle."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ponemos esta dirección, exactamente como la escribió, en cada formulario de baja y solicitud de eliminación de datos. Muchos sitios le buscan por esa dirección exacta, así que nunca la cambiamos. Las respuestas y los enlaces de confirmación llegan a su bandeja normal."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir tragen diese Adresse genau so, wie Sie sie eingegeben haben, in jedes Opt-out-Formular und jede Löschanfrage ein. Viele Seiten suchen Sie über genau diese Adresse, deshalb ändern wir sie nie. Antworten und Bestätigungslinks kommen in Ihrem normalen Posteingang an."
      }
     }
    }

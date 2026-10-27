@@ -73,7 +73,7 @@ struct OnboardingView: View {
                     VStack(spacing: 16) {
                         Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Your email address").font(.title.bold())
-                        Text("Required. This one address goes on every opt-out form and every data-deletion request, for you and your family.")
+                        Text("Required. This one address goes on every opt-out form and every data-deletion request.")
                             .multilineTextAlignment(.center)
                         TextField("you@example.com", text: $emailDraft)
                             .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()

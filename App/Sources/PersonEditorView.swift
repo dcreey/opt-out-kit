@@ -283,5 +283,5 @@ struct StringListSection: View {
 
 /// The same words wherever the app asks for the email, so what it does with it is always said the same way.
 enum EmailExplainer {
-    static let text = Loc.t("We put this one address, exactly as you typed it, on every opt-out form and data-deletion request, for you and everyone you add. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.")
+    static let text = Loc.t("We put this one address, exactly as you typed it, on every opt-out form and data-deletion request. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.")
 }

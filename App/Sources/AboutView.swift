@@ -72,7 +72,7 @@ extension AboutView {
         } header: {
             Text("Automatic protection")
         } footer: {
-            Text("Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about. Family profiles always ask the person themselves.")
+            Text("Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.")
         }
     }
 
