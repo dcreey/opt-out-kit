@@ -280,10 +280,10 @@ extension WebViewSession {
           var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
           var n=0;
           document.querySelectorAll('label,legend,h2,h3,h4,p,span,div').forEach(function(h){
-            var t=(h.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>60||h.children.length>1) return;
+            var t=(h.innerText||'').replace(/\s+/g,' ').replace(/\s*required\s*$/i,'').trim(); if(t.length>60||h.children.length>3) return;
             var who=/^\*?\s*I am an?\b/i.test(t), what=/^\*?\s*(select )?(the )?(request type|right to exercise|type of request)/i.test(t);
             if(!who&&!what) return;
-            var box=h.parentElement; var btns=[].slice.call(box.querySelectorAll('button,[role=button],[role=radio],label')).filter(function(b){return vis(b)&&(b.innerText||'').trim().length>1&&(b.innerText||'').trim().length<80;});
+            var box=h.parentElement, btns=[]; for(var up=0;up<4&&box;up++,box=box.parentElement){btns=[].slice.call(box.querySelectorAll('button,[role=button],[role=radio],[role=option],label,[class*=option],[class*=choice],[class*=tile]')).filter(function(b){return vis(b)&&b!==h&&(b.innerText||'').trim().length>1&&(b.innerText||'').trim().length<80&&b.children.length<=2;}); if(btns.length>=2) break;}
             if(btns.length<2||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
             var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
             var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i];
