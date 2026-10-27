@@ -19,6 +19,10 @@ struct PersonEditorView: View {
         _last = State(initialValue: person.legalLast)
     }
 
+    private func commit() {
+        if model.household.people.first(where: { $0.id == person.id }) != person { model.update(person) }
+    }
+
     var body: some View {
         Form {
             Section {
@@ -71,7 +75,12 @@ struct PersonEditorView: View {
         }
         .navigationTitle(person.displayName.isEmpty ? "Profile" : person.displayName)
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: person) { _, new in model.update(new) }
+        // Save once typing pauses, and again on leaving. Saving per keystroke rewrote the encrypted file and rebuilt the plan for every site each time.
+        .task(id: person) {
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            if !Task.isCancelled { commit() }
+        }
+        .onDisappear { commit() }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
         }
