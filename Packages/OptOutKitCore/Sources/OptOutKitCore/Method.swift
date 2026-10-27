@@ -2,12 +2,13 @@ import Foundation
 
 /// How a site's opt-out gets done, in terms of who does the work. This is what people see; the provisional A-D tiers stay internal.
 public enum OptOutMethod: String, CaseIterable, Sendable {
-    case automatic, semiAutomatic, guided, manual
+    case automatic, semiAutomatic, emailOnly, guided, manual
 
     public var title: String {
         switch self {
         case .automatic: return L10n.t("Automatic opt-out")
         case .semiAutomatic: return L10n.t("Semi-automated, with prompts for you")
+        case .emailOnly: return L10n.t("Email only, you send one message")
         case .guided: return L10n.t("Guided, you do the steps")
         case .manual: return L10n.t("Manual, you find the page")
         }
@@ -17,6 +18,7 @@ public enum OptOutMethod: String, CaseIterable, Sendable {
         switch self {
         case .automatic: return L10n.t("The app fills in the site's form and sends it on its own.")
         case .semiAutomatic: return L10n.t("The app fills in the form and sends it. You solve the bot check (and confirm an email if the site sends one).")
+        case .emailOnly: return L10n.t("This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.")
         case .guided: return L10n.t("The app opens the right page and walks you through each step. Some steps need things only you can do.")
         case .manual: return L10n.t("We could not read this site's opt-out page. Look for its privacy or \"do not sell\" link and follow it yourself.")
         }
@@ -58,7 +60,7 @@ public enum OptOutMethods {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
             }
             if let mail = e.contactEmail {
-                return MethodVerdict(method: .guided, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
+                return MethodVerdict(method: .emailOnly, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
             }
             if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page, but the app cannot fill in its form for you, so we take you there and walk you through it.")) }
             switch e.automation {

@@ -36,3 +36,11 @@ social profile links). All nine were moved to semi-automatic: the stored crawl f
 (an advertising ID, an IP address, a social profile) and clears the checks.
 
 Counts now: 456 semi-automatic, 252 guided, 85 unlock later, 21 automatic.
+
+## Email only is its own category (2026-10-27)
+
+The 138 sites whose only route is an email (no form) are no longer "guided": `OptOutMethod.emailOnly` sits between semi-automatic and guided. In the queue the new band "Email only" comes after every
+semi-automated band (`PlanRank.emailOnly`, between "Semi-automated, anywhere" and the manual bands), even for a broker registered where the person lives, so people finish the semi-automated sites first and then
+send the emails. The plan still makes them one task ("Send opt-out emails": one message per address, naming every site it handles; the person reads each and taps Send).
+
+Now: 456 semi-automatic, 138 email only, 114 guided, 85 unlock later, 21 automatic.

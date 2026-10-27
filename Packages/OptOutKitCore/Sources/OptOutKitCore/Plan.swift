@@ -128,9 +128,9 @@ public enum OptOutPlan {
             let domains = emailEntries.map(\.domain)
             claimed.formUnion(domains)
             let addresses = Set(emailEntries.compactMap { $0.contactEmail?.lowercased() }).count
-            byMethod[.guided, default: []].append(PlanTask(kind: .emails, title: L10n.t("Send opt-out emails"), domains: domains,
+            byMethod[.emailOnly, default: []].append(PlanTask(kind: .emails, title: L10n.t("Send opt-out emails"), domains: domains,
                 reason: L10n.f("%@ messages, one per address, each naming every site it handles. You read them and tap Send.", addresses),
-                method: .guided, registeredIn: states(domains)))
+                method: .emailOnly, registeredIn: states(domains)))
         }
         for e in entries where !claimed.contains(e.domain) {
             claimed.insert(e.domain)
@@ -170,7 +170,7 @@ public extension PlanTask {
 /// registered in their country (so far only US states publish registries); everything else is global. Guided and manual tasks are both
 /// "manual" here: the person does the steps.
 public enum PlanRank: Int, CaseIterable, Comparable, Identifiable, Sendable {
-    case localOfficial = 1, ourAutomatic, localSemi, countrySemi, localManualBig, globalSemi, localManualRest, globalManual
+    case localOfficial = 1, ourAutomatic, localSemi, countrySemi, localManualBig, globalSemi, emailOnly, localManualRest, globalManual
     public var id: Int { rawValue }
     public static func < (a: PlanRank, b: PlanRank) -> Bool { a.rawValue < b.rawValue }
     /// A shared manual task has to handle at least this many sites to jump ahead of the global semi-automated ones.
@@ -184,6 +184,7 @@ public enum PlanRank: Int, CaseIterable, Comparable, Identifiable, Sendable {
         case .countrySemi: return L10n.t("Semi-automated, registered in your country")
         case .localManualBig: return L10n.t("Big manual tasks where you live or in your country")
         case .globalSemi: return L10n.t("Semi-automated, anywhere")
+        case .emailOnly: return L10n.t("Email only")
         case .localManualRest: return L10n.t("Other manual tasks where you live or in your country")
         case .globalManual: return L10n.t("Remaining manual tasks, anywhere")
         }
@@ -196,6 +197,7 @@ public enum PlanRank: Int, CaseIterable, Comparable, Identifiable, Sendable {
         case .countrySemi: return L10n.t("The same, for brokers registered somewhere in your country.")
         case .localManualBig: return L10n.t("You do the steps, but each task handles 10 or more sites, so the effort pays off.")
         case .globalSemi: return L10n.t("The app fills in the form; you solve the check. These brokers are not registered near you, but they may still list you.")
+        case .emailOnly: return L10n.t("These sites take the request by email and have no form. The app writes one message per address and you tap Send. Do them after the semi-automated ones.")
         case .localManualRest: return L10n.t("Smaller manual tasks for brokers registered where you live or in your country.")
         case .globalManual: return L10n.t("Everything left: manual tasks for brokers registered elsewhere. Do these last.")
         }
@@ -222,6 +224,7 @@ public extension OptOutPlan {
         }
         if task.method == .automatic { return .ourAutomatic }
         if task.method == .semiAutomatic { return isLocal ? .localSemi : inCountry ? .countrySemi : .globalSemi }
+        if task.method == .emailOnly || task.kind == .emails { return .emailOnly }
         guard inCountry else { return .globalManual }
         return task.siteCount >= PlanRank.bigTaskSites ? .localManualBig : .localManualRest
     }

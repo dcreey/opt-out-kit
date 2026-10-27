@@ -1197,6 +1197,29 @@
     }
    }
   },
+  "Address line 2": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresse, ligne 2"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dirección, línea 2"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Adresszeile 2"
+     }
+    }
+   }
+  },
   "Advertisers and marketers": {
    "extractionState": "manual",
    "localizations": {
@@ -2738,6 +2761,29 @@
     }
    }
   },
+  "Country code": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Indicatif du pays"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prefijo del país"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ländervorwahl"
+     }
+    }
+   }
+  },
   "Cousin": {
    "extractionState": "manual",
    "localizations": {
@@ -3332,6 +3378,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "E-Mail-Adressen"
+     }
+    }
+   }
+  },
+  "Email only": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Par e-mail seulement"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nur per E-Mail"
+     }
+    }
+   }
+  },
+  "Email only, you send one message": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Par e-mail seulement, vous envoyez un message"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo por correo, usted envía un mensaje"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nur per E-Mail, Sie senden eine Nachricht"
      }
     }
    }
@@ -8718,6 +8810,29 @@
     }
    }
   },
+  "These sites take the request by email and have no form. The app writes one message per address and you tap Send. Do them after the semi-automated ones.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ces sites acceptent la demande par e-mail et n'ont pas de formulaire. L'app écrit un message par adresse et vous touchez Envoyer. Faites-les après les semi-automatiques."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estos sitios aceptan la solicitud por correo y no tienen formulario. La app escribe un mensaje por dirección y usted toca Enviar. Hágalos después de los semiautomáticos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seiten nehmen die Anfrage per E-Mail entgegen und haben kein Formular. Die App schreibt eine Nachricht pro Adresse und Sie tippen auf Senden. Erledigen Sie sie nach den halbautomatischen."
+     }
+    }
+   }
+  },
   "They can affect jobs, housing and loans, but credit and screening reports often stay on file by law, so opting out removes less.": {
    "extractionState": "manual",
    "localizations": {
@@ -9174,6 +9289,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Website %@."
+     }
+    }
+   }
+  },
+  "This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce site accepte les retraits par e-mail et n'a pas de formulaire. L'app écrit un message par adresse, nommant chaque site concerné ; vous le lisez et touchez Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este sitio acepta las bajas por correo y no tiene formulario. La app escribe un mensaje por dirección, con cada sitio que gestiona; usted lo lee y toca Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite nimmt Opt-outs per E-Mail entgegen und hat kein Formular. Die App schreibt eine Nachricht pro Adresse mit allen betroffenen Seiten; Sie lesen sie und tippen auf Senden."
      }
     }
    }

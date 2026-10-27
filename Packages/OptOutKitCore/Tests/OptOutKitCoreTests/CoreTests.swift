@@ -2365,7 +2365,7 @@ final class RunCheckTests: XCTestCase {
             let text = form.fields.map { $0.name + " " + $0.label }.joined(separator: " ")
             guard signup.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { continue }
             let m = OptOutMethods.classify(e).method
-            XCTAssertTrue(m == .guided || m == .manual, "\(e.domain) has a form with sign-up wording (\(text.prefix(120))) but is \(m)")
+            XCTAssertTrue(m == .guided || m == .manual || m == .emailOnly, "\(e.domain) has a form with sign-up wording (\(text.prefix(120))) but is \(m)")
         }
     }
 
@@ -2435,8 +2435,15 @@ final class RunCheckTests: XCTestCase {
         for d in flagged {
             guard let e = entries.first(where: { $0.domain == d }) else { XCTFail("\(d) is missing"); continue }
             let m = OptOutMethods.classify(e).method
-            XCTAssertTrue(m == .guided || m == .manual, "\(d) must not be automatic or semi-automatic, is \(m)"); XCTAssertNil(e.optOutForm, d)
+            XCTAssertTrue(m == .guided || m == .manual || m == .emailOnly, "\(d) must not be automatic or semi-automatic, is \(m)"); XCTAssertNil(e.optOutForm, d)
         }
+    }
+
+    func testEmailOnlySitesFormTheirOwnCategoryAfterTheSemiAutomaticOnes() {
+        XCTAssertTrue(PlanRank.globalSemi < PlanRank.emailOnly && PlanRank.emailOnly < PlanRank.localManualRest, "email only comes after every semi-automated band")
+        let t = PlanTask(kind: .emails, title: "Send opt-out emails", domains: ["a.com"], reason: "", method: .emailOnly, registeredIn: ["IL"])
+        XCTAssertEqual(OptOutPlan.rank(of: t, local: ["IL"], countryHasRegistries: true), .emailOnly, "even for a site registered where the person lives")
+        XCTAssertTrue(OptOutMethod.allCases.firstIndex(of: .semiAutomatic)! < OptOutMethod.allCases.firstIndex(of: .emailOnly)!)
     }
 
     func testTheReviewedRunIsInTheDirectory() throws {
@@ -2479,7 +2486,7 @@ final class EmailOnlyAndAddressTests: XCTestCase {
                                optOutURL: URL(string: "https://x.example/dnsmi"), signals: [])
         e.contactEmail = "privacy@x.example"
         let v = OptOutMethods.classify(e)
-        XCTAssertEqual(v.method, .guided)
+        XCTAssertEqual(v.method, .emailOnly)
         XCTAssertTrue(v.reason.contains("privacy@x.example"), v.reason)
     }
 
@@ -2510,7 +2517,7 @@ final class EmailBatchTests: XCTestCase {
         let tasks = steps.flatMap(\.tasks)
         let mail = try XCTUnwrap(tasks.first { $0.kind == .emails })
         XCTAssertGreaterThanOrEqual(mail.siteCount, 50)
-        XCTAssertEqual(mail.method, .guided, "email is not part of the semi-automated step")
+        XCTAssertEqual(mail.method, .emailOnly, "email is not part of the semi-automated step")
         XCTAssertTrue(entries.filter { mail.domains.contains($0.domain) }.allSatisfy { !OptOutPlan.hasForm($0) }, "only sites with no form")
         XCTAssertEqual(tasks.filter { $0.kind == .emails }.count, 1)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count, "still listed once")
