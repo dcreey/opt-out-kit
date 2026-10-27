@@ -147,9 +147,33 @@ extension WebViewSession {
           ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
           return (e.innerText||'').trim();})();
         """#
-        guard let clicked = (try? await webView.evaluateJavaScript(js)) as? String, !clicked.isEmpty else { return first }
-        try? await Task.sleep(nanoseconds: 2_500_000_000)
-        return await discoverForms()
+        if let clicked = (try? await webView.evaluateJavaScript(js)) as? String, !clicked.isEmpty {
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            let after = await discoverForms()
+            if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+        }
+        // A choice of requests or a "who is asking" step in front of the form.
+        if await advanceToRequestForm(loose: true) != nil {
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            let after = await discoverForms()
+            if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+        }
+        // The opt-out is a link to its own page: follow the clearest one that stays on the site (never a mail link or another company's page).
+        let follow = #"""
+        (function(){
+          var host=location.hostname.replace(/^www\./,''), reg=host.split('.').slice(-2).join('.');
+          var re=/^\s*(opt.?out( of (the )?sale( and sharing)?)?( request| form)?( here)?|(individual: )?opt.?out\/?(deletion)?( request)?( form)?|do not sell( or share)?( my (personal )?(information|info))?( request| form)?|submit (a )?(privacy|opt.?out|data) request|(privacy|data) (request|rights) form|delete (my|your) (data|information)|remove my information)\s*[.:]?\s*$/i;
+          var as=[].slice.call(document.querySelectorAll('a[href]')).filter(function(a){
+            var t=(a.innerText||'').replace(/\s+/g,' ').trim(); var h=a.getAttribute('href')||''; if(t.length>70||!re.test(t)) return false;
+            if(/^(mailto:|tel:|javascript:|#)/i.test(h)) return false; var r=a.getBoundingClientRect(); if(r.width<=0||r.height<=0) return false;
+            try{var u=new URL(a.href,location.href); return u.hostname.replace(/^www\./,'').split('.').slice(-2).join('.')===reg||/onetrust|trustarc|datasubject|ketch|transcend|osano|securiti|zendesk|force\.com|atlassian/.test(u.hostname);}catch(e){return false;}});
+          if(!as.length) return ''; as[0].scrollIntoView({block:'center'}); location.href=as[0].href; return as[0].href;})();
+        """#
+        guard let went = (try? await webView.evaluateJavaScript(follow)) as? String, !went.isEmpty else { return first }
+        try? await Task.sleep(nanoseconds: 4_000_000_000)
+        await settlePage(maxWait: 6)
+        let after = await discoverForms()
+        return LiveFormPicker.pick(after, pageContext: await pageContext()) != nil ? after : first
     }
 
     /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
@@ -207,7 +231,7 @@ extension WebViewSession {
               var pref=[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
               var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
                 var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete my (user )?data)$/i.test(t)||(\#(loose ? "true" : "false")&&e.tagName!=='A'&&/^(opt.?out|do not sell( or share)?( my (personal )?(information|data))?|delete( my (data|information|account))?|remove me)$/i.test(t)))&&r.width>0&&r.height>0&&e.children.length<=2;});
+                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete (my|your) (user )?(personal )?(data|information)|opt.?out of (the )?(sale|sharing)( (and|or) sharing)?( of (my|your) (personal )?(data|information))?|i am the person opting out[\s\S]{0,70}|i am (a )?consumer[\s\S]{0,50}|opt.?out form|individual: opt.?out.{0,30})$/i.test(t)||(\#(loose ? "true" : "false")&&e.tagName!=='A'&&/^(opt.?out|do not sell( or share)?( my (personal )?(information|data))?|delete( my (data|information|account))?|remove me)$/i.test(t)))&&r.width>0&&r.height>0&&e.children.length<=2;});
               for(var p=0;p<pref.length;p++){for(var i=0;i<els.length;i++){var t=(els[i].innerText||'').trim();
                 if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
               return '';})();

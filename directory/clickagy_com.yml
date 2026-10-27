@@ -10,7 +10,6 @@ confidence: "low"
 opt_out_url: "https://www.clickagy.com/privacy-center/no-resell/"
 contact_email: "privacy@clickagy.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://www.clickagy.com/privacy-center/no-resell/", "method": "post", "action": "https://www.clickagy.com/privacy-center/no-resell/", "fields": [{"type": "radio", "name": "california_resident", "label": "Yes"}, {"type": "radio", "name": "california_resident", "label": "No"}, {"type": "text", "name": "honeypot", "label": "honeypot"}, {"type": "text", "name": "request_type", "label": "request_type"}], "hops": 1}
 registered_in: [CA, OR, TX]
 signals: [opt_out_form_found]
 profiled: "2026-10-22"
@@ -19,3 +18,8 @@ priority: 24
 persistence: {"result": "unknown", "reup_months": 6}
 regions: {"list": ["US", "EU"], "evidence": "listed on the IAB Europe TCF vendor list as Clickagy LLC", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://www.clickagy.com/privacy-center/no-resell/"
+  blockers: []

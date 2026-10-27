@@ -19,3 +19,20 @@ person fills these), 15 questions the app cannot read (Google Forms where every 
 Which of these a person-or-code change could still move to semi-automatic: the 31 with no readable form (a custom widget, a page that needs a click path, or a wall), the 9 with unrecognised fields
 (fields named only by code), and the 10 phone-verification ones (the app can fill the form and the person confirms by phone). Business details, ID uploads, agent forms, accounts and advertising IDs
 stay with the person or the device.
+
+## Sample of the 31 "no readable form" and the 9 "unrecognised fields" (2026-10-27)
+
+**The 31 with no readable form** (all 31 re-audited after teaching the app to press tiles such as "I am the person opting out" or "Delete your data", and to follow the page's own opt-out link):
+2 now have a form and became semi-automatic: `blueaction.io` (its "Opt out of the sale and sharing of your data" tile opens a form) and `altairdata.com` (the "Individual: Opt-Out/Deletion Request Form"
+link opens an Atlassian service-desk form). The other 29 were looked at by hand (screenshots of 12):
+- the opt-out sits behind a click path the app does not follow yet: `greatlakeslists.com` ("who is submitting" tiles), `propertyreach.com` (an "Opt-Out Form" link to a separate portal), `familytreenow.com` (a menu that reveals the form, and its page now answers with an error page), `censia.com` (the policy links to a request form);
+- the page is a people-search page with a footer link and no request on it: `peoplebyname.com`, `clustal.org`, `veripages.com`, `searchusapeople.com`, `truthed.com` (an ID is required first);
+- the page is a privacy policy with no request form: `trelize.com`, `censia.com`.
+So most of the 31 are correctly guided: the person follows the page's links. A few could become semi-automatic with a smarter click path.
+
+**The 9 with unrecognised fields** all have a real opt-out form (screenshots checked): `liveramp.com` and `adprime.com` (a device opt-out with a reCAPTCHA, a device ID and AdID/IDFA buttons), `foursquare.com` (the same with an IDFA box),
+`blueprintaudiences.com`, `clickagy.com`, `completemedicallists.com` (a long form with a reCAPTCHA), `unacast.com` (a HubSpot form), `maxmind.com` (it asks for the person's IP address) and `meltwater.com` (the Klear form asks for
+social profile links). All nine were moved to semi-automatic: the stored crawl form (whose fields the app could not recognise) was dropped, the live page decides what is filled, and a person completes what the app does not hold
+(an advertising ID, an IP address, a social profile) and clears the checks.
+
+Counts now: 456 semi-automatic, 252 guided, 85 unlock later, 21 automatic.

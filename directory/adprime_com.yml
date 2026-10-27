@@ -10,7 +10,6 @@ confidence: "medium"
 opt_out_url: "https://optout.liveramp.com/device_opt_out"
 contact_email: "privacy@adprime.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://optout.liveramp.com/device_opt_out", "method": "post", "action": "https://optout.rlcdn.com/api/optout", "fields": [{"type": "text", "name": "optout_device_value", "label": "Enter Device ID"}, {"type": "radio", "name": "optout_device", "label": "optout_device"}, {"type": "radio", "name": "optout_device", "label": "optout_device"}], "hops": 3}
 family: "rlcdn_com"
 family_parent: "rlcdn.com"
 registered_in: [CA, TX]
@@ -21,3 +20,8 @@ priority: 68
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Adprime Media LLC; its pages mention United Kingdom", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://optout.liveramp.com/device_opt_out"
+  blockers: []

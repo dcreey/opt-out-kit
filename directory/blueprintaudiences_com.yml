@@ -10,7 +10,6 @@ confidence: "medium"
 opt_out_url: "https://blueprintaudiences.com/privacy-choices"
 contact_email: "privacy@blueprintaudiences.com"
 contact_email_source: "policy"
-opt_out_form: {"page": "https://blueprintaudiences.com/privacy-choices", "method": "get", "action": "https://blueprintaudiences.com/privacy-choices", "fields": [{"type": "checkbox", "name": "requesttypes", "label": "requesttypes"}, {"type": "checkbox", "name": "requesttypes", "label": "requesttypes"}, {"type": "checkbox", "name": "requesttypes", "label": "requesttypes"}, {"type": "checkbox", "name": "requesttypes", "label": "requesttypes"}, {"type": "checkbox", "name": "requesttypes", "label": "requesttypes"}], "hops": 1}
 family: "liveramp_com"
 family_parent: "liveramp.com"
 registered_in: [CA, OR, TX]
@@ -21,3 +20,8 @@ priority: 31
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-10-27"
+  found: true
+  page: "https://blueprintaudiences.com/privacy-choices"
+  blockers: []
