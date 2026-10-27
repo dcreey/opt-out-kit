@@ -4,7 +4,7 @@ Results: `docs/audits/real-send-next50/results.json` (53 sites).
 
 | Result | Sites |
 |---|---|
-| Stopped at a check the person must clear (nothing was sent): 14 reCAPTCHA checkbox or puzzle, 3 hCaptcha-style or Cloudflare... see list in the file; 12 certification boxes | 33 |
+| Stopped at a check the person must clear (nothing was sent): 16 a reCAPTCHA checkbox, 9 a certification box that you must tick yourself, 4 a reCAPTCHA puzzle, 3 a Cloudflare check, 1 an hCaptcha | 33 |
 | Failed | 19 |
 | Classifier said "confirmed" | 1 (`occulytics.com`): its screenshot shows only the top of the page, so it is not marked confirmed |
 | **Total** | **53** |
