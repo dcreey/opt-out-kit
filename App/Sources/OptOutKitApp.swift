@@ -37,7 +37,11 @@ final class AppModel: ObservableObject {
     /// Paragraphs of terms text a person has (or has not yet) reviewed. Ships with none reviewed, so nothing is ever accepted
     /// for anyone until a reviewer marks paragraphs and the person turns this on. See docs/TERMS.md.
     @Published private(set) var termsLibrary: TermsLibrary?
-    @Published private(set) var household = Household() { didSet { planCache = nil } }
+    @Published private(set) var household = Household() {
+        // Only a change to the people or their progress changes the plan; the email address and settings do not, and rebuilding the plan for
+        // every site is what made typing in the email box slow.
+        didSet { if oldValue.people != household.people || oldValue.progress != household.progress { planCache = nil } }
+    }
     @Published private(set) var selectedID: UUID { didSet { planCache = nil } }
     @Published private var regionTick = 0 { didSet { planCache = nil } }
     @Published var loadError: String?

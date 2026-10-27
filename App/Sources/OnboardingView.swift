@@ -19,6 +19,10 @@ struct OnboardingView: View {
     /// The place whose rules the person has scrolled to the end of. Choosing a different place asks them to read again.
     @State private var placeRead: String?
     @FocusState private var emailFocused: Bool
+    /// What is typed in the email box. The household is only written once typing pauses (each write rebuilds views and saves the encrypted file).
+    @State private var emailDraft = ""
+    private var emailValid: Bool { ContactEmail.isValid(emailDraft.trimmingCharacters(in: .whitespaces)) }
+    private func commitEmail() { if emailDraft != model.contactEmail { model.setContactEmail(emailDraft) } }
     @State private var autoScan = true
     @State private var autoOptOut = true
 
@@ -69,12 +73,18 @@ struct OnboardingView: View {
                         Text("Your email address").font(.title.bold())
                         Text("Required. This one address goes on every opt-out form and every data-deletion request, for you and your family.")
                             .multilineTextAlignment(.center)
-                        TextField("you@example.com", text: Binding(get: { model.contactEmail }, set: { model.setContactEmail($0) }))
+                        TextField("you@example.com", text: $emailDraft)
                             .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
                             .textContentType(.emailAddress).textFieldStyle(.roundedBorder).focused($emailFocused)
                             .accessibilityIdentifier("onboarding-email")
+                            .onAppear { if emailDraft.isEmpty { emailDraft = model.contactEmail } }
+                            .onSubmit { commitEmail() }
+                            .task(id: emailDraft) {
+                                try? await Task.sleep(nanoseconds: 600_000_000)
+                                if !Task.isCancelled { commitEmail() }
+                            }
                         Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
-                        if model.formEmail == nil {
+                        if !emailValid {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
                                 .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-email-needed")
                         }
@@ -130,16 +140,17 @@ struct OnboardingView: View {
                 Button("Skip") { withAnimation { index = max(index, pages.count) } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
                 if index < pages.count + 3 {
-                    Button("Next") { withAnimation { index += 1 } }
+                    Button("Next") { commitEmail(); withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
-                        .disabled((index == pages.count && model.formEmail == nil) || (index == pages.count + 1 && !rulesRead))
+                        .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))
                 } else {
                     Button((autoScan || autoOptOut) ? Loc.t("Turn on and start") : "Start") {
+                        commitEmail()
                         onDecide?(autoScan, autoOptOut)
                         onFinish()
                     }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
-                    .disabled(model.formEmail == nil || !rulesRead)
+                    .disabled(!emailValid || !rulesRead)
                 }
             }
             .padding()
