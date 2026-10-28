@@ -2117,6 +2117,29 @@
     }
    }
   },
+  "A new form appeared and we filled it in. Check it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un nouveau formulaire est apparu et nous l'avons rempli. Vérifiez-le."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Apareció un formulario nuevo y lo rellenamos. Compruébelo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein neues Formular ist erschienen und wir haben es ausgefüllt. Bitte prüfen."
+     }
+    }
+   }
+  },
   "A plain form we can fill in and send, with no bot check seen.": {
    "extractionState": "manual",
    "localizations": {

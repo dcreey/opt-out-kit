@@ -16,6 +16,8 @@ protocol AssistedPage: AnyObject {
     func send() async -> SubmitOutcome
     /// What is on screen now, for noticing a confirmation the person caused themselves. Empty in tests.
     func pageText() async -> String
+    /// When the page now shows a different privacy form from the one in use (a modal opened, a next step appeared), switches to it and fills it in. True when it did.
+    func adoptNewForm() async -> Bool
     func close()
     /// The live web view to show the person, or nil in tests. Reading it changes nothing: `present()` must be called first.
     var webView: WKWebView? { get }
@@ -23,7 +25,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func present() {}; func pageText() async -> String { "" } }
+extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false } }
 
 @MainActor
 protocol AssistedDriver {
@@ -38,6 +40,9 @@ struct WebAssistedDriver: AssistedDriver {
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
     var person: Person?
     var advertisingID: String?
+
+    /// What a form looks like, to tell one from another when the page changes under the person.
+    static func signature(_ form: LiveForm) -> String { form.fields.filter(\.visible).map { $0.label + "/" + $0.type }.joined(separator: "|") }
 
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? {
         let session = WebViewSession.make()
@@ -59,6 +64,7 @@ struct WebAssistedDriver: AssistedDriver {
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
             let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, advertisingID: adID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { session.close(); return nil }
+            page.remember(person: person, advertisingID: adID, page: form.page, signature: Self.signature(live))
         }
         await page.refill()
         await session.scrollChallengeIntoView()
@@ -73,11 +79,36 @@ final class WebAssistedPage: AssistedPage {
     private var liveForm: String?
     private var ownerMayConfirm = false
     private var stateName: String?
+    private var person: Person?
+    private var advertisingID: String?
+    private var pageURL: URL?
+    private var knownSignature = ""
     private var shown: WKWebView?
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
 
     func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
+
+    func remember(person: Person, advertisingID: String?, page: URL, signature: String) { self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignature = signature }
+
+    func adoptNewForm() async -> Bool {
+        guard let person, let pageURL, liveForm != nil else { return false }
+        let frameBefore = session.activeFrame
+        let forms = await session.discoverForms()
+        guard let new = LiveFormPicker.pick(forms, pageContext: await session.pageContext()) else { session.activeFrame = frameBefore; return false }
+        let sig = WebAssistedDriver.signature(new)
+        if sig == knownSignature { liveForm = new.token; return false }       // the same form, with its marks put on again
+        let form = new.asOptOutForm(page: pageURL)
+        let livePlan = FormFiller.plan(for: form, signals: nil, person: person, advertisingID: advertisingID)
+        guard case .ready = livePlan.verdict else { session.activeFrame = frameBefore; return false }
+        liveForm = new.token; plan = livePlan; knownSignature = sig
+        // What the person already typed is kept; only empty boxes of the new form are filled.
+        _ = await session.fillLive(plan.values, keepExisting: true)
+        _ = await session.chooseRequestOptions(form: new.token, ownerMayConfirm: ownerMayConfirm)
+        _ = await session.chooseCustomMenus(state: stateName)
+        _ = await session.chooseTileButtons()
+        return true
+    }
 
     var webView: WKWebView? { shown }
     func present() { if shown == nil { shown = session.presentable() } }
@@ -153,6 +184,8 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var results: [String: AutoOptOutResult] = [:]
     /// True while the person is asked whether the page's email step should be tracked, after they tapped Mark as done.
     @Published var askFollowUp = false
+    /// A short line about something the app did by itself (a new form appeared and was filled), shown under the instruction.
+    @Published private(set) var notice: String?
     private var markedDone: AutoOptOutResult?
     /// How often the screen is read for a confirmation the person caused themselves (pressing the page's own button, a message appearing without a new page).
     var watchInterval: TimeInterval = 12
@@ -193,6 +226,8 @@ final class AssistedRunner: ObservableObject {
         let added = FormRun.newText(before: baseline, after: now)
         baseline = now
         if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .submitted(awaitingEmail: email) }
+        // Nothing confirmed, but the screen changed: a new privacy form may have appeared (a window opened, the next step). Fill it in if so.
+        if await page.adoptNewForm() { notice = Loc.t("A new form appeared and we filled it in. Check it.") }
         return nil
     }
 
@@ -212,7 +247,7 @@ final class AssistedRunner: ObservableObject {
 
     func run() async {
         for i in items.indices {
-            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false
+            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false; notice = nil
             prepare(i)
             guard let ready = await preparing[i]?.value else { record(items[i], .failed("the page would not load")); continue }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
@@ -348,6 +383,7 @@ struct AssistedOptOutView: View {
                     Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).accessibilityIdentifier("assisted-site")
                     Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("assisted-instruction")
+                    if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(.blue).accessibilityIdentifier("assisted-notice") }
                     Spacer(minLength: 0)
                     HStack {
                         Button("Skip this site") { runner.skip() }.accessibilityIdentifier("assisted-skip")
