@@ -827,6 +827,10 @@ final class AppModel: ObservableObject {
         return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
             guard let form = entry.optOutForm else { return nil }
             let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now, hold: holdMap[entry.id])
+            // A form that wants the person's own listing: the runner searches the site and has them pick it first.
+            if case .needsYou? = pre.result, let plan = pre.plan, FormFiller.needsListing(form), let search = entry.listingSearchURL(for: person) {
+                return AssistedRunner.Item(entry: entry, form: form, plan: plan, searchURL: search)
+            }
             guard pre.result == nil, let plan = pre.plan else { return nil }
             return AssistedRunner.Item(entry: entry, form: form, plan: plan)
         }
@@ -857,7 +861,13 @@ final class AppModel: ObservableObject {
             }
             if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
             let plan = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: Date()).plan ?? FillPlan(values: [], verdict: .ready)
-            return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback)
+            let search = FormFiller.needsListing(form) ? entry.listingSearchURL(for: person) : nil
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("-uitest-fake-listing"), entry.domain == "advancedbackgroundchecks.com" {
+                return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback, searchURL: URL(string: "https://example.com/search"))
+            }
+            #endif
+            return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback, searchURL: search)
         }
     }
 
@@ -1219,12 +1229,24 @@ struct FakeSubmitter: FormSubmitter {
 @MainActor
 struct FakeAssistedDriver: AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { FakeAssistedPage() }
+    func openSearch(_ url: URL) async -> SearchPage? { FakeSearchPage() }
+}
+
+@MainActor
+final class FakeSearchPage: SearchPage {
+    private let view = WKWebView(frame: .zero)
+    var webView: WKWebView? { view }
+    init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h2>Results for Pat Example</h2><p><b>Pat Example</b>, 34<br>Springfield, IL<br>Relatives: Sam Example</p><hr><p><b>Pat Example</b>, 61<br>Portland, OR</p><hr><p><b>Patricia Example</b>, 29<br>Austin, TX</p></body></html>", baseURL: nil) }
+    func currentURL() -> URL? { URL(string: "https://example.com/people/pat-example-il") }
+    func close() {}
 }
 
 @MainActor
 final class FakeAssistedPage: AssistedPage {
     private var polls = 0
-    var webView: WKWebView? { nil }
+    private let view = WKWebView(frame: .zero)
+    var webView: WKWebView? { view }
+    init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Opt out of example.com</h1><p>Email</p><input value='you@example.com' style='width:100%;font-size:18px'><p>Full name</p><input value='Pat Example' style='width:100%;font-size:18px'><br><br><button style='font-size:18px'>Submit request</button></body></html>", baseURL: nil) }
     func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
     func refill() async {}
     func send() async -> SubmitOutcome { .submitted(awaitingEmail: false) }

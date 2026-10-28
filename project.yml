@@ -45,7 +45,7 @@ targets:
       properties:
         CFBundleDisplayName: "Exnay"
         CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "4"
+        CFBundleVersion: "5"
         UILaunchScreen: {}
         UIBackgroundModes: [fetch, processing]
         NSUserTrackingUsageDescription: "Some data brokers opt your phone out using its advertising ID. Exnay reads it only to give it to those brokers when you opt out, and never stores it."

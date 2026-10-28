@@ -434,6 +434,23 @@ extension WebViewSession {
 
     func pageTitle() async -> String { (try? await webView.evaluateJavaScript("document.title")) as? String ?? "" }
 
+    /// True when the page changed on screen since the last call and has been still for a moment (a window opened, the next step appeared, a message showed).
+    /// A watcher inside the page (a MutationObserver) records changes at no cost while nothing happens; the app asks for the flag every second or so.
+    /// A page that has just loaded, or has no watcher yet, counts as changed. Marks the app puts on the form (`data-ook`) are not changes.
+    func pageChanged() async -> Bool {
+        let js = #"""
+        (function(){var W=window.__ook;
+          if(!W){W=window.__ook={dirty:true,last:Date.now()};
+            try{new MutationObserver(function(rs){for(var i=0;i<rs.length;i++){var r=rs[i];
+              if(r.type==='attributes'&&/^data-ook/.test(r.attributeName||'')) continue; W.dirty=true; W.last=Date.now(); return;}})
+              .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style','hidden','open','aria-hidden','aria-expanded','src','disabled']});}catch(e){}}
+          if(W.dirty&&Date.now()-W.last>=600){W.dirty=false;return true;} return false;})();
+        """#
+        var changed = (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
+        if let f = activeFrame, (try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page)) as? Bool == true { changed = true }
+        return changed
+    }
+
     /// The text currently on screen (what is inside the viewport), from the page and from the frame the form is in. Cheap enough to read every few seconds.
     func viewportText() async -> String {
         let js = #"""

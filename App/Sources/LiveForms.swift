@@ -107,12 +107,12 @@ extension WebViewSession {
 
     /// The forms on the page, and when the page itself shows none that looks like an opt-out form, the forms inside its frames (privacy portals are
     /// often embedded from another site). When a frame's form is the one, every later step runs in that frame.
-    func discoverForms() async -> [LiveForm] {
+    func discoverForms(waitForFrames: Bool = true) async -> [LiveForm] {
         activeFrame = nil
         let main = await discoverFormsIn()
         let context = await pageContext()
         if LiveFormPicker.pick(main, pageContext: context) != nil { return main }
-        if frames.isEmpty, ((try? await webView.evaluateJavaScript("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
+        if waitForFrames, frames.isEmpty, ((try? await webView.evaluateJavaScript("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
             try? await Task.sleep(nanoseconds: 2_500_000_000)        // a frame reports itself only once it has loaded
         }
         for frame in frames {

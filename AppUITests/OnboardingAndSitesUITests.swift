@@ -44,7 +44,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["next-platform-ca-drop"].waitForExistence(timeout: 5), "the queue leads with California DROP")
         XCTAssertTrue(app.scrollUntilExists(app.buttons["band-1"], maxSwipes: 6), "and its band is the first")
         app.tabBars.buttons["Sites"].tap()
-        XCTAssertTrue(app.staticTexts["band-1"].waitForExistence(timeout: 5), "the official service is the first band on the Sites page")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Up next'")).firstMatch.waitForExistence(timeout: 5), "the Sites page lists the sites up next, not every task")
         app.searchSites("spokeo")
         XCTAssertTrue(app.buttons["task-platform-ca-drop"].waitForExistence(timeout: 5), "Spokeo is part of the DROP task, not a separate one")
         XCTAssertFalse(app.buttons["task-flow-spokeo"].exists)

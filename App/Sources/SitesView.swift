@@ -34,6 +34,7 @@ struct SitesView: View {
     @State private var fData: DataKind?
     @State private var fBuyer: BuyerKind?
     private var filtering: Bool { fCategory != nil || fData != nil || fBuyer != nil }
+    private var overview: Bool { !filtering && search.trimmingCharacters(in: .whitespaces).isEmpty }
 
     var body: some View {
         NavigationStack {
@@ -47,10 +48,12 @@ struct SitesView: View {
                         if !search.isEmpty { Button { search = "" } label: { Image(systemName: "xmark.circle.fill") }.buttonStyle(.plain).foregroundStyle(.secondary) }
                     }
                 } footer: {
-                    Text("Tracking \(model.totalSites) sites. Each is listed once, in ranked order: your official service first, then what the app does for you, then semi-automated and manual tasks, nearest first. A request that handles several sites is one task that names them all.")
+                    Text("Tracking \(model.totalSites) sites. Below: the ones you finished most recently and the ones up next, in the order the home page takes them. Search to find any site.")
                         .accessibilityIdentifier("sites-total")
                 }
-                let queue = model.queue
+                // Without a search or filter the tab shows only the sites sent most recently and the ones up next; searching or filtering lists matching tasks as before.
+                if overview { SiteOverviewSections() }
+                let queue = overview ? [] : model.queue
                 ForEach(queue) { band in
                     let tasks = band.tasks.filter { visible($0) }
                     if !tasks.isEmpty {

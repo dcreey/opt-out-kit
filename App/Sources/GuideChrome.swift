@@ -1,0 +1,46 @@
+import SwiftUI
+
+extension Color {
+    /// The gold of the app icon.
+    static let exnayGold = Color(red: 0.98, green: 0.725, blue: 0.2)
+}
+
+/// The line between our guide (above) and the site's own page (below): the icon's gold, broken by the icon and the app's name, so the two
+/// can never be mistaken for each other. Both the semi-automated and the manual guide use it.
+struct GuideBoundary: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Rectangle().fill(Color.exnayGold).frame(width: 14, height: 4)
+            Image("GuideIcon").resizable().frame(width: 24, height: 24).clipShape(RoundedRectangle(cornerRadius: 6))
+            Text("Exnay").font(.caption.bold()).foregroundStyle(Color.exnayGold)
+            Rectangle().fill(Color.exnayGold).frame(height: 4)
+        }
+        .padding(.top, 4).padding(.bottom, 6)
+        .background(Color.black)
+        .overlay(alignment: .bottom) { Rectangle().fill(Color.exnayGold).frame(height: 0) }
+        .accessibilityElement(children: .ignore).accessibilityLabel("Exnay").accessibilityIdentifier("guided-banner")
+    }
+}
+
+/// Black ground for the guide's controls and words; it runs up behind the status bar.
+struct GuideSurface<Content: View>: View {
+    let topInset: CGFloat
+    @ViewBuilder var content: Content
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) { content }
+            .padding(.horizontal, 14).padding(.top, topInset + 6).padding(.bottom, 6)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.black)
+            .tint(Color.exnayGold)
+            .environment(\.colorScheme, .dark)
+    }
+}
+
+/// The primary button of the guide: gold with dark words.
+struct GuidePrimaryStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.font(.callout.bold()).foregroundStyle(Color.black).lineLimit(1).minimumScaleFactor(0.7)
+            .padding(.horizontal, 14).padding(.vertical, 8)
+            .background(Color.exnayGold.opacity(configuration.isPressed ? 0.7 : 1), in: Capsule())
+    }
+}

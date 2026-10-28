@@ -18,6 +18,8 @@ protocol AssistedPage: AnyObject {
     func pageText() async -> String
     /// When the page now shows a different privacy form from the one in use (a modal opened, a next step appeared), switches to it and fills it in. True when it did.
     func adoptNewForm() async -> Bool
+    /// True when the screen changed since the last ask and has settled. Cheap: the page keeps the flag itself.
+    func changed() async -> Bool
     func close()
     /// The live web view to show the person, or nil in tests. Reading it changes nothing: `present()` must be called first.
     var webView: WKWebView? { get }
@@ -25,11 +27,37 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false } }
+extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false } }
 
 @MainActor
 protocol AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage?
+    /// Same, for a form that asks for the address of the person's own listing, which they picked on the site.
+    func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage?
+    /// The site's search results for the person, to pick their own listing from. Nil when none can be opened.
+    func openSearch(_ url: URL) async -> SearchPage?
+}
+
+extension AssistedDriver {
+    func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? { await prepare(form, plan: plan) }
+    func openSearch(_ url: URL) async -> SearchPage? { nil }
+}
+
+/// A site's search results page, shown so the person can tap their own listing.
+@MainActor
+protocol SearchPage: AnyObject {
+    var webView: WKWebView? { get }
+    func currentURL() -> URL?
+    func close()
+}
+
+@MainActor
+final class WebSearchPage: SearchPage {
+    private let session: WebViewSession
+    private(set) var webView: WKWebView?
+    init(session: WebViewSession) { self.session = session; webView = session.presentable() }
+    func currentURL() -> URL? { session.webView.url }
+    func close() { session.close() }
 }
 
 /// The real thing: a web view the person can see and use for the one step only they can do.
@@ -44,7 +72,18 @@ struct WebAssistedDriver: AssistedDriver {
     /// What a form looks like, to tell one from another when the page changes under the person.
     static func signature(_ form: LiveForm) -> String { form.fields.filter(\.visible).map { $0.label + "/" + $0.type }.joined(separator: "|") }
 
-    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? {
+    func openSearch(_ url: URL) async -> SearchPage? {
+        let session = WebViewSession.make()
+        do { try await session.load(URLRequest(url: url)) } catch { session.close(); return nil }
+        await session.settlePage(maxWait: 8)
+        _ = await session.denyCookies()
+        await session.hideConsentOverlays()
+        return WebSearchPage(session: session)
+    }
+
+    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { await prepare(form, plan: plan, listingURL: nil) }
+
+    func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? {
         let session = WebViewSession.make()
         do {
             if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page)) }
@@ -62,9 +101,9 @@ struct WebAssistedDriver: AssistedDriver {
             let liveForm = live.asOptOutForm(page: form.page)
             var adID = advertisingID
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
-            let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, advertisingID: adID)
+            let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
             if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { session.close(); return nil }
-            page.remember(person: person, advertisingID: adID, page: form.page, signature: Self.signature(live))
+            page.remember(person: person, advertisingID: adID, listingURL: listingURL, page: form.page, signature: Self.signature(live))
         }
         await page.refill()
         await session.scrollChallengeIntoView()
@@ -81,6 +120,7 @@ final class WebAssistedPage: AssistedPage {
     private var stateName: String?
     private var person: Person?
     private var advertisingID: String?
+    private var listingURL: URL?
     private var pageURL: URL?
     private var knownSignature = ""
     private var shown: WKWebView?
@@ -89,17 +129,17 @@ final class WebAssistedPage: AssistedPage {
 
     func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
 
-    func remember(person: Person, advertisingID: String?, page: URL, signature: String) { self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignature = signature }
+    func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignature = signature }
 
     func adoptNewForm() async -> Bool {
         guard let person, let pageURL, liveForm != nil else { return false }
         let frameBefore = session.activeFrame
-        let forms = await session.discoverForms()
+        let forms = await session.discoverForms(waitForFrames: false)
         guard let new = LiveFormPicker.pick(forms, pageContext: await session.pageContext()) else { session.activeFrame = frameBefore; return false }
         let sig = WebAssistedDriver.signature(new)
         if sig == knownSignature { liveForm = new.token; return false }       // the same form, with its marks put on again
         let form = new.asOptOutForm(page: pageURL)
-        let livePlan = FormFiller.plan(for: form, signals: nil, person: person, advertisingID: advertisingID)
+        let livePlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: advertisingID)
         guard case .ready = livePlan.verdict else { session.activeFrame = frameBefore; return false }
         liveForm = new.token; plan = livePlan; knownSignature = sig
         // What the person already typed is kept; only empty boxes of the new form are filled.
@@ -145,6 +185,7 @@ final class WebAssistedPage: AssistedPage {
     }
 
     func pageText() async -> String { await session.viewportText() }
+    func changed() async -> Bool { await session.pageChanged() }
 
     func close() { session.close() }
 }
@@ -162,11 +203,14 @@ final class AssistedRunner: ObservableObject {
         let plan: FillPlan
         /// The page in English, tried when the translated one has no form we can fill.
         var fallbackForm: OptOutForm?
+        /// Set when the form wants the person's own listing: the search results to pick it from.
+        var searchURL: URL?
         var id: String { entry.id }
     }
 
     enum Phase: Equatable {
         case loading
+        case pickingListing           // the site's search is shown; the person taps their own listing, then confirms it
         case waitingForTerms
         case waitingForCertification
         case waitingForCheck
@@ -187,6 +231,14 @@ final class AssistedRunner: ObservableObject {
     /// A short line about something the app did by itself (a new form appeared and was filled), shown under the instruction.
     @Published private(set) var notice: String?
     private var markedDone: AutoOptOutResult?
+    /// The page where the person picks their listing, while that step is on.
+    @Published private(set) var searchPage: SearchPage?
+    /// A line about the previous site, only when it did not go through.
+    @Published var previousNote: String?
+    /// Counts sites sent, so the screen can show a check each time.
+    @Published private(set) var celebrate = 0
+    private enum ListingChoice { case none, mine, notListed }
+    private var listingChoice = ListingChoice.none
     /// How often the screen is read for a confirmation the person caused themselves (pressing the page's own button, a message appearing without a new page).
     var watchInterval: TimeInterval = 12
 
@@ -198,7 +250,7 @@ final class AssistedRunner: ObservableObject {
     private var nextContinuation: CheckedContinuation<Void, Never>?
     var waitLimit: TimeInterval = 180
     var pollInterval: TimeInterval = 1
-    var pauseAfterSent: TimeInterval = 1.2
+    var pauseAfterSent: TimeInterval = 1.8
 
     init(items: [Item], driver: AssistedDriver, onResult: @escaping (DirectoryEntry, AutoOptOutResult) -> Void) {
         self.items = items; self.driver = driver; self.onResult = onResult
@@ -231,12 +283,41 @@ final class AssistedRunner: ObservableObject {
         return nil
     }
 
+    /// "This is my profile": the page the person is on is their listing.
+    func confirmListing() {
+        guard let url = searchPage?.currentURL(), let search = current?.searchURL, GuidedFlow.isListing(url, searchedAt: search) else {
+            notice = Loc.t("Tap your profile in the results first, so the page below is your own, then tap \"This is me\"."); return
+        }
+        notice = nil; listingChoice = .mine; resumeNext()
+    }
+    /// "I'm not on this site": nothing is sent.
+    func notListed() { listingChoice = .notListed; resumeNext() }
+
+    /// Shows the search for the person and waits until they pick their listing. Nil when they are not listed, skip it, or the search would not open.
+    private func chooseListing(_ item: Item, search: URL) async -> (URL?, AutoOptOutResult?) {
+        phase = .pickingListing
+        listingChoice = .none
+        guard let sp = await driver.openSearch(search) else { return (nil, .failed("the search page would not load")) }
+        searchPage = sp
+        defer { sp.close(); searchPage = nil }
+        while true {
+            if skipFlag { return (nil, .needsYou("skipped")) }
+            switch listingChoice {
+            case .mine: if let u = sp.currentURL() { return (u, nil) }
+            case .notListed: return (nil, .skippedNotListed)
+            case .none: break
+            }
+            listingChoice = .none
+            await withCheckedContinuation { nextContinuation = $0 }
+        }
+    }
+
     func skip() { skipFlag = true; resumeNext() }
     func next() { resumeNext() }
     private func resumeNext() { nextContinuation?.resume(); nextContinuation = nil }
 
     private func prepare(_ i: Int) {
-        guard items.indices.contains(i), preparing[i] == nil else { return }
+        guard items.indices.contains(i), preparing[i] == nil, items[i].searchURL == nil else { return }
         let item = items[i]
         preparing[i] = Task {
             if let page = await driver.prepare(item.form, plan: item.plan) { return page }
@@ -247,8 +328,13 @@ final class AssistedRunner: ObservableObject {
 
     func run() async {
         for i in items.indices {
-            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false; notice = nil
-            prepare(i)
+            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            if let search = items[i].searchURL {
+                let (listing, early) = await chooseListing(items[i], search: search)
+                if let early { record(items[i], early); continue }
+                phase = .loading
+                preparing[i] = Task { await driver.prepare(items[i].form, plan: items[i].plan, listingURL: listing) }
+            } else { prepare(i) }
             guard let ready = await preparing[i]?.value else { record(items[i], .failed("the page would not load")); continue }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready
@@ -271,7 +357,9 @@ final class AssistedRunner: ObservableObject {
                     else { phase = .waitingForCheck }
                     try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
                     waited += pollInterval; sinceWatch += pollInterval
-                    if sinceWatch >= watchInterval {
+                    // The page says when it changed (checked every poll); the slow read is only a backup for changes it cannot see.
+                    let moved = await ready.changed()
+                    if moved || sinceWatch >= watchInterval {
                         sinceWatch = 0
                         if let hit = await watch(ready, baseline: &baseline) {
                             outcome = hit
@@ -287,7 +375,6 @@ final class AssistedRunner: ObservableObject {
                 switch await ready.send() {
                 case .submitted(let email):
                     phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
-                    try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000))
                 case .challenged: continue      // a check appeared after sending: wait for the person again
                 case .rejected(let why), .failed(let why):
                     phase = .needsMore(why)
@@ -295,9 +382,14 @@ final class AssistedRunner: ObservableObject {
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
                     let watcher = Task { @MainActor [weak self] in
+                        var idle: TimeInterval = 0
                         while !Task.isCancelled {
-                            try? await Task.sleep(nanoseconds: UInt64((self?.watchInterval ?? 12) * 1_000_000_000))
+                            try? await Task.sleep(nanoseconds: UInt64((self?.pollInterval ?? 1) * 1_000_000_000))
                             guard !Task.isCancelled, let self else { return }
+                            idle += self.pollInterval
+                            let moved = await ready.changed()
+                            guard moved || idle >= self.watchInterval else { continue }
+                            idle = 0
                             if let hit = await self.watch(ready, baseline: &watched) {
                                 self.markedDone = hit
                                 if case .submitted(let email) = hit { self.phase = .sent(awaitingEmail: email) }
@@ -312,6 +404,8 @@ final class AssistedRunner: ObservableObject {
                 }
             }
             record(items[i], outcome ?? .challenged("the check came back"))
+            // The sent check is on screen meanwhile; the page it came from stays under it for a moment.
+            if case .submitted? = outcome { try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000)) }
             ready.close(); page = nil
         }
         finished = true
@@ -319,6 +413,13 @@ final class AssistedRunner: ObservableObject {
 
     private func record(_ item: Item, _ result: AutoOptOutResult) {
         results[item.id] = result
+        switch result {
+        case .submitted: celebrate += 1; previousNote = nil
+        case .failed(let why), .rejected(let why), .challenged(let why):
+            previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
+        case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
+        default: previousNote = nil
+        }
         onResult(item.entry, result)
     }
 }
@@ -336,6 +437,7 @@ struct AssistedOptOutView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @StateObject var runner: AssistedRunner
+    @State private var showSent = false
 
     var body: some View {
         NavigationStack {
@@ -352,51 +454,71 @@ struct AssistedOptOutView: View {
             Button("No, it is done") { runner.answerFollowUp(track: false) }
         } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
         .task { await runner.run() }
+        .overlay { if showSent { SentCheck().transition(.opacity) } }
+        .onChange(of: runner.celebrate) { _, _ in
+            withAnimation(.easeOut(duration: 0.2)) { showSent = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation(.easeIn(duration: 0.3)) { showSent = false } }
+        }
     }
 
     private var working: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
+                GuideSurface(topInset: geo.safeAreaInsets.top) {
+                    // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
+                    HStack(spacing: 10) {
+                        Menu {
+                            if let url = runner.page?.webView?.url ?? runner.searchPage?.webView?.url {
+                                Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
+                            }
+                            Button { runner.skip() } label: { Label("Skip this site", systemImage: "forward") }
+                            Menu {
+                                ForEach(IssueKind.allCases, id: \.self) { kind in
+                                    Button(kind.label) {
+                                        if let item = runner.current { model.reportIssue(kind, site: item.entry.id) }
+                                        runner.skip()
+                                    }
+                                }
+                            } label: { Label("Not working", systemImage: "exclamationmark.bubble") }
+                            Button(role: .destructive) { dismiss() } label: { Label("Stop", systemImage: "xmark.circle") }
+                        } label: { Image(systemName: "ellipsis.circle").font(.title2) }
+                            .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("assisted-more")
+                        Text("Site \(runner.index + 1) of \(runner.items.count)").font(.caption.bold()).foregroundStyle(.white.opacity(0.7))
+                        Spacer()
+                        if case .pickingListing = runner.phase {
+                            Button("Not listed") { runner.notListed() }.font(.callout).lineLimit(1).minimumScaleFactor(0.7).accessibilityIdentifier("assisted-not-listed")
+                            Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
+                        } else {
+                            if canMarkDone { Button("Mark as done") { Task { await runner.markDone() } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
+                            if case .needsMore = runner.phase { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
+                        }
+                    }
+                    ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold)
+                    Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).foregroundStyle(.white).accessibilityIdentifier("assisted-site")
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).fixedSize(horizontal: false, vertical: true)
+                                .accessibilityIdentifier("assisted-instruction")
+                        if let previous = runner.previousNote {
+                            HStack(alignment: .top) {
+                                Label(previous, systemImage: "arrow.uturn.backward.circle").font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityIdentifier("assisted-previous")
+                                Spacer(minLength: 0)
+                                Button { runner.previousNote = nil } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }.accessibilityLabel(Loc.t("Dismiss"))
+                            }
+                        }
+                        if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-notice") }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                GuideBoundary()
                 Group {
-                    if let web = runner.page?.webView { WebViewHost(webView: web).id(runner.index) }
+                    if let web = runner.searchPage?.webView { WebViewHost(webView: web).id("search\(runner.index)") }
+                    else if let web = runner.page?.webView { WebViewHost(webView: web).id(runner.index) }
                     else { ProgressView("Loading the form…").frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }
-                .frame(height: geo.size.height * 0.75)
-                Divider()
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Button("Stop") { dismiss() }.font(.footnote).accessibilityIdentifier("assisted-stop")
-                        Spacer()
-                        Text("Site \(runner.index + 1) of \(runner.items.count)").font(.caption.bold()).foregroundStyle(.secondary)
-                        Spacer()
-                        Menu {
-                            ForEach(IssueKind.allCases, id: \.self) { kind in
-                                Button(kind.label) {
-                                    if let item = runner.current { model.reportIssue(kind, site: item.entry.id) }
-                                    runner.skip()
-                                }
-                            }
-                        } label: { Label("Not working", systemImage: "exclamationmark.bubble").font(.footnote) }
-                            .accessibilityIdentifier("assisted-not-working")
-                    }
-                    ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1)))
-                    Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).accessibilityIdentifier("assisted-site")
-                    Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).fixedSize(horizontal: false, vertical: true)
-                        .accessibilityIdentifier("assisted-instruction")
-                    if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(.blue).accessibilityIdentifier("assisted-notice") }
-                    Spacer(minLength: 0)
-                    HStack {
-                        Button("Skip this site") { runner.skip() }.accessibilityIdentifier("assisted-skip")
-                        Spacer()
-                        // In case a confirmation was not noticed: the person says it is done.
-                        if canMarkDone { Button("Mark as done") { Task { await runner.markDone() } }.accessibilityIdentifier("assisted-mark-done") }
-                        if case .needsMore = runner.phase { Button("Next site") { runner.next() }.buttonStyle(.borderedProminent).accessibilityIdentifier("assisted-next") }
-                    }
-                }
-                .padding(.horizontal, 16).padding(.top, 10).padding(.bottom, 6)
-                .frame(height: geo.size.height * 0.25)
-                .background(.bar)
+                .frame(maxHeight: .infinity)
             }
+            .ignoresSafeArea(edges: .top)
         }
     }
 
@@ -429,13 +551,14 @@ struct AssistedOptOutView: View {
     private var instruction: String {
         switch runner.phase {
         case .loading: return Loc.t("Loading the form and filling in your details…")
+        case .pickingListing: return Loc.t("We searched this site for you. Tap your own profile in the results. If you are not in them, tap \"Not listed\". When you are on your profile, tap \"This is me\" and we do the rest.")
         case .waitingForTerms: return Loc.t("Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after.")
         case .waitingForCertification: return Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
         case .waitingForCheck: return Loc.t("Your details are filled in. Solve the check below and we will send it.")
         case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)
         case .sending: return "Sending…"
-        case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : "Sent."
-        case .needsMore(let why): return Loc.f("Sent, but the site did not confirm (%@). It may need one more step from you here. Tap Next site when you are done.", why)
+        case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : Loc.t("Sent.")
+        case .needsMore(let why): return Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)
         case .timedOut: return Loc.t("Timed out waiting for the check.")
         }
     }
@@ -443,7 +566,7 @@ struct AssistedOptOutView: View {
     private var icon: String {
         switch runner.phase {
         case .sent: return "checkmark.circle.fill"
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
+        case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
         case .needsMore, .timedOut: return "exclamationmark.triangle"
         default: return "hourglass"
         }
@@ -452,8 +575,30 @@ struct AssistedOptOutView: View {
     private var tint: Color {
         switch runner.phase {
         case .sent: return .green
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return .orange
-        default: return .secondary
+        case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return .orange
+        default: return .white.opacity(0.7)
         }
+    }
+}
+
+
+/// A big green check over the screen each time a site is sent, so a fast move to the next page is not missed.
+struct SentCheck: View {
+    @State private var grown = false
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle().fill(Color.green)
+                Image(systemName: "checkmark").font(.system(size: 64, weight: .bold)).foregroundStyle(.white)
+            }
+            .frame(width: 120, height: 120).scaleEffect(grown ? 1 : 0.3)
+            Text("Sent").font(.title.bold()).foregroundStyle(.green)
+        }
+        .padding(36)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28))
+        .shadow(radius: 20)
+        .onAppear { withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) { grown = true } }
+        .accessibilityElement(children: .ignore).accessibilityLabel(Loc.t("Sent")).accessibilityIdentifier("assisted-sent-check")
+        .allowsHitTesting(false)
     }
 }

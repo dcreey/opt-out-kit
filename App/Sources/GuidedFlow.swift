@@ -268,54 +268,54 @@ struct GuidedFlowView: View {
     }
 }
 
-/// The guide, kept small: a slim coloured band that names Exnay and the step (its content sits below the status bar and the
-/// camera cut-out), the current step in full (scrolling if it is long), and the controls. It is on top, away from the home
-/// indicator, and framed so it cannot be mistaken for part of the site below.
+/// The guide, on black and on top: its actions come first (the menu on the left, Back, Copy and Next on the right), then the step in full
+/// (scrolling if it is long). A gold line carrying the app's icon and name separates it from the site's own page below, the same as in the
+/// semi-automated screen.
 struct GuidedPanel: View {
     @ObservedObject var runner: GuidedRunner
     private var nextTitle: String {
         if case .pickListing? = runner.flow.current?.action { return Loc.t("This is my listing") }
         return runner.flow.index + 1 >= runner.flow.total ? Loc.t("Finish") : Loc.t("Next step")
     }
-    /// The top safe area (status bar, and the Dynamic Island or notch where there is one): the band's colour runs behind it, the band's
-    /// content starts below it.
+    /// The top safe area (status bar, and the Dynamic Island or notch where there is one): the black runs behind it, the content starts below it.
     var topInset: CGFloat = 0
     var maxStepHeight: CGFloat = 140
     @State private var stepHeight: CGFloat = 0
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
-                Button("Cancel") { runner.cancel() }.font(.footnote.bold()).foregroundStyle(.white).accessibilityIdentifier("guided-cancel")
-                Spacer(minLength: 4)
-                Label("Exnay · Guide", systemImage: "shield.lefthalf.filled").font(.caption.bold()).foregroundStyle(.white).lineLimit(1)
-                    .accessibilityIdentifier("guided-banner")
-                Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
-                    .accessibilityIdentifier("guided-progress")
-                Spacer(minLength: 4)
-                Menu {
-                    ForEach(IssueKind.allCases, id: \.self) { kind in
-                        Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
+            GuideSurface(topInset: topInset) {
+                HStack(spacing: 10) {
+                    Menu {
+                        if let url = runner.webView?.url {
+                            Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
+                        }
+                        Menu {
+                            ForEach(IssueKind.allCases, id: \.self) { kind in
+                                Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
+                            }
+                        } label: { Label("Not working", systemImage: "exclamationmark.bubble") }.accessibilityIdentifier("guided-not-working")
+                        Button(role: .destructive) { runner.cancel() } label: { Label("Cancel", systemImage: "xmark.circle") }.accessibilityIdentifier("guided-cancel")
+                    } label: { Image(systemName: "ellipsis.circle").font(.title2) }
+                        .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("guided-more")
+                    Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                        .accessibilityIdentifier("guided-progress")
+                    Spacer()
+                    if runner.flow.index > 0 { Button("Back") { runner.back() }.font(.callout).accessibilityIdentifier("guided-back") }
+                    if case .copy? = runner.flow.current?.action {
+                        Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }.font(.callout).accessibilityIdentifier("guided-copy")
                     }
-                } label: { Label("Not working", systemImage: "exclamationmark.bubble").labelStyle(.iconOnly).font(.body).foregroundStyle(.white) }
-                    .accessibilityLabel(Loc.t("Not working"))
-                    .accessibilityIdentifier("guided-not-working")
-            }
-            .padding(.horizontal, 12).padding(.top, topInset + 2).padding(.bottom, 6)
-            .background(Color.accentColor)
-
-            ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1)))
-                .progressViewStyle(.linear).tint(Color.accentColor).scaleEffect(x: 1, y: 0.6)
-
-            VStack(alignment: .leading, spacing: 6) {
+                    Button(nextTitle) { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("guided-next")
+                }
+                ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1))).tint(Color.exnayGold)
                 if let step = runner.flow.current {
                     // The whole instruction is shown; a long one scrolls instead of being cut off with an ellipsis.
                     ScrollView {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(step.title).font(.subheadline.bold()).fixedSize(horizontal: false, vertical: true)
+                            Text(step.title).font(.subheadline.bold()).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
                                 .accessibilityIdentifier("guided-step-title")
                             if let detail = step.detail {
-                                Text(detail).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                                Text(detail).font(.footnote).foregroundStyle(.white.opacity(0.7)).fixedSize(horizontal: false, vertical: true)
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -329,21 +329,8 @@ struct GuidedPanel: View {
                     Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("guided-status")
                 }
-                HStack(spacing: 8) {
-                    if runner.flow.index > 0 { Button("Back") { runner.back() }.buttonStyle(.bordered).controlSize(.small).accessibilityIdentifier("guided-back") }
-                    if case .copy? = runner.flow.current?.action {
-                        Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }
-                            .buttonStyle(.bordered).controlSize(.small).accessibilityIdentifier("guided-copy")
-                    }
-                    Spacer()
-                    Button(nextTitle) { runner.next() }
-                        .buttonStyle(.borderedProminent).controlSize(.small).accessibilityIdentifier("guided-next")
-                }
             }
-            .padding(.horizontal, 12).padding(.vertical, 8)
-            .background(Color(.secondarySystemBackground))
-
-            Rectangle().fill(Color.accentColor).frame(height: 3)
+            GuideBoundary()
         }
     }
 }

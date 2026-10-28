@@ -22,7 +22,7 @@ final class GuidedFlowUITests: XCTestCase {
         XCTAssertTrue(progress.waitForExistence(timeout: 10))
         XCTAssertTrue(progress.label.contains("of 6"), "the total number of steps is shown: \(progress.label)")
         let screen = app.windows.firstMatch.frame
-        XCTAssertTrue(app.staticTexts["guided-banner"].exists, "a coloured band names Exnay and the guide")
+        XCTAssertTrue(app.otherElements["guided-banner"].exists || app.staticTexts["guided-banner"].exists, "a gold line carrying the icon and Exnay separates the guide from the site")
         let next = app.buttons["guided-next"]
         XCTAssertLessThan(next.frame.maxY, screen.height * 0.6, "the guide and its buttons are on top, nothing is cut off at the bottom")
         let title = app.staticTexts["guided-step-title"]
@@ -58,8 +58,10 @@ final class GuidedFlowUITests: XCTestCase {
     func testCancelLeavesTheGuideAndGoesBackToTheSite() {
         let app = XCUIApplication()
         openGuide(app)
-        XCTAssertTrue(app.buttons["guided-cancel"].waitForExistence(timeout: 10))
-        app.buttons["guided-cancel"].tap()
+        XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
+        app.buttons["guided-more"].tap()
+        XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 3))
+        app.buttons["Cancel"].tap()
         XCTAssertTrue(app.buttons["guide-me"].waitForExistence(timeout: 5), "back on the site's page")
         XCTAssertFalse(app.staticTexts["reported-issue"].exists, "cancelling is not a report")
     }
@@ -67,8 +69,10 @@ final class GuidedFlowUITests: XCTestCase {
     func testNotWorkingOffersTheReasonsAndRecordsOne() {
         let app = XCUIApplication()
         openGuide(app)
-        XCTAssertTrue(app.buttons["guided-not-working"].waitForExistence(timeout: 10))
-        app.buttons["guided-not-working"].tap()
+        XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
+        app.buttons["guided-more"].tap()
+        XCTAssertTrue(app.buttons["Not working"].waitForExistence(timeout: 3))
+        app.buttons["Not working"].tap()
         shot(app, "8-guided-not-working-menu")
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 3), "\(label) is offered")
@@ -128,6 +132,6 @@ final class SiteViewLayoutUITests: XCTestCase {
         app.buttons["task-flow-peopleconnect"].tap()
         app.buttons["guide-me"].tap()
         XCTAssertTrue(app.staticTexts["guided-progress"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["guided-cancel"].exists)
+        XCTAssertTrue(app.buttons["guided-more"].exists, "the guide's menu is on top")
     }
 }
