@@ -3014,6 +3014,29 @@
     }
    }
   },
+  "Add your email address to start": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajoutez votre adresse e-mail pour commencer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Añada su correo para empezar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fügen Sie Ihre E-Mail-Adresse hinzu, um zu starten"
+     }
+    }
+   }
+  },
   "Address": {
    "extractionState": "manual",
    "localizations": {
@@ -5195,6 +5218,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wählen Sie Ihren Wohnort"
+     }
+    }
+   }
+  },
+  "Choose where you live and read the rules to start": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Choisissez où vous vivez et lisez les règles pour commencer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elija dónde vive y lea las reglas para empezar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wählen Sie Ihren Wohnort und lesen Sie die Regeln, um zu starten"
      }
     }
    }

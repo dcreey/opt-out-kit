@@ -30,6 +30,12 @@ struct OnboardingView: View {
     /// The "accept site terms" page is only shown when there is something to accept (reviewed terms exist); otherwise it would ask for what cannot be given.
     private var showsTerms: Bool { model.termsReviewedCount > 0 }
     private var autoIndex: Int { pages.count + (showsTerms ? 3 : 2) }
+    /// The first required step that is not done yet: the email, then reading the rules of the person's place. Nil when both are done.
+    private var firstUnmetStep: Int? {
+        if !emailValid { return pages.count }
+        if !rulesRead { return pages.count + 1 }
+        return nil
+    }
 
     private let pages: [Page] = [
         Page(id: 0, symbol: "bolt.shield", title: Loc.t("We remove your data for you"),
@@ -122,12 +128,22 @@ struct OnboardingView: View {
                             Label("To start, we need your legal name and current address. We ask for them next.", systemImage: "person.crop.circle.badge.checkmark")
                                 .font(.footnote).foregroundStyle(.secondary)
                         }
+                        // The Start button is off until the email and the place's rules are done: say which, and take the person there.
+                        if !emailValid {
+                            Button { withAnimation { index = pages.count } } label: { Label("Add your email address to start", systemImage: "envelope") }
+                                .buttonStyle(.bordered).accessibilityIdentifier("onboarding-fix-email")
+                        }
+                        if !rulesRead {
+                            Button { withAnimation { index = pages.count + 1 } } label: { Label("Choose where you live and read the rules to start", systemImage: "mappin.and.ellipse") }
+                                .buttonStyle(.bordered).accessibilityIdentifier("onboarding-fix-place")
+                        }
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            .onAppear { if placeRead == nil, model.placeChosenExplicitly { placeRead = placeKey } }       // a walkthrough shown again does not ask to re-read a place already chosen
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {
@@ -142,7 +158,8 @@ struct OnboardingView: View {
 
             HStack {
                 // The email is required, so Skip goes to it instead of leaving.
-                Button("Skip") { withAnimation { index = max(index, pages.count) } }.accessibilityIdentifier("onboarding-skip")
+                // Skip jumps to the first required step that is not done, and does nothing only when everything is done.
+                Button("Skip") { commitEmail(); withAnimation { index = firstUnmetStep ?? autoIndex } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
                 if index < autoIndex {
                     Button("Next") { commitEmail(); withAnimation { index += 1 } }

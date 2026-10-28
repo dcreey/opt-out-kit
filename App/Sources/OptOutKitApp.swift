@@ -258,6 +258,9 @@ final class AppModel: ObservableObject {
         return region.flatMap { r in r == "US" || jurisdictions.contains { $0.kind == "country" && $0.code == r } ? r : nil }
     }
 
+    /// Whether the person picked their place themselves (not just the device's region), so a walkthrough shown again does not ask them to read its rules again.
+    var placeChosenExplicitly: Bool { household.ownerCountry != nil && (household.ownerCountry != "US" || household.ownerState != nil) }
+
     func setOwnerCountry(_ code: String?) { household.setOwnerCountry(code); save() }
 
     /// Every place the app has rules for as a country, by name in the chosen language, plus the United States.
