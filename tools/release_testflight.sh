@@ -1,0 +1,25 @@
+#!/bin/bash
+# Archive, export and upload one TestFlight build.
+#
+#   ASC_KEY_ID=...  ASC_ISSUER_ID=...  tools/release_testflight.sh
+#
+# The API key file must be in ~/.appstoreconnect/private_keys/AuthKey_<ASC_KEY_ID>.p8 (altool finds it there). Raise CFBundleVersion in project.yml first:
+# xcodegen rewrites App/Info.plist from it, and Apple rejects a repeated build number.
+set -euo pipefail
+: "${ASC_KEY_ID:?set ASC_KEY_ID}"; : "${ASC_ISSUER_ID:?set ASC_ISSUER_ID}"
+TEAM="${TEAM_ID:-C84MKW6B2K}"
+OUT="$(mktemp -d)"
+cd "$(dirname "$0")/.."
+xcodegen generate
+xcodebuild archive -project OptOutKit.xcodeproj -scheme OptOutKit -configuration Release -destination 'generic/platform=iOS' -archivePath "$OUT/Exnay.xcarchive" -allowProvisioningUpdates
+cat > "$OUT/Export.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>method</key><string>app-store-connect</string><key>destination</key><string>export</string>
+<key>teamID</key><string>$TEAM</string><key>signingStyle</key><string>automatic</string>
+</dict></plist>
+PLIST
+xcodebuild -exportArchive -archivePath "$OUT/Exnay.xcarchive" -exportOptionsPlist "$OUT/Export.plist" -exportPath "$OUT/ipa" -allowProvisioningUpdates
+xcrun altool --upload-app -f "$OUT/ipa/OptOutKit.ipa" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+echo "Uploaded from $OUT"
