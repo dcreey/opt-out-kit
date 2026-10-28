@@ -40,6 +40,7 @@ final class PeopleTests: XCTestCase {
         me.names = [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .nickname, name: "Pat")]
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701", fromYear: 2015)]
         first.update(me)
+        first.flushSaves()
 
         let second = makeModel(url: url, keys: keys)
         XCTAssertEqual(second.selectedPerson?.legalName, "Pat Example")
@@ -53,11 +54,13 @@ final class PeopleTests: XCTestCase {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
         let first = makeModel(url: url)
         first.addPerson(named: "Mum")
+        first.flushSaves()
         let before = try Data(contentsOf: url)
 
         let locked = makeModel(url: url, keys: FixedKey())   // different key: cannot decrypt
         XCTAssertNotNil(locked.storageProblem)
         locked.addPerson(named: "Dad")                       // must not write over the original
+        locked.flushSaves()
         XCTAssertEqual(try Data(contentsOf: url), before)
     }
 

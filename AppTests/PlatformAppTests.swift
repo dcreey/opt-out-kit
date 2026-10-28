@@ -135,7 +135,8 @@ final class HandledOnceTests: XCTestCase {
         XCTAssertGreaterThan(steps[0].siteCount, 500)
         let domains = steps.flatMap { $0.tasks.flatMap(\.domains) }
         XCTAssertEqual(domains.count, Set(domains).count)
-        XCTAssertEqual(Set(domains).isSuperset(of: Set(m.directory.map(\.domain))), true)
+        // Only the sites that reach the person's country are in the plan until they ask for the others.
+        XCTAssertEqual(Set(domains).union(m.lockedSites.map(\.domain)).isSuperset(of: Set(m.regionSplit.inRegion.filter { $0.closed == nil }.map(\.domain))), true)
         let (il, _) = model(state: "IL")
         if case .method = il.plan.first?.kind {} else { XCTFail("someone outside California starts with our own steps") }
     }

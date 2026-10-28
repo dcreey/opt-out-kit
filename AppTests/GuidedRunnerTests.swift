@@ -339,7 +339,8 @@ final class ListingGuideTests: XCTestCase {
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = try XCTUnwrap(model.selectedPerson)
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
-        model.update(me)
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        model.update(me); model.setContactEmail("pat@example.com")
         let spokeo = try XCTUnwrap(model.brokers.first { $0.id == "spokeo" })
         XCTAssertEqual(OptOutMethods.classify(spokeo, in: model.directory).method, .semiAutomatic)
         let runner = try XCTUnwrap(model.guidedRunner(for: spokeo))

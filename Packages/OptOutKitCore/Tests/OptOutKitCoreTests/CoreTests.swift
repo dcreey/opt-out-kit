@@ -1716,6 +1716,20 @@ final class SiteOwnerTests: XCTestCase {
     }
 }
 
+final class PrivacyPortalFamilyTests: XCTestCase {
+    func testThePeopleSearchPortalSitesAreAutomaticFromTheShippedData() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let family = entries.filter { $0.liveForm?.page?.contains("/api/helper/optOutLight/") == true }
+        XCTAssertEqual(family.count, 15, "every site that uses this portal is in the family")
+        for e in family {
+            XCTAssertEqual(e.runCheck?.result, "confirmed", e.domain)
+            XCTAssertEqual(OptOutMethods.classify(e).method, .automatic, "\(e.domain): \(OptOutMethods.classify(e).reason)")
+        }
+    }
+}
+
 final class ListingFlowTests: XCTestCase {
     private let search = URL(string: "https://www.spokeo.com/pat-example")!
     private func entry(search: Bool = true) -> DirectoryEntry {
@@ -2451,7 +2465,7 @@ final class RunCheckTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
         let confirmed = entries.filter { $0.runCheck?.result == "confirmed" }.map(\.domain).sorted()
-        XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "alphonso.tv", "apollo.io", "attribits.com", "convex.com", "donorbureau.com", "draup.com", "everleads.com", "gatewaydata.io", "getliminal.com", "inmar.com", "lionsharemarketing.com", "liveintent.com", "m1-data.com", "marketingarchitects.com", "networx.com", "popacta.com", "scileads.com", "semantiqhealth.com", "statsocial.com", "stirista.com", "subgraph.tech", "torusvotersystems.com", "upcell.io"])
+        XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "alphonso.tv", "apollo.io", "attribits.com", "backgroundcheckers.net", "checksecrets.com", "convex.com", "donorbureau.com", "draup.com", "everleads.com", "gatewaydata.io", "getliminal.com", "inmar.com", "inmatessearcher.com", "lionsharemarketing.com", "liveintent.com", "m1-data.com", "marketingarchitects.com", "mugshotlook.com", "networx.com", "peoplesearch123.com", "peoplesearcher.com", "peoplesearchusa.org", "personsearchers.com", "popacta.com", "privaterecords.net", "privatereports.com", "publicsearcher.com", "scileads.com", "sealedrecords.net", "secretinfo.org", "semantiqhealth.com", "statsocial.com", "stirista.com", "subgraph.tech", "torusvotersystems.com", "truthrecord.org", "upcell.io", "weinform.org"])
         // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
         // unticked choices) and were fixed, so the next real run decides.
         XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a bot check")
@@ -2888,6 +2902,11 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "Region-State-Province-2"), ["62701"], "the label says postal code")
         XCTAssertEqual(v(p, "Region-State-Province")?.first, "IL")
         XCTAssertEqual(v(p, "phone_ext-9adf")?.first, "United States", "a menu beside a phone box is its country code")
+    }
+
+    func testAStateMenuWhoseCodeNameSaysSubjectIsStillTheState() {
+        let p = plan([("select", "subject_state", "State * | subject_state"), ("text", "fn", "First Name"), ("email", "e", "Email")])
+        XCTAssertEqual(v(p, "subject_state")?.first, "IL", "subject_state is the state of the person the request is about, not a request topic")
     }
 
     func testARequiredSecondAddressLineGetsNAAndAnOptionalOneStaysEmpty() {

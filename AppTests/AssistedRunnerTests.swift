@@ -246,3 +246,49 @@ final class WebAssistedDriverTests: XCTestCase {
         XCTAssertEqual(sink.rows.first?.1, .submitted(awaitingEmail: false))
     }
 }
+
+
+final class EmailFollowUpWordingTests: XCTestCase {
+    func testThePortalsCheckYourEmailPageIsTrackedAsAFollowUp() {
+        let page = "Check your email\nYour request is logged, and today's date is when our deadlines start. We've emailed a confirmation link to the address you gave. Nothing is removed until that link is clicked."
+        XCTAssertTrue(FormRun.mentionsEmailFollowUp(page))
+        XCTAssertEqual(FormRun.classifyConfirmed(page), .submitted(awaitingEmail: true))
+        XCTAssertFalse(FormRun.mentionsEmailFollowUp("Your request is recorded. There is nothing else for you to do."))
+    }
+}
+
+@MainActor
+final class EmailInsteadTests: XCTestCase {
+    private func item(_ host: String, email: String?) -> AssistedRunner.Item {
+        let form = OptOutForm(page: URL(string: "https://\(host)/optout")!, method: "post", action: nil, fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        let entry = DirectoryEntry(id: host.replacingOccurrences(of: ".", with: "_"), domain: host, name: host, bucket: "direct", tier: .B, automation: .guided,
+                                   optOutForm: form, contactEmail: email)
+        return AssistedRunner.Item(entry: entry, form: form, plan: FillPlan(values: [], verdict: .ready))
+    }
+
+    func testASiteThatDidNotLoadOffersAnEmailWaitsForTheAnswerAndIsDoneOnceItIsSent() async {
+        let driver = ScriptedDriverForEmail()
+        let r = AssistedRunner(items: [item("dead.example", email: "privacy@dead.example")], driver: driver) { _, _ in }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0
+        let run = Task { @MainActor in await r.run() }
+        for _ in 0..<200 where r.emailOffer == nil { try? await Task.sleep(nanoseconds: 5_000_000) }
+        XCTAssertEqual(r.emailOffer?.domain, "dead.example", "the person is offered an email for the site that failed")
+        XCTAssertFalse(r.finished, "the next site waits for the answer")
+        r.answerEmailOffer(sent: true)
+        await run.value
+        XCTAssertEqual(r.results["dead_example"], .emailed)
+        XCTAssertNil(r.emailOffer)
+    }
+
+    func testNoOfferWithoutAnAddressAndNoneForAPlainSkip() async {
+        let r = AssistedRunner(items: [item("dead.example", email: nil)], driver: ScriptedDriverForEmail()) { _, _ in }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0
+        await r.run()
+        XCTAssertNil(r.emailOffer); XCTAssertTrue(r.finished)
+    }
+}
+
+@MainActor
+private final class ScriptedDriverForEmail: AssistedDriver {
+    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { nil }
+}

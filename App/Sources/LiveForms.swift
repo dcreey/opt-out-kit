@@ -34,12 +34,12 @@ struct LiveForm: Decodable, Equatable {
 
 enum LiveFormPicker {
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
-    private static let optOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
+    private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
     private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
     /// Newsletter and marketing language in the words around a form's inputs.
     private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscribe|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
-    private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
+    private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
@@ -268,6 +268,17 @@ extension WebViewSession {
           function setValue(el,v){var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
             var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
             el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
+          // A phone number in the shape the box expects: its placeholder ("(555) 555-5555"), its length limit or its pattern decide; otherwise as stored.
+          function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return raw;
+            var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
+            var forms=[d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c,'1'+d,'+1'+d,'+1 '+a+' '+b+' '+c,'1-'+a+'-'+b+'-'+c];
+            var ph=el.getAttribute('placeholder')||'';
+            if((ph.match(/[0-9xX#_*]/g)||[]).length>=10){var i=0,mine=ph.replace(/[0-9xX#_*]/g,function(){return i<d.length?d[i++]:'';}); if(i===10||(i===d.length)) return mine;}
+            var pat=el.getAttribute('pattern');
+            if(pat){for(var k=0;k<forms.length;k++){try{if(new RegExp('^(?:'+pat+')$').test(forms[k])) return forms[k];}catch(e){break;}}}
+            var m=el.maxLength; if(m>0){if(m===10) return d; if(m===11) return '1'+d; if(m===12) return forms[1]; if(m===14) return forms[2]; for(var j=0;j<forms.length;j++) if(forms[j].length===m) return forms[j];}
+            return raw;}
+          function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
             if(el.tagName==='SELECT'){var done=false;
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
@@ -285,12 +296,47 @@ extension WebViewSession {
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
             } else if(\#(keepExistingValues ? "true" : "false")&&(el.value||'').trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,v.candidates[0]);filled++;}});
+            else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,isPhoneBox(el)?fmtPhone(el,v.candidates[0]):v.candidates[0]);filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
         return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
+    }
+
+    /// Brings the form being filled to the top of the screen, so the person sees what was filled and does not have to hunt for it.
+    func scrollFormIntoView(token: String) async {
+        let js = "(function(t){var f=document.querySelector('[data-ook-form=\"'+t+'\"]'); if(f){f.scrollIntoView({block:'start',behavior:'instant'}); window.scrollBy(0,-12); return true;} return false;})(\(Self.liveLiteral(token)));"
+        _ = await evalLive(js)
+    }
+
+    /// When the page now shows an opt-out button or link below the visible part ("Opt out" next to a listing that a search found), scrolls to it.
+    /// Does nothing when one is already on screen, so it never moves a page the person is using. True when it scrolled.
+    func scrollToOptOutControl() async -> Bool {
+        let js = #"""
+        (function(){var re=/opt.?(me.?)?out|remove (me|my|this)|do not sell|delete my/i;
+          var els=[].slice.call(document.querySelectorAll('a,button,input[type=submit],input[type=button],[role=button]')).filter(function(e){var t=(e.innerText||e.value||'').trim();
+            if(!re.test(t)||t.length>60) return false; var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&!(e.closest&&e.closest('nav,header,footer'));});
+          if(!els.length) return false;
+          if(els.some(function(e){var r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;})) return false;
+          els[0].scrollIntoView({block:'center',behavior:'smooth'}); return true;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+    }
+
+    /// A page that offers its one opt-out form as tabs ("Phone" and "Name"): opens the name tab, which is the one that takes a person's listing off.
+    /// Returns true when it pressed one.
+    func chooseNameTab() async -> Bool {
+        let js = #"""
+        (function(){var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
+          var items=[].slice.call(document.querySelectorAll('[role=tab],.nav-link,.tab,li,button,a,label,div,span')).filter(function(e){return vis(e)&&e.children.length<=1&&(e.innerText||'').trim().length<24;});
+          var by=function(re){return items.filter(function(e){return re.test((e.innerText||'').trim());});};
+          var names=by(/^(by )?(full )?(name|name lookup|people|person)$/i), phones=by(/^(by )?(phone|phone number|phone lookup|number)$/i);
+          if(!names.length||!phones.length) return false;
+          var n=names.filter(function(e){return /^(A|BUTTON)$/.test(e.tagName)||e.getAttribute('role')==='tab';})[0]||names.filter(function(e){return e.children.length===0;})[0]||names[0]; if(n.getAttribute('aria-selected')==='true'||/\bactive\b|\bselected\b/.test(n.className||'')) return false;
+          n.click(); return true;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
     /// Chooses, inside one form, the options an opt-out needs: "this request is for myself", the opt-out and deletion choices, and a
@@ -328,6 +374,8 @@ extension WebViewSession {
             if(!t) t=e.getAttribute('aria-label')||e.getAttribute('value')||'';
             if(!t&&e.nextSibling&&e.nextSibling.textContent) t=e.nextSibling.textContent;
             return t.replace(/\s+/g,' ').trim();};
+          var title=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
+            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t||'').split(/\n/)[0].trim().slice(0,80);};
           var self=/\b(myself|me|my own|individual|consumer|resident|myself)\b/i, notSelf=/deceased|authori[sz]ed|agent|behalf|represent|business|company|employee|minor|child/i;
           var yes=/opt.?out|do not sell|don.?t sell|do not share|targeted advertis|cross-context|profil|delete|deletion|remove|erase|unsubscribe|limit the use/i;
           var no=/opt.?in|\baccess\b|know|correct|portab|copy of|subscribe\b(?!.*(out|unsub))|newsletter|receive/i;
@@ -340,12 +388,19 @@ extension WebViewSession {
           var groups={};
           f.querySelectorAll('input[type=radio]').forEach(function(r){(groups[r.name||('g'+Math.random())]=groups[r.name||'']||[]).push(r);});
           var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
-          Object.keys(groups).forEach(function(k){var rs=groups[k]; if(rs.some(function(r){return r.checked;})) return;
+          var removal=/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i;
+          Object.keys(groups).forEach(function(k){var rs=groups[k];
+            // The page may start on its gentler choice ("Your privacy choices"); "Remove my information" is the one that takes a listing off.
+            var rm=rs.filter(function(r){return removal.test(title(r));})[0];
+            if(rm&&!rm.checked){rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
+            if(rs.some(function(r){return r.checked;})) return;
             var pick=null;
             // "Are you an authorized agent / acting on behalf of someone?": the person is asking for themselves, so the answer is No.
             var ctx=((rs[0].closest('fieldset')||rs[0].closest('div')||{innerText:''}).innerText||'').slice(0,200)+' '+(rs[0].name||'');
             if(agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)) pick=rs[i];}
+            // "Remove my information" (a person-search site taking a listing off) beats a plain "do not sell" choice beside it: it is the stronger opt-out.
+            for(var i=0;i<rs.length&&!pick;i++){var ti=title(rs[i]); if(/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i.test(ti)) pick=rs[i];}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(yesOrOptOut(t)||isDecl(t)) pick=rs[i];}
             if(pick){pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
             else if(rs.some(function(r){return r.required;})) unresolved.push(label(rs[0])||k);});
@@ -569,7 +624,8 @@ extension FormRun {
         _ = await session.advanceToRequestForm()
         let forms = await session.discoverFormsDeep()
         let context = await session.pageContext()
-        guard let form = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
+        guard let picked = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
+        var form = picked
         session.chosenForm = form.token
         let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
         switch plan.verdict {
@@ -581,9 +637,30 @@ extension FormRun {
         if fill.filled == 0 { return .failed("the form's fields could not be filled in") }
         if let miss = fill.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
         let beforeFill = await session.visibleText()
-        let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+        var options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
         _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
         _ = await session.chooseTileButtons()
+        // Choosing "remove my information" can open a second form with more boxes (state, birth date): read the page again and fill those too.
+        if options.chosen > 0 {
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            let known = WebAssistedDriver.signature(form)
+            let again = await session.discoverForms(waitForFrames: false)
+            if let fresh = again.filter({ LiveFormPicker.score($0, pageContext: context) >= 3 && WebAssistedDriver.signature($0) != known })
+                .max(by: { LiveFormPicker.score($0, pageContext: context) < LiveFormPicker.score($1, pageContext: context) }) {
+                form = fresh
+                session.chosenForm = fresh.token
+                let second = FormFiller.plan(for: fresh.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
+                switch second.verdict {
+                case .ready: break
+                case .needsData(let what): return .failed("the form asks for \(what.joined(separator: ", ")), which we do not hold")
+                case .needsYou(let why): return .failed(why)
+                }
+                let more = await session.fillLive(second.values, keepExisting: true)
+                if let miss = more.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
+                options = await session.chooseRequestOptions(form: fresh.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+                _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
+            }
+        }
         // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         let earlyText = await session.visibleText()

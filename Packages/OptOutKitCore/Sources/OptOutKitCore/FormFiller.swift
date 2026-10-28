@@ -181,7 +181,8 @@ public enum FormFiller {
             // A subject or message box: the same plain request every time, stating only what the person already sends.
             if visibleLabel.lowercased().range(of: "^\\s*(subject|topic|regarding)\\s*(\\*|:|\\(required\\))?\\s*$", options: .regularExpression) != nil { put(["Privacy opt-out and deletion request"], L10n.noun("Subject")); continue }
             // A menu asked for a subject or topic picks the option that names a privacy request; the long request sentence goes only in a text box.
-            if field.type == "select", has("subject|topic|regarding|reason for|type of (request|inquiry)|inquiry type|how can we help") {
+            // (A menu named "subject_state" is the state, not the topic: the field's code name is not enough.)
+            if field.type == "select", has("subject|topic|regarding|reason for|type of (request|inquiry)|inquiry type|how can we help"), !has("state|province|country|month|\\bday\\b|\\byear\\b|birth|dob|city|zip|postal") {
                 put(["Privacy opt-out and deletion request", "Privacy request", "Opt out", "Opt-out", "Do not sell", "Delete", "Privacy", "Other"], L10n.noun("Subject")); continue
             }
             if field.type == "select", has("message|comments?|details|description|tell us|your request") { continue }

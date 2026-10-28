@@ -94,6 +94,26 @@ enum FormAudit {
         try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
     }
 
+    /// Simulator work: the real run path (`FormRun.runLive`) in dry-run mode on each site for the owner's profile: nothing is sent. Writes Documents/dry-live/results.json.
+    static func dryLive(domains: [String], model: AppModel) async {
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("dry-live")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        guard let me = model.people.first(where: { $0.relationship == .me }) else { return }
+        let person = model.formPerson(me)
+        var rows: [[String: String]] = []
+        for d in domains {
+            guard let entry = model.directory.first(where: { $0.domain == d }).map(model.resolved) else { continue }
+            let page = entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL
+            guard let page else { continue }
+            FormRun.debugLastBlockers = []
+            let report = await FormRun.runLive(url: page, html: nil, person: person, dryRun: true, maxWait: 25, capture: true)
+            if let shot = report.screenshot { try? shot.write(to: dir.appendingPathComponent(d + ".jpg")) }
+            rows.append(["domain": d, "outcome": "\(report.outcome)", "blockers": FormRun.debugLastBlockers.joined(separator: "; ")])
+            if let data = try? JSONEncoder().encode(rows) { try? data.write(to: dir.appendingPathComponent("results.json")) }
+        }
+        try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
+    }
+
     /// Sites `from` to `to` (counting from 1) of each kind in the daily order, semi-automated queue only.
     static func range(from: Int, to: Int, model: AppModel) -> [String] {
         let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)

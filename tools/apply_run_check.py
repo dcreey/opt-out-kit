@@ -10,6 +10,14 @@ import argparse, datetime, os, re
 
 CONFIRMED = {"lionsharemarketing.com": "thank-you page: allow up to 45 days", "scileads.com": "it said Request received",
              "apollo.io": "it said We sent an email to you, please check your inbox"}
+# The privacy-request portal many people-search sites share ("Your Privacy Choices" / "Remove My Information"): one real send on
+# peoplesearchusa.org (2026-10-28) showed "Check your email ... nothing is removed until that link is clicked"; the others carry the same
+# template and filled completely, with no check in the way, in a dry run of the real run path.
+PORTAL = "removal request accepted; a confirmation link is emailed and must be clicked"
+for d in ["backgroundcheckers.net", "checksecrets.com", "inmatessearcher.com", "mugshotlook.com", "peoplesearch123.com", "peoplesearcher.com",
+          "peoplesearchusa.org", "personsearchers.com", "privaterecords.net", "privatereports.com", "publicsearcher.com", "sealedrecords.net",
+          "secretinfo.org", "truthrecord.org", "weinform.org"]:
+    CONFIRMED[d] = PORTAL
 FAILED = {}
 def put(note, *domains):
     for d in domains: FAILED[d] = note
@@ -28,8 +36,11 @@ put("the form was not on the page", "abovedata.io", "findem.ai", "lizdev.com", "
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--dir", default="directory"); ap.add_argument("--date", default=datetime.date.today().isoformat())
+    ap.add_argument("--only", help="comma-separated domains: write only these")
     a = ap.parse_args(); n = 0
+    only = set(a.only.split(",")) if a.only else None
     for domain, note in {**{d: ("confirmed", t) for d, t in CONFIRMED.items()}, **{d: ("failed", t) for d, t in FAILED.items()}}.items():
+        if only and domain not in only: continue
         result, text = note
         path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", domain.lower()).strip("_") + ".yml")
         if not os.path.exists(path): print("no entry for", domain); continue

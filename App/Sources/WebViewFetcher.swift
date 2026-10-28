@@ -50,6 +50,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     /// The token of the form a live run chose, so the final picture is cropped around it.
     var chosenForm: String?
     private var loadContinuation: CheckedContinuation<Void, Error>?
+    private var waitSerial = 0
     /// Frames (pages inside the page) that reported forms or fields, and the one the chosen form lives in, when it is not the page itself.
     var frames: [(info: WKFrameInfo, href: String)] = []
     var activeFrame: WKFrameInfo?
@@ -187,7 +188,24 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         if request.value(forHTTPHeaderField: "Accept-Language") == nil {
             request.setValue("\(Loc.language),en;q=0.5", forHTTPHeaderField: "Accept-Language")
         }
-        try await wait { self.webView.load(request) }
+        request.timeoutInterval = 45
+        // A site that drops the first attempt, or that is slow to answer, is tried again before the page is given up on.
+        var attempt = 0
+        while true {
+            do { try await wait { self.webView.load(request) }; return }
+            catch {
+                attempt += 1
+                guard attempt < 3, Self.isTransient(error) else { throw error }
+                try? await Task.sleep(nanoseconds: UInt64(attempt) * 1_500_000_000)
+            }
+        }
+    }
+
+    /// Errors that say "try again" (timed out, connection lost, could not connect, the load was interrupted), not "this page is gone".
+    static func isTransient(_ error: Error) -> Bool {
+        let e = error as NSError
+        if e.domain == NSURLErrorDomain { return [NSURLErrorTimedOut, NSURLErrorCannotConnectToHost, NSURLErrorNetworkConnectionLost, NSURLErrorNotConnectedToInternet, NSURLErrorDNSLookupFailed].contains(e.code) }
+        return e.domain == "WebKitErrorDomain" && e.code == 102
     }
 
     func loadHTML(_ html: String) async throws {
@@ -215,7 +233,14 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     private func wait(_ start: () -> Void) async throws {
         try await withCheckedThrowingContinuation { (c: CheckedContinuation<Void, Error>) in
             loadContinuation = c
+            waitSerial += 1
+            let mine = waitSerial
             start()
+            // A load that never reports back (a redirect that was cancelled and not followed) ends as a timeout instead of hanging.
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 50_000_000_000)
+                if self?.waitSerial == mine { self?.resume(URLError(.timedOut), force: true) }
+            }
         }
     }
 
@@ -245,7 +270,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { resume(error) }
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { resume(error) }
 
-    private func resume(_ error: Error?) {
+    /// A navigation that was cancelled because the page moved on to another one (a redirect) is not a failure: the next one reports.
+    private func resume(_ error: Error?, force: Bool = false) {
+        if let error, !force, (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled { return }
         guard let c = loadContinuation else { return }
         loadContinuation = nil
         if let error { c.resume(throwing: error) } else { c.resume() }
@@ -356,9 +383,14 @@ enum FormRun {
     /// Only a success reading, for text that may be anything: error and unknown readings come back as failed.
     nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome { text.isEmpty ? .failed("") : classify(text) }
 
+    /// New text on the page that offers an opt-out or removal (a listing's "Opt out" button after a search).
+    nonisolated static func mentionsOptOutControl(_ text: String) -> Bool {
+        text.range(of: "opt.?(me.?)?out|remove (me|my|this)|do not sell", options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
     /// Whether a page says an email will follow with more to do (a confirmation link, a verification message, "check your inbox").
     nonisolated static func mentionsEmailFollowUp(_ text: String) -> Bool {
-        text.lowercased().range(of: "check your (e-?mail|inbox|spam)|confirm your (e-?mail|request|identity)|(sent|send|sending|email|emailed|e-?mail) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| have| are going to)? (send|email|receive)[^.]{0,40}(e-?mail|link)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
+        text.lowercased().range(of: "check your (e-?mail|inbox|spam)|(emailed|e-?mailed|sent) (you |the address[^.]{0,30})?an? (confirmation|verification) (link|e-?mail|message)|confirm your (e-?mail|request|identity)|(sent|send|sending|email|emailed|e-?mail) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| have| are going to)? (send|email|receive)[^.]{0,40}(e-?mail|link)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
     }
 
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
@@ -444,6 +476,7 @@ extension WebViewSession {
             try{new MutationObserver(function(rs){for(var i=0;i<rs.length;i++){var r=rs[i];
               if(r.type==='attributes'&&/^data-ook/.test(r.attributeName||'')) continue; W.dirty=true; W.last=Date.now(); return;}})
               .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style','hidden','open','aria-hidden','aria-expanded','src','disabled']});}catch(e){}}
+          if(!W.ev){W.ev=true; var mark=function(){W.dirty=true;W.last=Date.now();}; document.addEventListener('change',mark,true); document.addEventListener('click',mark,true);}
           if(W.dirty&&Date.now()-W.last>=600){W.dirty=false;return true;} return false;})();
         """#
         var changed = (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
@@ -508,7 +541,7 @@ extension WebViewSession {
             if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
             if(!t){var n=c.parentElement; t=n?n.innerText:'';}
             // "I am an authorized agent submitting on behalf of someone else" is an option for agents, not a requirement for the subject.
-            if(re.test(t)&&!/\bagent\b|on behalf of (someone|another)|representative|mandataire|repr[ée]sentant|au nom d|agente|representante|en nombre de|bevollm[äa]chtigt|im namen/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
+            if(re.test(t)&&!/\bagent\b|\bon behalf\b|representative|mandataire|repr[ée]sentant|au nom d|agente|representante|en nombre de|bevollm[äa]chtigt|im namen/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
           return out;})();
         """#
         return (try? await webView.evaluateJavaScript(js)) as? String

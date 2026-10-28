@@ -55,7 +55,8 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertGreaterThan(sites.count, 50, "the directory has many forms")
         let rows = try XCTUnwrap(m.optOutRun[me.id])
         let sent = rows.filter { if case .submitted = $0.result { return true } else { return false } }
-        XCTAssertEqual(sent.count, box.calls, "every call was recorded as a send")
+        // Sites that share one opt-out page are sent once and each gets the result, so there are never fewer sends recorded than calls made.
+        XCTAssertGreaterThanOrEqual(sent.count, box.calls)
         XCTAssertEqual(m.progress.optOutAttempts.count, sent.count, "only sends are remembered")
         XCTAssertNotNil(m.autoSettings.lastOptOut)
     }
@@ -101,7 +102,7 @@ final class AutoProtectionTests: XCTestCase {
         let box = CallBox()
         await m.runAutoOptOut(for: me, automaticOnly: false, submitter: CountingSubmitter(box: box))
         XCTAssertEqual(box.calls, 0)
-        XCTAssertTrue(m.optOutRun[me.id]!.contains { if case .needsData = $0.result { return true } else { return false } }
-                      || m.optOutRun[me.id]!.allSatisfy { if case .needsYou = $0.result { return true } else { return false } })
+        // The run does not start: the person is asked for their current address first, and nothing is sent or recorded.
+        XCTAssertNil(m.optOutRun[me.id])
     }
 }

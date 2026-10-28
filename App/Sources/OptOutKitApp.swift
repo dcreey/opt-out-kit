@@ -164,6 +164,7 @@ final class AppModel: ObservableObject {
         if args.contains("-uitest-seed-profile"), var me = household.people.first(where: { $0.relationship == .me }) {
             me.names = [NameEntry(kind: .legal, name: "Pat Example")]
             me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+            if args.contains("-uitest-seed-birthdate") { me.birthdate = "1985-03-14" }
             household.update(me)
             household.setContactEmail("pat@example.com")
             household.updateAuto { $0.decidedAt = Date() }
@@ -1178,6 +1179,9 @@ final class AppModel: ObservableObject {
 
     /// Encrypting and writing the household takes a moment, so it runs off the main thread, one write at a time and in order. A failure is shown when it comes back.
     private let saveQueue = DispatchQueue(label: "dev.optoutkit.save", qos: .utility)
+    /// Waits until every save started so far has been written (saves run in the background). Tests read the file straight after a change.
+    func flushSaves() { saveQueue.sync {} }
+
     private func save() {
         guard storageProblem == nil else { return }
         let snapshot = household, store = store

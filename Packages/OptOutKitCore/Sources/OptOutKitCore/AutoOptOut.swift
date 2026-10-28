@@ -45,6 +45,7 @@ public enum AutoOptOutResult: Equatable, Sendable {
     case challenged(String)
     case rejected(String)
     case failed(String)
+    case emailed                       // this site did not take the form; the person emailed their opt-out to it instead
 
     public var label: String {
         switch self {
@@ -60,6 +61,7 @@ public enum AutoOptOutResult: Equatable, Sendable {
         case .challenged(let why): return L10n.f("Stopped: %@", why)
         case .rejected(let why): return L10n.f("The site refused: %@", why)
         case .failed(let why): return L10n.f("No confirmation: %@", why)
+        case .emailed: return L10n.t("Asked by email instead")
         }
     }
 }

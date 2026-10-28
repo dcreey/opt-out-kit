@@ -1,4 +1,5 @@
 import SwiftUI
+import MessageUI
 import WebKit
 import OptOutKitCore
 
@@ -18,6 +19,8 @@ protocol AssistedPage: AnyObject {
     func pageText() async -> String
     /// When the page now shows a different privacy form from the one in use (a modal opened, a next step appeared), switches to it and fills it in. True when it did.
     func adoptNewForm() async -> Bool
+    /// Scrolls to an opt-out button that appeared out of view. Nothing in tests.
+    func scrollToOptOut() async
     /// True when the screen changed since the last ask and has settled. Cheap: the page keeps the flag itself.
     func changed() async -> Bool
     func close()
@@ -27,7 +30,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false } }
+extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func scrollToOptOut() async {}; func changed() async -> Bool { false } }
 
 @MainActor
 protocol AssistedDriver {
@@ -87,7 +90,7 @@ struct WebAssistedDriver: AssistedDriver {
         let session = WebViewSession.make()
         do {
             if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page)) }
-        } catch { session.close(); return nil }
+        } catch { NSLog("OOK load failed %@: %@", form.page.absoluteString, "\(error)"); session.close(); return nil }
         await session.settlePage(maxWait: 10)
         _ = await session.denyCookies()
         try? await Task.sleep(nanoseconds: 1_000_000_000)
@@ -96,16 +99,22 @@ struct WebAssistedDriver: AssistedDriver {
         let page = WebAssistedPage(session: session, plan: plan)
         if let person {
             _ = await session.advanceToRequestForm()
-            guard let live = LiveFormPicker.pick(await session.discoverFormsDeep(), pageContext: await session.pageContext()) else { session.close(); return nil }
+            if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
+            let found = await session.discoverFormsDeep()
+            guard let live = LiveFormPicker.pick(found, pageContext: await session.pageContext()) else {
+                NSLog("OOK no form %@: %@", form.page.absoluteString, found.map { "[\($0.fields.filter(\.visible).map(\.label).joined(separator: ",")) | \($0.buttons.joined(separator: ","))]" }.joined(separator: " "))
+                session.close(); return nil
+            }
             // Only a form that asks for the phone's advertising ID makes the app ask the person (once) for permission to read it.
             let liveForm = live.asOptOutForm(page: form.page)
             var adID = advertisingID
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
             let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
-            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { session.close(); return nil }
+            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { NSLog("OOK plan not ready %@: %@", form.page.absoluteString, "\(livePlan.verdict)"); session.close(); return nil }
             page.remember(person: person, advertisingID: adID, listingURL: listingURL, page: form.page, signature: Self.signature(live))
         }
         await page.refill()
+        if let token = page.currentFormToken { await session.scrollFormIntoView(token: token) }
         await session.scrollChallengeIntoView()
         return page
     }
@@ -122,26 +131,35 @@ final class WebAssistedPage: AssistedPage {
     private var advertisingID: String?
     private var listingURL: URL?
     private var pageURL: URL?
-    private var knownSignature = ""
+    private var knownSignatures = Set<String>()
     private var shown: WKWebView?
+    var currentFormToken: String? { liveForm }
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
 
     func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
 
-    func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignature = signature }
+    func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
     func adoptNewForm() async -> Bool {
         guard let person, let pageURL, liveForm != nil else { return false }
         let frameBefore = session.activeFrame
         let forms = await session.discoverForms(waitForFrames: false)
-        guard let new = LiveFormPicker.pick(forms, pageContext: await session.pageContext()) else { session.activeFrame = frameBefore; return false }
+        // A form not seen before wins over the one already filled in: choosing "remove my information" opens a second form beside the first.
+        let context = await session.pageContext()
+        let fresh = forms.filter { LiveFormPicker.score($0, pageContext: context) >= 3 && !knownSignatures.contains(WebAssistedDriver.signature($0)) }
+            .max { LiveFormPicker.score($0, pageContext: context) < LiveFormPicker.score($1, pageContext: context) }
+        guard let new = fresh ?? LiveFormPicker.pick(forms, pageContext: context) else { session.activeFrame = frameBefore; return false }
         let sig = WebAssistedDriver.signature(new)
-        if sig == knownSignature { liveForm = new.token; return false }       // the same form, with its marks put on again
+        if knownSignatures.contains(sig) { liveForm = new.token; return false }       // the same form, with its marks put on again
         let form = new.asOptOutForm(page: pageURL)
         let livePlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: advertisingID)
-        guard case .ready = livePlan.verdict else { session.activeFrame = frameBefore; return false }
-        liveForm = new.token; plan = livePlan; knownSignature = sig
+        // A detail the profile lacks (a birth date) is left for the person to type; what the profile has is still filled in.
+        switch livePlan.verdict {
+        case .ready, .needsData: break
+        case .needsYou: session.activeFrame = frameBefore; return false
+        }
+        liveForm = new.token; plan = livePlan; knownSignatures.insert(sig)
         // What the person already typed is kept; only empty boxes of the new form are filled.
         _ = await session.fillLive(plan.values, keepExisting: true)
         _ = await session.chooseRequestOptions(form: new.token, ownerMayConfirm: ownerMayConfirm)
@@ -167,9 +185,11 @@ final class WebAssistedPage: AssistedPage {
     func refill() async {
         if let liveForm {
             _ = await session.fillLive(plan.values)
-            _ = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
+            let options = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
             _ = await session.chooseCustomMenus(state: stateName)
             _ = await session.chooseTileButtons()
+            // Choosing "remove my information" can reveal more boxes (state, birth year): read the form again and fill those too.
+            if options.chosen > 0 { _ = await adoptNewForm() }
         } else { _ = await session.fillFields(plan.values) }
     }
 
@@ -186,6 +206,7 @@ final class WebAssistedPage: AssistedPage {
 
     func pageText() async -> String { await session.viewportText() }
     func changed() async -> Bool { await session.pageChanged() }
+    func scrollToOptOut() async { _ = await session.scrollToOptOutControl() }
 
     func close() { session.close() }
 }
@@ -231,6 +252,12 @@ final class AssistedRunner: ObservableObject {
     /// A short line about something the app did by itself (a new form appeared and was filled), shown under the instruction.
     @Published private(set) var notice: String?
     private var markedDone: AutoOptOutResult?
+    /// A site that did not go through (or was reported as not working) and has an email address: the person is asked whether to email it instead.
+    @Published private(set) var emailOffer: DirectoryEntry?
+    private var emailContinuation: CheckedContinuation<Void, Never>?
+    private var reportedNotWorking = false
+    /// How many more times the screen is read right away, after a change was seen.
+    private var rescans = 0
     /// The page where the person picks their listing, while that step is on.
     @Published private(set) var searchPage: SearchPage?
     /// A line about the previous site, only when it did not go through.
@@ -272,14 +299,16 @@ final class AssistedRunner: ObservableObject {
     }
 
     /// Reads what is on screen; true outcome when the new text shows a confirmation, nil when nothing changed or it says nothing of the kind.
-    private func watch(_ page: AssistedPage, baseline: inout String) async -> AutoOptOutResult? {
+    private func watch(_ page: AssistedPage, baseline: inout String, force: Bool = false) async -> AutoOptOutResult? {
         let now = await page.pageText()
-        guard !now.isEmpty, now != baseline else { return nil }
+        // A form that opens with an animation may still be collapsed on the first look, so after a change the page is read again a few times even when the text is the same.
+        guard !now.isEmpty, now != baseline || force else { return nil }
         let added = FormRun.newText(before: baseline, after: now)
         baseline = now
         if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .submitted(awaitingEmail: email) }
         // Nothing confirmed, but the screen changed: a new privacy form may have appeared (a window opened, the next step). Fill it in if so.
         if await page.adoptNewForm() { notice = Loc.t("A new form appeared and we filled it in. Check it.") }
+        else if FormRun.mentionsOptOutControl(added) { await page.scrollToOptOut() }
         return nil
     }
 
@@ -312,7 +341,31 @@ final class AssistedRunner: ObservableObject {
         }
     }
 
-    func skip() { skipFlag = true; resumeNext() }
+    func skip(reported: Bool = false) { reportedNotWorking = reported; skipFlag = true; resumeNext() }
+
+    /// The person answered the offer to email a site that did not go through: `sent` is true once they sent the message, which finishes the site.
+    func answerEmailOffer(sent: Bool) {
+        if sent, let entry = emailOffer { results[entry.id] = .emailed }
+        emailOffer = nil
+        emailContinuation?.resume(); emailContinuation = nil
+    }
+
+    private func offerEmailIfNeeded(_ item: Item, _ result: AutoOptOutResult) async {
+        if offersEmail(result, item.entry) {
+            emailOffer = item.entry
+            await withCheckedContinuation { emailContinuation = $0 }
+        }
+        reportedNotWorking = false
+    }
+
+    private func offersEmail(_ result: AutoOptOutResult, _ entry: DirectoryEntry) -> Bool {
+        guard entry.contactEmail != nil else { return false }
+        switch result {
+        case .failed, .rejected, .challenged: return true
+        case .needsYou(let why): return why != "skipped" || reportedNotWorking
+        default: return false
+        }
+    }
     func next() { resumeNext() }
     private func resumeNext() { nextContinuation?.resume(); nextContinuation = nil }
 
@@ -331,11 +384,15 @@ final class AssistedRunner: ObservableObject {
             index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if let search = items[i].searchURL {
                 let (listing, early) = await chooseListing(items[i], search: search)
-                if let early { record(items[i], early); continue }
+                if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); continue }
                 phase = .loading
                 preparing[i] = Task { await driver.prepare(items[i].form, plan: items[i].plan, listingURL: listing) }
             } else { prepare(i) }
-            guard let ready = await preparing[i]?.value else { record(items[i], .failed("the page would not load")); continue }
+            guard let ready = await preparing[i]?.value else {
+                record(items[i], .failed("the page would not load"))
+                await offerEmailIfNeeded(items[i], .failed("the page would not load"))
+                continue
+            }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready
             prepare(i + 1)      // load the next one while the person works on this one
@@ -359,9 +416,11 @@ final class AssistedRunner: ObservableObject {
                     waited += pollInterval; sinceWatch += pollInterval
                     // The page says when it changed (checked every poll); the slow read is only a backup for changes it cannot see.
                     let moved = await ready.changed()
-                    if moved || sinceWatch >= watchInterval {
+                    if moved { rescans = 3 }
+                    let force = rescans > 0; if force { rescans -= 1 }
+                    if moved || force || sinceWatch >= watchInterval {
                         sinceWatch = 0
-                        if let hit = await watch(ready, baseline: &baseline) {
+                        if let hit = await watch(ready, baseline: &baseline, force: force) {
                             outcome = hit
                             if case .submitted(let email) = hit { phase = .sent(awaitingEmail: email) }
                             break
@@ -388,9 +447,11 @@ final class AssistedRunner: ObservableObject {
                             guard !Task.isCancelled, let self else { return }
                             idle += self.pollInterval
                             let moved = await ready.changed()
-                            guard moved || idle >= self.watchInterval else { continue }
+                            if moved { self.rescans = 3 }
+                            let force = self.rescans > 0; if force { self.rescans -= 1 }
+                            guard moved || force || idle >= self.watchInterval else { continue }
                             idle = 0
-                            if let hit = await self.watch(ready, baseline: &watched) {
+                            if let hit = await self.watch(ready, baseline: &watched, force: force) {
                                 self.markedDone = hit
                                 if case .submitted(let email) = hit { self.phase = .sent(awaitingEmail: email) }
                                 self.resumeNext(); return
@@ -403,7 +464,9 @@ final class AssistedRunner: ObservableObject {
                 case .filledNotSubmitted: outcome = .dryRunReady
                 }
             }
-            record(items[i], outcome ?? .challenged("the check came back"))
+            let final = outcome ?? .challenged("the check came back")
+            record(items[i], final)
+            await offerEmailIfNeeded(items[i], final)
             // The sent check is on screen meanwhile; the page it came from stays under it for a moment.
             if case .submitted? = outcome { try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000)) }
             ready.close(); page = nil
@@ -438,6 +501,7 @@ struct AssistedOptOutView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
+    @State private var composing: EmailBatch?
 
     var body: some View {
         NavigationStack {
@@ -455,9 +519,32 @@ struct AssistedOptOutView: View {
         } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
         .task { await runner.run() }
         .overlay { if showSent { SentCheck().transition(.opacity) } }
+        .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil }, set: { _ in }), titleVisibility: .visible) {
+            Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
+            Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
+        } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done.") }
+        .sheet(item: $composing) { batch in
+            MailComposer(to: [model.formEmail ?? ""], bcc: batch.addresses, subject: batch.subject, body: model.emailBody(for: batch)) { result in
+                composing = nil
+                if result == .sent {
+                    model.markEmailed(batch)
+                    if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() }       // asked by email: this site is done
+                } else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
+            }
+        }
         .onChange(of: runner.celebrate) { _, _ in
             withAnimation(.easeOut(duration: 0.2)) { showSent = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation(.easeIn(duration: 0.3)) { showSent = false } }
+        }
+    }
+
+    /// Some sites only take an opt-out by email (or the form is a dead end): the message is prepared for the person to read and send.
+    private func emailInstead(_ entry: DirectoryEntry) {
+        guard let batch = EmailBatch.single(entries: [entry]).first else { return }
+        if MFMailComposeViewController.canSendMail() { composing = batch }
+        else {
+            if let url = model.composeURL(for: batch, app: .mail) { UIApplication.shared.open(url) }
+            if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }       // no Mail account here: the message opens elsewhere and the person moves on
         }
     }
 
@@ -471,12 +558,15 @@ struct AssistedOptOutView: View {
                             if let url = runner.page?.webView?.url ?? runner.searchPage?.webView?.url {
                                 Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
                             }
+                            if let entry = runner.current?.entry, entry.contactEmail != nil {
+                                Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
+                            }
                             Button { runner.skip() } label: { Label("Skip this site", systemImage: "forward") }
                             Menu {
                                 ForEach(IssueKind.allCases, id: \.self) { kind in
                                     Button(kind.label) {
                                         if let item = runner.current { model.reportIssue(kind, site: item.entry.id) }
-                                        runner.skip()
+                                        runner.skip(reported: true)
                                     }
                                 }
                             } label: { Label("Not working", systemImage: "exclamationmark.bubble") }

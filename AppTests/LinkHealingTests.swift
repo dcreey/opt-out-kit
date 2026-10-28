@@ -70,6 +70,10 @@ final class LinkHealingTests: XCTestCase {
 
     func testABrokerFlowWhoseFirstPageMovedGuidesToTheNewPage() async throws {
         let m = model()
+        var me = try XCTUnwrap(m.selectedPerson)
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")      // a flow only starts for a person whose profile is complete
         let broker = try XCTUnwrap(m.brokers.first { $0.id == "peopleconnect" })
         let healed = await m.healLink(for: broker, inspector: movedSite(host: "suppression.peopleconnect.us"))
         XCTAssertNotNil(healed, "the broker's host was crawled for the new page")

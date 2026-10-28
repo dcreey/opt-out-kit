@@ -6,6 +6,9 @@ struct RootView: View {
     @State private var tab = 0
     @State private var showDemoReview = false
     @State private var debugLink: String?
+    #if DEBUG
+    @State private var debugSemi: DebugSemi?
+    #endif
 
     var body: some View {
         TabView(selection: $tab) {
@@ -24,6 +27,9 @@ struct RootView: View {
             if args.contains("-real-send"), let i = args.firstIndex(of: "-real-send-domains"), args.indices.contains(i + 1) {
                 await FormAudit.realSend(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
             }
+            if let i = args.firstIndex(of: "-dry-live-domains"), args.indices.contains(i + 1) {
+                await FormAudit.dryLive(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
+            }
             if let i = args.firstIndex(of: "-audit-range"), args.indices.contains(i + 1) {
                 let parts = args[i + 1].split(separator: "-").compactMap { Int($0) }
                 if parts.count == 2 { await FormAudit.run(domains: FormAudit.range(from: parts[0], to: parts[1], model: model), model: model) }
@@ -40,10 +46,16 @@ struct RootView: View {
             } else if let i = args.firstIndex(of: "-audit-domains"), args.indices.contains(i + 1) {
                 await FormAudit.run(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
             }
+            // Simulator work: `-semi-domains a.com,b.com` opens the Solve-and-send screen on those sites for the owner's profile.
+            if let i = args.firstIndex(of: "-semi-domains"), args.indices.contains(i + 1), let me = model.people.first(where: { $0.relationship == .me }) {
+                let items = model.verifyItems(domains: args[i + 1].split(separator: ",").map(String.init), for: me)
+                debugSemi = DebugSemi(runner: AssistedRunner(items: items, driver: model.makeAssistedDriver()) { _, _ in })
+            }
             if let i = args.firstIndex(of: "-open-link-filler"), args.indices.contains(i + 1) { debugLink = args[i + 1]; tab = 2 }
             if args.contains("-uitest-demo-run") { await model.runDemoOptOut() }
             if args.contains("-uitest-demo-review") { await model.runDemoOptOut(); model.runReport = nil; showDemoReview = true }
         }
+        .fullScreenCover(item: $debugSemi) { box in AssistedOptOutView(runner: box.runner) }
         .sheet(isPresented: $showDemoReview) {
             if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
         }
@@ -66,3 +78,7 @@ struct RootView: View {
         .id(model.language)                            // and words built in code are rebuilt when it changes
     }
 }
+
+#if DEBUG
+struct DebugSemi: Identifiable { let runner: AssistedRunner; var id: ObjectIdentifier { ObjectIdentifier(runner) } }
+#endif
