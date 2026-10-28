@@ -356,6 +356,11 @@ enum FormRun {
     /// Only a success reading, for text that may be anything: error and unknown readings come back as failed.
     nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome { text.isEmpty ? .failed("") : classify(text) }
 
+    /// Whether a page says an email will follow with more to do (a confirmation link, a verification message, "check your inbox").
+    nonisolated static func mentionsEmailFollowUp(_ text: String) -> Bool {
+        text.lowercased().range(of: "check your (e-?mail|inbox|spam)|confirm your (e-?mail|request|identity)|(sent|send|sending|email|emailed|e-?mail) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| have| are going to)? (send|email|receive)[^.]{0,40}(e-?mail|link)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
+    }
+
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
         // An error comes first: "problem with your submission" pages often also contain the word "request".
@@ -363,7 +368,7 @@ enum FormRun {
             return .rejected("the site showed an error after sending")
         }
         let success = t.range(of: "follow-?up e-?mail|(we|you)('ll| will) (send|email|receive)[^.]{0,40}(e-?mail|link)|thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
-        let needsEmail = t.range(of: "check your (e-?mail|inbox|spam)|confirm your (e-?mail|request|identity)|(sent|send|sending|email|emailed|e-?mail) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| have| are going to)? (send|email|receive)[^.]{0,40}(e-?mail|link)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
+        let needsEmail = mentionsEmailFollowUp(t)
         if success { return .submitted(awaitingEmail: needsEmail) }
         if t.range(of: "please enter|please provide", options: .regularExpression) != nil {
             return .rejected("the site flagged a field or asked to try again")
@@ -428,6 +433,21 @@ extension WebViewSession {
     }
 
     func pageTitle() async -> String { (try? await webView.evaluateJavaScript("document.title")) as? String ?? "" }
+
+    /// The text currently on screen (what is inside the viewport), from the page and from the frame the form is in. Cheap enough to read every few seconds.
+    func viewportText() async -> String {
+        let js = #"""
+        (function(){var out=[],h=innerHeight,w=innerWidth,n=0,tw=document.createTreeWalker(document.body||document.documentElement,NodeFilter.SHOW_TEXT),x;
+          while((x=tw.nextNode())&&n<4000){var t=(x.nodeValue||'').trim(); if(!t) continue; var e=x.parentElement; if(!e) continue;
+            var r=e.getBoundingClientRect(); if(r.width===0||r.height===0||r.bottom<0||r.top>h||r.right<0||r.left>w) continue;
+            var cs=getComputedStyle(e); if(cs.visibility==='hidden'||cs.display==='none') continue; out.push(t); n++;}
+          return out.join('\n').slice(0,8000);})();
+        """#
+        let page = (try? await webView.evaluateJavaScript(js)) as? String ?? ""
+        guard let f = activeFrame else { return page }
+        let inside = (try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page)) as? String ?? ""
+        return inside.isEmpty ? page : page + "\n" + inside
+    }
 
     func visibleText() async -> String {
         let page = (try? await webView.evaluateJavaScript("document.title + '\\n' + (document.body ? document.body.innerText : '')")) as? String ?? ""

@@ -1749,6 +1749,29 @@
     }
    }
   },
+  "A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un e-mail de confirmation ou de vérification semble en route. Le suivre ? L'app vous rappellera de le terminer dans Liens d'e-mail."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parece que viene un correo de confirmación o verificación. ¿Lo seguimos? La app le recordará terminarlo en Enlaces de correo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es scheint eine Bestätigungs- oder Verifizierungs-E-Mail unterwegs zu sein. Nachverfolgen? Die App erinnert Sie in E-Mail-Links daran, sie abzuschließen."
+     }
+    }
+   }
+  },
   "A daily scan and weekly opt-out requests, run for you in the background.": {
    "extractionState": "manual",
    "localizations": {
@@ -11777,6 +11800,29 @@
     }
    }
   },
+  "Mark as done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marquer comme terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marcar como hecho"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als erledigt markieren"
+     }
+    }
+   }
+  },
   "Mark done": {
    "extractionState": "manual",
    "localizations": {
@@ -13360,6 +13406,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Keine Seite passt zu dieser Suche."
+     }
+    }
+   }
+  },
+  "No, it is done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non, c'est terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No, ya está hecho"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nein, es ist erledigt"
      }
     }
    }
@@ -22495,6 +22564,29 @@
     }
    }
   },
+  "This page mentions an email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette page mentionne un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta página menciona un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite erwähnt eine E-Mail"
+     }
+    }
+   }
+  },
   "This page only needs your confirmation. Read it, then press \"%@\" yourself.": {
    "extractionState": "manual",
    "localizations": {
@@ -25576,6 +25668,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ja, ich habe sie gesendet"
+     }
+    }
+   }
+  },
+  "Yes, track it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, le suivre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, seguirlo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, nachverfolgen"
      }
     }
    }

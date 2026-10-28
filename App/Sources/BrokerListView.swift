@@ -8,8 +8,10 @@ struct BrokerListView: View {
     @State private var editing: Person?
 
     /// The editor can close only when the profile has its required details (and, for the owner, the household email).
+    /// The profile as typed in the open editor; the model itself is written when a field is left or Done is tapped.
+    @State private var editDraft: Person?
     private func editorComplete(_ person: Person) -> Bool {
-        guard let current = model.people.first(where: { $0.id == person.id }) else { return true }
+        guard let current = editDraft ?? model.people.first(where: { $0.id == person.id }) else { return true }
         return current.isComplete && (current.relationship != .me || model.formEmail != nil)
     }
     @State private var showAuto = false
@@ -137,11 +139,11 @@ struct BrokerListView: View {
             }
             .sheet(item: $editing) { person in
                 NavigationStack {
-                    PersonEditorView(person: person)
+                    PersonEditorView(person: person, onDraft: { editDraft = $0 })
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
                                 // A profile needs its legal name and current address before the editor can be closed.
-                                Button("Done") { editing = nil }
+                                Button("Done") { if let d = editDraft { model.update(d) }; editing = nil }
                                     .disabled(!(editorComplete(person)))
                                     .accessibilityIdentifier("editor-done")
                             }

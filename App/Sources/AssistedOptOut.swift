@@ -14,6 +14,8 @@ protocol AssistedPage: AnyObject {
     /// Puts the profile's values back, in case clearing a blocker reloaded the form.
     func refill() async
     func send() async -> SubmitOutcome
+    /// What is on screen now, for noticing a confirmation the person caused themselves. Empty in tests.
+    func pageText() async -> String
     func close()
     /// The live web view to show the person, or nil in tests. Reading it changes nothing: `present()` must be called first.
     var webView: WKWebView? { get }
@@ -21,7 +23,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func present() {} }
+extension AssistedPage { func present() {}; func pageText() async -> String { "" } }
 
 @MainActor
 protocol AssistedDriver {
@@ -111,6 +113,8 @@ final class WebAssistedPage: AssistedPage {
         return WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
     }
 
+    func pageText() async -> String { await session.viewportText() }
+
     func close() { session.close() }
 }
 
@@ -147,6 +151,11 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var page: AssistedPage?
     @Published private(set) var finished = false
     @Published private(set) var results: [String: AutoOptOutResult] = [:]
+    /// True while the person is asked whether the page's email step should be tracked, after they tapped Mark as done.
+    @Published var askFollowUp = false
+    private var markedDone: AutoOptOutResult?
+    /// How often the screen is read for a confirmation the person caused themselves (pressing the page's own button, a message appearing without a new page).
+    var watchInterval: TimeInterval = 12
 
     let items: [Item]
     private let driver: AssistedDriver
@@ -165,6 +174,28 @@ final class AssistedRunner: ObservableObject {
     var current: Item? { items.indices.contains(index) ? items[index] : nil }
     var sentCount: Int { results.values.filter { if case .submitted = $0 { return true } else { return false } }.count }
 
+    /// The person says this site is done, in case a confirmation was not noticed. If the page mentions an email to follow, they are asked whether to track it.
+    func markDone() async {
+        let text = await page?.pageText() ?? ""
+        if FormRun.mentionsEmailFollowUp(text) { askFollowUp = true } else { finishMarked(email: false) }
+    }
+    func answerFollowUp(track: Bool) { askFollowUp = false; finishMarked(email: track) }
+    private func finishMarked(email: Bool) {
+        markedDone = .submitted(awaitingEmail: email)
+        phase = .sent(awaitingEmail: email)
+        resumeNext()
+    }
+
+    /// Reads what is on screen; true outcome when the new text shows a confirmation, nil when nothing changed or it says nothing of the kind.
+    private func watch(_ page: AssistedPage, baseline: inout String) async -> AutoOptOutResult? {
+        let now = await page.pageText()
+        guard !now.isEmpty, now != baseline else { return nil }
+        let added = FormRun.newText(before: baseline, after: now)
+        baseline = now
+        if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .submitted(awaitingEmail: email) }
+        return nil
+    }
+
     func skip() { skipFlag = true; resumeNext() }
     func next() { resumeNext() }
     private func resumeNext() { nextContinuation?.resume(); nextContinuation = nil }
@@ -181,7 +212,7 @@ final class AssistedRunner: ObservableObject {
 
     func run() async {
         for i in items.indices {
-            index = i; phase = .loading; skipFlag = false; page = nil
+            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false
             prepare(i)
             guard let ready = await preparing[i]?.value else { record(items[i], .failed("the page would not load")); continue }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
@@ -190,11 +221,13 @@ final class AssistedRunner: ObservableObject {
 
             var outcome: AutoOptOutResult?
             var attempts = 0
+            var baseline = await ready.pageText()
             while outcome == nil, attempts < 3 {
                 attempts += 1
-                var waited: TimeInterval = 0
+                var waited: TimeInterval = 0, sinceWatch: TimeInterval = 0
                 while true {
                     if skipFlag { outcome = .needsYou("skipped"); break }
+                    if let done = markedDone { outcome = done; break }
                     let blockers = await ready.blockers()
                     if blockers.isEmpty { break }
                     if blockers.contains(.terms) { phase = .waitingForTerms }
@@ -202,7 +235,15 @@ final class AssistedRunner: ObservableObject {
                     else if let pick = blockers.compactMap({ if case .choose(let what) = $0 { return what } else { return nil } }).first { phase = .waitingForChoice(pick) }
                     else { phase = .waitingForCheck }
                     try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))
-                    waited += pollInterval
+                    waited += pollInterval; sinceWatch += pollInterval
+                    if sinceWatch >= watchInterval {
+                        sinceWatch = 0
+                        if let hit = await watch(ready, baseline: &baseline) {
+                            outcome = hit
+                            if case .submitted(let email) = hit { phase = .sent(awaitingEmail: email) }
+                            break
+                        }
+                    }
                     if waited > waitLimit { phase = .timedOut; outcome = .needsYou("timed out waiting for the check"); break }
                 }
                 if outcome != nil { break }
@@ -216,7 +257,22 @@ final class AssistedRunner: ObservableObject {
                 case .rejected(let why), .failed(let why):
                     phase = .needsMore(why)
                     outcome = .failed(why)
-                    await withCheckedContinuation { nextContinuation = $0 }      // the person finishes this one, then taps Next
+                    // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
+                    var watched = await ready.pageText()
+                    let watcher = Task { @MainActor [weak self] in
+                        while !Task.isCancelled {
+                            try? await Task.sleep(nanoseconds: UInt64((self?.watchInterval ?? 12) * 1_000_000_000))
+                            guard !Task.isCancelled, let self else { return }
+                            if let hit = await self.watch(ready, baseline: &watched) {
+                                self.markedDone = hit
+                                if case .submitted(let email) = hit { self.phase = .sent(awaitingEmail: email) }
+                                self.resumeNext(); return
+                            }
+                        }
+                    }
+                    await withCheckedContinuation { nextContinuation = $0 }
+                    watcher.cancel()
+                    if let done = markedDone { outcome = done }
                 case .filledNotSubmitted: outcome = .dryRunReady
                 }
             }
@@ -256,6 +312,10 @@ struct AssistedOptOutView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
+        .alert("This page mentions an email", isPresented: Binding(get: { runner.askFollowUp }, set: { _ in })) {
+            Button("Yes, track it") { runner.answerFollowUp(track: true) }
+            Button("No, it is done") { runner.answerFollowUp(track: false) }
+        } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
         .task { await runner.run() }
     }
 
@@ -292,6 +352,8 @@ struct AssistedOptOutView: View {
                     HStack {
                         Button("Skip this site") { runner.skip() }.accessibilityIdentifier("assisted-skip")
                         Spacer()
+                        // In case a confirmation was not noticed: the person says it is done.
+                        if canMarkDone { Button("Mark as done") { Task { await runner.markDone() } }.accessibilityIdentifier("assisted-mark-done") }
                         if case .needsMore = runner.phase { Button("Next site") { runner.next() }.buttonStyle(.borderedProminent).accessibilityIdentifier("assisted-next") }
                     }
                 }
@@ -299,6 +361,14 @@ struct AssistedOptOutView: View {
                 .frame(height: geo.size.height * 0.25)
                 .background(.bar)
             }
+        }
+    }
+
+    /// Whether the person can say this site is done: while it waits for them, or after a send that did not confirm.
+    private var canMarkDone: Bool {
+        switch runner.phase {
+        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return true
+        default: return false
         }
     }
 

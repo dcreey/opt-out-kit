@@ -1163,9 +1163,16 @@ final class AppModel: ObservableObject {
         save()
     }
 
+    /// Encrypting and writing the household takes a moment, so it runs off the main thread, one write at a time and in order. A failure is shown when it comes back.
+    private let saveQueue = DispatchQueue(label: "dev.optoutkit.save", qos: .utility)
     private func save() {
         guard storageProblem == nil else { return }
-        do { try store.save(household) } catch { storageProblem = Loc.f("Could not save: %@", error) }
+        let snapshot = household, store = store
+        saveQueue.async { [weak self] in
+            do { try store.save(snapshot) } catch {
+                DispatchQueue.main.async { self?.storageProblem = Loc.f("Could not save: %@", error) }
+            }
+        }
     }
 }
 

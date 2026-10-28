@@ -6,13 +6,16 @@ struct PersonEditorView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @State private var person: Person
+    /// Told the person as typed, on every change, so a host's Done or Continue button can follow it. Cheap: it never writes the model.
+    var onDraft: ((Person) -> Void)?
     @State private var confirmDelete = false
     // The three parts of the legal name are edited separately; the stored name is them joined (see `Person.composeLegalName`).
     @State private var first: String
     @State private var middle: String
     @State private var last: String
 
-    init(person: Person) {
+    init(person: Person, onDraft: ((Person) -> Void)? = nil) {
+        self.onDraft = onDraft
         _person = State(initialValue: person)
         _first = State(initialValue: person.legalFirst)
         _middle = State(initialValue: person.legalMiddle)
@@ -75,11 +78,11 @@ struct PersonEditorView: View {
         }
         .navigationTitle(person.displayName.isEmpty ? "Profile" : person.displayName)
         .navigationBarTitleDisplayMode(.inline)
-        // Save once typing pauses, and again on leaving. Saving per keystroke rewrote the encrypted file and rebuilt the plan for every site each time.
-        .task(id: person) {
-            try? await Task.sleep(nanoseconds: 700_000_000)
-            if !Task.isCancelled { commit() }
-        }
+        // The model is written when the person leaves a field, taps Done or Save, or leaves the screen, not while typing (each write rebuilds the plan and
+        // saves the encrypted file). The host reads the live draft, so its Done button does not wait for a write.
+        .onChange(of: person) { _, new in onDraft?(new) }
+        .onAppear { onDraft?(person) }
+        .onReceive(NotificationCenter.default.publisher(for: UITextField.textDidEndEditingNotification)) { _ in commit() }
         .onDisappear { commit() }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }

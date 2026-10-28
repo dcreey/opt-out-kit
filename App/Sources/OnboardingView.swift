@@ -19,7 +19,7 @@ struct OnboardingView: View {
     /// The place whose rules the person has scrolled to the end of. Choosing a different place asks them to read again.
     @State private var placeRead: String?
     @FocusState private var emailFocused: Bool
-    /// What is typed in the email box. The household is only written once typing pauses (each write rebuilds views and saves the encrypted file).
+    /// What is typed in the email box. The household is written when the person leaves the box or taps Next or Start, not while typing.
     @State private var emailDraft = ""
     private var emailValid: Bool { ContactEmail.isValid(emailDraft.trimmingCharacters(in: .whitespaces)) }
     private func commitEmail() { if emailDraft != model.contactEmail { model.setContactEmail(emailDraft) } }
@@ -81,11 +81,8 @@ struct OnboardingView: View {
                             .accessibilityIdentifier("onboarding-email")
                             .onAppear { if emailDraft.isEmpty { emailDraft = model.contactEmail } }
                             .onSubmit { commitEmail() }
-                            .task(id: emailDraft) {
-                                try? await Task.sleep(nanoseconds: 600_000_000)
-                                if !Task.isCancelled { commitEmail() }
-                            }
-                        Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
+                            .onChange(of: emailFocused) { _, focused in if !focused { commitEmail() } }
+                                            Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
                         if !emailValid {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
                                 .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-email-needed")
