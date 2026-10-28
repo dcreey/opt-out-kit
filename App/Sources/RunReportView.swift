@@ -24,9 +24,17 @@ struct RunReportSheet: View {
     let done: () -> Void
 
     @EnvironmentObject var model: AppModel
+    @State private var explainEmail = false
 
     var body: some View {
         NavigationStack { content.navigationBarHidden(true) }
+            .onAppear {
+                // The first run that leaves a request waiting on an email explains why, and how the Email links tab finishes it.
+                if model.shouldExplainEmailLinks, report.rows.contains(where: { if case .submitted(true) = $0.result { return true } else { return false } }) {
+                    model.markEmailLinksExplained(); explainEmail = true
+                }
+            }
+            .sheet(isPresented: $explainEmail) { EmailCheckExplainer(openTab: { explainEmail = false; done(); model.requestedTab = 2 }) { explainEmail = false } }
             .presentationDetents([.medium, .large])
     }
 

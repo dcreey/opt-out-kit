@@ -60,6 +60,7 @@ struct RootView: View {
             if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
         }
         #endif
+        .onChange(of: model.requestedTab) { _, t in if let t { tab = t; model.requestedTab = nil } }
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
         .sheet(item: $model.runReport) { report in RunReportSheet(report: report) { model.runReport = nil } }
         .fullScreenCover(isPresented: Binding(

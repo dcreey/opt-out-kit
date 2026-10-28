@@ -159,7 +159,7 @@ final class AppModel: ObservableObject {
         }
         #if DEBUG
         // Simulator work: `-reset-daily` forgets today's choice and the once-a-day screens, as if it were a new day.
-        if args.contains("-reset-daily") { for k in ["daily.themes", "daily.day", "daily.batches", "summary.day", "followup.explained"] { defaults.removeObject(forKey: k) } }
+        if args.contains("-reset-daily") { for k in ["daily.themes", "daily.day", "daily.batches", "summary.day", "followup.explained", "emaillinks.explained"] { defaults.removeObject(forKey: k) } }
         // A complete made-up profile, so screens that need one can be looked at without typing.
         if args.contains("-uitest-seed-profile"), var me = household.people.first(where: { $0.relationship == .me }) {
             me.names = [NameEntry(kind: .legal, name: "Pat Example")]
@@ -716,6 +716,13 @@ final class AppModel: ObservableObject {
     var gpcSetupDone: Bool { _ = regionTick; return defaults.bool(forKey: Self.gpcKey) }
     func setGPCSetupDone(_ on: Bool) { defaults.set(on, forKey: Self.gpcKey); regionTick += 1 }
 
+    private static let emailLinksKey = "emaillinks.explained"
+    /// The first time a request is sent that waits on an email, once: why the email matters and how the Email links tab finishes it.
+    var shouldExplainEmailLinks: Bool { !defaults.bool(forKey: Self.emailLinksKey) }
+    func markEmailLinksExplained() { defaults.set(true, forKey: Self.emailLinksKey) }
+    /// A screen asks for another tab (the explainer's "show me" button).
+    @Published var requestedTab: Int?
+
     private static let followUpKey = "followup.explained"
     /// The first time the person has sent anything, once: why the day ends with an email and what to expect in the inbox.
     var shouldExplainFollowUp: Bool { !defaults.bool(forKey: Self.followUpKey) && activitySummary.sites > 0 }
@@ -1253,7 +1260,7 @@ final class FakeAssistedPage: AssistedPage {
     init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Opt out of example.com</h1><p>Email</p><input value='you@example.com' style='width:100%;font-size:18px'><p>Full name</p><input value='Pat Example' style='width:100%;font-size:18px'><br><br><button style='font-size:18px'>Submit request</button></body></html>", baseURL: nil) }
     func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
     func refill() async {}
-    func send() async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+    func send() async -> SubmitOutcome { .submitted(awaitingEmail: ProcessInfo.processInfo.arguments.contains("-uitest-fake-email")) }
     func close() {}
 }
 #endif

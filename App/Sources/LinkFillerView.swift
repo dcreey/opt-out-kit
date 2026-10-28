@@ -235,3 +235,43 @@ struct LinkFillerTour: View {
         }.padding(.top, 48).presentationDetents([.large])
     }
 }
+
+/// Shown once, the first time a request is sent that needs an email check: why, and how the Email links tab finishes it.
+struct EmailCheckExplainer: View {
+    var openTab: (() -> Void)?
+    var done: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 52)).foregroundStyle(.tint).frame(maxWidth: .infinity)
+                Text("This request needs one more step: your email").font(.title2.bold()).multilineTextAlignment(.center).frame(maxWidth: .infinity)
+                Group {
+                    Text("Why").font(.headline)
+                    Text("The site sends a message to the address you gave to check that the request is really yours. Until you open the link in it, **nothing is removed**. Anyone could type your name into a form, so this is how sites stop people removing someone else.")
+                    Text("What to look for").font(.headline)
+                    Text("An email from the site, usually within a few minutes. Look in spam and promotions too. Some links expire after a day, so do it soon.")
+                    Text("How the Email links tab helps").font(.headline)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("We list every request that is waiting for an email on the Email links tab, and show the number on its icon.", systemImage: "list.bullet")
+                        Label("Open the email, press and hold its link, and choose Copy Link.", systemImage: "doc.on.clipboard")
+                        Label("Open the Email links tab and tap Paste. We check the link belongs to a site in your list, and tell you if you already finished it.", systemImage: "checkmark.shield")
+                        Label("We load the page and fill in your details. You press its final button, then tap \"I finished this request\" and it leaves the list.", systemImage: "hand.tap")
+                    }
+                }
+                .font(.callout).fixedSize(horizontal: false, vertical: true)
+                if let openTab {
+                    Button { openTab() } label: { Label("Show me the Email links tab", systemImage: "envelope.open").frame(maxWidth: .infinity) }
+                        .buttonStyle(.bordered).accessibilityIdentifier("email-explainer-open")
+                }
+            }
+            .padding(24)
+        }
+        // Pinned under the text, so it is always in reach however long the text runs.
+        Button("Got it", action: done).buttonStyle(.borderedProminent).controlSize(.large).frame(maxWidth: .infinity).padding(.horizontal, 24).padding(.vertical, 12)
+            .accessibilityIdentifier("email-explainer-done")
+        }
+        .presentationDetents([.large])
+    }
+}

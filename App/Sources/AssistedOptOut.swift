@@ -264,6 +264,8 @@ final class AssistedRunner: ObservableObject {
     @Published var previousNote: String?
     /// Counts sites sent, so the screen can show a check each time.
     @Published private(set) var celebrate = 0
+    /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
+    @Published private(set) var sentAwaitingEmail = 0
     private enum ListingChoice { case none, mine, notListed }
     private var listingChoice = ListingChoice.none
     /// How often the screen is read for a confirmation the person caused themselves (pressing the page's own button, a message appearing without a new page).
@@ -477,7 +479,7 @@ final class AssistedRunner: ObservableObject {
     private func record(_ item: Item, _ result: AutoOptOutResult) {
         results[item.id] = result
         switch result {
-        case .submitted: celebrate += 1; previousNote = nil
+        case .submitted(let email): celebrate += 1; previousNote = nil; if email { sentAwaitingEmail += 1 }
         case .failed(let why), .rejected(let why), .challenged(let why):
             previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
         case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
@@ -502,6 +504,7 @@ struct AssistedOptOutView: View {
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
     @State private var composing: EmailBatch?
+    @State private var explainEmail = false
 
     var body: some View {
         NavigationStack {
@@ -519,6 +522,12 @@ struct AssistedOptOutView: View {
         } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
         .task { await runner.run() }
         .overlay { if showSent { SentCheck().transition(.opacity) } }
+        .onChange(of: runner.sentAwaitingEmail) { _, _ in
+            guard model.shouldExplainEmailLinks else { return }
+            model.markEmailLinksExplained()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) { explainEmail = true }       // after the green check
+        }
+        .sheet(isPresented: $explainEmail) { EmailCheckExplainer(openTab: nil) { explainEmail = false } }
         .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil }, set: { _ in }), titleVisibility: .visible) {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
