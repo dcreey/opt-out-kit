@@ -101,15 +101,29 @@ enum FormAudit {
         guard let me = model.people.first(where: { $0.relationship == .me }) else { return }
         let person = model.formPerson(me)
         var rows: [[String: String]] = []
-        for d in domains {
-            guard let entry = model.directory.first(where: { $0.domain == d }).map(model.resolved) else { continue }
-            let page = entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL
-            guard let page else { continue }
-            FormRun.debugLastBlockers = []
-            let report = await FormRun.runLive(url: page, html: nil, person: person, dryRun: true, maxWait: 25, capture: true)
-            if let shot = report.screenshot { try? shot.write(to: dir.appendingPathComponent(d + ".jpg")) }
-            rows.append(["domain": d, "outcome": "\(report.outcome)", "blockers": FormRun.debugLastBlockers.joined(separator: "; ")])
-            if let data = try? JSONEncoder().encode(rows) { try? data.write(to: dir.appendingPathComponent("results.json")) }
+        let todo = domains.compactMap { d in model.directory.first(where: { $0.domain == d }).map(model.resolved) }
+        var next = 0
+        // Four sites at a time. Each writes <domain>.html (the page after every click the run made), <domain>.picked.json and a screenshot.
+        await withTaskGroup(of: [String: String]?.self) { group in
+            func add() {
+                guard next < todo.count else { return }
+                let entry = todo[next]; next += 1
+                group.addTask { @MainActor in
+                    guard let page = entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL else { return nil }
+                    let report = await FormRun.runLive(url: page, html: nil, person: person, dryRun: true, maxWait: 25, capture: true)
+                    if let shot = report.screenshot { try? shot.write(to: dir.appendingPathComponent(entry.domain + ".jpg")) }
+                    if let snap = FormRun.debugSnapshots.removeValue(forKey: page.absoluteString) {
+                        try? snap.html.write(to: dir.appendingPathComponent(entry.domain + ".html"), atomically: true, encoding: .utf8)
+                        if !snap.picked.isEmpty { try? snap.picked.write(to: dir.appendingPathComponent(entry.domain + ".picked.json"), atomically: true, encoding: .utf8) }
+                    }
+                    return ["domain": entry.domain, "outcome": "\(report.outcome)"]
+                }
+            }
+            for _ in 0..<4 { add() }
+            for await row in group {
+                if let row { rows.append(row); if let data = try? JSONEncoder().encode(rows) { try? data.write(to: dir.appendingPathComponent("results.json")) } }
+                add()
+            }
         }
         try? "done".write(to: dir.appendingPathComponent("DONE"), atomically: true, encoding: .utf8)
     }

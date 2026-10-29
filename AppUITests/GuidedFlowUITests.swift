@@ -107,7 +107,7 @@ final class SiteViewLayoutUITests: XCTestCase {
         XCTAssertFalse(guide.isHittable, "the guide is far above it")
     }
 
-    func testADirectorySiteViewLeadsWithTheGuideAndEndsWithTheSiteLink() {
+    func testADirectorySiteViewHasTheSiteLinkAtTheTopAndNotAgainAtTheBottom() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
         app.launch()
@@ -117,10 +117,11 @@ final class SiteViewLayoutUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
         let guide = app.buttons["guide-me"]
         XCTAssertTrue(guide.waitForExistence(timeout: 5))
-        XCTAssertLessThan(guide.frame.minY, app.windows.firstMatch.frame.height * 0.4)
-        scrollToBottom(app)
-        XCTAssertTrue(app.buttons["site-link"].waitForExistence(timeout: 3))
-        XCTAssertFalse(guide.isHittable)
+        XCTAssertLessThan(guide.frame.minY, app.windows.firstMatch.frame.height * 0.5)
+        let link = app.buttons["site-link"]
+        XCTAssertTrue(link.waitForExistence(timeout: 3), "the site link is in the status block at the top")
+        XCTAssertLessThan(link.frame.minY, app.windows.firstMatch.frame.height * 0.5)
+        XCTAssertEqual(app.buttons.matching(identifier: "site-link").count, 1, "one link, not a second one at the bottom")
     }
 
     func testTheGuideOpensFromTheSiteView() {

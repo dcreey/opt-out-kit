@@ -1,4 +1,5 @@
 import SwiftUI
+import MessageUI
 import WebKit
 import OptOutKitCore
 
@@ -675,7 +676,7 @@ final class AppModel: ObservableObject {
 
     /// How many sites still wait in each kind of broker, for the person to choose from.
     var remainingKinds: [(kind: String, count: Int)] {
-        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts)
+        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts, parked: progress.parkedSites())
     }
 
     // MARK: Daily summary
@@ -710,6 +711,24 @@ final class AppModel: ObservableObject {
     var shouldTourLinkFiller: Bool { !defaults.bool(forKey: Self.linkTourKey) }
     func markLinkFillerToured() { defaults.set(true, forKey: Self.linkTourKey) }
 
+    private static let mailAppKey = "mail.app"
+    /// The mail app the person chose for every email we prepare. Mail (the system composer) until they pick another.
+    var mailApp: MailApp {
+        _ = regionTick
+        return defaults.string(forKey: Self.mailAppKey).flatMap(MailApp.init(rawValue:)) ?? .mail
+    }
+    func setMailApp(_ app: MailApp) { defaults.set(app.rawValue, forKey: Self.mailAppKey); regionTick += 1 }
+    /// Mail, and each other app on this phone that we know how to open with a message ready.
+    var installedMailApps: [MailApp] {
+        MailApp.allCases.filter { app in
+            if app == .mail { return true }
+            guard let scheme = app.probeScheme, let url = URL(string: scheme + "://") else { return false }
+            return UIApplication.shared.canOpenURL(url)
+        }
+    }
+    /// True when the message should open in the in-app composer (which tells us whether it was sent) rather than another app.
+    var composesInApp: Bool { mailApp == .mail && MFMailComposeViewController.canSendMail() }
+
     private static let gpcKey = "gpc.setup.done"
     /// Whether the person said they turned on the Global Privacy Control in the browser they use. It is a one-time setting task, not a site: it
     /// is not in the plan, so it never counts toward the day's sites, requests sent or the streak.
@@ -735,12 +754,12 @@ final class AppModel: ObservableObject {
     /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
         let queue = OptOutPlan.verifyQueue(plan, entries: directory)
-        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches, chosen: dailyThemes)
+        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches, chosen: dailyThemes, parked: progress.parkedSites())
     }
 
     /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
     var verifyRemaining: Int {
-        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let ids = Set(directory.filter { queued.contains($0.domain) }.map(\.id))
+        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites(); let ids = Set(directory.filter { queued.contains($0.domain) && !parked.contains($0.id) }.map(\.id))
         let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a }); return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count
     }
 
@@ -750,16 +769,49 @@ final class AppModel: ObservableObject {
         progress.optOutAttempts[entryID]?.contains { $0.outcome == "emailed" && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval * 4 } ?? false
     }
 
+    /// The phone's advertising ID, once read for an email in this run. Never stored.
+    private(set) var emailAdID: String?
+
+    /// One company: only the details its form (or its kind of company) needs. Several: the plain request with name, email and address.
     func emailBody(for batch: EmailBatch) -> String {
         guard let p = selectedPerson else { return "" }
         let a = p.currentAddress
         let street = [a?.street, a?.city, [a?.state, a?.zip].compactMap { $0 }.joined(separator: " ")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
-        return batch.body(name: p.legalName, email: formEmail ?? "", address: street, country: p.countryCode)
+        guard let details = emailDetails(for: batch) else { return batch.body(name: p.legalName, email: formEmail ?? "", address: street, country: p.countryCode) }
+        return batch.body(name: p.legalName, email: formEmail ?? "", details: details, address: street, phone: p.phones.first, birthdate: p.birthdate, advertisingID: emailAdID, country: p.countryCode)
     }
 
-    /// The link that opens `app`'s compose screen with the message ready: you as the To address, every company in Bcc.
+    /// What one company's email carries, or nil for a message to several companies.
+    func emailDetails(for batch: EmailBatch) -> EmailDetails? {
+        guard batch.entryIDs.count == 1, let entry = directory.first(where: { $0.id == batch.entryIDs[0] }) else { return nil }
+        return EmailDetails.needs(for: entry)
+    }
+
+    /// True when this message wants the advertising ID and the person has not yet been asked, so we explain first.
+    func needsAdIDExplained(for batch: EmailBatch) -> Bool {
+        emailDetails(for: batch)?.advertisingID == true && AdvertisingID.status == .notDetermined
+    }
+
+    /// The person chose to send without the advertising ID.
+    func skipAdID() { emailAdID = nil }
+
+    /// Reads the advertising ID for a message that wants it (Apple's prompt shows on the first time). Without permission the message goes without it.
+    func loadAdID(for batch: EmailBatch) async {
+        emailAdID = nil
+        guard emailDetails(for: batch)?.advertisingID == true else { return }
+        emailAdID = await AdvertisingID.current()
+    }
+
+    /// Who a message goes to. One company: it is the To address and you are in Bcc for a copy. Many: you are To and every company is in Bcc, so none sees another.
+    func recipients(for batch: EmailBatch) -> (to: [String], bcc: [String]) {
+        if batch.addresses.count == 1 { return (batch.addresses, [formEmail].compactMap { $0 }) }
+        return ([formEmail].compactMap { $0 }, batch.addresses)
+    }
+
+    /// The link that opens `app`'s compose screen with the message ready (see `recipients(for:)`).
     func composeURL(for batch: EmailBatch, app: MailApp) -> URL? {
-        app.composeURL(to: formEmail ?? "", bcc: batch.addresses, subject: batch.subject, body: emailBody(for: batch))
+        let r = recipients(for: batch)
+        return app.composeURL(to: r.to.joined(separator: ","), bcc: r.bcc, subject: batch.subject, body: emailBody(for: batch))
     }
 
     /// The person tapped Send on the message: every site it covers is recorded as asked.
@@ -804,6 +856,13 @@ final class AppModel: ObservableObject {
                               hasScreenshot: evidence.exists(person: person.id, site: id))
         }
         return items.sorted { ($0.worked ? 1 : 0, $0.domain) < ($1.worked ? 1 : 0, $1.domain) }
+    }
+
+    /// The latest attempt that reached a site, as a review item (for its status page), or nil when none was recorded.
+    func reviewItem(entryID id: String, for person: Person) -> ReviewItem? {
+        guard let last = household.progress(for: person.id).optOutAttempts[id]?.filter({ $0.outcome != "emailed" }).max(by: { $0.date < $1.date }),
+              let domain = directory.first(where: { $0.id == id })?.domain else { return nil }
+        return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date, hasScreenshot: evidence.exists(person: person.id, site: id))
     }
 
     func screenshot(for item: ReviewItem, person: Person) -> Data? { evidence.load(person: person.id, site: item.id) }
@@ -881,9 +940,36 @@ final class AppModel: ObservableObject {
 
     /// The person reported a problem with a site (broken link, gated by something else, blocked them). Queues leave it alone for a month.
     func reportIssue(_ kind: IssueKind, site: String) {
-        household.mutateProgress(for: selectedID) { $0.reportIssue(kind, site: site) }
+        household.mutateProgress(for: selectedID) { $0.reportIssue(kind, site: site); $0.skipSite(site, reason: .notWorking) }
         save()
     }
+
+    // MARK: Skipped sites
+
+    /// Sets a site aside: it leaves today's batch (the next site takes its place) and comes back after a week with a reminder. Skipping it a
+    /// second time can be for good.
+    func skipSite(_ site: String, forever: Bool = false) {
+        household.mutateProgress(for: selectedID) { $0.skipSite(site, reason: .skipped, forever: forever) }
+        save()
+    }
+    func skipCount(_ site: String) -> Int { progress.skipCount(site) }
+    func isSkippedForever(_ site: String) -> Bool { progress.isSkippedForever(site) }
+    func bringBack(_ site: String) {
+        household.mutateProgress(for: selectedID) { $0.unskip(site) }
+        save()
+    }
+
+    /// Sites set aside and not finished since, with when each returns (nil: for good, or already back).
+    var skippedSites: [(entry: DirectoryEntry, skip: SiteSkip, returns: Date?, forever: Bool)] {
+        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let p = progress
+        return p.skippedSites().compactMap { id in
+            guard let e = byID[id], let skip = p.lastSkip(id) else { return nil }
+            return (e, skip, p.skipReturns(id), p.isSkippedForever(id))
+        }.sorted { $0.skip.date > $1.skip.date }
+    }
+    /// How many skipped sites have waited their week and are ready to be tried again.
+    var skippedDueCount: Int { progress.skippedDue().count }
 
     func activeIssue(for site: String) -> SiteIssue? { progress.activeIssue(for: site) }
 

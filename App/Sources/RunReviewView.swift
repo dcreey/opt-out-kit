@@ -76,6 +76,9 @@ struct EvidenceDetailView: View {
                 Label(item.label, systemImage: item.worked ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                     .font(.headline).foregroundStyle(item.worked ? Color.green : Color.orange).fixedSize(horizontal: false, vertical: true)
                 Text("\(item.domain) · \(Loc.date(item.date, time: true))").font(.footnote).foregroundStyle(.secondary)
+                if let entry = model.directory.first(where: { $0.id == item.id }) {
+                    NavigationLink { DirectoryInfoView(entry: entry) } label: { Label("Open the site page", systemImage: "globe") }.accessibilityIdentifier("evidence-site-page")
+                }
                 if let image {
                     Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity)
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.4)))
@@ -100,5 +103,39 @@ struct EvidenceDetailView: View {
         .navigationTitle(item.domain)
         .navigationBarTitleDisplayMode(.inline)
         .task { if let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
+    }
+}
+
+
+/// A small preview of the screenshot saved for a site; tap it to see it full size.
+struct SiteScreenshot: View {
+    @EnvironmentObject var model: AppModel
+    let item: AppModel.ReviewItem
+    let person: Person
+    @State private var image: UIImage?
+    @State private var enlarged = false
+
+    var body: some View {
+        Group {
+            if let image {
+                Button { enlarged = true } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.4)))
+                        Label("Tap to enlarge the page it showed on \(Loc.date(item.date))", systemImage: "arrow.up.left.and.arrow.down.right").font(.caption).foregroundStyle(.secondary)
+                    }
+                }.buttonStyle(.plain).accessibilityIdentifier("site-screenshot")
+            }
+        }
+        .task { if let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
+        .fullScreenCover(isPresented: $enlarged) {
+            NavigationStack {
+                ScrollView {
+                    if let image { Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity) }
+                }
+                .navigationTitle(item.domain).navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { enlarged = false }.accessibilityIdentifier("screenshot-close") } }
+            }
+        }
     }
 }

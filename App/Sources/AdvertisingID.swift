@@ -1,10 +1,13 @@
 import OptOutKitCore
+import SwiftUI
 import AdSupport
 import AppTrackingTransparency
 
 /// The phone's advertising ID, for the data brokers that opt a device out by it (their forms ask for a "MAID" or "IDFA"). Reading it needs
 /// the person's permission through Apple's tracking prompt, and the prompt text says it is only given to those brokers. It is not stored.
 enum AdvertisingID {
+    static var status: ATTrackingManager.AuthorizationStatus { ATTrackingManager.trackingAuthorizationStatus }
+
     /// Asks once (if the person has not been asked), then returns the ID, or nil when permission was refused or ad tracking is off.
     @MainActor
     static func current() async -> String? {
@@ -24,5 +27,33 @@ enum AdvertisingID {
     static func isAsked(by entries: [DirectoryEntry]) -> Bool {
         entries.contains { e in e.optOutForm?.fields.contains { f in
             (f.name + " " + f.label).range(of: "\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad", options: [.regularExpression, .caseInsensitive]) != nil } ?? false }
+    }
+}
+
+
+/// Said before Apple's tracking prompt appears, so the prompt is not a surprise.
+struct AdIDExplainer: View {
+    let siteName: String
+    let onContinue: () -> Void
+    let onSkip: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "iphone.badge.play").font(.system(size: 56)).foregroundStyle(.tint).padding(.top, 24)
+            Text("Opt your phone out of ad tracking").font(.title2.bold()).multilineTextAlignment(.center)
+            Text("\(siteName) tracks people for advertising by the unique ID of their phone. To opt your phone out, it needs that ID in your request.")
+                .multilineTextAlignment(.center)
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Next, iOS asks \"Allow Exnay to track you?\" Tap Allow. That is Apple's wording for sharing this one ID.", systemImage: "hand.tap")
+                Label("We do nothing else with it. It goes only into the opt-out you send, to opt your device out of tracking on the web.", systemImage: "lock.shield")
+                Label("We never store it and never send it anywhere else.", systemImage: "internaldrive.badge.xmark")
+            }.font(.callout)
+            Text("If you tap Ask App Not to Track, the email goes without it and the site may not be able to find your phone.").font(.footnote).foregroundStyle(.secondary)
+            Spacer()
+            Button(action: onContinue) { Text("Continue").frame(maxWidth: .infinity) }.buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("adid-continue")
+            Button("Send without it", action: onSkip).accessibilityIdentifier("adid-skip")
+        }
+        .padding(.horizontal, 24).padding(.bottom, 16)
+        .presentationDetents([.large])
     }
 }

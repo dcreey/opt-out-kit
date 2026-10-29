@@ -33,20 +33,13 @@ struct EmailQueueView: View {
     var perMessage: Int = EmailBatch.maxRecipients
     @State private var composing: EmailBatch?
     @State private var confirmSent: EmailBatch?
+    @State private var explainAdID: (batch: EmailBatch, app: MailApp)?
 
     private var batches: [EmailBatch] {
         let set = Set(domains)
         return EmailBatch.single(entries: model.directory.filter { set.contains($0.domain) }, maxRecipients: perMessage)
     }
     private func done(_ b: EmailBatch) -> Bool { b.entryIDs.allSatisfy { model.wasEmailed($0) } }
-    /// The mail apps on this phone we know how to open, besides the system Mail composer.
-    private var installedApps: [MailApp] {
-        MailApp.allCases.filter { app in
-            guard let scheme = app.probeScheme, let url = URL(string: scheme + "://") else { return false }
-            return UIApplication.shared.canOpenURL(url)
-        }
-    }
-
     var body: some View {
         let list = batches
         List {
@@ -61,30 +54,38 @@ struct EmailQueueView: View {
                     if done(b) {
                         Label("Sent", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                     } else {
-                        Button { open(b, app: .mail) } label: { Label("Open in Mail", systemImage: "envelope.open").frame(maxWidth: .infinity) }
+                        Button { open(b, app: model.mailApp) } label: { Label("Open in \(model.mailApp.name)", systemImage: "envelope.open").frame(maxWidth: .infinity) }
                             .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("email-open-mail")
-                        ForEach(installedApps, id: \.self) { app in
-                            Button { open(b, app: app) } label: { Label("Open in \(app.name)", systemImage: "envelope").frame(maxWidth: .infinity) }
-                                .buttonStyle(.bordered).accessibilityIdentifier("email-open-\(app.rawValue)")
-                        }
-                        Button { open(b, app: .other) } label: { Label("Use another mail app", systemImage: "ellipsis.circle").frame(maxWidth: .infinity) }
-                            .buttonStyle(.bordered).accessibilityIdentifier("email-open-other")
+                        Menu {
+                            ForEach(model.installedMailApps.filter { $0 != model.mailApp }, id: \.self) { app in
+                                Button("Open in \(app.name)") { open(b, app: app) }.accessibilityIdentifier("email-open-\(app.rawValue)")
+                            }
+                            Button("Use another mail app") { open(b, app: .other) }.accessibilityIdentifier("email-open-other")
+                        } label: { Label("Use a different mail app", systemImage: "ellipsis.circle").frame(maxWidth: .infinity) }
+                            .buttonStyle(.bordered)
                     }
                     Text("\(b.addresses.count) addresses, \(b.domains.count) sites").font(.caption).foregroundStyle(.secondary)
                     DisclosureGroup("Sites in this message") { ForEach(b.domains, id: \.self) { Text($0).font(.footnote) } }
                 }
             }
-            if !MFMailComposeViewController.canSendMail() {
+            if model.mailApp == .mail, !MFMailComposeViewController.canSendMail() {
                 Section { Label("Mail is not set up on this device, so \"Open in Mail\" opens your default mail app.", systemImage: "exclamationmark.circle").font(.footnote).foregroundStyle(.orange) }
             }
         }
         .navigationTitle("Opt-out email")
         .sheet(item: $composing) { b in
-            MailComposer(to: [model.formEmail].compactMap { $0 }, bcc: b.addresses, subject: b.subject, body: model.emailBody(for: b)) { result in
+            MailComposer(to: model.recipients(for: b).to, bcc: model.recipients(for: b).bcc, subject: b.subject, body: model.emailBody(for: b)) { result in
                 if result == .sent { model.markEmailed(b) }
                 composing = nil
             }
             .ignoresSafeArea()
+        }
+        .sheet(isPresented: Binding(get: { explainAdID != nil }, set: { if !$0 { explainAdID = nil } })) {
+            if let a = explainAdID {
+                AdIDExplainer(siteName: model.directory.first { $0.id == a.batch.entryIDs.first }?.name ?? "This company",
+                              onContinue: { explainAdID = nil; Task { await model.loadAdID(for: a.batch); launch(a.batch, app: a.app) } },
+                              onSkip: { explainAdID = nil; model.skipAdID(); launch(a.batch, app: a.app) })
+            }
         }
         .alert("Did you send it?", isPresented: Binding(get: { confirmSent != nil }, set: { if !$0 { confirmSent = nil } })) {
             Button("Yes, I sent it") { if let b = confirmSent { model.markEmailed(b) }; confirmSent = nil }
@@ -94,10 +95,15 @@ struct EmailQueueView: View {
 
     private func open(_ b: EmailBatch, app: MailApp) {
         model.requireProfile {
-            if app == .mail, MFMailComposeViewController.canSendMail() { composing = b; return }
-            // Every other way of opening a message cannot tell us whether it was sent, so we ask afterwards.
-            if let url = model.composeURL(for: b, app: app) { UIApplication.shared.open(url); confirmSent = b }
+            if model.needsAdIDExplained(for: b) { explainAdID = (b, app); return }
+            Task { await model.loadAdID(for: b); launch(b, app: app) }
         }
+    }
+
+    private func launch(_ b: EmailBatch, app: MailApp) {
+        if app == .mail, MFMailComposeViewController.canSendMail() { composing = b; return }
+        // Every other way of opening a message cannot tell us whether it was sent, so we ask afterwards.
+        if let url = model.composeURL(for: b, app: app) { UIApplication.shared.open(url); confirmSent = b }
     }
 }
 
@@ -106,6 +112,31 @@ struct VerifyQueueView: View {
     @EnvironmentObject var model: AppModel
     let domains: [String]
     @State private var runner: AssistedRunner?
+
+    /// The sites of this list: the ones still to do first, finished ones (with a check mark) after. A site to do opens its page; a finished one
+    /// opens what happened, with the screenshot when there is one.
+    @ViewBuilder private var siteRows: some View {
+        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        let attempts = model.progress.optOutAttempts
+        let entries = domains.compactMap { byDomain[$0] }
+        let finished = Set(entries.filter { $0.isCurrent(attempts: attempts) }.map(\.id))
+        let ordered = entries.filter { !finished.contains($0.id) } + entries.filter { finished.contains($0.id) }
+        Section {
+            ForEach(ordered, id: \.id) { entry in
+                let done = finished.contains(entry.id)
+                NavigationLink {
+                    if done, let person = model.selectedPerson, let item = model.reviewItem(entryID: entry.id, for: person) { EvidenceDetailView(item: item, person: person) }
+                    else { DirectoryInfoView(entry: entry) }
+                } label: {
+                    HStack {
+                        Image(systemName: done ? "checkmark.circle.fill" : "circle").foregroundStyle(done ? Color.green : Color.secondary)
+                        Text(entry.domain).font(.footnote).foregroundStyle(done ? Color.secondary : Color.primary)
+                    }
+                }
+                .accessibilityIdentifier("queue-site-\(entry.domain)")
+            }
+        } header: { Text("Sites (\(finished.count) of \(entries.count) done)") }
+    }
 
     var body: some View {
         let person = model.selectedPerson
@@ -127,7 +158,14 @@ struct VerifyQueueView: View {
                 .buttonStyle(.borderedProminent).controlSize(.large).disabled(items.isEmpty && model.isReady(person ?? Person(displayName: "")))
                 .accessibilityIdentifier("verify-start")
             }
-            Section("Sites") { ForEach(domains, id: \.self) { Text($0).font(.footnote) } }
+            siteRows
+            if !model.skippedSites.isEmpty {
+                Section {
+                    NavigationLink { SkippedSitesView() } label: {
+                        Label("Skipped sites (\(model.skippedSites.count))", systemImage: "forward")
+                    }.accessibilityIdentifier("skipped-sites-link")
+                } footer: { Text("Sites you skip or report as not working wait here for a week, so they never hold up the next 25.") }
+            }
         }
         .navigationTitle("Tap to verify")
         .fullScreenCover(item: Binding(get: { runner.map(VerifyRunnerBox.init) }, set: { if $0 == nil { runner = nil } })) { box in
@@ -139,4 +177,54 @@ struct VerifyQueueView: View {
 private struct VerifyRunnerBox: Identifiable {
     let runner: AssistedRunner
     var id: ObjectIdentifier { ObjectIdentifier(runner) }
+}
+
+
+/// Which mail app opens the emails we prepare. Used in the walkthrough and in About.
+struct MailAppPicker: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        Picker("Open emails in", selection: Binding(get: { model.mailApp }, set: { model.setMailApp($0) })) {
+            ForEach(model.installedMailApps, id: \.self) { Text($0.name).tag($0) }
+        }
+        .pickerStyle(.menu).accessibilityIdentifier("mail-app-picker")
+    }
+}
+
+
+/// Sites the person set aside: when each comes back, and a way to bring one back now or skip it for good.
+struct SkippedSitesView: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        let sites = model.skippedSites
+        List {
+            if sites.isEmpty { Section { Text("Nothing is set aside.").font(.footnote).foregroundStyle(.secondary) } }
+            ForEach(sites, id: \.entry.id) { row in
+                Section {
+                    NavigationLink { DirectoryInfoView(entry: row.entry) } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(row.entry.domain).font(.headline)
+                            Text(status(row)).font(.caption).foregroundStyle(row.returns == nil && !row.forever ? Color.orange : Color.secondary)
+                        }
+                    }
+                    if !row.forever { Button("Bring back now") { model.bringBack(row.entry.id) }.accessibilityIdentifier("skipped-bring-back-\(row.entry.domain)") }
+                    if row.forever { Button("Bring back") { model.bringBack(row.entry.id) } }
+                    else {
+                        Button("Skip forever", role: .destructive) { model.skipSite(row.entry.id, forever: true) }.accessibilityIdentifier("skipped-forever-\(row.entry.domain)")
+                    }
+                }
+            }
+        }
+        .navigationTitle("Skipped sites")
+        .accessibilityIdentifier("skipped-sites")
+    }
+
+    private func status(_ row: (entry: DirectoryEntry, skip: SiteSkip, returns: Date?, forever: Bool)) -> String {
+        let why = row.skip.reason == .notWorking ? Loc.t("Reported as not working") : Loc.t("Skipped")
+        if row.forever { return Loc.f("%@ · skipped for good", why) }
+        if let back = row.returns { return Loc.f("%@ · comes back %@", why, back.formatted(date: .abbreviated, time: .omitted)) }
+        return Loc.f("%@ · ready to try again", why)
+    }
 }

@@ -179,3 +179,30 @@ final class WebViewFetcherTests: XCTestCase {
         XCTAssertEqual(outcome, .removed)
     }
 }
+
+@MainActor
+final class SkippedSitesAppTests: XCTestCase {
+    func testASkippedSiteLeavesTodaysListAndAnIssueReportSetsItAsideToo() throws {
+        let model = makeModel()
+        let today = model.dailyGoals.verify
+        XCTAssertGreaterThan(today.count, 2)
+        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        let first = try XCTUnwrap(byDomain[today[0]]), second = try XCTUnwrap(byDomain[today[1]])
+
+        model.skipSite(first.id)
+        XCTAssertFalse(model.dailyGoals.verify.contains(first.domain))
+        XCTAssertEqual(model.skipCount(first.id), 1)
+        XCTAssertEqual(model.skippedSites.map(\.entry.id), [first.id])
+        XCTAssertNotNil(model.skippedSites.first?.returns)
+
+        model.reportIssue(.brokenLink, site: second.id)
+        XCTAssertFalse(model.dailyGoals.verify.contains(second.domain), "not working sets it aside like a skip")
+        XCTAssertEqual(model.skippedSites.count, 2)
+
+        model.skipSite(first.id, forever: true)
+        XCTAssertTrue(model.isSkippedForever(first.id))
+        model.bringBack(first.id)
+        XCTAssertTrue(model.dailyGoals.verify.contains(first.domain), "bringing a site back returns it to the list")
+        XCTAssertEqual(model.skippedDueCount, 0)
+    }
+}

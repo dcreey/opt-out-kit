@@ -109,6 +109,14 @@ struct BrokerListView: View {
                 } else if !goals.verify.isEmpty {
                     TodayCard(goals: goals, change: { chooser = .start }, more: { chooser = .more })
                 }
+                if model.skippedDueCount > 0 {
+                    // Sites skipped a week ago or more: a reminder to try them again.
+                    Section {
+                        NavigationLink(value: "skipped-sites") {
+                            Label(model.skippedDueCount == 1 ? "1 skipped site is ready to try again" : "\(model.skippedDueCount) skipped sites are ready to try again", systemImage: "arrow.uturn.forward.circle")
+                        }.accessibilityIdentifier("skipped-reminder")
+                    }
+                }
                 if !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
                     if case .platform = t.kind { return !model.isDone(t) }
@@ -187,6 +195,7 @@ struct BrokerListView: View {
                 switch key {
                 case "auto-activity": AutoActivityView()
                 case "daily-verify": VerifyQueueView(domains: model.dailyGoals.verify)
+                case "skipped-sites": SkippedSitesView()
                 case "daily-email": EmailQueueView(domains: model.dailyGoals.email?.domains ?? [])
                 default: EmptyView()
                 }

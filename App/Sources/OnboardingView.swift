@@ -89,6 +89,10 @@ struct OnboardingView: View {
                             .onSubmit { commitEmail() }
                             .onChange(of: emailFocused) { _, focused in if !focused { commitEmail() } }
                                             Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 4) {
+                            MailAppPicker()
+                            Text("When we prepare an email to a company, it opens in this app. You can change it any time in About.").font(.footnote).foregroundStyle(.secondary)
+                        }
                         if !emailValid {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
                                 .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-email-needed")

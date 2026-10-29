@@ -29,14 +29,16 @@ public struct DailyGoals: Equatable, Sendable {
     ///   - attempts: every recorded attempt for the person, by entry id.
     ///   - batches: how many batches of 25 the person has asked for today.
     public static func build(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(),
-                             batches: Int = 1, chosen: [String] = [], calendar: Calendar = .current) -> DailyGoals {
+                             batches: Int = 1, chosen: [String] = [], parked: Set<String> = [], calendar: Calendar = .current) -> DailyGoals {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         func emailedDates(_ id: String) -> [Date] { (attempts[id] ?? []).filter { $0.outcome == "emailed" }.map(\.date) }
         func doneBeforeToday(_ id: String, _ dates: [Date]) -> Bool { dates.contains { !calendar.isDate($0, inSameDayAs: now) } }
 
         // A site finished on an earlier day is behind us; today's list is the next sites, plus anything finished today.
         // A request still holds until it is due to be repeated (6 to 12 months, or never for opt-outs that last): once due, the site is back in the queue.
+        // Sites the person set aside (skipped or not working) wait in their own list, so they never hold up the batch.
         let open = queue.compactMap { byDomain[$0] }.filter { e in
+            !parked.contains(e.id) &&
             !(doneBeforeToday(e.id, attempts[e.id]?.filter(\.wasSubmitted).map(\.date) ?? []) && e.isCurrent(attempts: attempts, now: now, calendar: calendar))
         }
         // A batch is up to 25 sites of ONE kind. Every day starts fresh: the suggested kind is the highest-ranked one with sites left, unless
@@ -75,11 +77,11 @@ public struct DailyGoals: Equatable, Sendable {
     }
 
     /// How many sites still wait in each kind of broker (sites already finished do not count), in the default order. The person picks from these.
-    public static func remainingByKind(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], now: Date = Date(), calendar: Calendar = .current) -> [(kind: String, count: Int)] {
+    public static func remainingByKind(queue: [String], entries: [DirectoryEntry], attempts: [String: [OptOutAttempt]], parked: Set<String> = [], now: Date = Date(), calendar: Calendar = .current) -> [(kind: String, count: Int)] {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         var counts: [String: Int] = [:]
         for d in queue {
-            guard let e = byDomain[d] else { continue }
+            guard let e = byDomain[d], !parked.contains(e.id) else { continue }
             if !e.isCurrent(attempts: attempts, now: now, calendar: calendar) { counts[e.about?.category ?? "other", default: 0] += 1 }
         }
         return counts.map { (kind: $0.key, count: $0.value) }.sorted { (BrokerCategory(rawValue: $0.kind)?.rank ?? 99, $0.kind) < (BrokerCategory(rawValue: $1.kind)?.rank ?? 99, $1.kind) }

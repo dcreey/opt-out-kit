@@ -504,6 +504,8 @@ struct AssistedOptOutView: View {
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
     @State private var composing: EmailBatch?
+    @State private var confirmEmailSent: EmailBatch?
+    @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
 
     var body: some View {
@@ -532,8 +534,21 @@ struct AssistedOptOutView: View {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
         } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done.") }
+        .alert("Did you send it?", isPresented: Binding(get: { confirmEmailSent != nil }, set: { if !$0 { confirmEmailSent = nil } })) {
+            Button("Yes, I sent it") {
+                if let b = confirmEmailSent { model.markEmailed(b); if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() } }
+                confirmEmailSent = nil
+            }
+            Button("No", role: .cancel) { if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }; confirmEmailSent = nil }
+        } message: { Text("Other mail apps do not tell us whether you sent the message. Say yes only if you did.") }
+        .sheet(isPresented: Binding(get: { explainAdID != nil }, set: { if !$0 { explainAdID = nil } })) {
+            if let a = explainAdID {
+                AdIDExplainer(siteName: a.name, onContinue: { explainAdID = nil; Task { await model.loadAdID(for: a.batch); openEmail(a.batch) } },
+                              onSkip: { explainAdID = nil; model.skipAdID(); openEmail(a.batch) })
+            }
+        }
         .sheet(item: $composing) { batch in
-            MailComposer(to: [model.formEmail ?? ""], bcc: batch.addresses, subject: batch.subject, body: model.emailBody(for: batch)) { result in
+            MailComposer(to: model.recipients(for: batch).to, bcc: model.recipients(for: batch).bcc, subject: batch.subject, body: model.emailBody(for: batch)) { result in
                 composing = nil
                 if result == .sent {
                     model.markEmailed(batch)
@@ -550,10 +565,16 @@ struct AssistedOptOutView: View {
     /// Some sites only take an opt-out by email (or the form is a dead end): the message is prepared for the person to read and send.
     private func emailInstead(_ entry: DirectoryEntry) {
         guard let batch = EmailBatch.single(entries: [entry]).first else { return }
-        if MFMailComposeViewController.canSendMail() { composing = batch }
+        if model.needsAdIDExplained(for: batch) { explainAdID = (batch, entry.name); return }
+        Task { await model.loadAdID(for: batch); openEmail(batch) }
+    }
+
+    private func openEmail(_ batch: EmailBatch) {
+        if model.composesInApp { composing = batch }
         else {
-            if let url = model.composeURL(for: batch, app: .mail) { UIApplication.shared.open(url) }
-            if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }       // no Mail account here: the message opens elsewhere and the person moves on
+            // Another mail app cannot tell us whether the message was sent, so we ask when the person comes back.
+            if let url = model.composeURL(for: batch, app: model.mailApp) { UIApplication.shared.open(url); confirmEmailSent = batch }
+            else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
         }
     }
 
@@ -567,10 +588,27 @@ struct AssistedOptOutView: View {
                             if let url = runner.page?.webView?.url ?? runner.searchPage?.webView?.url {
                                 Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
                             }
+                            if let web = runner.page?.webView ?? runner.searchPage?.webView {
+                                // A form that fails and asks for a refresh: reload the page, then put the details back.
+                                Button {
+                                    web.reload()
+                                    Task { try? await Task.sleep(nanoseconds: 3_500_000_000); await runner.page?.refill() }
+                                } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("assisted-refresh")
+                            }
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
                             }
-                            Button { runner.skip() } label: { Label("Skip this site", systemImage: "forward") }
+                            Button {
+                                if let item = runner.current { model.skipSite(item.entry.id) }
+                                runner.skip()
+                            } label: { Label("Skip this site", systemImage: "forward") }.accessibilityIdentifier("assisted-skip")
+                            // After the first skip, the same site can be set aside for good.
+                            if let item = runner.current, model.skipCount(item.entry.id) >= 1 {
+                                Button(role: .destructive) {
+                                    model.skipSite(item.entry.id, forever: true)
+                                    runner.skip()
+                                } label: { Label("Skip this site forever", systemImage: "forward.end") }.accessibilityIdentifier("assisted-skip-forever")
+                            }
                             Menu {
                                 ForEach(IssueKind.allCases, id: \.self) { kind in
                                     Button(kind.label) {

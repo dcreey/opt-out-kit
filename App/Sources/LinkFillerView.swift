@@ -71,7 +71,7 @@ final class LinkFiller: ObservableObject {
             : Loc.f("Filled in %lld fields. Check them, solve any check, then press the page's own button to send.", fill.filled)
     }
 
-    func close() { session?.close(); session = nil; webView = nil; host = "" }
+    func close() { session?.close(); session = nil; webView = nil; host = ""; status = "" }
 }
 
 struct LinkFillerView: View {
@@ -115,7 +115,7 @@ struct LinkFillerView: View {
                 }
             }
         }
-        .onDisappear { filler.close(); check = nil; finished = false }
+        .onDisappear { returnToChooser() }
     }
 
     private var chooser: some View {
@@ -156,7 +156,7 @@ struct LinkFillerView: View {
                 Image(systemName: "lock.fill").foregroundStyle(.green)
                 Text(filler.host).font(.subheadline.bold()).lineLimit(1)
                 Spacer()
-                Button("Change link") { filler.close(); check = nil; finished = false }.font(.subheadline)
+                Button("Change link") { returnToChooser() }.font(.subheadline)
             }.padding(.horizontal).padding(.vertical, 8).background(.bar)
             if case .known(_, let name, _, _)? = check {
                 Label(Loc.f("This link matches %@, a site in your list.", name), systemImage: "checkmark.seal.fill").font(.footnote).foregroundStyle(.green).padding(.vertical, 6)
@@ -171,10 +171,8 @@ struct LinkFillerView: View {
                 } label: { Label("Fill in my details", systemImage: "square.and.pencil").frame(maxWidth: .infinity) }
                     .buttonStyle(.borderedProminent).controlSize(.large).disabled(filler.busy).accessibilityIdentifier("link-fill")
                 if case .known(let id, _, _, let waiting)? = check, waiting, !finished {
-                    Button { model.markFollowUpDone(id); finished = true } label: { Label("I finished this request", systemImage: "checkmark.circle").frame(maxWidth: .infinity) }
+                    Button { model.markFollowUpDone(id); returnToChooser() } label: { Label("I finished this request", systemImage: "checkmark.circle").frame(maxWidth: .infinity) }
                         .buttonStyle(.bordered).controlSize(.large)
-                } else if finished {
-                    Label("Marked as finished.", systemImage: "checkmark.circle.fill").font(.footnote).foregroundStyle(.green)
                 }
             }.padding()
         }
@@ -189,6 +187,9 @@ struct LinkFillerView: View {
         default: open(url, c)
         }
     }
+
+    /// Closes the page and clears the pasted link so the tab is ready for the next one.
+    private func returnToChooser() { filler.close(); check = nil; finished = false; text = "" }
 
     private func open(_ url: URL, _ c: LinkCheck) { check = c; finished = false; Task { await filler.open(url) } }
 

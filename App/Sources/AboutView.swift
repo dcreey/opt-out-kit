@@ -12,6 +12,9 @@ struct AboutView: View {
                     Button("Replay the walkthrough", systemImage: "play.circle") { model.showWalkthrough() }
                         .accessibilityIdentifier("show-walkthrough")
                 }
+                Section {
+                    MailAppPicker()
+                } header: { Text("Email") } footer: { Text("Opt-out emails we prepare open in this app, ready for you to read and send.") }
                 Section("How it works") {
                     Text("Pick a site, follow its step cards in your own browser, and mark each step done. You do any CAPTCHA, phone or ID step yourself. The app never submits anything for you.")
                     Text("Brokers re-list people, so check back on opted-out sites.")

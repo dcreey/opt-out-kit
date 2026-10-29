@@ -2909,6 +2909,33 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "subject_state")?.first, "IL", "subject_state is the state of the person the request is about, not a request topic")
     }
 
+    func testAnAdvertisingIDBoxLabelledNotRequiredDoesNotBlockTheRest() {
+        let p = plan([("text", "first-name", "* First Name"), ("email", "e", "* Primary Email Address"), ("text", "mobile-device-advertising-id", "* Mobile Device Advertising ID (Not required but strongly recommended)")])
+        XCTAssertNotNil(v(p, "first-name")); XCTAssertNotNil(v(p, "e"))
+        if case .needsYou = p.verdict { XCTFail("an optional advertising ID must not stop the fill") }
+    }
+
+    func testASingleSiteEmailCarriesOnlyWhatThatSiteNeeds() {
+        let b = EmailBatch(address: "p@x.example", addresses: ["p@x.example"], domains: ["x.example"], entryIDs: ["x"])
+        let ads = b.body(name: "Pat Example", email: "pat@example.com", details: EmailDetails(advertisingID: true), address: "1 Main St", phone: "555", advertisingID: "AAAA-1")
+        XCTAssertTrue(ads.contains("Mobile advertising ID (IDFA): AAAA-1")); XCTAssertFalse(ads.contains("1 Main St")); XCTAssertFalse(ads.contains("Phone:"))
+        let people = b.body(name: "Pat Example", email: "pat@example.com", details: EmailDetails(address: true), address: "1 Main St", advertisingID: "AAAA-1")
+        XCTAssertTrue(people.contains("Address: 1 Main St")); XCTAssertFalse(people.contains("AAAA-1"))
+        XCTAssertTrue(people.contains("Name: Pat Example")); XCTAssertTrue(people.contains("Email: pat@example.com"))
+    }
+
+    func testTheDetailsAnEmailCarriesComeFromTheFormElseTheCategory() {
+        func entry(_ category: String, fields: [FormField] = []) -> DirectoryEntry {
+            var e = DirectoryEntry(id: "x", domain: "x.example", name: "X", bucket: "registry", tier: .B, automation: .guided, confidence: nil)
+            e.about = BrokerAbout(category: category, summary: "")
+            if !fields.isEmpty { e.optOutForm = OptOutForm(page: URL(string: "https://x.example/")!, method: "post", action: nil, fields: fields, hops: 1) }
+            return e
+        }
+        XCTAssertEqual(EmailDetails.needs(for: entry("adtech")), EmailDetails(advertisingID: true))
+        XCTAssertEqual(EmailDetails.needs(for: entry("people_search")), EmailDetails(address: true))
+        XCTAssertEqual(EmailDetails.needs(for: entry("adtech", fields: [FormField(type: "text", name: "n", label: "Name"), FormField(type: "tel", name: "p", label: "Phone")])), EmailDetails(phone: true))
+    }
+
     func testARequiredSecondAddressLineGetsNAAndAnOptionalOneStaysEmpty() {
         let p = plan([("text", "a1", "Street Address *"), ("text", "a2", "Street Address Line 2 *"), ("text", "b2", "Address Line 2"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "a2"), ["N/A"]); XCTAssertNil(v(p, "b2"))
@@ -3041,5 +3068,64 @@ final class LiveFormAutomaticTests: XCTestCase {
         let results = await AutoOptOut(submitter: Recorder(), minInterval: 0, spacing: 0).run(entries: [e], person: person, progress: Progress())
         XCTAssertEqual(results.count, 1)
         if case .submitted = results[0].1 {} else { XCTFail("a live-form site is sent by the background run: \(results[0].1)") }
+    }
+}
+
+final class SkippedSitesTests: XCTestCase {
+    private func site(_ i: Int) -> DirectoryEntry {
+        DirectoryEntry(id: "s\(i)", domain: "s\(i).com", name: "s\(i)", bucket: "direct", tier: .B, automation: .guided, signals: [])
+    }
+    private let day: TimeInterval = 86_400
+
+    func testASkippedSiteLeavesTheBatchAndTheNextSiteTakesItsPlace() {
+        let entries = (0..<40).map(site)
+        let queue = entries.map(\.domain)
+        let plain = DailyGoals.build(queue: queue, entries: entries, attempts: [:])
+        XCTAssertEqual(plain.verify.count, 25)
+        XCTAssertTrue(plain.verify.contains("s0.com"))
+        let parked = DailyGoals.build(queue: queue, entries: entries, attempts: [:], parked: ["s0"])
+        XCTAssertEqual(parked.verify.count, 25, "the batch still has 25")
+        XCTAssertFalse(parked.verify.contains("s0.com"))
+        XCTAssertTrue(parked.verify.contains("s25.com"), "the next site fills the gap")
+    }
+
+    func testASkipWaitsAWeekThenComesBackAndIsRemindedAbout() {
+        var p = Progress(); let t0 = Date()
+        p.skipSite("s1", reason: .skipped, on: t0)
+        XCTAssertTrue(p.isParked("s1", now: t0.addingTimeInterval(6 * day)))
+        XCTAssertEqual(p.skipReturns("s1", now: t0), t0.addingTimeInterval(7 * day))
+        XCTAssertTrue(p.skippedDue(now: t0.addingTimeInterval(6 * day)).isEmpty)
+        XCTAssertFalse(p.isParked("s1", now: t0.addingTimeInterval(8 * day)))
+        XCTAssertEqual(p.skippedDue(now: t0.addingTimeInterval(8 * day)), ["s1"])
+    }
+
+    func testSkippingAgainRestartsTheWeekAndForeverNeverComesBack() {
+        var p = Progress(); let t0 = Date()
+        p.skipSite("s1", reason: .skipped, on: t0)
+        p.skipSite("s1", reason: .notWorking, on: t0.addingTimeInterval(8 * day))
+        XCTAssertEqual(p.skipCount("s1"), 2)
+        XCTAssertTrue(p.isParked("s1", now: t0.addingTimeInterval(10 * day)))
+        p.skipSite("s1", reason: .skipped, forever: true, on: t0.addingTimeInterval(11 * day))
+        XCTAssertTrue(p.isParked("s1", now: t0.addingTimeInterval(400 * day)))
+        XCTAssertNil(p.skipReturns("s1", now: t0.addingTimeInterval(12 * day)))
+        XCTAssertTrue(p.skippedDue(now: t0.addingTimeInterval(400 * day)).isEmpty)
+        p.unskip("s1")
+        XCTAssertFalse(p.isParked("s1"))
+    }
+
+    func testFinishingASkippedSiteEndsTheSkip() {
+        var p = Progress(); let t0 = Date()
+        p.skipSite("s1", reason: .skipped, on: t0)
+        p.recordOptOutAttempt(OptOutAttempt(date: t0.addingTimeInterval(60), outcome: "submitted"), site: "s1")
+        XCTAssertFalse(p.isParked("s1", now: t0.addingTimeInterval(120)))
+        XCTAssertTrue(p.skippedSites().isEmpty)
+    }
+
+    func testOlderSavedProgressWithoutSkipsStillLoads() throws {
+        let data = try JSONEncoder().encode(Progress())
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        json["siteSkips"] = nil
+        let back = try JSONDecoder().decode(Progress.self, from: JSONSerialization.data(withJSONObject: json))
+        XCTAssertTrue(back.siteSkips.isEmpty)
     }
 }

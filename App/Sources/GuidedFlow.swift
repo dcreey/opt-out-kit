@@ -290,6 +290,9 @@ struct GuidedPanel: View {
                         if let url = runner.webView?.url {
                             Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
                         }
+                        if let web = runner.webView {
+                            Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("guided-refresh")
+                        }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in
                                 Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")

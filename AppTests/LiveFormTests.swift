@@ -64,4 +64,32 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(LiveFormPicker.pick([optMeOut, device])?.token, "f3", "the email form, not the device-ID one")
         XCTAssertNil(LiveFormPicker.pick([trial, subscribe]), "a page with only marketing forms has no opt-out form")
     }
+
+    /// Veraset's footer box: one email input, a plain "Submit" button, and only "By subscribing, you consent to our Privacy Policy and receive updates" around it.
+    func testAFooterNewsletterBoxWithAPrivacyLinkIsNotAnOptOutForm() {
+        var box = LiveForm(token: "n", action: "", method: "get", visible: true,
+                           fields: [LiveField(token: "n-0", name: "Email", type: "email", label: "Enter your email", required: true, visible: true)],
+                           buttons: ["Submit"], text: "")
+        box.ctx = "By subscribing, you consent to our Privacy Policy and receive updates."
+        XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/legal/do-not-sell-request Do Not Sell Request"), "a newsletter box is never filled, even on a do-not-sell page")
+    }
+
+    func testALeadOrReportButtonIsNeverAnOptOutForm() {
+        for label in ["Get My FAFSA Guide", "Show My Report FREE"] {
+            let box = LiveForm(token: "l", action: "", method: "post", visible: true,
+                               fields: [LiveField(token: "l-0", name: "email", type: "email", label: "Email", required: true, visible: true)],
+                               buttons: [label], text: "Enter your email to continue")
+            XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/your-privacy-choices Your privacy choices"), label)
+        }
+    }
+
+    /// Mediawallah, Skydeo: a newsletter box in a block that also holds the footer's "Do Not Sell My Personal Information" link.
+    func testANewsletterBoxBesideADoNotSellLinkIsStillANewsletterBox() {
+        var box = LiveForm(token: "n", action: "", method: "post", visible: true,
+                           fields: [LiveField(token: "n-0", name: "EMAIL", type: "email", label: "Email", required: true, visible: true),
+                                    LiveField(token: "n-1", name: "_mc4wp_honeypot", type: "text", label: "", required: false, visible: true)],
+                           buttons: ["Submit"], text: "Email Submit")
+        box.ctx = "Sign Up for Our Newsletter Access our exclusive insights and updates Do Not Sell My Personal Information Privacy Policy"
+        XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/donotsell Do Not Sell"))
+    }
 }

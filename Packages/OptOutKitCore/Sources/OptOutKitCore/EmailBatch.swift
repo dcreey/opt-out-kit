@@ -58,3 +58,46 @@ public struct EmailBatch: Identifiable, Equatable, Sendable {
         ].joined(separator: "\n")
     }
 }
+
+
+/// Which of a person's details one company's opt-out email should carry: only what it needs to find the record.
+public struct EmailDetails: Equatable, Sendable {
+    public var address = false
+    public var phone = false
+    public var birthdate = false
+    public var advertisingID = false
+    public init(address: Bool = false, phone: Bool = false, birthdate: Bool = false, advertisingID: Bool = false) {
+        self.address = address; self.phone = phone; self.birthdate = birthdate; self.advertisingID = advertisingID
+    }
+
+    /// Name and email always go. The rest comes from the company's own form when we read one; otherwise from what kind of company it is.
+    public static func needs(for entry: DirectoryEntry) -> EmailDetails {
+        if let fields = entry.optOutForm?.fields, !fields.isEmpty {
+            func asks(_ pattern: String) -> Bool { fields.contains { ($0.name + " " + $0.label).range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil } }
+            return EmailDetails(address: asks("street|address|city|zip|postal|\\bstate\\b"),
+                                phone: asks("phone|mobile number|telephone"),
+                                birthdate: asks("birth|\\bdob\\b"),
+                                advertisingID: asks("\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad(vertising)?.?(id|identifier)|\\bad.?id\\b|device.?(id|identifier)"))
+        }
+        switch entry.about?.category ?? "" {
+        case "adtech", "location_data": return EmailDetails(advertisingID: true)                  // matched by the phone's ad ID and email, not a postal address
+        default: return EmailDetails(address: true)                                              // people search, marketing lists, records and the rest find a person by name and address
+        }
+    }
+}
+
+extension EmailBatch {
+    /// The message for one company: the same request, with only the details that company needs. Anything not given is left out.
+    public func body(name: String, email: String, details: EmailDetails, address street: String, phone: String? = nil, birthdate: String? = nil, advertisingID: String? = nil, country: String? = nil) -> String {
+        let generic = Self.genericBody(name: name, email: email, address: street, country: country).components(separatedBy: "\n")
+        var lines = generic.filter { !$0.hasPrefix("Address: ") }
+        guard let at = lines.firstIndex(of: "Email: \(email)") else { return generic.joined(separator: "\n") }
+        var extra: [String] = []
+        if details.address, !street.isEmpty { extra.append("Address: \(street)") }
+        if details.phone, let phone, !phone.isEmpty { extra.append("Phone: \(phone)") }
+        if details.birthdate, let birthdate, !birthdate.isEmpty { extra.append("Date of birth: \(birthdate)") }
+        if details.advertisingID, let advertisingID, !advertisingID.isEmpty { extra.append("Mobile advertising ID (IDFA): \(advertisingID)") }
+        lines.insert(contentsOf: extra, at: at + 1)
+        return lines.joined(separator: "\n")
+    }
+}

@@ -97,7 +97,9 @@ public enum FormFiller {
             if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
             // A live form carries the page's own label first, then " | " and the field's code name; rules about what the box says use the label alone.
             let visibleLabel = field.label.components(separatedBy: " | ").first ?? field.label
-            let required = field.label.contains("*") || field.label.lowercased().contains("(required)")
+            // A label can say "(Not required but strongly recommended)" next to a required attribute: the page's own words win.
+            let optionalWords = field.label.range(of: "not required|\\(optional\\)|optional\\)", options: [.regularExpression, .caseInsensitive]) != nil
+            let required = !optionalWords && (field.label.contains("*") || field.label.lowercased().contains("(required)"))
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }
                 if c.isEmpty { if required || field.type == "email" { missing.append(what) } }

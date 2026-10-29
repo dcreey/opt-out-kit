@@ -37,10 +37,12 @@ public struct Progress: Codable, Equatable, Sendable {
     public var optOutAttempts: [String: [OptOutAttempt]] = [:]
     /// Sites the person reported as not working (broken link, gated by something else, blocked them).
     public var siteIssues: [String: [SiteIssue]] = [:]
+    /// Sites the person set aside (skipped or not working); they wait a week before they are offered again.
+    public var siteSkips: [String: [SiteSkip]] = [:]
 
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case completedSteps, doneAt, checks, siteChecks, optOutAttempts, siteIssues }
+    enum CodingKeys: String, CodingKey { case completedSteps, doneAt, checks, siteChecks, optOutAttempts, siteIssues, siteSkips }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -50,6 +52,7 @@ public struct Progress: Codable, Equatable, Sendable {
         siteChecks = try c.decodeIfPresent([String: [CheckRecord]].self, forKey: .siteChecks) ?? [:]
         optOutAttempts = try c.decodeIfPresent([String: [OptOutAttempt]].self, forKey: .optOutAttempts) ?? [:]
         siteIssues = try c.decodeIfPresent([String: [SiteIssue]].self, forKey: .siteIssues) ?? [:]
+        siteSkips = try c.decodeIfPresent([String: [SiteSkip]].self, forKey: .siteSkips) ?? [:]
     }
 
     /// Records what was seen on a directory site: a scan result or the person's own look.

@@ -447,51 +447,167 @@ struct DirectoryInfoView: View {
         }
     }
 
-    /// Whether an opt-out here lasts, from the company's own policy, and when we will ask the person to repeat it.
-    @ViewBuilder private var persistenceSection: some View {
+    /// Whether an opt-out here lasts, from the company's own policy, and when we will ask the person to repeat it. (Last sent and due dates are in the status block.)
+    @ViewBuilder private var persistenceRows: some View {
         let info = entry.persistence
         let months = entry.reupMonths ?? 12
-        Section {
-            switch info?.result {
-            case "permanent": Label("The company says it keeps your opt-out, so you should not need to repeat it.", systemImage: "infinity").foregroundStyle(.green)
-            case "temporary": Label(Loc.f("The company says the data can come back. We will ask you to repeat this every %lld months.", months), systemImage: "arrow.clockwise").foregroundStyle(.orange)
-            default: Label(Loc.f("The company does not say whether it lasts. Most brokers collect data again, so we will ask you to repeat this after %lld months.", months), systemImage: "questionmark.circle").foregroundStyle(.secondary)
-            }
-            if let q = info?.quote { Text("\u{201C}\(q)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
-            if let sent = entry.lastSent(in: model.progress.optOutAttempts) {
-                if let due = entry.reupDate(after: sent) {
-                    Text(Loc.f("Last sent %@. Due to repeat around %@.", sent.formatted(date: .abbreviated, time: .omitted), due.formatted(date: .abbreviated, time: .omitted))).font(.footnote)
-                } else { Text(Loc.f("Last sent %@.", sent.formatted(date: .abbreviated, time: .omitted))).font(.footnote) }
-            }
-        } header: { Text("How long an opt-out lasts") }
+        switch info?.result {
+        case "permanent": Label("The company says it keeps your opt-out, so you should not need to repeat it.", systemImage: "infinity").foregroundStyle(.green)
+        case "temporary": Label(Loc.f("The company says the data can come back. We will ask you to repeat this every %lld months.", months), systemImage: "arrow.clockwise").foregroundStyle(.orange)
+        default: Label(Loc.f("The company does not say whether it lasts. Most brokers collect data again, so we will ask you to repeat this after %lld months.", months), systemImage: "questionmark.circle").foregroundStyle(.secondary)
+        }
+        if let q = info?.quote { Text("\u{201C}\(q)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
     }
 
-    /// Who the company is, what it tracks and who it sells to, as its own pages say.
+    /// Who the company is in a few lines; what it tracks and who it buys from are one tap away.
     @ViewBuilder private func aboutSection(_ about: BrokerAbout) -> some View {
         Section {
             if let cat = entry.brokerCategory { Label(cat.title, systemImage: "building.2").font(.caption.bold()).foregroundStyle(.tint) }
             Text(about.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
-            if let cat = entry.brokerCategory { Text(cat.whatItMeans).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true); CaseExamples(category: cat) }
             if let score = entry.priority {
                 Label(Loc.f("%@ (%lld of 100)", BrokerPriority.tier(score), score), systemImage: "flag.fill")
                     .font(.caption.bold()).foregroundStyle(score >= 60 ? .red : score >= 45 ? .orange : .secondary)
             }
+            if !about.tracks.isEmpty {
+                DisclosureGroup("What they track") {
+                    ForEach(about.tracks, id: \.self) { Text(DataKind(rawValue: $0)?.title ?? $0).font(.subheadline) }
+                    Text("From the company's own privacy policy and pages.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            DisclosureGroup("Who they sell to") {
+                if about.sellsTo.isEmpty { Text("Its policy does not name who it sells to.").foregroundStyle(.secondary) }
+                ForEach(about.sellsTo, id: \.self) { Text(BuyerKind(rawValue: $0)?.title ?? $0).font(.subheadline) }
+                if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+                if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
+            }
+            if let cat = entry.brokerCategory {
+                DisclosureGroup("What this kind of company does") {
+                    Text(cat.whatItMeans).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    CaseExamples(category: cat)
+                }
+            }
         } header: { Text("Who they are") }
-        if !about.tracks.isEmpty {
-            Section {
-                ForEach(about.tracks, id: \.self) { Text(DataKind(rawValue: $0)?.title ?? $0) }
-            } header: { Text("What they track") } footer: { Text("From the company's own privacy policy and pages.") }
-        }
+    }
+
+    /// Where this site stands for the person: done or not, the link to do it, when it was last done and when it comes due again, and the screenshot.
+    @ViewBuilder private var statusSection: some View {
+        let attempts = model.progress.optOutAttempts
+        let sent = entry.lastSent(in: attempts)
+        let done = entry.isCurrent(attempts: attempts)
+        let skip = model.progress.isParked(entry.id) ? model.progress.lastSkip(entry.id) : nil
+        let person = model.selectedPerson
+        let review = person.flatMap { model.reviewItem(entryID: entry.id, for: $0) }
         Section {
-            if about.sellsTo.isEmpty { Text("Its policy does not name who it sells to.").foregroundStyle(.secondary) }
-            ForEach(about.sellsTo, id: \.self) { Text(BuyerKind(rawValue: $0)?.title ?? $0) }
-            if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
-            if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
-        } header: { Text("Who they sell to") }
+            if done {
+                Label("Done", systemImage: "checkmark.circle.fill").font(.headline).foregroundStyle(.green).accessibilityIdentifier("site-state")
+            } else if let skip {
+                if model.isSkippedForever(entry.id) {
+                    Label("Skipped for good", systemImage: "forward.end").font(.headline).foregroundStyle(.secondary).accessibilityIdentifier("site-state")
+                } else if let back = model.progress.skipReturns(entry.id) {
+                    Label(skip.reason == .notWorking ? "Reported as not working" : "Skipped", systemImage: "forward").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
+                    Text(Loc.f("Comes back to your list on %@.", back.formatted(date: .abbreviated, time: .omitted))).font(.footnote).foregroundStyle(.secondary)
+                }
+            } else {
+                Label(sent == nil ? "Not done yet" : "Due again", systemImage: "circle").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
+            }
+            if let url = model.effectiveURL(for: entry) {
+                Button("Open the opt-out page", systemImage: "safari") { browserURL = url }.accessibilityIdentifier("site-link")
+            }
+            if let sent {
+                LabeledContent("Last done", value: sent.formatted(date: .abbreviated, time: .omitted))
+                if let due = entry.reupDate(after: sent) { LabeledContent("Do it again around", value: due.formatted(date: .abbreviated, time: .omitted)) }
+                else { LabeledContent("Do it again", value: Loc.t("Not needed: it lasts")) }
+            } else if let last = review, last.worked == false {
+                Text(last.label).font(.footnote).foregroundStyle(.orange)
+            }
+            if let review, let person, review.hasScreenshot { SiteScreenshot(item: review, person: person) }
+            if let issue = model.activeIssue(for: entry.id) {
+                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+            }
+            if model.progress.isParked(entry.id) {
+                Button("Bring this site back to my list") { model.bringBack(entry.id) }.accessibilityIdentifier("site-bring-back")
+            }
+        } header: { Text("Status") }
+    }
+
+    /// The detail most people never need, folded away: how it works, how long it lasts, where it operates, the form, what we noticed, the source.
+    @ViewBuilder private var moreDetails: some View {
+        let others = (entry.languages?.list ?? []).filter { $0 != "en" }
+        let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" && $0 != "GLOBAL" }
+        let worldwide = entry.regions?.list.contains("GLOBAL") == true
+        let n = Directory.familySize(of: entry, in: model.directory)
+        Section {
+            DisclosureGroup("More details") {
+                VStack(alignment: .leading, spacing: 14) {
+                    let verdict = model.method(for: entry)
+                    detail("How we handle it") {
+                        Text(verdict.method.title).font(.subheadline.bold()).accessibilityIdentifier("method-title")
+                        Text(verdict.reason).font(.footnote)
+                        Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
+                    }
+                    detail("How long an opt-out lasts") { persistenceRows }
+                    if worldwide || !places.isEmpty || !others.isEmpty {
+                        detail("Where it operates") {
+                            if worldwide { Label("Serves people worldwide", systemImage: "globe") }
+                            if !places.isEmpty { Text(Loc.f("Collects data about people in: %@", places.joined(separator: ", "))) }
+                            if !others.isEmpty { Text(Loc.f("Its site is offered in: %@", others.map(Regions.languageName).joined(separator: ", "))) }
+                            if let note = entry.regions?.evidence, !note.isEmpty { Text(note).font(.footnote).foregroundStyle(.secondary) }
+                        }
+                    }
+                    if let parent = entry.familyParent, n > 1 {
+                        detail("Shared opt-out") { Text("\(n) sites send their opt-outs to \(parent), so one request may clear them all. Not yet confirmed by a real run.") }
+                    }
+                    if let form = entry.optOutForm {
+                        detail("The opt-out form") {
+                            ForEach(Array(form.fields.enumerated()), id: \.offset) { _, f in
+                                Label(f.display, systemImage: f.type == "email" ? "envelope" : "text.cursor")
+                            }
+                            if let host = form.action?.host { Text("Submits to \(host)").font(.footnote).foregroundStyle(.secondary) }
+                            Text("Found automatically by following links from the home page (\(form.hops) hop\(form.hops == 1 ? "" : "s")). Nothing here has been submitted.").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    if let check = entry.searchCheck {
+                        detail("Checking if you're listed") { Label(check.statusLabel, systemImage: check.status == .calibrated ? "checkmark.seal" : "questionmark.circle") }
+                    }
+                    if let signals = entry.signals, !signals.isEmpty {
+                        detail("What we noticed") { ForEach(signals, id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") } }
+                    }
+                    if model.effectiveURL(for: entry) != nil {
+                        detail("Wrong or moved link?") { HealControls(siteID: entry.id, looking: $healing, find: { await model.healLink(for: entry) != nil }) }
+                    }
+                    detail("Source") {
+                        Text(entry.bucket == "direct" ? Loc.t("Listed as directly supported by an opt-out service.")
+                             : entry.bucket == "registry" ? Loc.t("Registered as a data broker in California.")
+                             : Loc.t("Listed as a mirror of another site."))
+                        if let d = entry.profiled { Text("Profiled \(d)").font(.footnote).foregroundStyle(.secondary) }
+                    }
+                }
+                .padding(.vertical, 6)
+            }.accessibilityIdentifier("more-details")
+        }
+    }
+
+    private func detail<C: View>(_ title: String, @ViewBuilder _ content: () -> C) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(Loc.t(title)).font(.caption.bold()).foregroundStyle(.secondary).textCase(.uppercase)
+            content()
+        }
     }
 
     var body: some View {
         List {
+            statusSection
+            // What to do: the guide, and the email when the site takes one.
+            Section {
+                GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
+                    model.requireProfile { guide = model.guidedRunner(for: entry) }
+                }
+                if let mail = entry.contactEmail, let url = Self.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: entry.domain) {
+                    Link(destination: url) { Label("Write the email to \(mail)", systemImage: "envelope").frame(maxWidth: .infinity) }
+                        .accessibilityIdentifier("write-email")
+                }
+            }
             if let caution = entry.caution {
                 Section {
                     Label(caution.title, systemImage: "exclamationmark.triangle.fill").font(.headline).foregroundStyle(.orange)
@@ -503,46 +619,10 @@ struct DirectoryInfoView: View {
                 }
                 .accessibilityIdentifier("caution")
             }
-            if let about = entry.about { aboutSection(about) }
-            persistenceSection
-            let others = (entry.languages?.list ?? []).filter { $0 != "en" }
-            let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" && $0 != "GLOBAL" }
-            let worldwide = entry.regions?.list.contains("GLOBAL") == true
-            if !others.isEmpty || !places.isEmpty || worldwide {
-                Section("Where it operates") {
-                    if worldwide { Label("Serves people worldwide", systemImage: "globe") }
-                    if !places.isEmpty { Text(Loc.f("Collects data about people in: %@", places.joined(separator: ", "))) }
-                    if !others.isEmpty { Text(Loc.f("Its site is offered in: %@", others.map(Regions.languageName).joined(separator: ", "))) }
-                    if let note = entry.regions?.evidence, !note.isEmpty { Text(note).font(.footnote).foregroundStyle(.secondary) }
-                }
-            }
-            Section {
-                GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
-                    model.requireProfile { guide = model.guidedRunner(for: entry) }
-                }
-            }
             if !alsoHandles.isEmpty {
                 Section {
                     ForEach(alsoHandles, id: \.self) { Text($0) }
                 } header: { Text("This one request also handles \(alsoHandles.count) sites") }
-            }
-            if let issue = model.activeIssue(for: entry.id) {
-                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
-                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
-            }
-            if let mail = entry.contactEmail, let url = Self.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: entry.domain) {
-                Section {
-                    Link(destination: url) {
-                        Label("Write the email to \(mail)", systemImage: "envelope").font(.headline).frame(maxWidth: .infinity)
-                    }
-                    .accessibilityIdentifier("write-email")
-                } footer: { Text("This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.") }
-            }
-            Section {
-                let verdict = model.method(for: entry)
-                Text(verdict.method.title).font(.headline).accessibilityIdentifier("method-title")
-                Text(verdict.reason).font(.footnote)
-                Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
             }
             if let cover = model.platformCover(for: entry) {
                 Section("\(cover.platform.shortName)") {
@@ -558,48 +638,8 @@ struct DirectoryInfoView: View {
                     }
                 }.accessibilityIdentifier("platform-cover")
             }
-            let n = Directory.familySize(of: entry, in: model.directory)
-            if let parent = entry.familyParent, n > 1 {
-                Section("Shared opt-out") {
-                    Text("\(n) sites send their opt-outs to \(parent), so one request may clear them all. Not yet confirmed by a real run.")
-                }
-            }
-            if let form = entry.optOutForm {
-                Section {
-                    ForEach(Array(form.fields.enumerated()), id: \.offset) { _, f in
-                        Label(f.display, systemImage: f.type == "email" ? "envelope" : "text.cursor")
-                    }
-                    if let host = form.action?.host { Text("Submits to \(host)").font(.footnote).foregroundStyle(.secondary) }
-                } header: {
-                    Text("The opt-out form")
-                } footer: {
-                    Text("Found automatically by following links from the home page (\(form.hops) hop\(form.hops == 1 ? "" : "s")). Nothing here has been submitted.")
-                }
-            }
-            if let check = entry.searchCheck {
-                Section("Checking if you're listed") {
-                    Label(check.statusLabel, systemImage: check.status == .calibrated ? "checkmark.seal" : "questionmark.circle")
-                }
-            }
-            if let signals = entry.signals, !signals.isEmpty {
-                Section("What we noticed") {
-                    ForEach(signals, id: \.self) { Label(Describe.signal($0), systemImage: "info.circle") }
-                }
-            }
-            Section("Source") {
-                Text(entry.bucket == "direct" ? Loc.t("Listed as directly supported by an opt-out service.")
-                     : entry.bucket == "registry" ? Loc.t("Registered as a data broker in California.")
-                     : Loc.t("Listed as a mirror of another site."))
-                if let d = entry.profiled { Text("Profiled \(d)").font(.footnote).foregroundStyle(.secondary) }
-            }
-            // The site's own link goes last: the guide above is the way in.
-            if let url = model.effectiveURL(for: entry) {
-                Section("Site link") {
-                    Button("Open in Safari", systemImage: "safari") { browserURL = url }.accessibilityIdentifier("site-link")
-                    Text(url.absoluteString).font(.caption).foregroundStyle(.secondary)
-                    HealControls(siteID: entry.id, looking: $healing, find: { await model.healLink(for: entry) != nil })
-                }
-            }
+            if let about = entry.about { aboutSection(about) }
+            moreDetails
         }
         .navigationTitle(entry.domain)
         .coach(CoachGuide.forMethod(model.method(for: entry).method))

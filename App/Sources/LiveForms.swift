@@ -36,9 +36,9 @@ enum LiveFormPicker {
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
     private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
-    private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a", options: .caseInsensitive)
+    private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a|get my [a-z ]*(guide|report)|show my report|free (guide|report)", options: .caseInsensitive)
     /// Newsletter and marketing language in the words around a form's inputs.
-    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscribe|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
+    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscrib(e|ing|ed)|receive (updates|news|emails?)|and receive|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
     private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
@@ -55,9 +55,11 @@ enum LiveFormPicker {
         // The words around the inputs say "newsletter" or "delivered to your inbox": a subscription box, whatever its button says.
         let ctx = f.ctx ?? ""
         // (A subscription box is small; a form with four or more inputs is not one, whatever sits near it.)
-        if fields.count <= 3 && has(signupContext, ctx) && !has(strongOptOut, ctx + " " + buttons) { return -100 }
+        // (Only the form's own button or words can rescue it: a footer's "Do Not Sell" link in the same block does not make a newsletter box an opt-out.)
+        if fields.count <= 3 && has(signupContext, ctx) && !has(strongOptOut, heading + " " + buttons) { return -100 }
         // A form of one input (just an email) needs something that says it is a privacy request, not only a page that mentions privacy.
-        if fields.count <= 1 && !has(optOut, buttons + " " + heading + " " + ctx) { return -100 }
+        // (A privacy-policy link beside a footer box does not count: only the button, the heading or a real opt-out phrase around it does.)
+        if fields.count <= 1 && !has(optOut, buttons + " " + heading) && !has(strongOptOut, ctx) { return -100 }
         var s = 0
         if has(optOut, buttons) { s += 4 }
         if has(optOut, heading) { s += 2 }
@@ -130,11 +132,27 @@ extension WebViewSession {
         _ = try? await webView.evaluateJavaScript(js)
     }
 
+    /// A form folded inside a closed accordion (`<details>`) has no size, so it is not seen. Clicks the headings of the closed ones that hold inputs,
+    /// one at a time (some sites keep only one open), and returns the forms from the first that shows an opt-out form.
+    func openFoldedForms() async -> [LiveForm]? {
+        let count = (try? await webView.evaluateJavaScript("document.querySelectorAll('details:not([open])').length")) as? Int ?? 0
+        guard count > 0 else { return nil }
+        for i in 0..<min(count, 6) {
+            let js = "(function(i){var ds=[].slice.call(document.querySelectorAll('details')).filter(function(d){return d.querySelector('input,select,textarea');}); var d=ds[i]; if(!d) return false; var s=d.querySelector('summary'); if(!s) return false; if(!d.open){s.scrollIntoView({block:'center'}); s.click();} return true;})(\(i));"
+            guard (try? await webView.evaluateJavaScript(js)) as? Bool == true else { break }
+            try? await Task.sleep(nanoseconds: 900_000_000)
+            let after = await discoverFormsIn()
+            if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+        }
+        return nil
+    }
+
     /// Opens a privacy request that hides behind a link or button on the page ("Submit a privacy request", "Your Privacy Choices") when no form shows,
     /// then looks again. Only a link that opens something in the page (no address, `#` or a script) is clicked, never one that writes an email.
     func discoverFormsDeep() async -> [LiveForm] {
         let first = await discoverForms()
         if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
+        if let opened = await openFoldedForms() { return opened }
         let js = #"""
         (function(){
           var re=/^\s*(submit (a |your )?(privacy|data|consumer)( rights?)? request|(make|file|start) (a |your )?(privacy|data) request|your privacy choices|privacy (request|choices|center|preferences)|data subject( access)? request|do not (sell|share)( or (sell|share))?( my (personal )?(information|info|data))?|exercise your (privacy )?rights|manage (my )?privacy( settings| choices)?)\s*[.:]?\s*$/i;
@@ -173,7 +191,8 @@ extension WebViewSession {
         try? await Task.sleep(nanoseconds: 4_000_000_000)
         await settlePage(maxWait: 6)
         let after = await discoverForms()
-        return LiveFormPicker.pick(after, pageContext: await pageContext()) != nil ? after : first
+        if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+        return await openFoldedForms() ?? first
     }
 
     /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
@@ -213,7 +232,7 @@ extension WebViewSession {
             // The buttons that belong to these inputs: those in the same block of the page, else every button.
             var box=ctxEl(loose[0]); var lb=[]; box.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
             if(!lb.length) document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(document.body.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});}
+            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});}
           return JSON.stringify(out);})();
         """#
         guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8) else { return [] }
@@ -607,6 +626,18 @@ extension FormRun {
             else { return SubmitEvidence(outcome: .failed("not a secure page")) }
         } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
         let outcome = await liveSteps(session, page: url ?? URL(string: "https://local.test/")!, person: person, dryRun: dryRun, maxWait: maxWait, advertisingID: advertisingID)
+        #if DEBUG
+        if dryRun, capture {
+            // For offline analysis: the page as it stands after every click the run made, and a summary of the form it chose.
+            var snapshot = (html: ((try? await session.webView.evaluateJavaScript("document.documentElement.outerHTML")) as? String) ?? "", picked: "")
+            if let token = session.chosenForm {
+                let js = "(function(t){var f=document.querySelector('[data-ook-form=\"'+t+'\"]'); if(!f) return ''; var q=function(e){return (e.innerText||e.value||'').replace(/\\s+/g,' ').trim().slice(0,60);}; var n=f; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var x=(n.innerText||'').replace(/\\s+/g,' ').trim(); if(x.length>=25&&x.length<=700) break;} return JSON.stringify({fields:[].slice.call(f.querySelectorAll('input,select,textarea')).filter(function(e){return !/hidden|submit|button|image|reset|checkbox|radio/.test(e.type)}).map(function(e){return (e.type||e.tagName)+':'+(e.name||e.id||'')}),buttons:[].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).map(q).filter(Boolean),ctx:((n&&n.innerText)||'').replace(/\\s+/g,' ').trim().slice(0,300),url:location.href});})(\(WebViewSession.liveLiteral(token)));"
+                snapshot.picked = ((try? await session.webView.evaluateJavaScript(js)) as? String) ?? ""
+            }
+            snapshot.picked += "\n" + (url.flatMap { debugForms[$0.absoluteString] } ?? "")
+            if let url { debugSnapshots[url.absoluteString] = snapshot }
+        }
+        #endif
         return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil)
     }
 
@@ -624,6 +655,9 @@ extension FormRun {
         _ = await session.advanceToRequestForm()
         let forms = await session.discoverFormsDeep()
         let context = await session.pageContext()
+        #if DEBUG
+        debugForms[page.absoluteString] = forms.map { "\($0.token) score=\(LiveFormPicker.score($0, pageContext: context)) text=\($0.text) | buttons=\($0.buttons) fields=\($0.fields.map { "\($0.type):\($0.name):\($0.visible)" }) | ctx=\($0.ctx ?? "")" }.joined(separator: "\n")
+        #endif
         guard let picked = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
         var form = picked
         session.chosenForm = form.token
@@ -709,6 +743,8 @@ extension FormRun {
     /// What the page said at the end of the last live run, for tests that check what the form received.
     nonisolated(unsafe) static var debugLastPageText = ""
     nonisolated(unsafe) static var debugLastBlockers: [String] = []
+    nonisolated(unsafe) static var debugForms: [String: String] = [:]
+    nonisolated(unsafe) static var debugSnapshots: [String: (html: String, picked: String)] = [:]
     nonisolated(unsafe) static var debugLastFormPage = ""
     #endif
 }
