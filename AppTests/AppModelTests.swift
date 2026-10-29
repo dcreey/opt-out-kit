@@ -206,3 +206,68 @@ final class SkippedSitesAppTests: XCTestCase {
         XCTAssertEqual(model.skippedDueCount, 0)
     }
 }
+
+@MainActor
+final class InterruptedRunAppTests: XCTestCase {
+    func testAResultIsSavedTheMomentItArrivesAndTheRunIsMarkedPendingUntilItFinishes() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
+        let keys = FixedKey()
+        let model = makeModel(url: url, keys: keys)
+        let me = try XCTUnwrap(model.selectedPerson)
+        let entry = try XCTUnwrap(model.directory.first)
+        model.recordAutoResult(entry, .submitted(awaitingEmail: false), for: me.id, dryRun: false)
+        // A fresh launch (the app was closed right after) still knows it was sent.
+        let again = makeModel(url: url, keys: keys)
+        XCTAssertTrue(again.progress.optOutAttempts[entry.id]?.contains { $0.wasSubmitted } ?? false, "the request is not lost when the app closes")
+        model.recordAutoResult(entry, .submitted(awaitingEmail: false), for: me.id, dryRun: true)
+        XCTAssertEqual(model.progress.optOutAttempts[entry.id]?.count, 1, "a dry run records nothing")
+    }
+}
+
+@MainActor
+final class PeriodSitesAppTests: XCTestCase {
+    func testEveryAutomaticDomainIsATrackedSite() throws {
+        let model = makeModel()
+        let me = try XCTUnwrap(model.selectedPerson)
+        let domains = model.automaticDomains(for: me)
+        let sites = model.automaticSites(for: me)
+        let known = Set(sites.map(\.domain))
+        print("PERIODCHECK domains=\(domains.count) sites=\(sites.count) missing=\(domains.subtracting(known).sorted().prefix(8))")
+        XCTAssertEqual(known, domains.intersection(Set(model.directory.map(\.domain))))
+    }
+}
+
+@MainActor
+final class MarkDoneAppTests: XCTestCase {
+    func testMarkingASiteDoneCountsItAndCanBeTakenBack() throws {
+        let model = makeModel()
+        let entry = try XCTUnwrap(model.directory.first)
+        XCTAssertFalse(entry.isCurrent(attempts: model.progress.optOutAttempts))
+        model.markSiteDone(entry.id)
+        XCTAssertTrue(entry.isCurrent(attempts: model.progress.optOutAttempts), "a site marked done counts as done")
+        XCTAssertTrue(model.wasMarkedByHand(entry.id))
+        model.unmarkSiteDone(entry.id)
+        XCTAssertFalse(entry.isCurrent(attempts: model.progress.optOutAttempts))
+        // A request the app really sent is never taken back by "undo".
+        model.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: "submitted"), site: entry.id)
+        model.unmarkSiteDone(entry.id)
+        XCTAssertTrue(entry.isCurrent(attempts: model.progress.optOutAttempts))
+    }
+}
+
+@MainActor
+final class OverdueFollowUpAppTests: XCTestCase {
+    func testASiteStillWaitingOnItsEmailAfter45DaysBecomesAFollowUpTask() throws {
+        let model = makeModel()
+        let entry = try XCTUnwrap(model.directory.first)
+        model.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-10 * 86_400), outcome: "submitted_email"), site: entry.id)
+        XCTAssertEqual(model.overdueFollowUpCount, 0, "10 days is still normal")
+        model.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-60 * 86_400), outcome: "submitted_email"), site: entry.id)
+        XCTAssertEqual(model.overdueFollowUpCount, 0, "the newest send counts")
+        model.resetProgressForTesting()
+        model.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-60 * 86_400), outcome: "submitted_email"), site: entry.id)
+        XCTAssertEqual(model.overdueFollowUps.map(\.entry.id), [entry.id])
+        model.markFollowUpDone(entry.id)
+        XCTAssertEqual(model.overdueFollowUpCount, 0, "finishing it ends the follow-up")
+    }
+}

@@ -499,7 +499,14 @@ struct DirectoryInfoView: View {
         let review = person.flatMap { model.reviewItem(entryID: entry.id, for: $0) }
         Section {
             if done {
-                Label("Done", systemImage: "checkmark.circle.fill").font(.headline).foregroundStyle(.green).accessibilityIdentifier("site-state")
+                HStack {
+                    Label("Done", systemImage: "checkmark.circle.fill").font(.headline).foregroundStyle(.green).accessibilityIdentifier("site-state")
+                    Spacer()
+                    // A "done" the person set by hand can be taken back; one the app sent cannot.
+                    if model.wasMarkedByHand(entry.id) {
+                        Button("Undo") { model.unmarkSiteDone(entry.id) }.font(.caption).buttonStyle(.bordered).controlSize(.mini).accessibilityIdentifier("site-undo-done")
+                    }
+                }
             } else if let skip {
                 if model.isSkippedForever(entry.id) {
                     Label("Skipped for good", systemImage: "forward.end").font(.headline).foregroundStyle(.secondary).accessibilityIdentifier("site-state")
@@ -512,6 +519,10 @@ struct DirectoryInfoView: View {
             }
             if let url = model.effectiveURL(for: entry) {
                 Button("Open the opt-out page", systemImage: "safari") { browserURL = url }.accessibilityIdentifier("site-link")
+            }
+            if !done {
+                Button { model.markSiteDone(entry.id) } label: { Label("Mark as done", systemImage: "checkmark") }
+                    .font(.caption).buttonStyle(.bordered).controlSize(.mini).accessibilityIdentifier("site-mark-done")
             }
             if let sent {
                 LabeledContent("Last done", value: sent.formatted(date: .abbreviated, time: .omitted))

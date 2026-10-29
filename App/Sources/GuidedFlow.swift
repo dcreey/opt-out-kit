@@ -12,10 +12,14 @@ protocol GuidedPage: AnyObject {
     func currentURL() -> URL?
     func visibleText() async -> String
     func fill(_ values: [FieldValue]) async -> Int
+    /// A site with no known form: look for one on the live page and fill it in. Pages that cannot scan fill nothing.
+    func scanAndFill(person: Person) async -> Int
     func blockers() async -> [AssistedBlocker]
     func send(_ values: [FieldValue]) async -> SubmitOutcome
     func close()
 }
+
+extension GuidedPage { func scanAndFill(person: Person) async -> Int { 0 } }
 
 @MainActor
 final class WebGuidedPage: GuidedPage {
@@ -33,6 +37,7 @@ final class WebGuidedPage: GuidedPage {
     func currentURL() -> URL? { session.webView.url }
     func visibleText() async -> String { await session.visibleText() }
     func fill(_ values: [FieldValue]) async -> Int { await session.fillFields(values) }
+    func scanAndFill(person: Person) async -> Int { await session.scanAndFill(person: person) }
 
     func blockers() async -> [AssistedBlocker] {
         var out: [AssistedBlocker] = []
@@ -83,6 +88,7 @@ final class GuidedRunner: ObservableObject {
     private var openedSteps = Set<Int>()       // steps whose page the runner has already loaded
     private var lastURL: URL?
     private var filledFor: URL?
+    private var scannedFor: URL?           // pages already scanned for a form (a scan can click, so it is not repeated every tick)
     private var started = false
     var pollInterval: TimeInterval = 1
 
@@ -110,6 +116,16 @@ final class GuidedRunner: ObservableObject {
         }
     }
     func back() { apply(.backTapped); status = nil }
+
+    /// The person asks for another try at filling the form (a page that failed and was refreshed, one that cleared the fields, one the first scan missed):
+    /// looks for the form again on the page they are on and fills it in. Works at any step; never sends.
+    func fillAgain() {
+        Task {
+            status = Loc.t("Looking for the form…")
+            let filled = fillValues.isEmpty ? await page.scanAndFill(person: person) : await page.fill(fillValues)
+            status = filled > 0 ? Loc.t("Your details are filled in again.") : Loc.t("Could not find the form's fields on this page. Fill it in yourself, then tap Next step.")
+        }
+    }
     func cancel() { finish(.cancelled) }
     func report(_ kind: IssueKind) {
         // A broken link is worth one automatic attempt at finding where the page moved before giving up on the site.
@@ -196,7 +212,14 @@ final class GuidedRunner: ObservableObject {
                 if page.currentURL()?.absoluteString != target.absoluteString { await page.load(target); lastURL = page.currentURL(); filledFor = nil; apply(.pageLoaded(lastURL)) }
             }
         case .autofill:
-            if filledFor != url {
+            if fillValues.isEmpty {
+                // No known form for this site: scan the page for one, once per page.
+                if scannedFor != url {
+                    scannedFor = url; status = Loc.t("Looking for the opt-out form…")
+                    if await page.scanAndFill(person: person) > 0 { filledFor = url; status = Loc.t("Your details are filled in. Check them, solve any check and submit it."); apply(.formFilled) }
+                    else { status = Loc.t("Could not find the form's fields on this page. Fill it in yourself, then tap Next step.") }
+                }
+            } else if filledFor != url {
                 if await page.fill(fillValues) > 0 { filledFor = url; status = Loc.t("Your details are filled in."); apply(.formFilled) }
                 else { status = Loc.t("Could not find the form's fields on this page. Fill it in yourself, then tap Next step.") }
             }
@@ -292,6 +315,7 @@ struct GuidedPanel: View {
                         }
                         if let web = runner.webView {
                             Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("guided-refresh")
+                            Button { runner.fillAgain() } label: { Label("Fill the form again", systemImage: "square.and.pencil") }.accessibilityIdentifier("guided-fill-again")
                         }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in

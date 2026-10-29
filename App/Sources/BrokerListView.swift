@@ -109,6 +109,14 @@ struct BrokerListView: View {
                 } else if !goals.verify.isEmpty {
                     TodayCard(goals: goals, change: { chooser = .start }, more: { chooser = .more })
                 }
+                if model.overdueFollowUpCount > 0 {
+                    // Sent a while ago and the site's email never came (or was never finished): a task to follow up.
+                    Section {
+                        NavigationLink(value: "followups") {
+                            Label(model.overdueFollowUpCount == 1 ? "1 email link never came: follow up" : "\(model.overdueFollowUpCount) email links never came: follow up", systemImage: "envelope.badge")
+                        }.accessibilityIdentifier("followup-task")
+                    } footer: { Text("These requests have waited more than \(FollowUps.overdueDays) days for the site's confirmation email, longer than sites usually take.") }
+                }
                 if model.skippedDueCount > 0 {
                     // Sites skipped a week ago or more: a reminder to try them again.
                     Section {
@@ -196,7 +204,7 @@ struct BrokerListView: View {
                 case "auto-activity": AutoActivityView()
                 case "daily-verify": VerifyQueueView(domains: model.dailyGoals.verify)
                 case "skipped-sites": SkippedSitesView()
-                case "daily-email": EmailQueueView(domains: model.dailyGoals.email?.domains ?? [])
+                case "followups": FollowUpsView()
                 default: EmptyView()
                 }
             }
@@ -420,19 +428,15 @@ struct KindOption: View {
     }
 }
 
-/// Today's one goal: a ring for today's progress, the two steps (fill in, then email the same sites) and a single button for what is next.
+/// Today's one goal: a ring for today's progress, the step (fill in the sites) and a single button for what is next.
 struct TodayCard: View {
     let goals: DailyGoals
     let change: () -> Void
     let more: () -> Void
 
     private var verifyTotal: Int { max(goals.verify.count, 1) }
-    private var emailTotal: Int { goals.email?.domains.count ?? 0 }
-    /// Today's progress across both steps, from 0 to 1.
-    private var fraction: Double {
-        let total = Double(verifyTotal + emailTotal)
-        return min(1, Double(goals.verifyDone + min(goals.emailDone, emailTotal)) / total)
-    }
+    /// Today's progress, from 0 to 1.
+    private var fraction: Double { min(1, Double(goals.verifyDone) / Double(verifyTotal)) }
     private var theme: String { goals.themes.compactMap { BrokerCategory(rawValue: $0)?.title }.first ?? "" }
 
     var body: some View {
@@ -448,7 +452,6 @@ struct TodayCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(Loc.f("Today: %@", theme)).font(.headline)
                     stepRow(Loc.t("Fill in the sites"), done: goals.verifyComplete, detail: "\(goals.verifyDone) / \(goals.verify.count)")
-                    if emailTotal > 0 { stepRow(Loc.t("Send one email to the same sites"), done: goals.emailComplete, detail: "\(min(goals.emailDone, emailTotal)) / \(emailTotal)") }
                 }
             }
             .padding(.vertical, 4)
@@ -456,9 +459,6 @@ struct TodayCard: View {
             if !goals.verifyComplete {
                 NavigationLink(value: "daily-verify") { Label(goals.verifyDone == 0 ? Loc.t("Start") : Loc.t("Continue"), systemImage: "play.fill").font(.headline) }
                     .accessibilityIdentifier("today-continue")
-            } else if !goals.emailComplete {
-                NavigationLink(value: "daily-email") { Label(Loc.t("Send the email"), systemImage: "envelope.fill").font(.headline) }
-                    .accessibilityIdentifier("today-email")
             } else {
                 Button(action: more) { Label("Keep going: take 25 more", systemImage: "forward.fill").font(.headline) }.accessibilityIdentifier("goal-more")
             }

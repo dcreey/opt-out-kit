@@ -239,6 +239,29 @@ extension WebViewSession {
         return (try? JSONDecoder().decode([LiveForm].self, from: data)) ?? []
     }
 
+    /// For a site with no known form: looks for the opt-out form on the live page (opening its links, accordions and request choices) and fills it
+    /// in with the person's details. Never sends. Returns how many fields were filled, 0 when no opt-out form was found.
+    func scanAndFill(person: Person, advertisingID: String? = nil) async -> Int {
+        await settlePage(maxWait: 6)
+        _ = await denyCookies()
+        _ = await advanceToRequestForm()
+        let forms = await discoverFormsDeep()
+        let context = await pageContext()
+        guard let picked = LiveFormPicker.pick(forms, pageContext: context) else { return 0 }
+        chosenForm = picked.token
+        let page = webView.url ?? URL(string: "https://invalid.example/")!
+        let plan = FormFiller.plan(for: picked.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
+        // Fill what we can even when the form also asks for something we do not hold: the person completes the rest.
+        let fill = await fillLive(plan.values, keepExisting: true)
+        if fill.filled > 0 {
+            _ = await chooseRequestOptions(form: picked.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+            _ = await chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
+            _ = await chooseTileButtons()
+            await scrollFormIntoView(picked.token)
+        }
+        return fill.filled
+    }
+
     /// Privacy portals that open on a choice of requests ("Start Access Request", "Start Deletion Request", "Start Opt Out Request"): clicks the one a
     /// person asking to be removed wants, so the form behind it is on the page. Opt-out of sale or sharing first, then deletion; never access, transfer,
     /// correction or update. Repeats once for a second step. Returns what it clicked, or nil when the page has no such choice.
@@ -267,10 +290,21 @@ extension WebViewSession {
     /// Fills the form; menus that fill in after another choice (a state list that waits for the country) get a second pass.
     func fillLive(_ values: [FieldValue], keepExisting: Bool = false) async -> (filled: Int, unmatchedRequired: [String]) {
         keepExistingValues = keepExisting
-        let first = await fillLiveOnce(values)
-        guard !first.unmatchedRequired.isEmpty else { return first }
-        try? await Task.sleep(nanoseconds: 900_000_000)
-        return await fillLiveOnce(values)
+        // Filling goes on for as long as it keeps getting somewhere: a choice can reveal more boxes, and each pass fills what the last one uncovered. There is
+        // no fixed number of passes; it stops when a pass leaves nothing required unfilled, or fills no more than the one before (the last guard is only against a page that never settles).
+        var result = await fillLiveOnce(values)
+        var total = result.filled
+        var pass = 1
+        while !result.unmatchedRequired.isEmpty, pass < 25 {
+            try? await Task.sleep(nanoseconds: 900_000_000)
+            let next = await fillLiveOnce(values)
+            pass += 1
+            total += next.filled
+            let progressed = next.unmatchedRequired.count < result.unmatchedRequired.count || next.filled > 0 && next.unmatchedRequired != result.unmatchedRequired
+            result = next
+            if !progressed { break }
+        }
+        return (max(total, result.filled), result.unmatchedRequired)
     }
 
     /// When set, a text box that already holds something (a link from an email pre-fills the name and email) is left as it is.
@@ -494,7 +528,8 @@ extension WebViewSession {
     /// `state` is the person's own state or region name: a menu that lists places picks that one, and never another.
     func chooseCustomMenus(state: String? = nil) async -> Int {
         var set = 0
-        for _ in 0..<3 {
+        // Every empty menu on the form is set, however many there are: the loop ends when none is left (the bound only guards against a page that keeps adding menus).
+        for _ in 0..<60 {
             let open = #"""
             (function(){
               var els=[].slice.call(document.querySelectorAll('[role=combobox],[aria-haspopup=listbox],.MuiSelect-select')).filter(function(e){

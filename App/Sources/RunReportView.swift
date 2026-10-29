@@ -45,6 +45,9 @@ struct RunReportSheet: View {
             Text(report.allSucceeded ? Loc.f("All %lld sites went through", report.sent)
                                      : Loc.f("%lld of %lld sites went through", report.sent, report.attempted))
                 .font(.title2.bold()).multilineTextAlignment(.center).accessibilityIdentifier("run-report-title")
+            if let now = model.periodHistory(for: model.people.first(where: { $0.id == report.personID }) ?? Person(displayName: "")).first {
+                Text(Loc.f("%lld of %lld sites handled this period", now.handled, now.total)).font(.subheadline.bold()).foregroundStyle(.secondary).accessibilityIdentifier("run-report-period")
+            }
             if report.allSucceeded {
                 Text("Nothing more to do for these. Some sites email a link to confirm; that tap is yours.").font(.callout).multilineTextAlignment(.center)
             } else {
@@ -85,6 +88,9 @@ struct LastRunRow: View {
                         Text(needYou == 0 ? Loc.f("Last run: all %lld sites went through", sent) : Loc.f("Last run: %lld of %lld went through, %lld need you", sent, attempted, needYou))
                             .font(.subheadline.bold()).fixedSize(horizontal: false, vertical: true)
                         Text(Loc.date(date, time: true)).font(.caption).foregroundStyle(.secondary)
+                        if let person = model.selectedPerson, let now = model.periodHistory(for: person).first {
+                            Text(Loc.f("This period: %lld of %lld sites handled", now.handled, now.total)).font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
             }

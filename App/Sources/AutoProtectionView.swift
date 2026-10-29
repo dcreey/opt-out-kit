@@ -95,9 +95,13 @@ struct AutoActivityView: View {
                     if let last = model.autoSettings.lastOptOut {
                         Text("Last run: \(Loc.date(last, time: true))").font(.footnote).foregroundStyle(.secondary)
                     }
+                    if let next = model.autoSettings.nextOptOutDate() {
+                        Text("Next monthly run: \(Loc.date(next))").font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("auto-next-run")
+                    }
                 } header: { Text(person.displayName) } footer: {
                     Text("It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.")
                 }
+                periodSections(for: person)
                 if model.autoSettings.lastAttempted != nil {
                     Section {
                         NavigationLink { RunReviewView(person: person) } label: {
@@ -121,17 +125,6 @@ struct AutoActivityView: View {
                             }
                         }
                     }
-                    DisclosureGroup("Sent (\(sent))") {
-                        ForEach(rows.filter(isSent)) { r in Text(r.domain).font(.footnote) }
-                    }
-                    let other = rows.filter { !isSent($0) && !needsPerson($0) }
-                    if !other.isEmpty {
-                        DisclosureGroup("Skipped or sent recently (\(other.count))") {
-                            ForEach(other) { r in
-                                VStack(alignment: .leading, spacing: 2) { Text(r.domain).font(.footnote); Text(r.result.label).font(.caption).foregroundStyle(.secondary) }
-                            }
-                        }
-                    }
                 } else if !busy {
                     Section { Text("Nothing has run yet for \(person.displayName).").font(.footnote).foregroundStyle(.secondary) }
                 }
@@ -144,6 +137,55 @@ struct AutoActivityView: View {
         }
         .navigationTitle("Automatic opt-out")
         .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
+    }
+
+    /// This period's tally, the checklist of every automatic site (what ran and what did not), and the earlier periods.
+    @ViewBuilder private func periodSections(for person: Person) -> some View {
+        let history = model.periodHistory(for: person)
+        if let now = history.first {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(Loc.f("%lld of %lld sites handled this period", now.handled, now.total)).font(.headline).accessibilityIdentifier("period-summary")
+                    ProgressView(value: Double(now.handled), total: Double(max(now.total, 1))).tint(now.complete ? .green : .accentColor)
+                    Text("\(Loc.date(now.period.start)) to \(Loc.date(now.period.end.addingTimeInterval(-1)))").font(.caption).foregroundStyle(.secondary)
+                    if now.complete { Label("Every site went through this period.", systemImage: "checkmark.seal.fill").font(.footnote).foregroundStyle(.green) }
+                    else { Text(Loc.f("%lld left. A run only does the sites not handled yet in this period.", now.total - now.handled)).font(.footnote).foregroundStyle(.secondary) }
+                }
+            } header: { Text("This period") }
+            let rows = model.periodRows(for: person)
+            let todo = rows.filter { !$0.handled }, done = rows.filter(\.handled)
+            Section {
+                ForEach(todo + done) { r in
+                    if let entry = model.directory.first(where: { $0.id == r.id }) { NavigationLink(value: entry) { periodRow(r) } } else { periodRow(r) }
+                }
+            } header: { Text("Each site") } footer: { Text("A check mark means the request went through this period.") }
+            if history.count > 1 {
+                Section("Earlier periods") {
+                    ForEach(Array(history.dropFirst().enumerated()), id: \.offset) { _, t in
+                        HStack {
+                            Image(systemName: t.complete ? "checkmark.circle.fill" : "circle.lefthalf.filled").foregroundStyle(t.complete ? .green : .orange)
+                            Text("\(Loc.date(t.period.start)) to \(Loc.date(t.period.end.addingTimeInterval(-1)))").font(.footnote)
+                            Spacer()
+                            Text(Loc.f("%lld of %lld", t.handled, t.total)).font(.footnote.bold())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func periodRow(_ r: AppModel.PeriodSiteRow) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: r.handled ? "checkmark.circle.fill" : (r.note != nil ? "exclamationmark.circle.fill" : "circle"))
+                .foregroundStyle(r.handled ? Color.green : (r.note != nil ? Color.orange : Color.secondary))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(r.domain).font(.footnote).foregroundStyle(r.handled ? Color.secondary : Color.primary)
+                if let on = r.handledOn { Text(Loc.f("Sent %@", Loc.date(on))).font(.caption2).foregroundStyle(.secondary) }
+                else if let note = r.note { Text(note).font(.caption2).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true) }
+                else { Text("Not sent yet").font(.caption2).foregroundStyle(.secondary) }
+            }
+        }
+        .accessibilityIdentifier("period-site-\(r.domain)")
     }
 
     private func attentionRow(_ r: AppModel.AutoOptOutRow) -> some View {

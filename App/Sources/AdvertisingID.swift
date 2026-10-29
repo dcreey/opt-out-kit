@@ -11,6 +11,10 @@ enum AdvertisingID {
     /// Asks once (if the person has not been asked), then returns the ID, or nil when permission was refused or ad tracking is off.
     @MainActor
     static func current() async -> String? {
+        #if DEBUG
+        // Simulator work: the simulator has no advertising ID, so `-fake-adid` stands one in (never on a device).
+        if ProcessInfo.processInfo.arguments.contains("-fake-adid") { return "11111111-2222-3333-4444-555555555555" }
+        #endif
         var status = ATTrackingManager.trackingAuthorizationStatus
         if status == .notDetermined { status = await ATTrackingManager.requestTrackingAuthorization() }
         guard status == .authorized else { return nil }

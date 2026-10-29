@@ -49,6 +49,14 @@ public enum FollowUps {
         return history.filter { $0.outcome == "submitted" || $0.outcome == "email_done" }.map(\.date).max()
     }
 
+    /// Sites usually answer within this many days; a request still waiting on its email after that needs a follow-up.
+    public static let overdueDays = 45
+
+    /// Requests that have waited on their email longer than `overdueDays`, oldest first.
+    public static func overdue(_ attempts: [String: [OptOutAttempt]], now: Date = Date(), days: Int = overdueDays) -> [(id: String, since: Date)] {
+        pending(attempts).filter { now.timeIntervalSince($0.since) >= Double(days) * 86_400 }
+    }
+
     /// Entry ids whose request still waits on an email, oldest first.
     public static func pending(_ attempts: [String: [OptOutAttempt]]) -> [(id: String, since: Date)] {
         attempts.compactMap { id, h in

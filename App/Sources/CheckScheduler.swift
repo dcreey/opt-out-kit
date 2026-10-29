@@ -45,7 +45,7 @@ enum CheckScheduler {
         if settings.optOutEnabled {
             let request = BGProcessingTaskRequest(identifier: optOutTaskID)
             request.requiresNetworkConnectivity = true
-            request.earliestBeginDate = (settings.lastOptOut ?? Date()).addingTimeInterval(AutoSettings.optOutEvery)
+            request.earliestBeginDate = settings.nextOptOutDate() ?? Date().addingTimeInterval(AutoSettings.optOutEvery)
             try? BGTaskScheduler.shared.submit(request)
         }
     }
@@ -60,6 +60,22 @@ enum CheckScheduler {
         content.title = "Exnay"
         content.body = parts.joined(separator: ", ").prefix(1).uppercased() + parts.joined(separator: ", ").dropFirst()
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))
+    }
+
+    /// A run was cut off by the app leaving the front: ask iOS to give it time again soon. Best effort; opening the app is what reliably resumes it.
+    static func scheduleResume() {
+        let request = BGProcessingTaskRequest(identifier: optOutTaskID)
+        request.requiresNetworkConnectivity = true
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
+    /// Generic on purpose: no site names on the lock screen.
+    static func notifyPaused() {
+        let content = UNMutableNotificationContent()
+        content.title = "Exnay"
+        content.body = "Your opt-out run is paused. Open Exnay to carry on where it stopped."
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "optout-paused", content: content, trigger: nil))
     }
 
     static func schedule(after seconds: TimeInterval = 6 * 3600) {
@@ -86,5 +102,67 @@ enum CheckScheduler {
         content.body = parts.joined(separator: ", ")
         UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil))
+    }
+}
+
+
+/// Keeps an opt-out run that the person started going while they use another app (iOS 26 and later). The system shows its progress as a Live
+/// Activity and the person can cancel it there. The run itself is the same one the app always does (see `AppModel.runAutoOptOut`); this only
+/// asks iOS for the time. If iOS refuses, or this is an older iOS, the caller falls back to finishing the current site and resuming on reopen.
+@available(iOS 26.0, *)
+@MainActor
+final class ContinuedRun {
+    static let identifier = "dev.optoutkit.app.optout.run"
+    private static var registered = false
+    private static weak var current: ContinuedRun?
+
+    private var task: BGContinuedProcessingTask?
+    private var done = 0, total = 0
+    private var onExpire: () -> Void = {}
+    private var completed = false
+
+    /// True once iOS has accepted the run and handed us its task: only then is it safe to stay running in the background.
+    var isGranted: Bool { task != nil && !completed }
+
+    /// Submits the request. False when iOS would not take it (so the caller uses the fallback).
+    func start(total: Int, onExpire: @escaping () -> Void) -> Bool {
+        self.total = total; self.onExpire = onExpire
+        Self.current = self
+        if !Self.registered {
+            Self.registered = true
+            BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.identifier, using: nil) { task in
+                guard let task = task as? BGContinuedProcessingTask else { return }
+                Task { @MainActor in Self.current?.attach(task) ?? task.setTaskCompleted(success: false) }
+            }
+        }
+        let request = BGContinuedProcessingTaskRequest(identifier: Self.identifier, title: "Opting you out", subtitle: "Starting…")
+        request.strategy = .queue
+        do { try BGTaskScheduler.shared.submit(request); NSLog("ContinuedRun: submitted"); return true }
+        catch { NSLog("ContinuedRun: refused: \(error)"); return false }
+    }
+
+    private func attach(_ task: BGContinuedProcessingTask) {
+        NSLog("ContinuedRun: granted")
+        self.task = task
+        task.expirationHandler = { [weak self] in
+            Task { @MainActor in NSLog("ContinuedRun: expired"); self?.onExpire(); self?.finish(success: false) }
+        }
+        push()
+    }
+
+    func report(done: Int, total: Int) { self.done = done; self.total = total; push() }
+
+    private func push() {
+        guard let task, !completed else { return }
+        task.progress.totalUnitCount = Int64(max(total, 1))
+        task.progress.completedUnitCount = Int64(done)
+        task.updateTitle("Opting you out", subtitle: "\(done) of \(total) sites")
+    }
+
+    func finish(success: Bool) {
+        guard !completed else { return }
+        completed = true
+        task?.setTaskCompleted(success: success)
+        if Self.current === self { Self.current = nil }
     }
 }

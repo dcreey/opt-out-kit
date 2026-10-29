@@ -228,3 +228,33 @@ struct SkippedSitesView: View {
         return Loc.f("%@ · ready to try again", why)
     }
 }
+
+
+/// Requests that have waited on the site's confirmation email past the usual 45 days: finish them, redo them, or write to the site.
+struct FollowUpsView: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        let items = model.overdueFollowUps
+        List {
+            if items.isEmpty { Section { Text("Nothing is waiting on an email.").font(.footnote).foregroundStyle(.secondary) } }
+            ForEach(items, id: \.entry.id) { item in
+                Section {
+                    NavigationLink { DirectoryInfoView(entry: item.entry) } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.entry.domain).font(.headline)
+                            let days = Int(Date().timeIntervalSince(item.since) / 86_400)
+                            Text(Loc.f("Sent %@ (%lld days ago). The confirmation email never came.", item.since.formatted(date: .abbreviated, time: .omitted), days)).font(.caption).foregroundStyle(.orange)
+                        }
+                    }
+                    Button("I finished it") { model.markFollowUpDone(item.entry.id) }.accessibilityIdentifier("followup-done-\(item.entry.domain)")
+                    if let mail = item.entry.contactEmail, let url = DirectoryInfoView.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: item.entry.domain) {
+                        Link(destination: url) { Label("Email them about it", systemImage: "envelope") }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Follow up")
+        .accessibilityIdentifier("followups")
+    }
+}

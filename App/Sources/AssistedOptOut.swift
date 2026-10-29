@@ -20,7 +20,7 @@ protocol AssistedPage: AnyObject {
     /// When the page now shows a different privacy form from the one in use (a modal opened, a next step appeared), switches to it and fills it in. True when it did.
     func adoptNewForm() async -> Bool
     /// Scrolls to an opt-out button that appeared out of view. Nothing in tests.
-    func scrollToOptOut() async
+    func scrollToOptOut() async -> Bool
     /// True when the screen changed since the last ask and has settled. Cheap: the page keeps the flag itself.
     func changed() async -> Bool
     func close()
@@ -30,7 +30,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func scrollToOptOut() async {}; func changed() async -> Bool { false } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false } }
 
 @MainActor
 protocol AssistedDriver {
@@ -194,6 +194,10 @@ final class WebAssistedPage: AssistedPage {
     }
 
     func send() async -> SubmitOutcome {
+        #if DEBUG
+        // Simulator work: `-assisted-no-send` watches a real page without ever pressing its submit button.
+        if ProcessInfo.processInfo.arguments.contains("-assisted-no-send") { return .filledNotSubmitted }
+        #endif
         let before = await session.visibleText()
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
@@ -206,7 +210,7 @@ final class WebAssistedPage: AssistedPage {
 
     func pageText() async -> String { await session.viewportText() }
     func changed() async -> Bool { await session.pageChanged() }
-    func scrollToOptOut() async { _ = await session.scrollToOptOutControl() }
+    func scrollToOptOut() async -> Bool { await session.scrollToOptOutControl() }
 
     func close() { session.close() }
 }
@@ -276,6 +280,7 @@ final class AssistedRunner: ObservableObject {
     private let onResult: (DirectoryEntry, AutoOptOutResult) -> Void
     private var preparing: [Int: Task<AssistedPage?, Never>] = [:]
     private var skipFlag = false
+    private var autoScrolls = 0          // times the page was scrolled to an opt-out button for this site; the person's own scrolling is never fought
     private var nextContinuation: CheckedContinuation<Void, Never>?
     var waitLimit: TimeInterval = 180
     var pollInterval: TimeInterval = 1
@@ -301,7 +306,7 @@ final class AssistedRunner: ObservableObject {
     }
 
     /// Reads what is on screen; true outcome when the new text shows a confirmation, nil when nothing changed or it says nothing of the kind.
-    private func watch(_ page: AssistedPage, baseline: inout String, force: Bool = false) async -> AutoOptOutResult? {
+    private func watch(_ page: AssistedPage, baseline: inout String, force: Bool = false, domChanged: Bool = false) async -> AutoOptOutResult? {
         let now = await page.pageText()
         // A form that opens with an animation may still be collapsed on the first look, so after a change the page is read again a few times even when the text is the same.
         guard !now.isEmpty, now != baseline || force else { return nil }
@@ -309,8 +314,10 @@ final class AssistedRunner: ObservableObject {
         baseline = now
         if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .submitted(awaitingEmail: email) }
         // Nothing confirmed, but the screen changed: a new privacy form may have appeared (a window opened, the next step). Fill it in if so.
-        if await page.adoptNewForm() { notice = Loc.t("A new form appeared and we filled it in. Check it.") }
-        else if FormRun.mentionsOptOutControl(added) { await page.scrollToOptOut() }
+        if await page.adoptNewForm() { notice = Loc.t("A new form appeared and we filled it in. Check it."); NSLog("OOKSCROLL adoptNewForm filled a new form") }
+        // Only a change in the page itself brings the opt-out button into view. The words on screen also change when the person scrolls, and moving the page
+        // under them because the new words mention "opt out" is the page jumping about; so at most twice per site, and never for a scroll.
+        else if domChanged, autoScrolls < 2, FormRun.mentionsOptOutControl(added) { if await page.scrollToOptOut() { autoScrolls += 1 } }
         return nil
     }
 
@@ -383,7 +390,7 @@ final class AssistedRunner: ObservableObject {
 
     func run() async {
         for i in items.indices {
-            index = i; phase = .loading; skipFlag = false; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            index = i; phase = .loading; skipFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if let search = items[i].searchURL {
                 let (listing, early) = await chooseListing(items[i], search: search)
                 if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); continue }
@@ -422,7 +429,7 @@ final class AssistedRunner: ObservableObject {
                     let force = rescans > 0; if force { rescans -= 1 }
                     if moved || force || sinceWatch >= watchInterval {
                         sinceWatch = 0
-                        if let hit = await watch(ready, baseline: &baseline, force: force) {
+                        if let hit = await watch(ready, baseline: &baseline, force: force, domChanged: moved) {
                             outcome = hit
                             if case .submitted(let email) = hit { phase = .sent(awaitingEmail: email) }
                             break
@@ -453,7 +460,7 @@ final class AssistedRunner: ObservableObject {
                             let force = self.rescans > 0; if force { self.rescans -= 1 }
                             guard moved || force || idle >= self.watchInterval else { continue }
                             idle = 0
-                            if let hit = await self.watch(ready, baseline: &watched, force: force) {
+                            if let hit = await self.watch(ready, baseline: &watched, force: force, domChanged: moved) {
                                 self.markedDone = hit
                                 if case .submitted(let email) = hit { self.phase = .sent(awaitingEmail: email) }
                                 self.resumeNext(); return
@@ -505,6 +512,9 @@ struct AssistedOptOutView: View {
     @State private var showSent = false
     @State private var composing: EmailBatch?
     @State private var confirmEmailSent: EmailBatch?
+    /// A message opened in another mail app: asked about when the person is back in this app (not while the offer is still on screen).
+    @State private var awaitingMailReturn: EmailBatch?
+    @Environment(\.scenePhase) private var scenePhase
     @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
 
@@ -534,6 +544,9 @@ struct AssistedOptOutView: View {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
         } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done.") }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active, let b = awaitingMailReturn { awaitingMailReturn = nil; confirmEmailSent = b }
+        }
         .alert("Did you send it?", isPresented: Binding(get: { confirmEmailSent != nil }, set: { if !$0 { confirmEmailSent = nil } })) {
             Button("Yes, I sent it") {
                 if let b = confirmEmailSent { model.markEmailed(b); if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() } }
@@ -573,7 +586,7 @@ struct AssistedOptOutView: View {
         if model.composesInApp { composing = batch }
         else {
             // Another mail app cannot tell us whether the message was sent, so we ask when the person comes back.
-            if let url = model.composeURL(for: batch, app: model.mailApp) { UIApplication.shared.open(url); confirmEmailSent = batch }
+            if let url = model.composeURL(for: batch, app: model.mailApp) { awaitingMailReturn = batch; UIApplication.shared.open(url) }
             else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
         }
     }
@@ -594,6 +607,7 @@ struct AssistedOptOutView: View {
                                     web.reload()
                                     Task { try? await Task.sleep(nanoseconds: 3_500_000_000); await runner.page?.refill() }
                                 } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("assisted-refresh")
+                                Button { Task { await runner.page?.refill() } } label: { Label("Fill the form again", systemImage: "square.and.pencil") }.accessibilityIdentifier("assisted-fill-again")
                             }
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")

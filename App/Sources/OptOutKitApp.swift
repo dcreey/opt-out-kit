@@ -16,6 +16,8 @@ struct OptOutKitApp: App {
                 .task { CheckScheduler.register(model: model) }
         }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .background { model.appDidEnterBackground() }
+            if phase == .active { model.appDidBecomeActive() }
             guard phase == .active, !ProcessInfo.processInfo.arguments.contains("-uitest-reset") else { return }
             Task { await model.runDueChecks(); await model.runDueAutomation() }
             CheckScheduler.schedule()
@@ -56,7 +58,16 @@ final class AppModel: ObservableObject {
     @Published private(set) var isChecking = false
     /// Last automatic opt-out run per person, in memory. What was actually sent is also saved in each person's progress.
     @Published private(set) var optOutRun: [UUID: [AutoOptOutRow]] = [:]
-    @Published private(set) var autoBusy: String?
+    @Published private(set) var autoBusy: String? {
+        // A run only goes on while the app is in front, so the screen is kept awake for it.
+        didSet { UIApplication.shared.isIdleTimerDisabled = autoBusy != nil }
+    }
+    /// Set when the app is about to be suspended: the run stops after the site it is on, and carries on the next time the app is open.
+    private(set) var autoStopRequested = false
+    private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    /// iOS 26+: the system-sanctioned background run for the current opt-out run (a `ContinuedRun`), when iOS accepted it.
+    private var continuedRun: Any?
+    private var continuedGranted: Bool { if #available(iOS 26.0, *) { return (continuedRun as? ContinuedRun)?.isGranted ?? false } else { return false } }
     /// While the weekly opt-out is running: how many sites it has been through, of how many.
     @Published private(set) var autoProgress: (done: Int, total: Int)?
     /// Set when an opt-out run finishes, so the result is shown right away: all sent, or which sites need the person.
@@ -204,6 +215,8 @@ final class AppModel: ObservableObject {
     /// For looking at the result screens: runs the automatic opt-out against the fake submitter at launch.
     func runDemoOptOut() async {
         guard let me = people.first(where: { $0.relationship == .me }) else { return }
+        // `-continued-demo`: the real run path (so the iOS 26 background run is requested), with the fake submitter, a pause per site.
+        if ProcessInfo.processInfo.arguments.contains("-continued-demo") { await runAutoOptOut(for: me); return }
         await runAutoOptOut(for: me, submitter: FakeSubmitter())
     }
     #endif
@@ -577,6 +590,114 @@ final class AppModel: ObservableObject {
         return WebFormSubmitter(person: person, advertisingID: advertisingID)
     }
 
+    /// A real opt-out run begins: written down as in progress (so a cut-off run is carried on at the next launch), the screen kept awake, and on iOS 26 the
+    /// system asked to keep it going while the person uses another app.
+    private func beginOptOutRun(total: Int, useContinued: Bool) {
+        autoBusy = "optout"; autoStopRequested = false
+        // Periods (months) are counted from the first run; an earlier send by hand counts as the start so nothing already done is lost from the tally.
+        let earliest = people.compactMap { household.progress(for: $0.id).optOutAttempts.values.flatMap { $0 }.filter(\.wasSubmitted).map(\.date).min() }.min()
+        if household.autoSettings.periodAnchor == nil { household.updateAuto { $0.periodAnchor = min(earliest ?? Date(), Date()) } }
+        household.updateAuto { $0.optOutResumePending = true }; save()
+        if #available(iOS 26.0, *), useContinued {
+            let run = ContinuedRun()
+            if run.start(total: max(total, 1), onExpire: { [weak self] in
+                // iOS ended the background run: stop after this site (it resumes on reopen), and say so.
+                self?.autoStopRequested = true; CheckScheduler.notifyPaused()
+            }) { continuedRun = run }
+        }
+    }
+
+    /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
+    private func endOptOutRun(interrupted: Bool) {
+        autoBusy = nil; autoProgress = nil
+        if !interrupted { household.updateAuto { $0.optOutResumePending = nil } }
+        if #available(iOS 26.0, *) { (continuedRun as? ContinuedRun)?.finish(success: !interrupted) }
+        continuedRun = nil
+        save(); endBackgroundTime()
+    }
+
+    // MARK: Run periods
+
+    /// The current period of the automatic run (a month when it runs monthly), once a first run has set its start.
+    func runPeriod(now: Date = Date()) -> RunPeriod? {
+        autoSettings.periodAnchor.map { RunPeriod.containing(now, anchor: $0) }
+    }
+
+    /// The sites the automatic run handles for a person, in name order.
+    /// The sites the automatic run handles for a person this period, in name order: those it handles now, and those it took on earlier in the
+    /// period that have since moved to another group because they did not go through (they stay on the list, unchecked).
+    func automaticSites(for person: Person, now: Date = Date()) -> [DirectoryEntry] {
+        let domains = automaticDomains(for: person)
+        let kept = Set(autoSettings.periodTargetIDs(person: person.id.uuidString))
+        return directory.filter { domains.contains($0.domain) || kept.contains($0.id) }.sorted { $0.domain < $1.domain }
+    }
+
+    /// How many automatic sites went through this period, and every earlier period back to the first run (current first).
+    func periodHistory(for person: Person, now: Date = Date()) -> [PeriodTally] {
+        guard let anchor = autoSettings.periodAnchor else { return [] }
+        return RunPeriods.history(anchor: anchor, now: now, siteIDs: automaticSites(for: person).map(\.id), attempts: household.progress(for: person.id).optOutAttempts)
+    }
+
+    /// One automatic site's standing in the current period, for the status page's checklist.
+    struct PeriodSiteRow: Identifiable, Equatable {
+        let id: String
+        let domain: String
+        let handledOn: Date?          // when it went through in this period; nil when it has not
+        let note: String?             // why not, from the latest attempt that did not go through
+        var handled: Bool { handledOn != nil }
+    }
+
+    func periodRows(for person: Person, now: Date = Date()) -> [PeriodSiteRow] {
+        let attempts = household.progress(for: person.id).optOutAttempts
+        let period = runPeriod(now: now)
+        return automaticSites(for: person).map { e in
+            let list = attempts[e.id] ?? []
+            let sentOn = period.flatMap { p in list.filter { $0.wasSubmitted && p.contains($0.date) }.map(\.date).max() }
+            var note: String?
+            if sentOn == nil, let last = list.filter({ !$0.wasSubmitted && $0.outcome != "emailed" && (period?.contains($0.date) ?? true) }).max(by: { $0.date < $1.date }) {
+                note = AppModel.ReviewItem(id: e.id, domain: e.domain, outcome: last.outcome, detail: last.detail, date: last.date, hasScreenshot: false).label
+            }
+            return PeriodSiteRow(id: e.id, domain: e.domain, handledOn: sentOn, note: note)
+        }
+    }
+
+    /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
+    func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, for personID: UUID, dryRun: Bool) {
+        guard !dryRun else { return }
+        if let attempt = AutoOptOut.attempt(for: result, now: Date()) { household.mutateProgress(for: personID) { $0.recordOptOutAttempt(attempt, site: entry.id) } }
+        var rows = optOutRun[personID] ?? []
+        rows.removeAll { $0.id == entry.id }
+        rows.append(AutoOptOutRow(id: entry.id, domain: entry.domain, result: result))
+        optOutRun[personID] = rows
+        save()
+    }
+
+    /// The app left the front: ask iOS for the extra time it gives (about 30 seconds) to finish the site in progress, then stop between sites.
+    func appDidEnterBackground() {
+        guard autoBusy == "optout", backgroundTask == .invalid else { return }
+        // iOS 26 gave the run its own background time (shown as a Live Activity): carry on, the expiry handler stops it if iOS takes the time back.
+        if continuedGranted { return }
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "optout-finish-site") { [weak self] in
+            Task { @MainActor in self?.autoStopRequested = true; CheckScheduler.notifyPaused(); self?.endBackgroundTime() }
+        }
+        // Stop after the current site instead of starting another one that iOS would freeze half-way.
+        autoStopRequested = true
+        NSLog("OptOutRun: background, finishing the current site then stopping")
+        CheckScheduler.scheduleResume()
+    }
+
+    /// Back in front: if the run was asked to stop, the next due-check (below) carries on with the sites left.
+    func appDidBecomeActive() {
+        endBackgroundTime()
+        // A quick glance away: the run was only asked to stop, so let it go on.
+        if autoBusy == "optout" { autoStopRequested = false }
+    }
+
+    func endBackgroundTime() {
+        guard backgroundTask != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTask); backgroundTask = .invalid
+    }
+
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
     func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
@@ -589,19 +710,29 @@ final class AppModel: ObservableObject {
         if let i = args.firstIndex(of: "-only-domains"), args.indices.contains(i + 1) { runnable = Set(args[i + 1].split(separator: ",").map(String.init)) }
         #endif
         let ownsBusy = autoBusy == nil && !dryRun
-        if ownsBusy { autoBusy = "optout" }
-        defer { if ownsBusy { autoBusy = nil; autoProgress = nil } }
+        if ownsBusy { beginOptOutRun(total: runnable?.count ?? directory.count, useContinued: submitter == nil) }
+        var interrupted = false
+        defer { if ownsBusy { endOptOutRun(interrupted: interrupted) } }
         // Only when a form in this run asks for the phone's advertising ID is the person asked (once) for permission to read it.
         var adID: String?
         if submitter == nil, AdvertisingID.isAsked(by: directory.filter { runnable?.contains($0.domain) ?? true }) { adID = await AdvertisingID.current() }
+        // The sites this run takes on are remembered for the period, so a site that fails (and so leaves the automatic group) still counts in "of N".
+        if !dryRun, let runnable {
+            let ids = directory.filter { runnable.contains($0.domain) }.map(\.id)
+            household.updateAuto { $0.addPeriodTargets(ids, person: person.id.uuidString) }
+        }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
-                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total) } },
+                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total); if #available(iOS 26.0, *) { (self.continuedRun as? ContinuedRun)?.report(done: done, total: total) } } },
                                    evidence: { [evidence, personID = original.id] entry, shot in
                                        try? evidence.save(shot, person: personID, site: entry.id)
                                        Self.exportForReview(entry.domain, shot)
-                                   })
+                                   },
+                                   period: runPeriod(now: now),
+                                   onResult: { [weak self] entry, result in await self?.recordAutoResult(entry, result, for: person.id, dryRun: dryRun) },
+                                   shouldStop: { [weak self] in await self?.autoStopRequested ?? true })
+        interrupted = autoStopRequested && !dryRun
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -610,18 +741,15 @@ final class AppModel: ObservableObject {
                 if let original = directory.first(where: { $0.id == entry.id }), await healLink(for: original, inspector: inspector) != nil { retry.append(resolved(original)) }
             }
             if !retry.isEmpty {
-                let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false)
+                let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false, period: runPeriod(now: now),
+                                             onResult: { [weak self] entry, result in await self?.recordAutoResult(entry, result, for: person.id, dryRun: false) })
                 for (entry, result) in again { if let i = results.firstIndex(where: { $0.0.id == entry.id }) { results[i] = (entry, result) } }
             }
         }
-        household.mutateProgress(for: person.id) { p in
-            for (entry, result) in results {
-                if let attempt = AutoOptOut.attempt(for: result, now: now) { p.recordOptOutAttempt(attempt, site: entry.id) }
-            }
-        }
+        NSLog("OptOutRun: run returned %d results, interrupted=%d", results.count, interrupted ? 1 : 0)
         optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
         Self.exportResults(results.map { ($0.0.domain, $0.1.label) })
-        if !dryRun {
+        if !dryRun, !interrupted {
             let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [], personID: original.id)
             household.updateAuto {
                 $0.lastOptOut = now
@@ -630,7 +758,7 @@ final class AppModel: ObservableObject {
             if report.attempted > 0 { runReport = report }
         }
         save()
-        if !dryRun { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
+        if !dryRun, !interrupted { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
     }
 
@@ -746,6 +874,13 @@ final class AppModel: ObservableObject {
     /// The first time the person has sent anything, once: why the day ends with an email and what to expect in the inbox.
     var shouldExplainFollowUp: Bool { !defaults.bool(forKey: Self.followUpKey) && activitySummary.sites > 0 }
     func markFollowUpExplained() { defaults.set(true, forKey: Self.followUpKey) }
+
+    /// Requests that have waited on the site's confirmation email longer than sites usually take (45 days), oldest first.
+    var overdueFollowUps: [(entry: DirectoryEntry, since: Date)] {
+        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        return FollowUps.overdue(progress.optOutAttempts).compactMap { p in byID[p.id].map { ($0, p.since) } }
+    }
+    var overdueFollowUpCount: Int { FollowUps.overdue(progress.optOutAttempts).count }
 
     func markDailySummaryShown() { defaults.set(Self.dayString(Date()), forKey: Self.summaryDayKey) }
 
@@ -944,6 +1079,19 @@ final class AppModel: ObservableObject {
         save()
     }
 
+    /// The person says a site is done (they did it another way, or a confirmation was missed). Counts like any request that went through.
+    func markSiteDone(_ site: String) {
+        household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(OptOutAttempt(date: Date(), outcome: "submitted", detail: AppModel.markedByHand), site: site) }
+        save()
+    }
+    /// Takes back a "done" the person set by hand (not one the app sent).
+    func unmarkSiteDone(_ site: String) {
+        household.mutateProgress(for: selectedID) { $0.optOutAttempts[site]?.removeAll { $0.detail == AppModel.markedByHand } }
+        save()
+    }
+    static let markedByHand = "marked done by you"
+    func wasMarkedByHand(_ site: String) -> Bool { progress.optOutAttempts[site]?.last?.detail == AppModel.markedByHand }
+
     // MARK: Skipped sites
 
     /// Sets a site aside: it leaves today's batch (the next site takes its place) and comes back after a week with a reminder. Skipping it a
@@ -1121,10 +1269,12 @@ final class AppModel: ObservableObject {
             save()
             autoBusy = nil
         }
-        if household.autoSettings.optOutDue(now: now) {
-            autoBusy = "optout"
+        // Due on schedule, or a run that was cut off (the app was closed or suspended) and still has sites left.
+        if household.autoSettings.optOutDue(now: now) || household.autoSettings.optOutResumePending == true {
+            NSLog("OptOutRun: resuming a run that was cut off (pending=%d)", household.autoSettings.optOutResumePending == true ? 1 : 0)
+            beginOptOutRun(total: directory.count, useContinued: true)
             for person in people where isReady(person) { await runAutoOptOut(for: person) }
-            autoBusy = nil
+            endOptOutRun(interrupted: autoStopRequested)
         }
         CheckScheduler.scheduleAutomation(autoSettings)
     }
@@ -1302,6 +1452,8 @@ struct FakeScanFetcher: PageFetcher {
 struct FakeSubmitter: FormSubmitter {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         if dryRun { return .filledNotSubmitted }
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-fake-submit-delay"), args.indices.contains(i + 1), let secs = Double(args[i + 1]) { try? await Task.sleep(nanoseconds: UInt64(secs * 1_000_000_000)) }
         return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a bot check")
     }
 

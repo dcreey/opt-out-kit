@@ -10,12 +10,15 @@ private final class ScriptedGuidedPage: GuidedPage {
     var blockerScript: [[AssistedBlocker]] = [[]]
     var sendOutcomes: [SubmitOutcome] = [.submitted(awaitingEmail: false)]
     var fillCount = 1
+    var scanCount = 1
+    private(set) var scans = 0
     private(set) var loaded: [URL] = [], fills = 0, sends = 0, polls = 0, closed = false
     var webView: WKWebView? { nil }
     func load(_ url: URL) async { loaded.append(url); self.url = url }
     func currentURL() -> URL? { url }
     func visibleText() async -> String { text }
     func fill(_ values: [FieldValue]) async -> Int { fills += 1; return fillCount }
+    func scanAndFill(person: Person) async -> Int { scans += 1; return scanCount }
     func blockers() async -> [AssistedBlocker] { defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
     func send(_ values: [FieldValue]) async -> SubmitOutcome { defer { sends += 1 }; return sendOutcomes[min(sends, sendOutcomes.count - 1)] }
     func close() { closed = true }
@@ -48,6 +51,36 @@ final class GuidedRunnerTests: XCTestCase {
     private func settle(_ r: GuidedRunner, until check: () -> Bool, seconds: Double = 3) async {
         let deadline = Date().addingTimeInterval(seconds)
         while !check(), Date() < deadline { try? await Task.sleep(nanoseconds: 10_000_000) }
+    }
+
+    private func manualPlan() -> GuidedPlan {
+        GuidedPlanner.plan(for: DirectoryEntry(id: "m", domain: "manual.example", name: "m", bucket: "direct", tier: .B, automation: .guided, signals: []))
+    }
+
+    func testASiteWithNoKnownFormIsScannedAndFilledOnceAndAgainOnRequest() async {
+        let page = ScriptedGuidedPage(), log = Log()
+        let r = runner(manualPlan(), page: page, log: log)
+        let task = Task { await r.run() }
+        await settle(r) { r.flow.index >= 2 }
+        XCTAssertEqual(page.scans, 1, "the page is scanned for the form and filled")
+        XCTAssertEqual(page.fills, 0, "there were no known fields to fill")
+        XCTAssertEqual(r.flow.index, 2, "filled: the person checks and submits next")
+        r.fillAgain()
+        await settle(r) { page.scans >= 2 }
+        XCTAssertEqual(page.scans, 2, "the menu button tries the scan again, at any step")
+        r.cancel(); await task.value
+    }
+
+    func testAScanThatFindsNoFormIsNotRepeatedEveryTickAndLeavesNextToThePerson() async {
+        let page = ScriptedGuidedPage(), log = Log()
+        page.scanCount = 0
+        let r = runner(manualPlan(), page: page, log: log)
+        let task = Task { await r.run() }
+        await settle(r, until: { page.scans >= 1 })
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(page.scans, 1, "one scan per page, not one per poll")
+        XCTAssertEqual(r.flow.index, 1)
+        r.cancel(); await task.value
     }
 
     func testLoadingThePageFinishesTheOpenStepAndTheCountIsShown() async {

@@ -91,14 +91,17 @@ public struct AutoOptOut: Sendable {
 
     /// Decides what to do for one site without touching the network. Nil means "go ahead and submit" with this plan.
     public static func precheck(entry: DirectoryEntry, person: Person, progress: Progress, now: Date,
-                                minInterval: TimeInterval = defaultMinInterval, hold: PlatformHold? = nil) -> (result: AutoOptOutResult?, plan: FillPlan?) {
+                                minInterval: TimeInterval = defaultMinInterval, hold: PlatformHold? = nil,
+                                period: RunPeriod? = nil) -> (result: AutoOptOutResult?, plan: FillPlan?) {
         guard let form = entry.optOutForm else { return (.needsYou(L10n.t("No opt-out form found for this site yet.")), nil) }
         if let hold, now < hold.until { return (.coveredByPlatform(name: hold.name, until: hold.until), nil) }
         if let issue = progress.activeIssue(for: entry.id, now: now) {
             return (.needsYou(L10n.f("You reported this site as not working (%@).", issue.kind.label.lowercased())), nil)
         }
-        if let last = progress.optOutAttempts[entry.id]?.filter(\.wasSubmitted).map(\.date).max(), now.timeIntervalSince(last) < minInterval {
-            return (.tooSoon(until: last.addingTimeInterval(minInterval)), nil)
+        if let last = progress.optOutAttempts[entry.id]?.filter(\.wasSubmitted).map(\.date).max() {
+            // Inside a run period, a site that already went through in it is handled: every run in the period leaves it alone, and the next period starts afresh.
+            if let period { if period.contains(last) { return (.tooSoon(until: period.end), nil) } }
+            else if now.timeIntervalSince(last) < minInterval { return (.tooSoon(until: last.addingTimeInterval(minInterval)), nil) }
         }
         // Do not hand details to a site a recent look says does not hold them.
         if let look = progress.latestSiteCheck(entry.id), look.result == .removed, now.timeIntervalSince(look.date) < 30 * 86_400 {
@@ -116,7 +119,10 @@ public struct AutoOptOut: Sendable {
     /// Runs the opt-out for every site with a form, one at a time. `dryRun` fills forms but never sends them.
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
                     holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
-                    evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
+                    evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil,
+                    period: RunPeriod? = nil,
+                    onResult: (@Sendable (DirectoryEntry, AutoOptOutResult) async -> Void)? = nil,
+                    shouldStop: (@Sendable () async -> Bool)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         // Forms read from the page, and forms found on the live page (a stand-in form carries the page; the live run decides what is filled).
         func standIn(_ e: DirectoryEntry) -> DirectoryEntry {
             guard e.optOutForm == nil, let page = e.liveForm?.page.flatMap(URL.init(string:)), e.liveForm?.found == true else { return e }
@@ -127,13 +133,16 @@ public struct AutoOptOut: Sendable {
         // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture.
         var sent: [String: (AutoOptOutResult, Data?)] = [:]
         for (i, entry) in targets.enumerated() {
-            let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id])
-            if let result = pre.result { out.append((entry, result)) }
+            // The app is about to be suspended or closed: stop between sites, so what is done is kept and the rest waits for the next run.
+            if await shouldStop?() == true { break }
+            let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id], period: period)
+            if let result = pre.result { out.append((entry, result)); await onResult?(entry, result) }
             else if let plan = pre.plan, let form = entry.optOutForm {
                 let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
                 if let again = sent[key] {
                     out.append((entry, again.0))
                     if let shot = again.1, !dryRun { evidence?(entry, shot) }
+                    await onResult?(entry, again.0)
                     progressCallback?(i + 1, targets.count)
                     continue
                 }
@@ -142,6 +151,7 @@ public struct AutoOptOut: Sendable {
                 let result = Self.result(for: report.outcome)
                 sent[key] = (result, report.screenshot)
                 out.append((entry, result))
+                await onResult?(entry, result)          // kept right away: closing the app now must not lose a request that was already sent
                 if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
             }
             progressCallback?(i + 1, targets.count)
@@ -163,6 +173,8 @@ public struct AutoOptOut: Sendable {
     public static func attempt(for result: AutoOptOutResult, now: Date) -> OptOutAttempt? {
         switch result {
         case .submitted(let email): return OptOutAttempt(date: now, outcome: email ? "submitted_email" : "submitted")
+        // The form did not go through and the person emailed the site instead: the request was made, so the site counts as done.
+        case .emailed: return OptOutAttempt(date: now, outcome: "submitted", detail: "sent by email instead")
         case .challenged(let why): return OptOutAttempt(date: now, outcome: "challenged", detail: why)
         case .rejected(let why): return OptOutAttempt(date: now, outcome: "rejected", detail: why)
         case .failed(let why): return OptOutAttempt(date: now, outcome: "failed", detail: why)
@@ -186,6 +198,13 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var lastAttempted: Int?          // sites it actually tried
     public var lastSent: Int?
     public var lastNeedYou: Int?
+    /// An opt-out run was started and has not finished (the app was closed or suspended): the next time the app is open it carries on with the sites left.
+    public var optOutResumePending: Bool?
+    /// When the first opt-out run started: periods (months) are counted from here, so each month's tally is comparable.
+    public var periodAnchor: Date?
+    /// The sites the automatic run has taken on, per person. A site that fails moves out of the automatic group, but it stays here, so the
+    /// "handled of total" and the checklist keep showing it (unchecked) in every period until it goes through.
+    public var periodTargets: [String: [String]]?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
     public static let optOutEvery: TimeInterval = 30 * 86_400     // monthly
@@ -193,7 +212,24 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public init() {}
 
     public func scanDue(now: Date) -> Bool { scanEnabled && (lastScan.map { now.timeIntervalSince($0) >= Self.scanEvery } ?? true) }
-    public func optOutDue(now: Date) -> Bool { optOutEnabled && (lastOptOut.map { now.timeIntervalSince($0) >= Self.optOutEvery } ?? true) }
+    public func optOutDue(now: Date) -> Bool {
+        guard optOutEnabled else { return false }
+        guard let last = lastOptOut else { return true }
+        // Due once a new period has begun that no run has been in yet.
+        if let periodAnchor { return last < RunPeriod.containing(now, anchor: periodAnchor).start }
+        return now.timeIntervalSince(last) >= Self.optOutEvery
+    }
+    public mutating func addPeriodTargets(_ ids: [String], person: String) {
+        var all = periodTargets?[person] ?? []
+        for id in ids where !all.contains(id) { all.append(id) }
+        var map = periodTargets ?? [:]; map[person] = all; periodTargets = map
+    }
+    public func periodTargetIDs(person: String) -> [String] { periodTargets?[person] ?? [] }
+    /// The next period's start: when the next monthly run is due.
+    public func nextOptOutDate(now: Date = Date()) -> Date? {
+        guard let periodAnchor else { return lastOptOut?.addingTimeInterval(Self.optOutEvery) }
+        return RunPeriod.containing(now, anchor: periodAnchor).end
+    }
     public var hasDecided: Bool { decidedAt != nil }
 
     /// Turns both on at the person's first-run approval. Either can be switched off later.

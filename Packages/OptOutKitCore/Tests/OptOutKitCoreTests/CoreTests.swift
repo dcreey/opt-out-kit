@@ -1349,6 +1349,7 @@ final class GuidedFlowTests: XCTestCase {
         XCTAssertTrue(p.addsEmailStepAfterSend)
         let plain = DirectoryEntry(id: "y", domain: "y.example", name: "y.example", bucket: "direct", tier: .C, automation: .guided)
         XCTAssertEqual(GuidedPlanner.plan(for: plain).steps.count, 4, "no form found: manual steps, with a stated total")
+        XCTAssertTrue(GuidedPlanner.plan(for: plain).steps.contains { $0.action == .autofill }, "no known form: the app still scans the page and fills it in")
     }
 
     func testReportedProblemsHideASiteForAWhileThenReturn() {
@@ -2598,7 +2599,7 @@ final class DailyGoalsTests: XCTestCase {
         return e
     }
 
-    func testTodayIsTheNext25SitesAndTheirEmailsAndAnEarlierDayIsLeftBehind() {
+    func testTodayIsTheNext25SitesAndAnEarlierDayIsLeftBehind() {
         let entries = (0..<60).map { site($0) }
         let queue = entries.map(\.domain)
         let cal = Calendar(identifier: .gregorian)
@@ -2606,7 +2607,6 @@ final class DailyGoalsTests: XCTestCase {
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
         XCTAssertEqual(g.verify.count, 25)
         XCTAssertEqual(g.verify.first, "s0.com")
-        XCTAssertEqual(g.email?.domains.count, 25)
         XCTAssertEqual(g.verifyDone, 0); XCTAssertFalse(g.allComplete)
 
         // Ten finished today stay in today's list and count.
@@ -2621,26 +2621,16 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertEqual(g.verify.first, "s10.com"); XCTAssertEqual(g.verifyDone, 0)
     }
 
-    func testEmailingTheBatchCompletesTheSecondGoalAndAnotherBatchAddsTwentyFiveMore() {
+    func testFinishingTheBatchCompletesTheGoalAndAnotherBatchAddsTwentyFiveMore() {
         let entries = (0..<60).map { site($0) }
         let queue = entries.map(\.domain), now = Date(), cal = Calendar(identifier: .gregorian)
         var attempts: [String: [OptOutAttempt]] = [:]
         for i in 0..<25 { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted"), OptOutAttempt(date: now, outcome: "emailed")] }
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
-        XCTAssertTrue(g.verifyComplete && g.emailComplete && g.allComplete)
+        XCTAssertTrue(g.verifyComplete && g.allComplete)
         g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, batches: 2, calendar: cal)
         XCTAssertEqual(g.verify.count, 50); XCTAssertFalse(g.allComplete)
         XCTAssertEqual(DailyGoals.daysLeft(remaining: 700), 28)
-    }
-
-    func testEverythingFinishedTodayIsEmailedEvenWhenItIsNotInTheListedBatch() {
-        let entries = (0..<40).map { site($0) }
-        let queue = Array(entries.prefix(30).map(\.domain)), now = Date(), cal = Calendar(identifier: .gregorian)
-        let attempts = ["s35": [OptOutAttempt(date: now, outcome: "submitted")]]          // done by the automatic run, not in the queue
-        let g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
-        XCTAssertEqual(g.verify.count, 25)
-        XCTAssertEqual(g.email?.domains.count, 26, "the batch plus the site done another way")
-        XCTAssertTrue(g.email?.domains.contains("s35.com") ?? false)
     }
 
     func testEachBatchIsOneKindOfBrokerAndAnotherBatchTakesTheNextKind() {
@@ -2680,10 +2670,10 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertEqual(none.themes, ["people_search"])
     }
 
-    func testASiteWithNoEmailAddressStillCountsForTheFirstGoal() {
+    func testASiteWithNoEmailAddressStillCountsForTheGoal() {
         let entries = [site(0, email: false), site(1)]
         let g = DailyGoals.build(queue: entries.map(\.domain), entries: entries, attempts: [:])
-        XCTAssertEqual(g.verify.count, 2); XCTAssertEqual(g.email?.domains, ["s1.com"])
+        XCTAssertEqual(g.verify.count, 2)
     }
 }
 
@@ -3071,6 +3061,38 @@ final class LiveFormAutomaticTests: XCTestCase {
     }
 }
 
+final class InterruptedRunTests: XCTestCase {
+    private struct Sender: FormSubmitter {
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+    }
+    private actor Box { var seen: [String] = []; var stop = false
+        func add(_ d: String) { seen.append(d); if seen.count == 2 { stop = true } }
+        func shouldStop() -> Bool { stop } }
+    private func site(_ i: Int) -> DirectoryEntry {
+        var e = DirectoryEntry(id: "s\(i)", domain: "s\(i).com", name: "s\(i)", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.liveForm = LiveFormCheck(checked: "2026-10-26", found: true, page: "https://s\(i).com/optout", blockers: [])
+        return e
+    }
+    private let person = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main", city: "X", state: "IL", zip: "60601")], emails: ["pat@example.com"])
+
+    func testEachSiteIsReportedAsSoonAsItIsDoneAndAStopLeavesTheRestForTheNextRun() async {
+        let entries = (0..<5).map(site)
+        let box = Box()
+        let engine = AutoOptOut(submitter: Sender(), minInterval: 30 * 86_400, spacing: 0)
+        var progress = Progress()
+        let first = await engine.run(entries: entries, person: person, progress: progress,
+                                     onResult: { e, _ in await box.add(e.domain) }, shouldStop: { await box.shouldStop() })
+        XCTAssertEqual(first.count, 2, "stopped between sites after two")
+        let seen = await box.seen
+        XCTAssertEqual(seen, ["s0.com", "s1.com"], "each result was handed over the moment it was done")
+        // What was recorded is not sent again; the next run does only the sites left.
+        for (e, r) in first { if let a = AutoOptOut.attempt(for: r, now: Date()) { progress.recordOptOutAttempt(a, site: e.id) } }
+        let second = await engine.run(entries: entries, person: person, progress: progress)
+        let sent = second.filter { if case .submitted = $0.1 { return true } else { return false } }.map { $0.0.domain }
+        XCTAssertEqual(sent, ["s2.com", "s3.com", "s4.com"])
+    }
+}
+
 final class SkippedSitesTests: XCTestCase {
     private func site(_ i: Int) -> DirectoryEntry {
         DirectoryEntry(id: "s\(i)", domain: "s\(i).com", name: "s\(i)", bucket: "direct", tier: .B, automation: .guided, signals: [])
@@ -3127,5 +3149,92 @@ final class SkippedSitesTests: XCTestCase {
         json["siteSkips"] = nil
         let back = try JSONDecoder().decode(Progress.self, from: JSONSerialization.data(withJSONObject: json))
         XCTAssertTrue(back.siteSkips.isEmpty)
+    }
+}
+
+final class RunPeriodTests: XCTestCase {
+    private let day: TimeInterval = 86_400
+    private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+    private func sent(_ d: Date) -> OptOutAttempt { OptOutAttempt(date: d, outcome: "submitted") }
+
+    func testPeriodsRunBackToBackFromTheFirstRun() {
+        let p0 = RunPeriod.containing(t0.addingTimeInterval(5 * day), anchor: t0)
+        XCTAssertEqual(p0.start, t0); XCTAssertEqual(p0.end, t0.addingTimeInterval(30 * day))
+        let p1 = RunPeriod.containing(t0.addingTimeInterval(31 * day), anchor: t0)
+        XCTAssertEqual(p1.start, t0.addingTimeInterval(30 * day))
+        XCTAssertEqual(p1.previous(), p0)
+    }
+
+    func testTheTallyCountsSitesSentInThePeriodAndHistoryKeepsEachMonth() {
+        let attempts: [String: [OptOutAttempt]] = [
+            "a": [sent(t0.addingTimeInterval(2 * day)), sent(t0.addingTimeInterval(33 * day))],
+            "b": [sent(t0.addingTimeInterval(3 * day))],
+            "c": [OptOutAttempt(date: t0.addingTimeInterval(4 * day), outcome: "failed", detail: "x")],
+        ]
+        let now = t0.addingTimeInterval(35 * day)
+        let h = RunPeriods.history(anchor: t0, now: now, siteIDs: ["a", "b", "c"], attempts: attempts)
+        XCTAssertEqual(h.count, 2)
+        XCTAssertEqual(h[0].handled, 1, "this month only a was sent")
+        XCTAssertEqual(h[1].handled, 2, "last month a and b were sent; a failure is not a success")
+        XCTAssertEqual(h[0].total, 3)
+        XCTAssertFalse(h[1].complete)
+    }
+
+    func testARunInThePeriodOnlyDoesTheSitesNotYetHandledAndTheNextPeriodDoesAll() {
+        let person = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main", city: "X", state: "IL", zip: "60601")], emails: ["pat@example.com"])
+        var e = DirectoryEntry(id: "x", domain: "x.com", name: "X", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        e.liveForm = LiveFormCheck(checked: "2026-10-26", found: true, page: "https://x.com/optout", blockers: [])
+        e.optOutForm = OptOutForm(page: URL(string: "https://x.com/optout")!, method: "post", action: nil, fields: [], hops: 1)
+        var progress = Progress()
+        progress.recordOptOutAttempt(sent(t0.addingTimeInterval(2 * day)), site: "x")
+        let inPeriod = RunPeriod.containing(t0.addingTimeInterval(10 * day), anchor: t0)
+        let again = AutoOptOut.precheck(entry: e, person: person, progress: progress, now: t0.addingTimeInterval(10 * day), period: inPeriod)
+        if case .tooSoon(let until)? = again.result { XCTAssertEqual(until, inPeriod.end) } else { XCTFail("handled this period: left alone") }
+        // Late in the period (29 days after the send) it is still handled; early in the next one it is due again, even though only 6 days have passed.
+        var late = progress; late.optOutAttempts["x"] = [sent(t0.addingTimeInterval(28 * day))]
+        let next = RunPeriod.containing(t0.addingTimeInterval(34 * day), anchor: t0)
+        XCTAssertNil(AutoOptOut.precheck(entry: e, person: person, progress: late, now: t0.addingTimeInterval(34 * day), period: next).result)
+    }
+
+    func testTheMonthlyRunIsDueWhenANewPeriodHasBegun() {
+        var s = AutoSettings(); s.optOutEnabled = true; s.periodAnchor = t0; s.lastOptOut = t0.addingTimeInterval(1 * day)
+        XCTAssertFalse(s.optOutDue(now: t0.addingTimeInterval(29 * day)))
+        XCTAssertTrue(s.optOutDue(now: t0.addingTimeInterval(30 * day)))
+        XCTAssertEqual(s.nextOptOutDate(now: t0.addingTimeInterval(10 * day)), t0.addingTimeInterval(30 * day))
+    }
+}
+
+final class PeriodTargetsTests: XCTestCase {
+    func testASiteTakenOnStaysTrackedAcrossPeriodsUntilItGoesThrough() {
+        var s = AutoSettings()
+        s.addPeriodTargets(["a", "b"], person: "me")
+        s.addPeriodTargets(["b", "c"], person: "me")
+        XCTAssertEqual(s.periodTargetIDs(person: "me"), ["a", "b", "c"])
+        XCTAssertEqual(s.periodTargetIDs(person: "someone"), [])
+        let back = try? JSONDecoder().decode(AutoSettings.self, from: JSONEncoder().encode(s))
+        XCTAssertEqual(back?.periodTargetIDs(person: "me"), ["a", "b", "c"])
+    }
+}
+
+final class EmailedInsteadTests: XCTestCase {
+    func testASiteEmailedInsteadOfItsFormCountsAsDone() {
+        let now = Date()
+        let attempt = AutoOptOut.attempt(for: .emailed, now: now)
+        XCTAssertEqual(attempt?.wasSubmitted, true, "the dialog says we mark it done once the email is sent")
+        var p = Progress(); if let attempt { p.recordOptOutAttempt(attempt, site: "x") }
+        XCTAssertEqual(p.optOutAttempts["x"]?.count, 1)
+    }
+}
+
+final class OverdueFollowUpTests: XCTestCase {
+    func testARequestStillWaitingOnItsEmailAfter45DaysIsOverdue() {
+        let now = Date(), day: TimeInterval = 86_400
+        let attempts: [String: [OptOutAttempt]] = [
+            "old": [OptOutAttempt(date: now.addingTimeInterval(-50 * day), outcome: "submitted_email")],
+            "new": [OptOutAttempt(date: now.addingTimeInterval(-10 * day), outcome: "submitted_email")],
+            "done": [OptOutAttempt(date: now.addingTimeInterval(-60 * day), outcome: "submitted_email"), OptOutAttempt(date: now.addingTimeInterval(-5 * day), outcome: "email_done")],
+        ]
+        XCTAssertEqual(FollowUps.overdue(attempts, now: now).map(\.id), ["old"], "only the one still waiting past 45 days; the finished one is not")
+        XCTAssertEqual(FollowUps.pending(attempts).count, 2)
     }
 }

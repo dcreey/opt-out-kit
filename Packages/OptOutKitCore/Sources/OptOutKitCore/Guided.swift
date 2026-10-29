@@ -219,8 +219,9 @@ public enum GuidedPlanner {
         }
         let start = entry.optOutURL ?? URL(string: "https://\(entry.domain)/")!
         add(L10n.t("Open the site's opt-out page"), entry.domain, .openPage(start), .pageLoaded)
-        add(L10n.t("Find the opt-out or privacy request form and fill it in"), L10n.t("We could not find the form automatically."), .instruction)
-        add(L10n.t("Submit it"), nil, .confirm)
+        // No known form: the app still scans the live page for one (following its opt-out links) and fills it in. If it finds none, the person does it.
+        add(L10n.t("We look for the opt-out form and fill it in"), L10n.t("If we cannot find it, find the form yourself and fill it in, then tap Next step."), .autofill, .formFilled)
+        add(L10n.t("Check it, then submit it"), L10n.t("Solve any check and send the form yourself."), .confirm)
         add(L10n.t("Confirm the email they send you, if they send one"), L10n.t("Open the message and click its link."), .waitForEmail(subject: nil, minutes: nil))
         return GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: false)
     }
