@@ -181,22 +181,31 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
 
     // MARK: Loading
 
-    func load(_ request: URLRequest) async throws {
+    /// `budget`: keep trying for at most this many seconds in all (a dropped or slow first attempt is retried), then give up. Without it, the usual three tries.
+    func load(_ request: URLRequest, within budget: TimeInterval? = nil) async throws {
+        let deadline = budget.map { Date().addingTimeInterval($0) }
         // Ask for the site in the language the person chose, so a site that has its terms and forms in that language shows them.
         var request = request
         request.setValue("1", forHTTPHeaderField: "Sec-GPC")
         if request.value(forHTTPHeaderField: "Accept-Language") == nil {
             request.setValue("\(Loc.language),en;q=0.5", forHTTPHeaderField: "Accept-Language")
         }
-        request.timeoutInterval = 45
+        request.timeoutInterval = deadline.map { max(4, $0.timeIntervalSinceNow) } ?? 45
         // A site that drops the first attempt, or that is slow to answer, is tried again before the page is given up on.
         var attempt = 0
         while true {
             do { try await wait { self.webView.load(request) }; return }
             catch {
                 attempt += 1
-                guard attempt < 3, Self.isTransient(error) else { throw error }
-                try? await Task.sleep(nanoseconds: UInt64(attempt) * 1_500_000_000)
+                if let deadline {
+                    // Within a budget: retry until it runs out, whatever the error was.
+                    guard deadline.timeIntervalSinceNow > 2.5 else { throw error }
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    request.timeoutInterval = max(3, deadline.timeIntervalSinceNow)
+                } else {
+                    guard attempt < 3, Self.isTransient(error) else { throw error }
+                    try? await Task.sleep(nanoseconds: UInt64(attempt) * 1_500_000_000)
+                }
             }
         }
     }

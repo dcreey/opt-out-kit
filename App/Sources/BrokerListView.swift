@@ -54,10 +54,25 @@ struct BrokerListView: View {
                 } else if model.autoOptOutStarted, let last = model.autoSettings.lastOptOut {
                     Section {
                         NavigationLink { AutoActivityView() } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Label("Automatic opt-out", systemImage: "bolt.fill").font(.headline)
-                                Text(Loc.f("Last run %@: %lld sent, %lld need you.", Loc.date(last, time: false), model.autoSettings.lastSent ?? 0, model.autoSettings.lastNeedYou ?? 0))
-                                    .font(.footnote).foregroundStyle(.secondary)
+                            if let tally = model.currentPeriodTally, tally.total > 0 {
+                                // This period's standing: how many went through, how many are left. Nothing left: the task is complete until the next period.
+                                let left = tally.total - tally.handled
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Label(left == 0 ? "Automatic opt-out: complete" : "Automatic opt-out", systemImage: left == 0 ? "checkmark.seal.fill" : "bolt.fill")
+                                        .font(.headline).foregroundStyle(left == 0 ? Color.green : Color.primary)
+                                    if left == 0 {
+                                        Text(Loc.f("All %lld sites went through this period.", tally.total)).font(.footnote).foregroundStyle(.secondary)
+                                        if let next = model.autoSettings.nextOptOutDate() { Text(Loc.f("Next run %@", Loc.date(next))).font(.caption).foregroundStyle(.secondary) }
+                                    } else {
+                                        ProgressView(value: Double(tally.handled), total: Double(tally.total))
+                                        Text(Loc.f("This period: %lld sent, %lld remaining", tally.handled, left)).font(.footnote).foregroundStyle(.secondary)
+                                    }
+                                }
+                            } else {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Label("Automatic opt-out", systemImage: "bolt.fill").font(.headline)
+                                    Text(Loc.f("Last run %@: %lld sent.", Loc.date(last, time: false), model.autoSettings.lastSent ?? 0)).font(.footnote).foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .accessibilityIdentifier("home-auto-status")

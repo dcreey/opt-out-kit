@@ -271,3 +271,37 @@ final class OverdueFollowUpAppTests: XCTestCase {
         XCTAssertEqual(model.overdueFollowUpCount, 0, "finishing it ends the follow-up")
     }
 }
+
+@MainActor
+final class PeriodHomeAppTests: XCTestCase {
+    func testTheAutomaticTaskIsCompleteOnceEverySiteWentThroughThisPeriod() throws {
+        let model = makeModel()
+        let me = try XCTUnwrap(model.selectedPerson)
+        let sites = model.automaticSites(for: me)
+        XCTAssertGreaterThan(sites.count, 2)
+        model.recordAutoResult(sites[0], .submitted(awaitingEmail: false), for: me.id, dryRun: false)
+        // Starting the first run sets the period; recording alone does not, so set it as a run would.
+        model.startPeriodForTesting()
+        var t = try XCTUnwrap(model.currentPeriodTally)
+        XCTAssertEqual(t.handled, 1); XCTAssertFalse(t.complete)
+        let task = try XCTUnwrap(model.plan.flatMap(\.tasks).first { $0.kind == .automatic })
+        XCTAssertFalse(model.isDone(task))
+        for s in sites { model.recordAutoResult(s, .submitted(awaitingEmail: false), for: me.id, dryRun: false) }
+        t = try XCTUnwrap(model.currentPeriodTally)
+        XCTAssertTrue(t.complete, "none remaining")
+        XCTAssertTrue(model.isDone(task), "so the task is marked fully complete")
+    }
+}
+
+
+@MainActor
+final class UnloadableSiteAppTests: XCTestCase {
+    func testASiteWhosePageWillNotLoadIsSetAsideForAWeekAndNotHeldAgainstItsMethod() throws {
+        let model = makeModel()
+        let me = try XCTUnwrap(model.selectedPerson)
+        let entry = try XCTUnwrap(model.directory.first)
+        model.recordAssisted(entry, .needsYou(AssistedRunner.unloadable), for: me)
+        XCTAssertEqual(model.skippedSites.map(\.entry.id), [entry.id])
+        XCTAssertNil(model.progress.optOutAttempts[entry.id], "no failed attempt was recorded, so it is not moved to a guide")
+    }
+}

@@ -44,6 +44,19 @@ private func items(_ hosts: [String]) -> [AssistedRunner.Item] {
     }
 }
 
+@MainActor
+private final class SlowDriver: AssistedDriver {
+    let slow: String
+    private var gate: CheckedContinuation<Void, Never>?
+    private var released = false
+    init(slow: String) { self.slow = slow }
+    func release() { released = true; gate?.resume(); gate = nil }
+    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? {
+        if form.page.host == slow, !released { await withCheckedContinuation { gate = $0 } }
+        return ScriptedPage()
+    }
+}
+
 private final class Sink: @unchecked Sendable { var rows: [(String, AutoOptOutResult)] = [] }
 
 @MainActor
@@ -126,6 +139,36 @@ final class AssistedRunnerTests: XCTestCase {
         XCTAssertEqual(sink.rows.count, 2)
     }
 
+    func testSkippingTheLastSiteEndsTheRun() async {
+        let sink = Sink()
+        let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": ScriptedPage(), "b.example": ScriptedPage(blockers: [[.check("a bot check")]])]), sink)
+        r.waitLimit = 30
+        let task = Task { @MainActor in await r.run() }
+        for _ in 0..<200 where r.index < 1 { try? await Task.sleep(nanoseconds: 10_000_000) }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        r.skip()
+        await task.value
+        XCTAssertTrue(r.finished, "nothing is left: the run ends and shows its summary")
+        XCTAssertEqual(sink.rows.last?.1, .needsYou("skipped"))
+    }
+
+    func testSkippingWhileAPageIsStillLoadingMovesOnAtOnce() async {
+        let sink = Sink()
+        let driver = SlowDriver(slow: "a.example")
+        let r = AssistedRunner(items: items(["a.example", "b.example"]), driver: driver) { entry, result in sink.rows.append((entry.domain, result)) }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0; r.waitLimit = 30
+        let task = Task { @MainActor in await r.run() }
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertEqual(r.index, 0); XCTAssertEqual(r.phase, .loading)
+        r.skip()
+        for _ in 0..<200 where r.index < 1 { try? await Task.sleep(nanoseconds: 10_000_000) }
+        XCTAssertEqual(r.index, 1, "it did not wait for the slow page")
+        XCTAssertEqual(sink.rows.first?.1, .needsYou("skipped"))
+        driver.release()
+        await task.value
+        XCTAssertTrue(r.finished)
+    }
+
     func testTheNextSiteLoadsWhileThePersonStillWorksOnTheCurrentOne() async {
         let slow = ScriptedPage(blockers: [[.check("a bot check")], [.check("a bot check")], [.check("a bot check")], []])
         let driver = ScriptedDriver(["a.example": slow, "b.example": ScriptedPage()])
@@ -159,12 +202,20 @@ final class AssistedRunnerTests: XCTestCase {
         XCTAssertEqual(sink.rows[0].1, .submitted(awaitingEmail: false))
     }
 
-    func testAPageThatWillNotLoadIsReportedAndTheRunContinues() async {
+    func testAPageThatWillNotLoadIsSkippedShownAsSkippedAndTheRunContinues() async {
         let sink = Sink()
         let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": nil, "b.example": ScriptedPage()]), sink)
         await r.run()
-        XCTAssertEqual(sink.rows[0].1, .failed("the page would not load"))
+        XCTAssertEqual(sink.rows[0].1, .needsYou(AssistedRunner.unloadable), "skipped, not recorded as a failed attempt")
         XCTAssertEqual(sink.rows[1].1, .submitted(awaitingEmail: false))
+        XCTAssertEqual(r.skippedCount, 1, "the screen is told to show the skip animation")
+        XCTAssertTrue(r.finished)
+    }
+
+    func testAPageThatWillNotLoadAsTheOnlySiteEndsTheRun() async {
+        let r = runner(["a.example"], ScriptedDriver(["a.example": nil]), Sink())
+        await r.run()
+        XCTAssertTrue(r.finished); XCTAssertEqual(r.skippedCount, 1)
     }
 
     func testTheAppModelQueuesOnlySitesItCanFillAndHasNotSentRecently() throws {
@@ -268,7 +319,8 @@ final class EmailInsteadTests: XCTestCase {
 
     func testASiteThatDidNotLoadOffersAnEmailWaitsForTheAnswerAndIsDoneOnceItIsSent() async {
         let driver = ScriptedDriverForEmail()
-        let r = AssistedRunner(items: [item("dead.example", email: "privacy@dead.example")], driver: driver) { _, _ in }
+        var reported: [AutoOptOutResult] = []
+        let r = AssistedRunner(items: [item("dead.example", email: "privacy@dead.example")], driver: driver) { _, result in reported.append(result) }
         r.pollInterval = 0.01; r.pauseAfterSent = 0
         let run = Task { @MainActor in await r.run() }
         for _ in 0..<200 where r.emailOffer == nil { try? await Task.sleep(nanoseconds: 5_000_000) }
@@ -277,6 +329,7 @@ final class EmailInsteadTests: XCTestCase {
         r.answerEmailOffer(sent: true)
         await run.value
         XCTAssertEqual(r.results["dead_example"], .emailed)
+        XCTAssertEqual(reported.last, .emailed, "saved as done, so the queue and the period count it, not only this screen")
         XCTAssertNil(r.emailOffer)
     }
 

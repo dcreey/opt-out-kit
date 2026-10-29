@@ -428,6 +428,8 @@ final class AppModel: ObservableObject {
             let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
             return !ids.isEmpty && ids.allSatisfy { wasEmailed($0) }
         case .automatic:
+            // Done once every site has gone through this period (the next period starts it afresh).
+            if let tally = currentPeriodTally, tally.total > 0 { return tally.complete }
             let byDomain = Dictionary(directory.map { ($0.domain, $0.id) }, uniquingKeysWith: { a, _ in a })
             return !task.domains.isEmpty && task.domains.allSatisfy { d in byDomain[d].map { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false } ?? true }
         }
@@ -638,6 +640,9 @@ final class AppModel: ObservableObject {
         return RunPeriods.history(anchor: anchor, now: now, siteIDs: automaticSites(for: person).map(\.id), attempts: household.progress(for: person.id).optOutAttempts)
     }
 
+    /// This period's tally for the selected person, or nil before the first run has set the period's start.
+    var currentPeriodTally: PeriodTally? { selectedPerson.flatMap { periodHistory(for: $0).first } }
+
     /// One automatic site's standing in the current period, for the status page's checklist.
     struct PeriodSiteRow: Identifiable, Equatable {
         let id: String
@@ -764,7 +769,8 @@ final class AppModel: ObservableObject {
 
     #if DEBUG
     func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
-    func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
+    func startPeriodForTesting() { household.updateAuto { $0.periodAnchor = Date().addingTimeInterval(-86_400) } }
+        func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
 
     // MARK: Today's goals
@@ -1249,6 +1255,8 @@ final class AppModel: ObservableObject {
     func recordAssisted(_ entry: DirectoryEntry, _ result: AutoOptOutResult, for person: Person) {
         household.mutateProgress(for: person.id) { p in
             if let attempt = AutoOptOut.attempt(for: result, now: Date()) { p.recordOptOutAttempt(attempt, site: entry.id) }
+            // A page that would not load is skipped: it leaves today's batch and comes back in a week (the failure is not held against the site's method).
+            if case .needsYou(let why) = result, why == AssistedRunner.unloadable { p.skipSite(entry.id, reason: .skipped) }
         }
         var rows = optOutRun[person.id] ?? []
         rows.removeAll { $0.id == entry.id }

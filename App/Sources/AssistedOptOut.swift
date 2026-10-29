@@ -89,7 +89,7 @@ struct WebAssistedDriver: AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? {
         let session = WebViewSession.make()
         do {
-            if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page)) }
+            if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page), within: 15) }
         } catch { NSLog("OOK load failed %@: %@", form.page.absoluteString, "\(error)"); session.close(); return nil }
         await session.settlePage(maxWait: 10)
         _ = await session.denyCookies()
@@ -110,7 +110,10 @@ struct WebAssistedDriver: AssistedDriver {
             var adID = advertisingID
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
             let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
-            if case .ready = livePlan.verdict { page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? "")) } else { NSLog("OOK plan not ready %@: %@", form.page.absoluteString, "\(livePlan.verdict)"); session.close(); return nil }
+            // Whatever the plan says the person must do (tick a consent box, type a missing detail), the page is shown with everything else filled in:
+            // the runner waits for them at that step. Closing the page here made such sites look like they "would not load".
+            page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? ""))
+            if case .ready = livePlan.verdict {} else { NSLog("OOK plan needs the person %@: %@", form.page.absoluteString, "\(livePlan.verdict)") }
             page.remember(person: person, advertisingID: adID, listingURL: listingURL, page: form.page, signature: Self.signature(live))
         }
         await page.refill()
@@ -268,6 +271,10 @@ final class AssistedRunner: ObservableObject {
     @Published var previousNote: String?
     /// Counts sites sent, so the screen can show a check each time.
     @Published private(set) var celebrate = 0
+    /// Counts sites that were skipped (by the person, or because their page would not load), so the screen can show it.
+    @Published private(set) var skippedCount = 0
+    /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
+    static let unloadable = "the page would not load, so it was skipped"
     /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
     @Published private(set) var sentAwaitingEmail = 0
     private enum ListingChoice { case none, mine, notListed }
@@ -279,6 +286,7 @@ final class AssistedRunner: ObservableObject {
     private let driver: AssistedDriver
     private let onResult: (DirectoryEntry, AutoOptOutResult) -> Void
     private var preparing: [Int: Task<AssistedPage?, Never>] = [:]
+    private var loadedPages = Set<Int>()           // pages whose load has finished (well or badly), so a skip does not have to wait for a slow one
     private var skipFlag = false
     private var autoScrolls = 0          // times the page was scrolled to an opt-out button for this site; the person's own scrolling is never fought
     private var nextContinuation: CheckedContinuation<Void, Never>?
@@ -354,7 +362,10 @@ final class AssistedRunner: ObservableObject {
 
     /// The person answered the offer to email a site that did not go through: `sent` is true once they sent the message, which finishes the site.
     func answerEmailOffer(sent: Bool) {
-        if sent, let entry = emailOffer { results[entry.id] = .emailed }
+        if sent, let entry = emailOffer {
+            results[entry.id] = .emailed; previousNote = nil
+            onResult(entry, .emailed)          // saved as done, not just shown as done on this screen
+        }
         emailOffer = nil
         emailContinuation?.resume(); emailContinuation = nil
     }
@@ -382,6 +393,7 @@ final class AssistedRunner: ObservableObject {
         guard items.indices.contains(i), preparing[i] == nil, items[i].searchURL == nil else { return }
         let item = items[i]
         preparing[i] = Task {
+            defer { loadedPages.insert(i) }
             if let page = await driver.prepare(item.form, plan: item.plan) { return page }
             if let fallback = item.fallbackForm { return await driver.prepare(fallback, plan: item.plan) }
             return nil
@@ -395,11 +407,20 @@ final class AssistedRunner: ObservableObject {
                 let (listing, early) = await chooseListing(items[i], search: search)
                 if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); continue }
                 phase = .loading
-                preparing[i] = Task { await driver.prepare(items[i].form, plan: items[i].plan, listingURL: listing) }
+                preparing[i] = Task { defer { loadedPages.insert(i) }; return await driver.prepare(items[i].form, plan: items[i].plan, listingURL: listing) }
             } else { prepare(i) }
+            // Skip works while a page is still loading: wait for the load, but not past the person's skip.
+            while !loadedPages.contains(i), !skipFlag { try? await Task.sleep(nanoseconds: UInt64(min(pollInterval, 0.1) * 1_000_000_000)) }
+            if !loadedPages.contains(i), skipFlag {
+                let loading = preparing[i]
+                Task { await loading?.value?.close() }          // the page that was loading is closed when it arrives
+                record(items[i], .needsYou("skipped"))
+                await offerEmailIfNeeded(items[i], .needsYou("skipped"))
+                continue
+            }
             guard let ready = await preparing[i]?.value else {
-                record(items[i], .failed("the page would not load"))
-                await offerEmailIfNeeded(items[i], .failed("the page would not load"))
+                record(items[i], .needsYou(Self.unloadable))
+                await offerEmailIfNeeded(items[i], .needsYou(Self.unloadable))
                 continue
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
@@ -489,9 +510,10 @@ final class AssistedRunner: ObservableObject {
         case .submitted(let email): celebrate += 1; previousNote = nil; if email { sentAwaitingEmail += 1 }
         case .failed(let why), .rejected(let why), .challenged(let why):
             previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
-        case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
+        case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why); if why == Self.unloadable { skippedCount += 1 }
         default: previousNote = nil
         }
+        if case .needsYou("skipped") = result { skippedCount += 1 }
         onResult(item.entry, result)
     }
 }
@@ -510,6 +532,7 @@ struct AssistedOptOutView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
+    @State private var showSkipped = false
     @State private var composing: EmailBatch?
     @State private var confirmEmailSent: EmailBatch?
     /// A message opened in another mail app: asked about when the person is back in this app (not while the offer is still on screen).
@@ -533,7 +556,7 @@ struct AssistedOptOutView: View {
             Button("No, it is done") { runner.answerFollowUp(track: false) }
         } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
         .task { await runner.run() }
-        .overlay { if showSent { SentCheck().transition(.opacity) } }
+        .overlay { if showSent { SentCheck().transition(.opacity) } else if showSkipped { SkippedMark().transition(.opacity) } }
         .onChange(of: runner.sentAwaitingEmail) { _, _ in
             guard model.shouldExplainEmailLinks else { return }
             model.markEmailLinksExplained()
@@ -542,8 +565,10 @@ struct AssistedOptOutView: View {
         .sheet(isPresented: $explainEmail) { EmailCheckExplainer(openTab: nil) { explainEmail = false } }
         .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil }, set: { _ in }), titleVisibility: .visible) {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
+            // Already emailed them, or got it done another way: one tap says so, and the site counts as done.
+            Button("Mark as done") { runner.answerEmailOffer(sent: true) }.accessibilityIdentifier("assisted-offer-mark-done")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
-        } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done.") }
+        } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done. If you already did, tap Mark as done.") }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active, let b = awaitingMailReturn { awaitingMailReturn = nil; confirmEmailSent = b }
         }
@@ -568,6 +593,10 @@ struct AssistedOptOutView: View {
                     if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() }       // asked by email: this site is done
                 } else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
             }
+        }
+        .onChange(of: runner.skippedCount) { _, _ in
+            withAnimation(.easeOut(duration: 0.2)) { showSkipped = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { withAnimation(.easeIn(duration: 0.3)) { showSkipped = false } }
         }
         .onChange(of: runner.celebrate) { _, _ in
             withAnimation(.easeOut(duration: 0.2)) { showSent = true }
@@ -640,7 +669,7 @@ struct AssistedOptOutView: View {
                             Button("Not listed") { runner.notListed() }.font(.callout).lineLimit(1).minimumScaleFactor(0.7).accessibilityIdentifier("assisted-not-listed")
                             Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
                         } else {
-                            if canMarkDone { Button("Mark as done") { Task { await runner.markDone() } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
+                            if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
                             if case .needsMore = runner.phase { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
                         }
                     }
@@ -682,6 +711,15 @@ struct AssistedOptOutView: View {
     }
 
     private var summary: some View {
+        VStack(spacing: 0) {
+            summaryList
+            // The run is over: one clear way out, however each site ended (sent, skipped or set aside).
+            Button { dismiss() } label: { Text("Done").frame(maxWidth: .infinity) }
+                .buttonStyle(.borderedProminent).controlSize(.large).padding().accessibilityIdentifier("assisted-finish")
+        }
+    }
+
+    private var summaryList: some View {
         List {
             let sent = runner.results.values.filter { if case .submitted = $0 { return true } else { return false } }.count
             Section {
@@ -734,6 +772,28 @@ struct AssistedOptOutView: View {
 
 
 /// A big green check over the screen each time a site is sent, so a fast move to the next page is not missed.
+/// What shows in place of the green check when a site is skipped (the person skipped it, or its page would not load): the site slides out and the next one comes.
+struct SkippedMark: View {
+    @State private var moved = false
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle().fill(Color.orange)
+                Image(systemName: "forward.fill").font(.system(size: 56, weight: .bold)).foregroundStyle(.white)
+                    .offset(x: moved ? 6 : -30).opacity(moved ? 1 : 0.2)
+            }
+            .frame(width: 120, height: 120).scaleEffect(moved ? 1 : 0.4)
+            Text("Skipped").font(.title.bold()).foregroundStyle(.orange)
+        }
+        .padding(36)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28))
+        .shadow(radius: 20)
+        .onAppear { withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) { moved = true } }
+        .accessibilityElement(children: .ignore).accessibilityLabel(Loc.t("Skipped")).accessibilityIdentifier("assisted-skipped-mark")
+        .allowsHitTesting(false)
+    }
+}
+
 struct SentCheck: View {
     @State private var grown = false
     var body: some View {
