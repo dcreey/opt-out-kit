@@ -10,8 +10,10 @@ set -euo pipefail
 TEAM="${TEAM_ID:-C84MKW6B2K}"
 OUT="$(mktemp -d)"
 cd "$(dirname "$0")/.."
+# The API key also signs in for provisioning, so a new bundle id (the share extension) gets its profile without an Xcode account.
+AUTH=(-authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
 xcodegen generate
-xcodebuild archive -project OptOutKit.xcodeproj -scheme OptOutKit -configuration Release -destination 'generic/platform=iOS' -archivePath "$OUT/Exnay.xcarchive" -allowProvisioningUpdates
+xcodebuild archive -project OptOutKit.xcodeproj -scheme OptOutKit -configuration Release -destination 'generic/platform=iOS' -archivePath "$OUT/Exnay.xcarchive" -allowProvisioningUpdates "${AUTH[@]}"
 cat > "$OUT/Export.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -20,6 +22,6 @@ cat > "$OUT/Export.plist" <<PLIST
 <key>teamID</key><string>$TEAM</string><key>signingStyle</key><string>automatic</string>
 </dict></plist>
 PLIST
-xcodebuild -exportArchive -archivePath "$OUT/Exnay.xcarchive" -exportOptionsPlist "$OUT/Export.plist" -exportPath "$OUT/ipa" -allowProvisioningUpdates
+xcodebuild -exportArchive -archivePath "$OUT/Exnay.xcarchive" -exportOptionsPlist "$OUT/Export.plist" -exportPath "$OUT/ipa" -allowProvisioningUpdates "${AUTH[@]}"
 xcrun altool --upload-app -f "$OUT/ipa/OptOutKit.ipa" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 echo "Uploaded from $OUT"
