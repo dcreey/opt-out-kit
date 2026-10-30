@@ -371,7 +371,7 @@ final class ListingGuideTests: XCTestCase {
         let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = try XCTUnwrap(model.selectedPerson)
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"; me.emails = ["pat@example.com"]
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         model.update(me); model.setContactEmail("pat@example.com")
         let spokeo = try XCTUnwrap(model.brokers.first { $0.id == "spokeo" })

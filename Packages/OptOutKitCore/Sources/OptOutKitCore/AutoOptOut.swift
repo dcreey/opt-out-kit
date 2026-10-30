@@ -159,13 +159,16 @@ public struct AutoOptOut: Sendable {
         return out
     }
 
-    static func result(for outcome: SubmitOutcome) -> AutoOptOutResult {
+    /// What a site that answers "Too many requests" is reported as: not a failure of the form, so nothing is recorded against the site and it stays to try again.
+    public static let rateLimited = "the site said too many requests; wait a few minutes and try it again"
+
+    public static func result(for outcome: SubmitOutcome) -> AutoOptOutResult {
         switch outcome {
         case .submitted(let email): return .submitted(awaitingEmail: email)
         case .filledNotSubmitted: return .dryRunReady
         case .challenged(let why): return .challenged(why)
         case .rejected(let why): return .rejected(why)
-        case .failed(let why): return .failed(why)
+        case .failed(let why): return why == rateLimited ? .needsYou(why) : .failed(why)
         }
     }
 

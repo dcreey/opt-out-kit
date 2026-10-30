@@ -120,7 +120,7 @@ struct AutoActivityView: View {
                         Section("Needs you (\(attention.count))") {
                             ForEach(attention) { r in
                                 if let entry = model.directory.first(where: { $0.id == r.id }) {
-                                    NavigationLink(value: entry) { attentionRow(r) }
+                                    NavigationLink { DirectoryInfoView(entry: entry) } label: { attentionRow(r) }
                                 } else { attentionRow(r) }
                             }
                         }
@@ -136,7 +136,8 @@ struct AutoActivityView: View {
             }
         }
         .navigationTitle("Automatic opt-out")
-        .navigationDestination(for: DirectoryEntry.self) { DirectoryInfoView(entry: $0) }
+        // Links on this page carry their own destination. A page opened by a closure-style link must not declare a `navigationDestination` of its own:
+        // SwiftUI builds the page a second time when a value is pushed, finds the route "declared earlier on the stack", and the push bounces straight back.
     }
 
     /// This period's tally, the checklist of every automatic site (what ran and what did not), and the earlier periods.
@@ -156,7 +157,7 @@ struct AutoActivityView: View {
             let todo = rows.filter { !$0.handled }, done = rows.filter(\.handled)
             Section {
                 ForEach(todo + done) { r in
-                    if let entry = model.directory.first(where: { $0.id == r.id }) { NavigationLink(value: entry) { periodRow(r) } } else { periodRow(r) }
+                    if let entry = model.directory.first(where: { $0.id == r.id }) { NavigationLink { DirectoryInfoView(entry: entry) } label: { periodRow(r) }.accessibilityIdentifier("period-site-\(r.domain)") } else { periodRow(r) }
                 }
             } header: { Text("Each site") } footer: { Text("A check mark means the request went through this period.") }
             if history.count > 1 {
@@ -185,7 +186,6 @@ struct AutoActivityView: View {
                 else { Text("Not sent yet").font(.caption2).foregroundStyle(.secondary) }
             }
         }
-        .accessibilityIdentifier("period-site-\(r.domain)")
     }
 
     private func attentionRow(_ r: AppModel.AutoOptOutRow) -> some View {

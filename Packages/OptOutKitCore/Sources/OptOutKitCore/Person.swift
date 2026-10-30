@@ -160,6 +160,7 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         var out: [String] = []
         if legalFirst.isEmpty { out.append(L10n.noun("Legal first name")) }
         if legalLast.isEmpty { out.append(L10n.noun("Legal last name")) }
+        if age() == nil { out.append(L10n.noun("Birthdate")) }
         let a = currentAddress
         if (a?.street ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current street address")) }
         if (a?.city ?? "").trimmingCharacters(in: .whitespaces).isEmpty { out.append(L10n.noun("Current city")) }

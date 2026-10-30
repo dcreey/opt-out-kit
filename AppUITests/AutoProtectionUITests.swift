@@ -87,4 +87,39 @@ final class AutoProtectionUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["earned"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["2 pts"].waitForExistence(timeout: 3))
     }
+
+    /// A site on the automatic status page must open its page and stay there. (It once bounced straight back: the page declared a navigation destination of
+    /// its own while opened by a closure-style link, so SwiftUI built it twice and rejected the push.)
+    func testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-demo-run"]
+        app.launch()
+        let done = app.buttons["run-report-done"]
+        if done.waitForExistence(timeout: 120) { done.tap() }          // the run's result sheet comes up when it finishes
+        let status = app.buttons["home-auto-status"]
+        XCTAssertTrue(status.waitForExistence(timeout: 30), "the home page shows the period standing")
+        status.tap()
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'period-site-'")).firstMatch
+        XCTAssertTrue(app.scrollUntilExists(row), "the status page lists every site")
+        row.tap()
+        let state = app.descendants(matching: .any)["site-state"]
+        XCTAssertTrue(state.waitForExistence(timeout: 5), "the site's page opened")
+        Thread.sleep(forTimeInterval: 2.5)
+        XCTAssertTrue(state.exists, "and it stayed: the push did not bounce back")
+        shot(app, "5-site-opened-from-the-status-page")
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["period-summary"].waitForExistence(timeout: 5), "back on the status page")
+    }
+
+    func testTheBirthdateIsChosenYearThenMonthThenDayAndIsRequired() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-require-birthdate"]
+        app.launch()
+        app.buttons["profile-button"].tap()
+        let year = app.descendants(matching: .any)["birth-year"]
+        XCTAssertTrue(app.scrollUntilExists(year), "the profile asks for a birthdate")
+        XCTAssertFalse(app.descendants(matching: .any)["birth-month"].isEnabled, "month waits for the year")
+        XCTAssertFalse(app.descendants(matching: .any)["birth-day"].isEnabled, "day waits for the month")
+        XCTAssertTrue(app.staticTexts["missing-details"].exists || app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'birthdate'")).count > 0, "and says it is still needed")
+    }
 }

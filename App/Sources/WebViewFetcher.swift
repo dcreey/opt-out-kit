@@ -404,11 +404,13 @@ enum FormRun {
 
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
+        // A bare "Too many requests" page: the site is limiting us, which says nothing about the form. Reported as that, not as a failed attempt.
+        if t.range(of: "too many requests|rate.?limit(ed)?|error 429|429 too many", options: .regularExpression) != nil { return .failed(AutoOptOut.rateLimited) }
         // An error comes first: "problem with your submission" pages often also contain the word "request".
         if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
             return .rejected("the site showed an error after sending")
         }
-        let success = t.range(of: "follow-?up e-?mail|(we|you)('ll| will) (send|email|receive)[^.]{0,40}(e-?mail|link)|thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
+        let success = t.range(of: "follow-?up e-?mail|(we|you)('ll| will) (send|email|receive)[^.]{0,40}(e-?mail|link)|thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|(profile|listing|record)s? (has |have |was |were |is |are )?(now |been |successfully )*blocked|(successfully|been) blocked|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
         let needsEmail = mentionsEmailFollowUp(t)
         if success { return .submitted(awaitingEmail: needsEmail) }
         if t.range(of: "please enter|please provide", options: .regularExpression) != nil {

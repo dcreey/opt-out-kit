@@ -39,9 +39,12 @@ protocol AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage?
     /// The site's search results for the person, to pick their own listing from. Nil when none can be opened.
     func openSearch(_ url: URL) async -> SearchPage?
+    /// Why the last `prepare` of this form returned nothing: "noform" when the page loaded but holds no opt-out form we can fill (a contact form, or only an email address), nil when it would not load.
+    func failureReason(for form: OptOutForm) -> String?
 }
 
 extension AssistedDriver {
+    func failureReason(for form: OptOutForm) -> String? { nil }
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? { await prepare(form, plan: plan) }
     func openSearch(_ url: URL) async -> SearchPage? { nil }
 }
@@ -68,6 +71,8 @@ final class WebSearchPage: SearchPage {
 struct WebAssistedDriver: AssistedDriver {
     /// Test hook: render this HTML instead of loading the site, so a test can imitate a form and a bot check.
     var htmlOverride: String?
+    private static var reasons: [String: String] = [:]
+    func failureReason(for form: OptOutForm) -> String? { Self.reasons[form.page.absoluteString] }
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
     var person: Person?
     var advertisingID: String?
@@ -88,6 +93,7 @@ struct WebAssistedDriver: AssistedDriver {
 
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? {
         let session = WebViewSession.make()
+        Self.reasons[form.page.absoluteString] = nil
         do {
             if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page), within: 15) }
         } catch { NSLog("OOK load failed %@: %@", form.page.absoluteString, "\(error)"); session.close(); return nil }
@@ -102,6 +108,7 @@ struct WebAssistedDriver: AssistedDriver {
             if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
             let found = await session.discoverFormsDeep()
             guard let live = LiveFormPicker.pick(found, pageContext: await session.pageContext()) else {
+                Self.reasons[form.page.absoluteString] = "noform"
                 NSLog("OOK no form %@: %@", form.page.absoluteString, found.map { "[\($0.fields.filter(\.visible).map(\.label).joined(separator: ",")) | \($0.buttons.joined(separator: ","))]" }.joined(separator: " "))
                 session.close(); return nil
             }
@@ -233,11 +240,19 @@ final class AssistedRunner: ObservableObject {
         var fallbackForm: OptOutForm?
         /// Set when the form wants the person's own listing: the search results to pick it from.
         var searchURL: URL?
+        /// A site with no form at all, only an email address: nothing is loaded, the person is told to send an email instead.
+        var emailOnly = false
+        /// Sites whose page is a people search with a "Block Profile" button beside each result (USA Trace and its sister site): there is no form to send,
+        /// the person searches for themselves in the page and blocks their own listings.
+        var blockWidget: Bool { Self.blockWidgetDomains.contains(entry.domain) }
+        static let blockWidgetDomains: Set<String> = ["usatrace.com", "quickpeopletrace.com"]
         var id: String { entry.id }
     }
 
     enum Phase: Equatable {
         case loading
+        case pacing(Int)              // waiting a little before sending to a site of the same company as the last one, so its shared limit is not hit
+        case noForm                   // no online form exists for this site: the person sends an email instead (or marks it done, or skips)
         case pickingListing           // the site's search is shown; the person taps their own listing, then confirms it
         case waitingForTerms
         case waitingForCertification
@@ -275,6 +290,8 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var skippedCount = 0
     /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
     static let unloadable = "the page would not load, so it was skipped"
+    /// The page loaded but has no opt-out form we can fill (a contact form, or only an email address): skipped, and the email offer is the way through.
+    static let noForm = "the site has no online opt-out form we can fill (its page is a contact form or only gives an email address), so it was skipped"
     /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
     @Published private(set) var sentAwaitingEmail = 0
     private enum ListingChoice { case none, mine, notListed }
@@ -358,16 +375,51 @@ final class AssistedRunner: ObservableObject {
         }
     }
 
-    func skip(reported: Bool = false) { reportedNotWorking = reported; skipFlag = true; resumeNext() }
+    func skip(reported: Bool = false) {
+        reportedNotWorking = reported; skipFlag = true; resumeNext()
+        if phase == .noForm { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
+    }
 
     /// The person answered the offer to email a site that did not go through: `sent` is true once they sent the message, which finishes the site.
     func answerEmailOffer(sent: Bool) {
+        // On a site that has no form the person stays here until they send it, mark it done or skip: "No" to the mail prompt is not an answer.
+        if !sent, phase == .noForm { return }
         if sent, let entry = emailOffer {
+            celebrate += 1
             results[entry.id] = .emailed; previousNote = nil
             onResult(entry, .emailed)          // saved as done, not just shown as done on this screen
         }
         emailOffer = nil
         emailContinuation?.resume(); emailContinuation = nil
+    }
+
+    // MARK: Spacing sends to one company's sites
+
+    /// Sites run by one company use one form model (the same field-name prefix, e.g. `InfoPay_...[fname]`) and one rate limit.
+    private static func family(_ item: Item) -> String? {
+        item.form.fields.compactMap { f -> String? in f.name.firstIndex(of: "[").map { String(f.name[..<$0]) } }.first
+    }
+    private var lastSend: [String: Date] = [:]
+    /// How long to leave between sends to sites of one company.
+    var familyGap: TimeInterval = 45
+    private func noteSend(_ item: Item) { if let k = Self.family(item) { lastSend[k] = Date() } }
+    private func paceIfNeeded(_ item: Item) async {
+        guard let k = Self.family(item), let last = lastSend[k] else { return }
+        var wait = familyGap - Date().timeIntervalSince(last)
+        while wait > 0, !skipFlag, markedDone == nil {
+            phase = .pacing(Int(wait.rounded(.up)))
+            try? await Task.sleep(nanoseconds: UInt64(min(1, wait) * 1_000_000_000))
+            wait = familyGap - Date().timeIntervalSince(last)
+        }
+    }
+
+    /// A site with no online form and an email address: waits for the person to send the email (finishes the site), mark it done, or skip it.
+    private func waitForEmail(_ item: Item) async {
+        phase = .noForm; page = nil
+        emailOffer = item.entry
+        await withCheckedContinuation { emailContinuation = $0 }
+        emailOffer = nil
+        if skipFlag { record(item, .needsYou("skipped")) }          // sent or marked done was already saved when the person answered
     }
 
     private func offerEmailIfNeeded(_ item: Item, _ result: AutoOptOutResult) async {
@@ -403,6 +455,7 @@ final class AssistedRunner: ObservableObject {
     func run() async {
         for i in items.indices {
             index = i; phase = .loading; skipFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            if items[i].emailOnly { await waitForEmail(items[i]); continue }
             if let search = items[i].searchURL {
                 let (listing, early) = await chooseListing(items[i], search: search)
                 if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); continue }
@@ -419,8 +472,12 @@ final class AssistedRunner: ObservableObject {
                 continue
             }
             guard let ready = await preparing[i]?.value else {
-                record(items[i], .needsYou(Self.unloadable))
-                await offerEmailIfNeeded(items[i], .needsYou(Self.unloadable))
+                let noForm = driver.failureReason(for: items[i].form) == "noform"
+                // The page loaded but holds no form we can fill, and the site gives an address: say so, and let the person send the email from here.
+                if noForm, items[i].entry.contactEmail != nil { await waitForEmail(items[i]); continue }
+                let why = noForm ? Self.noForm : Self.unloadable
+                record(items[i], .needsYou(why))
+                await offerEmailIfNeeded(items[i], .needsYou(why))
                 continue
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
@@ -459,15 +516,21 @@ final class AssistedRunner: ObservableObject {
                     if waited > waitLimit { phase = .timedOut; outcome = .needsYou("timed out waiting for the check"); break }
                 }
                 if outcome != nil { break }
+                // Sites run by one company share one limit on how fast requests may come: space the sends so the later ones are not turned away.
+                await paceIfNeeded(items[i])
+                if skipFlag { outcome = .needsYou("skipped"); break }
+                if let done = markedDone { outcome = done; break }
                 phase = .sending
                 await ready.refill()
-                switch await ready.send() {
+                noteSend(items[i])
+            // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
+            switch items[i].blockWidget ? SubmitOutcome.failed("waiting for you to block your profile") : await ready.send() {
                 case .submitted(let email):
                     phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
                 case .challenged: continue      // a check appeared after sending: wait for the person again
                 case .rejected(let why), .failed(let why):
                     phase = .needsMore(why)
-                    outcome = .failed(why)
+                    outcome = why == AutoOptOut.rateLimited ? .needsYou(why) : .failed(why)         // a rate limit is not the form's fault
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
                     let watcher = Task { @MainActor [weak self] in
@@ -510,7 +573,7 @@ final class AssistedRunner: ObservableObject {
         case .submitted(let email): celebrate += 1; previousNote = nil; if email { sentAwaitingEmail += 1 }
         case .failed(let why), .rejected(let why), .challenged(let why):
             previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why)
-        case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why); if why == Self.unloadable { skippedCount += 1 }
+        case .needsYou(let why) where why != "skipped": previousNote = Loc.f("%@ was not sent: %@.", item.entry.domain, why); if why == Self.unloadable || why == Self.noForm { skippedCount += 1 }
         default: previousNote = nil
         }
         if case .needsYou("skipped") = result { skippedCount += 1 }
@@ -563,7 +626,7 @@ struct AssistedOptOutView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) { explainEmail = true }       // after the green check
         }
         .sheet(isPresented: $explainEmail) { EmailCheckExplainer(openTab: nil) { explainEmail = false } }
-        .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil }, set: { _ in }), titleVisibility: .visible) {
+        .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil && runner.phase != .noForm }, set: { _ in }), titleVisibility: .visible) {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
             // Already emailed them, or got it done another way: one tap says so, and the site counts as done.
             Button("Mark as done") { runner.answerEmailOffer(sent: true) }.accessibilityIdentifier("assisted-offer-mark-done")
@@ -694,7 +757,8 @@ struct AssistedOptOutView: View {
                 Group {
                     if let web = runner.searchPage?.webView { WebViewHost(webView: web).id("search\(runner.index)") }
                     else if let web = runner.page?.webView { WebViewHost(webView: web).id(runner.index) }
-                    else { ProgressView("Loading the form…").frame(maxWidth: .infinity, maxHeight: .infinity) }
+                    else if runner.phase == .noForm, let entry = runner.current?.entry { noFormCard(entry) }
+                    else { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }
                 .frame(maxHeight: .infinity)
             }
@@ -703,6 +767,23 @@ struct AssistedOptOutView: View {
     }
 
     /// Whether the person can say this site is done: while it waits for them, or after a send that did not confirm.
+    /// Shown instead of a page for a site with no online form.
+    private func noFormCard(_ entry: DirectoryEntry) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: "envelope.badge").font(.system(size: 44)).foregroundStyle(Color.exnayGold)
+            Text("No form exists for \(entry.domain)").font(.title3.bold()).foregroundStyle(.white).multilineTextAlignment(.center)
+            Text("This site takes opt-outs by email. We write the message with the details it needs; you read it and send it.").font(.callout).foregroundStyle(.white.opacity(0.75)).multilineTextAlignment(.center)
+            if let mail = entry.contactEmail { Text(mail).font(.footnote.monospaced()).foregroundStyle(.white.opacity(0.6)) }
+            Button { emailInstead(entry) } label: { Label("Write the email", systemImage: "envelope").frame(maxWidth: .infinity) }
+                .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("assisted-write-email")
+            HStack {
+                Button("Mark as done") { runner.answerEmailOffer(sent: true) }.buttonStyle(.bordered).accessibilityIdentifier("assisted-nf-mark-done")
+                Button("Skip this site") { model.skipSite(entry.id); runner.skip() }.buttonStyle(.bordered).accessibilityIdentifier("assisted-nf-skip")
+            }
+        }
+        .padding(24).frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.black)
+    }
+
     private var canMarkDone: Bool {
         switch runner.phase {
         case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return true
@@ -738,6 +819,12 @@ struct AssistedOptOutView: View {
     }
 
     private var instruction: String {
+        if let item = runner.current, item.blockWidget, !runner.finished {
+            switch runner.phase {
+            case .loading, .pacing, .sending, .sent, .noForm, .timedOut: break
+            default: return Loc.t("This site hides your listing; there is no form to send. Pass the human check, search for yourself in the page, and tap Block Profile next to each result that is you. When it says blocked we move on; if it does not, tap Mark as done.")
+            }
+        }
         switch runner.phase {
         case .loading: return Loc.t("Loading the form and filling in your details…")
         case .pickingListing: return Loc.t("We searched this site for you. Tap your own profile in the results. If you are not in them, tap \"Not listed\". When you are on your profile, tap \"This is me\" and we do the rest.")
@@ -747,8 +834,12 @@ struct AssistedOptOutView: View {
         case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)
         case .sending: return "Sending…"
         case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : Loc.t("Sent.")
-        case .needsMore(let why): return Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)
+        case .needsMore(let why): return why == AutoOptOut.rateLimited
+            ? Loc.t("The site said \"too many requests\". It limits how fast it takes them, and this company runs several of these sites. Wait a few minutes and try it again later; tap Next site to carry on.")
+            : Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)
         case .timedOut: return Loc.t("Timed out waiting for the check.")
+        case .noForm: return Loc.t("No online form exists for this site. Send an email instead: tap Write the email.")
+        case .pacing(let n): return Loc.f("This company runs several of these sites and limits how fast it takes requests. Sending in %lld seconds so it is not turned away.", n)
         }
     }
 
@@ -757,6 +848,8 @@ struct AssistedOptOutView: View {
         case .sent: return "checkmark.circle.fill"
         case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
         case .needsMore, .timedOut: return "exclamationmark.triangle"
+        case .noForm: return "envelope"
+        case .pacing: return "timer"
         default: return "hourglass"
         }
     }
@@ -764,7 +857,7 @@ struct AssistedOptOutView: View {
     private var tint: Color {
         switch runner.phase {
         case .sent: return .green
-        case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return .orange
+        case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut, .noForm: return .orange
         default: return .white.opacity(0.7)
         }
     }
@@ -790,6 +883,33 @@ struct SkippedMark: View {
         .shadow(radius: 20)
         .onAppear { withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) { moved = true } }
         .accessibilityElement(children: .ignore).accessibilityLabel(Loc.t("Skipped")).accessibilityIdentifier("assisted-skipped-mark")
+        .allowsHitTesting(false)
+    }
+}
+
+/// The waiting mark: the same round badge as the check and the skip, with a turning arrow.
+struct LoadingMark: View {
+    let title: String
+    @State private var turning = false
+    @State private var grown = false
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle().fill(Color.exnayGold)
+                Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 56, weight: .bold)).foregroundStyle(.white)
+                    .rotationEffect(.degrees(turning ? 360 : 0))
+            }
+            .frame(width: 120, height: 120).scaleEffect(grown ? 1 : 0.4)
+            Text(title).font(.title3.bold()).foregroundStyle(Color.exnayGold)
+        }
+        .padding(36)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28))
+        .shadow(radius: 20)
+        .onAppear {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { grown = true }
+            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) { turning = true }
+        }
+        .accessibilityElement(children: .ignore).accessibilityLabel(title).accessibilityIdentifier("loading-mark")
         .allowsHitTesting(false)
     }
 }

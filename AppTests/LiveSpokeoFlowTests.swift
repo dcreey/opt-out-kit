@@ -43,7 +43,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
         let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = try XCTUnwrap(model.selectedPerson)
-        me.names = [NameEntry(kind: .legal, name: "John Smith")]
+        me.names = [NameEntry(kind: .legal, name: "John Smith")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Chicago", state: "IL", zip: "62701")]
         XCTAssertTrue(me.isComplete)
         model.update(me)

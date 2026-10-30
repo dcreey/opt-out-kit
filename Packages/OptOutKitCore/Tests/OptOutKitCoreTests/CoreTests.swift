@@ -1802,10 +1802,12 @@ final class ListingFlowTests: XCTestCase {
 final class RequiredDetailsTests: XCTestCase {
     func testAProfileNeedsALegalFirstAndLastNameAndACurrentAddress() {
         var p = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat")])
-        XCTAssertEqual(p.missingRequiredDetails, ["legal last name", "current street address", "current city", "current state", "current zip code"])
+        XCTAssertEqual(p.missingRequiredDetails, ["legal last name", "birthdate", "current street address", "current city", "current state", "current zip code"])
         XCTAssertFalse(p.isComplete)
         p.names = [NameEntry(kind: .legal, name: "Pat Example")]
         p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL")]
+        XCTAssertEqual(p.missingRequiredDetails, ["birthdate", "current zip code"], "the birthdate is required too")
+        p.birthdate = "1985-03-14"
         XCTAssertEqual(p.missingRequiredDetails, ["current zip code"], "a ZIP code is required too")
         p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         XCTAssertTrue(p.isComplete); XCTAssertEqual(p.missingRequiredDetails, [])
@@ -1823,7 +1825,7 @@ final class RequiredDetailsTests: XCTestCase {
     }
 
     func testBlankSpacesDoNotCount() {
-        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "  ", city: " ", state: "IL", zip: " ")])
+        let p = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "  ", city: " ", state: "IL", zip: " ")], birthdate: "1985-03-14")
         XCTAssertEqual(p.missingRequiredDetails, ["current street address", "current city", "current zip code"])
     }
 }
@@ -3236,5 +3238,35 @@ final class OverdueFollowUpTests: XCTestCase {
         ]
         XCTAssertEqual(FollowUps.overdue(attempts, now: now).map(\.id), ["old"], "only the one still waiting past 45 days; the finished one is not")
         XCTAssertEqual(FollowUps.pending(attempts).count, 2)
+    }
+}
+
+final class EmailOnlyInVerifyQueueTests: XCTestCase {
+    func testSitesWithOnlyAnEmailAddressJoinTheOneAtATimeQueueAfterTheFormSites() {
+        var form = DirectoryEntry(id: "f", domain: "f.com", name: "f", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        form.liveForm = LiveFormCheck(checked: "2026-10-26", found: true, page: "https://f.com/optout", blockers: [])
+        var mail = DirectoryEntry(id: "m", domain: "m.com", name: "m", bucket: "direct", tier: .B, automation: .guided, signals: [])
+        mail.contactEmail = "privacy@m.com"
+        let steps = OptOutPlan.build(entries: [mail, form], brokers: [], platforms: [],
+                                     classifyEntry: { e in e.liveForm?.found == true ? MethodVerdict(method: .semiAutomatic, reason: "") : MethodVerdict(method: .emailOnly, reason: "") },
+                                     classifyBroker: { _ in MethodVerdict(method: .manual, reason: "") })
+        XCTAssertEqual(OptOutPlan.verifyQueue(steps, entries: [mail, form]), ["f.com", "m.com"])
+    }
+}
+
+final class LegalBasisFillTests: XCTestCase {
+    func testABoxAskingForTheApplicableLawIsFilledWithAtLeast50CharactersNamingCCPAAndGDPR() {
+        let person = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(street: "1 Main", city: "Austin", state: "TX", zip: "78701")], emails: ["pat@example.com"], birthdate: "1985-03-14")
+        let form = OptOutForm(page: URL(string: "https://f.example/privacy-request")!, method: "post", action: nil, fields: [
+            FormField(type: "textarea", name: "legalInfo", label: "Please cite the particular, applicable law that affords you protection"),
+            FormField(type: "textarea", name: "threatInfo", label: "Please describe the threat against you"),
+            FormField(type: "email", name: "email", label: "Email"),
+        ], hops: 1)
+        let plan = FormFiller.plan(for: form, signals: nil, person: person)
+        let law = plan.values.first { $0.name == "legalInfo" }?.candidates.first ?? ""
+        XCTAssertGreaterThanOrEqual(law.count, 50, "the form insists on at least 50 characters")
+        XCTAssertTrue(law.contains("CCPA") && law.contains("GDPR") && law.lowercased().contains("opt out"))
+        XCTAssertNil(plan.values.first { $0.name == "threatInfo" }, "a claim of physical risk is never made for the person")
     }
 }

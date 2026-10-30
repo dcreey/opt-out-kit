@@ -21,7 +21,7 @@ final class ContactEmailAppTests: XCTestCase {
     private func complete(_ m: AppModel, name: String, relationship: Relationship? = nil) -> Person {
         var p = m.people.first { $0.relationship == .me }!
         if let relationship { p = m.addPerson(named: name, relationship: relationship)! }
-        p.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        p.names = [NameEntry(kind: .legal, name: "Pat Example")]; p.birthdate = "1985-03-14"
         p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(p)
         return p

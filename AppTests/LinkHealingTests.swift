@@ -71,7 +71,7 @@ final class LinkHealingTests: XCTestCase {
     func testABrokerFlowWhoseFirstPageMovedGuidesToTheNewPage() async throws {
         let m = model()
         var me = try XCTUnwrap(m.selectedPerson)
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")      // a flow only starts for a person whose profile is complete
         let broker = try XCTUnwrap(m.brokers.first { $0.id == "peopleconnect" })
@@ -93,7 +93,7 @@ final class LinkHealingTests: XCTestCase {
         final class Calls: @unchecked Sendable { var pages: [String] = [] }
         let m = model()
         var me = try XCTUnwrap(m.selectedPerson)
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"; me.emails = ["pat@example.com"]
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         let submitter = GoneThenFine()

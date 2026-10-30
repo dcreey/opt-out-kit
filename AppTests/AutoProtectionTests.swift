@@ -19,7 +19,7 @@ final class AutoProtectionTests: XCTestCase {
     }
     private func withProfile(_ m: AppModel) throws -> Person {
         var me = try XCTUnwrap(m.selectedPerson)
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.emails = ["pat@example.com"]
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(me)
@@ -87,7 +87,7 @@ final class AutoProtectionTests: XCTestCase {
         let m = model()
         m.setAuto(scan: true, optOut: true)
         let kid = try XCTUnwrap(m.addPerson(named: "Kim Example"))
-        var k = kid; k.isMinor = true; k.emails = ["k@example.com"]; k.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        var k = kid; k.isMinor = true; k.birthdate = "2015-05-01"; k.emails = ["k@example.com"]; k.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(k)
         m.setContactEmail("pat@example.com")
         let box = CallBox()

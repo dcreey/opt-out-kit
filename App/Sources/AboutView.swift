@@ -245,7 +245,7 @@ struct GPCSetupView: View {
             }
             Section {
                 Button { model.setGPCSetupDone(!model.gpcSetupDone) } label: {
-                    Label(model.gpcSetupDone ? "Marked as done. Tap to undo." : "I turned it on", systemImage: model.gpcSetupDone ? "checkmark.circle.fill" : "circle")
+                    Label(model.gpcSetupDone ? "Marked completed. Tap to undo." : "Mark completed", systemImage: model.gpcSetupDone ? "checkmark.circle.fill" : "circle")
                 }.accessibilityIdentifier("gpc-done")
                 NavigationLink("What it is and who has to honor it") { GlobalPrivacyControlView() }
             }

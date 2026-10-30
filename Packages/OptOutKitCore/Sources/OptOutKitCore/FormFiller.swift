@@ -188,6 +188,10 @@ public enum FormFiller {
                 put(["Privacy opt-out and deletion request", "Privacy request", "Opt out", "Opt-out", "Do not sell", "Delete", "Privacy", "Other"], L10n.noun("Subject")); continue
             }
             if field.type == "select", has("message|comments?|details|description|tell us|your request") { continue }
+            // "Please cite the law that gives you this right": the plain statement of the privacy laws that do. (The box about a threat of physical harm is never filled.)
+            if (field.type == "textarea" || field.type == "text"), has("legal.?info|legal basis|basis for (your |the )?request|applicable law|cite .{0,30}law|which law|law that (affords|gives|protects)"), !has("threat|harm|danger") {
+                put([FormFiller.legalBasis(for: person)], L10n.noun("Legal basis")); continue
+            }
             if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
                 put([FormFiller.standardRequest(for: person)], L10n.noun("Message")); continue
             }
@@ -235,6 +239,16 @@ public enum FormFiller {
     }
 
     /// The request text for a free-text box: plain, the same for everyone, and only what the form already receives.
+    /// What a box that asks "which law gives you this right" gets: the plain statement that privacy laws give the right to opt out and to delete. Always more than
+    /// 50 characters (some forms insist on that), and it claims nothing about the person beyond living where the law applies.
+    public static func legalBasis(for person: Person) -> String {
+        let country = person.countryCode ?? "US"
+        if country != "US" {
+            return "I am afforded the right to opt out of the sale and sharing of my personal information, and to have it deleted, under \(Regions.law(forCountry: country)) and the GDPR where it applies to me."
+        }
+        return "I am afforded the right to opt out of the sale and sharing of my personal information, and to have it deleted, under the California Consumer Privacy Act (CCPA), the GDPR where it applies to me, and similar state privacy laws."
+    }
+
     public static func standardRequest(for person: Person) -> String {
         let country = person.countryCode ?? "US"
         if country != "US" {

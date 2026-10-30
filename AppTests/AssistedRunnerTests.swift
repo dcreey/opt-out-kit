@@ -223,7 +223,7 @@ final class AssistedRunnerTests: XCTestCase {
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = try XCTUnwrap(m.selectedPerson)
         XCTAssertTrue(m.assistedItems(for: me).isEmpty, "with no name or email there is nothing to fill in")
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com"]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"; me.emails = ["pat@example.com"]
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         let queue = m.assistedItems(for: me)
@@ -344,4 +344,112 @@ final class EmailInsteadTests: XCTestCase {
 @MainActor
 private final class ScriptedDriverForEmail: AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { nil }
+}
+
+@MainActor
+final class NoFormReasonTests: XCTestCase {
+    private final class NoFormDriver: AssistedDriver {
+        func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { nil }
+        func failureReason(for form: OptOutForm) -> String? { "noform" }
+    }
+    private func entry(_ host: String, email: String?) -> (DirectoryEntry, OptOutForm) {
+        let form = OptOutForm(page: URL(string: "https://\(host)/contact-us")!, method: "post", action: nil, fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        return (DirectoryEntry(id: host.replacingOccurrences(of: ".", with: "_"), domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutForm: form, contactEmail: email), form)
+    }
+
+    func testAPageWithNoFormWaitsOnTheNoFormScreenForTheEmailInsteadOfCallingItUnloadable() async {
+        let (e, form) = entry("contact.example", email: "privacy@contact.example")
+        var got: [AutoOptOutResult] = []
+        let r = AssistedRunner(items: [AssistedRunner.Item(entry: e, form: form, plan: FillPlan(values: [], verdict: .ready))], driver: NoFormDriver()) { _, res in got.append(res) }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0
+        let run = Task { @MainActor in await r.run() }
+        for _ in 0..<200 where r.emailOffer == nil { try? await Task.sleep(nanoseconds: 5_000_000) }
+        XCTAssertEqual(r.phase, .noForm, "says no form exists, send an email instead")
+        r.answerEmailOffer(sent: false)
+        XCTAssertEqual(r.phase, .noForm); XCTAssertFalse(r.finished, "\"No\" to the mail prompt keeps waiting; it is not an answer")
+        r.answerEmailOffer(sent: true); await run.value
+        XCTAssertEqual(got.last, .emailed); XCTAssertTrue(r.finished)
+    }
+
+    func testAnEmailOnlySiteLoadsNothingAndCanBeSkipped() async {
+        let (e, form) = entry("mail.example", email: "privacy@mail.example")
+        var item = AssistedRunner.Item(entry: e, form: form, plan: FillPlan(values: [], verdict: .ready)); item.emailOnly = true
+        var got: [AutoOptOutResult] = []
+        let r = AssistedRunner(items: [item], driver: ScriptedDriverNeverLoads()) { _, res in got.append(res) }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0
+        let run = Task { @MainActor in await r.run() }
+        for _ in 0..<200 where r.phase != .noForm { try? await Task.sleep(nanoseconds: 5_000_000) }
+        XCTAssertEqual(r.phase, .noForm)
+        r.skip(); await run.value
+        XCTAssertEqual(got.last, .needsYou("skipped")); XCTAssertEqual(r.skippedCount, 1); XCTAssertTrue(r.finished)
+    }
+
+    private final class ScriptedDriverNeverLoads: AssistedDriver {
+        func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { XCTFail("an email-only site loads no page"); return nil }
+    }
+}
+
+@MainActor
+final class BlockWidgetTests: XCTestCase {
+    func testABlockedProfileMessageAdvancesButTheBlockButtonAloneDoesNot() {
+        XCTAssertEqual(FormRun.classifyConfirmed("Your profile has been blocked."), .submitted(awaitingEmail: false))
+        XCTAssertEqual(FormRun.classifyConfirmed("The profile was successfully blocked. Changes may take 48 hours."), .submitted(awaitingEmail: false))
+        if case .submitted = FormRun.classifyConfirmed("Name: Riva N Reed Age: 36 Block Profile") { XCTFail("a Block Profile button is not a confirmation") }
+    }
+
+    func testUSATraceAndItsSisterSiteAreBlockWidgets() {
+        func item(_ host: String) -> AssistedRunner.Item {
+            let form = OptOutForm(page: URL(string: "https://\(host)/your-privacy/")!, method: "post", action: nil, fields: [], hops: 1)
+            let entry = DirectoryEntry(id: host, domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutForm: form)
+            return AssistedRunner.Item(entry: entry, form: form, plan: FillPlan(values: [], verdict: .ready))
+        }
+        XCTAssertTrue(item("usatrace.com").blockWidget)
+        XCTAssertTrue(item("quickpeopletrace.com").blockWidget)
+        XCTAssertFalse(item("infotracer.com").blockWidget)
+    }
+}
+
+@MainActor
+final class RateLimitTests: XCTestCase {
+    func testABarePageSayingTooManyRequestsIsARateLimitNotAFailedForm() {
+        XCTAssertEqual(FormRun.classify("Too many requests!!"), .failed(AutoOptOut.rateLimited))
+        XCTAssertEqual(AutoOptOut.result(for: .failed(AutoOptOut.rateLimited)), .needsYou(AutoOptOut.rateLimited), "so no failed attempt is recorded against the site")
+        XCTAssertNil(AutoOptOut.attempt(for: .needsYou(AutoOptOut.rateLimited), now: Date()))
+    }
+
+    private func familyItems(_ hosts: [String]) -> [AssistedRunner.Item] {
+        hosts.map { host in
+            let form = OptOutForm(page: URL(string: "https://\(host)/optout")!, method: "post", action: nil,
+                                  fields: [FormField(type: "text", name: "InfoPay_Core_Components[fname]", label: "First name")], hops: 1)
+            let entry = DirectoryEntry(id: host.replacingOccurrences(of: ".", with: "_"), domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutForm: form)
+            return AssistedRunner.Item(entry: entry, form: form, plan: FillPlan(values: [], verdict: .ready))
+        }
+    }
+
+    private final class Pages: AssistedDriver {
+        func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { Page() }
+    }
+    private final class Page: AssistedPage {
+        var webView: WKWebView? { nil }
+        func blockers() async -> [AssistedBlocker] { [] }
+        func refill() async {}
+        func send() async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+        func close() {}
+    }
+
+    func testTheSecondSiteOfOneCompanyWaitsBeforeItIsSent() async {
+        let r = AssistedRunner(items: familyItems(["a.example", "b.example"]), driver: Pages()) { _, _ in }
+        r.pollInterval = 0.01; r.pauseAfterSent = 0; r.familyGap = 0.5
+        var sawPacing = false
+        let run = Task { @MainActor in await r.run() }
+        let start = Date()
+        while !r.finished, Date().timeIntervalSince(start) < 5 {
+            if case .pacing = r.phase { sawPacing = true }
+            try? await Task.sleep(nanoseconds: 20_000_000)
+        }
+        await run.value
+        XCTAssertTrue(sawPacing, "it showed that it was waiting")
+        XCTAssertGreaterThanOrEqual(Date().timeIntervalSince(start), 0.45, "the second send came after the gap")
+        XCTAssertEqual(r.results.values.filter { if case .submitted = $0 { return true } else { return false } }.count, 2)
+    }
 }

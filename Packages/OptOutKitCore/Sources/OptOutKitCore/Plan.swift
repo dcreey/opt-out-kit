@@ -66,7 +66,12 @@ public enum OptOutPlan {
         }
         // Forms that ask for a typed code come last; otherwise the brokers that matter most come first.
         func typed(_ e: DirectoryEntry) -> Int { ((e.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (e.liveForm?.blockers.contains("code") ?? false)) ? 1 : 0 }
-        return eligible.sorted { (typed($0), -($0.priority ?? 0), $0.domain) < (typed($1), -($1.priority ?? 0), $1.domain) }.map(\.domain)
+        let forms = eligible.sorted { (typed($0), -($0.priority ?? 0), $0.domain) < (typed($1), -($1.priority ?? 0), $1.domain) }.map(\.domain)
+        // Sites with no form, only an email address, come one at a time too, after the form sites: each shows "no form exists, send an email instead".
+        let emailOnly = steps.flatMap(\.tasks).filter { $0.kind == .emails }.flatMap(\.domains).compactMap { byDomain[$0] }
+            .filter { $0.contactEmail != nil && !hasForm($0) }
+            .sorted { (-($0.priority ?? 0), $0.domain) < (-($1.priority ?? 0), $1.domain) }.map(\.domain)
+        return forms + emailOnly
     }
 
     public static func build(entries: [DirectoryEntry], brokers: [Broker], platforms: [Platform],

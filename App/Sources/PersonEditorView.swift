@@ -60,13 +60,6 @@ struct PersonEditorView: View {
             }
             StringListSection(title: "Phones", hint: "Optional", addLabel: Loc.t("Add phone"),
                               items: $person.phones, keyboard: .phonePad)
-            Section("Birthdate") {
-                TextField("YYYY-MM-DD (optional)", text: Binding(
-                    get: { person.birthdate ?? "" },
-                    set: { person.birthdate = $0.isEmpty ? nil : $0 }))
-                    .keyboardType(.numbersAndPunctuation)
-                Text("Sent only to sites whose definition asks for it.").font(.footnote).foregroundStyle(.secondary)
-            }
             if model.people.count > 1 {
                 Section {
                     Button("Delete this person", role: .destructive) { confirmDelete = true }
@@ -78,6 +71,13 @@ struct PersonEditorView: View {
         }
         .navigationTitle(person.displayName.isEmpty ? "Profile" : person.displayName)
         .navigationBarTitleDisplayMode(.inline)
+        #if DEBUG
+        // UI tests that fill in a profile do not drive the year menu: they get a birthdate unless a test asks to choose one (`-uitest-require-birthdate`).
+        .onAppear {
+            let args = ProcessInfo.processInfo.arguments
+            if args.contains("-uitest-reset"), !args.contains("-uitest-require-birthdate"), person.birthdate == nil { person.birthdate = "1985-03-14" }
+        }
+        #endif
         // The model is written when the person leaves a field, taps Done or Save, or leaves the screen, not while typing (each write rebuilds the plan and
         // saves the encrypted file). The host reads the live draft, so its Done button does not wait for a write.
         .onChange(of: person) { _, new in onDraft?(new) }
@@ -170,6 +170,7 @@ struct PersonEditorView: View {
                     person.addresses[0].zip = v.isEmpty ? nil : v
                 }))
                 .keyboardType(.numbersAndPunctuation).textContentType(.postalCode).accessibilityIdentifier("current-zip")
+            BirthdatePicker(birthdate: $person.birthdate)
             if person.relationship == .me { emailRows }
             let missing = person.missingRequiredDetails + (person.relationship == .me && model.formEmail == nil ? [L10n.noun("Email address")] : [])
             if !missing.isEmpty {
@@ -177,9 +178,9 @@ struct PersonEditorView: View {
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("missing-details")
             }
         } header: {
-            Text("Required: legal name and current address")
+            Text("Required: legal name, current address and birthdate")
         } footer: {
-            Text("Sites find and remove records by legal name and address, so every profile needs both. Only the fields a site's form asks for are ever sent.")
+            Text("Sites find and remove records by legal name and address, and many ask for a birthdate, so every profile needs all three. Only the fields a site's form asks for are ever sent.")
         }
     }
 
@@ -287,4 +288,51 @@ struct StringListSection: View {
 /// The same words wherever the app asks for the email, so what it does with it is always said the same way.
 enum EmailExplainer {
     static let text = Loc.t("We put this one address, exactly as you typed it, on every opt-out form and data-deletion request. Many sites look you up by that exact address, so we never change it. Replies and confirmation links arrive in your normal inbox.")
+}
+
+
+/// The birthdate, chosen year first, then month, then day. Stored as "YYYY-MM-DD". Required: a profile is not complete without it.
+struct BirthdatePicker: View {
+    @Binding var birthdate: String?
+
+    private var parts: (y: Int?, m: Int?, d: Int?) {
+        let p = (birthdate ?? "").split(separator: "-").compactMap { Int($0) }
+        return (p.count > 0 ? p[0] : nil, p.count > 1 ? p[1] : nil, p.count > 2 ? p[2] : nil)
+    }
+    private static let thisYear = Calendar.current.component(.year, from: Date())
+
+    private func daysIn(_ y: Int, _ m: Int) -> Int {
+        Calendar.current.range(of: .day, in: .month, for: Calendar.current.date(from: DateComponents(year: y, month: m, day: 1)) ?? Date())?.count ?? 31
+    }
+
+    private func set(y: Int?, m: Int?, d: Int?) {
+        guard let y else { birthdate = nil; return }
+        // A month or day is kept only once the part before it is chosen; a day that the new month does not have becomes its last day.
+        guard let m else { birthdate = String(format: "%04d", y); return }
+        let day = d.map { min($0, daysIn(y, m)) }
+        birthdate = day.map { String(format: "%04d-%02d-%02d", y, m, $0) } ?? String(format: "%04d-%02d", y, m)
+    }
+
+    var body: some View {
+        let p = parts
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Birthdate").font(.subheadline.bold())
+            HStack(spacing: 8) {
+                Picker("Year", selection: Binding(get: { p.y ?? 0 }, set: { set(y: $0 == 0 ? nil : $0, m: p.m, d: p.d) })) {
+                    Text("Year").tag(0)
+                    ForEach((1900...Self.thisYear).reversed(), id: \.self) { Text(String($0)).tag($0) }
+                }.accessibilityIdentifier("birth-year")
+                Picker("Month", selection: Binding(get: { p.m ?? 0 }, set: { set(y: p.y, m: $0 == 0 ? nil : $0, d: p.d) })) {
+                    Text("Month").tag(0)
+                    ForEach(1...12, id: \.self) { Text(Calendar.current.monthSymbols[$0 - 1]).tag($0) }
+                }.disabled(p.y == nil).accessibilityIdentifier("birth-month")
+                Picker("Day", selection: Binding(get: { p.d ?? 0 }, set: { set(y: p.y, m: p.m, d: $0 == 0 ? nil : $0) })) {
+                    Text("Day").tag(0)
+                    ForEach(1...daysIn(p.y ?? 2000, p.m ?? 1), id: \.self) { Text(String($0)).tag($0) }
+                }.disabled(p.m == nil).accessibilityIdentifier("birth-day")
+            }
+            .pickerStyle(.menu)
+            Text("Sent only to sites whose form asks for it.").font(.footnote).foregroundStyle(.secondary)
+        }
+    }
 }

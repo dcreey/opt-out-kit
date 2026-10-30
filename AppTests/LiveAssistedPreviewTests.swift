@@ -14,7 +14,7 @@ final class LiveAssistedPreviewTests: XCTestCase {
         let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                              defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var pat = try XCTUnwrap(model.selectedPerson)
-        pat.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        pat.names = [NameEntry(kind: .legal, name: "Pat Example")]; pat.birthdate = "1985-03-14"
         pat.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
         model.update(pat); model.setContactEmail("pat@example.com")
         let items = model.assistedItems(for: pat).filter { only == ["all"] || only.contains($0.entry.domain) }

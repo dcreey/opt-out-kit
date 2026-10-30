@@ -176,7 +176,7 @@ final class AppModel: ObservableObject {
         if args.contains("-uitest-seed-profile"), var me = household.people.first(where: { $0.relationship == .me }) {
             me.names = [NameEntry(kind: .legal, name: "Pat Example")]
             me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
-            if args.contains("-uitest-seed-birthdate") { me.birthdate = "1985-03-14" }
+            me.birthdate = "1985-03-14"          // a complete profile includes the birthdate
             household.update(me)
             household.setContactEmail("pat@example.com")
             household.updateAuto { $0.decidedAt = Date() }
@@ -1059,6 +1059,14 @@ final class AppModel: ObservableObject {
         let progress = household.progress(for: person.id)
         return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
             guard set.contains(entry.domain) else { return nil }
+            // No form at all, only an email address: shown one at a time with "no form exists, send an email instead".
+            if entry.optOutForm == nil, entry.liveForm?.found != true, entry.contactEmail != nil {
+                let page = entry.optOutURL ?? URL(string: "https://\(entry.domain)/")!
+                let none = OptOutForm(page: page, method: "post", action: nil, fields: [], hops: 0)
+                if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
+                var item = AssistedRunner.Item(entry: entry, form: none, plan: FillPlan(values: [], verdict: .ready)); item.emailOnly = true
+                return item
+            }
             // A form the crawl could not read but a real page load found: the live page decides what is filled, so a stand-in form is enough.
             guard let form = entry.optOutForm ?? entry.liveForm?.page.flatMap(URL.init(string:)).map({ OptOutForm(page: $0, method: "post", action: nil, fields: [], hops: 1) }) else { return nil }
             // Shown in the person's language when the site offers its opt-out page in it; the original page is the fallback.
@@ -1256,7 +1264,7 @@ final class AppModel: ObservableObject {
         household.mutateProgress(for: person.id) { p in
             if let attempt = AutoOptOut.attempt(for: result, now: Date()) { p.recordOptOutAttempt(attempt, site: entry.id) }
             // A page that would not load is skipped: it leaves today's batch and comes back in a week (the failure is not held against the site's method).
-            if case .needsYou(let why) = result, why == AssistedRunner.unloadable { p.skipSite(entry.id, reason: .skipped) }
+            if case .needsYou(let why) = result, why == AssistedRunner.unloadable || why == AssistedRunner.noForm { p.skipSite(entry.id, reason: .skipped) }
         }
         var rows = optOutRun[person.id] ?? []
         rows.removeAll { $0.id == entry.id }

@@ -12,7 +12,7 @@ final class PlatformAppTests: XCTestCase {
 
     private func setUp(_ m: AppModel, state: String?) -> Person {
         var me = m.people.first { $0.relationship == .me }!
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Springfield", state: state ?? "", zip: "62701")]
         m.update(me)
         m.setContactEmail("pat@example.com")
@@ -92,7 +92,7 @@ final class HandledOnceTests: XCTestCase {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: state, zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         return (m, me)
@@ -198,7 +198,7 @@ final class ProfileGateAppTests: XCTestCase {
         XCTAssertNil(m.guidedRunner(for: m.brokers[0]))
         XCTAssertTrue(m.assistedItems(for: m.selectedPerson!).isEmpty)
         var me = m.people.first { $0.relationship == .me }!
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         m.profileGateFinished(completed: true)
@@ -223,7 +223,7 @@ final class AutomaticRunAppTests: XCTestCase {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         final class Seen: FormSubmitter, @unchecked Sendable {
@@ -272,7 +272,7 @@ final class RunReviewAppTests: XCTestCase {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
-        me.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
         m.update(me); m.setContactEmail("pat@example.com")
         struct Shot: FormSubmitter {

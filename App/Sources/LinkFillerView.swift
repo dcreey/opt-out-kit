@@ -95,6 +95,7 @@ struct LinkFillerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
+        .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…")).transition(.opacity) } }
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
         .confirmationDialog(askTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }), titleVisibility: .visible, presenting: asking) { a in
             Button(isUnknown(a.check) ? "Open it anyway" : "Open it again", role: isUnknown(a.check) ? .destructive : nil) { open(a.url, a.check) }
@@ -127,7 +128,9 @@ struct LinkFillerView: View {
                     TextField("Paste the link from the email", text: $text)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
                         .accessibilityIdentifier("link-field")
-                    Button("Paste") { if let s = UIPasteboard.general.string { text = s } }.buttonStyle(.bordered)
+                    // The system's own paste button: reading the clipboard from code makes iOS ask "Allow Paste?" every time; this does not.
+                    PasteButton(payloadType: String.self) { strings in if let s = strings.first { text = s; begin() } }
+                        .labelStyle(.titleOnly).buttonBorderShape(.capsule).accessibilityIdentifier("link-paste")
                 }
                 Button { begin() } label: { Label("Check the link", systemImage: "link") }
                     .disabled(LinkFiller.normalized(text) == nil || filler.busy).accessibilityIdentifier("link-open")
@@ -247,18 +250,21 @@ struct EmailCheckExplainer: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 52)).foregroundStyle(.tint).frame(maxWidth: .infinity)
-                Text("This request needs one more step: your email").font(.title2.bold()).multilineTextAlignment(.center).frame(maxWidth: .infinity)
+                Text("This site hasn't opted you out yet").font(.title2.bold()).multilineTextAlignment(.center).frame(maxWidth: .infinity)
                 Group {
-                    Text("Why").font(.headline)
-                    Text("The site sends a message to the address you gave to check that the request is really yours. Until you open the link in it, **nothing is removed**. Anyone could type your name into a form, so this is how sites stop people removing someone else.")
-                    Text("What to look for").font(.headline)
-                    Text("An email from the site, usually within a few minutes. Look in spam and promotions too. Some links expire after a day, so do it soon.")
-                    Text("How the Email links tab helps").font(.headline)
+                    Text("They need one more step from you: you have to click a link they email you, and the page it opens may ask for more information. Until you do, **nothing is removed**.")
+                    Text("We keep track of these").font(.headline)
+                    Text("Every request waiting on an email is listed in the **Email links** tab, and the number on its icon shows how many.")
+                    Text("When the email arrives").font(.headline)
                     VStack(alignment: .leading, spacing: 10) {
-                        Label("We list every request that is waiting for an email on the Email links tab, and show the number on its icon.", systemImage: "list.bullet")
-                        Label("Open the email, press and hold its link, and choose Copy Link.", systemImage: "doc.on.clipboard")
-                        Label("Open the Email links tab and tap Paste. We check the link belongs to a site in your list, and tell you if you already finished it.", systemImage: "checkmark.shield")
-                        Label("We load the page and fill in your details. You press its final button, then tap \"I finished this request\" and it leaves the list.", systemImage: "hand.tap")
+                        Label("Look for it in your inbox, and in spam or promotions. Some links expire after a day, so do it soon.", systemImage: "envelope")
+                        Label("Don't tap the link in the email. Press and hold the link and choose Copy Link.", systemImage: "doc.on.clipboard")
+                        Label("Open the Email links tab in Exnay and paste it.", systemImage: "link")
+                    }
+                    Text("Why paste it here instead of tapping it").font(.headline)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("1. We check that the link is safe: that it really belongs to the site you opted out of.", systemImage: "checkmark.shield")
+                        Label("2. We fill in anything the page asks for, with your details, so you only press its final button. Then tap \"I finished this request\" and it leaves the list.", systemImage: "square.and.pencil")
                     }
                 }
                 .font(.callout).fixedSize(horizontal: false, vertical: true)
