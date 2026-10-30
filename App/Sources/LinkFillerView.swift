@@ -71,6 +71,9 @@ final class LinkFiller: ObservableObject {
             : Loc.f("Filled in %lld fields. Check them, solve any check, then press the page's own button to send.", fill.filled)
     }
 
+    /// The words on the page now, for noticing that it says the opt-out is complete.
+    func pageText() async -> String { await session?.viewportText() ?? "" }
+
     func close() { session?.close(); session = nil; webView = nil; host = ""; status = "" }
 }
 
@@ -82,6 +85,7 @@ struct LinkFillerView: View {
     @State private var asking: (url: URL, check: LinkCheck)?
     @State private var showTour = false
     @State private var finished = false
+    @State private var showDone = false
     var startLink: String = ""
 
     var body: some View {
@@ -96,6 +100,8 @@ struct LinkFillerView: View {
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
         .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…")).transition(.opacity) } }
+        .overlay { if showDone { SentCheck().transition(.opacity) } }
+        .task(id: filler.webView == nil) { await watchForCompletion() }
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
         .confirmationDialog(askTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }), titleVisibility: .visible, presenting: asking) { a in
             Button(isUnknown(a.check) ? "Open it anyway" : "Open it again", role: isUnknown(a.check) ? .destructive : nil) { open(a.url, a.check) }
@@ -174,8 +180,8 @@ struct LinkFillerView: View {
                 } label: { Label("Fill in my details", systemImage: "square.and.pencil").frame(maxWidth: .infinity) }
                     .buttonStyle(.borderedProminent).controlSize(.large).disabled(filler.busy).accessibilityIdentifier("link-fill")
                 if case .known(let id, _, _, let waiting)? = check, waiting, !finished {
-                    Button { model.markFollowUpDone(id); returnToChooser() } label: { Label("I finished this request", systemImage: "checkmark.circle").frame(maxWidth: .infinity) }
-                        .buttonStyle(.bordered).controlSize(.large)
+                    Button { complete(id) } label: { Label("I finished this request", systemImage: "checkmark.circle.fill").frame(maxWidth: .infinity) }
+                        .buttonStyle(.borderedProminent).tint(.green).controlSize(.large).accessibilityIdentifier("link-finished")
                 }
             }.padding()
         }
@@ -188,6 +194,32 @@ struct LinkFillerView: View {
         case .unknown: asking = (url, c)
         case .known(_, _, let done?, _) where done != nil: asking = (url, c)
         default: open(url, c)
+        }
+    }
+
+    /// The request is finished: the site leaves the waiting list, the green check shows, and the tab goes back to an empty link box.
+    private func complete(_ id: String) {
+        guard !showDone else { return }
+        model.markFollowUpDone(id)
+        withAnimation { showDone = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation { showDone = false }; returnToChooser() }
+    }
+
+    /// While a link's page is open, reads it for a "removal complete" kind of message and finishes the request by itself when it appears.
+    private func watchForCompletion() async {
+        guard filler.webView != nil else { return }
+        var baseline = await filler.pageText()
+        while !Task.isCancelled, filler.webView != nil, !showDone {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            let now = await filler.pageText()
+            guard !now.isEmpty, now != baseline else { continue }
+            let added = FormRun.newText(before: baseline, after: now)
+            baseline = now
+            if FormRun.looksFinished(added) {
+                if case .known(let id, _, _, _)? = check { complete(id) }
+                else { withAnimation { showDone = true }; DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation { showDone = false }; returnToChooser() } }
+                return
+            }
         }
     }
 

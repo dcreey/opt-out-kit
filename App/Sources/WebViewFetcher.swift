@@ -392,6 +392,12 @@ enum FormRun {
     /// Only a success reading, for text that may be anything: error and unknown readings come back as failed.
     nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome { text.isEmpty ? .failed("") : classify(text) }
 
+    /// New text that says the whole opt-out is done (the page a confirmation email's link ends on), stricter than a send confirmation: "thank you" alone is not enough.
+    nonisolated static func looksFinished(_ text: String) -> Bool {
+        text.range(of: "(removal|opt.?out|deletion|request|verification) (is |has been |was )?(now )?(complete[d]?|confirmed|successful(ly)?|verified|finali[sz]ed)|(has|have) been (removed|deleted|suppressed|opted.?out)|(successfully|now) (removed|deleted|opted.?out|unsubscribed|verified|confirmed)|you (have|'ve) been (removed|opted.?out|unsubscribed)|(record|profile|listing|information)s? (has |have |was |were )?(been )?(removed|deleted|suppressed)|e-?mail (address )?(has been |is )?(verified|confirmed)|you are all set|you're all set",
+                   options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
     /// New text on the page that offers an opt-out or removal (a listing's "Opt out" button after a search).
     nonisolated static func mentionsOptOutControl(_ text: String) -> Bool {
         text.range(of: "opt.?(me.?)?out|remove (me|my|this)|do not sell", options: [.regularExpression, .caseInsensitive]) != nil

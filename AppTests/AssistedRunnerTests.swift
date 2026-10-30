@@ -453,3 +453,14 @@ final class RateLimitTests: XCTestCase {
         XCTAssertEqual(r.results.values.filter { if case .submitted = $0 { return true } else { return false } }.count, 2)
     }
 }
+
+final class LooksFinishedTests: XCTestCase {
+    func testCompletionMessagesAreRecognisedAndPlainThanksIsNot() {
+        for t in ["Your removal is complete.", "Your record has been removed.", "Opt-out confirmed", "Your email has been verified.", "You have been opted out."] {
+            XCTAssertTrue(FormRun.looksFinished(t), t)
+        }
+        for t in ["Thank you for your request", "Enter your email to remove your record", "We received your request"] {
+            XCTAssertFalse(FormRun.looksFinished(t), t)
+        }
+    }
+}
