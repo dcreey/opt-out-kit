@@ -34,8 +34,9 @@ final class LinkFiller: ObservableObject {
         busy = false
     }
 
-    func fill(person: Person) async {
-        guard let s = session else { return }
+    @discardableResult
+    func fill(person: Person) async -> Bool {
+        guard let s = session else { return false }
         busy = true; defer { busy = false }
         status = Loc.t("Filling in your details…")
         // A form already on the page is filled as it is. Only a page with no form gets its request chosen (plain "Opt Out" and "Delete" buttons, never links).
@@ -46,17 +47,17 @@ final class LinkFiller: ObservableObject {
             forms = await s.discoverForms()
         }
         guard let form = LiveFormPicker.pick(forms, pageContext: await s.pageContext()) else {
-            if let confirm = await s.confirmButtonLabel() { status = Loc.f("This page only needs your confirmation. Read it, then press \"%@\" yourself.", confirm); return }
+            if let confirm = await s.confirmButtonLabel() { status = Loc.f("This page only needs your confirmation. Read it, then press \"%@\" yourself.", confirm); return false }
             status = step != nil ? Loc.f("We chose \"%@\" for you. Read the page and confirm with its own button.", step ?? "")
                                  : Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.")
-            return
+            return false
         }
         s.chosenForm = form.token
         let plan = FormFiller.plan(for: form.asOptOutForm(page: webView?.url ?? URL(string: "https://invalid.example")!), signals: nil, person: person)
         switch plan.verdict {
         case .ready: break
-        case .needsData(let what): status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return
-        case .needsYou(let why): status = why; return
+        case .needsData(let what): status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return false
+        case .needsYou(let why): status = why; return false
         }
         let fill = await s.fillLive(plan.values, keepExisting: true)
         _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
@@ -69,6 +70,35 @@ final class LinkFiller: ObservableObject {
         #endif
         status = fill.filled == 0 ? Loc.t("The form's fields could not be filled in. Fill it in the page yourself.")
             : Loc.f("Filled in %lld fields. Check them, solve any check, then press the page's own button to send.", fill.filled)
+        return fill.filled > 0
+    }
+
+    /// Like the semi-automatic queue: once the person has cleared whatever the page asks of them (a check, terms, a confirmation box, a choice), press the form's
+    /// own send button and read the answer. Nil while it is still waiting or if it was stopped; the result once sent.
+    func sendWhenReady(isCancelled: @escaping () -> Bool) async -> SubmitOutcome? {
+        guard let s = session, let token = s.chosenForm else { return nil }
+        status = Loc.t("Your details are filled in. Clear any check below and we will send it.")
+        var waited: TimeInterval = 0
+        while !isCancelled(), waited < 600 {
+            try? await Task.sleep(nanoseconds: 1_500_000_000); waited += 1.5
+            guard session === s else { return nil }
+            var open = await s.hasTermsPrompt()
+            if !open { open = await s.pendingCertification() != nil }
+            if !open { open = await s.visibleChallenge() != nil }
+            if !open { open = await s.emptyCodeField() }
+            if !open { open = await s.emptyRequiredChoice(form: token) != nil }
+            if open { continue }
+            status = Loc.t("Sending…")
+            let before = await s.visibleText()
+            guard await s.pressLiveSubmit(form: token) else { status = Loc.t("We could not find the page's send button. Press it yourself."); return nil }
+            await s.settlePage(maxWait: 20)
+            if await s.pressConfirmStep() { await s.settlePage(maxWait: 20) }
+            if await s.visibleChallenge() != nil { continue }      // a check appeared after sending: wait for the person again
+            let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: await s.visibleText())
+            if case .submitted = outcome { status = Loc.t("Sent.") } else { status = Loc.t("We pressed Send but saw no confirmation. If it needs one more step, do it in the page.") }
+            return outcome
+        }
+        return nil
     }
 
     /// The words on the page now, for noticing that it says the opt-out is complete.
@@ -115,6 +145,7 @@ struct LinkFillerView: View {
                     Task {
                         check = model.checkLink(url)
                         await filler.open(url)
+                        await autoFinish()
                         #if DEBUG
                         if ProcessInfo.processInfo.arguments.contains("-auto-fill"), let me = model.selectedPerson { await filler.fill(person: model.formPerson(me)) }
                         #endif
@@ -226,7 +257,22 @@ struct LinkFillerView: View {
     /// Closes the page and clears the pasted link so the tab is ready for the next one.
     private func returnToChooser() { filler.close(); check = nil; finished = false; text = "" }
 
-    private func open(_ url: URL, _ c: LinkCheck) { check = c; finished = false; Task { await filler.open(url) } }
+    private func open(_ url: URL, _ c: LinkCheck) {
+        check = c; finished = false
+        Task {
+            await filler.open(url)
+            await autoFinish()
+        }
+    }
+
+    /// For a link from a site in the list: fill the form in, wait for the person to clear any check, send it, and finish the request on a confirmation.
+    /// A link from an unknown site is only loaded; filling and sending stay the person's call.
+    private func autoFinish() async {
+        guard filler.webView != nil, case .known(let id, _, _, _)? = check, let me = model.selectedPerson, model.isReady(me) else { return }
+        guard await filler.fill(person: model.formPerson(me)) else { return }
+        let gone = { [filler] in filler.webView == nil }
+        if case .submitted? = await filler.sendWhenReady(isCancelled: gone) { complete(id) }
+    }
 
     private func isUnknown(_ c: LinkCheck) -> Bool { if case .unknown = c { return true } else { return false } }
     private var askTitle: String {
@@ -251,7 +297,7 @@ struct LinkFillerTour: View {
         ("envelope.open", Loc.t("Some opt-outs finish by email"), Loc.t("After you send a request, some sites email you a link to confirm it or to finish a form. Until you open that link, the request is not done. The app keeps a list of the ones waiting.")),
         ("doc.on.clipboard", Loc.t("Copy the link from the email"), Loc.t("Open the email, press and hold the button or link, and choose Copy Link. Then come back here and tap Paste.")),
         ("checkmark.shield", Loc.t("We check it first"), Loc.t("We make sure the link is from a site in your list and tell you if it is not, or if you already finished that site. Then we load the page and fill in your details.")),
-        ("hand.tap", Loc.t("You press the last button"), Loc.t("Read the page, clear any check, and press its own button. We never send it for you. Tap \"I finished this request\" when you are done."))
+        ("hand.tap", Loc.t("You clear the check"), Loc.t("We fill in the page and wait while you read it and clear any check or terms. Then we press its send button and watch for the confirmation. If it needs one more step, do it in the page and tap \"I finished this request\"."))
     ]
 
     var body: some View {
