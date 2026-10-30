@@ -796,15 +796,26 @@ final class AppModel: ObservableObject {
         }
         set {
             objectWillChange.send()
-            defaults.set(Self.dayString(Date()), forKey: Self.batchDayKey); defaults.set(max(1, newValue), forKey: Self.batchCountKey)
+            startTodayIfNeeded()
+            defaults.set(max(1, newValue), forKey: Self.batchCountKey)
         }
+    }
+
+    /// The first change of the day clears what an earlier day left: otherwise setting today's date for one value made the other (the batch count of a
+    /// day with several batches) look like it was from today, and a fresh pick brought extra batches of other kinds with it.
+    private func startTodayIfNeeded() {
+        let today = Self.dayString(Date())
+        guard defaults.string(forKey: Self.batchDayKey) != today else { return }
+        defaults.set(today, forKey: Self.batchDayKey)
+        defaults.set(1, forKey: Self.batchCountKey)
+        defaults.set([String](), forKey: Self.themesKey)
     }
     private static let themesKey = "daily.themes"
 
     /// The kinds of broker the person chose for today's batches, in order. Empty until they choose, and again each new day.
     var dailyThemes: [String] {
         get { defaults.string(forKey: Self.batchDayKey) == Self.dayString(Date()) ? (defaults.stringArray(forKey: Self.themesKey) ?? []) : [] }
-        set { objectWillChange.send(); defaults.set(Self.dayString(Date()), forKey: Self.batchDayKey); defaults.set(newValue, forKey: Self.themesKey) }
+        set { objectWillChange.send(); startTodayIfNeeded(); defaults.set(newValue, forKey: Self.themesKey) }
     }
 
     /// Choose the kind for today's first batch (before anything is finished today).

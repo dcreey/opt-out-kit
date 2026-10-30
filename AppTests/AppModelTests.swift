@@ -315,3 +315,20 @@ final class SharedLinkTests: XCTestCase {
         XCTAssertNil(AppModel.sharedLink(in: URL(string: "https://example.com")!))
     }
 }
+
+@MainActor
+final class DailyBatchRolloverTests: XCTestCase {
+    func testAFreshPickOnANewDayIsOneBatchNotTheOldDaysBatchCount() {
+        let defaults = UserDefaults(suiteName: "ook.test.\(UUID())")!
+        // An earlier day on which three batches were taken.
+        defaults.set("2000-1-1", forKey: "daily.day"); defaults.set(3, forKey: "daily.batches"); defaults.set(["adtech", "b2b", "arrests"], forKey: "daily.themes")
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
+        let model = AppModel(store: HouseholdStore(url: file, keys: FixedKey()), defaults: defaults)
+        XCTAssertEqual(model.dailyBatches, 1)
+        XCTAssertEqual(model.dailyThemes, [])
+        model.chooseFirstKind("healthcare")
+        XCTAssertEqual(model.dailyBatches, 1, "the old day's count must not carry over")
+        XCTAssertEqual(model.dailyThemes, ["healthcare"])
+        XCTAssertEqual(model.dailyGoals.themes, ["healthcare"])
+    }
+}
