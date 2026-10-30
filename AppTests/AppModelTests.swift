@@ -331,4 +331,17 @@ final class DailyBatchRolloverTests: XCTestCase {
         XCTAssertEqual(model.dailyThemes, ["healthcare"])
         XCTAssertEqual(model.dailyGoals.themes, ["healthcare"])
     }
+
+    func testALeftOverListOfKindsFromTheBugIsIgnoredUntilSomethingIsFinished() {
+        let defaults = UserDefaults(suiteName: "ook.test.\(UUID())")!
+        let today = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        defaults.set("\(today.year ?? 0)-\(today.month ?? 0)-\(today.day ?? 0)", forKey: "daily.day")
+        defaults.set(4, forKey: "daily.batches"); defaults.set(["people_search", "location_data", "healthcare", "arrests"], forKey: "daily.themes")
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
+        let model = AppModel(store: HouseholdStore(url: file, keys: FixedKey()), defaults: defaults)
+        XCTAssertEqual(model.dailyGoals.themes, ["people_search"], "one kind, since nothing is finished today")
+        model.chooseFirstKind("healthcare")
+        XCTAssertEqual(model.dailyThemes, ["healthcare"])
+        XCTAssertEqual(model.dailyBatches, 1)
+    }
 }

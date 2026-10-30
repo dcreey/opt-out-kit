@@ -820,8 +820,8 @@ final class AppModel: ObservableObject {
 
     /// Choose the kind for today's first batch (before anything is finished today).
     func chooseFirstKind(_ id: String) {
-        var t = dailyGoals.themes; if t.isEmpty { t = [id] } else { t[0] = id }
-        dailyThemes = t; dailyBatches = max(dailyBatches, t.count)
+        var t = dailyGoals.themes; if t.isEmpty || dailyGoals.verifyDone == 0 { t = [id] } else { t[0] = id }
+        dailyThemes = t; dailyBatches = t.count
     }
 
     /// Take another 25 of a kind the person picks.
@@ -917,7 +917,12 @@ final class AppModel: ObservableObject {
     /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
         let queue = OptOutPlan.verifyQueue(plan, entries: directory)
-        return DailyGoals.build(queue: queue, entries: directory, attempts: progress.optOutAttempts, batches: dailyBatches, chosen: dailyThemes, parked: progress.parkedSites())
+        let attempts = progress.optOutAttempts, parked = progress.parkedSites()
+        // Nothing finished today means only the first batch can be real: a second one is taken only after finishing the first. A saved count or list of
+        // kinds that says otherwise is left over from a bug (a new day's pick inherited an earlier day's batches) and would fill the day with other kinds.
+        let first = DailyGoals.build(queue: queue, entries: directory, attempts: attempts, batches: 1, chosen: Array(dailyThemes.prefix(1)), parked: parked)
+        if first.verifyDone == 0 { return first }
+        return DailyGoals.build(queue: queue, entries: directory, attempts: attempts, batches: dailyBatches, chosen: dailyThemes, parked: parked)
     }
 
     /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
