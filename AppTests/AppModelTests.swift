@@ -305,3 +305,13 @@ final class UnloadableSiteAppTests: XCTestCase {
         XCTAssertNil(model.progress.optOutAttempts[entry.id], "no failed attempt was recorded, so it is not moved to a guide")
     }
 }
+
+@MainActor
+final class SharedLinkTests: XCTestCase {
+    func testOnlyAWebAddressInsideAnExnayLinkIsTaken() {
+        XCTAssertEqual(AppModel.sharedLink(in: URL(string: "exnay://link?u=https%3A%2F%2Fexample.com%2Fconfirm%3Fid%3D1")!), "https://example.com/confirm?id=1")
+        XCTAssertNil(AppModel.sharedLink(in: URL(string: "exnay://link?u=javascript%3Aalert(1)")!))
+        XCTAssertNil(AppModel.sharedLink(in: URL(string: "exnay://other?u=https%3A%2F%2Fexample.com")!))
+        XCTAssertNil(AppModel.sharedLink(in: URL(string: "https://example.com")!))
+    }
+}

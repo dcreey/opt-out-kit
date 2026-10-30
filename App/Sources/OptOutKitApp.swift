@@ -13,6 +13,7 @@ struct OptOutKitApp: App {
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(model)
+                .onOpenURL { if let link = AppModel.sharedLink(in: $0) { model.incomingLink = link } }
                 .task { CheckScheduler.register(model: model) }
         }
         .onChange(of: scenePhase) { _, phase in
@@ -509,6 +510,16 @@ final class AppModel: ObservableObject {
 
     /// True while the "finish your profile" sheet is showing.
     @Published var showProfileGate = false
+    /// A link shared to Exnay from another app (exnay://link?u=…): the Email links tab loads it.
+    @Published var incomingLink: String?
+
+    /// The web address inside an exnay://link?u=… address, https only.
+    static func sharedLink(in url: URL) -> String? {
+        guard url.scheme == "exnay", url.host == "link",
+              let u = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "u" })?.value,
+              let link = URL(string: u), ["https", "http"].contains(link.scheme?.lowercased() ?? "") else { return nil }
+        return u
+    }
     private var afterProfile: (() -> Void)?
 
     /// Runs `action` if the selected person has their legal name, current address and the household email; otherwise asks for them

@@ -40,6 +40,7 @@ targets:
         buildPhase: resources
     dependencies:
       - package: OptOutKitCore
+      - target: ShareExtension
     info:
       path: App/Info.plist
       properties:
@@ -48,6 +49,7 @@ targets:
         CFBundleVersion: "11"
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
+        CFBundleURLTypes: [{CFBundleURLName: dev.optoutkit.app, CFBundleURLSchemes: [exnay]}]
         UIBackgroundModes: [fetch, processing]
         NSUserTrackingUsageDescription: "Some data brokers opt your phone out using its advertising ID. Exnay reads it only to give it to those brokers when you opt out, and never stores it."
         LSApplicationQueriesSchemes: [googlegmail, ms-outlook, ymail, readdle-spark, protonmail]
@@ -59,6 +61,29 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  ShareExtension:
+    type: app-extension
+    platform: iOS
+    sources: [ShareExtension]
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: "Exnay"
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "11"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.share
+        DEVELOPMENT_TEAM: C84MKW6B2K
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
   OptOutKitTests:
     type: bundle.unit-test
     platform: iOS

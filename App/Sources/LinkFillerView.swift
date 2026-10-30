@@ -130,6 +130,7 @@ struct LinkFillerView: View {
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
         .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…")).transition(.opacity) } }
+        .onChange(of: model.incomingLink) { _, _ in takeIncomingLink() }
         .overlay { if showDone { SentCheck().transition(.opacity) } }
         .task(id: filler.webView == nil) { await watchForCompletion() }
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
@@ -138,7 +139,8 @@ struct LinkFillerView: View {
             Button("Don't open", role: .cancel) {}
         } message: { a in Text(askMessage(a.check)) }
         .onAppear {
-            if model.shouldTourLinkFiller, startLink.isEmpty { showTour = true }
+            if model.incomingLink != nil { takeIncomingLink() }
+            else if model.shouldTourLinkFiller, startLink.isEmpty { showTour = true }
             if !startLink.isEmpty, text.isEmpty {
                 text = startLink
                 if let url = LinkFiller.normalized(startLink) {
@@ -216,6 +218,15 @@ struct LinkFillerView: View {
                 }
             }.padding()
         }
+    }
+
+    /// A link shared to Exnay from a mail app: any page that was open is closed, and the link is checked and opened as if it had been pasted.
+    private func takeIncomingLink() {
+        guard let link = model.incomingLink else { return }
+        model.incomingLink = nil
+        returnToChooser()
+        text = link
+        begin()
     }
 
     private func begin() {

@@ -4,7 +4,7 @@
 #   ASC_KEY_ID=...  ASC_ISSUER_ID=...  tools/release_testflight.sh
 #
 # The API key file must be in ~/.appstoreconnect/private_keys/AuthKey_<ASC_KEY_ID>.p8 (altool finds it there). Raise CFBundleVersion in project.yml first:
-# xcodegen rewrites App/Info.plist from it, and Apple rejects a repeated build number.
+# xcodegen rewrites App/Info.plist from it, and Apple rejects a repeated build number. Raise it in the ShareExtension target too: the two must match.
 set -euo pipefail
 : "${ASC_KEY_ID:?set ASC_KEY_ID}"; : "${ASC_ISSUER_ID:?set ASC_ISSUER_ID}"
 TEAM="${TEAM_ID:-C84MKW6B2K}"
