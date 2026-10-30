@@ -246,6 +246,11 @@ final class AssistedRunner: ObservableObject {
         /// the person searches for themselves in the page and blocks their own listings.
         var blockWidget: Bool { Self.blockWidgetDomains.contains(entry.domain) }
         static let blockWidgetDomains: Set<String> = ["usatrace.com", "quickpeopletrace.com"]
+        /// Sites whose only form is a name search: removal is requested on each record's own page, so the person finds their records and files each one.
+        var perRecordForm: Bool { Self.perRecordDomains.contains(entry.domain) }
+        static let perRecordDomains: Set<String> = ["open-public-records.com"]
+        /// Sites where the app never presses send: the person finishes in the page.
+        var handsOff: Bool { blockWidget || perRecordForm }
         var id: String { entry.id }
     }
 
@@ -524,7 +529,7 @@ final class AssistedRunner: ObservableObject {
                 await ready.refill()
                 noteSend(items[i])
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
-            switch items[i].blockWidget ? SubmitOutcome.failed("waiting for you to block your profile") : await ready.send() {
+            switch items[i].handsOff ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
                 case .challenged: continue      // a check appeared after sending: wait for the person again
@@ -819,6 +824,12 @@ struct AssistedOptOutView: View {
     }
 
     private var instruction: String {
+        if let item = runner.current, item.perRecordForm, !runner.finished {
+            switch runner.phase {
+            case .loading, .pacing, .sending, .sent, .noForm, .timedOut: break
+            default: return Loc.t("This site has no removal form of its own: each record has one. Tap Find my record, open each record that is you, scroll to Request Removal of This Record, add your name and email, and submit it. Then tap Mark as done.")
+            }
+        }
         if let item = runner.current, item.blockWidget, !runner.finished {
             switch runner.phase {
             case .loading, .pacing, .sending, .sent, .noForm, .timedOut: break

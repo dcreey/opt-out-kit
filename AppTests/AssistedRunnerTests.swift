@@ -406,6 +406,9 @@ final class BlockWidgetTests: XCTestCase {
         XCTAssertTrue(item("usatrace.com").blockWidget)
         XCTAssertTrue(item("quickpeopletrace.com").blockWidget)
         XCTAssertFalse(item("infotracer.com").blockWidget)
+        XCTAssertTrue(item("open-public-records.com").handsOff)
+        XCTAssertFalse(item("open-public-records.com").blockWidget)
+        XCTAssertFalse(item("infotracer.com").handsOff)
     }
 }
 

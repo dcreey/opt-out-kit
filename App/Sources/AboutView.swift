@@ -15,6 +15,7 @@ struct AboutView: View {
                 Section {
                     MailAppPicker()
                 } header: { Text("Email") } footer: { Text("Opt-out emails we prepare open in this app, ready for you to read and send.") }
+                AdvertisingIDSection()
                 Section("How it works") {
                     Text("Pick a site, follow its step cards in your own browser, and mark each step done. You do any CAPTCHA, phone or ID step yourself. The app never submits anything for you.")
                     Text("Brokers re-list people, so check back on opted-out sites.")
@@ -252,5 +253,61 @@ struct GPCSetupView: View {
         }
         .navigationTitle("Global Privacy Control")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+
+/// Shows the phone's advertising ID (the "MAID" or "IDFA" some brokers ask for) with a Copy button. The ID is read only when tracking is allowed
+/// and is kept in memory while the screen is open, never stored. iOS asks for permission once; after a refusal only the Settings app can change it.
+struct AdvertisingIDSection: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var id: String?
+    @State private var status = AdvertisingID.status
+    @State private var copied = false
+
+    var body: some View {
+        Section {
+            if let id {
+                Text(id).font(.system(.callout, design: .monospaced)).lineLimit(1).minimumScaleFactor(0.6).textSelection(.enabled).accessibilityIdentifier("maid-value")
+                Button(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc") { copy(id) }.accessibilityIdentifier("maid-copy")
+            } else if status == .notDetermined {
+                Text("Some brokers opt your phone out by its advertising ID. Allow it once to see the ID here so you can copy it.")
+                Button("Show my advertising ID", systemImage: "iphone.badge.play") { Task { await reveal() } }.accessibilityIdentifier("maid-show")
+            } else if status == .authorized {
+                Text("Your phone's advertising ID is switched off or reset, so there is nothing to copy. In Settings, open Privacy & Security, then Apple Advertising, and make sure Personalized Ads is on, or turn tracking back on for Exnay.")
+                openSettingsButton
+            } else {
+                Text("You asked Exnay not to track you, so it cannot read the ID. iOS only asks once. To change your mind, open Settings, tap Exnay, and turn on Allow Tracking.")
+                openSettingsButton
+            }
+        } header: { Text("Advertising ID") } footer: {
+            Text("Also called a MAID or IDFA. It is used only to fill brokers' opt-out forms that ask for it, and Exnay never stores it or sends it anywhere else.")
+        }
+        .task { await refresh() }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await refresh() } } }
+    }
+
+    private var openSettingsButton: some View {
+        Button("Open Settings", systemImage: "gearshape") {
+            if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+        }.accessibilityIdentifier("maid-settings")
+    }
+
+    /// Re-reads the permission (it can change in the Settings app) and shows the ID if it is already allowed. Never prompts.
+    private func refresh() async {
+        status = AdvertisingID.status
+        if status == .authorized || ProcessInfo.processInfo.arguments.contains("-fake-adid") { id = await AdvertisingID.current() } else { id = nil }
+    }
+
+    /// Triggers Apple's prompt, the only time the app can ask.
+    private func reveal() async {
+        id = await AdvertisingID.current()
+        status = AdvertisingID.status
+    }
+
+    private func copy(_ value: String) {
+        UIPasteboard.general.setItems([[UIPasteboard.typeAutomatic: value]], options: [.expirationDate: Date().addingTimeInterval(60)])
+        copied = true
+        Task { try? await Task.sleep(for: .seconds(2)); copied = false }
     }
 }
