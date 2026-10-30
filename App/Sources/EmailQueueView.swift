@@ -164,7 +164,7 @@ struct VerifyQueueView: View {
                     NavigationLink { SkippedSitesView() } label: {
                         Label("Skipped sites (\(model.skippedSites.count))", systemImage: "forward")
                     }.accessibilityIdentifier("skipped-sites-link")
-                } footer: { Text("Sites you skip or report as not working wait here for a week, so they never hold up the next 25.") }
+                } footer: { Text("Sites you skip or report as not working wait here for a week, so they never hold up the next batch.") }
             }
         }
         .navigationTitle("Tap to verify")

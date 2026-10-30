@@ -163,6 +163,8 @@ struct LinkFillerView: View {
             Section {
                 Text("Some opt-outs end with an email: a link to confirm or to finish a form. Copy that link from the email, paste it here, and we check it and fill in your details.")
                     .font(.footnote).foregroundStyle(.secondary)
+                Text("Or skip the copying: press and hold the link in your mail app, tap Share, and choose Exnay. It opens here and loads the page.")
+                    .font(.footnote).foregroundStyle(.secondary)
                 HStack {
                     TextField("Paste the link from the email", text: $text)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
@@ -307,6 +309,7 @@ struct LinkFillerTour: View {
     private let pages: [(icon: String, title: String, body: String)] = [
         ("envelope.open", Loc.t("Some opt-outs finish by email"), Loc.t("After you send a request, some sites email you a link to confirm it or to finish a form. Until you open that link, the request is not done. The app keeps a list of the ones waiting.")),
         ("doc.on.clipboard", Loc.t("Copy the link from the email"), Loc.t("Open the email, press and hold the button or link, and choose Copy Link. Then come back here and tap Paste.")),
+        ("square.and.arrow.up", Loc.t("Or share it to Exnay"), Loc.t("In Gmail or another mail app, press and hold the link, tap Share, and choose Exnay. The app opens on this tab and loads the page. If Exnay is not in the list, scroll the share sheet to More. If it only copies the link, open Exnay and tap Paste.")),
         ("checkmark.shield", Loc.t("We check it first"), Loc.t("We make sure the link is from a site in your list and tell you if it is not, or if you already finished that site. Then we load the page and fill in your details.")),
         ("hand.tap", Loc.t("You clear the check"), Loc.t("We fill in the page and wait while you read it and clear any check or terms. Then we press its send button and watch for the confirmation. If it needs one more step, do it in the page and tap \"I finished this request\"."))
     ]
@@ -349,6 +352,7 @@ struct EmailCheckExplainer: View {
                         Label("Look for it in your inbox, and in spam or promotions. Some links expire after a day, so do it soon.", systemImage: "envelope")
                         Label("Don't tap the link in the email. Press and hold the link and choose Copy Link.", systemImage: "doc.on.clipboard")
                         Label("Open the Email links tab in Exnay and paste it.", systemImage: "link")
+                        Label("Or choose Share, then Exnay, to open the link here without pasting.", systemImage: "square.and.arrow.up")
                     }
                     Text("Why paste it here instead of tapping it").font(.headline)
                     VStack(alignment: .leading, spacing: 10) {

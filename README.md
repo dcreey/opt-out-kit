@@ -19,7 +19,7 @@ only to the broker sites they opt out of.
   - *Guided*: the app opens the page and walks the person through it, because the form needs something the app cannot supply.
   - *Email*: one opt-out email to the privacy addresses of the day's sites, sent from the person's own mail app.
 - **Email links tab.** Some opt-outs finish with a link in an email. The person pastes it; the app checks it against the directory and the sites already
-  finished, loads it, and fills in the form. Requests that said an email would follow are tracked until the person finishes them.
+  finished, loads it, and fills in the form. A Share extension (`ShareExtension/`) lets the person share a link from a mail app straight to Exnay, which opens this tab through the `exnay://link?u=…` URL scheme; if the system blocks the hop, the link is copied for Paste. Requests that said an email would follow are tracked until the person finishes them.
 - **Official one-request services.** California's DROP is a platform task: one request that reaches every registered California broker.
 - **Global Privacy Control.** Every page the app opens sends the signal, and a one-time task walks the person through turning it on in their own browser.
 - **Re-ups.** The app records whether an opt-out is permanent or has to be repeated, and brings sites back after 6 to 12 months.

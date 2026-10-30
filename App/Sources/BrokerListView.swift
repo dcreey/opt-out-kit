@@ -288,7 +288,7 @@ struct KindChooserView: View {
             List {
                 Section {
                     Text(mode == .start ? Loc.t("Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.")
-                                        : Loc.t("Nice work. Pick the kind of broker for your next 25."))
+                                        : Loc.t("Nice work. Pick the kind of broker for your next batch."))
                         .font(.subheadline)
                 }
                 Section {
@@ -298,7 +298,7 @@ struct KindChooserView: View {
                     }
                 } header: { Text("In the order we suggest") } footer: { Text("Ranked by how bad the worst case can get and how much opting out helps. Start at the top, or pick any.") }
             }
-            .navigationTitle(mode == .start ? Loc.t("Today's kind of broker") : Loc.t("Next 25"))
+            .navigationTitle(mode == .start ? Loc.t("Today's kind of broker") : Loc.t("Next batch"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
@@ -475,7 +475,7 @@ struct TodayCard: View {
                 NavigationLink(value: "daily-verify") { Label(goals.verifyDone == 0 ? Loc.t("Start") : Loc.t("Continue"), systemImage: "play.fill").font(.headline) }
                     .accessibilityIdentifier("today-continue")
             } else {
-                Button(action: more) { Label("Keep going: take 25 more", systemImage: "forward.fill").font(.headline) }.accessibilityIdentifier("goal-more")
+                Button(action: more) { Label("Keep going: take another batch", systemImage: "forward.fill").font(.headline) }.accessibilityIdentifier("goal-more")
             }
             if goals.verifyDone == 0 {
                 Button(action: change) { Label("Change today's kind of broker", systemImage: "arrow.triangle.2.circlepath").font(.footnote) }

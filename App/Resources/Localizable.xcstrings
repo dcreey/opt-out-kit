@@ -6073,6 +6073,98 @@
     }
    }
   },
+  "Or skip the copying: press and hold the link in your mail app, tap Share, and choose Exnay. It opens here and loads the page.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ou évitez la copie : appuyez longuement sur le lien dans votre application de messagerie, touchez Partager et choisissez Exnay. Il s'ouvre ici et charge la page."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "O sin copiar: mantenga pulsado el enlace en su app de correo, toque Compartir y elija Exnay. Se abre aquí y carga la página."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oder ohne Kopieren: Halten Sie den Link in Ihrer Mail-App gedrückt, tippen Sie auf Teilen und wählen Sie Exnay. Er öffnet sich hier und lädt die Seite."
+     }
+    }
+   }
+  },
+  "Or share it to Exnay": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ou partagez-le avec Exnay"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "O compártalo con Exnay"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oder mit Exnay teilen"
+     }
+    }
+   }
+  },
+  "In Gmail or another mail app, press and hold the link, tap Share, and choose Exnay. The app opens on this tab and loads the page. If Exnay is not in the list, scroll the share sheet to More. If it only copies the link, open Exnay and tap Paste.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans Gmail ou une autre application de messagerie, appuyez longuement sur le lien, touchez Partager et choisissez Exnay. L'app s'ouvre sur cet onglet et charge la page. Si Exnay n'est pas dans la liste, faites défiler la feuille de partage jusqu'à Plus. S'il ne fait que copier le lien, ouvrez Exnay et touchez Coller."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En Gmail u otra app de correo, mantenga pulsado el enlace, toque Compartir y elija Exnay. La app se abre en esta pestaña y carga la página. Si Exnay no aparece en la lista, desplace la hoja de compartir hasta Más. Si solo copia el enlace, abra Exnay y toque Pegar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halten Sie in Gmail oder einer anderen Mail-App den Link gedrückt, tippen Sie auf Teilen und wählen Sie Exnay. Die App öffnet diesen Tab und lädt die Seite. Ist Exnay nicht in der Liste, scrollen Sie im Teilen-Menü zu Mehr. Wird der Link nur kopiert, öffnen Sie Exnay und tippen Sie auf Einsetzen."
+     }
+    }
+   }
+  },
+  "Or choose Share, then Exnay, to open the link here without pasting.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ou choisissez Partager, puis Exnay, pour ouvrir le lien ici sans le coller."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "O elija Compartir y luego Exnay para abrir el enlace aquí sin pegarlo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oder wählen Sie Teilen und dann Exnay, um den Link ohne Einsetzen hier zu öffnen."
+     }
+    }
+   }
+  },
   "Copy the link from the email": {
    "extractionState": "manual",
    "localizations": {
@@ -10627,25 +10719,25 @@
     }
    }
   },
-  "Keep going: take 25 more": {
+  "Keep going: take another batch": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Continuer : en prendre 25 de plus"
+      "value": "Continuer : prendre un autre lot"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Seguir: tomar 25 más"
+      "value": "Seguir: tomar otro lote"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Weitermachen: 25 weitere übernehmen"
+      "value": "Weitermachen: nächsten Stapel übernehmen"
      }
     }
    }
@@ -13042,25 +13134,25 @@
     }
    }
   },
-  "Next 25": {
+  "Next batch": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "25 suivants"
+      "value": "Lot suivant"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Siguientes 25"
+      "value": "Siguiente lote"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nächste 25"
+      "value": "Nächster Stapel"
      }
     }
    }
@@ -13134,25 +13226,25 @@
     }
    }
   },
-  "Nice work. Pick the kind of broker for your next 25.": {
+  "Nice work. Pick the kind of broker for your next batch.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Bravo. Choisissez le type de courtier pour vos 25 suivants."
+      "value": "Bravo. Choisissez le type de courtier pour votre prochain lot."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Buen trabajo. Elige el tipo de corredor para los siguientes 25."
+      "value": "Buen trabajo. Elige el tipo de corredor para el siguiente lote."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Gut gemacht. Wählen Sie die Art des Brokers für die nächsten 25."
+      "value": "Gut gemacht. Wählen Sie die Art des Brokers für den nächsten Stapel."
      }
     }
    }
