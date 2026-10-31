@@ -755,6 +755,12 @@ struct AssistedOptOutView: View {
                             }
                         }
                         if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-notice") }
+                        // A site that also takes opt-outs by email can be finished that way when its form is a dead end (one request per app or panel, a
+                        // form that will not take taps): the same button is in the menu, but it is easy to miss there.
+                        if let entry = runner.current?.entry, entry.contactEmail != nil, !runner.finished, runner.phase != .noForm, runner.phase != .loading {
+                            Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }
+                                .font(.caption.bold()).buttonStyle(.bordered).tint(Color.exnayGold).accessibilityIdentifier("assisted-email-shortcut")
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
