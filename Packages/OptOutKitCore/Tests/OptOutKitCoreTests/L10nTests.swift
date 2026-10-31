@@ -64,3 +64,41 @@ final class L10nSafetyTests: XCTestCase {
         XCTAssertEqual(L10n.f("Step %@ of %@", 1, 2, 3), "Step 1 of 2", "extra arguments are ignored")
     }
 }
+
+final class RemindersTests: XCTestCase {
+    private var cal: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }
+    private func day(_ d: Int, hour: Int = 9) -> Date { cal.date(from: DateComponents(year: 2026, month: 1, day: d, hour: hour))! }
+
+    func testEachMissStageFiresOnceOnItsOwnDay() {
+        let plan = Reminders.plan(lastActive: day(1), streak: 4, target: .people_search, now: day(1), calendar: cal)
+        XCTAssertEqual(plan.prefix(4).map(\.stage), [.streak, .threeDays, .week, .month])
+        XCTAssertEqual(plan.prefix(4).map { cal.dateComponents([.month, .day, .hour], from: $0.fireDate) }.map { "\($0.month!)-\($0.day!) \($0.hour!)" },
+                       ["1-2 18", "1-4 18", "1-8 18", "1-31 18"])
+        XCTAssertEqual(Set(plan.map(\.id)).count, plan.count, "every reminder has its own id, so none repeats")
+        XCTAssertEqual(plan.filter { $0.stage == .threeDays }.count, 1, "the 3-day miss is not repeated every 3 days")
+    }
+
+    func testAfterTheFirstMonthItRepeatsMonthlyAndNeverMoreOftenThanThat() {
+        let plan = Reminders.plan(lastActive: day(1), streak: 1, target: nil, now: day(1), calendar: cal, monthlyRepeats: 3)
+        let months = plan.filter { $0.stage == .month }.map(\.fireDate)
+        XCTAssertEqual(months.count, 4)
+        for (a, b) in zip(months, months.dropFirst()) { XCTAssertEqual(cal.dateComponents([.day], from: a, to: b).day, 30) }
+    }
+
+    func testAnotherOptOutRestartsTheCycleAndPastDatesAreNeverFiredLate() {
+        let first = Reminders.plan(lastActive: day(1), streak: 1, target: nil, now: day(1), calendar: cal)
+        let later = Reminders.plan(lastActive: day(5), streak: 1, target: nil, now: day(5), calendar: cal)
+        XCTAssertTrue(later.first!.fireDate > first.first!.fireDate)
+        let missed = Reminders.plan(lastActive: day(1), streak: 0, target: nil, now: day(9), calendar: cal)
+        XCTAssertEqual(missed.first?.stage, .month, "the day, 3-day and week nudges are past; none is sent late")
+    }
+
+    func testTheStreakNudgeNeedsAStreakAndMessagesAreShortAndNameTheTarget() {
+        XCTAssertNil(Reminders.plan(lastActive: day(1), streak: 0, target: nil, now: day(1), calendar: cal).first { $0.stage == .streak })
+        for p in Reminders.plan(lastActive: day(1), streak: 3, target: .people_search, now: day(1), calendar: cal) {
+            XCTAssertTrue(p.body.contains("People search"), p.body)
+            XCTAssertTrue(p.body.contains("strangers can look up your home address"), p.body)
+            XCTAssertLessThan(p.body.count, 130, p.body)
+        }
+    }
+}

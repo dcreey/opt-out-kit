@@ -77,7 +77,7 @@ cd Packages/OptOutKitCore && swift test
 
 The core package holds the logic and its unit tests (about 270). The app also has a debug-only harness (`-audit-semi`, `-audit-range`, `-real-send`) that dry-runs or
 really sends opt-outs from the simulator and saves a screenshot of every result. Read each screenshot: the classifier mislabels results both ways. A site is only
-marked confirmed (`run_check: confirmed`) after a person has seen its confirmation. See [docs/TESTING.md](docs/TESTING.md) and [docs/FORM-AUDIT.md](docs/FORM-AUDIT.md).
+marked confirmed (`run_check: confirmed`) after a person has seen its confirmation. See [docs/TESTING.md](docs/TESTING.md) and [docs/FORM-AUDIT.md](docs/FORM-AUDIT.md). How forms are found and filled, and the rules that keep a person's typing safe: [docs/FORM-FILLING.md](docs/FORM-FILLING.md). Come-back reminders: [docs/REMINDERS.md](docs/REMINDERS.md).
 
 ## Status
 

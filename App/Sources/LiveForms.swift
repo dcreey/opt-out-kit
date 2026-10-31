@@ -304,6 +304,7 @@ extension WebViewSession {
             result = next
             if !progressed { break }
         }
+        await tryPhoneFormats()
         return (max(total, result.filled), result.unmatchedRequired)
     }
 
@@ -318,21 +319,29 @@ extension WebViewSession {
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return (0, []) }
         let js = #"""
         (function(values){var filled=0, unmatched=[];
+          // A box or menu the person changed themselves is theirs: later passes leave it alone. Only real input counts, never our own events.
+          if(!window.__ookUserWatch){window.__ookUserWatch=true;
+            ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
           function setValue(el,v){var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
             var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
             el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
-          // A phone number in the shape the box expects: its placeholder ("(555) 555-5555"), its length limit or its pattern decide; otherwise as stored.
-          function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return raw;
-            var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
-            var forms=[d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c,'1'+d,'+1'+d,'+1 '+a+' '+b+' '+c,'1-'+a+'-'+b+'-'+c];
-            var ph=el.getAttribute('placeholder')||'';
-            if((ph.match(/[0-9xX#_*]/g)||[]).length>=10){var i=0,mine=ph.replace(/[0-9xX#_*]/g,function(){return i<d.length?d[i++]:'';}); if(i===10||(i===d.length)) return mine;}
+          // A phone number is typed as plain digits, with no spaces or punctuation. Only a box that shows an error gets other shapes (see tryPhoneFormats).
+          // A menu of country codes ("United States (+1)") beside the box already supplies the code, so then the box takes the number alone.
+          function hasCountryCode(el){var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){
+              var ss=n.querySelectorAll('select'); for(var i=0;i<ss.length;i++){var o=ss[i].options[ss[i].selectedIndex]; if(o&&/\+\d{1,3}\b/.test(o.text+' '+o.value)) return true;}
+              if(n.tagName==='FORM') break;}
+            return false;}
+          function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1);
             var pat=el.getAttribute('pattern');
-            if(pat){for(var k=0;k<forms.length;k++){try{if(new RegExp('^(?:'+pat+')$').test(forms[k])) return forms[k];}catch(e){break;}}}
-            var m=el.maxLength; if(m>0){if(m===10) return d; if(m===11) return '1'+d; if(m===12) return forms[1]; if(m===14) return forms[2]; for(var j=0;j<forms.length;j++) if(forms[j].length===m) return forms[j];}
-            return raw;}
+            if(d.length===10&&pat){var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6); var fs=[d,'1'+d,'+1'+d,a+'-'+b+'-'+c];
+              for(var k=0;k<fs.length;k++){try{if(new RegExp('^(?:'+pat+')$').test(fs[k])) return fs[k];}catch(e){break;}}}
+            return d;}
           function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
+            if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
+            // Whatever is already in a box or menu stays, unless it is exactly what this fill put there before.
+            if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
+            else if((el.value||'').trim()!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}
             if(el.tagName==='SELECT'){var done=false;
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
                 for(var i=0;i<el.options.length;i++){var o=el.options[i];
@@ -346,15 +355,58 @@ extension WebViewSession {
                 // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
                 for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();
                   if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
-              if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
+              if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
             } else if(\#(keepExistingValues ? "true" : "false")&&(el.value||'').trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){setValue(el,isPhoneBox(el)?fmtPhone(el,v.candidates[0]):v.candidates[0]);filled++;}});
+            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el); setValue(el,ph?fmtPhone(el,v.candidates[0]):v.candidates[0]); el.setAttribute('data-ook-last',el.value); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
         return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
+    }
+
+    /// Looks at the phone boxes this fill typed into; one that shows an error (a failed pattern, an invalid flag, a visible error message) is tried
+    /// again in other shapes, one at a time, until the error clears. A box the person changed is never touched, and when no shape works the plain digits go back.
+    func tryPhoneFormats() async {
+        guard await evalLive("document.querySelector('[data-ook-phone]')!==null") as? Bool == true else { return }
+        try? await Task.sleep(for: .milliseconds(250))
+        for step in 1...10 {
+            guard await phoneFormatStep(step) else { return }
+            try? await Task.sleep(for: .milliseconds(250))
+        }
+    }
+
+    /// One round of `tryPhoneFormats`: false when no box is in error or no other shape is left to try.
+    private func phoneFormatStep(_ step: Int) async -> Bool {
+        let js = #"""
+        (function(step){var bad=0, more=false;
+          function hasCC(el){var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){var ss=n.querySelectorAll('select');
+            for(var i=0;i<ss.length;i++){var o=ss[i].options[ss[i].selectedIndex]; if(o&&/\+\d{1,3}\b/.test(o.text+' '+o.value)) return true;} if(n.tagName==='FORM') break;} return false;}
+          function visible(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'&&(e.innerText||'').trim()!=='';}
+          function invalid(el){
+            if(el.willValidate&&!el.checkValidity()) return true;
+            if(el.getAttribute('aria-invalid')==='true') return true;
+            var cls=(el.className||'')+' '+(el.parentElement?el.parentElement.className||'':''); if(/(^|[\s_-])(is-invalid|invalid|has-error|ng-invalid|error)($|[\s_-])/i.test(cls)) return true;
+            var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement){var errs=n.querySelectorAll('[role=alert],.error,.invalid-feedback,.field-error,.help-block,[class*=error]');
+              for(var i=0;i<errs.length;i++) if(!errs[i].contains(el)&&visible(errs[i])&&/phone|number|digit|valid|format|invalid|required/i.test(errs[i].innerText)) return true;}
+            return false;}
+          function set(el,v){var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
+            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value);}
+          [].slice.call(document.querySelectorAll('[data-ook-phone]')).forEach(function(el){
+            if(el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
+            var d=el.getAttribute('data-ook-phone'); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return;
+            ['blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));});
+            if(!invalid(el)) return;
+            var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
+            var forms=hasCC(el)?[d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c]:[d,'1'+d,'+1'+d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c,'+1 '+a+' '+b+' '+c,'1-'+a+'-'+b+'-'+c];
+            bad++;
+            if(step<forms.length){set(el,forms[step]); more=true;} else { set(el,d); }
+          });
+          return JSON.stringify({bad:bad,more:more});})(\#(step));
+        """#
+        guard let out = await evalLive(js) as? String, let d = out.data(using: .utf8), let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return false }
+        return (obj["bad"] as? Int ?? 0) > 0 && obj["more"] as? Bool == true
     }
 
     /// Brings the form being filled to the top of the screen, so the person sees what was filled and does not have to hunt for it.

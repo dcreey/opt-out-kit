@@ -688,8 +688,14 @@ final class AppModel: ObservableObject {
         save()
     }
 
+    /// Lines up the reminders that bring the person back (3 days, a week, a month of no opt-outs, and a streak nudge), aimed at the next kind of broker to go after.
+    func refreshReminders() {
+        ReminderScheduler.update(summary: activitySummary, target: remainingKinds.first.flatMap { BrokerCategory(rawValue: $0.kind) })
+    }
+
     /// The app left the front: ask iOS for the extra time it gives (about 30 seconds) to finish the site in progress, then stop between sites.
     func appDidEnterBackground() {
+        refreshReminders()
         guard autoBusy == "optout", backgroundTask == .invalid else { return }
         // iOS 26 gave the run its own background time (shown as a Live Activity): carry on, the expiry handler stops it if iOS takes the time back.
         if continuedGranted { return }
@@ -705,6 +711,7 @@ final class AppModel: ObservableObject {
     /// Back in front: if the run was asked to stop, the next due-check (below) carries on with the sites left.
     func appDidBecomeActive() {
         endBackgroundTime()
+        refreshReminders()
         // A quick glance away: the run was only asked to stop, so let it go on.
         if autoBusy == "optout" { autoStopRequested = false }
     }
@@ -774,6 +781,7 @@ final class AppModel: ObservableObject {
             if report.attempted > 0 { runReport = report }
         }
         save()
+        refreshReminders()
         if !dryRun, !interrupted { CheckScheduler.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
     }
