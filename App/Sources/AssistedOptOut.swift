@@ -310,6 +310,7 @@ final class AssistedRunner: ObservableObject {
     private var preparing: [Int: Task<AssistedPage?, Never>] = [:]
     private var loadedPages = Set<Int>()           // pages whose load has finished (well or badly), so a skip does not have to wait for a slow one
     private var skipFlag = false
+    private var emailedFlag = false
     private var autoScrolls = 0          // times the page was scrolled to an opt-out button for this site; the person's own scrolling is never fought
     private var nextContinuation: CheckedContinuation<Void, Never>?
     var waitLimit: TimeInterval = 180
@@ -378,6 +379,12 @@ final class AssistedRunner: ObservableObject {
             listingChoice = .none
             await withCheckedContinuation { nextContinuation = $0 }
         }
+    }
+
+    /// The person emailed a site that had a form: it is done, shown with the green check and counted as emailed, not as skipped.
+    func finishByEmail() {
+        emailedFlag = true
+        skip()
     }
 
     func skip(reported: Bool = false) {
@@ -459,7 +466,7 @@ final class AssistedRunner: ObservableObject {
 
     func run() async {
         for i in items.indices {
-            index = i; phase = .loading; skipFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            index = i; phase = .loading; skipFlag = false; emailedFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if items[i].emailOnly { await waitForEmail(items[i]); continue }
             if let search = items[i].searchURL {
                 let (listing, early) = await chooseListing(items[i], search: search)
@@ -573,6 +580,8 @@ final class AssistedRunner: ObservableObject {
     }
 
     private func record(_ item: Item, _ result: AutoOptOutResult) {
+        var result = result
+        if emailedFlag, case .needsYou("skipped") = result { result = .emailed; celebrate += 1; emailedFlag = false }
         results[item.id] = result
         switch result {
         case .submitted(let email): celebrate += 1; previousNote = nil; if email { sentAwaitingEmail += 1 }
@@ -642,7 +651,7 @@ struct AssistedOptOutView: View {
         }
         .alert("Did you send it?", isPresented: Binding(get: { confirmEmailSent != nil }, set: { if !$0 { confirmEmailSent = nil } })) {
             Button("Yes, I sent it") {
-                if let b = confirmEmailSent { model.markEmailed(b); if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() } }
+                if let b = confirmEmailSent { model.markEmailed(b); if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.finishByEmail() } }
                 confirmEmailSent = nil
             }
             Button("No", role: .cancel) { if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }; confirmEmailSent = nil }
@@ -658,7 +667,7 @@ struct AssistedOptOutView: View {
                 composing = nil
                 if result == .sent {
                     model.markEmailed(batch)
-                    if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.skip() }       // asked by email: this site is done
+                    if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.finishByEmail() }       // asked by email: this site is done
                 } else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
             }
         }
