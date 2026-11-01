@@ -462,4 +462,19 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
         await join(run, r)
     }
+
+    func testAConfirmationOnAFormTheAppSentItselfStillMovesOnByItself() async {
+        let log = Log()
+        // The app presses send; its own read of the page is too early ("no success message"); the confirmation shows a moment later.
+        let page = FakePage(blockers: [[]], outcome: .failed("no success message was shown")); page.texts = ["Opt out form", "Opt out form", "Thanks for completing this form!"]
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { true }; r.watchInterval = 0.02; r.pauseAfterSent = 0
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 1)
+        XCTAssertEqual(page.sends, 1, "the app pressed send")
+        XCTAssertEqual(r.index, 1, "and went on to the next site without waiting for a tap")
+        XCTAssertFalse(r.awaitingNext)
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
+        await join(run, r)
+    }
 }

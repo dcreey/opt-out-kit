@@ -433,6 +433,7 @@ final class AssistedRunner: ObservableObject {
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
             let manual = !revisiting && !items[i].handsOff && !autoSubmit()
+            let sentByApp = !manual && !revisiting && !items[i].handsOff          // the app presses send itself: a confirmation it finds afterwards is its own work
             switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     sentForms += 1; sentEmail = sentEmail || email
@@ -461,9 +462,10 @@ final class AssistedRunner: ObservableObject {
                             if let hit = await self.watch(ready, baseline: &watched, force: force, domChanged: moved) {
                                 self.markedDone = hit
                                 if case .submitted(let email) = hit {
-                                    // Noticed, shown and saved; the person moves on when they are ready (their Next site ends the wait below).
                                     self.phase = .sent(awaitingEmail: email)
-                                    self.holdAfterDetected(self.items[i], hit)
+                                    // A form the app sent itself (its own read of the page was too early to see the confirmation) goes on as it always did.
+                                    // One the person sent is noticed, shown and saved, and waits for their Next site.
+                                    if sentByApp { self.resumeNext() } else { self.holdAfterDetected(self.items[i], hit) }
                                 } else { self.resumeNext() }
                                 return
                             }
