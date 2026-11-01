@@ -23,6 +23,13 @@ enum PageFlow {
     static let nextStepMarker = "the form moved on to its next step"
     static let rejectedMarker = "rejected the automatic send"
 
+    /// "Refresh the page" in every flow: a form that fails and asks for a refresh is reloaded, then the person's details are put back once the page has settled.
+    static func reloadThenRefill(reload: () -> Void, refill: () async -> Void, settle: UInt64 = 3_500_000_000) async {
+        reload()
+        try? await Task.sleep(nanoseconds: settle)
+        await refill()
+    }
+
     /// Presses send on the page's current form and says what that was.
     static func sendOnce(_ page: AssistedPage) async -> SendStep {
         switch await page.send() {

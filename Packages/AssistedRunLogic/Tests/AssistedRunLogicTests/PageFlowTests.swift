@@ -24,6 +24,12 @@ final class PageFlowTests: XCTestCase {
         }
     }
 
+    func testRefreshReloadsThenPutsTheDetailsBackInEveryFlow() async {
+        var log: [String] = []
+        await PageFlow.reloadThenRefill(reload: { log.append("reload") }, refill: { log.append("refill") }, settle: 1_000_000)
+        XCTAssertEqual(log, ["reload", "refill"])
+    }
+
     func testASentFormSaysWhetherAnotherFormIsReadyAndFillsIt() async {
         let page = Page(); page.extraForms = 1
         let first = await PageFlow.sendOnce(page); let second = await PageFlow.sendOnce(page)

@@ -389,8 +389,7 @@ struct AssistedOptOutView: View {
                             if let web = pageWebView ?? searchWebView {
                                 // A form that fails and asks for a refresh: reload the page, then put the details back.
                                 Button {
-                                    web.reload()
-                                    Task { try? await Task.sleep(nanoseconds: 3_500_000_000); await runner.page?.refill() }
+                                    Task { await PageFlow.reloadThenRefill(reload: { web.reload() }, refill: { await runner.page?.refill() }) }
                                 } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("assisted-refresh")
                                 Button { Task { await runner.page?.refill() } } label: { Label("Fill the form again", systemImage: "square.and.pencil") }.accessibilityIdentifier("assisted-fill-again")
                             }
