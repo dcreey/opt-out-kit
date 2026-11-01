@@ -45,6 +45,15 @@ enum LiveFormPicker {
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
 
+    /// A form whose own words say it is an opt-out or deletion request: not a search, a sign-up, a contact form or a feedback box, even on an opt-out page.
+    /// Only these are sent after the first form of a page.
+    static func isDedicatedOptOut(_ f: LiveForm, pageContext: String = "") -> Bool {
+        guard score(f, pageContext: pageContext) >= 3 else { return false }
+        let own = f.buttons.joined(separator: " ") + " " + f.text + " " + (f.ctx ?? "")
+        return has(strongOptOut, own) || has(ownWords, f.buttons.joined(separator: " "))
+    }
+    private static let ownWords = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|unsubscribe|delete|remove|erase", options: .caseInsensitive)
+
     /// How likely a form is the opt-out form: opt-out wording and several identity fields count for it, marketing wording against it.
     static func score(_ f: LiveForm, pageContext: String = "") -> Int {
         let fields = f.fields.filter { $0.visible && !["hidden", "submit", "button", "image", "password"].contains($0.type) }
@@ -524,6 +533,9 @@ extension WebViewSession {
               // Where only one can be chosen, deleting the data beats opting out of its sale.
               ||rs.filter(function(r){var t=title(r); return /\b(delet|eras)\w*\b/i.test(t)&&!no.test(t)&&!notSelf.test(t);})[0];
             if(rs.some(touched)||rs.some(autoDone)) return;
+            // A choice of device ID types (GAID is Android's, IDFA is this phone's): this is an iPhone.
+            var idfa=rs.filter(function(r){return /\bidfa\b/i.test(label(r));})[0];
+            if(idfa){ if(!idfa.checked){markAuto(idfa); idfa.click(); if(!idfa.checked){idfa.checked=true; idfa.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;} return; }
             if(rm&&!rm.checked){markAuto(rm); rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
             if(rs.some(function(r){return r.checked;})) return;
             var pick=null;

@@ -22,12 +22,16 @@ protocol AssistedPage: AnyObject {
     func scrollToOptOut() async -> Bool
     /// True when the screen changed since the last ask and has settled. Cheap: the page keeps the flag itself.
     func changed() async -> Bool
+    /// A page with more than one opt-out form (an email form and a device-ID form side by side): moves on to the next one, filled in and ready. False when none is left.
+    func moreForms() async -> Bool
+    /// How many more opt-out forms this page has after the one on screen.
+    var formsRemaining: Int { get }
     func close()
     /// Moves the page's web view out of its hidden window so a screen can show it. Called by the runner, never while a view is drawing.
     func present()
 }
 
-extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; var formsRemaining: Int { 0 } }
 
 @MainActor
 protocol AssistedDriver {
@@ -122,6 +126,8 @@ final class AssistedRunner: ObservableObject {
     @Published var previousNote: String?
     /// Counts sites sent, so the screen can show a check each time.
     @Published private(set) var celebrate = 0
+    /// Which opt-out form of the page is on screen and how many it has, so the screen can say "form 2 of 3". One form: total 1.
+    @Published private(set) var pageForms = (current: 1, total: 1)
     /// Counts sites that were skipped (by the person, or because their page would not load), so the screen can show it.
     @Published private(set) var skippedCount = 0
     /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
@@ -142,6 +148,10 @@ final class AssistedRunner: ObservableObject {
     private var loadedPages = Set<Int>()           // pages whose load has finished (well or badly), so a skip does not have to wait for a slow one
     private var skipFlag = false
     private var emailedFlag = false
+    /// A confirmation the app noticed (the person pressed the page's button themselves): the site is recorded and the check is shown, but the screen stays on
+    /// the site until the person taps Next site. Moving on by itself took the page away before they had looked at it.
+    @Published private(set) var awaitingNext = false
+    private var recordedEarly = false
     /// The person asked for the previous site: the current one is left as it was, and the one before it opens again.
     private var goBack = false
     /// The furthest site the run has reached. Every site before it that is opened again is only being looked at.
@@ -165,6 +175,8 @@ final class AssistedRunner: ObservableObject {
 
     /// The person says this site is done, in case a confirmation was not noticed. If the page mentions an email to follow, they are asked whether to track it.
     func markDone() async {
+        // A confirmation was already noticed and is waiting for the person: Mark as done is their go-ahead, the same as Next site.
+        if awaitingNext { resumeNext(); return }
         let text = await page?.pageText() ?? ""
         if FormRun.mentionsEmailFollowUp(text) { askFollowUp = true } else { finishMarked(email: false) }
     }
@@ -338,7 +350,7 @@ final class AssistedRunner: ObservableObject {
     /// One site, from loading its page to its result. Returns without a result when the person went back.
     private func process(_ i: Int) async {
         do {
-            index = i; phase = .loading; skipFlag = false; emailedFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
             if items[i].emailOnly { goingBack = false; await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
@@ -369,9 +381,11 @@ final class AssistedRunner: ObservableObject {
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready; goingBack = false
+            pageForms = (1, 1 + ready.formsRemaining)
             prepare(i + 1)      // load the next one while the person works on this one
 
             var outcome: AutoOptOutResult?
+            var sentForms = 0, sentEmail = false
             var attempts = 0
             var baseline = await ready.pageText()
             while outcome == nil, attempts < 3 {
@@ -396,7 +410,12 @@ final class AssistedRunner: ObservableObject {
                         sinceWatch = 0
                         if let hit = await watch(ready, baseline: &baseline, force: force, domChanged: moved) {
                             outcome = hit
-                            if case .submitted(let email) = hit { phase = .sent(awaitingEmail: email) }
+                            if case .submitted(let email) = hit {
+                                phase = .sent(awaitingEmail: email)
+                                holdAfterDetected(items[i], hit)
+                                await withCheckedContinuation { nextContinuation = $0 }          // until Next site (or Skip, Previous, Mark as done)
+                                awaitingNext = false
+                            }
                             break
                         }
                     }
@@ -414,12 +433,16 @@ final class AssistedRunner: ObservableObject {
             let manual = !revisiting && !items[i].handsOff && !autoSubmit()
             switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
-                    phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
+                    sentForms += 1; sentEmail = sentEmail || email
+                    // The same page may hold another opt-out form (a device ID, a second request type): it gets its turn before the site is done.
+                    if await ready.moreForms() { pageForms.current += 1; phase = .loading; attempts = 0; continue }
+                    phase = .sent(awaitingEmail: sentEmail); outcome = .submitted(awaitingEmail: sentEmail)
                 case .challenged: continue      // a check appeared after sending: wait for the person again
                 case .rejected(let why), .failed(let why):
                     phase = revisiting ? .reviewing : manual ? .manualSend : .needsMore(why)
                     // A site the person is sending themselves is not failed when they move on without a confirmation: it just is not done yet.
-                    outcome = why == AutoOptOut.rateLimited || manual ? .needsYou(manual ? "you sent it yourself and we saw no confirmation" : why) : .failed(why)         // a rate limit is not the form's fault
+                    // One form of the page went through and a later one did not: the site is sent, and the person can finish the rest in the page.
+                    outcome = sentForms > 0 ? .submitted(awaitingEmail: sentEmail) : why == AutoOptOut.rateLimited || manual ? .needsYou(manual ? "you sent it yourself and we saw no confirmation" : why) : .failed(why)         // a rate limit is not the form's fault
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
                     let watcher = Task { @MainActor [weak self] in
@@ -435,24 +458,35 @@ final class AssistedRunner: ObservableObject {
                             idle = 0
                             if let hit = await self.watch(ready, baseline: &watched, force: force, domChanged: moved) {
                                 self.markedDone = hit
-                                if case .submitted(let email) = hit { self.phase = .sent(awaitingEmail: email) }
-                                self.resumeNext(); return
+                                if case .submitted(let email) = hit {
+                                    // Noticed, shown and saved; the person moves on when they are ready (their Next site ends the wait below).
+                                    self.phase = .sent(awaitingEmail: email)
+                                    self.holdAfterDetected(self.items[i], hit)
+                                } else { self.resumeNext() }
+                                return
                             }
                         }
                     }
                     await withCheckedContinuation { nextContinuation = $0 }
-                    watcher.cancel()
+                    watcher.cancel(); awaitingNext = false
                     if let done = markedDone { outcome = done }
                 case .filledNotSubmitted: outcome = .dryRunReady
                 }
             }
             let final = outcome ?? .challenged("the check came back")
-            record(items[i], final)
-            await offerEmailIfNeeded(items[i], final)
-            // The sent check is on screen meanwhile; the page it came from stays under it for a moment.
-            if case .submitted? = outcome { try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000)) }
+            if !recordedEarly {
+                record(items[i], final)
+                await offerEmailIfNeeded(items[i], final)
+                // The sent check is on screen meanwhile; the page it came from stays under it for a moment.
+                if case .submitted? = outcome { try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000)) }
+            }
             ready.close(); page = nil
         }
+    }
+
+    /// A confirmation was noticed: save and celebrate it now, and wait for the person's Next site.
+    private func holdAfterDetected(_ item: Item, _ hit: AutoOptOutResult) {
+        record(item, hit); recordedEarly = true; awaitingNext = true
     }
 
     private func record(_ item: Item, _ result: AutoOptOutResult) {

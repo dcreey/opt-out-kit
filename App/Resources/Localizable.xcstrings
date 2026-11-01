@@ -22748,6 +22748,29 @@
     }
    }
   },
+  "This page has %lld opt-out forms. We send each one: form %lld of %lld.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette page a %lld formulaires de désinscription. Nous les envoyons tous : formulaire %lld sur %lld."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta página tiene %lld formularios de exclusión. Enviamos cada uno: formulario %lld de %lld."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite hat %lld Opt-out-Formulare. Wir senden jedes: Formular %lld von %lld."
+     }
+    }
+   }
+  },
   "This page mentions an email": {
    "extractionState": "manual",
    "localizations": {

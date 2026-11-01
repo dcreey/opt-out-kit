@@ -71,6 +71,9 @@ struct WebAssistedDriver: AssistedDriver {
             page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? ""))
             if case .ready = livePlan.verdict {} else { NSLog("OOK plan needs the person %@: %@", form.page.absoluteString, "\(livePlan.verdict)") }
             page.remember(person: person, advertisingID: adID, listingURL: listingURL, page: form.page, signature: Self.signature(live))
+            // The page's other opt-out forms, in page order: each is filled and sent after this one.
+            let context = await session.pageContext()
+            page.queueMoreForms(found.filter { $0.token != live.token && LiveFormPicker.isDedicatedOptOut($0, pageContext: context) })
         }
         await page.refill()
         if let token = page.currentFormToken { await session.scrollFormIntoView(token: token) }
@@ -95,6 +98,29 @@ final class WebAssistedPage: AssistedPage {
     var termsPolicy: TermsPolicy?
     private var termsTriedFor: URL?
     var currentFormToken: String? { liveForm }
+    private var moreLiveForms: [LiveForm] = []
+    var formsRemaining: Int { moreLiveForms.count }
+    func queueMoreForms(_ forms: [LiveForm]) { moreLiveForms = forms; for f in forms { knownSignatures.insert(WebAssistedDriver.signature(f)) } }
+
+    /// The next opt-out form on the page, filled in. A form that cannot be filled (a device ID the person did not allow us to read) is left for them.
+    func moreForms() async -> Bool {
+        guard let person, let pageURL else { return false }
+        while !moreLiveForms.isEmpty {
+            let next = moreLiveForms.removeFirst()
+            let form = next.asOptOutForm(page: pageURL)
+            var adID = advertisingID
+            if adID == nil, AdvertisingID.isAsked(by: form.fields) { adID = await AdvertisingID.current() }
+            let nextPlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
+            guard case .ready = nextPlan.verdict, !nextPlan.values.isEmpty else { continue }
+            liveForm = next.token; plan = nextPlan; advertisingID = adID
+            await session.scrollFormIntoView(token: next.token)
+            _ = await session.fillLive(plan.values)
+            _ = await session.chooseRequestOptions(form: next.token, ownerMayConfirm: ownerMayConfirm)
+            _ = await session.chooseCustomMenus(state: stateName)
+            return true
+        }
+        return false
+    }
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
 
@@ -322,7 +348,7 @@ struct AssistedOptOutView: View {
                             Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
                         } else {
                             if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
-                            if runner.phase == .reviewing || runner.phase == .manualSend || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
+                            if runner.awaitingNext || runner.phase == .reviewing || runner.phase == .manualSend || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
                         }
                     }
                     ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold)
@@ -337,6 +363,10 @@ struct AssistedOptOutView: View {
                                 Spacer(minLength: 0)
                                 Button { runner.previousNote = nil } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }.accessibilityLabel(Loc.t("Dismiss"))
                             }
+                        }
+                        if runner.pageForms.total > 1 {
+                            Label(Loc.f("This page has %lld opt-out forms. We send each one: form %lld of %lld.", runner.pageForms.total, runner.pageForms.current, runner.pageForms.total), systemImage: "square.stack.3d.up")
+                                .font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-page-forms")
                         }
                         if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-notice") }
                         // A site that also takes opt-outs by email can be finished that way when its form is a dead end (one request per app or panel, a
@@ -387,6 +417,7 @@ struct AssistedOptOutView: View {
     private var canMarkDone: Bool {
         switch runner.phase {
         case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut, .reviewing, .manualSend: return true
+        case .sent: return runner.awaitingNext
         default: return false
         }
     }

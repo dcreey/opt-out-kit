@@ -30,7 +30,15 @@ final class EmailAndSkipFlowTests: XCTestCase {
         init(blockers: [[AssistedBlocker]], outcome: SubmitOutcome = .submitted(awaitingEmail: false)) { blockerScript = blockers; self.outcome = outcome }
         func blockers() async -> [AssistedBlocker] { defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
         func refill() async {}
-        func send() async -> SubmitOutcome { sends += 1; return outcome }
+        /// More forms on the same page (an email form, a device-ID form, ...), and what the later ones answer when sent.
+        var extraForms = 0; var laterOutcome: SubmitOutcome?
+        func moreForms() async -> Bool { if extraForms > 0 { extraForms -= 1; return true }; return false }
+        var formsRemaining: Int { extraForms }
+        var sendDelay: UInt64 = 0
+        /// What the page shows on each read, the last one repeating: a person pressing the page's own button makes a confirmation appear.
+        var texts: [String] = []; private var reads = 0
+        func pageText() async -> String { guard !texts.isEmpty else { return "" }; defer { reads += 1 }; return texts[min(reads, texts.count - 1)] }
+        func send() async -> SubmitOutcome { if sendDelay > 0 { try? await Task.sleep(nanoseconds: sendDelay) }; sends += 1; return sends > 1 ? (laterOutcome ?? outcome) : outcome }
         func close() { closed = true }
     }
     @MainActor private final class Driver: AssistedDriver {
@@ -342,7 +350,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let run = Task { @MainActor in await r.run() }
         await wait(r.phase == .manualSend)
         await r.markDone()
-        await join(run, r)
+        await join(run, r)            // it moved on: the run is over
         XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
     }
 
@@ -353,5 +361,105 @@ final class EmailAndSkipFlowTests: XCTestCase {
         r.autoSubmit = { true }
         await join(Task { @MainActor in await r.run() }, r)
         XCTAssertEqual(page.sends, 1); XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
+    }
+
+    // MARK: a page with several opt-out forms
+
+    func testEveryFormOnAPageIsSentBeforeTheSiteIsDone() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]]); page.extraForms = 2; page.sendDelay = 30_000_000
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        var seen: [Int] = []
+        let watcher = Task { @MainActor in while !r.finished { if r.index == 0 { seen.append(r.pageForms.current * 10 + r.pageForms.total) }; try? await Task.sleep(nanoseconds: 1_000_000) } }
+        await join(Task { @MainActor in await r.run() }, r)
+        watcher.cancel()
+        XCTAssertTrue(seen.contains(13), "the person is told: form 1 of 3 (saw \(Set(seen).sorted()))")
+        XCTAssertEqual(page.sends, 3, "all three forms of the page were sent")
+        XCTAssertEqual(log.rows.map(\.0), ["a.example", "b.example"], "and the site is recorded once")
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
+    }
+
+    func testALaterFormThatFailsDoesNotUndoTheOnesThatWentThrough() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]], outcome: .submitted(awaitingEmail: true)); page.extraForms = 1; page.laterOutcome = .rejected("device id refused")
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": page]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .needsMore("device id refused"))
+        r.next(); await join(run, r)
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: true)], "the site stays sent; the person finished the rest in the page")
+    }
+
+    func testAPageWithOneFormIsSentOnce() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]])
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": page]), log)
+        await join(Task { @MainActor in await r.run() }, r)
+        XCTAssertEqual(page.sends, 1)
+    }
+
+    // MARK: a confirmation the app noticed does not move the screen on
+
+    func testAConfirmationTheAppNoticesAfterThePersonSentItStaysOnTheSiteUntilNext() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]]); page.texts = ["Opt out form", "Opt out form", "Thank you. Your request has been received."]
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { false }; r.watchInterval = 0.02
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.awaitingNext)
+        XCTAssertTrue(r.awaitingNext, "it noticed the confirmation")
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)], "and saved it at once")
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertEqual(r.index, 0, "but it did not go to the next site by itself")
+        XCTAssertEqual(r.phase, .sent(awaitingEmail: false))
+        r.next()
+        await wait(r.index == 1)
+        XCTAssertEqual(r.index, 1)
+        XCTAssertFalse(r.awaitingNext)
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)], "moving on did not record it a second time")
+        r.skip(); await join(run, r)
+    }
+
+    func testAConfirmationNoticedWhileWaitingOnACheckAlsoWaitsForNext() async {
+        let log = Log()
+        let page = FakePage(blockers: [[.check("a bot check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.watchInterval = 0.02
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.awaitingNext)
+        XCTAssertTrue(r.awaitingNext)
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertEqual(r.index, 0)
+        XCTAssertEqual(page.sends, 0, "the person sent it, not the app")
+        r.next()
+        await wait(r.index == 1)
+        r.skip(); await join(run, r)
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
+    }
+
+    func testMarkAsDoneMovesOnFromASiteWhoseConfirmationWasAlreadyNoticed() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]]); page.texts = ["Opt out form", "Opt out form", "Thank you. Your request has been received."]
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { false }; r.watchInterval = 0.02
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.awaitingNext)
+        await r.markDone()
+        await wait(r.index == 1)
+        XCTAssertEqual(r.index, 1, "Mark as done is a go-ahead, like Next site")
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)], "and it is not recorded twice")
+        r.skip(); await join(run, r)
+    }
+
+    func testMarkAsDoneOnASiteTheAppIsStillWaitingOnMovesOnToo() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)],
+                          Driver(["a.example": FakePage(blockers: [[.check("a bot check")]]), "b.example": FakePage(blockers: [[]])]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .waitingForCheck)
+        await r.markDone()
+        await wait(r.index == 1)
+        XCTAssertEqual(r.index, 1)
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
+        await join(run, r)
     }
 }

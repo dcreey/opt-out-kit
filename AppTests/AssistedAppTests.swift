@@ -56,6 +56,38 @@ final class WebAssistedDriverTests: XCTestCase {
         return AssistedRunner.Item(entry: entry, form: form, plan: FormFiller.plan(for: form, signals: nil, person: pat))
     }
 
+    /// nordicdataresources.com: an email form, a cookie button and a device-ID form on one page. Both forms are sent, the device-ID one with this phone's IDFA.
+    func testEveryOptOutFormOnAPageIsFilledAndSentIncludingTheDeviceIDOne() async throws {
+        let html = """
+            <html><body>
+            <h3>Opt out of segments by email</h3>
+            <form id="e" onsubmit="event.preventDefault(); document.getElementById('log').innerText += ' EMAIL-SENT:' + this.querySelector('input[type=email]').value;">
+              <input id="email-input" type="email" placeholder="E-mail"><button type="submit" class="optOutBtn">Opt me out</button></form>
+            <h3>Opt out of third-party cookies</h3><button id="cookie-btn" class="optOutBtn">Click to opt out</button>
+            <h3>Opt out of Mobile ID</h3>
+            <form id="m" novalidate onsubmit="event.preventDefault(); document.getElementById('log').innerText += ' MAID-SENT:' + this.querySelector('input[type=radio]:checked').value + ':' + this.querySelector('input[type=text]').value;">
+              <label><input type="radio" name="id_type" value="AdID" checked> GAID</label><label><input type="radio" name="id_type" value="IDFA"> IDFA</label>
+              <input id="maid-input" type="text" placeholder="Device ID"><button type="submit" class="optOutBtn">Opt me out</button></form>
+            <p id="log">LOG</p>
+            </body></html>
+            """
+        let id = "11111111-2222-3333-4444-555555555555"
+        let driver = WebAssistedDriver(htmlOverride: html, person: pat, advertisingID: id)
+        let form = OptOutForm(page: URL(string: "https://x.example/opt-out/")!, method: "get", action: nil, fields: [FormField(type: "email", name: "email-input", label: "E-mail")], hops: 1)
+        let prepared = await driver.prepare(form, plan: FormFiller.plan(for: form, signals: nil, person: pat))
+        let page = try XCTUnwrap(prepared)
+        defer { page.close() }
+        _ = await page.send()
+        let more = await page.moreForms()
+        XCTAssertTrue(more, "the second form is next")
+        _ = await page.send()
+        let none = await page.moreForms()
+        XCTAssertFalse(none, "and that was all of them (the cookie button is not a form)")
+        let log = await page.pageText()
+        XCTAssertTrue(log.contains("EMAIL-SENT:pat@example.com"), log)
+        XCTAssertTrue(log.contains("MAID-SENT:IDFA:\(id)"), "this phone's IDFA, not the Android GAID: \(log)")
+    }
+
     func testFillsTheFormWaitsForAPersonToClearTheCheckThenSendsAndReadsTheConfirmation() async {
         let challenge = "<iframe id=\"block\" src=\"https://www.google.com/recaptcha/api2/bframe\" style=\"width:300px;height:400px\"></iframe>"
         let sink = Sink()

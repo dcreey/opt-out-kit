@@ -989,6 +989,7 @@
   "This one request also handles %lld sites",
   "This opt-out asks for a photo of your face and your consent to biometric data. The company says it uses the photo only to block your face from its search results, but you hand a face photo to the company you want to be removed from. Privacy guides are divided on whether it is worth it. The app never uploads a photo for you: this one you do yourself, if you decide to.",
   "This opt-out asks for something sensitive in return. Read what it asks for before you start.",
+  "This page has %lld opt-out forms. We send each one: form %lld of %lld.",
   "This page mentions an email",
   "This page only needs your confirmation. Read it, then press \"%@\" yourself.",
   "This searches each site for %@ the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.",

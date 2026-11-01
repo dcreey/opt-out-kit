@@ -345,4 +345,22 @@ final class LiveFormTests: XCTestCase {
         let title = await read(session, "document.title")
         XCTAssertEqual(title, "delete", "clicked: \(clicked ?? "nothing")")
     }
+
+    func testOnlyFormsThatAreSpecificallyOptOutsAreSentAfterTheFirst() async throws {
+        let html = """
+            <html><body>
+            <h3>Opt out by email</h3><form id="a" onsubmit="event.preventDefault()"><input type="email" placeholder="E-mail"><button type="submit">Opt me out</button></form>
+            <h3>Stay in touch</h3><form id="b" onsubmit="event.preventDefault()"><input type="email" placeholder="Your email"><button type="submit">Subscribe to our newsletter</button></form>
+            <h3>Questions?</h3><form id="c" onsubmit="event.preventDefault()"><input name="n" placeholder="Name"><input type="email" placeholder="Email"><textarea placeholder="How can we help?"></textarea><button type="submit">Send message</button></form>
+            <h3>Opt out of Mobile ID</h3><form id="d" onsubmit="event.preventDefault()"><input placeholder="Device ID"><button type="submit">Opt me out</button></form>
+            </body></html>
+            """
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let context = await session.pageContext()
+        let optOuts = forms.filter { LiveFormPicker.isDedicatedOptOut($0, pageContext: context) }
+        XCTAssertEqual(optOuts.count, 2, "the email opt-out and the device-ID opt-out; not the newsletter or the contact form: \(forms.map { $0.buttons })")
+        XCTAssertTrue(optOuts.allSatisfy { $0.buttons.joined().lowercased().contains("opt me out") })
+    }
 }
