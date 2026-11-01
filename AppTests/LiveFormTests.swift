@@ -331,4 +331,18 @@ final class LiveFormTests: XCTestCase {
         let kept = await read(session, "document.querySelector('input[name=t]:checked').value")
         XCTAssertEqual(kept, "optout", "the person's own choice of opt-out stays")
     }
+
+    func testALandingPageWithBothLinksGoesToDeletion() async throws {
+        let html = """
+            <html><body>
+            <button id="o" onclick="document.title='optout'">Opt out of the sale of my personal information</button>
+            <button id="d" onclick="document.title='delete'">Delete my personal information</button>
+            </body></html>
+            """
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let clicked = await session.advanceToRequestForm()
+        let title = await read(session, "document.title")
+        XCTAssertEqual(title, "delete", "clicked: \(clicked ?? "nothing")")
+    }
 }
