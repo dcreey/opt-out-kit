@@ -11938,6 +11938,29 @@
     }
    }
   },
+  "Mark completed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marquer comme terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marcar como completado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als abgeschlossen markieren"
+     }
+    }
+   }
+  },
   "Mark done": {
    "extractionState": "manual",
    "localizations": {
@@ -13406,6 +13429,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Antworten nicht mehr"
+     }
+    }
+   }
+  },
+  "No match: this link is not from a site in your list, so there is nothing to mark completed. Be careful what you enter.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucune correspondance : ce lien ne vient pas d'un site de votre liste, il n'y a donc rien à marquer comme terminé. Faites attention à ce que vous saisissez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin coincidencia: este enlace no es de un sitio de tu lista, así que no hay nada que marcar como completado. Ten cuidado con lo que introduces."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine Übereinstimmung: Dieser Link stammt nicht von einer Website Ihrer Liste, daher gibt es nichts als abgeschlossen zu markieren. Seien Sie vorsichtig mit Ihren Eingaben."
      }
     }
    }

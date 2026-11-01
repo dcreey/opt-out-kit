@@ -100,6 +100,7 @@ struct LinkFillerView: View {
                 else if !filler.status.isEmpty { Text(filler.status).font(.footnote).foregroundStyle(.secondary).padding() }
             }
             .navigationTitle("Email links")
+            .toolbarColorScheme(filler.webView != nil ? .dark : nil, for: .navigationBar)          // the guide above the page is black: the title stays readable on it
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
@@ -169,32 +170,52 @@ struct LinkFillerView: View {
         }
     }
 
+    /// The page, with the guide's controls above it in the same place and style as Solve and send: always at the top, so the page below can use the rest of the screen.
     private func loaded(_ web: WKWebView) -> some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "lock.fill").foregroundStyle(.green)
-                Text(filler.host).font(.subheadline.bold()).lineLimit(1)
-                Spacer()
-                Button("Change link") { returnToChooser() }.font(.subheadline)
-            }.padding(.horizontal).padding(.vertical, 8).background(.bar)
-            if case .known(_, let name, _, _)? = check {
-                Label(Loc.f("This link matches %@, a site in your list.", name), systemImage: "checkmark.seal.fill").font(.footnote).foregroundStyle(.green).padding(.vertical, 6)
-            } else if case .unknown? = check {
-                Label("This link is not from a site in your list. Be careful what you enter.", systemImage: "exclamationmark.triangle.fill").font(.footnote).foregroundStyle(.orange).padding(.vertical, 6)
-            }
-            WebViewHost(webView: web)
-            VStack(spacing: 8) {
-                Text(filler.status).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                AutoSubmitToggle()
-                Button {
-                    if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
-                } label: { Label("Fill in my details", systemImage: "square.and.pencil").frame(maxWidth: .infinity) }
-                    .buttonStyle(.borderedProminent).controlSize(.large).disabled(filler.busy).accessibilityIdentifier("link-fill")
-                if case .known(let id, _, _, let waiting)? = check, waiting, !finished {
-                    Button { complete(id) } label: { Label("I finished this request", systemImage: "checkmark.circle.fill").frame(maxWidth: .infinity) }
-                        .buttonStyle(.borderedProminent).tint(.green).controlSize(.large).accessibilityIdentifier("link-finished")
+            GuideSurface(topInset: 0) {
+                HStack(spacing: 10) {
+                    Menu {
+                        Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("link-refresh")
+                        Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
+                    } label: { Image(systemName: "ellipsis.circle").font(.title2) }
+                        .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("link-more")
+                    Image(systemName: "lock.fill").foregroundStyle(.green).font(.caption)
+                    Text(filler.host).font(.caption.bold()).foregroundStyle(.white.opacity(0.8)).lineLimit(1)
+                    Spacer(minLength: 4)
+                    Button {
+                        if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
+                    } label: { Text("Fill in my details") }
+                        .buttonStyle(GuidePrimaryStyle()).disabled(filler.busy).opacity(filler.busy ? 0.5 : 1).accessibilityIdentifier("link-fill")
                 }
-            }.padding()
+                matchLine
+                if !filler.status.isEmpty {
+                    Text(filler.status).font(.caption).foregroundStyle(.white.opacity(0.75)).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-status")
+                }
+                HStack(spacing: 12) {
+                    markCompletedButton
+                    AutoSubmitToggle()
+                }
+            }
+            GuideBoundary()
+            WebViewHost(webView: web)
+        }
+    }
+
+    /// Mark completed is always there: it finishes the request for the site the link matched, or it is dimmed and the line below says why it cannot.
+    private var markCompletedButton: some View {
+        let matched: String? = { if case .known(let id, _, _, _)? = check { return id } else { return nil } }()
+        return Button { if let matched { complete(matched) } } label: { Label("Mark completed", systemImage: "checkmark.circle") }
+            .buttonStyle(GuidePillStyle(filled: false))
+            .disabled(matched == nil || showDone).opacity(matched == nil ? 0.45 : 1).accessibilityIdentifier("link-finished")
+    }
+
+    @ViewBuilder private var matchLine: some View {
+        if case .known(_, let name, _, _)? = check {
+            Label(Loc.f("This link matches %@, a site in your list.", name), systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(.green).accessibilityIdentifier("link-match")
+        } else {
+            Label("No match: this link is not from a site in your list, so there is nothing to mark completed. Be careful what you enter.", systemImage: "exclamationmark.triangle.fill")
+                .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-no-match")
         }
     }
 
