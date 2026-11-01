@@ -55,6 +55,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
     var frames: [(info: WKFrameInfo, href: String)] = []
     var activeFrame: WKFrameInfo?
     private let reporter = FrameReporter()
+    private let focus = FocusReporter()
 
     /// The HTTP status of the last page the web view loaded.
     var httpStatus: Int { status }
@@ -80,7 +81,11 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         // Every frame that has inputs tells the session, so a form inside a frame from another site can be read and filled.
         config.userContentController.add(reporter, contentWorld: .page, name: "ookFrame")
         config.userContentController.addUserScript(WKUserScript(source: "(function(){if(window.top===window)return; function r(){try{var n=document.querySelectorAll('input,select,textarea').length; if(n>0) webkit.messageHandlers.ookFrame.postMessage({n:n,href:location.href});}catch(e){}} if(document.readyState==='complete') setTimeout(r,800); else window.addEventListener('load',function(){setTimeout(r,800);}); setTimeout(r,3000);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: false))
-        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
+        let box = InputMenuWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
+        focus.view = box
+        config.userContentController.add(focus, name: InputMenuWebView.focusMessage)
+        config.userContentController.addUserScript(WKUserScript(source: InputMenuWebView.focusScript, injectionTime: .atDocumentEnd, forMainFrameOnly: false))
+        webView = box
         super.init()
         reporter.session = self
         webView.navigationDelegate = self
