@@ -449,20 +449,40 @@ extension WebViewSession {
     /// Returns what it chose, and the names of required choices it could not make.
     /// Pages that ask "I am a(n)" or "Select request type" with a row of buttons instead of radio boxes: picks the plain consumer or "other" answer, and the
     /// opt-out or deletion request (never access, update, correction or transfer). Returns how many it pressed.
+    /// Page script shared by the choosers: what the person tapped or changed is theirs, and what the app chose once it does not choose again.
+    /// A refill (after a check is solved, before sending) must never undo a tile, box or menu the person set, nor tap a tile a second time (a tile that
+    /// toggles would switch our own choice off). Only real taps count (`isTrusted`), never our own clicks.
+    static let ownershipJS = #"""
+        if(!window.__ookUserWatch){window.__ookUserWatch=true;
+          ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
+        if(!window.__ookClickWatch){window.__ookClickWatch=true; window.__ookTouched=[];
+          document.addEventListener('click',function(e){if(e.isTrusted&&e.target&&e.target.nodeType===1){window.__ookTouched.push(e.target); if(window.__ookTouched.length>80) window.__ookTouched.shift();}},true);}
+        var touched=function(el){var t=window.__ookTouched||[];
+          for(var i=0;i<t.length;i++){var x=t[i]; var lab=x.closest?x.closest('label'):null;
+            if(x===el||el.contains(x)||(x.tagName==='LABEL'&&x.htmlFor&&x.htmlFor===el.id)||(lab&&lab.contains(el))) return true;}
+          return el.getAttribute('data-ook-user')==='1';};
+        var autoDone=function(el){return el.getAttribute('data-ook-auto')==='1';};
+        var markAuto=function(el){el.setAttribute('data-ook-auto','1');};
+        """#
+
     func chooseTileButtons() async -> Int {
         let js = #"""
         (function(){
+          \#(Self.ownershipJS)
           var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
-          var n=0;
+          var n=0; window.__ookTiles=window.__ookTiles||{};
           document.querySelectorAll('label,legend,h2,h3,h4,p,span,div').forEach(function(h){
             var t=(h.innerText||'').replace(/\s+/g,' ').replace(/\s*required\s*$/i,'').trim(); if(t.length>60||h.children.length>3) return;
             var who=/^\*?\s*I am an?\b/i.test(t), what=/^\*?\s*(select )?(the )?(request type|right to exercise|type of request)/i.test(t);
             if(!who&&!what) return;
             var box=h.parentElement, btns=[]; for(var up=0;up<4&&box;up++,box=box.parentElement){btns=[].slice.call(box.querySelectorAll('button,[role=button],[role=radio],[role=option],label,[class*=option],[class*=choice],[class*=tile]')).filter(function(b){return vis(b)&&b!==h&&(b.innerText||'').trim().length>1&&(b.innerText||'').trim().length<80&&b.children.length<=2;}); if(btns.length>=2) break;}
-            if(btns.length<2||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
+            if(btns.length<2) return;
+            // A group is handled once per page: after that, and whenever the person has tapped any of its tiles, it is theirs.
+            if(window.__ookTiles[t]) return; window.__ookTiles[t]=1;
+            if(btns.some(touched)||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
             var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
             var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i];
-            for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); btns[i].click(); n++; return;}}}
+            for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); markAuto(btns[i]); btns[i].click(); n++; return;}}}
           });
           return n;})();
         """#
@@ -473,6 +493,7 @@ extension WebViewSession {
         let js = #"""
         (function(token){
           var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return JSON.stringify({chosen:0,unresolved:[]});
+          \#(Self.ownershipJS)
           var label=function(e){var t='';
             if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
@@ -497,7 +518,8 @@ extension WebViewSession {
           Object.keys(groups).forEach(function(k){var rs=groups[k];
             // The page may start on its gentler choice ("Your privacy choices"); "Remove my information" is the one that takes a listing off.
             var rm=rs.filter(function(r){return removal.test(title(r));})[0];
-            if(rm&&!rm.checked){rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
+            if(rs.some(touched)||rs.some(autoDone)) return;
+            if(rm&&!rm.checked){markAuto(rm); rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
             if(rs.some(function(r){return r.checked;})) return;
             var pick=null;
             // "Are you an authorized agent / acting on behalf of someone?": the person is asking for themselves, so the answer is No.
@@ -507,19 +529,19 @@ extension WebViewSession {
             // "Remove my information" (a person-search site taking a listing off) beats a plain "do not sell" choice beside it: it is the stronger opt-out.
             for(var i=0;i<rs.length&&!pick;i++){var ti=title(rs[i]); if(/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i.test(ti)) pick=rs[i];}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(yesOrOptOut(t)||isDecl(t)) pick=rs[i];}
-            if(pick){pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
+            if(pick){markAuto(pick); pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
             else if(rs.some(function(r){return r.required;})) unresolved.push(label(rs[0])||k);});
           f.querySelectorAll('input[type=checkbox]').forEach(function(c){var t=label(c);
-            if(c.checked||!t) return;
+            if(c.checked||!t||touched(c)||autoDone(c)) return;
             // "I am submitting this request for myself" (next to "...on behalf of someone else"): the person is asking for themselves.
-            if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
-            if(yesOrOptOut(t)||isDecl(t)){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
+            if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
+            if(yesOrOptOut(t)||isDecl(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
           f.querySelectorAll('select').forEach(function(s){
             var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
             var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);
             // A menu of states or countries is filled by value; a request-type menu that merely sits near the word "state" is not one.
             if(/state|country|province|region/.test(l)||s.options.length>=40) return;
-            if(s.selectedIndex>0 && s.value) return;
+            if((s.selectedIndex>0 && s.value)||touched(s)||autoDone(s)) return;
             var best=-1,bestScore=0;
             var isAgentQ=agentQ.test(l+' '+near);
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
@@ -532,7 +554,7 @@ extension WebViewSession {
               if(/access|know|correct|update|portab/i.test(t)) sc=0;
               if(sc>bestScore){bestScore=sc;best=i;}}
             var placeholder=s.selectedIndex<=0;
-            if(best>=0&&placeholder){s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); s.dispatchEvent(new Event('input',{bubbles:true})); chosen++;}
+            if(best>=0&&placeholder){markAuto(s); s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); s.dispatchEvent(new Event('input',{bubbles:true})); chosen++;}
             else if(s.required&&placeholder) unresolved.push((near.split('\n')[0]||l||'a menu').slice(0,60));});
           return JSON.stringify({chosen:chosen,unresolved:unresolved});})(\#(Self.liveLiteral(token)));
         """#

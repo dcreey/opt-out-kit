@@ -161,4 +161,120 @@ final class LiveFormTests: XCTestCase {
         box.ctx = "Sign Up for Our Newsletter Access our exclusive insights and updates Do Not Sell My Personal Information Privacy Policy"
         XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/donotsell Do Not Sell"))
     }
+
+    // MARK: what the person chose is theirs
+
+    private func read(_ session: WebViewSession, _ js: String) async -> String { "\(await session.evalLive(js) ?? "")" }
+
+    /// Tiles that toggle, with a state the page marks in its own way (no aria-pressed, no "selected" class), like the "Select request type(s)" page.
+    private let tilePage = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+        <h3>* Select request type(s)</h3>
+        <div id="grid">
+          <button type="button" class="tile" id="del">Request to delete personal information</button>
+          <button type="button" class="tile" id="know">Request to Know - Specific Pieces of Personal Information</button>
+          <button type="button" class="tile" id="optout">Request to Opt-Out (Do Not Sell or Share My Personal Information)</button>
+          <button type="button" class="tile" id="sale">Request to Opt-Out (Sale of Personal Information)</button>
+        </div>
+        <input name="em"><button type="submit">Submit</button></form>
+        <script>window.clicks=0; document.querySelectorAll('.tile').forEach(function(b){b.addEventListener('click',function(){window.clicks++; b.classList.toggle('on');});});</script>
+        </body></html>
+        """
+    private func tiles(_ session: WebViewSession) async -> String { await read(session, "[].map.call(document.querySelectorAll('.tile'),function(b){return b.classList.contains('on')?b.id:''}).filter(Boolean).join(',')") }
+    /// What a real tap does: the page toggles the tile and the app is told it was the person's (the test marks it the way a trusted event does).
+    private func personTaps(_ session: WebViewSession, _ id: String) async {
+        _ = await session.evalLive("(function(){var b=document.getElementById('\(id)'); b.click(); b.setAttribute('data-ook-user','1');})()")
+    }
+
+    func testTilesTheAppChoseOnceAreNotTappedAgainOnARefill() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(tilePage)
+        let first = await session.chooseTileButtons()
+        let chosen = await tiles(session)
+        XCTAssertEqual(first, 1); XCTAssertEqual(chosen, "optout", "the opt-out tile is chosen at first")
+        for _ in 0..<3 { _ = await session.chooseTileButtons() }
+        let after = await tiles(session)
+        let clicks = await read(session, "window.clicks")
+        XCTAssertEqual(after, "optout", "refills leave it on: a tile that toggles would have been switched off")
+        XCTAssertEqual(clicks, "1", "tapped once, never again")
+    }
+
+    func testAPersonAddingAnotherTileKeepsItAndTheAppDoesNotChooseForThem() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(tilePage)
+        _ = await session.chooseTileButtons()
+        await personTaps(session, "del")                                  // multi select: delete as well
+        for _ in 0..<3 { _ = await session.chooseTileButtons() }
+        let kept = await tiles(session)
+        XCTAssertEqual(kept, "del,optout", "both stay on")
+    }
+
+    func testAPersonUnselectingTheAppsTileAndPickingAnotherIsNotUndone() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(tilePage)
+        _ = await session.chooseTileButtons()
+        await personTaps(session, "optout")                               // off again
+        await personTaps(session, "sale")
+        for _ in 0..<3 { _ = await session.chooseTileButtons() }
+        let kept = await tiles(session)
+        XCTAssertEqual(kept, "sale", "the app does not wipe their choice or bring its own back")
+    }
+
+    func testATileTheAppHasNotYetChosenIsLeftAloneOnceThePersonTappedFirst() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(tilePage)
+        await personTaps(session, "know")                                 // the person got there before the first fill
+        let n = await session.chooseTileButtons()
+        let kept = await tiles(session)
+        XCTAssertEqual(n, 0); XCTAssertEqual(kept, "know")
+    }
+
+    private let boxesPage = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+        <h2>Do Not Sell My Personal Information</h2>
+        <fieldset><legend>Request</legend>
+          <label><input type="radio" name="t" value="optout"> Do not sell or share my information</label>
+          <label><input type="radio" name="t" value="remove"> Remove my information</label>
+          <label><input type="radio" name="t" value="access"> Access my information</label></fieldset>
+        <label><input type="checkbox" name="c" value="optout"> Opt out of targeted advertising</label>
+        <label><input type="checkbox" name="c" value="delete"> Request deletion of my information</label>
+        <label><input type="checkbox" name="c" value="access"> Request access to my information</label>
+        <label>Type<select name="s"><option value="">Select</option><option value="o">Opt-out of sale</option><option value="d">Delete my data</option><option value="k">Know what you hold</option></select></label>
+        <input name="em"><button type="submit">Send</button></form></body></html>
+        """
+    private func state(_ session: WebViewSession) async -> String {
+        await read(session, "(function(){var f=document.getElementById('f'); var o=[]; f.querySelectorAll('input[type=radio]:checked,input[type=checkbox]:checked').forEach(function(e){o.push(e.name+'='+e.value);}); o.push('s='+f.s.value); return o.join(',');})()")
+    }
+
+    func testBoxesAndMenusTheAppSetAreNotRedoneAfterThePersonChangedThem() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(boxesPage)
+        let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
+        _ = await session.chooseRequestOptions(form: form.token)
+        let first = await state(session)
+        XCTAssertTrue(first.contains("t=remove") && first.contains("c=optout") && first.contains("c=delete") && first.contains("s=o"), first)
+        // The person: unticks opt-out, ticks access too, picks the other radio and another menu entry.
+        _ = await session.evalLive("""
+            (function(){var f=document.getElementById('f');
+              function mark(e){e.setAttribute('data-ook-user','1');}
+              var cs=f.querySelectorAll('input[name=c]'); cs[0].checked=false; mark(cs[0]); cs[2].checked=true; mark(cs[2]);
+              var rs=f.querySelectorAll('input[name=t]'); rs[0].checked=true; mark(rs[0]);
+              f.s.value='d'; mark(f.s);})()
+            """)
+        let theirs = await state(session)
+        for _ in 0..<3 { _ = await session.chooseRequestOptions(form: form.token) }
+        let after = await state(session)
+        XCTAssertEqual(after, theirs, "refills change nothing the person set")
+    }
+
+    func testABoxTheAppTickedIsNotTickedAgainAfterItWasUntickedEvenWithoutAUserMark() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(boxesPage)
+        let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
+        _ = await session.chooseRequestOptions(form: form.token)
+        _ = await session.evalLive("document.querySelectorAll('input[name=c]')[0].checked=false")
+        _ = await session.chooseRequestOptions(form: form.token)
+        let optOutBox = await read(session, "document.querySelectorAll('input[name=c]')[0].checked")
+        XCTAssertEqual(optOutBox, "0", "the app chose once; it does not choose again")
+    }
 }

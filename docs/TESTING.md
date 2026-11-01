@@ -35,6 +35,7 @@ Notes about how a test works live in the test file itself. This is the list of w
 | In-app Mail composer | Send saves and finishes the site; Cancel saves nothing | `EmailHandoffTests`, `EmailAndSkipFlowTests` | Mac |
 | Site failed or "Not working" | A site with an address offers email; Mark as done saves it as emailed; Skip moves on; no address means no offer | `EmailInsteadTests`, `EmailAndSkipFlowTests` | Mac |
 | Stray or double email answers | Ignored; saved once | `EmailAndSkipFlowTests.testAnswersWithNothingOpen...` | Mac |
+| Choices the person makes on the page (request-type tiles, boxes, radios, menus) | The app chooses once, before the person acts, and never again on a refill. A tile, box or menu the person tapped is theirs: adding a second tile, unselecting ours or picking another is never undone, and a toggling tile is never tapped twice | `LiveFormTests.testTilesTheAppChoseOnce...`, `testAPersonAddingAnotherTile...`, `testAPersonUnselecting...`, `testATileTheAppHasNotYetChosen...`, `testBoxesAndMenusTheAppSet...`, `testABoxTheAppTicked...` | Sim |
 | Reading a confirmation page | Real thanks and receipts count; plain "thanks" and hidden templates do not | `LooksFinishedTests`, `EmailFollowUpWordingTests`, `WebFormSubmitterTests` | Mac / Sim |
 | Real web view against a local page | Fills, waits for the person, sends, reads the result | `WebAssistedDriverTests` | Sim |
 | Today's queue | Only sites the app can fill and has not sent to recently | `AssistedQueueTests` | Sim |
