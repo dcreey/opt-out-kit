@@ -114,7 +114,7 @@ checked in the simulator.
 
 Solve and send, Email links, the monthly automated run and the guide all find forms, fill them, press send and read the result with the same code
 (`Shared/AssistedRun`): `WebAssistedDriver.prepareLoaded` and `WebAssistedPage` for the page, `PageFlow.sendOnce` for what a press of send meant,
-`PageFlow.watch` for what the person did, `LiveFormPicker` for which form is the opt-out. What differs between flows is only the surroundings: the buttons,
+`PageFlow.watch` for what the person did, `PageFlow.reloadThenRefill` for Refresh the page, `PageMenu.items` for the … menu's page actions (Copy link, Refresh the page, fill), `LiveFormPicker` for which form is the opt-out. What differs between flows is only the surroundings: the buttons,
 whether a next site exists (Solve and send), whether a person is there to ask (the monthly run gives up on a check, the others wait for it), and the
 guide's steps. The semi-automated flow is pinned the hardest: `SemiAutomatedFlowTests` (28), `EmailAndSkipFlowTests`, `EmailHandoffTests`,
 `AssistedRunnerTests`, `PageFlowTests` run on the Mac in a few seconds.

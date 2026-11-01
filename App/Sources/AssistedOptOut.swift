@@ -383,16 +383,7 @@ struct AssistedOptOutView: View {
                     // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
                     HStack(spacing: 10) {
                         Menu {
-                            if let url = pageWebView?.url ?? searchWebView?.url {
-                                Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
-                            }
-                            if let web = pageWebView ?? searchWebView {
-                                // A form that fails and asks for a refresh: reload the page, then put the details back.
-                                Button {
-                                    Task { await PageFlow.reloadThenRefill(reload: { web.reload() }, refill: { await runner.page?.refill() }) }
-                                } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("assisted-refresh")
-                                Button { Task { await runner.page?.refill() } } label: { Label("Fill the form again", systemImage: "square.and.pencil") }.accessibilityIdentifier("assisted-fill-again")
-                            }
+                            PageMenu.items(web: pageWebView ?? searchWebView, idPrefix: "assisted") { await runner.page?.refill() }
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
                             }

@@ -176,13 +176,9 @@ struct LinkFillerView: View {
             GuideSurface(topInset: 0) {
                 HStack(spacing: 10) {
                     Menu {
-                        Button {
+                        PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy) {
                             if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
-                        } label: { Label("Fill in my details", systemImage: "square.and.pencil") }.disabled(filler.busy).accessibilityIdentifier("link-fill")
-                        Button {
-                            // The same refresh as Solve and send: the page is reloaded, then the details are put back.
-                            Task { await PageFlow.reloadThenRefill(reload: { web.reload() }, refill: { if let me = model.selectedPerson { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } }) }
-                        } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("link-refresh")
+                        }
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
                     } label: { Image(systemName: "ellipsis.circle").font(.title2) }
                         .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("link-more")

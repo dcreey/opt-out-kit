@@ -378,13 +378,7 @@ struct GuidedPanel: View {
             GuideSurface(topInset: topInset) {
                 HStack(spacing: 10) {
                     Menu {
-                        if let url = runner.webView?.url {
-                            Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
-                        }
-                        if let web = runner.webView {
-                            Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("guided-refresh")
-                            Button { runner.fillAgain() } label: { Label("Fill the form again", systemImage: "square.and.pencil") }.accessibilityIdentifier("guided-fill-again")
-                        }
+                        PageMenu.items(web: runner.webView, idPrefix: "guided") { runner.fillAgain() }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in
                                 Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")

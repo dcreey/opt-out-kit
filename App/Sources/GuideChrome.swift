@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 extension Color {
     /// The gold of the app icon.
@@ -69,5 +70,25 @@ struct AutoSubmitToggle: View {
         }
         .buttonStyle(GuidePillStyle(filled: on))
         .accessibilityIdentifier("auto-submit-toggle").accessibilityValue(on ? "on" : "off")
+    }
+}
+
+/// The page actions every guide's … menu starts with, so Solve and send, the guided steps and Email links offer the same three things in the same order:
+/// copy the page's address, refresh it (reload, then the details are put back: `PageFlow.reloadThenRefill`) and fill the form in.
+enum PageMenu {
+    /// - fillTitle: "Fill the form again" where the guide fills for you, "Fill in my details" where you start it.
+    /// - idPrefix: prefix of the accessibility identifiers (assisted, guided, link).
+    @MainActor @ViewBuilder
+    static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, fill: @escaping () async -> Void) -> some View {
+        if let url = web?.url {
+            Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
+        }
+        if let web {
+            Button {
+                Task { await PageFlow.reloadThenRefill(reload: { web.reload() }, refill: fill) }
+            } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("\(idPrefix)-refresh")
+            Button { Task { await fill() } } label: { Label(fillTitle, systemImage: "square.and.pencil") }
+                .disabled(!canFill).accessibilityIdentifier("\(idPrefix)-\(fillID)")
+        }
     }
 }
