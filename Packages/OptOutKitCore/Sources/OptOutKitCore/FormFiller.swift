@@ -214,7 +214,17 @@ public enum FormFiller {
             if field.type == "select", has("phone|mobile|tel\\b|ph.?ext|t[ée]l[ée]phone") {
                 put(person.countryCode == "US" || person.countryCode == nil ? ["United States", "United States (+1)", "+1", "US", "USA"] : [Regions.englishName(person.countryCode ?? "")], L10n.noun("Country code")); continue
             }
-            if field.type == "email" || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
+            // The visible label beats the code name: a box labelled "Phone" whose name is `form_fields[email]` is the phone number, not the email.
+            let labelPhone = labelOnly.range(of: "phone|mobile|t[ée]l[ée]phone|tel[ée]fono|telefon|handy", options: .regularExpression) != nil && labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) == nil
+            let labelEmail = labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) != nil && labelOnly.range(of: "phone|mobile|t[ée]l[ée]phone|tel[ée]fono|telefon|handy", options: .regularExpression) == nil
+            // One box for the whole address ("Full Address", "Complete address"): "full" there is not the full name.
+            if has("(full|complete|entire|whole).{0,6}address|address.{0,6}(in full|complete)") && !labelEmail && field.type != "email" {
+                if let a = address, let street = a.street { put(["\(street), \(a.city), \(a.state) \(a.zip ?? "")".trimmingCharacters(in: .whitespaces), street], L10n.noun("Street address")) }
+                else if required { missing.append(L10n.noun("Street address")) }
+                continue
+            }
+            if labelPhone && field.type != "email" { put([person.phones.first], L10n.noun("Phone number")) }
+            else if field.type == "email" || labelEmail || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
             else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }
             else if has("full|\\bname\\b|\\bnom\\b|\\bnombre\\b") { put([legal], L10n.noun("Full name")) }

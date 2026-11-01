@@ -3269,4 +3269,32 @@ final class LegalBasisFillTests: XCTestCase {
         XCTAssertTrue(law.contains("CCPA") && law.contains("GDPR") && law.lowercased().contains("opt out"))
         XCTAssertNil(plan.values.first { $0.name == "threatInfo" }, "a claim of physical risk is never made for the person")
     }
+
+    /// usmarketinggrp.com/privacy-policy: Elementor names every box `form_fields[...]`, and the box labelled Phone is named `email`.
+    func testTheVisibleLabelBeatsTheCodeNameAndAFullAddressBoxTakesTheAddress() {
+        let f: [FormField] = [
+            FormField(type: "text", name: "form_fields[name]", label: "First Name | form_fields[name]"),
+            FormField(type: "text", name: "form_fields[field_2a4f259]", label: "Last Name | form_fields[field_2a4f259]"),
+            FormField(type: "text", name: "form_fields[field_192408f]", label: "Full Address * | form_fields[field_192408f]"),
+            FormField(type: "text", name: "form_fields[email]", label: "Phone | form_fields[email]"),
+            FormField(type: "email", name: "form_fields[field_29e0ac1]", label: "Email * | form_fields[field_29e0ac1]"),
+        ]
+        let form = OptOutForm(page: URL(string: "https://usmarketinggrp.com/privacy-policy/")!, method: "post", action: nil, fields: f, hops: 1)
+        var me = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
+                        addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
+        me.phones = ["773 633 1564"]
+        let got = Dictionary(uniqueKeysWithValues: FormFiller.plan(for: form, signals: nil, person: me).values.map { ($0.name, $0.candidates) })
+        XCTAssertEqual(got["form_fields[name]"]?.first, "Pat")
+        XCTAssertEqual(got["form_fields[field_2a4f259]"]?.first, "Example")
+        XCTAssertEqual(got["form_fields[field_192408f]"]?.first, "1 Main St, Springfield, IL 62701", "the whole address, not the name")
+        XCTAssertEqual(got["form_fields[email]"]?.first, me.phones.first, "the box labelled Phone gets the phone, whatever its code name says")
+        XCTAssertEqual(got["form_fields[field_29e0ac1]"]?.first, "pat@example.com")
+    }
+
+    func testAnEmailBoxNamedPhoneStillTakesTheEmailWhenItsLabelSaysEmail() {
+        let f = [FormField(type: "text", name: "phone_number", label: "Email address | phone_number")]
+        let form = OptOutForm(page: URL(string: "https://x.example/")!, method: "post", action: nil, fields: f, hops: 1)
+        let me = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
+        XCTAssertEqual(FormFiller.plan(for: form, signals: nil, person: me).values.first?.candidates.first, "pat@example.com")
+    }
 }
