@@ -423,7 +423,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let log = Log()
         let page = FakePage(blockers: [[.check("a bot check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
         let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
-        r.watchInterval = 0.02
+        r.autoSubmit = { false }; r.watchInterval = 0.02
         let run = Task { @MainActor in await r.run() }
         await wait(r.awaitingNext)
         XCTAssertTrue(r.awaitingNext)
@@ -476,5 +476,18 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertFalse(r.awaitingNext)
         XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
         await join(run, r)
+    }
+
+    func testAutoSendOnMovesOnByItselfEvenWhenThePersonPressedThePagesButton() async {
+        let log = Log()
+        let page = FakePage(blockers: [[.check("a bot check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { true }; r.watchInterval = 0.02; r.pauseAfterSent = 0
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 1)
+        XCTAssertEqual(r.index, 1, "one rule: Auto-send on, the app moves on by itself")
+        XCTAssertFalse(r.awaitingNext)
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
+        r.skip(); await join(run, r)
     }
 }

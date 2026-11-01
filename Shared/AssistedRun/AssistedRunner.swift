@@ -150,8 +150,8 @@ final class AssistedRunner: ObservableObject {
     private var loadedPages = Set<Int>()           // pages whose load has finished (well or badly), so a skip does not have to wait for a slow one
     private var skipFlag = false
     private var emailedFlag = false
-    /// A confirmation the app noticed (the person pressed the page's button themselves): the site is recorded and the check is shown, but the screen stays on
-    /// the site until the person taps Next site. Moving on by itself took the page away before they had looked at it.
+    /// Auto-send off, and a confirmation the app noticed: the site is recorded and the check is shown, but the screen stays on the site until the person
+    /// taps Next site. (With Auto-send on the app moves on by itself, as before.)
     @Published private(set) var awaitingNext = false
     private var recordedEarly = false
     /// The person asked for the previous site: the current one is left as it was, and the one before it opens again.
@@ -414,9 +414,11 @@ final class AssistedRunner: ObservableObject {
                             outcome = hit
                             if case .submitted(let email) = hit {
                                 phase = .sent(awaitingEmail: email)
-                                holdAfterDetected(items[i], hit)
-                                await withCheckedContinuation { nextContinuation = $0 }          // until Next site (or Skip, Previous, Mark as done)
-                                awaitingNext = false
+                                if !autoSubmit() {
+                                    holdAfterDetected(items[i], hit)
+                                    await withCheckedContinuation { nextContinuation = $0 }      // until Next site (or Skip, Previous, Mark as done)
+                                    awaitingNext = false
+                                }
                             }
                             break
                         }
@@ -433,7 +435,6 @@ final class AssistedRunner: ObservableObject {
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
             let manual = !revisiting && !items[i].handsOff && !autoSubmit()
-            let sentByApp = !manual && !revisiting && !items[i].handsOff          // the app presses send itself: a confirmation it finds afterwards is its own work
             switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     sentForms += 1; sentEmail = sentEmail || email
@@ -463,9 +464,8 @@ final class AssistedRunner: ObservableObject {
                                 self.markedDone = hit
                                 if case .submitted(let email) = hit {
                                     self.phase = .sent(awaitingEmail: email)
-                                    // A form the app sent itself (its own read of the page was too early to see the confirmation) goes on as it always did.
-                                    // One the person sent is noticed, shown and saved, and waits for their Next site.
-                                    if sentByApp { self.resumeNext() } else { self.holdAfterDetected(self.items[i], hit) }
+                                    // One rule: Auto-send on moves on by itself, off waits for the person's Next site. The confirmation is noticed and saved either way.
+                                    if self.autoSubmit() { self.resumeNext() } else { self.holdAfterDetected(self.items[i], hit) }
                                 } else { self.resumeNext() }
                                 return
                             }
