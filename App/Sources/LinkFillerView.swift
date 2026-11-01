@@ -33,7 +33,7 @@ final class LinkFiller: ObservableObject {
         await s.settlePage(maxWait: 10)
         _ = await s.denyCookies()
         webView = s.presentable()
-        status = Loc.t("The page is loaded. Check the address above, then tap \"Fill in my details\".")
+        status = Loc.t("The page is loaded. Check the address above, then choose \"Fill in my details\" in the … menu.")
         busy = false
     }
 
@@ -55,7 +55,7 @@ final class LinkFiller: ObservableObject {
         let stand = OptOutForm(page: url, method: "post", action: nil, fields: [], hops: 1)
         guard let prepared = await driver.prepareLoaded(session: s, form: stand, plan: FillPlan(values: [], verdict: .ready), keepOpenWithoutForm: true, advanceOnlyWithoutForm: true) else {
             if let confirm = await s.confirmButtonLabel() { status = Loc.f("This page only needs your confirmation. Read it, then press \"%@\" yourself.", confirm); return false }
-            status = Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.")
+            status = Loc.t("No form found on this page. If it needs a click first, do that in the page, then choose \"Fill in my details\" in the … menu again.")
             return false
         }
         page = prepared
@@ -179,7 +179,11 @@ struct LinkFillerView: View {
                         Button {
                             if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
                         } label: { Label("Fill in my details", systemImage: "square.and.pencil") }.disabled(filler.busy).accessibilityIdentifier("link-fill")
-                        Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("link-refresh")
+                        Button {
+                            // As in Solve and send: the page is reloaded, then the details are put back.
+                            web.reload()
+                            Task { try? await Task.sleep(nanoseconds: 3_500_000_000); if let me = model.selectedPerson { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } }
+                        } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("link-refresh")
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
                     } label: { Image(systemName: "ellipsis.circle").font(.title2) }
                         .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("link-more")

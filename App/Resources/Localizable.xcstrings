@@ -13364,25 +13364,25 @@
     }
    }
   },
-  "No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.": {
+  "No form found on this page. If it needs a click first, do that in the page, then choose \"Fill in my details\" in the … menu again.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Aucun formulaire trouvé sur cette page. S'il faut d'abord cliquer, faites-le dans la page, puis appuyez de nouveau sur Remplir mes informations."
+      "value": "Aucun formulaire trouvé sur cette page. S'il faut d'abord cliquer, faites-le dans la page, puis choisissez de nouveau « Remplir mes informations » dans le menu …."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "No se encontró ningún formulario en esta página. Si hay que pulsar algo antes, hazlo en la página y vuelve a pulsar Rellenar mis datos."
+      "value": "No se encontró ningún formulario en esta página. Si primero hay que hacer clic, hágalo en la página y luego elija de nuevo «Rellenar mis datos» en el menú …."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Auf dieser Seite wurde kein Formular gefunden. Falls zuerst ein Klick nötig ist, tun Sie das auf der Seite und tippen Sie dann erneut auf Meine Angaben ausfüllen."
+      "value": "Auf dieser Seite wurde kein Formular gefunden. Falls zuerst ein Klick nötig ist, tun Sie das in der Seite und wählen Sie dann im Menü … erneut „Meine Angaben ausfüllen“."
      }
     }
    }
@@ -21230,25 +21230,25 @@
     }
    }
   },
-  "The page is loaded. Check the address above, then tap \"Fill in my details\".": {
+  "The page is loaded. Check the address above, then choose \"Fill in my details\" in the … menu.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "La page est chargée. Vérifiez l'adresse ci-dessus, puis appuyez sur « Remplir mes informations »."
+      "value": "La page est chargée. Vérifiez l'adresse ci-dessus, puis choisissez « Remplir mes informations » dans le menu …."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "La página está cargada. Comprueba la dirección de arriba y pulsa «Rellenar mis datos»."
+      "value": "La página está cargada. Revise la dirección de arriba y luego elija «Rellenar mis datos» en el menú …."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Die Seite ist geladen. Prüfen Sie die Adresse oben und tippen Sie dann auf „Meine Angaben ausfüllen“."
+      "value": "Die Seite ist geladen. Prüfen Sie die Adresse oben und wählen Sie dann im Menü … „Meine Angaben ausfüllen“."
      }
     }
    }
