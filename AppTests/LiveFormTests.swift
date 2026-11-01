@@ -370,4 +370,39 @@ final class LiveFormTests: XCTestCase {
         let none = try await challenge("<html><body><form><input name='email'><button>Opt me out</button></form></body></html>")
         XCTAssertNil(none)
     }
+
+    /// OneTrust's privacy portal: the first question is a type-ahead "State of Residence" (only a picked option counts) and the person's own questions appear after it.
+    func testTheEmailLinksFillAnswersAStateTypeAheadAndThenFillsWhatItRevealed() async throws {
+        let html = """
+            <html><body><p>You may have rights with respect to your personal information. Complete this form to exercise these rights.</p>
+            <form id="f" onsubmit="event.preventDefault()">
+              <label for="stateDSARElement">State of Residence</label>
+              <input id="stateDSARElement" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-label="State of Residence" autocomplete="off" required>
+              <ul id="list" role="listbox" style="display:none"></ul>
+              <div id="more" style="display:none">
+                <label for="fn">First Name</label><input id="fn" required><label for="ln">Last Name</label><input id="ln" required><label for="em">Email</label><input id="em" type="email" required>
+              </div>
+              <label for="captchaCode">Captcha</label><input id="captchaCode" name="captchaCode" aria-label="Captcha">
+              <button type="submit">Submit</button>
+            </form>
+            <script>
+              var states=['Alabama','Illinois','Indiana','Texas'], inp=document.getElementById('stateDSARElement'), list=document.getElementById('list');
+              function show(){var v=inp.value.toLowerCase(); list.innerHTML=''; states.filter(function(s){return s.toLowerCase().indexOf(v)===0;}).forEach(function(s){
+                var li=document.createElement('li'); li.setAttribute('role','option'); li.textContent=s; li.style.padding='6px';
+                li.addEventListener('click',function(){inp.value=s; list.style.display='none'; document.getElementById('more').style.display='block';}); list.appendChild(li);}); list.style.display='block';}
+              inp.addEventListener('input',show); inp.addEventListener('focus',show);
+            </script></body></html>
+            """
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let filler = LinkFiller(); filler.attach(session)
+        var me = pat; me.phones = ["773 633 1564"]
+        let ok = await filler.fill(person: me)
+        func value(_ id: String) async -> String { "\(await session.evalLive("document.getElementById('\(id)').value") ?? "")" }
+        let state = await value("stateDSARElement"), first = await value("fn"), last = await value("ln"), email = await value("em"), captcha = await value("captchaCode")
+        XCTAssertEqual(state, "Illinois", "the state was picked from the list, not just typed")
+        XCTAssertEqual([first, last, email], ["Pat", "Example", "pat@example.com"], "and the questions it revealed were filled in")
+        XCTAssertEqual(captcha, "", "a typed captcha is left for the person")
+        XCTAssertTrue(ok, filler.status)
+    }
 }

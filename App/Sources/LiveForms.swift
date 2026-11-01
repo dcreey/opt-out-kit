@@ -540,6 +540,40 @@ extension WebViewSession {
     /// to the company or their state, and picks a consumer-style answer ("Consumer", "None", "Other", the person's state). Never picks employee,
     /// customer, vendor or business answers. Returns how many it set.
     /// `state` is the person's own state or region name: a menu that lists places picks that one, and never another.
+    /// A state (or similar) box that is really a type-ahead list (OneTrust's "State of Residence": a text box that offers matching options as you type, and counts
+    /// only an option you pick). Types the state's name, waits for the list, and picks the option that is exactly that name. Returns how many it chose.
+    func chooseAutocomplete(state: String?) async -> Int {
+        guard let state, !state.isEmpty else { return 0 }
+        let open = #"""
+        (function(name){
+          var els=[].slice.call(document.querySelectorAll('input[role=combobox][aria-autocomplete]')).filter(function(e){
+            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||e.getAttribute('data-ook-ac')) return false;
+            var l=((e.getAttribute('aria-label')||'')+' '+(e.id||'')+' '+((e.id&&document.querySelector('label[for="'+e.id+'"]'))?document.querySelector('label[for="'+e.id+'"]').innerText:'')).toLowerCase();
+            return /state|province|region|residence/.test(l)&&!/country/.test(l);});
+          if(!els.length) return false;
+          var e=els[0]; e.setAttribute('data-ook-ac','1'); e.scrollIntoView({block:'center'}); e.focus();
+          var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); d.set.call(e,name);
+          ['keydown','input','keyup'].forEach(function(t){e.dispatchEvent(new Event(t,{bubbles:true}));});
+          ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
+          return true;})(\#(Self.liveLiteral(state)));
+        """#
+        var chosen = 0
+        for _ in 0..<4 {
+            guard (await evalLive(open)) as? Bool == true else { break }
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            let pick = #"""
+            (function(name){var want=name.toLowerCase();
+              var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=option],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
+              for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim().toLowerCase(); if(t===want){opts[i].scrollIntoView({block:'center'});
+                ['mousedown','mouseup','click'].forEach(function(k){opts[i].dispatchEvent(new MouseEvent(k,{bubbles:true,cancelable:true}));}); return true;}}
+              return false;})(\#(Self.liveLiteral(state)));
+            """#
+            if (await evalLive(pick)) as? Bool == true { chosen += 1 }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+        }
+        return chosen
+    }
+
     func chooseCustomMenus(state: String? = nil) async -> Int {
         var set = 0
         // Every empty menu on the form is set, however many there are: the loop ends when none is left (the bound only guards against a page that keeps adding menus).
@@ -609,7 +643,9 @@ extension WebViewSession {
 
     /// The page's address path and title: a form on a page about opting out is more likely the opt-out form.
     func pageContext() async -> String {
-        ((try? await webView.evaluateJavaScript("location.pathname + ' ' + document.title")) as? String) ?? ""
+        // The address, the title and the first words of the page: a portal whose only form asks "State of Residence" says what it is for in its intro
+        // ("you may have rights with respect to your personal information… exercise these rights"), not in the form.
+        ((try? await webView.evaluateJavaScript("location.pathname + ' ' + document.title + ' ' + (document.body ? document.body.innerText.replace(/\\s+/g,' ').slice(0,300) : '')")) as? String) ?? ""
     }
 
     /// A visible, empty text box that asks for a code ("Captcha", "Security code"): the person types it, and the form is not sent until it is filled.

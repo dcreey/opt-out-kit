@@ -83,4 +83,12 @@ final class LiveFormPickerTests: XCTestCase {
         XCTAssertEqual(asForm.fields.map(\.label).map { $0.components(separatedBy: " | ").first }, ["First Name", "Street Address"])
         XCTAssertEqual(asForm.fields.map(\.name), ["t-0", "t-1"], "each box is found again by its token")
     }
+
+    /// OneTrust's privacy portal: the only form asks "State of Residence" and a captcha, and the page says what it is for in its intro.
+    func testAPortalFormThatOnlyAsksForTheStateIsPickedFromThePagesIntro() {
+        let portal = form("p", [("text", "State of Residence"), ("text", "Captcha")], buttons: ["Submit"], text: "State of Residence Submit")
+        XCTAssertNil(LiveFormPicker.pick([portal], pageContext: "/webform/1/2"), "with nothing saying what the page is for, it is not taken for an opt-out")
+        let intro = "/webform/1/2 Privacy Web Form You may have rights with respect to your personal information. Complete this form to exercise these rights."
+        XCTAssertEqual(LiveFormPicker.pick([portal], pageContext: intro)?.token, "p")
+    }
 }

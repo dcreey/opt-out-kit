@@ -22,6 +22,9 @@ final class LinkFiller: ObservableObject {
         return c.scheme == "https" ? c.url : nil
     }
 
+    /// Test hook: works on a session that already holds a page.
+    func attach(_ session: WebViewSession) { close(); self.session = session; webView = session.presentable(); host = "test" }
+
     func open(_ url: URL) async {
         close(); busy = true; host = url.host ?? ""
         status = Loc.t("Loading the page…")
@@ -52,17 +55,32 @@ final class LinkFiller: ObservableObject {
                                  : Loc.t("No form found on this page. If it needs a click first, do that in the page, then tap Fill in my details again.")
             return false
         }
-        s.chosenForm = form.token
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: webView?.url ?? URL(string: "https://invalid.example")!), signals: nil, person: person)
-        switch plan.verdict {
-        case .ready: break
-        case .needsData(let what): status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return false
-        case .needsYou(let why): status = why; return false
+        let stateName = USStates.name(for: person.currentAddress?.state ?? "")
+        let pageURL = webView?.url ?? URL(string: "https://invalid.example")!
+        // A form that grows as it is answered (OneTrust: pick the state and the rest of the questions appear) is filled in rounds, each with what the last one revealed.
+        var fill: (filled: Int, unmatchedRequired: [String]) = (0, [])
+        var current = form
+        for round in 0..<4 {
+            s.chosenForm = current.token
+            let plan = FormFiller.plan(for: current.asOptOutForm(page: pageURL), signals: nil, person: person)
+            switch plan.verdict {
+            case .ready: break
+            case .needsData(let what): if round == 0 { status = Loc.f("The form asks for %@, which we do not hold. Add it to your profile.", what.joined(separator: ", ")); return false }
+            case .needsYou(let why): if round == 0 { status = why; return false }
+            }
+            if case .ready = plan.verdict {} else if round > 0 { break }
+            let pass = await s.fillLive(plan.values, keepExisting: true)
+            fill = (fill.filled + pass.filled, pass.unmatchedRequired)
+            let options = await s.chooseRequestOptions(form: current.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
+            let menus = await s.chooseCustomMenus(state: stateName)
+            let typed = await s.chooseAutocomplete(state: stateName)
+            guard options.chosen + menus + typed > 0 else { break }
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            await s.settlePage(maxWait: 3)
+            guard let next = LiveFormPicker.pick(await s.discoverForms(), pageContext: await s.pageContext()) else { break }
+            current = next
         }
-        let fill = await s.fillLive(plan.values, keepExisting: true)
-        _ = await s.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
-        _ = await s.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
-        await s.scrollFormIntoView(form.token)
+        await s.scrollFormIntoView(current.token)
         #if DEBUG
         // Simulator work: what every visible field held after the fill, written to Documents/linkfill.json.
         if let json = try? await s.webView.evaluateJavaScript("JSON.stringify([...document.querySelectorAll('input,select,textarea')].filter(e=>e.getBoundingClientRect().width>0&&!['hidden','submit','button'].includes(e.type)).map(e=>({label:((e.id&&document.querySelector('label[for=\"'+e.id+'\"]')||e.closest('label')||{}).innerText||e.placeholder||e.name||'').trim().slice(0,50),type:e.type,value:(e.tagName==='SELECT'?(e.options[e.selectedIndex]||{}).text:e.type==='checkbox'?String(e.checked):e.value)||''})))") as? String,

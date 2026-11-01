@@ -155,6 +155,7 @@ final class WebAssistedPage: AssistedPage {
         _ = await session.fillLive(plan.values, keepExisting: true)
         _ = await session.chooseRequestOptions(form: new.token, ownerMayConfirm: ownerMayConfirm)
         _ = await session.chooseCustomMenus(state: stateName)
+        _ = await session.chooseAutocomplete(state: stateName)
         _ = await session.chooseTileButtons()
         return true
     }
@@ -183,9 +184,10 @@ final class WebAssistedPage: AssistedPage {
             _ = await session.fillLive(plan.values)
             let options = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
             _ = await session.chooseCustomMenus(state: stateName)
+            let typedAhead = await session.chooseAutocomplete(state: stateName)          // a "State of Residence" that only counts a picked option
             _ = await session.chooseTileButtons()
-            // Choosing "remove my information" can reveal more boxes (state, birth year): read the form again and fill those too.
-            if options.chosen > 0 { _ = await adoptNewForm() }
+            // Choosing "remove my information" (or a state) can reveal more boxes (name, birth year): read the form again and fill those too.
+            if options.chosen > 0 || typedAhead > 0 { _ = await adoptNewForm() }
         } else { _ = await session.fillFields(plan.values) }
     }
 
