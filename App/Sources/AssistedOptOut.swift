@@ -279,8 +279,12 @@ struct AssistedOptOutView: View {
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
                             }
+                            if runner.canGoBack {
+                                Button { runner.back() } label: { Label("Previous site", systemImage: "backward") }.accessibilityIdentifier("assisted-back")
+                            }
                             Button {
-                                if let item = runner.current { model.skipSite(item.entry.id) }
+                                // A site visited again keeps its result: moving on from it is not skipping it.
+                                if let item = runner.current, !runner.revisiting { model.skipSite(item.entry.id) }
                                 runner.skip()
                             } label: { Label("Skip this site", systemImage: "forward") }.accessibilityIdentifier("assisted-skip")
                             // After the first skip, the same site can be set aside for good.
@@ -308,7 +312,7 @@ struct AssistedOptOutView: View {
                             Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
                         } else {
                             if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
-                            if case .needsMore = runner.phase { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
+                            if runner.phase == .reviewing || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
                         }
                     }
                     ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold)
@@ -367,7 +371,7 @@ struct AssistedOptOutView: View {
 
     private var canMarkDone: Bool {
         switch runner.phase {
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut: return true
+        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut, .reviewing: return true
         default: return false
         }
     }
@@ -425,6 +429,7 @@ struct AssistedOptOutView: View {
             ? Loc.t("The site said \"too many requests\". It limits how fast it takes them, and this company runs several of these sites. Wait a few minutes and try it again later; tap Next site to carry on.")
             : Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)
         case .timedOut: return Loc.t("Timed out waiting for the check.")
+        case .reviewing: return Loc.t("You are back on this site. Look at it or do something else here, like another form. It keeps its result unless you finish it now. Tap Next site when you are done.")
         case .noForm: return Loc.t("No online form exists for this site. Send an email instead: tap Write the email.")
         case .pacing(let n): return Loc.f("This company runs several of these sites and limits how fast it takes requests. Sending in %lld seconds so it is not turned away.", n)
         }
@@ -435,6 +440,7 @@ struct AssistedOptOutView: View {
         case .sent: return "checkmark.circle.fill"
         case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
         case .needsMore, .timedOut: return "exclamationmark.triangle"
+        case .reviewing: return "arrow.uturn.backward.circle"
         case .noForm: return "envelope"
         case .pacing: return "timer"
         default: return "hourglass"

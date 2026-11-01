@@ -64,7 +64,7 @@ def state_names():
 
 
 def cmd_extract(a):
-    app = scan_calls(glob.glob("App/Sources/*.swift")); app.update({k: v | app.get(k, set()) for k, v in swiftui_keys().items()})
+    app = scan_calls(glob.glob("App/Sources/*.swift") + glob.glob("Shared/AssistedRun/*.swift")); app.update({k: v | app.get(k, set()) for k, v in swiftui_keys().items()})
     core = scan_calls(glob.glob("Packages/OptOutKitCore/Sources/OptOutKitCore/*.swift")); core.update(state_names())
     json.dump({"app": sorted(app), "core": sorted(core)}, open("l10n/keys.json", "w"), indent=1, ensure_ascii=False)
     print(f"{len(app)} app strings, {len(core)} core strings, {len(set(app) | set(core))} distinct")

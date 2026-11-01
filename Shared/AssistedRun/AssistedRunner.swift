@@ -96,6 +96,7 @@ final class AssistedRunner: ObservableObject {
         case sent(awaitingEmail: Bool)
         case needsMore(String)        // sent, but no confirmation: the site wants another step from the person
         case timedOut
+        case reviewing                // back on a site already passed: shown as it is, nothing is sent for the person
     }
 
     @Published private(set) var index = 0
@@ -140,6 +141,12 @@ final class AssistedRunner: ObservableObject {
     private var loadedPages = Set<Int>()           // pages whose load has finished (well or badly), so a skip does not have to wait for a slow one
     private var skipFlag = false
     private var emailedFlag = false
+    /// The person asked for the previous site: the current one is left as it was, and the one before it opens again.
+    private var goBack = false
+    /// The furthest site the run has reached. Every site before it that is opened again is only being looked at.
+    private var frontier = 0
+    /// True while a site already passed is open again.
+    @Published private(set) var revisiting = false
     private var autoScrolls = 0          // times the page was scrolled to an opt-out button for this site; the person's own scrolling is never fought
     private var nextContinuation: CheckedContinuation<Void, Never>?
     var waitLimit: TimeInterval = 180
@@ -216,6 +223,15 @@ final class AssistedRunner: ObservableObject {
         skip()
     }
 
+    /// Back to the previous site, to look at it or do something else there. Only works on the second site or later.
+    var canGoBack: Bool { index > 0 && !finished }
+    func back() {
+        guard canGoBack else { return }
+        goBack = true; skipFlag = true
+        resumeNext()
+        if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
+    }
+
     func skip(reported: Bool = false) {
         reportedNotWorking = reported; skipFlag = true; resumeNext()
         // Whatever the site was waiting on (the no-form screen, or the offer to email a site that failed), skipping answers it.
@@ -265,7 +281,7 @@ final class AssistedRunner: ObservableObject {
     }
 
     private func offerEmailIfNeeded(_ item: Item, _ result: AutoOptOutResult) async {
-        if offersEmail(result, item.entry) {
+        if !goBack, !revisiting, offersEmail(result, item.entry) {
             emailOffer = item.entry
             await withCheckedContinuation { emailContinuation = $0 }
         }
@@ -295,12 +311,33 @@ final class AssistedRunner: ObservableObject {
     }
 
     func run() async {
-        for i in items.indices {
+        var i = 0
+        while items.indices.contains(i) {
+            revisiting = i < frontier
+            if !revisiting { frontier = i }
+            await process(i)
+            if goBack {
+                // Leaving this site untouched: its page is dropped so it loads fresh when the person gets here again, and the one before it comes back.
+                goBack = false
+                forget(i)
+                forget(i - 1)
+                i -= 1
+            } else { i += 1 }
+        }
+        finished = true
+    }
+
+    private func forget(_ i: Int) { preparing[i] = nil; loadedPages.remove(i) }
+
+    /// One site, from loading its page to its result. Returns without a result when the person went back.
+    private func process(_ i: Int) async {
+        do {
             index = i; phase = .loading; skipFlag = false; emailedFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
-            if items[i].emailOnly { await waitForEmail(items[i]); continue }
+            if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
+            if items[i].emailOnly { await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
                 let (listing, early) = await chooseListing(items[i], search: search)
-                if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); continue }
+                if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); return }
                 phase = .loading
                 preparing[i] = Task { defer { loadedPages.insert(i) }; return await driver.prepare(items[i].form, plan: items[i].plan, listingURL: listing) }
             } else { prepare(i) }
@@ -311,16 +348,16 @@ final class AssistedRunner: ObservableObject {
                 Task { await loading?.value?.close() }          // the page that was loading is closed when it arrives
                 record(items[i], .needsYou("skipped"))
                 await offerEmailIfNeeded(items[i], .needsYou("skipped"))
-                continue
+                return
             }
             guard let ready = await preparing[i]?.value else {
                 let noForm = driver.failureReason(for: items[i].form) == "noform"
                 // The page loaded but holds no form we can fill, and the site gives an address: say so, and let the person send the email from here.
-                if noForm, items[i].entry.contactEmail != nil { await waitForEmail(items[i]); continue }
+                if noForm, items[i].entry.contactEmail != nil { await waitForEmail(items[i]); return }
                 let why = noForm ? Self.noForm : Self.unloadable
                 record(items[i], .needsYou(why))
                 await offerEmailIfNeeded(items[i], .needsYou(why))
-                continue
+                return
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready
@@ -335,7 +372,7 @@ final class AssistedRunner: ObservableObject {
                 while true {
                     if skipFlag { outcome = .needsYou("skipped"); break }
                     if let done = markedDone { outcome = done; break }
-                    let blockers = await ready.blockers()
+                    let blockers = revisiting ? [] : await ready.blockers()        // a site visited again is never sent for the person
                     if blockers.isEmpty { break }
                     if blockers.contains(.terms) { phase = .waitingForTerms }
                     else if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { phase = .waitingForCertification }
@@ -359,19 +396,19 @@ final class AssistedRunner: ObservableObject {
                 }
                 if outcome != nil { break }
                 // Sites run by one company share one limit on how fast requests may come: space the sends so the later ones are not turned away.
-                await paceIfNeeded(items[i])
+                if !revisiting { await paceIfNeeded(items[i]) }
                 if skipFlag { outcome = .needsYou("skipped"); break }
                 if let done = markedDone { outcome = done; break }
                 phase = .sending
                 await ready.refill()
-                noteSend(items[i])
+                if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
-            switch items[i].handsOff ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
+            switch items[i].handsOff || revisiting ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
                 case .challenged: continue      // a check appeared after sending: wait for the person again
                 case .rejected(let why), .failed(let why):
-                    phase = .needsMore(why)
+                    phase = revisiting ? .reviewing : .needsMore(why)
                     outcome = why == AutoOptOut.rateLimited ? .needsYou(why) : .failed(why)         // a rate limit is not the form's fault
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
@@ -406,11 +443,15 @@ final class AssistedRunner: ObservableObject {
             if case .submitted? = outcome { try? await Task.sleep(nanoseconds: UInt64(pauseAfterSent * 1_000_000_000)) }
             ready.close(); page = nil
         }
-        finished = true
     }
 
     private func record(_ item: Item, _ result: AutoOptOutResult) {
         var result = result
+        if goBack { return }                      // leaving a site by going back says nothing about it
+        if revisiting {
+            // A site visited again keeps what it had, unless the person finished it now (a skipped site they decide to do after all).
+            switch result { case .submitted, .emailed: break; default: return }
+        }
         if emailedFlag, case .needsYou("skipped") = result { result = .emailed; celebrate += 1; emailedFlag = false }
         results[item.id] = result
         switch result {

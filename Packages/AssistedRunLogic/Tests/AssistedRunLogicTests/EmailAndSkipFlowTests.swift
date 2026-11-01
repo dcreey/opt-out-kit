@@ -215,4 +215,98 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.emailed, 1, "saved once")
         XCTAssertEqual(log.rows.filter { $0.1 == .emailed }.count, 1)
     }
+
+    // MARK: going back to the previous site
+
+    func testBackReopensThePreviousSiteWithoutChangingEitherSiteAndNothingIsSentForThePerson() async {
+        let log = Log()
+        let a = FakePage(blockers: [[]]), b = FakePage(blockers: waiting)
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": a, "b.example": b]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        XCTAssertEqual(log.rows.map(\.0), ["a.example"])
+        XCTAssertTrue(r.canGoBack)
+        r.back()
+        await wait(r.index == 0 && r.phase == .reviewing)
+        XCTAssertEqual(r.phase, .reviewing, "the earlier site is shown as it is, not sent again")
+        XCTAssertTrue(r.revisiting)
+        XCTAssertEqual(log.rows.map(\.0), ["a.example"], "leaving b recorded nothing: not skipped, not failed")
+        XCTAssertEqual(r.skippedCount, 0)
+        r.next()
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        XCTAssertFalse(r.revisiting)
+        XCTAssertEqual(log.rows.count, 1, "going back and forward left a's result as it was")
+        r.skip(); await join(run, r)
+        XCTAssertEqual(log.rows.map(\.0), ["a.example", "b.example"])
+    }
+
+    func testTheFirstSiteHasNothingBefore() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": FakePage(blockers: waiting)]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .waitingForCheck)
+        XCTAssertFalse(r.canGoBack); r.back()
+        XCTAssertEqual(r.index, 0); XCTAssertEqual(log.rows.count, 0)
+        r.skip(); await join(run, r)
+    }
+
+    func testASkippedSiteDoneNowAfterGoingBackIsRecordedAsDone() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)],
+                          Driver(["a.example": FakePage(blockers: waiting), "b.example": FakePage(blockers: waiting)]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 0 && r.phase == .waitingForCheck)
+        r.skip()
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        XCTAssertEqual(log.rows.last?.1, .needsYou("skipped"))
+        r.back()
+        await wait(r.index == 0 && r.phase == .reviewing)
+        await r.markDone()                                   // they did it by hand on the page
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        XCTAssertEqual(log.rows.map(\.1), [.needsYou("skipped"), .submitted(awaitingEmail: false)], "now done")
+        r.skip(); await join(run, r)
+    }
+
+    func testSkippingOrLeavingASiteVisitedAgainDoesNotOverwriteItsResult() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: "privacy@a.example"), item("b.example", email: nil)],
+                          Driver(["a.example": FakePage(blockers: [[]]), "b.example": FakePage(blockers: waiting)]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        r.back()
+        await wait(r.index == 0 && r.phase == .reviewing)
+        r.skip()
+        await wait(r.index == 1 && r.phase == .waitingForCheck)
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)], "a stays sent")
+        XCTAssertEqual(r.skippedCount, 0); XCTAssertNil(r.emailOffer, "no email offer for a site only looked at")
+        r.skip(); await join(run, r)
+    }
+
+    func testGoingBackTwiceWalksBackTwoSites() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil), item("c.example", email: nil)],
+                          Driver(["a.example": FakePage(blockers: [[]]), "b.example": FakePage(blockers: [[]]), "c.example": FakePage(blockers: waiting)]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 2 && r.phase == .waitingForCheck)
+        r.back(); await wait(r.index == 1 && r.phase == .reviewing)
+        r.back(); await wait(r.index == 0 && r.phase == .reviewing)
+        XCTAssertFalse(r.canGoBack)
+        r.next(); await wait(r.index == 1 && r.phase == .reviewing)
+        r.next(); await wait(r.index == 2 && r.phase == .waitingForCheck)
+        r.skip(); await join(run, r)
+        XCTAssertEqual(log.rows.map(\.0), ["a.example", "b.example", "c.example"])
+    }
+
+    func testBackFromTheEmailOfferLeavesTheSiteUntouched() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: "privacy@b.example")],
+                          Driver(["a.example": FakePage(blockers: [[]])], noForm: ["b.example"]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .noForm)
+        r.back()
+        await wait(r.index == 0 && r.phase == .reviewing)
+        XCTAssertEqual(log.rows.map(\.0), ["a.example"])
+        r.next(); await wait(r.phase == .noForm)
+        r.skip(); await join(run, r)
+    }
 }

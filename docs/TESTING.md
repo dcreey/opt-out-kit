@@ -24,6 +24,9 @@ Notes about how a test works live in the test file itself. This is the list of w
 | No confirmation after sending | Waits for the person, then records the site as incomplete | `testASiteThatShowsNoConfirmationWaits...` | Mac |
 | Same company's sites in a row | The second waits so the shared rate limit is not hit | `RateLimitTests` | Mac |
 | Next site loads while the person works | No wait between sites | `testTheNextSiteLoadsWhileThePersonStillWorks...` | Mac |
+| Previous site (… menu) | Reopens the earlier site shown as it is; nothing is sent for the person; leaving either site records nothing. Going back twice walks back two sites. Not offered on the first site | `EmailAndSkipFlowTests.testBack...`, `testGoingBackTwice...`, `testTheFirstSiteHasNothingBefore` | Mac |
+| Finish a site after going back | A site that was skipped and is then done (sent or marked done) is recorded as done. A site only looked at keeps its result: Skip or Next on it is not a skip, no email offer | `testASkippedSiteDoneNowAfterGoingBack...`, `testSkippingOrLeavingASiteVisitedAgain...` | Mac |
+| Back from the email screen | The no-form or offer screen is left untouched and comes back when moving forward | `testBackFromTheEmailOffer...` | Mac |
 | Skip this site | Moves on at once from the form page, while still loading, and from the last site (run ends) | `testSkipMovesOnWithoutSending`, `testSkippingWhileAPageIsStillLoading...`, `testSkippingTheLastSiteEndsTheRun` | Mac |
 | Page will not load | Skipped after retries, shown as skipped, run continues | `testAPageThatWillNotLoad...` | Mac |
 | Site has no form, only an email address | The no-form screen waits; "No" to the mail prompt keeps waiting; Skip moves on | `NoFormReasonTests`, `EmailHandoffTests`, `EmailAndSkipFlowTests` | Mac |
