@@ -338,14 +338,17 @@ struct AssistedOptOutView: View {
                                 Button { runner.previousNote = nil } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }.accessibilityLabel(Loc.t("Dismiss"))
                             }
                         }
-                        AutoSubmitToggle()
                         if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-notice") }
                         // A site that also takes opt-outs by email can be finished that way when its form is a dead end (one request per app or panel, a
                         // form that will not take taps): the same button is in the menu, but it is easy to miss there.
-                        if let entry = runner.current?.entry, entry.contactEmail != nil, !runner.finished, runner.phase != .noForm, runner.phase != .loading {
-                            Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }
-                                .font(.caption.bold()).buttonStyle(.bordered).tint(Color.exnayGold).accessibilityIdentifier("assisted-email-shortcut")
+                        HStack(spacing: 12) {
+                            if let entry = runner.current?.entry, entry.contactEmail != nil, !runner.finished, runner.phase != .noForm, runner.phase != .loading {
+                                Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }
+                                    .buttonStyle(GuidePillStyle(filled: false)).accessibilityIdentifier("assisted-email-shortcut")
+                            }
+                            AutoSubmitToggle()
                         }
+                        .padding(.top, 6)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -433,7 +436,8 @@ struct AssistedOptOutView: View {
         case .pickingListing: return Loc.t("We searched this site for you. Tap your own profile in the results. If you are not in them, tap \"Not listed\". When you are on your profile, tap \"This is me\" and we do the rest.")
         case .waitingForTerms: return Loc.t("Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after.")
         case .waitingForCertification: return Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
-        case .waitingForCheck: return Loc.t("Your details are filled in. Solve the check below and we will send it.")
+        case .waitingForCheck: return model.autoSubmit ? Loc.t("Your details are filled in. Solve the check below and we will send it.")
+                                                        : Loc.t("Your details are filled in. Solve the check below, then press the page's own button yourself.")
         case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)
         case .sending: return "Sending…"
         case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : Loc.t("Sent.")

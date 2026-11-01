@@ -365,7 +365,7 @@ struct GuidedPanel: View {
                     .frame(height: min(max(stepHeight, 20), maxStepHeight))
                     .onPreferenceChange(StepHeightKey.self) { stepHeight = $0 }
                 }
-                AutoSubmitToggle()
+                AutoSubmitToggle().padding(.top, 4)
                 if let status = runner.status {
                     Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("guided-status")

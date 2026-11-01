@@ -4118,6 +4118,52 @@
     }
    }
   },
+  "Auto-send OFF": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoi auto désactivé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envío automático desactivado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auto-Senden aus"
+     }
+    }
+   }
+  },
+  "Auto-send ON": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoi auto activé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envío automático activado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auto-Senden an"
+     }
+    }
+   }
+  },
   "Automatic activity": {
    "extractionState": "manual",
    "localizations": {
@@ -26933,6 +26979,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Angaben sind eingetragen. Bestehen Sie die Prüfung unten, dann senden wir es."
+     }
+    }
+   }
+  },
+  "Your details are filled in. Solve the check below, then press the page's own button yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont remplies. Passez le contrôle ci-dessous, puis appuyez vous-même sur le bouton de la page."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están rellenados. Supera la comprobación de abajo y luego pulsa tú mismo el botón de la página."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind ausgefüllt. Erledigen Sie die Prüfung unten und drücken Sie dann selbst die Taste der Seite."
      }
     }
    }

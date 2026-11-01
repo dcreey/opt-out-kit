@@ -45,15 +45,29 @@ struct GuidePrimaryStyle: ButtonStyle {
     }
 }
 
-/// "Send it for me": on by default (Settings changes the default). Turned off, a guide fills the form in and the person presses the page's own button.
+/// A pill for the guide's own choices: gold and solid when it is on, a gold outline when it is not.
+struct GuidePillStyle: ButtonStyle {
+    var filled: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.font(.caption.bold()).lineLimit(1).minimumScaleFactor(0.8)
+            .foregroundStyle(filled ? Color.black : Color.exnayGold)
+            .padding(.horizontal, 14).padding(.vertical, 9)
+            .background(filled ? Color.exnayGold : Color.exnayGold.opacity(0.14), in: Capsule())
+            .overlay(Capsule().stroke(Color.exnayGold, lineWidth: filled ? 0 : 1))
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
+/// "Auto-send": on by default (Settings changes the default). Turned off, a guide fills the form in and the person presses the page's own button.
 /// The choice lasts until the app is closed.
 struct AutoSubmitToggle: View {
     @EnvironmentObject var model: AppModel
     var body: some View {
-        Button { model.autoSubmitSession = !model.autoSubmit } label: {
-            Label("Send it for me", systemImage: model.autoSubmit ? "checkmark.square.fill" : "square")
+        let on = model.autoSubmit
+        Button { model.autoSubmitSession = !on } label: {
+            Label(on ? Loc.t("Auto-send ON") : Loc.t("Auto-send OFF"), systemImage: on ? "bolt.fill" : "bolt.slash")
         }
-        .font(.caption.bold()).foregroundStyle(.white.opacity(0.85)).buttonStyle(.plain)
-        .accessibilityIdentifier("auto-submit-toggle").accessibilityValue(model.autoSubmit ? "on" : "off")
+        .buttonStyle(GuidePillStyle(filled: on))
+        .accessibilityIdentifier("auto-submit-toggle").accessibilityValue(on ? "on" : "off")
     }
 }
