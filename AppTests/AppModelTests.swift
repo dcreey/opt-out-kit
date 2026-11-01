@@ -257,6 +257,22 @@ final class MarkDoneAppTests: XCTestCase {
 
 @MainActor
 final class OverdueFollowUpAppTests: XCTestCase {
+    /// A link pasted in Email links for a site that was never waiting on an email: sending its form still marks the site done.
+    func testSendingAFormFromAPastedLinkMarksTheSiteDoneEvenWhenItWasNotWaitingOnAnEmail() throws {
+        let model = makeModel()
+        let me = try XCTUnwrap(model.selectedPerson)
+        let waiting = try XCTUnwrap(model.directory.first), other = try XCTUnwrap(model.directory.dropFirst().first { $0.optOutForm != nil })
+        model.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-3 * 86_400), outcome: "submitted_email"), site: waiting.id)
+        XCTAssertTrue(model.pendingFollowUps.contains { $0.entry.id == waiting.id })
+        model.completeFromLink(waiting.id)
+        XCTAssertFalse(model.pendingFollowUps.contains { $0.entry.id == waiting.id }, "a site waiting on its email just finishes that step")
+        XCTAssertFalse(other.isCurrent(attempts: model.progress.optOutAttempts))
+        model.completeFromLink(other.id)
+        XCTAssertTrue(other.isCurrent(attempts: model.progress.optOutAttempts), "a site that was not waiting is recorded as done now")
+        XCTAssertEqual(model.progress.optOutAttempts[other.id]?.last?.wasSubmitted, true)
+        XCTAssertNotNil(me)
+    }
+
     func testASiteStillWaitingOnItsEmailAfter45DaysBecomesAFollowUpTask() throws {
         let model = makeModel()
         let entry = try XCTUnwrap(model.directory.first)

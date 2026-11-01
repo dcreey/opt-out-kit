@@ -545,6 +545,58 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(page.sends, 2, "Next, then Submit")
         XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
     }
+
+    // MARK: Email links sends through the same page code
+
+    private func send(_ page: FakePage, auto: Bool = true) async -> (SubmitOutcome?, [String]) {
+        var said: [String] = []
+        let r = await PageSender.sendWhenReady(page: page, autoSubmit: { auto }, status: { said.append($0) }, isCancelled: { false }, pollSeconds: 0.01, limitSeconds: 3)
+        return (r, said)
+    }
+
+    func testEmailLinksSendsEveryOptOutFormOfThePage() async {
+        let page = FakePage(blockers: [[]]); page.extraForms = 1
+        let (r, said) = await send(page)
+        XCTAssertEqual(r, .submitted(awaitingEmail: false)); XCTAssertEqual(page.sends, 2, "both forms")
+        XCTAssertEqual(said.last, "Sent.")
+    }
+
+    func testEmailLinksWaitsForTheCheckBeforeSending() async {
+        let page = FakePage(blockers: [[.check("a bot check")], [.check("a bot check")], []])
+        let (r, _) = await send(page)
+        XCTAssertEqual(r, .submitted(awaitingEmail: false)); XCTAssertEqual(page.sends, 1)
+        XCTAssertGreaterThanOrEqual(page.polls, 3, "it did not send while the check was up")
+    }
+
+    func testEmailLinksWithAutoSendOffNeverPressesAndNoticesTheConfirmation() async {
+        let page = FakePage(blockers: [[]]); page.texts = ["Opt out form", "Opt out form", "Thank you. Your request has been received."]
+        let (r, _) = await send(page, auto: false)
+        XCTAssertEqual(r, .submitted(awaitingEmail: false)); XCTAssertEqual(page.sends, 0)
+    }
+
+    func testEmailLinksHandsAReCAPTCHAThatRefusesAScriptedPressToThePerson() async {
+        let page = FakePage(blockers: [[]], outcome: .challenged("a reCAPTCHA that rejected the automatic send"))
+        page.texts = ["Opt out form", "Opt out form", "Opt out form", "Your request has been received. Thank you."]
+        let (r, said) = await send(page)
+        XCTAssertEqual(page.sends, 1, "pressed once, never again")
+        XCTAssertEqual(r, .submitted(awaitingEmail: false))
+        XCTAssertTrue(said.contains { $0.contains("Press its Submit button yourself") })
+    }
+
+    func testEmailLinksThroughAMultiStepFormAndAFailedLaterForm() async {
+        let steps = FakePage(blockers: [[]], outcome: .challenged("the form moved on to its next step")); steps.laterOutcome = .submitted(awaitingEmail: true)
+        let (a, _) = await send(steps)
+        XCTAssertEqual(a, .submitted(awaitingEmail: true)); XCTAssertEqual(steps.sends, 2, "Next, then Submit")
+        let twoForms = FakePage(blockers: [[]]); twoForms.extraForms = 1; twoForms.laterOutcome = .rejected("device id refused")
+        let (b, _) = await send(twoForms)
+        XCTAssertEqual(b, .submitted(awaitingEmail: false), "the first form went through; the second failing does not undo it")
+    }
+
+    func testEmailLinksReportsASendThatShowedNoConfirmation() async {
+        let (r, said) = await send(FakePage(blockers: [[]], outcome: .failed("no success message was shown")))
+        XCTAssertEqual(r, .failed("no confirmation"))
+        XCTAssertTrue(said.last?.contains("saw no confirmation") == true)
+    }
 }
 
 final class ContactEmailPickerTests: XCTestCase {

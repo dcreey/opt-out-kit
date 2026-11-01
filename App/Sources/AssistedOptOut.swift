@@ -52,10 +52,19 @@ struct WebAssistedDriver: AssistedDriver {
         try? await Task.sleep(nanoseconds: 1_000_000_000)
         _ = await session.denyCookies()
         await session.hideConsentOverlays()
+        return await prepareLoaded(session: session, form: form, plan: plan, listingURL: listingURL)
+    }
+
+    /// Everything after the page has loaded: finding the opt-out form, the others beside it, filling them in. Solve and send and Email links both use this, so a
+    /// kind of page one of them can handle is handled by the other. `keepOpenWithoutForm` leaves the page on screen for the person when no form is found;
+    /// `advanceOnlyWithoutForm` (a page already holding its form, as an emailed link's page does) clicks through to a request form only when none is there.
+    func prepareLoaded(session: WebViewSession, form: OptOutForm, plan: FillPlan, listingURL: URL? = nil, keepOpenWithoutForm: Bool = false, advanceOnlyWithoutForm: Bool = false) async -> AssistedPage? {
         let page = WebAssistedPage(session: session, plan: plan)
         page.termsPolicy = termsPolicy
         if let person {
-            _ = await session.advanceToRequestForm()
+            if advanceOnlyWithoutForm {
+                if LiveFormPicker.pick(await session.discoverFormsDeep(), pageContext: await session.pageContext()) == nil { _ = await session.advanceToRequestForm(loose: true) }
+            } else { _ = await session.advanceToRequestForm() }
             if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
             let found = await session.discoverFormsDeep()
             guard let live = LiveFormPicker.pick(found, pageContext: await session.pageContext()) else {
@@ -63,7 +72,8 @@ struct WebAssistedDriver: AssistedDriver {
                 // No form and (perhaps) no address on file: an address on the page itself can still be offered.
                 Self.foundEmails[form.page.absoluteString] = ContactEmailPicker.best(await session.pageEmails(), pageHost: form.page.host ?? "")
                 NSLog("OOK no form %@: %@", form.page.absoluteString, found.map { "[\($0.fields.filter(\.visible).map(\.label).joined(separator: ",")) | \($0.buttons.joined(separator: ","))]" }.joined(separator: " "))
-                session.close(); return nil
+                if !keepOpenWithoutForm { session.close() }
+                return nil
             }
             // Only a form that asks for the phone's advertising ID makes the app ask the person (once) for permission to read it.
             let liveForm = live.asOptOutForm(page: form.page)

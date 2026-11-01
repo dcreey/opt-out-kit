@@ -872,6 +872,14 @@ final class AppModel: ObservableObject {
         save()
     }
 
+    /// A form was sent from a pasted link and the page showed it went through. A site that was waiting on its email just finishes that step; a site that was
+    /// not waiting on anything (the person sent it somewhere else, or it was never in the queue) is recorded as sent now, so it counts as done like any other.
+    func completeFromLink(_ entryID: String) {
+        guard let entry = directory.first(where: { $0.id == entryID }), let me = selectedPerson else { markFollowUpDone(entryID); return }
+        if pendingFollowUps.contains(where: { $0.entry.id == entryID }) { markFollowUpDone(entryID) }
+        else { recordAssisted(entry, .submitted(awaitingEmail: false), for: me) }
+    }
+
     func checkLink(_ url: URL) -> LinkCheck { LinkCheck.check(url, entries: directory, attempts: progress.optOutAttempts) }
 
     private static let linkTourKey = "linkfiller.toured"
