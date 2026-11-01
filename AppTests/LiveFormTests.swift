@@ -118,50 +118,6 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(report.outcome, .filledNotSubmitted)
     }
 
-    func testTheOptOutFormIsPickedOverMarketingForms() {
-        func f(_ token: String, _ fields: [(String, String)], buttons: [String], text: String) -> LiveForm {
-            LiveForm(token: token, action: "", method: "get", visible: true,
-                     fields: fields.enumerated().map { LiveField(token: "\(token)-\($0.offset)", name: $0.element.1, type: $0.element.0, label: $0.element.1, required: false, visible: true) },
-                     buttons: buttons, text: text)
-        }
-        let trial = f("f0", [("email", "email")], buttons: ["Get free trial"], text: "")
-        let subscribe = f("f1", [("email", "email")], buttons: ["Subscribe"], text: "Subscribe")
-        let real = f("f2", [("text", "First name"), ("text", "Last name"), ("email", "Email")], buttons: ["Submit Privacy Request"], text: "Your privacy rights")
-        let optMeOut = f("f3", [("email", "E-mail")], buttons: ["OPT ME OUT"], text: "")
-        let device = f("f4", [("text", "Enter device ID")], buttons: ["OPT ME OUT"], text: "AdID IDFA")
-        XCTAssertEqual(LiveFormPicker.pick([trial, subscribe, real])?.token, "f2")
-        XCTAssertEqual(LiveFormPicker.pick([optMeOut, device])?.token, "f3", "the email form, not the device-ID one")
-        XCTAssertNil(LiveFormPicker.pick([trial, subscribe]), "a page with only marketing forms has no opt-out form")
-    }
-
-    /// Veraset's footer box: one email input, a plain "Submit" button, and only "By subscribing, you consent to our Privacy Policy and receive updates" around it.
-    func testAFooterNewsletterBoxWithAPrivacyLinkIsNotAnOptOutForm() {
-        var box = LiveForm(token: "n", action: "", method: "get", visible: true,
-                           fields: [LiveField(token: "n-0", name: "Email", type: "email", label: "Enter your email", required: true, visible: true)],
-                           buttons: ["Submit"], text: "")
-        box.ctx = "By subscribing, you consent to our Privacy Policy and receive updates."
-        XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/legal/do-not-sell-request Do Not Sell Request"), "a newsletter box is never filled, even on a do-not-sell page")
-    }
-
-    func testALeadOrReportButtonIsNeverAnOptOutForm() {
-        for label in ["Get My FAFSA Guide", "Show My Report FREE"] {
-            let box = LiveForm(token: "l", action: "", method: "post", visible: true,
-                               fields: [LiveField(token: "l-0", name: "email", type: "email", label: "Email", required: true, visible: true)],
-                               buttons: [label], text: "Enter your email to continue")
-            XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/your-privacy-choices Your privacy choices"), label)
-        }
-    }
-
-    /// Mediawallah, Skydeo: a newsletter box in a block that also holds the footer's "Do Not Sell My Personal Information" link.
-    func testANewsletterBoxBesideADoNotSellLinkIsStillANewsletterBox() {
-        var box = LiveForm(token: "n", action: "", method: "post", visible: true,
-                           fields: [LiveField(token: "n-0", name: "EMAIL", type: "email", label: "Email", required: true, visible: true),
-                                    LiveField(token: "n-1", name: "_mc4wp_honeypot", type: "text", label: "", required: false, visible: true)],
-                           buttons: ["Submit"], text: "Email Submit")
-        box.ctx = "Sign Up for Our Newsletter Access our exclusive insights and updates Do Not Sell My Personal Information Privacy Policy"
-        XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/donotsell Do Not Sell"))
-    }
-
     // MARK: what the person chose is theirs
 
     private func read(_ session: WebViewSession, _ js: String) async -> String { "\(await session.evalLive(js) ?? "")" }
@@ -387,5 +343,31 @@ final class LiveFormTests: XCTestCase {
         let got = [await value("a1"), await value("a2"), await value("a3"), await value("a4"), await value("a5"), await value("a6"), await value("a8")]
         XCTAssertEqual(got, ["Pat", "Example", "1 Main St", "Springfield", "IL", "62701", "pat@example.com"])
         let phone = await value("a7"); XCTAssertEqual(phone, "7736331564")
+    }
+
+    // MARK: what counts as a check that stops the run
+
+    private func challenge(_ html: String) async throws -> String? {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        return await session.visibleChallenge()
+    }
+
+    func testAReCAPTCHAErrorMeansOnlyThePersonsOwnPressCanGetPast() async throws {
+        let got = try await challenge("<html><body><div class='err'>There was a problem with your submission. The reCAPTCHA response was missing or invalid.</div><form><input></form></body></html>")
+        XCTAssertEqual(got, "a reCAPTCHA that rejected the automatic send")
+    }
+
+    func testTheLeftOverAntiSpamLineOfASolvedCheckIsNotACheck() async throws {
+        let solved = "<html><body><form><input name='email'><input type='hidden' name='cf-turnstile-response' value='TOKEN'><p>Please wait for the anti-spam check above the button to finish, then try again.</p></form></body></html>"
+        let none = try await challenge(solved)
+        XCTAssertNil(none, "the check already passed: its token is there")
+        let unsolved = try await challenge(solved.replacingOccurrences(of: "value='TOKEN'", with: "value=''"))
+        XCTAssertEqual(unsolved, "a bot check", "without a token the same line is a real check")
+    }
+
+    func testAPlainPageIsNotACheck() async throws {
+        let none = try await challenge("<html><body><form><input name='email'><button>Opt me out</button></form></body></html>")
+        XCTAssertNil(none)
     }
 }

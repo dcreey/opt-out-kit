@@ -201,6 +201,23 @@ final class GuidedRunnerTests: XCTestCase {
         XCTAssertEqual(r.ending, .finished)
     }
 
+    func testWithAutoSendOffTheGuideFillsButNeverPressesSendAndNoticesTheConfirmation() async {
+        let page = ScriptedGuidedPage(), log = Log()
+        page.text = "Opt out form"
+        let (plan, values) = directoryPlan()
+        let r = runner(plan, page: page, log: log, fill: values)
+        r.autoSubmit = { false }
+        let task = Task { await r.run() }
+        await settle(r) { r.status?.contains("Press the page") == true }
+        XCTAssertEqual(page.sends, 0, "the app did not press send")
+        XCTAssertGreaterThan(page.fills, 0, "but it filled the form")
+        page.text = "Opt out form\nThank you. Your request has been received."      // the person pressed the page's own button
+        await settle(r) { !log.sent.isEmpty }
+        XCTAssertEqual(log.sent, [.submitted(awaitingEmail: false)], "the confirmation was noticed and saved")
+        XCTAssertEqual(page.sends, 0)
+        r.cancel(); await task.value
+    }
+
     func testIfSendingCannotBeConfirmedThePersonFinishesItAndTapsNext() async {
         let page = ScriptedGuidedPage(), log = Log()
         page.sendOutcomes = [.failed("no success message was shown")]

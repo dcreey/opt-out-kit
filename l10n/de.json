@@ -997,6 +997,7 @@
  "This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.": "Diese Seite nimmt Opt-outs per E-Mail entgegen und hat kein Formular. Die App schreibt eine Nachricht pro Adresse mit allen betroffenen Seiten; Sie lesen sie und tippen auf Senden.",
  "This site takes opt-outs by email, not through a form. The message is filled in with your name and the household email; read it, then send it from your own mail app.": "Diese Seite nimmt Opt-outs per E-Mail an, nicht über ein Formular. Die Nachricht ist mit Ihrem Namen und der Haushalts-E-Mail vorausgefüllt; lesen Sie sie und senden Sie sie aus Ihrer Mail-App.",
  "This site takes opt-outs by email: write to %@. We prepare the message for you.": "Diese Seite nimmt Opt-outs per E-Mail an: schreiben Sie an %@. Wir bereiten die Nachricht für Sie vor.",
+ "This site's form is written for US residents, so we take you to it and walk you through it.": "Das Formular dieser Website ist für Einwohner der USA gedacht; wir führen Sie hin und begleiten Sie Schritt für Schritt.",
  "This site's opt-out page had moved. We found the new one on %@.": "Die Opt-out-Seite dieser Website war umgezogen. Wir haben die neue am %@ gefunden.",
  "Those companies hold less of your data.": "Diese Firmen halten weniger Ihrer Daten.",
  "Tick the confirmation box yourself if it is true, then solve the check.": "Haken Sie das Bestätigungskästchen selbst an, wenn es stimmt, und bestehen Sie dann die Prüfung.",

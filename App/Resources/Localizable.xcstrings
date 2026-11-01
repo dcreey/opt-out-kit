@@ -22956,7 +22956,27 @@
    }
   },
   "This site's form is written for US residents, so we take you to it and walk you through it.": {
-   "extractionState": "manual"
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le formulaire de ce site est conçu pour les résidents des États-Unis ; nous vous y conduisons et vous guidons pas à pas."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El formulario de este sitio está pensado para residentes de EE. UU.; te llevamos hasta él y te guiamos paso a paso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Formular dieser Website ist für Einwohner der USA gedacht; wir führen Sie hin und begleiten Sie Schritt für Schritt."
+     }
+    }
+   }
   },
   "This site's opt-out page had moved. We found the new one on %@.": {
    "extractionState": "manual",

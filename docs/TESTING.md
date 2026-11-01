@@ -41,7 +41,7 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Accepting site terms for you | Off until the person taps Allow. When on, a prompt whose every paragraph is on the reviewed list is accepted once per page and logged; anything else, a risk-flagged paragraph, or the setting off leaves it to the person. The shipped list reviews nothing risk-flagged | `CoreTests.testTheGeneratedLibrary...`, `TermsAcceptanceTests` (render, Solve-and-send page), `TermsSettingsTests` | Mac / Sim |
 | Settings: California DROP link | Shown only when California is the chosen state | none yet (view only) | n/a |
 | Opening the right form is not "done" | Instructions on a form page ("your request is submitted only after you enter the code") are never a confirmation; real confirmations ("Thank you. Your request has been received.") still count, even below the instructions | `AssistedRunnerTests.PrematureDoneTests` (Melissa's consumer privacy page) | Mac |
-| Never the deceased-person form | No directory opt-out page is a deceased list; Melissa uses its consumer privacy form; the live form picker scores a deceased form down | `CoreTests.testNoOptOutPageIsAListForDeceased...` | Mac |
+| Never the deceased-person form | No directory opt-out page is a deceased list; Melissa uses its consumer privacy form; the live form picker scores a deceased form down | `CoreTests.testNoOptOutPageIsAListForDeceased...`, `LiveFormPickerTests.testAFormForADeceasedPersonIsScoredBelow...` | Mac |
 | Send it for me (guides) | On by default; the box in a guide changes it for the session; Settings changes the default. Off: the form is filled, nothing is pressed, the person presses the page's button, and a confirmation is noticed or they tap Mark as done or Next (not recorded as sent or failed) | `EmailAndSkipFlowTests` (three tests), `WorkflowGapTests`, `SolveAndSendUITests` | Mac / Sim |
 | A page with several opt-out forms (nordicdataresources.com: email, cookie button, device ID) | The person is told "This page has 3 opt-out forms… form 2 of 3". Every form whose own words say opt-out or delete is filled and sent in turn, a sign-up, newsletter or contact form never is, the device-ID form gets this phone's IDFA (not the Android GAID), a later form that fails does not undo the earlier ones, the site is recorded once | `EmailAndSkipFlowTests` (three multi-form tests), `LiveFormTests.testOnlyFormsThatAreSpecificallyOptOuts...`, `AssistedAppTests.testEveryOptOutFormOnAPageIsFilledAndSentIncludingTheDeviceIDOne` | Mac / Sim |
 | A check already passed | The page's own "please wait for the anti-spam check" line, left on screen from an early press, no longer keeps a solved check alive | sim only; covered by the multi-form page test | Sim |
@@ -106,6 +106,14 @@ checked in the simulator.
 | 14 | Accepting site terms for you | Core: `TermsGate` tests, library has no risk-flagged approvals | `TermsAcceptanceTests` | Covered |
 | 15 | Background runs, reminders, notifications | Core: reminder schedule tests | none | **Gap**: iOS background scheduling and notification permission need a device |
 | 16 | Share extension (send a link to Exnay) | Core: none | `AppModelTests.OnlyAWebAddress...` covers the app side | **Gap**: the extension itself needs a device |
+
+### What can and cannot be tested without a simulator
+
+Everything that decides something is plain Swift and runs on the Mac: the runner and its screens' state, the email handoff, which form on a page is
+the opt-out (`LiveFormPicker`), what counts as a confirmation, which address to email, the form filler and the directory data, and the translation
+catalogs (`python3 -m unittest discover -s tools/tests`, 22 tests). Only the page-side JavaScript needs a web view, so it is tested in the simulator on
+local pages: reading a box's label (`aria-labelledby`), the tiles, radios and menus the app picks, whether a check is solved, pressing Next then Submit,
+and finding an address on a page. The SwiftUI wiring (what is drawn) is checked by `SolveAndSendUITests` and the screenshots in `docs/screens`.
 
 Known simulator failures that are not from recent changes: most of `AppUITests` that open the Sites tab or the profile editor (BrokerListUITests,
 GuidedFlowUITests, ProfileEditorUITests, SafetyFlagsUITests, OnboardingAndSitesUITests) fail identically on Build 18, before this audit, on the
