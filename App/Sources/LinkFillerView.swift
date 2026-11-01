@@ -176,6 +176,9 @@ struct LinkFillerView: View {
             GuideSurface(topInset: 0) {
                 HStack(spacing: 10) {
                     Menu {
+                        Button {
+                            if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
+                        } label: { Label("Fill in my details", systemImage: "square.and.pencil") }.disabled(filler.busy).accessibilityIdentifier("link-fill")
                         Button { web.reload() } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("link-refresh")
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
                     } label: { Image(systemName: "ellipsis.circle").font(.title2) }
@@ -183,19 +186,13 @@ struct LinkFillerView: View {
                     Image(systemName: "lock.fill").foregroundStyle(.green).font(.caption)
                     Text(filler.host).font(.caption.bold()).foregroundStyle(.white.opacity(0.8)).lineLimit(1)
                     Spacer(minLength: 4)
-                    Button {
-                        if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
-                    } label: { Text("Fill in my details") }
-                        .buttonStyle(GuidePrimaryStyle()).disabled(filler.busy).opacity(filler.busy ? 0.5 : 1).accessibilityIdentifier("link-fill")
+                    markCompletedButton
                 }
                 matchLine
                 if !filler.status.isEmpty {
                     Text(filler.status).font(.caption).foregroundStyle(.white.opacity(0.75)).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-status")
                 }
-                HStack(spacing: 12) {
-                    markCompletedButton
-                    AutoSubmitToggle()
-                }
+                AutoSubmitToggle()
             }
             GuideBoundary()
             WebViewHost(webView: web)
@@ -205,8 +202,8 @@ struct LinkFillerView: View {
     /// Mark completed is always there: it finishes the request for the site the link matched, or it is dimmed and the line below says why it cannot.
     private var markCompletedButton: some View {
         let matched: String? = { if case .known(let id, _, _, _)? = check { return id } else { return nil } }()
-        return Button { if let matched { complete(matched) } } label: { Label("Mark completed", systemImage: "checkmark.circle") }
-            .buttonStyle(GuidePillStyle(filled: false))
+        return Button { if let matched { complete(matched) } } label: { Text("Mark completed") }
+            .font(.callout.bold())
             .disabled(matched == nil || showDone).opacity(matched == nil ? 0.45 : 1).accessibilityIdentifier("link-finished")
     }
 
