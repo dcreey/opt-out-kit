@@ -135,7 +135,7 @@ final class AssistedRunner: ObservableObject {
     /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
     static let unloadable = "the page would not load, so it was skipped"
     /// The page loaded but has no opt-out form we can fill (a contact form, or only an email address): skipped, and the email offer is the way through.
-    static let noForm = "the site has no online opt-out form we can fill (its page is a contact form or only gives an email address), so it was skipped"
+    static let noForm = "the site has no online opt-out form we can fill, and we have no email address for it, so it was skipped"
     /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
     @Published private(set) var sentAwaitingEmail = 0
     private enum ListingChoice { case none, mine, notListed }
