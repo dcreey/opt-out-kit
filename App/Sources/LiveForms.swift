@@ -737,90 +737,69 @@ extension FormRun {
         if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
 
-        _ = await session.advanceToRequestForm()
-        let forms = await session.discoverFormsDeep()
-        let context = await session.pageContext()
+        // From here the page is handled by the same code Solve and send and Email links use (`WebAssistedDriver.prepareLoaded`, `WebAssistedPage`): finding the form,
+        // the choices, the forms that appear as others are answered, several forms on one page, steps, the bot-check rules. This run only differs in having nobody to ask.
+        let driver = WebAssistedDriver(person: person, advertisingID: advertisingID, termsPolicy: nil)
+        let stand = OptOutForm(page: page, method: "post", action: nil, fields: [], hops: 1)
         #if DEBUG
-        debugForms[page.absoluteString] = forms.map { "\($0.token) score=\(LiveFormPicker.score($0, pageContext: context)) text=\($0.text) | buttons=\($0.buttons) fields=\($0.fields.map { "\($0.type):\($0.name):\($0.visible)" }) | ctx=\($0.ctx ?? "")" }.joined(separator: "\n")
+        let found = await session.discoverFormsDeep()
+        let context = await session.pageContext()
+        debugForms[page.absoluteString] = found.map { "\($0.token) score=\(LiveFormPicker.score($0, pageContext: context)) text=\($0.text) | buttons=\($0.buttons) fields=\($0.fields.map { "\($0.type):\($0.name):\($0.label):v=\($0.visible)" })" }.joined(separator: "\n")
         #endif
-        guard let picked = LiveFormPicker.pick(forms, pageContext: context) else { return .failed("no opt-out form was found on the page") }
-        var form = picked
-        session.chosenForm = form.token
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
-        switch plan.verdict {
-        case .ready: break
-        case .needsData(let what): return .failed("the form asks for \(what.joined(separator: ", ")), which we do not hold")
-        case .needsYou(let why): return .failed(why)
+        guard let prepared = await driver.prepareLoaded(session: session, form: stand, plan: FillPlan(values: [], verdict: .ready), keepOpenWithoutForm: true) as? WebAssistedPage else {
+            return .failed("no opt-out form was found on the page")
         }
-        let fill = await session.fillLive(plan.values)
-        if fill.filled == 0 { return .failed("the form's fields could not be filled in") }
-        if let miss = fill.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
-        let beforeFill = await session.visibleText()
-        var options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
-        _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
-        _ = await session.chooseTileButtons()
-        // Choosing "remove my information" can open a second form with more boxes (state, birth date): read the page again and fill those too.
-        if options.chosen > 0 {
-            try? await Task.sleep(nanoseconds: 800_000_000)
-            let known = WebAssistedDriver.signature(form)
-            let again = await session.discoverForms(waitForFrames: false)
-            if let fresh = again.filter({ LiveFormPicker.score($0, pageContext: context) >= 3 && WebAssistedDriver.signature($0) != known })
-                .max(by: { LiveFormPicker.score($0, pageContext: context) < LiveFormPicker.score($1, pageContext: context) }) {
-                form = fresh
-                session.chosenForm = fresh.token
-                let second = FormFiller.plan(for: fresh.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
-                switch second.verdict {
-                case .ready: break
-                case .needsData(let what): return .failed("the form asks for \(what.joined(separator: ", ")), which we do not hold")
-                case .needsYou(let why): return .failed(why)
-                }
-                let more = await session.fillLive(second.values, keepExisting: true)
-                if let miss = more.unmatchedRequired.first { return .failed("the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you") }
-                options = await session.chooseRequestOptions(form: fresh.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
-                _ = await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
-            }
-        }
-        // Some forms send themselves the moment a choice is made. If the page already shows a confirmation, that is the result.
+        prepared.maxWait = maxWait
+        if let problem = prepared.problem { return .failed(problem) }
+        // Some forms send themselves the moment a choice is made: then the page already shows the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
-        let earlyText = await session.visibleText()
-        if earlyText != beforeFill, case .submitted(let email) = FormRun.classifyConfirmed(WebFormSubmitter.newLines(before: beforeFill, after: earlyText)), !dryRun {
-            return .submitted(awaitingEmail: email)
-        }
-        if let missing = options.unresolved.first { return .failed("the form needs a choice we cannot make for you (\(missing))") }
+        if !dryRun, let early = await prepared.earlyConfirmation() { return early }
         if dryRun {
-            await session.scrollFormIntoView(form.token)
+            if let token = prepared.currentFormToken { await session.scrollFormIntoView(token: token) }
             #if DEBUG
-            var found: [String] = []
-            if await session.hasTermsPrompt() { found.append("terms") }
-            if let c = await session.pendingCertification() { found.append("certify:" + c.prefix(40)) }
-            if let c = await session.visibleChallenge() { found.append("check:" + c) }
-            debugLastBlockers = found
+            var blocked: [String] = []
+            if await session.hasTermsPrompt() { blocked.append("terms") }
+            if let c = await session.pendingCertification() { blocked.append("certify:" + c.prefix(40)) }
+            if let c = await session.visibleChallenge() { blocked.append("check:" + c) }
+            debugLastBlockers = blocked
             debugLastFormPage = page.absoluteString
             #endif
             return .filledNotSubmitted
         }
-        if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
-        if let why = await session.visibleChallenge() { return .challenged(why) }
-
-        let before = await session.visibleText()
-        let stateBefore = await session.formState(form.token)
-        guard await session.pressLiveSubmit(form: form.token) else { return .failed("no submit button found") }
-        await session.settlePage(maxWait: maxWait)
-        if await session.pressConfirmStep() { await session.settlePage(maxWait: maxWait) }          // a review step with its own final button
-        if let why = await session.visibleChallenge() { return .challenged(why) }
-        await session.scrollFormIntoView(form.token)
-        let after = await session.visibleText()
-        #if DEBUG
-        debugLastPageText = after
-        #endif
-        let result = WebFormSubmitter.classifyAfterSending(before: before, after: after)
-        // No confirmation wording, but the form is gone or the page moved on, and nothing says it went wrong: the site took it.
-        if case .failed(let why) = result, why != "nothing on the page changed after sending" || true {
-            let now = await session.formState(form.token)
-            let moved = !now.visible || (!now.url.isEmpty && now.url != stateBefore.url)
-            let errorSeen = FormRun.classify(WebFormSubmitter.newLines(before: before, after: after).isEmpty ? "" : WebFormSubmitter.newLines(before: before, after: after)) != .failed("no success message was shown")
-            if moved, !errorSeen { return .submitted(awaitingEmail: false) }
+        // Nobody to ask: anything the page needs from a person ends the run for this site, saying what.
+        for blocker in await prepared.blockers() {
+            switch blocker {
+            case .terms: return .challenged("a terms prompt that you need to accept yourself")
+            case .certify: return .challenged("a certification box that you must tick yourself")
+            case .check(let why): return .challenged(why)
+            case .choose(let what): return .failed("the form needs a choice we cannot make for you (\(what))")
+            }
         }
+        // Send each opt-out form of the page; a form that moves on to a next step is filled and sent again.
+        var result: SubmitOutcome = .failed("no submit button found")
+        var sentAny = false, sentEmail = false, rounds = 0
+        while rounds < 6 {
+            rounds += 1
+            await prepared.refill()
+            let outcome = await prepared.send()
+            #if DEBUG
+            debugLastPageText = await session.visibleText()
+            #endif
+            switch outcome {
+            case .submitted(let email):
+                sentAny = true; sentEmail = sentEmail || email
+                if await prepared.moreForms() { continue }
+                return .submitted(awaitingEmail: sentEmail)
+            case .challenged(let why):
+                if why == "the form moved on to its next step" { continue }
+                return sentAny ? .submitted(awaitingEmail: sentEmail) : .challenged(why)
+            default:
+                if sentAny { return .submitted(awaitingEmail: sentEmail) }
+                result = outcome
+            }
+            break
+        }
+        await session.scrollFormIntoView(session.chosenForm ?? "")
         return result
     }
 

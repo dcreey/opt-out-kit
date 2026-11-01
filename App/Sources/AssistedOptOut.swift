@@ -111,6 +111,13 @@ final class WebAssistedPage: AssistedPage {
     private var shown: WKWebView?
     var termsPolicy: TermsPolicy?
     private var termsTriedFor: URL?
+    /// How long to wait for the page to settle after pressing send. Solve and send waits long; the monthly run uses the time it was given.
+    var maxWait: TimeInterval = 20
+    /// What the last fill did, so a run that cannot ask the person (the monthly one) can say why it could not go on.
+    private(set) var lastFill: (filled: Int, unmatchedRequired: [String]) = (0, [])
+    private var unresolvedChoices: [String] = []
+    private var textBeforeChoices = ""
+    private var planVerdict: FillPlan.Verdict = .ready
     var currentFormToken: String? { liveForm }
     private var moreLiveForms: [LiveForm] = []
     var formsRemaining: Int { moreLiveForms.count }
@@ -126,7 +133,7 @@ final class WebAssistedPage: AssistedPage {
             if adID == nil, AdvertisingID.isAsked(by: form.fields) { adID = await AdvertisingID.current() }
             let nextPlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
             guard case .ready = nextPlan.verdict, !nextPlan.values.isEmpty else { continue }
-            liveForm = next.token; plan = nextPlan; advertisingID = adID
+            liveForm = next.token; session.chosenForm = next.token; plan = nextPlan; planVerdict = nextPlan.verdict; advertisingID = adID
             await session.scrollFormIntoView(token: next.token)
             _ = await session.fillLive(plan.values)
             _ = await session.chooseRequestOptions(form: next.token, ownerMayConfirm: ownerMayConfirm)
@@ -138,7 +145,7 @@ final class WebAssistedPage: AssistedPage {
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
 
-    func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
+    func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; session.chosenForm = token; planVerdict = plan.verdict; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
 
     func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
@@ -160,7 +167,7 @@ final class WebAssistedPage: AssistedPage {
         case .ready, .needsData: break
         case .needsYou: session.activeFrame = frameBefore; return false
         }
-        liveForm = new.token; plan = livePlan; knownSignatures.insert(sig)
+        liveForm = new.token; session.chosenForm = new.token; plan = livePlan; planVerdict = livePlan.verdict; knownSignatures.insert(sig)
         // What the person already typed is kept; only empty boxes of the new form are filled.
         _ = await session.fillLive(plan.values, keepExisting: true)
         _ = await session.chooseRequestOptions(form: new.token, ownerMayConfirm: ownerMayConfirm)
@@ -189,10 +196,32 @@ final class WebAssistedPage: AssistedPage {
         return out
     }
 
+    /// Why this page cannot be sent without the person, in words: for a run that has nobody to ask (the monthly one). Nil when the form is filled and nothing is missing.
+    var problem: String? {
+        switch planVerdict {
+        case .ready: break
+        case .needsData(let what): return "the form asks for \(what.joined(separator: ", ")), which we do not hold"
+        case .needsYou(let why): return why
+        }
+        if lastFill.filled == 0 { return "the form's fields could not be filled in" }
+        if let miss = lastFill.unmatchedRequired.first { return "the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you" }
+        if let missing = unresolvedChoices.first { return "the form needs a choice we cannot make for you (\(missing))" }
+        return nil
+    }
+
+    /// Some forms send themselves the moment a choice is made. When the page, since the last fill, shows a confirmation, that is the result.
+    func earlyConfirmation() async -> SubmitOutcome? {
+        let now = await session.visibleText()
+        guard now != textBeforeChoices, case .submitted(let email) = FormRun.classifyConfirmed(FormRun.newText(before: textBeforeChoices, after: now)) else { return nil }
+        return .submitted(awaitingEmail: email)
+    }
+
     func refill() async {
         if let liveForm {
-            _ = await session.fillLive(plan.values)
+            textBeforeChoices = await session.visibleText()
+            lastFill = await session.fillLive(plan.values)
             let options = await session.chooseRequestOptions(form: liveForm, ownerMayConfirm: ownerMayConfirm)
+            unresolvedChoices = options.unresolved
             _ = await session.chooseCustomMenus(state: stateName)
             let typedAhead = await session.chooseAutocomplete(state: stateName)          // a "State of Residence" that only counts a picked option
             _ = await session.chooseTileButtons()
@@ -206,17 +235,27 @@ final class WebAssistedPage: AssistedPage {
         // Simulator work: `-assisted-no-send` watches a real page without ever pressing its submit button.
         if ProcessInfo.processInfo.arguments.contains("-assisted-no-send") { return .filledNotSubmitted }
         #endif
+        if let early = await earlyConfirmation() { return early }
         let before = await session.visibleText()
         let stepBefore = await formSignature()
+        var stateBefore: (visible: Bool, url: String)?
+        if let liveForm { stateBefore = await session.formState(liveForm) }
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed("no submit button found") }
-        await session.settlePage(maxWait: 20)
-        if await session.pressConfirmStep() { await session.settlePage(maxWait: 20) }
+        await session.settlePage(maxWait: maxWait)
+        if await session.pressConfirmStep() { await session.settlePage(maxWait: maxWait) }
         if let why = await session.visibleChallenge() { return .challenged(why) }
-        let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
+        let after = await session.visibleText()
+        let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: after)
         // A multi-step form (Next, then Submit): the same form is still there with other boxes. That is its next step, not a result; the run fills it and presses again.
         if case .submitted = outcome { return outcome }
+        // No confirmation wording, but the form is gone or the page moved on, and nothing on the page says it went wrong: the site took it.
+        if case .failed = outcome, let liveForm, let was = stateBefore {
+            let now = await session.formState(liveForm)
+            let errorSeen = FormRun.classify(FormRun.newText(before: before, after: after)) != .failed("no success message was shown")
+            if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen { return .submitted(awaitingEmail: false) }
+        }
         if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged("the form moved on to its next step") }
         return outcome
     }
