@@ -215,6 +215,8 @@ extension WebViewSession {
           var label=function(e){var t='';
             if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
+            // Form builders (Tally, Typeform) put the question in a heading and point the box at it: aria-labelledby="label_<id>".
+            if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
             if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.getAttribute('title')||'';
             if(!t&&e.previousElementSibling) t=e.previousElementSibling.innerText||'';
             if(!t&&e.parentElement) t=(e.parentElement.innerText||'').slice(0,60);
@@ -509,6 +511,7 @@ extension WebViewSession {
           var label=function(e){var t='';
             if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
+            if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
             if(!t) t=e.getAttribute('aria-label')||e.getAttribute('value')||'';
             if(!t&&e.nextSibling&&e.nextSibling.textContent) t=e.nextSibling.textContent;
             return t.replace(/\s+/g,' ').trim();};

@@ -71,7 +71,8 @@ final class GuidedRunner: ObservableObject {
     enum Ending: Equatable { case finished, cancelled, reported(IssueKind) }
 
     @Published private(set) var flow: GuidedFlow
-    @Published private(set) var status: String?
+    /// The same line is set on every tick while a step waits; only a different one redraws the screen (an open menu blinked otherwise).
+    private(set) var status: String? { willSet { if newValue != status { objectWillChange.send() } } }
     @Published private(set) var ending: Ending?
     @Published private(set) var webView: WKWebView?
 

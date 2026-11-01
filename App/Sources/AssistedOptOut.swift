@@ -225,6 +225,21 @@ struct AssistedOptOutView: View {
     @StateObject private var handoff: EmailHandoff
     private var livePage: WebAssistedPage? { runner.page as? WebAssistedPage }
     private var liveSearch: WebSearchPage? { runner.searchPage as? WebSearchPage }
+    /// The web view of whichever page is on screen (the scripted pages UI tests use have one too).
+    private var pageWebView: WKWebView? {
+        if let live = livePage { return live.webView }
+        #if DEBUG
+        if let fake = runner.page as? FakeAssistedPage { return fake.webView }
+        #endif
+        return nil
+    }
+    private var searchWebView: WKWebView? {
+        if let live = liveSearch { return live.webView }
+        #if DEBUG
+        if let fake = runner.searchPage as? FakeSearchPage { return fake.webView }
+        #endif
+        return nil
+    }
     init(runner: AssistedRunner) { _runner = StateObject(wrappedValue: runner); _handoff = StateObject(wrappedValue: EmailHandoff(runner: runner)) }
     @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
@@ -301,10 +316,10 @@ struct AssistedOptOutView: View {
                     // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
                     HStack(spacing: 10) {
                         Menu {
-                            if let url = livePage?.webView?.url ?? liveSearch?.webView?.url {
+                            if let url = pageWebView?.url ?? searchWebView?.url {
                                 Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
                             }
-                            if let web = livePage?.webView ?? liveSearch?.webView {
+                            if let web = pageWebView ?? searchWebView {
                                 // A form that fails and asks for a refresh: reload the page, then put the details back.
                                 Button {
                                     web.reload()
@@ -385,8 +400,8 @@ struct AssistedOptOutView: View {
                 GuideBoundary()
                 Group {
                     if runner.goingBack { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
-                    else if let web = liveSearch?.webView { WebViewHost(webView: web).id("search\(runner.index)") }
-                    else if let web = livePage?.webView { WebViewHost(webView: web).id(runner.index) }
+                    else if let web = searchWebView { WebViewHost(webView: web).id("search\(runner.index)") }
+                    else if let web = pageWebView { WebViewHost(webView: web).id(runner.index) }
                     else if runner.phase == .noForm, let entry = runner.current?.entry { noFormCard(entry) }
                     else { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }

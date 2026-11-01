@@ -363,4 +363,29 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(optOuts.count, 2, "the email opt-out and the device-ID opt-out; not the newsletter or the contact form: \(forms.map { $0.buttons })")
         XCTAssertTrue(optOuts.allSatisfy { $0.buttons.joined().lowercased().contains("opt me out") })
     }
+
+    /// realsourcedata.com is a Tally form: the question is a heading and each box points at it with aria-labelledby, with no placeholder, name or label tag.
+    func testBoxesLabelledByAHeadingThroughAriaLabelledbyAreFilled() async throws {
+        func field(_ id: String, _ question: String, type: String = "text") -> String {
+            "<div><h3 id=\"label_\(id)\">\(question)</h3><div><input id=\"\(id)\" type=\"\(type)\" placeholder=\"\" required aria-labelledby=\"label_\(id)\"></div></div>"
+        }
+        let html = """
+            <html><body><h1>Do Not Sell My Personal Information</h1><form id="t" onsubmit="event.preventDefault()">
+            \(field("a1", "First Name"))\(field("a2", "Last Name"))\(field("a3", "Street Address"))\(field("a4", "City"))\(field("a5", "State"))
+            \(field("a6", "Zip Code"))\(field("a7", "Phone Number", type: "tel"))\(field("a8", "Email", type: "email"))
+            <button type="submit">Send</button></form></body></html>
+            """
+        var me = pat; me.phones = ["773 633 1564"]
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        XCTAssertEqual(form.fields.map(\.label), ["First Name", "Last Name", "Street Address", "City", "State", "Zip Code", "Phone Number", "Email"], "the heading is the box's label")
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        func value(_ id: String) async -> String { "\(await session.evalLive("document.getElementById('\(id)').value") ?? "")" }
+        let got = [await value("a1"), await value("a2"), await value("a3"), await value("a4"), await value("a5"), await value("a6"), await value("a8")]
+        XCTAssertEqual(got, ["Pat", "Example", "1 Main St", "Springfield", "IL", "62701", "pat@example.com"])
+        let phone = await value("a7"); XCTAssertEqual(phone, "7736331564")
+    }
 }

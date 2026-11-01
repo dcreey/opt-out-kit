@@ -105,7 +105,9 @@ final class AssistedRunner: ObservableObject {
     }
 
     @Published private(set) var index = 0
-    @Published private(set) var phase: Phase = .loading
+    /// Not `@Published`: the run sets its phase on every poll (once a second while it waits), and a screen told "changed" that often redraws its open menu
+    /// each time, which showed as a blink. Only a different phase tells the screen.
+    private(set) var phase: Phase = .loading { willSet { if newValue != phase { objectWillChange.send() } } }
     @Published private(set) var page: AssistedPage?
     @Published private(set) var finished = false
     @Published private(set) var results: [String: AutoOptOutResult] = [:]
