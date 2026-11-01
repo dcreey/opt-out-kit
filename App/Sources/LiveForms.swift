@@ -481,7 +481,7 @@ extension WebViewSession {
             if(window.__ookTiles[t]) return; window.__ookTiles[t]=1;
             if(btns.some(touched)||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
             var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
-            var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/opt.?out|do not sell|do not share/i,/delet|remov|erase/i];
+            var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/delet|remov|erase/i,/opt.?out|do not sell|do not share/i];
             for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); markAuto(btns[i]); btns[i].click(); n++; return;}}}
           });
           return n;})();
@@ -517,7 +517,9 @@ extension WebViewSession {
           var removal=/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i;
           Object.keys(groups).forEach(function(k){var rs=groups[k];
             // The page may start on its gentler choice ("Your privacy choices"); "Remove my information" is the one that takes a listing off.
-            var rm=rs.filter(function(r){return removal.test(title(r));})[0];
+            var rm=rs.filter(function(r){return removal.test(title(r));})[0]
+              // Where only one can be chosen, deleting the data beats opting out of its sale.
+              ||rs.filter(function(r){var t=title(r); return /\b(delet|eras)\w*\b/i.test(t)&&!no.test(t)&&!notSelf.test(t);})[0];
             if(rs.some(touched)||rs.some(autoDone)) return;
             if(rm&&!rm.checked){markAuto(rm); rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
             if(rs.some(function(r){return r.checked;})) return;
@@ -546,8 +548,8 @@ extension WebViewSession {
             var isAgentQ=agentQ.test(l+' '+near);
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
               if(isAgentQ&&/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(t)) sc=5;
-              if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=3;
-              if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,2);
+              if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=2;
+              if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,3);          // deleting the data beats opting out of its sale
               if(/\b(consumer|individual|personal|myself|resident|person|the (person|individual|subject)|data subject|yourself|owner|me)\b/i.test(t)&&!/business|agent|deceased|on behalf|representative/i.test(t)) sc=Math.max(sc,1);
               // "Relationship with us" menus: a person who is only asking to be removed is a consumer, not a customer, employee or partner.
               if(/relationship|how do we know|are you a|i am/i.test(l+' '+near)&&/\b(consumer|individual|none of the above|not a (customer|client|user)|no relationship|general public|just a consumer|other)\b/i.test(t)&&!/business|agent|employee|partner|client of|vendor/i.test(t)) sc=Math.max(sc,1);

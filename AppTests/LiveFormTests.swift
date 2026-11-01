@@ -191,11 +191,11 @@ final class LiveFormTests: XCTestCase {
         try await session.loadHTML(tilePage)
         let first = await session.chooseTileButtons()
         let chosen = await tiles(session)
-        XCTAssertEqual(first, 1); XCTAssertEqual(chosen, "optout", "the opt-out tile is chosen at first")
+        XCTAssertEqual(first, 1); XCTAssertEqual(chosen, "del", "the deletion tile is chosen at first")
         for _ in 0..<3 { _ = await session.chooseTileButtons() }
         let after = await tiles(session)
         let clicks = await read(session, "window.clicks")
-        XCTAssertEqual(after, "optout", "refills leave it on: a tile that toggles would have been switched off")
+        XCTAssertEqual(after, "del", "refills leave it on: a tile that toggles would have been switched off")
         XCTAssertEqual(clicks, "1", "tapped once, never again")
     }
 
@@ -203,7 +203,7 @@ final class LiveFormTests: XCTestCase {
         let session = WebViewSession.make(); defer { session.close() }
         try await session.loadHTML(tilePage)
         _ = await session.chooseTileButtons()
-        await personTaps(session, "del")                                  // multi select: delete as well
+        await personTaps(session, "optout")                              // multi select: opt-out as well
         for _ in 0..<3 { _ = await session.chooseTileButtons() }
         let kept = await tiles(session)
         XCTAssertEqual(kept, "del,optout", "both stay on")
@@ -213,7 +213,7 @@ final class LiveFormTests: XCTestCase {
         let session = WebViewSession.make(); defer { session.close() }
         try await session.loadHTML(tilePage)
         _ = await session.chooseTileButtons()
-        await personTaps(session, "optout")                               // off again
+        await personTaps(session, "del")                                  // off again
         await personTaps(session, "sale")
         for _ in 0..<3 { _ = await session.chooseTileButtons() }
         let kept = await tiles(session)
@@ -252,7 +252,7 @@ final class LiveFormTests: XCTestCase {
         let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
         _ = await session.chooseRequestOptions(form: form.token)
         let first = await state(session)
-        XCTAssertTrue(first.contains("t=remove") && first.contains("c=optout") && first.contains("c=delete") && first.contains("s=o"), first)
+        XCTAssertTrue(first.contains("t=remove") && first.contains("c=optout") && first.contains("c=delete") && first.contains("s=d"), first)
         // The person: unticks opt-out, ticks access too, picks the other radio and another menu entry.
         _ = await session.evalLive("""
             (function(){var f=document.getElementById('f');
@@ -276,5 +276,59 @@ final class LiveFormTests: XCTestCase {
         _ = await session.chooseRequestOptions(form: form.token)
         let optOutBox = await read(session, "document.querySelectorAll('input[name=c]')[0].checked")
         XCTAssertEqual(optOutBox, "0", "the app chose once; it does not choose again")
+    }
+
+    // MARK: where only one can be chosen, deletion beats opt-out
+
+    func testASingleChoiceOfTilesTakesDeletionEvenWhenOptOutComesFirst() async throws {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML("""
+            <html><body><form><h3>Select request type</h3><div>
+              <button type="button" class="tile" id="optout">Request to Opt-Out (Do Not Sell or Share My Personal Information)</button>
+              <button type="button" class="tile" id="sale">Request to Opt-Out (Sale of Personal Information)</button>
+              <button type="button" class="tile" id="del">Request to delete personal information</button>
+            </div><input name="em"></form>
+            <script>document.querySelectorAll('.tile').forEach(function(b){b.addEventListener('click',function(){b.classList.toggle('on');});});</script></body></html>
+            """)
+        _ = await session.chooseTileButtons()
+        let chosen = await tiles(session)
+        XCTAssertEqual(chosen, "del")
+    }
+
+    func testASingleChoiceOfRadiosAndAMenuTakeDeletionEvenWhenOptOutComesFirst() async throws {
+        let html = """
+            <html><body><form id="f" onsubmit="event.preventDefault()">
+            <fieldset><legend>Request</legend>
+              <label><input type="radio" name="t" value="optout"> Do not sell or share my information</label>
+              <label><input type="radio" name="t" value="delete"> Delete my personal information</label>
+              <label><input type="radio" name="t" value="access"> Access my information</label></fieldset>
+            <label>Type<select name="s"><option value="">Select</option><option value="o">Opt-out of sale</option><option value="d">Delete my data</option></select></label>
+            <input name="em"><button type="submit">Send</button></form></body></html>
+            """
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
+        _ = await session.chooseRequestOptions(form: form.token)
+        let got = await read(session, "(function(){var f=document.getElementById('f'); return f.querySelector('input[name=t]:checked').value+','+f.s.value;})()")
+        XCTAssertEqual(got, "delete,d")
+    }
+
+    func testAPageThatStartsOnOptOutIsMovedToDeletionUnlessThePersonChose() async throws {
+        let html = """
+            <html><body><form id="f" onsubmit="event.preventDefault()">
+            <label><input type="radio" name="t" value="optout" checked> Do not sell my information</label>
+            <label><input type="radio" name="t" value="delete"> Delete my personal information</label>
+            <input name="em"><button type="submit">Send</button></form></body></html>
+            """
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
+        _ = await session.chooseRequestOptions(form: form.token)
+        let first = await read(session, "document.querySelector('input[name=t]:checked').value")
+        XCTAssertEqual(first, "delete")
+        _ = await session.evalLive("(function(){var r=document.querySelector('input[name=t][value=optout]'); r.checked=true; r.setAttribute('data-ook-user','1');})()")
+        _ = await session.chooseRequestOptions(form: form.token)
+        let kept = await read(session, "document.querySelector('input[name=t]:checked').value")
+        XCTAssertEqual(kept, "optout", "the person's own choice of opt-out stays")
     }
 }
