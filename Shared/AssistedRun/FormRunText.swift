@@ -14,7 +14,19 @@ enum FormRun {
     }
 
     /// Only a success reading, for text that may be anything: error and unknown readings come back as failed.
-    nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome { text.isEmpty ? .failed("") : classify(text) }
+    nonisolated static func classifyConfirmed(_ text: String) -> SubmitOutcome {
+        // A page the person just navigated to is all "new text", and its instructions talk about submitting ("your request is submitted only after
+        // you enter the code"). Lines that explain what will happen are not a confirmation of what did.
+        let kept = text.split(whereSeparator: \.isNewline).map(String.init).filter { !isInstruction($0) }.joined(separator: "\n")
+        return kept.isEmpty ? .failed("") : classify(kept)
+    }
+
+    /// A line that tells the person what to do or what will happen, with no sign that it already did.
+    nonisolated static func isInstruction(_ line: String) -> Bool {
+        let opts: String.CompareOptions = [.regularExpression, .caseInsensitive]
+        if line.range(of: "thank you|thanks for|has been (received|submitted|sent|processed)|have been (received|submitted)|was (received|submitted|sent)|successfully|is complete", options: opts) != nil { return false }
+        return line.range(of: "^\\s*(note:|\\*)|\\b(if you|if we|when you|once you|until you|before you|after you|clicking|click|select this|does not submit|not submit|only after|to process|unless|you must|please (enter|provide|select|choose))\\b", options: opts) != nil
+    }
 
     /// New text that says the whole opt-out is done (the page a confirmation email's link ends on), stricter than a send confirmation: "thank you" alone is not enough.
     nonisolated static func looksFinished(_ text: String) -> Bool {

@@ -17895,6 +17895,52 @@
     }
    }
   },
+  "Send forms for me by default": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyer les formulaires pour moi par défaut"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviar los formularios por mí de forma predeterminada"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formulare standardmäßig für mich senden"
+     }
+    }
+   }
+  },
+  "Send it for me": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyer pour moi"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviarlo por mí"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für mich senden"
+     }
+    }
+   }
+  },
   "Send one email to the same sites": {
    "extractionState": "manual",
    "localizations": {
@@ -25258,6 +25304,29 @@
     }
    }
   },
+  "When on, a guide presses a form's own send button once the checks are cleared. Each guide has a \"Send it for me\" box to change this for the rest of the session. Turned off, you press the button yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Activé, un guide appuie sur le bouton d'envoi du formulaire une fois les vérifications passées. Chaque guide a une case « Envoyer pour moi » pour changer cela jusqu'à la fermeture de l'app. Désactivé, vous appuyez vous-même sur le bouton."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Activado, una guía pulsa el botón de envío del formulario cuando se superan las comprobaciones. Cada guía tiene una casilla «Enviarlo por mí» para cambiarlo hasta que cierres la app. Desactivado, pulsas el botón tú mismo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn aktiviert, drückt eine Anleitung die Senden-Taste des Formulars, sobald die Prüfungen erledigt sind. Jede Anleitung hat ein Kästchen „Für mich senden“, um dies bis zum Schließen der App zu ändern. Deaktiviert, drücken Sie die Taste selbst."
+     }
+    }
+   }
+  },
   "Where I live": {
    "extractionState": "manual",
    "localizations": {
@@ -26753,6 +26822,29 @@
     }
    }
   },
+  "Your details are filled in. Check them, solve any check, then press the page's own button yourself. We will notice the confirmation, or tap Mark as done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont remplies. Vérifiez-les, passez les contrôles, puis appuyez vous-même sur le bouton de la page. Nous verrons la confirmation, ou touchez Marquer comme terminé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están rellenados. Revísalos, supera las comprobaciones y pulsa tú mismo el botón de la página. Notaremos la confirmación, o toca Marcar como hecho."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind ausgefüllt. Prüfen Sie sie, erledigen Sie die Prüfungen und drücken Sie dann selbst die Taste der Seite. Wir erkennen die Bestätigung, oder tippen Sie auf Als erledigt markieren."
+     }
+    }
+   }
+  },
   "Your details are filled in. Pick \"%@\" in the form below, then we will send it.": {
    "extractionState": "manual",
    "localizations": {
@@ -26795,6 +26887,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Angaben sind ausgefüllt. Wählen Sie unten die Option, die das Formular verlangt; dann senden wir es."
+     }
+    }
+   }
+  },
+  "Your details are filled in. Press the page's own button yourself; we will notice the confirmation, or tap Next step.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos informations sont remplies. Appuyez vous-même sur le bouton de la page ; nous verrons la confirmation, ou touchez Étape suivante."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus datos están rellenados. Pulsa tú mismo el botón de la página; notaremos la confirmación, o toca Siguiente paso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ihre Angaben sind ausgefüllt. Drücken Sie selbst die Taste der Seite; wir erkennen die Bestätigung, oder tippen Sie auf Nächster Schritt."
      }
     }
    }

@@ -3300,4 +3300,19 @@ final class LegalBasisFillTests: XCTestCase {
         let me = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")], addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"])
         XCTAssertEqual(FormFiller.plan(for: form, signals: nil, person: me).values.first?.candidates.first, "pat@example.com")
     }
+
+    /// Melissa's first guess pointed at its suppression list for deceased people; its consumer privacy form is the one that takes a living person's request.
+    func testNoOptOutPageIsAListForDeceasedPeopleAndMelissaUsesItsConsumerPrivacyForm() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let files = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
+        for f in files {
+            let text = try String(contentsOf: f, encoding: .utf8)
+            for line in text.split(separator: "\n") where line.hasPrefix("opt_out_url:") || line.contains("page: \"") {
+                XCTAssertFalse(line.lowercased().contains("deceased"), "\(f.lastPathComponent): \(line)")
+            }
+        }
+        let melissa = try String(contentsOf: dir.appendingPathComponent("melissa_com.yml"), encoding: .utf8)
+        XCTAssertTrue(melissa.contains("opt_out_url: \"https://apps.melissa.com/user/consumerprivacy.aspx\""))
+    }
 }

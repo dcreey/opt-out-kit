@@ -26,11 +26,11 @@ import OptOutKitCore
 final class EmailAndSkipFlowTests: XCTestCase {
     @MainActor private final class FakePage: AssistedPage {
         var blockerScript: [[AssistedBlocker]]; var outcome: SubmitOutcome
-        private(set) var polls = 0, closed = false
+        private(set) var polls = 0, sends = 0, closed = false
         init(blockers: [[AssistedBlocker]], outcome: SubmitOutcome = .submitted(awaitingEmail: false)) { blockerScript = blockers; self.outcome = outcome }
         func blockers() async -> [AssistedBlocker] { defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
         func refill() async {}
-        func send() async -> SubmitOutcome { outcome }
+        func send() async -> SubmitOutcome { sends += 1; return outcome }
         func close() { closed = true }
     }
     @MainActor private final class Driver: AssistedDriver {
@@ -227,7 +227,11 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.rows.map(\.0), ["a.example"])
         XCTAssertTrue(r.canGoBack)
         r.back()
+        XCTAssertTrue(r.goingBack, "the screen can show the loading mark at once")
+        XCTAssertEqual(r.index, 0, "and moves to the earlier site straight away")
+        XCTAssertFalse(r.canGoBack, "a second tap while it loads does nothing")
         await wait(r.index == 0 && r.phase == .reviewing)
+        XCTAssertFalse(r.goingBack, "the loading mark is gone once the earlier site is on screen")
         XCTAssertEqual(r.phase, .reviewing, "the earlier site is shown as it is, not sent again")
         XCTAssertTrue(r.revisiting)
         XCTAssertEqual(log.rows.map(\.0), ["a.example"], "leaving b recorded nothing: not skipped, not failed")
@@ -308,5 +312,46 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.rows.map(\.0), ["a.example"])
         r.next(); await wait(r.phase == .noForm)
         r.skip(); await join(run, r)
+    }
+
+    // MARK: "Send it for me" turned off
+
+    func testWithSendingForThePersonOffTheFormIsFilledButNothingIsPressedAndNextLeavesItNotDone() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]])
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        var auto = false
+        r.autoSubmit = { auto }
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .manualSend)
+        XCTAssertEqual(page.sends, 0, "the app did not press send")
+        XCTAssertEqual(log.rows.count, 0)
+        auto = true                                       // turning it back on later does not send a page the person is already finishing
+        r.next()
+        await wait(r.index == 1)
+        XCTAssertEqual(page.sends, 0)
+        XCTAssertEqual(log.rows.first?.1, .needsYou("you sent it yourself and we saw no confirmation"), "not recorded as sent, and not as failed")
+        await join(run, r)
+        XCTAssertEqual(log.rows.last?.0, "b.example")
+    }
+
+    func testMarkAsDoneAfterSendingItYourselfRecordsTheSiteAsSent() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { false }
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .manualSend)
+        await r.markDone()
+        await join(run, r)
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
+    }
+
+    func testWithSendingForThePersonOnTheAppSendsAsBefore() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]])
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": page]), log)
+        r.autoSubmit = { true }
+        await join(Task { @MainActor in await r.run() }, r)
+        XCTAssertEqual(page.sends, 1); XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
     }
 }

@@ -80,6 +80,9 @@ final class GuidedRunner: ObservableObject {
     private var fillValues: [FieldValue]
     private let person: Person
     private let onStepCompleted: (Int) -> Void
+    /// Asked when the send step comes up: whether to press the page's own button. The screen sets it from the person's checkbox.
+    var autoSubmit: () -> Bool = { true }
+    private var manualBaseline: String?
     private let onSent: (AutoOptOutResult) -> Void
     private let onIssue: (IssueKind) -> Void
     /// Looks for the site's current opt-out page when the recorded one is gone. Nil means healing is not available.
@@ -227,6 +230,14 @@ final class GuidedRunner: ObservableObject {
             if filledFor != url { _ = await page.fill(fillValues); filledFor = url }       // a page reload can clear the fields
             let blockers = await page.blockers()
             if blockers.isEmpty { apply(.blockersCleared) } else { status = describe(blockers) }
+        case .send where !autoSubmit():
+            // The person sends it themselves: nothing is pressed, and a confirmation that appears afterwards is noticed.
+            let now = await page.visibleText()
+            guard let base = manualBaseline else { manualBaseline = now; status = Loc.t("Your details are filled in. Press the page's own button yourself; we will notice the confirmation, or tap Next step."); break }
+            if case .submitted(let email) = FormRun.classifyConfirmed(FormRun.newText(before: base, after: now)) {
+                onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
+                apply(.formSent(awaitingEmail: email))
+            }
         case .send:
             _ = await page.fill(fillValues)
             switch await page.send(fillValues) {
@@ -268,6 +279,7 @@ final class GuidedRunner: ObservableObject {
 
 struct GuidedFlowView: View {
     @StateObject var runner: GuidedRunner
+    @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -286,6 +298,7 @@ struct GuidedFlowView: View {
             }
             .ignoresSafeArea(edges: .top)
         }
+        .onAppear { runner.autoSubmit = { model.autoSubmit } }
         .task { await runner.run() }
         .onChange(of: runner.ending) { _, e in if e != nil { dismiss() } }
     }
@@ -352,6 +365,7 @@ struct GuidedPanel: View {
                     .frame(height: min(max(stepHeight, 20), maxStepHeight))
                     .onPreferenceChange(StepHeightKey.self) { stepHeight = $0 }
                 }
+                AutoSubmitToggle()
                 if let status = runner.status {
                     Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("guided-status")

@@ -40,6 +40,9 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Filling a form whose code names mislead (usmarketinggrp.com: the box labelled Phone is named `email`; a "Full Address" box) | The visible label wins over the code name: Phone gets the phone, Full Address gets the whole address, never the name | `CoreTests.testTheVisibleLabelBeatsTheCodeName...`, `testAnEmailBoxNamedPhone...` | Mac |
 | Accepting site terms for you | Off until the person taps Allow. When on, a prompt whose every paragraph is on the reviewed list is accepted once per page and logged; anything else, a risk-flagged paragraph, or the setting off leaves it to the person. The shipped list reviews nothing risk-flagged | `CoreTests.testTheGeneratedLibrary...`, `TermsAcceptanceTests` (render, Solve-and-send page), `TermsSettingsTests` | Mac / Sim |
 | Settings: California DROP link | Shown only when California is the chosen state | none yet (view only) | n/a |
+| Opening the right form is not "done" | Instructions on a form page ("your request is submitted only after you enter the code") are never a confirmation; real confirmations ("Thank you. Your request has been received.") still count, even below the instructions | `AssistedRunnerTests.PrematureDoneTests` (Melissa's consumer privacy page) | Mac |
+| Never the deceased-person form | No directory opt-out page is a deceased list; Melissa uses its consumer privacy form; the live form picker scores a deceased form down | `CoreTests.testNoOptOutPageIsAListForDeceased...` | Mac |
+| Send it for me (guides) | On by default; the box in a guide changes it for the session; Settings changes the default. Off: the form is filled, nothing is pressed, the person presses the page's button, and a confirmation is noticed or they tap Mark as done or Next (not recorded as sent or failed) | `EmailAndSkipFlowTests` (three tests), `WorkflowGapTests`, `SolveAndSendUITests` | Mac / Sim |
 | Reading a confirmation page | Real thanks and receipts count; plain "thanks" and hidden templates do not | `LooksFinishedTests`, `EmailFollowUpWordingTests`, `WebFormSubmitterTests` | Mac / Sim |
 | Real web view against a local page | Fills, waits for the person, sends, reads the result | `WebAssistedDriverTests` | Sim |
 | Today's queue | Only sites the app can fill and has not sent to recently | `AssistedQueueTests` | Sim |
@@ -69,11 +72,43 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Run now shows what was sent and what needs you, with no network | `AutoProtectionUITests`, `DryRunUITests` | Sim |
 | Spokeo, FastPeopleSearch, PeopleConnect flows | `BrokerFlowUITests` | Sim |
 
-### Gaps
+## Workflow audit (2026-11-01)
 
-- Whether the real screen shows the alert or dialog (the logic is tested, the SwiftUI wiring is not).
-- The hand-off to Gmail or Outlook on a device.
-- The skip-to-return loop through the app model.
+Every workflow a person can do in the app, with the tests that pin it. **Mac** = `swift test` in `Packages/OptOutKitCore` or
+`Packages/AssistedRunLogic`, no simulator. **Sim** = `xcodebuild test` on the iPhone 17 Pro simulator. A workflow is only "covered
+without a simulator" when its rules live in the Mac packages; the SwiftUI wiring itself (what is drawn, which alert shows) can only be
+checked in the simulator.
+
+| # | Workflow | Mac tests | Simulator tests | Status |
+|---|---|---|---|---|
+| 1 | First run: walkthrough once, replay from About, language, place, both auto switches | Core: `FreshInstallGetsWalkthrough`, `UpdateWith...Message`, translation and country tests, `OptOutIsMonthlyNothingScansAndBothStartOffUntilThePersonDecides`, `DecliningTurnsEverythingOff...` | `OnboardingAndSitesUITests`, `AutoProtectionUITests`, `AppModelTests.WalkthroughOnFirstInstall...` | Covered |
+| 2 | Profile: complete before anything runs, editor, relatives and switching, minor and public-figure flags, tagged email, encryption | Core: profile completeness, flags, Gmail tag, `RoundTrip`, `TamperingIsDetected`, `RemovingPersonDeletesTheirData` | `ProfileEditorUITests`, `SafetyFlagsUITests`, `ContactEmailAppTests`, `PlatformAppTests` (gate) | Covered |
+| 3 | Queue and daily batch: 25 sites, kinds, rollover, goals | Core: `Daily`, batch and kind tests, queue order and bands | `AppModelTests.AFreshPick...`, `PlatformAppTests` queue tests, `BrokerListUITests` | Covered |
+| 4 | Sites tab: search, groups, status, scan, look-yourself and points | Core: scan, points, grouping tests | `OnboardingAndSitesUITests` (Sites tab, scan, points) | Covered |
+| 5 | Site page: guide, email, heal a moved link, report a problem, skip, skip forever, bring back | Core: skip and return after a week, forever, report, healing, closed sites carry evidence | `LinkHealingTests`, `AppModelTests.ASkippedSite...`, `GuidedFlowUITests` | Covered; the lists of closed and locked sites are view-only (not tested) |
+| 6 | Automatic protection: monthly run, run now, activity, run report, review and reject a result | Core: run period, one send a month, dry run, evidence screenshots | `AutoProtectionTests`, `AutoProtectionUITests`, `PlatformAppTests` | Covered |
+| 7 | Solve and send: check, terms, send, no confirmation, rate-limit pacing, skip, Mark as done, Previous site | AssistedRunLogic: `AssistedRunnerTests`, `EmailAndSkipFlowTests`, `EmailHandoffTests` | `SolveAndSendUITests` (skip, Previous site, Next site on the real screen), `AssistedAppTests` | Covered |
+| 8 | Email an opt-out: batches, Bcc, mail apps, in-app composer, "Did you send it?" | Core: batch and mail-link tests; AssistedRunLogic: handoff | none for the Opt-out email screen's own alert | **Gap**: that screen's alert is wired in the view (same logic as the assisted run, which is tested) |
+| 9 | Verify queue (forms that need only a bot check ticked) | Core: `FormsThatOnlyNeedABotCheck...`; AssistedRunLogic | `SolveAndSendUITests` shares the screen | Covered |
+| 10 | Email links tab: paste a link, safety check, fill, send, follow-ups, link shared from a mail app | Core: link check and follow-up tests | `AppModelTests` (link taken from the share, follow-ups after 45 days), `WorkflowGapTests` (pasted address rules) | **Gap**: filling and sending on the loaded page needs a live https page |
+| 11 | Guided flow for sites needing a person | Core: guided plan tests | `GuidedRunnerTests`, `GuidedFlowUITests` | Covered |
+| 12 | Live forms: picking the form, choices the person made, deletion over opt-out | Core: `FormFiller` tests (labels beat code names) | `LiveFormTests`, `WebFormSubmitterTests` | Covered |
+| 13 | Settings: language, place, California link, Global Privacy Control, advertising ID, terms | Core: language and place tests, terms rules | `WorkflowGapTests` (California link, Global Privacy Control), `TermsAcceptanceTests`, `PlatformAppTests` | Covered; the advertising ID read needs a device |
+| 14 | Accepting site terms for you | Core: `TermsGate` tests, library has no risk-flagged approvals | `TermsAcceptanceTests` | Covered |
+| 15 | Background runs, reminders, notifications | Core: reminder schedule tests | none | **Gap**: iOS background scheduling and notification permission need a device |
+| 16 | Share extension (send a link to Exnay) | Core: none | `AppModelTests.OnlyAWebAddress...` covers the app side | **Gap**: the extension itself needs a device |
+
+Known simulator failures that are not from recent changes: most of `AppUITests` that open the Sites tab or the profile editor (BrokerListUITests,
+GuidedFlowUITests, ProfileEditorUITests, SafetyFlagsUITests, OnboardingAndSitesUITests) fail identically on Build 18, before this audit, on the
+iPhone 17 Pro simulator (iOS 26.5). All unit tests (142) and the new Solve-and-send UI test pass. Fixing those UI tests is separate work.
+
+Run everything:
+
+```bash
+swift test --package-path Packages/OptOutKitCore
+swift test --package-path Packages/AssistedRunLogic
+xcodebuild test -scheme OptOutKit -destination 'id=<iPhone 17 Pro UDID>'   # unit and UI tests
+```
 
 Human-only steps (CAPTCHA, phone, ID) are never automated; see docs/DESIGN.md.
 TODO: mock broker site for UI flow tests, fake inbox for `wait_for_email`, live-page drift check.

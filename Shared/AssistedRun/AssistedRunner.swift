@@ -96,6 +96,7 @@ final class AssistedRunner: ObservableObject {
         case sent(awaitingEmail: Bool)
         case needsMore(String)        // sent, but no confirmation: the site wants another step from the person
         case timedOut
+        case manualSend               // the person turned off sending for them: details are filled, they press the page's own button
         case reviewing                // back on a site already passed: shown as it is, nothing is sent for the person
     }
 
@@ -151,6 +152,8 @@ final class AssistedRunner: ObservableObject {
     private var nextContinuation: CheckedContinuation<Void, Never>?
     var waitLimit: TimeInterval = 180
     var pollInterval: TimeInterval = 1
+    /// Asked at the moment of sending: whether the app presses the page's own send button. The screen sets it from the person's checkbox.
+    var autoSubmit: () -> Bool = { true }
     var pauseAfterSent: TimeInterval = 1.8
 
     init(items: [Item], driver: AssistedDriver, onResult: @escaping (DirectoryEntry, AutoOptOutResult) -> Void) {
@@ -224,10 +227,13 @@ final class AssistedRunner: ObservableObject {
     }
 
     /// Back to the previous site, to look at it or do something else there. Only works on the second site or later.
-    var canGoBack: Bool { index > 0 && !finished }
+    var canGoBack: Bool { index > 0 && !finished && !goingBack }
+    /// True from the tap on Previous site until the earlier site's page is on screen: the screen shows the loading mark meanwhile.
+    @Published private(set) var goingBack = false
     func back() {
         guard canGoBack else { return }
         goBack = true; skipFlag = true
+        goingBack = true; index -= 1; phase = .loading          // the screen moves to the earlier site at once; its page follows
         resumeNext()
         if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
     }
@@ -334,8 +340,9 @@ final class AssistedRunner: ObservableObject {
         do {
             index = i; phase = .loading; skipFlag = false; emailedFlag = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
-            if items[i].emailOnly { await waitForEmail(items[i]); return }
+            if items[i].emailOnly { goingBack = false; await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
+                goingBack = false
                 let (listing, early) = await chooseListing(items[i], search: search)
                 if let early { record(items[i], early); await offerEmailIfNeeded(items[i], early); return }
                 phase = .loading
@@ -351,6 +358,7 @@ final class AssistedRunner: ObservableObject {
                 return
             }
             guard let ready = await preparing[i]?.value else {
+                goingBack = false
                 let noForm = driver.failureReason(for: items[i].form) == "noform"
                 // The page loaded but holds no form we can fill, and the site gives an address: say so, and let the person send the email from here.
                 if noForm, items[i].entry.contactEmail != nil { await waitForEmail(items[i]); return }
@@ -360,7 +368,7 @@ final class AssistedRunner: ObservableObject {
                 return
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
-            page = ready
+            page = ready; goingBack = false
             prepare(i + 1)      // load the next one while the person works on this one
 
             var outcome: AutoOptOutResult?
@@ -403,13 +411,15 @@ final class AssistedRunner: ObservableObject {
                 await ready.refill()
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
-            switch items[i].handsOff || revisiting ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
+            let manual = !revisiting && !items[i].handsOff && !autoSubmit()
+            switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     phase = .sent(awaitingEmail: email); outcome = .submitted(awaitingEmail: email)
                 case .challenged: continue      // a check appeared after sending: wait for the person again
                 case .rejected(let why), .failed(let why):
-                    phase = revisiting ? .reviewing : .needsMore(why)
-                    outcome = why == AutoOptOut.rateLimited ? .needsYou(why) : .failed(why)         // a rate limit is not the form's fault
+                    phase = revisiting ? .reviewing : manual ? .manualSend : .needsMore(why)
+                    // A site the person is sending themselves is not failed when they move on without a confirmation: it just is not done yet.
+                    outcome = why == AutoOptOut.rateLimited || manual ? .needsYou(manual ? "you sent it yourself and we saw no confirmation" : why) : .failed(why)         // a rate limit is not the form's fault
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
                     let watcher = Task { @MainActor [weak self] in

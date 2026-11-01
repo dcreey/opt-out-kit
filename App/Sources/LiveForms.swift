@@ -40,6 +40,7 @@ enum LiveFormPicker {
     /// Newsletter and marketing language in the words around a form's inputs.
     private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscrib(e|ing|ed)|receive (updates|news|emails?)|and receive|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
     private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
+    private static let deceasedForm = try! NSRegularExpression(pattern: "deceased|decedent|late (husband|wife|mother|father)|passed away", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
     private static func has(_ re: NSRegularExpression, _ s: String) -> Bool { re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
@@ -63,6 +64,8 @@ enum LiveFormPicker {
         var s = 0
         if has(optOut, buttons) { s += 4 }
         if has(optOut, heading) { s += 2 }
+        // A form for a deceased person (a suppression list for the dead) is never the opt-out of a living one.
+        if has(deceasedForm, heading + " " + buttons + " " + pageContext.prefix(300)) { s -= 8 }
         if has(marketing, buttons) { s -= 6 }
         if has(marketing, heading) && !has(optOut, buttons) { s -= 3 }
         if has(optOut, pageContext) { s += 3 }

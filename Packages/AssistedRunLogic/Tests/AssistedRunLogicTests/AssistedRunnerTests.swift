@@ -385,3 +385,34 @@ final class LooksFinishedTests: XCTestCase {
         }
     }
 }
+
+/// Melissa's consumer privacy form lists, as plain instructions, what happens after the person sends it: all of it appears at once when they open the page.
+final class PrematureDoneTests: XCTestCase {
+    private let melissaPage = """
+        Consumer Privacy Request Form
+        Please provide a current email address. We will send a one-time confirmation code to this address. You must enter that code to submit your request.
+        Clicking this button sends a one-time confirmation code to your email. It does not submit your request. Your request is submitted only after you enter the code.
+        Note: If you select this option, your Right to Know report will be prepared from the information we hold when we receive your request. Your deletion and opt-out
+        * To process a request to correct, we match the information you provide on this form against our records; your name and address are typically sufficient.
+        I want Melissa to delete my personal information.
+        Send Confirmation Code
+        """
+
+    func testTheInstructionsOnAFormPageAreNotAConfirmation() {
+        if case .submitted = FormRun.classifyConfirmed(melissaPage) { XCTFail("opening the right form must not look like a finished request") }
+        for line in melissaPage.split(separator: "\n") {
+            if case .submitted = FormRun.classifyConfirmed(String(line)) { XCTFail("a single line counted as sent: \(line)") }
+        }
+    }
+
+    func testRealConfirmationsStillCount() {
+        XCTAssertEqual(FormRun.classifyConfirmed("Thank you. Your request has been received."), .submitted(awaitingEmail: false))
+        XCTAssertEqual(FormRun.classifyConfirmed("Your request was submitted successfully."), .submitted(awaitingEmail: false))
+        XCTAssertEqual(FormRun.classifyConfirmed("Thank you for submitting. Once you click the link in the email we send, your request is processed."), .submitted(awaitingEmail: true))
+        XCTAssertEqual(FormRun.classifyConfirmed("We will send you an email to confirm your request."), .submitted(awaitingEmail: true))
+    }
+
+    func testAConfirmationBelowTheInstructionsIsStillFound() {
+        XCTAssertEqual(FormRun.classifyConfirmed(melissaPage + "\nYour request has been submitted. Thank you."), .submitted(awaitingEmail: false))
+    }
+}

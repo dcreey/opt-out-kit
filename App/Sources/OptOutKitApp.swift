@@ -261,6 +261,9 @@ final class AppModel: ObservableObject {
         return household.ownerState
     }
 
+    /// Whether the person chose California (or their address is there): only then is the California DROP link shown in Settings.
+    var showsCaliforniaDrop: Bool { ownerCountry == "US" && ownerStateCode == "CA" }
+
     /// A US state's rules, by its two-letter code.
     func jurisdiction(code: String) -> Jurisdiction? { jurisdictions.first { $0.id == "us-" + code.lowercased() } }
     func jurisdiction(id: String) -> Jurisdiction? { jurisdictions.first { $0.id == id } }
@@ -896,6 +899,16 @@ final class AppModel: ObservableObject {
     private static let gpcKey = "gpc.setup.done"
     /// Whether the person said they turned on the Global Privacy Control in the browser they use. It is a one-time setting task, not a site: it
     /// is not in the plan, so it never counts toward the day's sites, requests sent or the streak.
+    // MARK: Sending for the person
+
+    private static let autoSubmitKey = "autosubmit.default"
+    /// Whether the guides press a form's own send button for the person unless they turn that off. On unless the person changes it in Settings.
+    var autoSubmitDefault: Bool { _ = regionTick; return defaults.object(forKey: Self.autoSubmitKey) as? Bool ?? true }
+    func setAutoSubmitDefault(_ on: Bool) { defaults.set(on, forKey: Self.autoSubmitKey); regionTick += 1 }
+    /// The choice made with the checkbox in a guide; it lasts until the app is closed. Nil until the person touches it.
+    @Published var autoSubmitSession: Bool?
+    var autoSubmit: Bool { autoSubmitSession ?? autoSubmitDefault }
+
     var gpcSetupDone: Bool { _ = regionTick; return defaults.bool(forKey: Self.gpcKey) }
     func setGPCSetupDone(_ on: Bool) { defaults.set(on, forKey: Self.gpcKey); regionTick += 1 }
 
@@ -1547,7 +1560,8 @@ final class FakeAssistedPage: AssistedPage {
     private let view = WKWebView(frame: .zero)
     var webView: WKWebView? { view }
     init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Opt out of example.com</h1><p>Email</p><input value='you@example.com' style='width:100%;font-size:18px'><p>Full name</p><input value='Pat Example' style='width:100%;font-size:18px'><br><br><button style='font-size:18px'>Submit request</button></body></html>", baseURL: nil) }
-    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
+    // -uitest-fake-hold keeps the check up, so a test can work on the screen without the site sending itself meanwhile.
+    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= (ProcessInfo.processInfo.arguments.contains("-uitest-fake-hold") ? 10_000 : 2) ? [.check("a bot check")] : [] }
     func refill() async {}
     func send() async -> SubmitOutcome { .submitted(awaitingEmail: ProcessInfo.processInfo.arguments.contains("-uitest-fake-email")) }
     func close() {}

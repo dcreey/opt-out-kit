@@ -44,3 +44,16 @@ struct GuidePrimaryStyle: ButtonStyle {
             .background(Color.exnayGold.opacity(configuration.isPressed ? 0.7 : 1), in: Capsule())
     }
 }
+
+/// "Send it for me": on by default (Settings changes the default). Turned off, a guide fills the form in and the person presses the page's own button.
+/// The choice lasts until the app is closed.
+struct AutoSubmitToggle: View {
+    @EnvironmentObject var model: AppModel
+    var body: some View {
+        Button { model.autoSubmitSession = !model.autoSubmit } label: {
+            Label("Send it for me", systemImage: model.autoSubmit ? "checkmark.square.fill" : "square")
+        }
+        .font(.caption.bold()).foregroundStyle(.white.opacity(0.85)).buttonStyle(.plain)
+        .accessibilityIdentifier("auto-submit-toggle").accessibilityValue(model.autoSubmit ? "on" : "off")
+    }
+}

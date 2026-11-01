@@ -231,7 +231,7 @@ struct AssistedOptOutView: View {
             Button("Mark as done") { runner.answerEmailOffer(sent: true) }.accessibilityIdentifier("assisted-offer-mark-done")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
         } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done. If you already did, tap Mark as done.") }
-        .onAppear { handoff.markEmailed = { model.markEmailed($0) } }
+        .onAppear { handoff.markEmailed = { model.markEmailed($0) }; runner.autoSubmit = { model.autoSubmit } }
         .alert("Did you send it?", isPresented: Binding(get: { handoff.confirming != nil }, set: { _ in })) {
             Button("Yes, I sent it") { handoff.answer(sent: true) }
             Button("No", role: .cancel) { handoff.answer(sent: false) }
@@ -322,7 +322,7 @@ struct AssistedOptOutView: View {
                             Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
                         } else {
                             if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
-                            if runner.phase == .reviewing || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
+                            if runner.phase == .reviewing || runner.phase == .manualSend || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
                         }
                     }
                     ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold)
@@ -338,6 +338,7 @@ struct AssistedOptOutView: View {
                                 Button { runner.previousNote = nil } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }.accessibilityLabel(Loc.t("Dismiss"))
                             }
                         }
+                        AutoSubmitToggle()
                         if let notice = runner.notice { Label(notice, systemImage: "doc.badge.plus").font(.caption).foregroundStyle(Color.exnayGold).accessibilityIdentifier("assisted-notice") }
                         // A site that also takes opt-outs by email can be finished that way when its form is a dead end (one request per app or panel, a
                         // form that will not take taps): the same button is in the menu, but it is easy to miss there.
@@ -350,7 +351,8 @@ struct AssistedOptOutView: View {
                 }
                 GuideBoundary()
                 Group {
-                    if let web = liveSearch?.webView { WebViewHost(webView: web).id("search\(runner.index)") }
+                    if runner.goingBack { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
+                    else if let web = liveSearch?.webView { WebViewHost(webView: web).id("search\(runner.index)") }
                     else if let web = livePage?.webView { WebViewHost(webView: web).id(runner.index) }
                     else if runner.phase == .noForm, let entry = runner.current?.entry { noFormCard(entry) }
                     else { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
@@ -381,7 +383,7 @@ struct AssistedOptOutView: View {
 
     private var canMarkDone: Bool {
         switch runner.phase {
-        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut, .reviewing: return true
+        case .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice, .needsMore, .timedOut, .reviewing, .manualSend: return true
         default: return false
         }
     }
@@ -439,6 +441,7 @@ struct AssistedOptOutView: View {
             ? Loc.t("The site said \"too many requests\". It limits how fast it takes them, and this company runs several of these sites. Wait a few minutes and try it again later; tap Next site to carry on.")
             : Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)
         case .timedOut: return Loc.t("Timed out waiting for the check.")
+        case .manualSend: return Loc.t("Your details are filled in. Check them, solve any check, then press the page's own button yourself. We will notice the confirmation, or tap Mark as done.")
         case .reviewing: return Loc.t("You are back on this site. Look at it or do something else here, like another form. It keeps its result unless you finish it now. Tap Next site when you are done.")
         case .noForm: return Loc.t("No online form exists for this site. Send an email instead: tap Write the email.")
         case .pacing(let n): return Loc.f("This company runs several of these sites and limits how fast it takes requests. Sending in %lld seconds so it is not turned away.", n)
@@ -451,6 +454,7 @@ struct AssistedOptOutView: View {
         case .pickingListing, .waitingForTerms, .waitingForCertification, .waitingForCheck, .waitingForChoice: return "hand.point.up.left"
         case .needsMore, .timedOut: return "exclamationmark.triangle"
         case .reviewing: return "arrow.uturn.backward.circle"
+        case .manualSend: return "hand.point.up.left"
         case .noForm: return "envelope"
         case .pacing: return "timer"
         default: return "hourglass"

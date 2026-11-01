@@ -38,6 +38,12 @@ struct AboutView: View {
                     Text("Laws about data brokers and your rights, by country and state, and how this app uses them.")
                 }
                 autoSection
+                Section {
+                    Toggle("Send forms for me by default", isOn: Binding(get: { model.autoSubmitDefault }, set: { model.setAutoSubmitDefault($0) }))
+                        .accessibilityIdentifier("settings-auto-submit")
+                } footer: {
+                    Text("When on, a guide presses a form's own send button once the checks are cleared. Each guide has a \"Send it for me\" box to change this for the rest of the session. Turned off, you press the button yourself.")
+                }
                 if let lib = model.termsLibrary {
                     termsSection(lib)
                 }
@@ -47,7 +53,7 @@ struct AboutView: View {
                     Text("The repository is private until the pre-release checks finish.").font(.footnote).foregroundStyle(.secondary)
                 }
                 // The California DROP link only matters to someone who chose California.
-                if model.ownerCountry == "US", model.ownerStateCode == "CA" {
+                if model.showsCaliforniaDrop {
                     Section {
                         Link("California residents: one free request to every registered broker", destination: URL(string: "https://privacy.ca.gov/drop/")!)
                             .accessibilityIdentifier("california-drop")
