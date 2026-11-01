@@ -4,6 +4,25 @@ import OptOutKitCore
 @testable import OptOutKit
 
 /// Every way out of a site in the assisted run that involves email or Skip, driven the way the screen drives it (runner + handoff), no UI.
+///
+/// Expected behavior (each line is pinned by a test below, or by EmailHandoffTests / Core's skip tests where noted):
+///
+/// Emailing a site
+/// - Other mail app (Gmail, Outlook, ...): "Did you send it?" is asked the moment the app is opened, so it is waiting on return. Nothing may cover it,
+///   including the "This site did not go through" dialog. Yes saves the site as emailed; No saves nothing.
+/// - In-app Mail composer: Send saves the site as emailed; Cancel saves nothing. The result counts even if the sheet cleared its own state first.
+/// - Emailed from a live form page: the site ends as Emailed (green check), never as Skipped, and the run moves to the next site.
+/// - A No on a form page keeps the site open. A No on a failed site's offer moves on. A No on the no-form screen keeps waiting.
+/// - An answer to a question that was never asked, or a second answer to the same one, changes nothing and saves once.
+///
+/// Skip
+/// - Skip this site always moves to the next site, whatever the site is waiting on: the form page, the no-form screen, or the email offer.
+/// - A plain skip never offers email and counts as skipped. "Not working" on a site with an address offers email; with no address it just moves on.
+/// - A rejected or failed site with an address offers email; Mark as done on the offer saves it as emailed; Skip on the offer moves on.
+///
+/// Skipped sites coming back (Core's CoreTests, "ASkipWaitsAWeek..." and neighbours; not yet tested end to end through the app model)
+/// - A skipped site leaves the batch, waits a week, then returns with a reminder. Skipping again restarts the week. "Forever" never returns.
+///   Finishing a skipped site ends its skip.
 @MainActor
 final class EmailAndSkipFlowTests: XCTestCase {
     @MainActor private final class FakePage: AssistedPage {
