@@ -1,8 +1,11 @@
 # Terms library: matching site terms against text a person has reviewed
 
-Status 2026-10-21: the matching and decision logic is built and tested. **Nothing presses "I agree" for anyone.** The step
-that would do that (the web view clicking the button) is not built, and building it was blocked by this session's permission
-system, so it needs an explicit decision (see "Open decision").
+Status 2026-11-01: **on.** The project owner gave the go-ahead (see "Decision" below). 333 of the 396 paragraphs are marked
+reviewed and ok, recorded as `reviewer: owner blanket approval 2026-11-01` (approved on the owner's say-so, not read one by one).
+The 63 paragraphs flagged for automation, payment, arbitration, indemnity, permissible use or protected people stay unreviewed, and
+the app never accepts a prompt that contains one. The switch is still the person's: Settings, "Accepting site terms for you",
+Review and allow. When it is on, the Solve-and-send run presses a site's "I agree" itself when the rule below allows it, once per
+page, and logs it in the acceptance log. Otherwise the prompt is left for the person, as before.
 
 > **Correction (2026-10-21).** The census behind the numbers below counted acceptable-use text in page footers as "prompts". The
 > 45 arrests, warrants and records sites are **not** gated by it; only a prompt with an "I agree" button is. The matching and the
@@ -50,7 +53,7 @@ python3 tools/terms_library.py                                                  
 A reviewer reads `.terms-review/review-sheet.txt` (full canonical paragraphs, with flags) and sets `reviewed` and `verdict`
 in `terms/library.yml`. Re-running keeps existing verdicts.
 
-## Open decision
+## Decision (2026-11-01: go-ahead given, items 1 and 2 below are the owner's responsibility)
 
 To act on a decision, the app's hidden web view would have to press "I agree" on a third party's terms. That is the
 step this session's permission system refused. Before anyone builds it:

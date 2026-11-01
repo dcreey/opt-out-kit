@@ -1083,7 +1083,7 @@ final class AppModel: ObservableObject {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeAssistedDriver() }
         #endif
-        return WebAssistedDriver(person: selectedPerson.map(formPerson), advertisingID: nil)
+        return WebAssistedDriver(person: selectedPerson.map(formPerson), advertisingID: nil, termsPolicy: makeTermsPolicy())
     }
 
     /// The pages in the "tap to verify" task, ready for the visible runner. A placeholder plan stands in when the stored form's plan is

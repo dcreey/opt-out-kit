@@ -22,6 +22,8 @@ struct WebAssistedDriver: AssistedDriver {
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
     var person: Person?
     var advertisingID: String?
+    /// Accepts a site's "I agree" prompt for the person when they allowed it; nil means the person always does.
+    var termsPolicy: TermsPolicy?
 
     /// What a form looks like, to tell one from another when the page changes under the person.
     static func signature(_ form: LiveForm) -> String { form.fields.filter(\.visible).map { $0.label + "/" + $0.type }.joined(separator: "|") }
@@ -49,6 +51,7 @@ struct WebAssistedDriver: AssistedDriver {
         _ = await session.denyCookies()
         await session.hideConsentOverlays()
         let page = WebAssistedPage(session: session, plan: plan)
+        page.termsPolicy = termsPolicy
         if let person {
             _ = await session.advanceToRequestForm()
             if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
@@ -89,6 +92,8 @@ final class WebAssistedPage: AssistedPage {
     private var pageURL: URL?
     private var knownSignatures = Set<String>()
     private var shown: WKWebView?
+    var termsPolicy: TermsPolicy?
+    private var termsTriedFor: URL?
     var currentFormToken: String? { liveForm }
 
     init(session: WebViewSession, plan: FillPlan) { self.session = session; self.plan = plan }
@@ -129,7 +134,12 @@ final class WebAssistedPage: AssistedPage {
 
     func blockers() async -> [AssistedBlocker] {
         var out: [AssistedBlocker] = []
-        if await session.hasTermsPrompt() { out.append(.terms) }
+        if await session.hasTermsPrompt() {
+            // Tried once per page: the person's approved list decides, and everything else is left for them.
+            let url = session.webView.url
+            if termsTriedFor != url { termsTriedFor = url; _ = await session.acceptTermsIfAllowed(policy: termsPolicy, domain: url?.host ?? pageURL?.host ?? ""); await refill() }
+            if await session.hasTermsPrompt() { out.append(.terms) }
+        }
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
         if let why = await session.visibleChallenge() { out.append(.check(why)) }
         if await session.emptyCodeField() { out.append(.check("a code to type")) }

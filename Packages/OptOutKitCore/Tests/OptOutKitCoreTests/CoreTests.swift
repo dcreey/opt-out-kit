@@ -898,12 +898,15 @@ final class TermsGateTests: XCTestCase {
         XCTAssertNil(old.termsApproval, "data saved before this feature still loads")
     }
 
-    func testTheGeneratedLibraryDecodesAndStartsWithNothingReviewed() throws {
+    func testTheGeneratedLibraryDecodesAndOnlyParagraphsWithoutRiskFlagsAreReviewed() throws {
         let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("terms/library.yml")
         let library = try TermsLibrary.load(url)
         XCTAssertGreaterThan(library.paragraphs.count, 100)
-        XCTAssertEqual(library.reviewedCount, 0, "a person must read paragraphs before any are marked reviewed; this repo ships none")
+        XCTAssertGreaterThan(library.reviewedCount, 0, "the owner approved the list, so the switch in settings can be turned on")
+        let risky: Set<String> = ["automation", "payment", "arbitration", "indemnity", "permissible_use", "restricted_people"]
+        let approvedRisky = library.paragraphs.filter { $0.approvedByReviewer && !risky.isDisjoint(with: $0.flags) }
+        XCTAssertEqual(approvedRisky.count, 0, "wording about automation, payment, arbitration, indemnity, permissible use or protected people is never approved")
     }
 }
 

@@ -46,13 +46,16 @@ struct AboutView: View {
                     Link("View the code on GitHub", destination: AppInfo.repoURL)
                     Text("The repository is private until the pre-release checks finish.").font(.footnote).foregroundStyle(.secondary)
                 }
-                Section {
-                    Link("California residents: one free request to every registered broker", destination: URL(string: "https://privacy.ca.gov/drop/")!)
-                        .accessibilityIdentifier("california-drop")
-                } header: {
-                    Text("Also worth doing")
-                } footer: {
-                    Text("California's DROP, run by the state's privacy agency, sends one deletion request to every broker registered in California. It needs identity verification through the state, which Exnay cannot do for you.")
+                // The California DROP link only matters to someone who chose California.
+                if model.ownerCountry == "US", model.ownerStateCode == "CA" {
+                    Section {
+                        Link("California residents: one free request to every registered broker", destination: URL(string: "https://privacy.ca.gov/drop/")!)
+                            .accessibilityIdentifier("california-drop")
+                    } header: {
+                        Text("Also worth doing")
+                    } footer: {
+                        Text("California's DROP, run by the state's privacy agency, sends one deletion request to every broker registered in California. It needs identity verification through the state, which Exnay cannot do for you.")
+                    }
                 }
                 Section("Good to know") {
                     Text("Exnay is not affiliated with any data broker and is not legal advice. Broker pages change often, so a step may need updating.")

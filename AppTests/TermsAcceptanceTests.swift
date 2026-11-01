@@ -99,6 +99,37 @@ final class TermsAcceptanceTests: XCTestCase {
         XCTAssertTrue(page.text.contains(Rechecker.termsGateMarker), "a changed paragraph must stop acceptance")
         XCTAssertEqual(box.entries.count, 1, "only the first case was accepted")
     }
+
+    // MARK: the page the person is working on (Solve and send)
+
+    /// A page whose prompt goes away when "I Agree" is pressed, as on a real site.
+    private let vanishingGate = gatePage.replacingOccurrences(of: "<button id=\"agree\" onclick=\"", with: "<button id=\"agree\" onclick=\"document.getElementById('gate').remove();")
+
+    private func liveBlockers(_ policy: TermsPolicy?, html: String? = nil) async throws -> [AssistedBlocker] {
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html ?? gatePage)
+        let page = WebAssistedPage(session: session, plan: FillPlan(values: [], verdict: .ready))
+        page.termsPolicy = policy
+        return await page.blockers()
+    }
+
+    func testTheSolveAndSendPageAcceptsAPromptOnlyWhenThePolicySaysAccept() async throws {
+        let accepting = RecordingPolicy(.accept(paragraphs: 2, libraryVersion: 7))
+        let blockers = try await liveBlockers(accepting, html: vanishingGate)
+        XCTAssertFalse(blockers.contains(.terms), "the prompt was accepted, so nothing is left for the person")
+        XCTAssertEqual(accepting.acceptedCalls.count, 1, "and it was logged once")
+    }
+
+    func testTheSolveAndSendPageLeavesThePromptToThePersonInEveryOtherCase() async throws {
+        for decision: TermsDecision in [.notApproved(paragraphs: 2), .unreviewed(count: 1), .excluded(flags: ["automation"]), .nothingToJudge] {
+            let policy = RecordingPolicy(decision)
+            let blockers = try await liveBlockers(policy)
+            XCTAssertTrue(blockers.contains(.terms), "\(decision) leaves the prompt for the person")
+            XCTAssertTrue(policy.acceptedCalls.isEmpty)
+        }
+        let none = try await liveBlockers(nil)
+        XCTAssertTrue(none.contains(.terms), "with the setting off the person always accepts")
+    }
 }
 
 @MainActor
@@ -119,15 +150,19 @@ final class TermsSettingsTests: XCTestCase {
                         termsLibraryURL: url, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
     }
 
-    func testTheShippedLibraryReviewsNothingSoTheAppNeverAcceptsAnything() throws {
+    func testTheShippedLibraryIsReviewedButNothingIsAcceptedUntilThePersonAllowsIt() throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         XCTAssertGreaterThan(m.termsLibrary?.paragraphs.count ?? 0, 100)
-        XCTAssertEqual(m.termsReviewedCount, 0)
-        m.approveTerms()                       // refused: nothing has been reviewed
-        XCTAssertNil(m.termsApproval)
+        XCTAssertGreaterThan(m.termsReviewedCount, 0, "the owner approved the list, so the switch can be turned on")
+        XCTAssertNil(m.termsApproval, "it is off until the person allows it")
         XCTAssertFalse(m.termsActive)
         XCTAssertNil(m.makeTermsPolicy())
+        m.approveTerms()                       // the person taps Allow
+        XCTAssertTrue(m.termsActive)
+        XCTAssertNotNil(m.makeTermsPolicy())
+        m.revokeTerms()
+        XCTAssertFalse(m.termsActive); XCTAssertNil(m.makeTermsPolicy())
     }
 
     func testApprovalTurnsItOnAndRevokingTurnsItOff() throws {

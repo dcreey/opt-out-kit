@@ -7,141 +7,161 @@ paragraphs:
     kinds: [privacy, prompt, terms]
     flags: []
     prefix: "important note: this website is not affiliated with"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 02884a6c4be06495
     sites: 38
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "a tracking cookie helps us improve the effectiveness"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0720da066207e5b7
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "we may make changes to our terms of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0bf846fa136f421f
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "if you send unsolicited information, ideas, comments or"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 281ecb785cdd0b02
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "a session id cookie enables you to navigate"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 360ac2e79ad1f11b
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "our editorial review policies strive to maintain a"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3a6a39f05b9915c1
     sites: 38
     kinds: [terms]
     flags: [data_sharing]
     prefix: "we are not responsible for information or for"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4593e5f66fd8b8f6
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "please do not hesitate to contact us at"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 48357d2a9fd10d02
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "nothing electronic is 100% secure; even though we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 49dc2139923b2708
     sites: 38
     kinds: [terms]
     flags: [data_sharing]
     prefix: "we may receive compensation from advertisers, service providers,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 58e917bcf616b8b3
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "if you follow a link from our website"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5a262a0ac8d7b3e6
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "we do not knowingly collect information from anyone"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5ff742ffce747de3
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "if you think that content on our website"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 65fab629f84075bb
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "we invite you to enjoy our site and"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7d65224050632850
     sites: 38
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "if you provide us with personal information, such"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 822658037a33329b
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "when you visit this website, your visit implies"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8ce8e87e9d62d0c1
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "when you visit this website, your visit implies"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8fafaa80d605a912
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "our privacy policies are part of our terms"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: acf36e305641b305
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "all content on this website is protected by"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ae7c794465248525
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "in order to improve the usability of our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b5e8851b2be78e56
     sites: 38
     kinds: [privacy]
@@ -154,57 +174,65 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we may make changes to our privacy policies"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: be55110462ae5418
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "please do not hesitate to contact us at"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bebd516df0785385
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "the content on this site is provided \"as-is,\""
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c91203795a3ac5ad
     sites: 38
     kinds: [terms]
     flags: [data_sharing]
     prefix: "advertisements, announcements and information on our website may"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c9814b3458629a25
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "you can choose not to accept cookies by"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: cf05dbeea841ad3d
     sites: 38
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "we, our advertisers and/or service providers may place"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d172039fa82ddf37
     sites: 38
     kinds: [terms]
     flags: []
     prefix: "we are in no way liable for any"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ef41fb319e06b14a
     sites: 38
     kinds: [privacy]
     flags: []
     prefix: "information we collect on our website may be"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ef45be84211a1c51
     sites: 38
     kinds: [terms]
@@ -217,8 +245,9 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "we offer our website services to you, provided"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: fd28cd55f0ea012b
     sites: 37
     kinds: [privacy, prompt, terms]
@@ -231,57 +260,65 @@ paragraphs:
     kinds: [privacy, terms]
     flags: []
     prefix: "right to delete: request the removal of your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 15be9350e2944053
     sites: 33
     kinds: [privacy, terms]
     flags: []
     prefix: "i am an authorized agent submitting this request"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3ed8463628a53b2b
     sites: 33
     kinds: [privacy, terms]
     flags: []
     prefix: "pursuant to applicable state data privacy laws, you"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 74c372f537e5de33
     sites: 33
     kinds: [privacy, terms]
     flags: []
     prefix: "please fill out the form to submit your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 848619dd0eb64f14
     sites: 33
     kinds: [privacy, terms]
     flags: []
     prefix: "right to know: find out what personal data"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d98d381b580cff73
     sites: 33
     kinds: [privacy]
     flags: []
     prefix: "welcome to our website: {domain} (hereinafter: \"the site\""
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: eaf382b12a27a575
     sites: 33
     kinds: [privacy, terms]
     flags: [data_sharing]
     prefix: "right to opt out: request that we do"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b9ea6eb954010cce
     sites: 31
     kinds: [privacy, terms]
     flags: []
     prefix: "you can also submit your privacy request via"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 593951b69e7cc8d4
     sites: 29
     kinds: [privacy, terms]
@@ -294,50 +331,57 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "4. the address, telephone number, and e-mail address"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d47a904a580be8df
     sites: 23
     kinds: [terms]
     flags: []
     prefix: "5. a statement from the owner, made under"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 215cd494df96f37c
     sites: 15
     kinds: [terms]
     flags: []
     prefix: "the address, telephone number, and e-mail address of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: dbe2fb7166767742
     sites: 15
     kinds: [terms]
     flags: []
     prefix: "a statement from the owner, made under penalty"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0138f1938a0883c4
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "non-identifiable (i.e, anonymous) information is collected from all"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 01ed50891f660d59
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "the information received from us via any channel"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 05babf3ca5f36d8c
     sites: 4
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "several features and services of this website require"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 1a9a7f9df9868699
     sites: 4
     kinds: [terms]
@@ -357,8 +401,9 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "if you find any content or information on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 1fc9e29425a60bd9
     sites: 4
     kinds: [privacy]
@@ -371,127 +416,145 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "any information received by us, this includes comments,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2a90193ab66a8cc9
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "we do not assume any warranties/guaranties pertaining to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2aa40022f9215cef
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "you also agree to not use this website,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2dcf8312d4d2d616
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "as the owners and operators of this site,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 31d820a343db7b89
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "hence, we are not liable for any damages/losses"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 35d5e706f37570cf
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "by using this website and/or any of its"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4295b18bb621e23c
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "when our users click on ad banners and"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4342c480d94935ae
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "also, we do not assume any responsibility, whether"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 43521ffc6744e13c
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "all content on the website is offered \"as-is\""
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4783098342e69647
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "a statement claiming ownership of the material and"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4a4128590a8c874f
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "you agree to not use any of this"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4b3b203de484af3e
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "our site will redirect you to third-party websites"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4e41ca40a754c978
     sites: 4
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "tracking cookies: as their name suggests, these files"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4e54a646cfe0b92a
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "as the user of this website, you have"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 59c5f90afbd36d5e
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "we are happy to have you're here with"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 631557fc820dd9b5
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "the above-implied consent to indemnity also applies to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7bb9d638c2ebbebb
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "we and our partners cannot be held liable"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 80a1194d4d0b0dd1
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "our editorial team follows a meticulous process to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8aea3337a0843dfd
     sites: 4
     kinds: [privacy]
@@ -511,218 +574,249 @@ paragraphs:
     kinds: [terms]
     flags: [data_sharing]
     prefix: "you are exclusively liable for any losses that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 97f459348935280c
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "by visiting and/or using this site, you accept"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 99d4894a166c91d8
     sites: 4
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "when you share your contact details with us,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9c6e053f62444ee1
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "the users are also wholly and exclusively responsible"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9d7be45fdbfdb358
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "as such, the local laws of these countries"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ab66f7796626f380
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "you have the right to use this website"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ae86ef6c30ea3edf
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "contact details of the copyright owner, including the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ae97dd0a956c2e0f
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "session id cookies: these help you to better"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bc118c31c703aa47
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "we reserve the right to change this document"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c2fdc674d8b9b154
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "if you do not agree with any of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c6c8a3ea4c541d6b
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "all information on this site is offered without"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ccd4cffa7adb1256
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "welcome to our website: {domain} (hereinafter termed as,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ce385dce4f7489b5
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "we do not support, condone or commit spam"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d3c64a8a2dbfcd1a
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "the owners of this site do not offer"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ddd4416231a1185c
     sites: 4
     kinds: [terms]
     flags: []
     prefix: "the privacy policy of this website is a"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: de4558f6deaa64ff
     sites: 4
     kinds: [privacy]
     flags: []
     prefix: "we have state-of-the-art network security programs in place"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e0e7d5670be56e74
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "all our content is copyrighted. furthermore, the content"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e1fd29acb6bf86cf
     sites: 4
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "we exercise no control over the policies nor"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f5b5bddf713ef214
     sites: 4
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "this site, its affiliates and its advertisers use"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: fb78bedf9fca9f9a
     sites: 4
     kinds: [terms]
     flags: [data_sharing]
     prefix: "the owners of this site are not responsible"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3781df667933c43f
     sites: 2
     kinds: [privacy]
     flags: []
     prefix: "for further questions and clarifications pertaining to our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4fef3b7c2b0c48a7
     sites: 2
     kinds: [privacy, terms]
     flags: []
     prefix: "a link to a county or state records"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 925af0d9dca1a5a6
     sites: 2
     kinds: [privacy]
     flags: []
     prefix: "find {state} on facebook connect {state} on google"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b445b0e64c7b0e7f
     sites: 2
     kinds: [terms]
     flags: []
     prefix: "in case of any questions pertaining to this"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: cb9dc1101381a72a
     sites: 2
     kinds: [privacy]
     flags: []
     prefix: "for further questions and clarifications pertaining to our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: dae13931930f6bef
     sites: 2
     kinds: [terms]
     flags: []
     prefix: "in case of any questions pertaining to this"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 01c32f73c7ce4663
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we endeavor to respond to a verifiable consumer"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 032c0406bd22ad34
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "indirectly from you. for example, from observing your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 03bcfb89742c2040
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "if the ability to accept cookies is disabled,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 03c7a705d5cbe46d
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: record retention schedules determine which records need"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0508206e8ac0734f
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "you may only make a verifiable consumer request"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 06d0d826def5f53d
     sites: 1
     kinds: [privacy]
@@ -742,85 +836,97 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "to provide you with information, products, or services"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 07dbeaada5d6dd71
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "you can also submit your privacy request via"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 085add7df82e039a
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "{domain} would not operate were it not for"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 09a259ea08f0a23e
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the email address, telephone number and the address"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 09aed3f49c752099
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "https://{domain}/ is committed to protecting your privacy online."
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0a4ebf85275b084d
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "to help us track down the issue quickly,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0b5f8e27c184fe04
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "we are offering you the services available on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0c06dc9c3ef644e2
     sites: 1
     kinds: [privacy, prompt, terms]
     flags: []
     prefix: "this website receives compensation for its recommendations. at"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0c68bb465ab3f6db
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: parties involved in court filings should limit"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0c6b95ca560c3460
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "at times, we use certain anonymous or non-identifiable"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0d23d127b2c8a88c
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "parties involved in court filings should be cautious"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0dbdc69af3b1248b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "requests for public records can be made through"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 0f80f5d6b6e7ea66
     sites: 1
     kinds: [privacy]
@@ -840,36 +946,41 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "we share your personal information with the following"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 116b7b6881601e8d
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "welcome to {domain}, hereafter referred to as the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 11b2ea537e9c45de
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "visiting our site and the usage of our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 13a0bcc94d2605e9
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "important note: this is a private site which"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 13d86f99ef095544
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "a statement by the copyrighted material's owner, given"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 169508c50f333724
     sites: 1
     kinds: [privacy]
@@ -896,36 +1007,41 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "q: what should i do to protect my"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 1853a6dec9b9b40c
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "a phone number, mailing address, or office hours"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 18ef206eb99acd34
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "except as otherwise described in this privacy statement,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 18f029b6acb379f4
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the categories of sources for the personal information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 190028ba788c80fa
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "in particular, website has collected the following categories"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 19350481f03737f2
     sites: 1
     kinds: [terms]
@@ -938,22 +1054,25 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "making a verifiable consumer request does not require"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 1a42b07bde4cb1f2
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "{domain} welcomes you to use the services provided"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 1c45f8e064b09597
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "{domain} contains numerous links to outside sites. users"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 20879a2b9948a2b7
     sites: 1
     kinds: [privacy]
@@ -966,64 +1085,73 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "we will not sell your personal information to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 21ac230c66ff88d9
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "q: do public entities have to respond to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 225eda2ceb419fb6
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "the announcements, advertisements or information available on our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 22c8fb95c19ca660
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to provide you with support and to respond"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 22dad09fd53817bf
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "this site strives to make users' experiences easy"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 23dd88cbd7bf443c
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: maintaining privacy is important for business owners"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 24969feee3081754
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "further, our site and site owners assume no"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 265dba9e8fce3d54
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "make other internal and lawful uses of that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2674a46e23b94456
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "if you feel that any content on our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 26b1506bd3c2f709
     sites: 1
     kinds: [privacy, terms]
@@ -1036,8 +1164,9 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "the site and any of its service providers"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 28d4ff9b98b6f73a
     sites: 1
     kinds: [terms]
@@ -1064,85 +1193,97 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "by visiting our site, you have impliedly agreed"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 297f9e3467cf8317
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "we may disclose your personal information to a"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 299a47d6b278ae07
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the site may operate in any number of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 29a2343e3dd1c708
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "adhering to redaction rules and protecting sensitive information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 29dddb86891f1f5f
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we will deliver our written response by mail"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2a2d8f2d9bd5bb56
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we will not discriminate against you for exercising"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2a359f2e07841574
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "can i leave the state of {state} if"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2ae22de0c6615d5f
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "arrest records in {state} can be a public"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2ae5cc44b4505ee7
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "welcome to our website: https://{domain}/ (hereinafter: \"the site\""
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2c2a57c120a386a7
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "this privacy notice for {state} residents supplements the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2c3b53a6d5db2e85
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the review policies used by our editors strive"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2cb811e993188258
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the site endeavors to present only accurate and"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 2eb9b13af0f99cd8
     sites: 1
     kinds: [privacy]
@@ -1155,15 +1296,17 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "welcome to {domain}! **explore** our privacy statement to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 314e107bec192c4c
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the privacy policy of {domain} is always available"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 316227c17a68a969
     sites: 1
     kinds: [terms]
@@ -1176,71 +1319,81 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "you will be able to navigate through our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 337bbf45dfdcee99
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "a tracking cookie might be placed on your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 33d1eda94ccafc6e
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "a sworn statement by the alleged owner of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3449960885e0ed92
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we will not collect additional categories of personal"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 352f73c70280f624
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "alterations to our privacy policy come into effect"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 352f7510ef1878cf
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "you have the right to request that we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 36b17d9251f3495e
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "our site is not responsible for any losses,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 36fc71f666228b5b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "q: is the clerk of the court responsible"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 381029d314e5619f
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "with the help of the tracking cookie we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3b6bc17062208a42
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "in case if you send {state} unsolicited ideas,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3bb996740642931a
     sites: 1
     kinds: [privacy]
@@ -1253,43 +1406,49 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "record retention policies determine which records are retained"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3cbb2ed3930f5e97
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "with the help of your internet browser settings"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3cfe35759160a36b
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "{state}: privacy concerns in arrest records - what's"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3e9bd2605fdc345d
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "the site fully appreciates the importance of all"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3eaabc6fddb581f4
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "describe your request with sufficient detail that allows"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3ee7680599e96661
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "as described to you when collecting your personal"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 3f4f123c89cc5e91
     sites: 1
     kinds: [privacy]
@@ -1302,50 +1461,57 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "every report submitted through this form comes directly"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 42edb28321d0aeda
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "please feel free to get in touch with"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 433c9fa1e965de93
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we may deny your deletion request if retaining"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 461b912cb4c9b936
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "complete the transaction for which we collected the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 46ada928aca1cec8
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we reserve the right to modify this privacy"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 482498b9d90a58cb
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "we welcome you to utilize the services offered"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 48d815c0e4e5dff5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "k. inferences drawn from other personal information. profile"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 48fdaa7c63554f3e
     sites: 1
     kinds: [privacy]
@@ -1358,15 +1524,17 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "residents of {state} have the right to be"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4946e28ae7fb2b50
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "users should not assume that any link contained"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 49ba476222a947db
     sites: 1
     kinds: [privacy]
@@ -1379,8 +1547,9 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "all the responsibilities or liabilities for damages caused"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4cfbbfa1ad2b0f7b
     sites: 1
     kinds: [privacy]
@@ -1393,78 +1562,89 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we reserve the right to amend this privacy"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4ea742e3dc27ed48
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{domain} is a privately owned and for-profit entity"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4eecc4b703f79468
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the alleged copyright owner's contact information, including, if"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4f9818b703b4014a
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the content available on this website is provided"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4fa00880de531b09
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to exercise the access, data portability, and deletion"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 4fb1dc175a05ca44
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "furthermore, {state} has established comprehensive guidelines that outline"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 51994612a1888a50
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "at any time, and without any prior notice"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 523274be005d0275
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to the extent that we can delete your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 526a527101a50167
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "thanks for stopping by {domain}. every visitor should"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 53044d770ed6278d
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "{state}'s \"shine the light\" law (civil code section"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 53c7f4bc357ab2c5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to exercise the access, data portability, and deletion"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 53c87d11e47e12c7
     sites: 1
     kinds: [privacy]
@@ -1477,8 +1657,9 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "another cookie utilized by the site is the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 54575da0e638f243
     sites: 1
     kinds: [privacy]
@@ -1491,15 +1672,17 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "users are not obligated to accept cookies of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 55ace93a91bbbbdb
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "feel free to contact {state} at any time"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 55db8dc674d45be2
     sites: 1
     kinds: [privacy]
@@ -1519,36 +1702,41 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we cannot respond to your request or provide"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 585351738d16e24e
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "if you are trying to have a {state}"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 58dfa3ab608d5667
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "it's worth noting that public entities are not"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5996c6a7a8ab2b27
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the ccpa provides consumers ({state} residents) with specific"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5a260e00d3d136e5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: requests for records can be made through"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5a737b6b44d948da
     sites: 1
     kinds: [terms]
@@ -1561,57 +1749,65 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "{state}'s public records laws aim to balance access"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5af74b6b72463d68
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "we strive to maintain the highest levels of"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5b6b505287be22ed
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the data offered on this site is accessed/assimilated"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5bd436cc1be68999
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "when making a request for public records, you"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 5c82d0b6cf151880
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "you have the right to request that we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 61008d1d7edb5348
     sites: 1
     kinds: [privacy, prompt, terms]
     flags: []
     prefix: "this website and its parent company are privately"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6163afc5e7b928ce
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "should you provide {state} with personal information including"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 62ca376d91b5bfc8
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "if you give {state} any of your personal"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6405743e9d1e077c
     sites: 1
     kinds: [privacy, prompt, terms]
@@ -1624,57 +1820,65 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "explore our site and have a blast during"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6604ca6a0588b64a
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "the site's users assume complete liability and acknowledge"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 66102c69964d24df
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "d. commercial information. records of personal property, products"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 669667d1c88730a0
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "information excluded from the ccpa's scope, like certain"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 67043d12331d5fa8
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a records search tool or court portal that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 68cabb8d232785ba
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "at any time and without notice we may"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 699233e2178dac87
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: no, refraining from including protected information in"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 69a8a12bba1d085a
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "this site is not owned, operated or connected"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6a336de839f633ba
     sites: 1
     kinds: [terms]
@@ -1687,29 +1891,33 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "the categories of third parties with whom we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6d9397a3095ba85e
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "all the information collected through our website could"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6da4ba901cb122c5
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "**rightful use:** use this site lawfully. each user's"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6dccd13a21fa6fa8
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "https://{domain} is committed to protecting your privacy online."
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 6ebd6fbbf23a4849
     sites: 1
     kinds: [privacy]
@@ -1722,50 +1930,57 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we will only use personal information provided in"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 70c8e83e4d153a33
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: when a public entity receives a request"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 723b0dbf8f63ba5b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{state}'s llcs offer privacy advantages, while c-corps do"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 72632b847316bc75
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "a tracking cookie enables {state} to make our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 76cbb7bdf818ae55
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "comply with the {state} electronic communications privacy act"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 77f07f1ae05ffece
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "when filing documents in court, it is crucial"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7822961ee21d89d6
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "you have the right to request that we"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 78473025099d263e
     sites: 1
     kinds: [privacy]
@@ -1778,78 +1993,89 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "the email address, phone number and mailing address"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7a5518e84e6f7b6a
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "your visiting of our site implies that you"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7acc8b5e2c5da048
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "furthermore, many items contained within this site may"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7e33ebc24fbabb75
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "this site is neither owned nor affiliated with"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7e6f6e94f97241f6
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "information shared or passed electronically is never 100%"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 7f89c3a651c0f130
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "disclosures for a business purpose, identifying the personal"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8022fd505bedecf0
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "you may only make a verifiable consumer request"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 802ed8390fde5e8e
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: {state}'s public records laws allow individuals to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 81f3fe287b62a649
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "we will not be responsible for any loss,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 820c62a1f3bfc7a8
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "if your goal is to have an {state}"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8242a0ec5bd9887a
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "welcome to our website: {domain}(hereinafter: \"the site\" \"our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 82971ec33eede6b7
     sites: 1
     kinds: [terms]
@@ -1862,8 +2088,9 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "information on our site that conflicts with what"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 84f59eb7c63a353a
     sites: 1
     kinds: [terms]
@@ -1883,29 +2110,33 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we obtain the categories of personal information listed"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 86143c81eb3f4468
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "user with questions or comments about the {domain}"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 870cd58f93bbffe4
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "f. internet or other similar network activity. browsing"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 879a1fdf1f7b9438
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "privacy laws and guidelines exist in {state} to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 87e0f7a8bee5fba6
     sites: 1
     kinds: [privacy]
@@ -1918,15 +2149,17 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "we might alter the policies of our service"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 89decaeebd1301ad
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "if you have any questions or comments about"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 89fcd8edc29372de
     sites: 1
     kinds: [terms]
@@ -1939,50 +2172,57 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "we genuinely appreciate every report. accurate public-records information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8bd91c4755a94dfb
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{state} residents have legitimate concerns about the privacy"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8df2334e1ef3c6ca
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "a tracking cookie might be placed on your"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8e103e6c33dba948
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: no, {state} llcs are not required to"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8ecb09fe35552da9
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: no, {state} c-corps do not enjoy the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 8faff27f72d33cd5
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "if in case you feel that the content"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 90ab83e4010239ca
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{state}'s public records laws aim to balance the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 90e3d3b0cfeccb1e
     sites: 1
     kinds: [terms]
@@ -1995,8 +2235,9 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "we genuinely appreciate every report we receive. accurate"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 91dd13ffa7051150
     sites: 1
     kinds: [privacy, terms]
@@ -2009,15 +2250,17 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "a: public entities are not obligated to respond"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 98d517bcb52ae146
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a typo, a confusing instruction, or a step"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9a1eebb4b6a36371
     sites: 1
     kinds: [privacy, terms]
@@ -2030,15 +2273,17 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "c. protected classification characteristics under {state} or federal"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9cc35377737e5270
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we assume no liability or obligations for the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9cd8b11052143cb9
     sites: 1
     kinds: [privacy]
@@ -2051,29 +2296,33 @@ paragraphs:
     kinds: [privacy, terms]
     flags: []
     prefix: "what are the rights of a person during"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9dbdcaaf40361150
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "j. non-public education information (per the family educational"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9e5b7d1fb6bbdda0
     sites: 1
     kinds: [privacy, terms]
     flags: [data_sharing]
     prefix: "any advertisements, announcements or other information available on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9ebf82a78ca4625a
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "no information is purposefully collected on this website"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: 9fac1df86fc846e6
     sites: 1
     kinds: [privacy]
@@ -2086,22 +2335,25 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "when involved in court filings, it is crucial"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a09039c9a5b1ede7
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "at times, without prior notice, the site may"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a0d132eb6f2910dc
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to serve your best interests and to provide"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a1776f348b379486
     sites: 1
     kinds: [privacy, terms]
@@ -2121,99 +2373,113 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "https://{domain}/ uses commercially reasonable managerial and technical safeguards"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a5e10799a757681d
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "users acknowledge that with any visit to {domain},"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a6f0a26f46239550
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "by using {domain}, users evidence an implied consent"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a797a2898258baa2
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "to help us fix the issue quickly, include"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a7dbe2c8d80bb88a
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "to help us fix the issue quickly, include"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a8736781048a2ddb
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we may use or disclose the personal information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a92132aa7e258b1d
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "we are in no way responsible for the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: a9498fb3cf754762
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the specific pieces of personal information we've collected"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: aa89b2f505fc6527
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we use cookies, clear gifs, and log file"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ac8879ac12beda45
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "when you visit https://{domain}/, we may send one"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: acbe296933a344fc
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "when making a request for public records in"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: aff90671a5d750cc
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "this site and its contents are copyright protected."
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b16f0aee581fb0dc
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: no, {state} does not have income tax"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b1f262c480496dea
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "for further clarification of the {domain} privacy policy,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b70375b26eb967e8
     sites: 1
     kinds: [terms]
@@ -2233,43 +2499,49 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "to evaluate or conduct a merger, divestiture, restructuring,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b9e152a823cfa72b
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "you can read our privacy policies for our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: b9fb00f02f56448c
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "information on our site that conflicts with what"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ba38dbd21edb1c31
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "if you have any questions about this privacy"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bb0df1d227c20f97
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "as such, the site cannot be held accountable"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bb6bf2c77a70c5f5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "provide sufficient information that allows {state} to reasonably"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bcca11ff59c64518
     sites: 1
     kinds: [terms]
@@ -2282,29 +2554,33 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "sales, identifying the personal information categories that each"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bd789bc57d6700bf
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "in order to better serve the visitors on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: be41da2f95a7a720
     sites: 1
     kinds: [privacy, terms]
     flags: []
     prefix: "can you pass a background check with a"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: be4faa07729a72ad
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "debug products to identify and repair errors that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: bf175c86a19408f1
     sites: 1
     kinds: [terms]
@@ -2317,43 +2593,49 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "suggest that you may receive a different price"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c5e11cdc937abf92
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "**welcome to our website: {domain} (hereinafter: \"the site\""
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c7c88734b1ef3fd9
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "greetings! welcome to **{domain}** (referred to as \"the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: c82acdfd407bfadc
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "users who believe that there is a copyright"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: caa37759696ae70d
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "a phone number, mailing address, or office hours"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: cab0d4c5c0e66c1c
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we might need to make changes to our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: cb99e66e166a785f
     sites: 1
     kinds: [privacy]
@@ -2366,120 +2648,137 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "an essential element of the agreement between the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: cc90228ecf25cec7
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "welcome to our site, https://{domain}/. please review our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ced788e79e953a12
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "information that conflicts with what you found on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d05b9cc443dbe494
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "our business or commercial purpose for collecting or"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d30addb7b4eb6b93
     sites: 1
     kinds: [privacy, terms]
     flags: [data_sharing]
     prefix: "the site receives compensation from third parties for"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d6ab480059ae2ccf
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "your visitation and usage of our site is"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d6d9710ba1610246
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "we do not undertake any warranties towards the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d6f8eadfbe4c9232
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: protected information includes personal data such as"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d7f3116e0052e56f
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "you can also submit your privacy request via"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d80f51035f66c92e
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to protect your privacy further, it is essential"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: d862704e580d55ae
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "any disclosures we provide will only cover the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: da20580e6fc61d05
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "protected information, such as financial account numbers or"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: db2409f37def6740
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "detect security incidents, protect against malicious, deceptive, fraudulent,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: dd5cb6d97ac00dee
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "e. biometric information. genetic, physiological, behavioral, and biological"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: dec9fa5783c22f21
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "all the contents of this site are copyright"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: df832852162af97c
     sites: 1
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "this site has its own terms of service"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e26d1b03b383071b
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "when users submit any information to this site,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e299e9e7ecb0552f
     sites: 1
     kinds: [privacy]
@@ -2492,22 +2791,25 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "when it comes to data security, {state} has"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e347649f323222d0
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: {state} llcs do not have to disclose"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e3ab14ef7d3d7c48
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "q: are {state} llcs required to disclose the"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e3eec4abc4e68c31
     sites: 1
     kinds: [terms]
@@ -2520,57 +2822,65 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "disclaimer of warranties and limitation of liability: this"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e434032ea6a56a4a
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a: more information about record retention policies can"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e448de32fdbbab6b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "h. sensory data. audio, electronic, visual, thermal, olfactory,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e470e341db385b1b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "indicates the natural person(s) or legal entity that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e47efe2a4f2b6746
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "if we sold or disclosed your personal information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e5acc60d33b10e8f
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "we genuinely appreciate every report. accurate public-records information"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e78555dd2a97cb53
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "in case if you are transferred to another"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e797caa9044aaf51
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "all content included and found on this site,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e80ff7fdf9451665
     sites: 1
     kinds: [privacy]
@@ -2583,57 +2893,65 @@ paragraphs:
     kinds: [privacy, terms]
     flags: []
     prefix: "home privacy term of use contact login {state}"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e918ca67bf1ac05f
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "what we cannot do is change, remove, seal,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e93fe1f50f5917e5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "all internet users must note that {domain} takes"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: e99d1208dbba2659
     sites: 1
     kinds: [terms]
     flags: [data_sharing]
     prefix: "we might receive commission or compensations from our"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ea130b201fdffc43
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "you may only use the services offered on"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ec698b5875cae76b
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "what we cannot do is change, remove, seal,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ec6f77d0d932524a
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "welcome to {domain} ( hereinafter referred to as"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: ecc5e911682fa198
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{state} has implemented strict privacy laws and guidelines"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: edea48b4491eeb62
     sites: 1
     kinds: [privacy]
@@ -2646,29 +2964,33 @@ paragraphs:
     kinds: [privacy]
     flags: [data_sharing]
     prefix: "your personal information is protected. we do not"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f07912e512f0ac4f
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "protecting personal information is crucial for both individuals"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f18fa559724a7656
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "please feel free to contact {state} anytime if"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f192bec2e1cc497e
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "the {state} consumer privacy act of {year} (\"ccpa\")"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f31eb6da125775f2
     sites: 1
     kinds: [privacy]
@@ -2681,8 +3003,9 @@ paragraphs:
     kinds: [privacy, terms]
     flags: []
     prefix: "can you fly out of state with a"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f4b766f78fefb6d8
     sites: 1
     kinds: [privacy, terms]
@@ -2695,36 +3018,41 @@ paragraphs:
     kinds: [terms]
     flags: []
     prefix: "a link to a county or state records"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f534737d6b0a0588
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "directly from you. for example, from forms you"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f57a1f83826ab544
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "what we cannot do is change, remove, seal,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f59a9b8eed797de5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "{state} residents have the right to request that"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f6d020f31ae4afb5
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "a. identifiers. a real name, alias, postal address,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f6ec2197037cbda2
     sites: 1
     kinds: [terms]
@@ -2737,36 +3065,41 @@ paragraphs:
     kinds: [privacy]
     flags: []
     prefix: "the website collects information that identifies, relates to,"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f91bcbbc1a8c463f
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "to fulfill any other purpose for which you"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f927de737f8fe55c
     sites: 1
     kinds: [terms]
     flags: []
     prefix: "a statement by the owner, under the penalty"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: f93fa3badc514876
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "when involved in court filings, parties should be"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: fd594611cfe76976
     sites: 1
     kinds: [privacy]
     flags: []
     prefix: "record retention schedules are necessary in determining which"
-    reviewed: false
-    verdict: null
+    reviewed: true
+    verdict: ok
+    reviewer: "owner blanket approval 2026-11-01"
   - hash: fec9b740a335ddc3
     sites: 1
     kinds: [privacy]

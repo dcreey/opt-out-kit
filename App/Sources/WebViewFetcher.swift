@@ -123,6 +123,16 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
 
     // MARK: Terms prompts
 
+    /// For a page the person is working on: when the person allowed it and every paragraph of the prompt and its terms pages is on the reviewed list,
+    /// presses "I agree" and logs it. Anything else leaves the prompt for them. True when the button was pressed.
+    func acceptTermsIfAllowed(policy: TermsPolicy?, domain: String) async -> Bool {
+        guard let policy, let gate = await findTermsGate() else { return false }
+        guard case .accept(let paragraphs, let version) = await policy.decide(domain: domain, prompt: gate.prompt, documentLinks: gate.links), await clickAgree() else { return false }
+        await policy.accepted(domain: domain, paragraphs: paragraphs, libraryVersion: version)
+        await settle(maxWait: 8)
+        return true
+    }
+
     private static let gatePattern = #"acceptable use policy|by clicking [“"']?i agree|i agree.{0,120}(terms|policy)|accept (the )?terms|you must agree|j'accepte.{0,120}(conditions|politique)|accepter les conditions|acepto.{0,120}(términos|condiciones|política)|aceptar los términos|ich stimme.{0,120}(bedingungen|datenschutz)|nutzungsbedingungen akzeptieren"#
 
     /// The prompt text (the smallest element that holds the gate wording) and the same-site terms and privacy pages it links
