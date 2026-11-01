@@ -19,14 +19,38 @@ protocol GuidedPage: AnyObject {
     func close()
 }
 
-extension GuidedPage { func scanAndFill(person: Person) async -> Int { 0 } }
+extension GuidedPage {
+    func scanAndFill(person: Person) async -> Int { 0 }
+    /// Who the guide is for, so a page can find and fill their form the same way Solve and send does.
+    func use(person: Person) {}
+}
 
 @MainActor
 final class WebGuidedPage: GuidedPage {
     private let session = WebViewSession.make()
     private var shown: WKWebView?
+    private var person: Person?
+    /// The page as Solve and send sees it (`WebAssistedPage`): for a site with no form of its own to follow, the guide finds, fills and sends with that same code.
+    private var live: WebAssistedPage?
+    private var liveFor: URL?
 
     var webView: WKWebView? { shown ?? { shown = session.presentable(); return shown }() }
+
+    func use(person: Person) { self.person = person }
+
+    /// Test hook: shows this page instead of loading an address.
+    func loadHTML(_ html: String) async { try? await session.loadHTML(html); await session.settlePage(maxWait: 3) }
+
+    private func livePage() async -> WebAssistedPage? {
+        guard let url = session.webView.url else { return nil }
+        if let live, liveFor == url { return live }
+        guard let person else { return nil }
+        live = nil; liveFor = url
+        let driver = WebAssistedDriver(person: person, advertisingID: nil, termsPolicy: nil)
+        let stand = OptOutForm(page: url, method: "post", action: nil, fields: [], hops: 1)
+        live = await driver.prepareLoaded(session: session, form: stand, plan: FillPlan(values: [], verdict: .ready), keepOpenWithoutForm: true, advanceOnlyWithoutForm: true) as? WebAssistedPage
+        return live
+    }
 
     func load(_ url: URL) async {
         try? await session.load(URLRequest(url: url))
@@ -36,10 +60,18 @@ final class WebGuidedPage: GuidedPage {
 
     func currentURL() -> URL? { session.webView.url }
     func visibleText() async -> String { await session.visibleText() }
-    func fill(_ values: [FieldValue]) async -> Int { await session.fillFields(values) }
-    func scanAndFill(person: Person) async -> Int { await session.scanAndFill(person: person) }
+    func fill(_ values: [FieldValue]) async -> Int {
+        if let live, liveFor == session.webView.url { await live.refill(); return live.lastFill.filled }
+        return await session.fillFields(values)
+    }
+    func scanAndFill(person: Person) async -> Int {
+        self.person = person
+        if let page = await livePage() { return max(page.lastFill.filled, 0) }
+        return await session.scanAndFill(person: person)
+    }
 
     func blockers() async -> [AssistedBlocker] {
+        if let live, liveFor == session.webView.url { return await live.blockers() }
         var out: [AssistedBlocker] = []
         if await session.hasTermsPrompt() { out.append(.terms) }
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
@@ -48,6 +80,22 @@ final class WebGuidedPage: GuidedPage {
     }
 
     func send(_ values: [FieldValue]) async -> SubmitOutcome {
+        if let live, liveFor == session.webView.url {
+            // The same read of a send as every other flow: forms that follow each other, a form's next step, a check the person has to clear.
+            var sentEmail = false, sent = false
+            for _ in 0..<6 {
+                await live.refill()
+                switch await PageFlow.sendOnce(live) {
+                case .sent(let email, let more): sent = true; sentEmail = sentEmail || email; if !more { return .submitted(awaitingEmail: sentEmail) }
+                case .nextStep: continue
+                case .handToPerson: return .challenged("a reCAPTCHA that \(PageFlow.rejectedMarker)")
+                case .checkAppeared(let why): return sent ? .submitted(awaitingEmail: sentEmail) : .challenged(why)
+                case .notConfirmed(let answer): return sent ? .submitted(awaitingEmail: sentEmail) : answer
+                case .dryRun: return .filledNotSubmitted
+                }
+            }
+            return sent ? .submitted(awaitingEmail: sentEmail) : .failed("the form did not finish")
+        }
         guard await session.pressSubmit(for: values) else { return .failed("no submit button found") }
         await session.settlePage(maxWait: 20)
         if let why = await session.visibleChallenge() { return .challenged(why) }
@@ -84,6 +132,8 @@ final class GuidedRunner: ObservableObject {
     /// Asked when the send step comes up: whether to press the page's own button. The screen sets it from the person's checkbox.
     var autoSubmit: () -> Bool = { true }
     private var manualBaseline: String?
+    /// The page's bot check refused a scripted press: from here the person presses the page's own button.
+    private var forceManual = false
     private let onSent: (AutoOptOutResult) -> Void
     private let onIssue: (IssueKind) -> Void
     /// Looks for the site's current opt-out page when the recorded one is gone. Nil means healing is not available.
@@ -104,6 +154,7 @@ final class GuidedRunner: ObservableObject {
         self.flow = f; self.siteName = plan.siteName; self.person = person; self.fillValues = fillValues
         self.page = page; self.onStepCompleted = onStepCompleted; self.onSent = onSent; self.onIssue = onIssue; self.healer = healer
         self.webView = page.webView
+        page.use(person: person)
     }
 
     // The person's buttons
@@ -231,7 +282,7 @@ final class GuidedRunner: ObservableObject {
             if filledFor != url { _ = await page.fill(fillValues); filledFor = url }       // a page reload can clear the fields
             let blockers = await page.blockers()
             if blockers.isEmpty { apply(.blockersCleared) } else { status = describe(blockers) }
-        case .send where !autoSubmit():
+        case .send where !autoSubmit() || forceManual:
             // The person sends it themselves: nothing is pressed, and a confirmation that appears afterwards is noticed.
             let now = await page.visibleText()
             guard let base = manualBaseline else { manualBaseline = now; status = Loc.t("Your details are filled in. Press the page's own button yourself; we will notice the confirmation, or tap Next step."); break }
@@ -245,6 +296,9 @@ final class GuidedRunner: ObservableObject {
             case .submitted(let email):
                 onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
+            case .challenged(let why) where why.contains(PageFlow.rejectedMarker):
+                forceManual = true; manualBaseline = nil
+                status = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.")
             case .challenged(let why): status = Loc.f("The site wants another check: %@. Solve it and we will send again.", why)
             case .rejected(let why), .failed(let why):
                 status = Loc.f("We could not confirm it was sent (%@). Finish it yourself in the page, then tap Next step.", why)

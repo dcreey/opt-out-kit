@@ -110,6 +110,18 @@ checked in the simulator.
 | 15 | Background runs, reminders, notifications | Core: reminder schedule tests | none | **Gap**: iOS background scheduling and notification permission need a device |
 | 16 | Share extension (send a link to Exnay) | Core: none | `AppModelTests.OnlyAWebAddress...` covers the app side | **Gap**: the extension itself needs a device |
 
+### One set of rules for every flow
+
+Solve and send, Email links, the monthly automated run and the guide all find forms, fill them, press send and read the result with the same code
+(`Shared/AssistedRun`): `WebAssistedDriver.prepareLoaded` and `WebAssistedPage` for the page, `PageFlow.sendOnce` for what a press of send meant,
+`PageFlow.watch` for what the person did, `LiveFormPicker` for which form is the opt-out. What differs between flows is only the surroundings: the buttons,
+whether a next site exists (Solve and send), whether a person is there to ask (the monthly run gives up on a check, the others wait for it), and the
+guide's steps. The semi-automated flow is pinned the hardest: `SemiAutomatedFlowTests` (28), `EmailAndSkipFlowTests`, `EmailHandoffTests`,
+`AssistedRunnerTests`, `PageFlowTests` run on the Mac in a few seconds.
+
+Not yet on the shared code: the guide's flows built from a stored form or a person's own listing (Spokeo and similar) still fill from the stored form, because the
+shared page code does not take a listing address yet.
+
 ### What can and cannot be tested without a simulator
 
 Everything that decides something is plain Swift and runs on the Mac: the runner and its screens' state, the email handoff, which form on a page is

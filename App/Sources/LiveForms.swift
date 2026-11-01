@@ -781,21 +781,22 @@ extension FormRun {
         while rounds < 6 {
             rounds += 1
             await prepared.refill()
-            let outcome = await prepared.send()
+            let step = await PageFlow.sendOnce(prepared)
             #if DEBUG
             debugLastPageText = await session.visibleText()
             #endif
-            switch outcome {
-            case .submitted(let email):
+            switch step {
+            case .sent(let email, let more):
                 sentAny = true; sentEmail = sentEmail || email
-                if await prepared.moreForms() { continue }
+                if more { continue }
                 return .submitted(awaitingEmail: sentEmail)
-            case .challenged(let why):
-                if why == "the form moved on to its next step" { continue }
-                return sentAny ? .submitted(awaitingEmail: sentEmail) : .challenged(why)
-            default:
+            case .nextStep: continue
+            case .handToPerson: return sentAny ? .submitted(awaitingEmail: sentEmail) : .challenged("a reCAPTCHA that rejected the automatic send")
+            case .checkAppeared(let why): return sentAny ? .submitted(awaitingEmail: sentEmail) : .challenged(why)
+            case .dryRun: return .filledNotSubmitted
+            case .notConfirmed(let answer):
                 if sentAny { return .submitted(awaitingEmail: sentEmail) }
-                result = outcome
+                result = answer
             }
             break
         }

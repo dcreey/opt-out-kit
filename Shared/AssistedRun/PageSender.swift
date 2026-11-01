@@ -10,34 +10,36 @@ enum PageSender {
                               pollSeconds: Double = 1.5, limitSeconds: Double = 600) async -> SubmitOutcome? {
         status(autoSubmit() ? Loc.t("Your details are filled in. Clear any check below and we will send it.")
                             : Loc.t("Your details are filled in. Check them, solve any check, then press the page's own button to send."))
-        var waited: Double = 0, forced = false, baseline: String?
+        var waited: Double = 0, forced = false, baseline: String?, scrolls = 0
         var sentForms = 0, sentEmail = false
         while !isCancelled(), waited < limitSeconds {
             try? await Task.sleep(nanoseconds: UInt64(pollSeconds * 1_000_000_000)); waited += pollSeconds
             guard stillCurrent() else { return nil }
             if forced || !autoSubmit() {
                 // The person presses the page's own button; a confirmation that appears is noticed.
-                let now = await page.pageText()
-                guard let base = baseline else { baseline = now; continue }
-                if case .submitted(let email) = FormRun.classifyConfirmed(FormRun.newText(before: base, after: now)) { status(Loc.t("Sent.")); return .submitted(awaitingEmail: email) }
+                guard var base = baseline else { baseline = await page.pageText(); continue }
+                let seen = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls)
+                baseline = base
+                if case .confirmed(let email) = seen { status(Loc.t("Sent.")); return .submitted(awaitingEmail: email) }
                 continue
             }
             if !(await page.blockers()).isEmpty { continue }
             status(Loc.t("Sending…"))
             await page.refill()
-            switch await page.send() {
-            case .submitted(let email):
+            switch await PageFlow.sendOnce(page) {
+            case .sent(let email, let more):
                 sentForms += 1; sentEmail = sentEmail || email
-                if await page.moreForms() { continue }                       // another opt-out form on the same page
+                if more { continue }                                         // another opt-out form on the same page
                 status(Loc.t("Sent.")); return .submitted(awaitingEmail: sentEmail)
-            case .challenged(let why):
-                if why.contains("rejected the automatic send") { forced = true; baseline = await page.pageText(); status(Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.")) }
+            case .handToPerson:
+                forced = true; baseline = await page.pageText(); status(Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself."))
+            case .nextStep, .checkAppeared:
                 continue                                                     // a check appeared, or the form moved on to its next step
-            case .rejected, .failed:
+            case .notConfirmed:
                 if sentForms > 0 { return .submitted(awaitingEmail: sentEmail) }
                 status(Loc.t("We pressed Send but saw no confirmation. If it needs one more step, do it in the page."))
                 return .failed("no confirmation")
-            case .filledNotSubmitted: return .filledNotSubmitted
+            case .dryRun: return .filledNotSubmitted
             }
         }
         return nil

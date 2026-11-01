@@ -398,4 +398,28 @@ final class ListingGuideTests: XCTestCase {
         let peopleconnect = try XCTUnwrap(model.brokers.first { $0.id == "peopleconnect" })
         XCTAssertEqual(model.guidedRunner(for: peopleconnect)?.flow.plan.steps.first?.title, "Open suppression.peopleconnect.us", "other walkthroughs are unchanged")
     }
+
+    // MARK: the real guided page runs on the same code as Solve and send
+
+    func testTheGuidedWebPageFindsFillsAndSendsThroughTheSharedPageCode() async {
+        let html = """
+            <html><body><h1>Opt out</h1>
+            <form id="a" onsubmit="event.preventDefault(); document.getElementById('log').innerText += ' A-SENT:' + this.querySelector('input[type=email]').value;">
+              <input id="fn" placeholder="First Name"><input id="ln" placeholder="Last Name"><input type="email" placeholder="Email"><button type="submit">Opt me out</button></form>
+            <form id="d" onsubmit="event.preventDefault(); document.getElementById('log').innerText += ' D-SENT';"><h3>Opt out of Mobile ID</h3><input placeholder="Device ID"><button type="submit">Opt me out</button></form>
+            <p id="log">LOG</p></body></html>
+            """
+        let page = WebGuidedPage()
+        defer { page.close() }
+        page.use(person: pat)
+        await page.loadHTML(html)
+        let filled = await page.scanAndFill(person: pat)
+        XCTAssertGreaterThan(filled, 0, "it found the form and filled it")
+        let blockers = await page.blockers()
+        XCTAssertTrue(blockers.isEmpty)
+        let outcome = await page.send([])
+        let log = await page.visibleText()
+        XCTAssertTrue(log.contains("A-SENT:pat@example.com"), log)
+        XCTAssertTrue(outcome == .submitted(awaitingEmail: false) || { if case .failed = outcome { return true } else { return false } }(), "\(outcome)")
+    }
 }

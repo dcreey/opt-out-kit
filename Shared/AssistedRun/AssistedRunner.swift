@@ -194,20 +194,16 @@ final class AssistedRunner: ObservableObject {
         resumeNext()
     }
 
-    /// Reads what is on screen; true outcome when the new text shows a confirmation, nil when nothing changed or it says nothing of the kind.
+    /// Reads what is on screen (see `PageFlow.watch`); the outcome when the new text shows a confirmation, nil otherwise. A form that appeared is noted for the screen.
     private func watch(_ page: AssistedPage, baseline: inout String, force: Bool = false, domChanged: Bool = false) async -> AutoOptOutResult? {
-        let now = await page.pageText()
-        // A form that opens with an animation may still be collapsed on the first look, so after a change the page is read again a few times even when the text is the same.
-        guard !now.isEmpty, now != baseline || force else { return nil }
-        let added = FormRun.newText(before: baseline, after: now)
-        baseline = now
-        if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .submitted(awaitingEmail: email) }
-        // Nothing confirmed, but the screen changed: a new privacy form may have appeared (a window opened, the next step). Fill it in if so.
-        if await page.adoptNewForm() { notice = Loc.t("A new form appeared and we filled it in. Check it."); NSLog("OOKSCROLL adoptNewForm filled a new form") }
-        // Only a change in the page itself brings the opt-out button into view. The words on screen also change when the person scrolls, and moving the page
-        // under them because the new words mention "opt out" is the page jumping about; so at most twice per site, and never for a scroll.
-        else if domChanged, autoScrolls < 2, FormRun.mentionsOptOutControl(added) { if await page.scrollToOptOut() { autoScrolls += 1 } }
-        return nil
+        var scrolls = autoScrolls
+        let seen = await PageFlow.watch(page, baseline: &baseline, autoScrolls: &scrolls, force: force, domChanged: domChanged)
+        autoScrolls = scrolls
+        switch seen {
+        case .confirmed(let email): return .submitted(awaitingEmail: email)
+        case .newFormFilled: notice = Loc.t("A new form appeared and we filled it in. Check it."); return nil
+        case .nothing: return nil
+        }
     }
 
     /// "This is my profile": the page the person is on is their listing.
@@ -446,17 +442,21 @@ final class AssistedRunner: ObservableObject {
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
             let manual = !revisiting && !items[i].handsOff && (!autoSubmit() || forceManual)
-            switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
-                case .submitted(let email):
+            let step: SendStep = items[i].handsOff || revisiting || manual ? .notConfirmed(.failed("waiting for you to finish in the page")) : await PageFlow.sendOnce(ready)
+            switch step {
+                case .sent(let email, let more):
                     sentForms += 1; sentEmail = sentEmail || email
                     // The same page may hold another opt-out form (a device ID, a second request type): it gets its turn before the site is done.
-                    if await ready.moreForms() { pageForms.current += 1; phase = .loading; attempts = 0; continue }
+                    if more { pageForms.current += 1; phase = .loading; attempts = 0; continue }
                     phase = .sent(awaitingEmail: sentEmail); outcome = .submitted(awaitingEmail: sentEmail)
-                case .challenged(let why):
+                case .handToPerson:
                     // A bot check that refuses a scripted press (reCAPTCHA v3) is not retried: the person presses the page's own button, and we notice the result.
-                    if why.contains("rejected the automatic send") { forceManual = true; notice = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.") }
+                    forceManual = true; notice = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.")
+                    continue
+                case .nextStep, .checkAppeared:
                     continue      // a check appeared after sending (or the next step of the form came up): go round again
-                case .rejected(let why), .failed(let why):
+                case .notConfirmed(let answer):
+                    let why: String = { switch answer { case .rejected(let w), .failed(let w), .challenged(let w): return w; default: return "no confirmation" } }()
                     phase = revisiting ? .reviewing : manual ? .manualSend : .needsMore(why)
                     // A site the person is sending themselves is not failed when they move on without a confirmation: it just is not done yet.
                     // One form of the page went through and a later one did not: the site is sent, and the person can finish the rest in the page.
@@ -488,7 +488,7 @@ final class AssistedRunner: ObservableObject {
                     await withCheckedContinuation { nextContinuation = $0 }
                     watcher.cancel(); awaitingNext = false
                     if let done = markedDone { outcome = done }
-                case .filledNotSubmitted: outcome = .dryRunReady
+                case .dryRun: outcome = .dryRunReady
                 }
             }
             let final = outcome ?? .challenged("the check came back")

@@ -256,7 +256,7 @@ final class WebAssistedPage: AssistedPage {
             let errorSeen = FormRun.classify(FormRun.newText(before: before, after: after)) != .failed("no success message was shown")
             if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen { return .submitted(awaitingEmail: false) }
         }
-        if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged("the form moved on to its next step") }
+        if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged(PageFlow.nextStepMarker) }
         return outcome
     }
 
