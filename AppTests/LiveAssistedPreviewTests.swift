@@ -24,7 +24,7 @@ final class LiveAssistedPreviewTests: XCTestCase {
             try? await Task.sleep(nanoseconds: 2_500_000_000)
             let blockers = await page.blockers()
             print("LIVEPREVIEW \(item.entry.domain): blockers=\(blockers) fieldsToFill=\(item.plan.values.map(\.name))")
-            if env["OPTOUT_SHOTS"] == "1", let web = page.webView {
+            if env["OPTOUT_SHOTS"] == "1", let web = (page as? WebAssistedPage)?.webView {
                 web.frame = CGRect(x: 0, y: 0, width: 390, height: 800)
                 let image = try? await web.takeSnapshot(configuration: nil)
                 if let image { let a = XCTAttachment(image: image); a.name = "live-\(item.entry.domain)"; a.lifetime = .keepAlways; add(a) }

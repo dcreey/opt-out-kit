@@ -20,6 +20,7 @@ targets:
     platform: iOS
     sources:
       - App/Sources
+      - Shared/AssistedRun
       - App/Resources
       - path: brokers
         type: folder

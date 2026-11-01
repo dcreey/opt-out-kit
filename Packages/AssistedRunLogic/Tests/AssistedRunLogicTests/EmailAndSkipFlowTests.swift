@@ -1,7 +1,6 @@
 import XCTest
-import WebKit
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// Every way out of a site in the assisted run that involves email or Skip, driven the way the screen drives it (runner + handoff), no UI.
 ///
@@ -28,7 +27,6 @@ final class EmailAndSkipFlowTests: XCTestCase {
     @MainActor private final class FakePage: AssistedPage {
         var blockerScript: [[AssistedBlocker]]; var outcome: SubmitOutcome
         private(set) var polls = 0, closed = false
-        var webView: WKWebView? { nil }
         init(blockers: [[AssistedBlocker]], outcome: SubmitOutcome = .submitted(awaitingEmail: false)) { blockerScript = blockers; self.outcome = outcome }
         func blockers() async -> [AssistedBlocker] { defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
         func refill() async {}
@@ -54,6 +52,12 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let h = EmailHandoff(runner: r); h.markEmailed = { _ in log.emailed += 1 }
         return (r, h)
     }
+    /// Waits for the run to end without hanging the suite when an assertion above it has already failed.
+    private func join(_ run: Task<Void, Never>, _ r: AssistedRunner) async {
+        for _ in 0..<600 where !r.finished { try? await Task.sleep(nanoseconds: 5_000_000) }
+        XCTAssertTrue(r.finished, "the run did not finish")
+        if r.finished { await run.value } else { run.cancel() }
+    }
     private func wait(_ cond: @autoclosure () -> Bool) async { for _ in 0..<600 where !cond() { try? await Task.sleep(nanoseconds: 5_000_000) } }
     private func batch(_ r: AssistedRunner, _ host: String) -> EmailBatch { EmailBatch.single(entries: [r.current!.entry]).first! }
     private let url = URL(string: "mailto:privacy@a.example")!
@@ -70,7 +74,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         h.open(batch(r, "a.example"), composesInApp: false, url: url) { _ in }
         XCTAssertNil(r.emailOffer, "a live form page has no offer, the person chose to email")
         h.answer(sent: true)
-        await run.value
+        await join(run, r)
         XCTAssertEqual(log.rows.map(\.1), [.emailed, .submitted(awaitingEmail: false)])
         XCTAssertEqual(r.skippedCount, 0, "not counted as skipped"); XCTAssertEqual(r.celebrate, 2, "green check for the email and for the next send")
         XCTAssertEqual(log.emailed, 1)
@@ -85,7 +89,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         h.answer(sent: false)
         XCTAssertFalse(r.finished); XCTAssertEqual(log.emailed, 0); XCTAssertEqual(log.rows.count, 0)
         XCTAssertFalse(h.active)
-        r.skip(); await run.value
+        r.skip(); await join(run, r)
         XCTAssertEqual(log.rows.map(\.1), [.needsYou("skipped")])
     }
 
@@ -97,7 +101,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let b = batch(r, "a.example")
         h.open(b, composesInApp: true, url: nil) { _ in }
         h.composeFinished(b, sent: true)
-        await run.value
+        await join(run, r)
         XCTAssertEqual(log.rows.map(\.1), [.emailed]); XCTAssertEqual(r.skippedCount, 0)
     }
 
@@ -108,7 +112,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let (r, _) = make([item("a.example", email: "privacy@a.example")], Driver(["a.example": FakePage(blockers: waiting)]), log)
         let run = Task { @MainActor in await r.run() }
         await wait(r.phase == .waitingForCheck)
-        r.skip(); await run.value
+        r.skip(); await join(run, r)
         XCTAssertEqual(log.rows.map(\.1), [.needsYou("skipped")]); XCTAssertEqual(r.skippedCount, 1); XCTAssertNil(r.emailOffer)
     }
 
@@ -123,7 +127,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(r.emailOffer?.domain, "a.example")
         h.open(EmailBatch.single(entries: [r.emailOffer!]).first!, composesInApp: false, url: url) { _ in }
         h.answer(sent: true)
-        await run.value
+        await join(run, r)
         XCTAssertEqual(log.rows.map(\.1).last, .submitted(awaitingEmail: false), "the next site ran")
         XCTAssertEqual(r.results["a_example"], .emailed)
     }
@@ -133,7 +137,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": FakePage(blockers: waiting)]), log)
         let run = Task { @MainActor in await r.run() }
         await wait(r.phase == .waitingForCheck)
-        r.skip(reported: true); await run.value
+        r.skip(reported: true); await join(run, r)
         XCTAssertNil(r.emailOffer); XCTAssertTrue(r.finished)
     }
 
@@ -145,36 +149,43 @@ final class EmailAndSkipFlowTests: XCTestCase {
         await wait(r.phase == .waitingForCheck)
         r.skip(reported: true)
         await wait(r.emailOffer != nil)
-        r.skip(); await run.value
+        r.skip(); await join(run, r)
         XCTAssertTrue(r.finished); XCTAssertEqual(log.rows.last?.0, "b.example")
     }
 
     // MARK: a site that is rejected or fails
 
-    func testARejectedSiteWithAnAddressOffersEmailAndSkipMovesOn() async {
+    func testARejectedSiteStaysOnItsPageUntilNextThenOffersEmailAndSkipMovesOn() async {
         let log = Log()
         let (r, _) = make([item("a.example", email: "privacy@a.example"), item("b.example", email: nil)],
                           Driver(["a.example": FakePage(blockers: [[]], outcome: .rejected("bad field")), "b.example": FakePage(blockers: [[]])]), log)
         let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .needsMore("bad field"))
+        XCTAssertNil(r.emailOffer, "the person is still on the page, finishing it themselves")
+        r.next()
         await wait(r.emailOffer != nil)
         XCTAssertEqual(r.emailOffer?.domain, "a.example")
-        r.skip(); await run.value
+        r.skip(); await join(run, r)
         XCTAssertEqual(log.rows.map(\.0), ["a.example", "b.example"])
     }
 
     func testARejectedSiteWithNoAddressGetsNoOffer() async {
         let log = Log()
         let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": FakePage(blockers: [[]], outcome: .rejected("bad field"))]), log)
-        await r.run()
-        XCTAssertNil(r.emailOffer); XCTAssertTrue(r.finished)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .needsMore("bad field"))
+        r.next(); await join(run, r)
+        XCTAssertNil(r.emailOffer)
     }
 
     func testMarkAsDoneOnTheOfferCountsTheSiteAsEmailed() async {
         let log = Log()
         let (r, _) = make([item("a.example", email: "privacy@a.example")], Driver(["a.example": FakePage(blockers: [[]], outcome: .failed("no confirmation"))]), log)
         let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .needsMore("no confirmation"))
+        r.next()
         await wait(r.emailOffer != nil)
-        r.answerEmailOffer(sent: true); await run.value
+        r.answerEmailOffer(sent: true); await join(run, r)
         XCTAssertEqual(log.rows.last?.1, .emailed)
     }
 
@@ -187,7 +198,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         let run = Task { @MainActor in await r.run() }
         await wait(r.phase == .noForm)
         XCTAssertFalse(r.finished)
-        r.skip(); await run.value
+        r.skip(); await join(run, r)
         XCTAssertEqual(log.rows.map(\.0), ["a.example", "b.example"]); XCTAssertEqual(log.rows.first?.1, .needsYou("skipped"))
     }
 
@@ -200,7 +211,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.emailed, 0); XCTAssertFalse(r.finished, "an answer to a question never asked changes nothing")
         h.open(batch(r, "a.example"), composesInApp: false, url: url) { _ in }
         h.answer(sent: true); h.answer(sent: true)
-        await run.value
+        await join(run, r)
         XCTAssertEqual(log.emailed, 1, "saved once")
         XCTAssertEqual(log.rows.filter { $0.1 == .emailed }.count, 1)
     }
