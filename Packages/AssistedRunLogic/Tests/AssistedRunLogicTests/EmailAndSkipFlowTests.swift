@@ -42,8 +42,9 @@ final class EmailAndSkipFlowTests: XCTestCase {
         func close() { closed = true }
     }
     @MainActor private final class Driver: AssistedDriver {
-        var pages: [String: FakePage]; var noForm: Set<String>
-        init(_ pages: [String: FakePage], noForm: Set<String> = []) { self.pages = pages; self.noForm = noForm }
+        var pages: [String: FakePage]; var noForm: Set<String>; var discovered: [String: String]
+        init(_ pages: [String: FakePage], noForm: Set<String> = [], discovered: [String: String] = [:]) { self.pages = pages; self.noForm = noForm; self.discovered = discovered }
+        func discoveredEmail(for form: OptOutForm) -> String? { discovered[form.page.host ?? ""] }
         func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { pages[form.page.host ?? ""] }
         func failureReason(for form: OptOutForm) -> String? { noForm.contains(form.page.host ?? "") ? "noform" : nil }
     }
@@ -489,5 +490,77 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertFalse(r.awaitingNext)
         XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false))
         r.skip(); await join(run, r)
+    }
+
+    // MARK: an address found on the site's own page
+
+    func testASiteWithNoFormAndNoAddressOnFileIsOfferedTheAddressItsPageGives() async {
+        let log = Log()
+        let (r, h) = make([item("a.example", email: nil)], Driver([:], noForm: ["a.example"], discovered: ["a.example": "privacy@a.example"]), log)
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.phase == .noForm)
+        XCTAssertEqual(r.emailOffer?.contactEmail, "privacy@a.example", "the address came from the page")
+        XCTAssertTrue(r.emailFoundOnPage, "and the screen can say so")
+        let b = EmailBatch.single(entries: [r.emailOffer!]).first!
+        XCTAssertEqual(b.address, "privacy@a.example")
+        h.open(b, composesInApp: false, url: URL(string: "mailto:privacy@a.example")!) { _ in }
+        h.answer(sent: true)
+        await join(run, r)
+        XCTAssertEqual(log.rows.map(\.1), [.emailed])
+        XCTAssertEqual(log.rows.first?.0, "a.example")
+    }
+
+    func testNoAddressOnFileAndNoneOnThePageStaysASkipThatSaysSo() async {
+        let log = Log()
+        let (r, _) = make([item("a.example", email: nil)], Driver([:], noForm: ["a.example"]), log)
+        await join(Task { @MainActor in await r.run() }, r)
+        XCTAssertNil(r.emailOffer); XCTAssertFalse(r.emailFoundOnPage)
+        XCTAssertEqual(log.rows.first?.1, .needsYou(AssistedRunner.noForm))
+    }
+
+    // MARK: a bot check that refuses a scripted press
+
+    func testAReCAPTCHAThatRejectsTheAutomaticSendIsHandedToThePersonAndNotRetried() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]], outcome: .challenged("a reCAPTCHA that rejected the automatic send"))
+        let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
+        r.autoSubmit = { true }; r.watchInterval = 0.02; r.pauseAfterSent = 0
+        page.texts = ["Opt out form", "Opt out form", "Thank you. Your request has been received."]
+        var told = false
+        let watcher = Task { @MainActor in while !r.finished { if r.index == 0, r.notice != nil { told = true }; try? await Task.sleep(nanoseconds: 1_000_000) } }
+        let run = Task { @MainActor in await r.run() }
+        await wait(r.index == 1)
+        watcher.cancel()
+        XCTAssertEqual(page.sends, 1, "the app pressed once and did not keep pressing")
+        XCTAssertTrue(told, "the person is told to press the page's own button")
+        XCTAssertEqual(log.rows.first?.1, .submitted(awaitingEmail: false), "their own press was noticed and the run moved on (Auto-send is on)")
+        r.skip(); await join(run, r)
+    }
+
+    func testMultiStepFormsAreSentOnceTheLastStepGoesThrough() async {
+        let log = Log()
+        let page = FakePage(blockers: [[]], outcome: .challenged("the form moved on to its next step")); page.laterOutcome = .submitted(awaitingEmail: false)
+        let (r, _) = make([item("a.example", email: nil)], Driver(["a.example": page]), log)
+        await join(Task { @MainActor in await r.run() }, r)
+        XCTAssertEqual(page.sends, 2, "Next, then Submit")
+        XCTAssertEqual(log.rows.map(\.1), [.submitted(awaitingEmail: false)])
+    }
+}
+
+final class ContactEmailPickerTests: XCTestCase {
+    func testThePrivacyAddressOnTheSitesOwnDomainBeatsGeneralOnes() {
+        let got = ContactEmailPicker.best(["info@redidata.com", "privacy@redidata.com", "someone@gmail.com", "noreply@redidata.com"], pageHost: "www.redidata.com")
+        XCTAssertEqual(got, "privacy@redidata.com")
+    }
+    func testOnlyTheSitesOwnDomainCounts() {
+        XCTAssertNil(ContactEmailPicker.best(["help@zendesk.com", "x@sentry.io", "name@example.com"], pageHost: "redidata.com"))
+        XCTAssertEqual(ContactEmailPicker.best(["dpo@privacy.redidata.com"], pageHost: "redidata.com"), "dpo@privacy.redidata.com", "a subdomain of the site is the site")
+    }
+    func testBrokenAndRepeatedAddressesAreIgnored() {
+        XCTAssertNil(ContactEmailPicker.best(["not an address", "a@b", "@redidata.com"], pageHost: "redidata.com"))
+        XCTAssertEqual(ContactEmailPicker.best(["Contact@RediData.com.", "contact@redidata.com"], pageHost: "redidata.com"), "contact@redidata.com")
+    }
+    func testTwoPartSuffixesAreHandled() {
+        XCTAssertEqual(ContactEmailPicker.best(["privacy@acme.co.uk"], pageHost: "www.acme.co.uk"), "privacy@acme.co.uk")
     }
 }

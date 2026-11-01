@@ -88,6 +88,47 @@ final class WebAssistedDriverTests: XCTestCase {
         XCTAssertTrue(log.contains("MAID-SENT:IDFA:\(id)"), "this phone's IDFA, not the Android GAID: \(log)")
     }
 
+    /// statara.com: a two-step Gravity form. Next shows the choices; Submit sends. Pressing Next is not a result, and the choices are picked before Submit.
+    func testAMultiStepFormIsTakenThroughItsStepsAndTheOptOutChoiceIsPicked() async throws {
+        let html = """
+            <html><body><h1>Opt in/Opt out</h1>
+            <form id="g" onsubmit="event.preventDefault(); document.getElementById('log').innerText = 'PICKED:' + this.querySelector('input[name=r]:checked').value + ' Thank you. Your opt-out request has been received.'">
+              <div id="p1"><input name="fn" placeholder="First"><input name="ln" placeholder="Last"><input type="email" name="em" placeholder="Email">
+                <button type="button" id="next" onclick="document.getElementById('p1').style.display='none'; document.getElementById('p2').style.display='block'">Next</button></div>
+              <div id="p2" style="display:none"><p>Your choices for selecting your consumer rights are (select one only):</p>
+                <label><input type="radio" name="r" value="limit"> The Right to Limit Use and Disclosure of your personal information</label>
+                <label><input type="radio" name="r" value="out"> The Right to Opt-Out of the selling or sharing of your personal information</label>
+                <label><input type="radio" name="r" value="in"> The Right to Opt-In of the selling or sharing of your personal information</label>
+                <button type="submit">Submit</button></div>
+            </form><p id="log">LOG</p></body></html>
+            """
+        let driver = WebAssistedDriver(htmlOverride: html, person: pat)
+        let form = OptOutForm(page: URL(string: "https://x.example/optin-optout/")!, method: "post", action: nil, fields: [FormField(type: "text", name: "fn", label: "First")], hops: 1)
+        let prepared = await driver.prepare(form, plan: FormFiller.plan(for: form, signals: nil, person: pat))
+        let page = try XCTUnwrap(prepared)
+        defer { page.close() }
+        let first = await page.send()
+        XCTAssertEqual(first, .challenged("the form moved on to its next step"), "Next is a step, not a result")
+        await page.refill()                                  // the choices are picked on the new step
+        let second = await page.send()
+        let log = await page.pageText()
+        XCTAssertTrue(log.contains("PICKED:out"), "the opt-out choice, not limit-use or opt-in: \(log)")
+        XCTAssertEqual(second, .submitted(awaitingEmail: false))
+    }
+
+    /// redidata.com and others: no form and no address on file, but the page links a privacy address.
+    func testANoFormPageThatLinksAPrivacyAddressGivesItToTheRun() async throws {
+        let html = """
+            <html><body><h1>Privacy</h1><p>To opt out, write to <a href="mailto:Privacy@x.example?subject=optout">our team</a>. Or info@x.example. Or help@zendesk.com.</p></body></html>
+            """
+        let driver = WebAssistedDriver(htmlOverride: html, person: pat)
+        let form = OptOutForm(page: URL(string: "https://www.x.example/opt-out/")!, method: "post", action: nil, fields: [], hops: 1)
+        let page = await driver.prepare(form, plan: FillPlan(values: [], verdict: .ready))
+        XCTAssertNil(page, "no form to fill")
+        XCTAssertEqual(driver.failureReason(for: form), "noform")
+        XCTAssertEqual(driver.discoveredEmail(for: form), "privacy@x.example", "the site's own privacy address, not info@ or another company's")
+    }
+
     func testFillsTheFormWaitsForAPersonToClearTheCheckThenSendsAndReadsTheConfirmation() async {
         let challenge = "<iframe id=\"block\" src=\"https://www.google.com/recaptcha/api2/bframe\" style=\"width:300px;height:400px\"></iframe>"
         let sink = Sink()

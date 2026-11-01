@@ -21598,6 +21598,29 @@
     }
    }
   },
+  "The site's bot check did not accept an automatic send. Press its Submit button yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le contrôle anti-robot du site n'a pas accepté un envoi automatique. Appuyez vous-même sur son bouton Envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La comprobación antirrobot del sitio no aceptó un envío automático. Pulsa tú mismo su botón Enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Bot-Prüfung der Website hat einen automatischen Versand nicht akzeptiert. Drücken Sie selbst auf deren Senden-Taste."
+     }
+    }
+   }
+  },
   "The terms are each site's own words, in the language that site shows you. If a site offers its terms in your language we use that version; if not, the original stays as it is. They are never machine-translated.": {
    "extractionState": "manual",
    "localizations": {
@@ -24380,6 +24403,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir haben die Opt-out-Seite gefunden, aber die App kann ihr Formular nicht für Sie ausfüllen. Wir führen Sie hin und begleiten Sie Schritt für Schritt."
+     }
+    }
+   }
+  },
+  "We found this address on the site's own page. Check it before you send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons trouvé cette adresse sur la page du site. Vérifiez-la avant d'envoyer."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encontramos esta dirección en la propia página del sitio. Compruébala antes de enviar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben diese Adresse auf der Seite der Website gefunden. Prüfen Sie sie vor dem Senden."
      }
     }
    }

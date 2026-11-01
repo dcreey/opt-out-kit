@@ -19,6 +19,8 @@ struct WebAssistedDriver: AssistedDriver {
     var htmlOverride: String?
     private static var reasons: [String: String] = [:]
     func failureReason(for form: OptOutForm) -> String? { Self.reasons[form.page.absoluteString] }
+    func discoveredEmail(for form: OptOutForm) -> String? { Self.foundEmails[form.page.absoluteString] }
+    private static var foundEmails: [String: String] = [:]
     /// When set, the form is found on the live page and filled from these details (the stored crawl is only a hint).
     var person: Person?
     var advertisingID: String?
@@ -41,7 +43,7 @@ struct WebAssistedDriver: AssistedDriver {
 
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? {
         let session = WebViewSession.make()
-        Self.reasons[form.page.absoluteString] = nil
+        Self.reasons[form.page.absoluteString] = nil; Self.foundEmails[form.page.absoluteString] = nil
         do {
             if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page), within: 15) }
         } catch { NSLog("OOK load failed %@: %@", form.page.absoluteString, "\(error)"); session.close(); return nil }
@@ -58,6 +60,8 @@ struct WebAssistedDriver: AssistedDriver {
             let found = await session.discoverFormsDeep()
             guard let live = LiveFormPicker.pick(found, pageContext: await session.pageContext()) else {
                 Self.reasons[form.page.absoluteString] = "noform"
+                // No form and (perhaps) no address on file: an address on the page itself can still be offered.
+                Self.foundEmails[form.page.absoluteString] = ContactEmailPicker.best(await session.pageEmails(), pageHost: form.page.host ?? "")
                 NSLog("OOK no form %@: %@", form.page.absoluteString, found.map { "[\($0.fields.filter(\.visible).map(\.label).joined(separator: ",")) | \($0.buttons.joined(separator: ","))]" }.joined(separator: " "))
                 session.close(); return nil
             }
@@ -191,13 +195,25 @@ final class WebAssistedPage: AssistedPage {
         if ProcessInfo.processInfo.arguments.contains("-assisted-no-send") { return .filledNotSubmitted }
         #endif
         let before = await session.visibleText()
+        let stepBefore = await formSignature()
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed("no submit button found") }
         await session.settlePage(maxWait: 20)
         if await session.pressConfirmStep() { await session.settlePage(maxWait: 20) }
         if let why = await session.visibleChallenge() { return .challenged(why) }
-        return WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
+        let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: await session.visibleText())
+        // A multi-step form (Next, then Submit): the same form is still there with other boxes. That is its next step, not a result; the run fills it and presses again.
+        if case .submitted = outcome { return outcome }
+        if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged("the form moved on to its next step") }
+        return outcome
+    }
+
+    /// What the form on screen asks for, to tell one step of it from the next.
+    private func formSignature() async -> String? {
+        guard let liveForm else { return nil }
+        let forms = await session.discoverForms(waitForFrames: false)
+        return forms.first { $0.token == liveForm }.map { WebAssistedDriver.signature($0) }
     }
 
     func pageText() async -> String { await session.viewportText() }
@@ -419,6 +435,7 @@ struct AssistedOptOutView: View {
             Text("No form exists for \(entry.domain)").font(.title3.bold()).foregroundStyle(.white).multilineTextAlignment(.center)
             Text("This site takes opt-outs by email. We write the message with the details it needs; you read it and send it.").font(.callout).foregroundStyle(.white.opacity(0.75)).multilineTextAlignment(.center)
             if let mail = entry.contactEmail { Text(mail).font(.footnote.monospaced()).foregroundStyle(.white.opacity(0.6)) }
+            if runner.emailFoundOnPage { Text("We found this address on the site's own page. Check it before you send.").font(.caption).foregroundStyle(Color.exnayGold).multilineTextAlignment(.center).accessibilityIdentifier("assisted-email-found") }
             Button { emailInstead(entry) } label: { Label("Write the email", systemImage: "envelope").frame(maxWidth: .infinity) }
                 .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("assisted-write-email")
             HStack {

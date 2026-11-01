@@ -310,7 +310,7 @@ extension WebFormSubmitter {
     nonisolated static func classifyAfterSending(before: String, after: String) -> SubmitOutcome {
         let added = FormRun.newText(before: before, after: after)
         if added.isEmpty { return .failed("nothing on the page changed after sending") }
-        return FormRun.classify(added)
+        return FormRun.classifyConfirmed(added)
     }
 }
 
@@ -496,6 +496,8 @@ extension WebViewSession {
           var text=(document.body?document.body.innerText:'').toLowerCase();
           // A check the person already passed leaves a token behind; the page's own "please wait for the anti-spam check" line (from an early press) can stay on screen.
           var solved=[].some.call(document.querySelectorAll('input[name="cf-turnstile-response"],textarea[name="g-recaptcha-response"],textarea[name="h-captcha-response"]'),function(e){return !!e.value;});
+          // The page says its reCAPTCHA refused the send (a score-based one rejects scripted presses): only the person's own tap on the page's button can get past it.
+          if(/recaptcha[^.]{0,40}(missing|invalid|failed|expired|could not be verified)|failed (the )?recaptcha/.test(text)) return 'a reCAPTCHA that rejected the automatic send';
           if(!solved&&/anti-?spam check|wait for the (anti-?spam|security) check|confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
           var ts=document.querySelector('.cf-turnstile,[class*="turnstile" i],[id*="turnstile" i]');
           if(ts){var tr=ts.getBoundingClientRect(),tt=document.querySelector('input[name="cf-turnstile-response"]'); if(tr.width>0&&tr.height>0&&(!tt||!tt.value)) return 'a Cloudflare check';}

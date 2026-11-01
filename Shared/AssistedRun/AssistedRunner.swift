@@ -42,10 +42,13 @@ protocol AssistedDriver {
     func openSearch(_ url: URL) async -> SearchPage?
     /// Why the last `prepare` of this form returned nothing: "noform" when the page loaded but holds no opt-out form we can fill (a contact form, or only an email address), nil when it would not load.
     func failureReason(for form: OptOutForm) -> String?
+    /// For a page with no form and no address on file: an address found on the page itself (a privacy@ link), or nil.
+    func discoveredEmail(for form: OptOutForm) -> String?
 }
 
 extension AssistedDriver {
     func failureReason(for form: OptOutForm) -> String? { nil }
+    func discoveredEmail(for form: OptOutForm) -> String? { nil }
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? { await prepare(form, plan: plan) }
     func openSearch(_ url: URL) async -> SearchPage? { nil }
 }
@@ -130,6 +133,8 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var celebrate = 0
     /// Which opt-out form of the page is on screen and how many it has, so the screen can say "form 2 of 3". One form: total 1.
     @Published private(set) var pageForms = (current: 1, total: 1)
+    /// The address offered for this site was found on its own page, not on file: the screen says so, so the person checks it before sending.
+    @Published private(set) var emailFoundOnPage = false
     /// Counts sites that were skipped (by the person, or because their page would not load), so the screen can show it.
     @Published private(set) var skippedCount = 0
     /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
@@ -352,7 +357,7 @@ final class AssistedRunner: ObservableObject {
     /// One site, from loading its page to its result. Returns without a result when the person went back.
     private func process(_ i: Int) async {
         do {
-            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; emailFoundOnPage = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
             if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
             if items[i].emailOnly { goingBack = false; await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
@@ -376,6 +381,12 @@ final class AssistedRunner: ObservableObject {
                 let noForm = driver.failureReason(for: items[i].form) == "noform"
                 // The page loaded but holds no form we can fill, and the site gives an address: say so, and let the person send the email from here.
                 if noForm, items[i].entry.contactEmail != nil { await waitForEmail(items[i]); return }
+                // No address on file, but the page itself gives one: the person is offered that, told where it came from.
+                if noForm, let found = driver.discoveredEmail(for: items[i].form) {
+                    var entry = items[i].entry; entry.contactEmail = found
+                    emailFoundOnPage = true
+                    await waitForEmail(AssistedRunner.Item(entry: entry, form: items[i].form, plan: items[i].plan)); return
+                }
                 let why = noForm ? Self.noForm : Self.unloadable
                 record(items[i], .needsYou(why))
                 await offerEmailIfNeeded(items[i], .needsYou(why))
@@ -387,7 +398,7 @@ final class AssistedRunner: ObservableObject {
             prepare(i + 1)      // load the next one while the person works on this one
 
             var outcome: AutoOptOutResult?
-            var sentForms = 0, sentEmail = false
+            var sentForms = 0, sentEmail = false, forceManual = false
             var attempts = 0
             var baseline = await ready.pageText()
             while outcome == nil, attempts < 3 {
@@ -396,7 +407,7 @@ final class AssistedRunner: ObservableObject {
                 while true {
                     if skipFlag { outcome = .needsYou("skipped"); break }
                     if let done = markedDone { outcome = done; break }
-                    let blockers = revisiting ? [] : await ready.blockers()        // a site visited again is never sent for the person
+                    let blockers = revisiting || forceManual ? [] : await ready.blockers()        // a site visited again is never sent for the person
                     if blockers.isEmpty { break }
                     if blockers.contains(.terms) { phase = .waitingForTerms }
                     else if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { phase = .waitingForCertification }
@@ -434,14 +445,17 @@ final class AssistedRunner: ObservableObject {
                 await ready.refill()
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
-            let manual = !revisiting && !items[i].handsOff && !autoSubmit()
+            let manual = !revisiting && !items[i].handsOff && (!autoSubmit() || forceManual)
             switch items[i].handsOff || revisiting || manual ? SubmitOutcome.failed("waiting for you to finish in the page") : await ready.send() {
                 case .submitted(let email):
                     sentForms += 1; sentEmail = sentEmail || email
                     // The same page may hold another opt-out form (a device ID, a second request type): it gets its turn before the site is done.
                     if await ready.moreForms() { pageForms.current += 1; phase = .loading; attempts = 0; continue }
                     phase = .sent(awaitingEmail: sentEmail); outcome = .submitted(awaitingEmail: sentEmail)
-                case .challenged: continue      // a check appeared after sending: wait for the person again
+                case .challenged(let why):
+                    // A bot check that refuses a scripted press (reCAPTCHA v3) is not retried: the person presses the page's own button, and we notice the result.
+                    if why.contains("rejected the automatic send") { forceManual = true; notice = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.") }
+                    continue      // a check appeared after sending (or the next step of the form came up): go round again
                 case .rejected(let why), .failed(let why):
                     phase = revisiting ? .reviewing : manual ? .manualSend : .needsMore(why)
                     // A site the person is sending themselves is not failed when they move on without a confirmation: it just is not done yet.

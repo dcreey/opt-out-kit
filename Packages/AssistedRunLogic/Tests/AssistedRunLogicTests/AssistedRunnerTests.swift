@@ -415,4 +415,15 @@ final class PrematureDoneTests: XCTestCase {
     func testAConfirmationBelowTheInstructionsIsStillFound() {
         XCTAssertEqual(FormRun.classifyConfirmed(melissaPage + "\nYour request has been submitted. Thank you."), .submitted(awaitingEmail: false))
     }
+
+    /// statara.com (Gravity Forms, two steps): its consent paragraph and the choices page both talk about "submitted" and "processed" before anything is sent.
+    func testConsentAndChoicesWordingIsNotAConfirmation() {
+        let consent = "By submitting this request, you acknowledge that you have reviewed the Statara Privacy Policy. You state that this request has been submitted by the individual identified in the request."
+        let choices = "All requests selected from the list below will be processed within 15 days of receipt.\nYour choices for selecting your consumer rights are (select one only):(Required)"
+        for text in [consent, choices, consent + "\n" + choices] {
+            if case .submitted = FormRun.classifyConfirmed(text) { XCTFail("counted as sent: \(text)") }
+        }
+        XCTAssertEqual(FormRun.classifyConfirmed("There was a problem with your submission. The reCAPTCHA response was missing or invalid."), .rejected("the site showed an error after sending"))
+        XCTAssertEqual(FormRun.classifyConfirmed(consent + "\nThank you. Your request has been submitted."), .submitted(awaitingEmail: false))
+    }
 }
