@@ -5,7 +5,7 @@ import OptOutKitCore
 /// The page every flow shows, with one addition: long-pressing a text box offers "My details", with everything the app knows about the person
 /// (names, emails, phones, addresses, birth date) to put into that box. It is for the box the person is on; nothing else on the page changes.
 /// Solve and send, the guide and Email links all show this web view, so all three get it. The monthly run shows nothing, so nothing is offered.
-final class InputMenuWebView: WKWebView {
+final class InputMenuWebView: WKWebView, UIEditMenuInteractionDelegate, UIGestureRecognizerDelegate {
     /// The details to offer: set once by the app, read each time the menu opens. Nil or empty offers nothing.
     nonisolated(unsafe) static var details: () -> [DetailGroup] = { [] }
 
@@ -26,17 +26,75 @@ final class InputMenuWebView: WKWebView {
     })();
     """
 
-    override func buildMenu(with builder: any UIMenuBuilder) {
-        super.buildMenu(with: builder)
-        guard textBoxFocused, builder.system == .context else { return }
+    /// Shown by this view itself on an empty box, where the system offers no menu of its own to add to.
+    private var emptyBoxMenu: UIEditMenuInteraction?
+
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        super.init(frame: frame, configuration: configuration)
+        let interaction = UIEditMenuInteraction(delegate: self)
+        addInteraction(interaction); emptyBoxMenu = interaction
+        let press = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(_:)))
+        press.minimumPressDuration = 0.5; press.cancelsTouchesInView = false; press.delegate = self
+        addGestureRecognizer(press)
+    }
+    required init?(coder: NSCoder) { fatalError("not used") }
+
+    func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
+
+    /// The system menu comes with text in the box. An empty box gets none, so a long press there asks the page whether the touch is on an empty text box,
+    /// puts the cursor in it, and shows "My details" once the finger is lifted.
+    @objc private func longPressed(_ g: UILongPressGestureRecognizer) {
+        guard g.state == .ended, !Self.details().isEmpty else { return }
+        let point = g.location(in: self)
+        let js = """
+        (function(x,y){ var vv=window.visualViewport, s=vv?vv.scale:1, ox=vv?vv.offsetLeft:0, oy=vv?vv.offsetTop:0;
+          var el=document.elementFromPoint(ox+x/s, oy+y/s); while(el&&el.shadowRoot){ var inner=el.shadowRoot.elementFromPoint(ox+x/s, oy+y/s); if(!inner||inner===el) break; el=inner; }
+          if(!el) return false; var t=(el.tagName||'').toLowerCase(), ok=false;
+          if(t==='textarea') ok=!el.readOnly&&!el.disabled;
+          else if(t==='input'){ var k=(el.type||'text').toLowerCase(); ok=!el.readOnly&&!el.disabled&&['text','email','tel','search','url','number','password'].indexOf(k)>=0; }
+          else ok=!!el.isContentEditable;
+          if(!ok) return false; var v=el.isContentEditable?(el.innerText||''):el.value; if(v&&v.length) return false;
+          el.focus(); return true; })(\(point.x),\(point.y));
+        """
+        evaluateJavaScript(js) { [weak self] result, _ in
+            guard let self, result as? Bool == true else { return }
+            self.textBoxFocused = true
+            // The page may zoom to the box as it takes the cursor: once it has settled, the menu is shown over the box where it ended up.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let rect = """
+                (function(){ var e=document.activeElement, vv=window.visualViewport; if(!e||!vv) return null; var r=e.getBoundingClientRect();
+                  return [(r.left+r.width/2-vv.offsetLeft)*vv.scale, (r.top-vv.offsetTop)*vv.scale]; })();
+                """
+                self.evaluateJavaScript(rect) { found, _ in
+                    var at = point
+                    if let xy = found as? [Double], xy.count == 2, self.bounds.contains(CGPoint(x: xy[0], y: xy[1])) { at = CGPoint(x: xy[0], y: xy[1]) }
+                    self.emptyBoxMenu?.presentEditMenu(with: UIEditMenuConfiguration(identifier: nil, sourcePoint: at))
+                }
+            }
+        }
+    }
+
+    func editMenuInteraction(_ interaction: UIEditMenuInteraction, menuFor configuration: UIEditMenuConfiguration, suggestedActions: [UIMenuElement]) -> UIMenu? {
+        guard let menu = detailsMenu() else { return nil }
+        return UIMenu(children: [menu])
+    }
+
+    /// "My details" with a submenu for each kind of detail.
+    private func detailsMenu() -> UIMenu? {
         let groups = Self.details()
-        guard !groups.isEmpty else { return }
+        guard !groups.isEmpty else { return nil }
         let menus = groups.map { group in
             UIMenu(title: Self.title(group.kind), children: group.values.map { value in
                 UIAction(title: value) { [weak self] _ in self?.put(value) }
             })
         }
-        builder.insertChild(UIMenu(title: Loc.t("My details"), image: UIImage(systemName: "person.text.rectangle"), children: menus), atStartOfMenu: .standardEdit)
+        return UIMenu(title: Loc.t("My details"), image: UIImage(systemName: "person.text.rectangle"), children: menus)
+    }
+
+    override func buildMenu(with builder: any UIMenuBuilder) {
+        super.buildMenu(with: builder)
+        guard textBoxFocused, builder.system == .context, let menu = detailsMenu() else { return }
+        builder.insertChild(menu, atStartOfMenu: .standardEdit)
     }
 
     static func title(_ kind: DetailKind) -> String {
