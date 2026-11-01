@@ -389,7 +389,8 @@ final class AssistedRunner: ObservableObject {
 
     func skip(reported: Bool = false) {
         reportedNotWorking = reported; skipFlag = true; resumeNext()
-        if phase == .noForm { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
+        // Whatever the site was waiting on (the no-form screen, or the offer to email a site that failed), skipping answers it.
+        if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
     }
 
     /// The person answered the offer to email a site that did not go through: `sent` is true once they sent the message, which finishes the site.
@@ -610,11 +611,8 @@ struct AssistedOptOutView: View {
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
     @State private var showSkipped = false
-    @State private var composing: EmailBatch?
-    @State private var confirmEmailSent: EmailBatch?
-    /// A message opened in another mail app: asked about when the person is back in this app (not while the offer is still on screen).
-    @State private var awaitingMailReturn: EmailBatch?
-    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var handoff: EmailHandoff
+    init(runner: AssistedRunner) { _runner = StateObject(wrappedValue: runner); _handoff = StateObject(wrappedValue: EmailHandoff(runner: runner)) }
     @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
 
@@ -640,21 +638,16 @@ struct AssistedOptOutView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) { explainEmail = true }       // after the green check
         }
         .sheet(isPresented: $explainEmail) { EmailCheckExplainer(openTab: nil) { explainEmail = false } }
-        .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && composing == nil && runner.phase != .noForm }, set: { _ in }), titleVisibility: .visible) {
+        .confirmationDialog(Loc.t("This site did not go through"), isPresented: Binding(get: { runner.emailOffer != nil && !handoff.active && runner.phase != .noForm }, set: { _ in }), titleVisibility: .visible) {
             Button("Write the email") { if let e = runner.emailOffer { emailInstead(e) } }.accessibilityIdentifier("assisted-offer-email")
             // Already emailed them, or got it done another way: one tap says so, and the site counts as done.
             Button("Mark as done") { runner.answerEmailOffer(sent: true) }.accessibilityIdentifier("assisted-offer-mark-done")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
         } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done. If you already did, tap Mark as done.") }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active, let b = awaitingMailReturn { awaitingMailReturn = nil; confirmEmailSent = b }
-        }
-        .alert("Did you send it?", isPresented: Binding(get: { confirmEmailSent != nil }, set: { if !$0 { confirmEmailSent = nil } })) {
-            Button("Yes, I sent it") {
-                if let b = confirmEmailSent { model.markEmailed(b); if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.finishByEmail() } }
-                confirmEmailSent = nil
-            }
-            Button("No", role: .cancel) { if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }; confirmEmailSent = nil }
+        .onAppear { handoff.markEmailed = { model.markEmailed($0) } }
+        .alert("Did you send it?", isPresented: Binding(get: { handoff.confirming != nil }, set: { _ in })) {
+            Button("Yes, I sent it") { handoff.answer(sent: true) }
+            Button("No", role: .cancel) { handoff.answer(sent: false) }
         } message: { Text("Other mail apps do not tell us whether you sent the message. Say yes only if you did.") }
         .sheet(isPresented: Binding(get: { explainAdID != nil }, set: { if !$0 { explainAdID = nil } })) {
             if let a = explainAdID {
@@ -662,13 +655,9 @@ struct AssistedOptOutView: View {
                               onSkip: { explainAdID = nil; model.skipAdID(); openEmail(a.batch) })
             }
         }
-        .sheet(item: $composing) { batch in
+        .sheet(item: $handoff.composing) { batch in
             MailComposer(to: model.recipients(for: batch).to, bcc: model.recipients(for: batch).bcc, subject: batch.subject, body: model.emailBody(for: batch)) { result in
-                composing = nil
-                if result == .sent {
-                    model.markEmailed(batch)
-                    if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.finishByEmail() }       // asked by email: this site is done
-                } else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
+                handoff.composeFinished(batch, sent: result == .sent)
             }
         }
         .onChange(of: runner.skippedCount) { _, _ in
@@ -689,12 +678,7 @@ struct AssistedOptOutView: View {
     }
 
     private func openEmail(_ batch: EmailBatch) {
-        if model.composesInApp { composing = batch }
-        else {
-            // Another mail app cannot tell us whether the message was sent, so we ask when the person comes back.
-            if let url = model.composeURL(for: batch, app: model.mailApp) { awaitingMailReturn = batch; UIApplication.shared.open(url) }
-            else if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) }
-        }
+        handoff.open(batch, composesInApp: model.composesInApp, url: model.composeURL(for: batch, app: model.mailApp)) { UIApplication.shared.open($0) }
     }
 
     private var working: some View {
