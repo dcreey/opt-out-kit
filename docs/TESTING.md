@@ -124,7 +124,7 @@ shared page code does not take a listing address yet.
 
 **Long press on a text box** (every flow that shows a page): the system edit menu gains "My details" with the person's names, emails, phones, addresses and birth date
 (`InputMenuWebView`, `App/Sources/InputMenu.swift`). What is offered is `DetailChoices.groups`, tested on the Mac (`DetailChoicesTests`). The menu itself and the typing
-into the box need a real web view: checked by hand in the simulator, both on text already in a box (the system menu gains My details) and on an empty box (the system shows no menu there, so the web view shows its own after the long press).
+into the box need a real web view: checked by hand in the simulator (long press on text already in a box, My details, Name, a value).
 
 ### What can and cannot be tested without a simulator
 
