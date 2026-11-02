@@ -37,7 +37,7 @@ enum FormRun {
 
     /// New text that says a code was sent to the person, or asks them to type one, so the request is not finished until they do.
     nonisolated static func asksForCode(_ text: String) -> Bool {
-        text.range(of: "(enter|type|input|submit|paste) (the |your |a |this )?((\\d+|six|four|five)[- ]?(digit|character) |verification |confirmation |one[- ]?time |security |email |e-?mail |authentication )*(code|otp|passcode)|\\botp\\b|(check|look in|see) (your|the) (e-?mail|inbox|messages?)[^.]{0,40}\\bcode|\\bcode (has been |was |is being |will be )?(sent|e-?mailed)|(sent|e-?mailed|emailed) (you |to you |the address[^.]{0,30} )?(an? |the )?([a-z0-9-]+ )?code|[0-9]-digit code",
+        text.range(of: "(enter|type|input|submit|paste) (the |your |a |this )?((\\d+|six|four|five)[- ]?(digit|character) |verification |confirmation |one[- ]?time |security |email |e-?mail |authentication )*(code|otp|passcode)|\\botp\\b|(check|look in|see) (your|the) (e-?mail|inbox|messages?)[^.]{0,40}\\bcode|\\bcode (has been |was |is being |is |will be |gets )?(sent|e-?mailed|emailed)|(sent|e-?mailed|emailed) (you |to you |the address[^.]{0,30} )?(an? |the )?([a-z0-9-]+ )?code|[0-9]-digit code",
                    options: [.regularExpression, .caseInsensitive]) != nil
     }
 

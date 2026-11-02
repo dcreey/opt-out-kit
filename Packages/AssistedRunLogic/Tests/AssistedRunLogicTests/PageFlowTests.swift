@@ -45,7 +45,7 @@ final class PageFlowTests: XCTestCase {
     }
 
     func testAVerifyEmailSubFormIsAStepNotTheEndInEveryFlow() async {
-        for sent in ["Verification code sent. Thank you!", "We have sent a verification code to your email. Enter the code below.", "Thanks! A 6-digit code was emailed to you.", "Check your email for the one-time code."] {
+        for sent in ["A verification code is sent to your email. Please check your Inbox/Junk.", "Verification code sent. Thank you!", "We have sent a verification code to your email. Enter the code below.", "Thanks! A 6-digit code was emailed to you.", "Check your email for the one-time code."] {
             XCTAssertTrue(FormRun.asksForCode(sent), sent)
             if case .submitted = FormRun.classifyConfirmed(sent) { XCTFail("not finished: \(sent)") }
         }
