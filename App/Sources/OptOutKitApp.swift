@@ -15,7 +15,6 @@ struct OptOutKitApp: App {
             RootView().environmentObject(model)
                 .onOpenURL { if let link = AppModel.sharedLink(in: $0) { model.incomingLink = link } }
                 .task { CheckScheduler.register(model: model) }
-                .onAppear { InputMenuWebView.details = { [model] in model.selectedPerson.map { DetailChoices.groups(for: $0, email: model.formEmail) } ?? [] } }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { model.appDidEnterBackground() }

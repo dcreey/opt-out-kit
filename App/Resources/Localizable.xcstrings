@@ -4463,29 +4463,6 @@
     }
    }
   },
-  "Birth date": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Date de naissance"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fecha de nacimiento"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Geburtsdatum"
-     }
-    }
-   }
-  },
   "Birth day": {
    "extractionState": "manual",
    "localizations": {
@@ -12674,29 +12651,6 @@
     }
    }
   },
-  "My details": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Mes informations"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Mis datos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Meine Angaben"
-     }
-    }
-   }
-  },
   "NSUserTrackingUsageDescription": {
    "extractionState": "manual",
    "localizations": {
@@ -16189,29 +16143,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Personensuche"
-     }
-    }
-   }
-  },
-  "Phone": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Téléphone"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Teléfono"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Telefon"
      }
     }
    }

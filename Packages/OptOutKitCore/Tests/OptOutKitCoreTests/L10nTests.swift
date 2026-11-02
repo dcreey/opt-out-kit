@@ -102,26 +102,3 @@ final class RemindersTests: XCTestCase {
         }
     }
 }
-
-/// What a long press on a form box offers, in every flow.
-final class DetailChoicesTests: XCTestCase {
-    func testEveryDetailOfThePersonIsOfferedOnceInTheOrderAPersonLooksForIt() {
-        var p = Person(displayName: "Sam", names: [NameEntry(kind: .legal, name: "Sam Q Rivera"), NameEntry(kind: .nickname, name: "Sammy"), NameEntry(kind: .maiden, name: "sammy")],
-                       addresses: [Address(street: "1 Main St", city: "Austin", state: "TX", zip: "78701"), Address(city: "Dallas", state: "TX")],
-                       emails: ["sam@example.com", "SAM@example.com", "work@example.com"], phones: ["555-0100"], birthdate: "1990-04-09")
-        p.confirmsOwnIdentity = true
-        let groups = DetailChoices.groups(for: p, email: "forms@example.com")
-        XCTAssertEqual(groups.map(\.kind), [.name, .email, .phone, .address, .birthdate])
-        XCTAssertEqual(groups[0].values, ["Sam Q Rivera", "Sam", "Rivera", "Sammy"])
-        XCTAssertEqual(groups[1].values, ["forms@example.com", "sam@example.com", "work@example.com"])
-        XCTAssertEqual(groups[2].values, ["555-0100"])
-        XCTAssertEqual(groups[3].values, ["1 Main St, Austin, TX 78701", "1 Main St", "Austin", "TX", "78701", "Dallas, TX", "Dallas"])
-        XCTAssertEqual(groups[4].values, ["04/09/1990", "1990-04-09"])
-    }
-
-    func testAProfileWithLittleOnlyOffersWhatItHas() {
-        let groups = DetailChoices.groups(for: Person(displayName: "Alex", names: []))
-        XCTAssertEqual(groups.map(\.kind), [.name])
-        XCTAssertEqual(groups[0].values, ["Alex"])
-    }
-}
