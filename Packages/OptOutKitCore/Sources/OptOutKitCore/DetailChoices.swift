@@ -20,12 +20,8 @@ public enum DetailChoices {
             if !list.isEmpty { out.append(DetailGroup(kind: kind, values: list)) }
         }
 
-        // Names: the legal name whole, then its parts, then every other name the person goes by.
-        let legal = person.legalName
-        let parts = legal.split(separator: " ").map(String.init)
-        var names = [legal]
-        if parts.count > 1, let first = parts.first, let last = parts.last { names += [first, last] }
-        names += person.names.map(\.name)
+        // Name: the full legal name only.
+        var names = [person.legalName]
         if names.allSatisfy({ $0.isEmpty }) { names = [person.displayName] }
         add(.name, names)
 

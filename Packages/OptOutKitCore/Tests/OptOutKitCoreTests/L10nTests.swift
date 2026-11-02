@@ -112,7 +112,7 @@ final class DetailChoicesTests: XCTestCase {
         p.confirmsOwnIdentity = true
         let groups = DetailChoices.groups(for: p, email: "forms@example.com")
         XCTAssertEqual(groups.map(\.kind), [.name, .email, .phone, .address, .birthdate])
-        XCTAssertEqual(groups[0].values, ["Sam Q Rivera", "Sam", "Rivera", "Sammy"])
+        XCTAssertEqual(groups[0].values, ["Sam Q Rivera"])
         XCTAssertEqual(groups[1].values, ["forms@example.com", "sam@example.com", "work@example.com"])
         XCTAssertEqual(groups[2].values, ["555-0100"])
         XCTAssertEqual(groups[3].values, ["1 Main St, Austin, TX 78701", "Dallas, TX"])
