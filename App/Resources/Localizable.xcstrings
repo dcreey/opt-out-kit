@@ -3152,6 +3152,29 @@
     }
    }
   },
+  "Advertising ID (MAID)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Identifiant publicitaire (MAID)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Identificador de publicidad (MAID)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbe-ID (MAID)"
+     }
+    }
+   }
+  },
   "Advertising technology": {
    "extractionState": "manual",
    "localizations": {
@@ -3424,6 +3447,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Erlauben"
+     }
+    }
+   }
+  },
+  "Allow the advertising ID in Settings": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autoriser l’identifiant publicitaire dans Réglages"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Permitir el identificador de publicidad en Ajustes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbe-ID in den Einstellungen erlauben"
      }
     }
    }
@@ -18719,6 +18765,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Einkäufe"
+     }
+    }
+   }
+  },
+  "Show my advertising ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Afficher mon identifiant publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrar mi identificador de publicidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meine Werbe-ID anzeigen"
      }
     }
    }

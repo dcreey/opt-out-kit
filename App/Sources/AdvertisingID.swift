@@ -22,6 +22,23 @@ enum AdvertisingID {
         return id.uuidString == "00000000-0000-0000-0000-000000000000" ? nil : id.uuidString
     }
 
+    /// The ID when permission is already given (never prompts), else nil.
+    static var ifAllowed: String? {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-fake-adid") { return "11111111-2222-3333-4444-555555555555" }
+        #endif
+        guard status == .authorized else { return nil }
+        let id = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        return id == "00000000-0000-0000-0000-000000000000" ? nil : id
+    }
+
+    /// Puts a value on the clipboard for a minute only, the way the About screen does for the ID.
+    @MainActor
+    static func copy(_ value: String) {
+        UIPasteboard.general.setItems([[UIPasteboard.typeAutomatic: value]], options: [.expirationDate: Date().addingTimeInterval(60)])
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+
     /// Whether one form's fields ask for it.
     static func isAsked(by fields: [FormField]) -> Bool {
         fields.contains { f in (f.name + " " + f.label).range(of: "\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad|device.?(id|identifier)", options: [.regularExpression, .caseInsensitive]) != nil }

@@ -90,7 +90,7 @@ extension DetailKind {
 
 enum PageMenu {
     /// - fillTitle: "Fill the form again" where the guide fills for you, "Fill in my details" where you start it.
-    /// - details: the person's own details, copied one at a time from "My data"; none hides the entry.
+    /// - details: the person's own details, copied one at a time from "My data", with the advertising ID (MAID) last.
     /// - idPrefix: prefix of the accessibility identifiers (assisted, guided, link).
     @MainActor @ViewBuilder
     static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, details: [DetailGroup] = [], fill: @escaping () async -> Void) -> some View {
@@ -104,19 +104,28 @@ enum PageMenu {
             Button { Task { await fill() } } label: { Label(fillTitle, systemImage: "square.and.pencil") }
                 .disabled(!canFill).accessibilityIdentifier("\(idPrefix)-\(fillID)")
         }
-        if !details.isEmpty {
-            Menu {
-                ForEach(details, id: \.kind) { group in
-                    Section(group.kind.title) {
-                        ForEach(group.values, id: \.self) { value in
-                            Button(value) {
-                                UIPasteboard.general.string = value
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            }
+        Menu {
+            ForEach(details, id: \.kind) { group in
+                Section(group.kind.title) {
+                    ForEach(group.values, id: \.self) { value in
+                        Button(value) {
+                            UIPasteboard.general.string = value
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                         }
                     }
                 }
-            } label: { Label("My data", systemImage: "person.text.rectangle") }.accessibilityIdentifier("\(idPrefix)-my-data")
-        }
+            }
+            Section("Advertising ID (MAID)") {
+                if let id = AdvertisingID.ifAllowed {
+                    Button(id) { AdvertisingID.copy(id) }.accessibilityIdentifier("\(idPrefix)-maid")
+                } else if AdvertisingID.status == .notDetermined {
+                    Button("Show my advertising ID") { Task { if let id = await AdvertisingID.current() { AdvertisingID.copy(id) } } }.accessibilityIdentifier("\(idPrefix)-maid")
+                } else {
+                    Button("Allow the advertising ID in Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                    }.accessibilityIdentifier("\(idPrefix)-maid")
+                }
+            }
+        } label: { Label("My data", systemImage: "person.text.rectangle") }.accessibilityIdentifier("\(idPrefix)-my-data")
     }
 }

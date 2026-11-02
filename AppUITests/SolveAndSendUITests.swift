@@ -56,5 +56,6 @@ final class SolveAndSendUITests: XCTestCase {
         XCTAssertTrue(myData.waitForExistence(timeout: 5), "My data is in the … menu")
         myData.tap()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '@'")).firstMatch.waitForExistence(timeout: 5), "the person's email is listed to copy")
+        XCTAssertTrue(app.buttons["assisted-maid"].exists, "the advertising ID (MAID) is offered too")
     }
 }
