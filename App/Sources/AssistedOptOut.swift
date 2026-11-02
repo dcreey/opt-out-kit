@@ -608,7 +608,10 @@ struct SkippedMark: View {
 /// The waiting mark: the same round badge as the check and the skip, with a turning arrow.
 struct LoadingMark: View {
     let title: String
+    /// When given, a Cancel button appears once the wait is long enough for the person to want out of it.
+    var cancel: (() -> Void)? = nil
     @State private var turning = false
+    @State private var tooLong = false
     @State private var grown = false
     var body: some View {
         VStack(spacing: 10) {
@@ -619,6 +622,9 @@ struct LoadingMark: View {
             }
             .frame(width: 120, height: 120).scaleEffect(grown ? 1 : 0.4)
             Text(title).font(.title3.bold()).foregroundStyle(Color.exnayGold)
+            if let cancel, tooLong {
+                Button("Cancel", role: .cancel, action: cancel).buttonStyle(.bordered).padding(.top, 4).accessibilityIdentifier("loading-cancel")
+            }
         }
         .padding(36)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28))
@@ -627,8 +633,9 @@ struct LoadingMark: View {
             withAnimation(.spring(response: 0.45, dampingFraction: 0.6)) { grown = true }
             withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) { turning = true }
         }
-        .accessibilityElement(children: .ignore).accessibilityLabel(title).accessibilityIdentifier("loading-mark")
-        .allowsHitTesting(false)
+        .task { try? await Task.sleep(nanoseconds: 6_000_000_000); withAnimation { tooLong = true } }
+        .accessibilityElement(children: cancel == nil ? .ignore : .contain).accessibilityLabel(title).accessibilityIdentifier("loading-mark")
+        .allowsHitTesting(cancel != nil)
     }
 }
 

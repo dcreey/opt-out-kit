@@ -207,7 +207,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         // A site that drops the first attempt, or that is slow to answer, is tried again before the page is given up on.
         var attempt = 0
         while true {
-            do { try await wait { self.webView.load(request) }; return }
+            do { try await wait(limit: deadline == nil ? 50 : request.timeoutInterval + 1) { self.webView.load(request) }; return }
             catch {
                 attempt += 1
                 if let deadline {
@@ -252,7 +252,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         (try? String(data: JSONSerialization.data(withJSONObject: [s]), encoding: .utf8))?.dropFirst().dropLast().description ?? "\"\""
     }
 
-    private func wait(_ start: () -> Void) async throws {
+    private func wait(limit: TimeInterval = 50, _ start: () -> Void) async throws {
         try await withCheckedThrowingContinuation { (c: CheckedContinuation<Void, Error>) in
             loadContinuation = c
             waitSerial += 1
@@ -260,7 +260,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
             start()
             // A load that never reports back (a redirect that was cancelled and not followed) ends as a timeout instead of hanging.
             Task { @MainActor [weak self] in
-                try? await Task.sleep(nanoseconds: 50_000_000_000)
+                try? await Task.sleep(nanoseconds: UInt64(limit * 1_000_000_000))
                 if self?.waitSerial == mine { self?.resume(URLError(.timedOut), force: true) }
             }
         }

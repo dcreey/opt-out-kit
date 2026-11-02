@@ -317,19 +317,20 @@ struct BirthdatePicker: View {
         let p = parts
         VStack(alignment: .leading, spacing: 8) {
             Text("Birthdate").font(.subheadline.bold())
-            HStack(spacing: 8) {
+            // Three equal columns, each showing its own prompt ("Year", "Month", "Day") until chosen, so nothing wraps or floats above its neighbours.
+            HStack(spacing: 4) {
                 Picker("Year", selection: Binding(get: { p.y ?? 0 }, set: { set(y: $0 == 0 ? nil : $0, m: p.m, d: p.d) })) {
                     Text("Year").tag(0)
                     ForEach((1900...Self.thisYear).reversed(), id: \.self) { Text(String($0)).tag($0) }
-                }.accessibilityIdentifier("birth-year")
+                }.labelsHidden().frame(maxWidth: .infinity).accessibilityLabel("Year").accessibilityIdentifier("birth-year")
                 Picker("Month", selection: Binding(get: { p.m ?? 0 }, set: { set(y: p.y, m: $0 == 0 ? nil : $0, d: p.d) })) {
                     Text("Month").tag(0)
                     ForEach(1...12, id: \.self) { Text(Calendar.current.monthSymbols[$0 - 1]).tag($0) }
-                }.disabled(p.y == nil).accessibilityIdentifier("birth-month")
+                }.labelsHidden().frame(maxWidth: .infinity).accessibilityLabel("Month").disabled(p.y == nil).accessibilityIdentifier("birth-month")
                 Picker("Day", selection: Binding(get: { p.d ?? 0 }, set: { set(y: p.y, m: p.m, d: $0 == 0 ? nil : $0) })) {
                     Text("Day").tag(0)
                     ForEach(1...daysIn(p.y ?? 2000, p.m ?? 1), id: \.self) { Text(String($0)).tag($0) }
-                }.disabled(p.m == nil).accessibilityIdentifier("birth-day")
+                }.labelsHidden().frame(maxWidth: .infinity).accessibilityLabel("Day").disabled(p.m == nil).accessibilityIdentifier("birth-day")
             }
             .pickerStyle(.menu)
             Text("Sent only to sites whose form asks for it.").font(.footnote).foregroundStyle(.secondary)

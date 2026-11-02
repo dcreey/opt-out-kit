@@ -11,6 +11,8 @@ final class LinkFiller: ObservableObject {
     @Published var host = ""
     @Published var busy = false
     private var session: WebViewSession?
+    /// Bumped when the person cancels (or another page is opened): a load still running for an older number stops quietly.
+    private var generation = 0
 
     /// A web address from pasted text: https only (an http link is upgraded), with a real host.
     static func normalized(_ text: String) -> URL? {
@@ -25,13 +27,26 @@ final class LinkFiller: ObservableObject {
     /// Test hook: works on a session that already holds a page.
     func attach(_ session: WebViewSession) { close(); self.session = session; webView = session.presentable(); host = "test" }
 
+    /// The person gave up waiting for the page: it is dropped and the link box comes back.
+    func cancelLoading() { generation += 1; close(); busy = false }
+
+    /// How long a page may take before it is shown as it is (a page that keeps loading in the background, or never reports that it finished).
+    static let loadSeconds: TimeInterval = 30
+
     func open(_ url: URL) async {
-        close(); busy = true; host = url.host ?? ""
+        close(); generation += 1; let mine = generation
+        busy = true; host = url.host ?? ""
         status = Loc.t("Loading the page…")
         let s = WebViewSession.make(); session = s
-        do { try await s.load(URLRequest(url: url)) } catch { status = Loc.t("The page would not load. Check the link and try again."); busy = false; return }
+        do { try await s.load(URLRequest(url: url), within: Self.loadSeconds) } catch {
+            guard mine == generation else { return }
+            status = Loc.t("The page would not load. Check the link and try again."); busy = false; return
+        }
+        guard mine == generation else { return }
         await s.settlePage(maxWait: 10)
+        guard mine == generation else { return }
         _ = await s.denyCookies()
+        guard mine == generation else { return }
         webView = s.presentable()
         status = Loc.t("The page is loaded. Check the address above, then choose \"Fill in my details\" in the … menu.")
         busy = false
@@ -104,7 +119,7 @@ struct LinkFillerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
-        .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…")).transition(.opacity) } }
+        .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…"), cancel: { filler.cancelLoading(); returnToChooser() }).transition(.opacity) } }
         .onChange(of: model.incomingLink) { _, _ in takeIncomingLink() }
         .overlay { if showDone { SentCheck().transition(.opacity) } }
         .onAppear { filler.autoSubmit = { model.autoSubmit } }
