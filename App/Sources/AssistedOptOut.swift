@@ -333,6 +333,10 @@ struct AssistedOptOutView: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
         .sentQuestionAlert(runner.sentQuestion)
+        #if DEBUG
+        // Simulator work and its UI test: `-show-sent-question` puts the "Was this sent?" question on screen as soon as the screen opens.
+        .task { if ProcessInfo.processInfo.arguments.contains("-show-sent-question") { try? await Task.sleep(nanoseconds: 3_000_000_000); _ = await runner.sentQuestion.ask(awaitingEmail: false) } }
+        #endif
         .alert("This page mentions an email", isPresented: Binding(get: { runner.askFollowUp }, set: { _ in })) {
             Button("Yes, track it") { runner.answerFollowUp(track: true) }
             Button("No, it is done") { runner.answerFollowUp(track: false) }

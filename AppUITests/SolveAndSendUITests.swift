@@ -58,4 +58,16 @@ final class SolveAndSendUITests: XCTestCase {
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '@'")).firstMatch.waitForExistence(timeout: 5), "the person's email is listed to copy")
         XCTAssertTrue(app.buttons["assisted-maid"].exists, "the advertising ID (MAID) is offered too")
     }
+
+    func testAConfirmationNobodyPressedAnythingForAsksWasThisSent() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com", "-show-sent-question"]
+        app.launch()
+        let alert = app.alerts["Was this sent?"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 30), "the question is on screen")
+        XCTAssertTrue(alert.buttons["Yes, it was sent"].exists)
+        XCTAssertTrue(alert.buttons["No, keep waiting"].exists)
+        alert.buttons["No, keep waiting"].tap()
+        XCTAssertFalse(alert.waitForExistence(timeout: 2), "answering closes it")
+    }
 }
