@@ -363,6 +363,7 @@ struct GuidedFlowView: View {
 /// (scrolling if it is long). A gold line carrying the app's icon and name separates it from the site's own page below, the same as in the
 /// semi-automated screen.
 struct GuidedPanel: View {
+    @EnvironmentObject var model: AppModel
     @ObservedObject var runner: GuidedRunner
     private var nextTitle: String {
         if case .pickListing? = runner.flow.current?.action { return Loc.t("This is my listing") }
@@ -378,7 +379,7 @@ struct GuidedPanel: View {
             GuideSurface(topInset: topInset) {
                 HStack(spacing: 10) {
                     Menu {
-                        PageMenu.items(web: runner.webView, idPrefix: "guided") { runner.fillAgain() }
+                        PageMenu.items(web: runner.webView, idPrefix: "guided", details: model.pageDetails) { runner.fillAgain() }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in
                                 Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")

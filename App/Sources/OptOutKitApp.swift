@@ -487,6 +487,8 @@ final class AppModel: ObservableObject {
     var contactEmail: String { household.contactEmail ?? "" }
     /// What goes into forms (Gmail addresses carry +optoutkit), or nil until a valid address has been given.
     var formEmail: String? { household.formEmail }
+    /// What "My data" in the page menu of every flow offers to copy.
+    var pageDetails: [DetailGroup] { selectedPerson.map { DetailChoices.groups(for: $0, email: formEmail) } ?? [] }
 
     func setContactEmail(_ email: String) {
         household.setContactEmail(email)

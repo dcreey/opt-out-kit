@@ -383,7 +383,7 @@ struct AssistedOptOutView: View {
                     // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
                     HStack(spacing: 10) {
                         Menu {
-                            PageMenu.items(web: pageWebView ?? searchWebView, idPrefix: "assisted") { await runner.page?.refill() }
+                            PageMenu.items(web: pageWebView ?? searchWebView, idPrefix: "assisted", details: model.pageDetails) { await runner.page?.refill() }
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
                             }

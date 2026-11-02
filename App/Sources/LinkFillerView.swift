@@ -176,7 +176,7 @@ struct LinkFillerView: View {
             GuideSurface(topInset: 0) {
                 HStack(spacing: 10) {
                     Menu {
-                        PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy) {
+                        PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy, details: model.pageDetails) {
                             if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
                         }
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")

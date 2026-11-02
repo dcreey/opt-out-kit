@@ -45,4 +45,16 @@ final class SolveAndSendUITests: XCTestCase {
         expectation(for: NSPredicate(format: "label == %@", second), evaluatedWith: label)
         waitForExpectations(timeout: 20)
     }
+
+    func testMyDataIsInTheMenuAndOffersEachDetailToCopy() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 20))
+        app.buttons["assisted-more"].tap()
+        let myData = app.buttons["assisted-my-data"]
+        XCTAssertTrue(myData.waitForExistence(timeout: 5), "My data is in the … menu")
+        myData.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '@'")).firstMatch.waitForExistence(timeout: 5), "the person's email is listed to copy")
+    }
 }

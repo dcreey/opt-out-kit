@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import OptOutKitCore
 
 extension Color {
     /// The gold of the app icon.
@@ -75,11 +76,24 @@ struct AutoSubmitToggle: View {
 
 /// The page actions every guide's … menu starts with, so Solve and send, the guided steps and Email links offer the same three things in the same order:
 /// copy the page's address, refresh it (reload, then the details are put back: `PageFlow.reloadThenRefill`) and fill the form in.
+extension DetailKind {
+    var title: LocalizedStringKey {
+        switch self {
+        case .name: "Name"
+        case .email: "Email"
+        case .phone: "Phone"
+        case .address: "Address"
+        case .birthdate: "Birth date"
+        }
+    }
+}
+
 enum PageMenu {
     /// - fillTitle: "Fill the form again" where the guide fills for you, "Fill in my details" where you start it.
+    /// - details: the person's own details, copied one at a time from "My data"; none hides the entry.
     /// - idPrefix: prefix of the accessibility identifiers (assisted, guided, link).
     @MainActor @ViewBuilder
-    static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, fill: @escaping () async -> Void) -> some View {
+    static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, details: [DetailGroup] = [], fill: @escaping () async -> Void) -> some View {
         if let url = web?.url {
             Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
         }
@@ -89,6 +103,20 @@ enum PageMenu {
             } label: { Label("Refresh the page", systemImage: "arrow.clockwise") }.accessibilityIdentifier("\(idPrefix)-refresh")
             Button { Task { await fill() } } label: { Label(fillTitle, systemImage: "square.and.pencil") }
                 .disabled(!canFill).accessibilityIdentifier("\(idPrefix)-\(fillID)")
+        }
+        if !details.isEmpty {
+            Menu {
+                ForEach(details, id: \.kind) { group in
+                    Section(group.kind.title) {
+                        ForEach(group.values, id: \.self) { value in
+                            Button(value) {
+                                UIPasteboard.general.string = value
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
+                        }
+                    }
+                }
+            } label: { Label("My data", systemImage: "person.text.rectangle") }.accessibilityIdentifier("\(idPrefix)-my-data")
         }
     }
 }
