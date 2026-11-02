@@ -159,7 +159,7 @@ def good_links(base, links, own):
     seen, out = set(), []
     for href, text, *around in links:
         u = urllib.parse.urljoin(base, href).split("#")[0]
-        if not u.startswith("http") or u in seen or "clym-widget.net" in u: continue     # a consent-widget bridge, not a form
+        if not u.startswith("http") or u in seen or "clym-widget.net" in u or "ethyca.com/janus" in u: continue     # a consent-widget bridge, not a form
         if P.registrable(urllib.parse.urlsplit(u).netloc) != own and not any(k in u for k in P.PORTALS) and not PORTAL_HOSTS.search(u) \
                 and not re.search(r"opt[\\s_-]?out|do[\\s_-]?not[\\s_-]?sell|privacy[\\s_-]?request", u, re.I): continue
         sc = max(P.link_score(u, text), P.link_score(u, text + " " + (around[0] if around else "")) - 2) + (8 if PORTAL_HOSTS.search(u) else 0)

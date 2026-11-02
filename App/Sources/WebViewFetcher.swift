@@ -44,7 +44,7 @@ protocol TermsPolicy: Sendable {
 }
 
 @MainActor
-final class WebViewSession: NSObject, WKNavigationDelegate {
+final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     let webView: WKWebView
     private var status = 200
     /// The token of the form a live run chose, so the final picture is cropped around it.
@@ -80,10 +80,13 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         // Every frame that has inputs tells the session, so a form inside a frame from another site can be read and filled.
         config.userContentController.add(reporter, contentWorld: .page, name: "ookFrame")
         config.userContentController.addUserScript(WKUserScript(source: "(function(){if(window.top===window)return; function r(){try{var n=document.querySelectorAll('input,select,textarea').length; if(n>0) webkit.messageHandlers.ookFrame.postMessage({n:n,href:location.href});}catch(e){}} if(document.readyState==='complete') setTimeout(r,800); else window.addEventListener('load',function(){setTimeout(r,800);}); setTimeout(r,3000);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: false))
+        // The person's own touches and keys (only real ones, never the page's or the app's scripted events) are noted, so the app can leave the page alone while they type.
+        config.userContentController.addUserScript(WKUserScript(source: "(function(){var top=window.top===window; function mark(e){if(!e.isTrusted)return; if(top) window.__ookUserAt=Date.now(); else try{window.top.postMessage('ookUser','*');}catch(x){}} ['pointerdown','touchstart','keydown','beforeinput','input'].forEach(function(n){document.addEventListener(n,mark,true);}); if(top) window.addEventListener('message',function(e){if(e.data==='ookUser') window.__ookUserAt=Date.now();});})();", injectionTime: .atDocumentStart, forMainFrameOnly: false))
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
         reporter.session = self
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
         webView.alpha = 0.01
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
@@ -278,6 +281,15 @@ final class WebViewSession: NSObject, WKNavigationDelegate {
         }
     }
 
+    // MARK: WKUIDelegate
+
+    /// A link that asks for a new window (target="_blank", window.open) opens in this same page: there is no second window to show, and without this the tap does nothing.
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if navigationAction.targetFrame == nil || navigationAction.targetFrame?.isMainFrame == false,
+           let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https" { webView.load(navigationAction.request) }
+        return nil
+    }
+
     // MARK: WKNavigationDelegate
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
@@ -451,6 +463,16 @@ extension WebViewSession {
     /// True when the page changed on screen since the last call and has been still for a moment (a window opened, the next step appeared, a message showed).
     /// A watcher inside the page (a MutationObserver) records changes at no cost while nothing happens; the app asks for the flag every second or so.
     /// A page that has just loaded, or has no watcher yet, counts as changed. Marks the app puts on the form (`data-ook`) are not changes.
+    /// True while the person has the cursor in a box on the page and has touched or typed in the last 45 seconds: nothing may be clicked, scrolled or filled then.
+    func userIsTyping() async -> Bool {
+        let js = #"""
+        (function(){var a=document.activeElement; if(!a) return false; var t=window.__ookUserAt||0; if(Date.now()-t>45000) return false;
+          var tag=a.tagName; if(tag==='IFRAME') return true; if(tag==='TEXTAREA'||a.isContentEditable) return true;
+          return tag==='INPUT'&&!/^(checkbox|radio|button|submit|reset|image|file|range|color|hidden)$/i.test(a.type||'');})();
+        """#
+        return (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
+    }
+
     func pageChanged() async -> Bool {
         let js = #"""
         (function(){var W=window.__ook;

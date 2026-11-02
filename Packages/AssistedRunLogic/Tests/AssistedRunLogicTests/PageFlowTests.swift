@@ -62,6 +62,16 @@ final class PageFlowTests: XCTestCase {
         XCTAssertEqual(later, .confirmed(awaitingEmail: false))
     }
 
+    func testNothingIsFilledClickedOrScrolledWhileThePersonTypesInABox() async {
+        let page = Page(); page.texts = ["form", "form\nA new window with fields\nOpt out of the sale of my data"]; page.adoptScript = [true]; page.typing = true
+        var base = await page.pageText(), scrolls = 0
+        let whileTyping = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls, domChanged: true)
+        XCTAssertEqual(whileTyping, .nothing); XCTAssertEqual(page.adopts, 0, "no form is filled in"); XCTAssertEqual(page.scrolls, 0, "the page is not scrolled"); XCTAssertEqual(base, "form", "the change is kept to look at later")
+        page.typing = false
+        let after = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls, domChanged: true)
+        XCTAssertEqual(after, .newFormFilled, "once they are done the change is handled")
+    }
+
     func testWatchingFillsANewFormAndScrollsToAnOptOutButtonOnlyForARealChange() async {
         let page = Page(); page.texts = ["form", "form\nA new window with fields"]; page.adoptScript = [true]
         var base = await page.pageText(), scrolls = 0

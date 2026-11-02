@@ -1057,6 +1057,21 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertNil(plan.values.first { $0.name == "token" }, "hidden fields are left as the site set them")
     }
 
+    func testAStateBoxWhoseHintNamesTheCountryGetsTheStateNotTheCountry() {
+        let f = form([("text", "country", "Country*"), ("text", "state", "State (select country first)*"), ("text", "city", "City")])
+        let plan = FormFiller.plan(for: f, signals: nil, person: pat)
+        let state = plan.values.first { $0.name == "state" }?.candidates ?? []
+        XCTAssertTrue(state.contains("Illinois") || state.contains("IL"), "State is filled with the person's state, got \(state)")
+        XCTAssertFalse(state.contains("United States"), "the hint naming the country must not make it the country box")
+    }
+
+    func testAnIPAddressBoxIsNotTheStreetAddress() {
+        let f = form([("text", "ip", "Opt-Out my current IP address https://whatismyipaddress.com"), ("text", "address1", "Address1"), ("text", "zip", "Zip address")])
+        let plan = FormFiller.plan(for: f, signals: nil, person: pat)
+        XCTAssertNil(plan.values.first { $0.name == "ip" }, "the IP box is left empty")
+        XCTAssertEqual(plan.values.first { $0.name == "address1" }?.candidates.first, "1 Main St")
+    }
+
     func testAskForWhatIsMissingInsteadOfGuessing() {
         let noEmail = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
         let plan = FormFiller.plan(for: form([("email", "email", "Email")]), signals: nil, person: noEmail)

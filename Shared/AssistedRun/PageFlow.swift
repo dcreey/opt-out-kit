@@ -50,6 +50,8 @@ enum PageFlow {
     /// may have appeared (a window opened, the next step), which is filled in; or an opt-out button came into view, which is scrolled to (at most twice per site, and
     /// never for the person's own scrolling).
     static func watch(_ page: AssistedPage, baseline: inout String, autoScrolls: inout Int, force: Bool = false, domChanged: Bool = false) async -> Watched {
+        // The person has the cursor in a box: no reading that could fill, click or scroll. The change is looked at once they are done, since the baseline is not moved.
+        if await page.userIsTyping() { return .nothing }
         let now = await page.pageText()
         // A form that opens with an animation may still be collapsed on the first look, so after a change the page is read again a few times even when the text is the same.
         guard !now.isEmpty, now != baseline || force else { return .nothing }

@@ -26,6 +26,8 @@ protocol AssistedPage: AnyObject {
     func moreForms() async -> Bool
     /// True when the page shows an empty box for a code sent to the person (a verification step); the request is not done until they type it.
     func awaitingCode() async -> Bool
+    /// True while the person has the cursor in a box (touched or typed lately): the app clicks, scrolls and fills nothing then.
+    func userIsTyping() async -> Bool
     /// How many more opt-out forms this page has after the one on screen.
     var formsRemaining: Int { get }
     func close()
@@ -33,7 +35,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; var formsRemaining: Int { 0 } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; func userIsTyping() async -> Bool { false }; var formsRemaining: Int { 0 } }
 
 @MainActor
 protocol AssistedDriver {

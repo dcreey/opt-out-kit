@@ -150,6 +150,7 @@ final class WebAssistedPage: AssistedPage {
     func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
     func adoptNewForm() async -> Bool {
+        if await session.userIsTyping() { return false }          // never fill or click while the person is typing in a box
         guard let person, let pageURL, liveForm != nil else { return false }
         let frameBefore = session.activeFrame
         let forms = await session.discoverForms(waitForFrames: false)
@@ -185,7 +186,7 @@ final class WebAssistedPage: AssistedPage {
         if await session.hasTermsPrompt() {
             // Tried once per page: the person's approved list decides, and everything else is left for them.
             let url = session.webView.url
-            if termsTriedFor != url { termsTriedFor = url; _ = await session.acceptTermsIfAllowed(policy: termsPolicy, domain: url?.host ?? pageURL?.host ?? ""); await refill() }
+            if termsTriedFor != url, !(await session.userIsTyping()) { termsTriedFor = url; _ = await session.acceptTermsIfAllowed(policy: termsPolicy, domain: url?.host ?? pageURL?.host ?? ""); await refill() }
             if await session.hasTermsPrompt() { out.append(.terms) }
         }
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
@@ -270,7 +271,8 @@ final class WebAssistedPage: AssistedPage {
     func pageText() async -> String { await session.viewportText() }
     func changed() async -> Bool { await session.pageChanged() }
     func awaitingCode() async -> Bool { await session.emptyVerificationCodeBox() }
-    func scrollToOptOut() async -> Bool { await session.scrollToOptOutControl() }
+    func scrollToOptOut() async -> Bool { if await session.userIsTyping() { return false }; return await session.scrollToOptOutControl() }
+    func userIsTyping() async -> Bool { await session.userIsTyping() }
 
     func close() { session.close() }
 }

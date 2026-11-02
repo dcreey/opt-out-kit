@@ -544,18 +544,29 @@ extension WebViewSession {
     /// only an option you pick). Types the state's name, waits for the list, and picks the option that is exactly that name. Returns how many it chose.
     func chooseAutocomplete(state: String?) async -> Int {
         guard let state, !state.isEmpty else { return 0 }
+        // A country box that is also a type-ahead comes first: a state box beside it ("State (select country first)") stays switched off until a country is picked.
+        // The person's state is a US state here, so the country is the United States.
+        let country = await pickFromTypeAhead(kind: "country", name: "United States")
+        if country > 0 { try? await Task.sleep(nanoseconds: 600_000_000) }
+        return country + (await pickFromTypeAhead(kind: "state", name: state))
+    }
+
+    /// One kind of type-ahead box ("state" or "country"): types the name, waits for the list, picks the option that is exactly that name. Returns how many it chose.
+    private func pickFromTypeAhead(kind: String, name: String) async -> Int {
         let open = #"""
-        (function(name){
-          var els=[].slice.call(document.querySelectorAll('input[role=combobox][aria-autocomplete]')).filter(function(e){
-            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||e.getAttribute('data-ook-ac')) return false;
-            var l=((e.getAttribute('aria-label')||'')+' '+(e.id||'')+' '+((e.id&&document.querySelector('label[for="'+e.id+'"]'))?document.querySelector('label[for="'+e.id+'"]').innerText:'')).toLowerCase();
-            return /state|province|region|residence/.test(l)&&!/country/.test(l);});
+        (function(kind,name){
+          var strip=function(t){return (t||'').replace(/\([^)]*\)/g,' ');};
+          var els=[].slice.call(document.querySelectorAll('input[aria-autocomplete]')).filter(function(e){
+            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||e.getAttribute('data-ook-ac-'+kind)) return false;
+            var g=e.closest('.form-group'); g=g&&g.querySelector('label');
+            var l=(strip(e.getAttribute('aria-label'))+' '+(e.id||'')+' '+(e.name||'')+' '+strip(((e.id&&document.querySelector('label[for="'+e.id+'"]'))?document.querySelector('label[for="'+e.id+'"]').innerText:''))+' '+strip(g?g.innerText:'')).toLowerCase();
+            return kind==='country' ? /country/.test(l) : (/state|province|region|residence/.test(l)&&!/country/.test(l));});
           if(!els.length) return false;
-          var e=els[0]; e.setAttribute('data-ook-ac','1'); e.scrollIntoView({block:'center'}); e.focus();
+          var e=els[0]; e.setAttribute('data-ook-ac-'+kind,'1');
           var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); d.set.call(e,name);
           ['keydown','input','keyup'].forEach(function(t){e.dispatchEvent(new Event(t,{bubbles:true}));});
           ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
-          return true;})(\#(Self.liveLiteral(state)));
+          return true;})(\#(Self.liveLiteral(kind)),\#(Self.liveLiteral(name)));
         """#
         var chosen = 0
         for _ in 0..<4 {
@@ -564,9 +575,9 @@ extension WebViewSession {
             let pick = #"""
             (function(name){var want=name.toLowerCase();
               var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=option],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
-              for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim().toLowerCase(); if(t===want){opts[i].scrollIntoView({block:'center'});
+              for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim().toLowerCase(); if(t===want){
                 ['mousedown','mouseup','click'].forEach(function(k){opts[i].dispatchEvent(new MouseEvent(k,{bubbles:true,cancelable:true}));}); return true;}}
-              return false;})(\#(Self.liveLiteral(state)));
+              return false;})(\#(Self.liveLiteral(name)));
             """#
             if (await evalLive(pick)) as? Bool == true { chosen += 1 }
             try? await Task.sleep(nanoseconds: 400_000_000)

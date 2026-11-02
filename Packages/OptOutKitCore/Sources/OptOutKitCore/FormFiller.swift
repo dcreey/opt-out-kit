@@ -93,10 +93,12 @@ public enum FormFiller {
         let hasPrenom = allKeys.contains { $0.range(of: "pr[ée]nom|first|vorname", options: .regularExpression) != nil }
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         for field in form.fields {
-            let key = (field.name + " " + field.label).lowercased()
+            // A hint in brackets tells the person what to do, not what the box is: "State (select country first)" is the state, not the country or a first name.
+            let hint = "\\s*\\((select|choose|pick|enter|type|please)[^)]*\\)"
+            let key = (field.name + " " + field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive]).lowercased()
             if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
             // A live form carries the page's own label first, then " | " and the field's code name; rules about what the box says use the label alone.
-            let visibleLabel = field.label.components(separatedBy: " | ").first ?? field.label
+            let visibleLabel = (field.label.components(separatedBy: " | ").first ?? field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive])
             // A label can say "(Not required but strongly recommended)" next to a required attribute: the page's own words win.
             let optionalWords = field.label.range(of: "not required|\\(optional\\)|optional\\)", options: [.regularExpression, .caseInsensitive]) != nil
             let required = !optionalWords && (field.label.contains("*") || field.label.lowercased().contains("(required)"))
@@ -128,6 +130,8 @@ public enum FormFiller {
             // (A field that asks for "First / Middle Name(s)" is the first name.)
             if key.range(of: "\\b(middle|mn|mi|suffix)\\b|middle.?name|middle.?initial", options: .regularExpression) != nil,
                key.range(of: "first|pr[ée]nom|vorname|given", options: .regularExpression) == nil { continue }
+            // A box about the device's IP address ("Opt-Out my current IP address, https://whatismyipaddress.com") is not a street address: it is left empty.
+            if key.range(of: "(^|[^a-z])ip.?address|whatismyip|\\bip\\b", options: .regularExpression) != nil { continue }
             // A link to the person's own listing has to come from them: the form cannot succeed without it.
             if isListingField(field) {
                 if let listingURL { values.append(FieldValue(name: field.name, type: field.type, candidates: [listingURL.absoluteString], label: field.label)) }
