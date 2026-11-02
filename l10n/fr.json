@@ -314,7 +314,7 @@
  "Don't open": "Ne pas ouvrir",
  "Done": "Terminé",
  "Done for you by the app": "Fait pour vous par l’app",
- "Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.": "Chaque jour, vous traitez jusqu'à 25 courtiers du même type. Choisissez celui que vous voulez traiter aujourd'hui.",
+ "Each day you work through up to %lld brokers of one kind. Pick the kind you want to tackle today.": "Chaque jour, vous traitez jusqu'à %lld courtiers du même type. Choisissez celui que vous voulez traiter aujourd'hui.",
  "Each is filled in; you tick the human check": "Chacun est rempli ; vous cochez la vérification humaine",
  "Each person": "Chaque personne",
  "Each person has their own progress": "Chaque personne a sa propre progression",

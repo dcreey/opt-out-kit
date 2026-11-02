@@ -268,7 +268,7 @@ extension BrokerListView {
 }
 
 
-/// Why a day's batch is being chosen: the first of the day, or another 25 after finishing.
+/// Why a day's batch is being chosen: the first of the day, or another batch after finishing.
 enum ChooserMode: String, Identifiable { case start, more; var id: String { rawValue } }
 
 /// The words every opt-out flow repeats: finishing an opt-out sometimes takes a follow-up email.
@@ -287,7 +287,7 @@ struct KindChooserView: View {
         NavigationStack {
             List {
                 Section {
-                    Text(mode == .start ? Loc.t("Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.")
+                    Text(mode == .start ? Loc.f("Each day you work through up to %lld brokers of one kind. Pick the kind you want to tackle today.", DailyGoals.batchSize)
                                         : Loc.t("Nice work. Pick the kind of broker for your next batch."))
                         .font(.subheadline)
                 }

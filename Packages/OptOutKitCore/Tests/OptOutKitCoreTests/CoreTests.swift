@@ -2619,13 +2619,13 @@ final class DailyGoalsTests: XCTestCase {
         return e
     }
 
-    func testTodayIsTheNext25SitesAndAnEarlierDayIsLeftBehind() {
+    func testTodayIsTheNextBatchOfSitesAndAnEarlierDayIsLeftBehind() {
         let entries = (0..<60).map { site($0) }
         let queue = entries.map(\.domain)
         let cal = Calendar(identifier: .gregorian)
         let now = Date()
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
-        XCTAssertEqual(g.verify.count, 25)
+        XCTAssertEqual(g.verify.count, DailyGoals.batchSize)
         XCTAssertEqual(g.verify.first, "s0.com")
         XCTAssertEqual(g.verifyDone, 0); XCTAssertFalse(g.allComplete)
 
@@ -2633,7 +2633,7 @@ final class DailyGoalsTests: XCTestCase {
         var attempts: [String: [OptOutAttempt]] = [:]
         for i in 0..<10 { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted")] }
         g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
-        XCTAssertEqual(g.verify.count, 25); XCTAssertEqual(g.verify.first, "s0.com"); XCTAssertEqual(g.verifyDone, 10)
+        XCTAssertEqual(g.verify.count, DailyGoals.batchSize); XCTAssertEqual(g.verify.first, "s0.com"); XCTAssertEqual(g.verifyDone, 10)
 
         // Finished yesterday: tomorrow's list starts after them.
         let tomorrow = now.addingTimeInterval(86_400)
@@ -2641,16 +2641,16 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertEqual(g.verify.first, "s10.com"); XCTAssertEqual(g.verifyDone, 0)
     }
 
-    func testFinishingTheBatchCompletesTheGoalAndAnotherBatchAddsTwentyFiveMore() {
+    func testFinishingTheBatchCompletesTheGoalAndAnotherBatchAddsAnotherBatch() {
         let entries = (0..<60).map { site($0) }
         let queue = entries.map(\.domain), now = Date(), cal = Calendar(identifier: .gregorian)
         var attempts: [String: [OptOutAttempt]] = [:]
-        for i in 0..<25 { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted"), OptOutAttempt(date: now, outcome: "emailed")] }
+        for i in 0..<DailyGoals.batchSize { attempts["s\(i)"] = [OptOutAttempt(date: now, outcome: "submitted"), OptOutAttempt(date: now, outcome: "emailed")] }
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, calendar: cal)
         XCTAssertTrue(g.verifyComplete && g.allComplete)
         g = DailyGoals.build(queue: queue, entries: entries, attempts: attempts, now: now, batches: 2, calendar: cal)
-        XCTAssertEqual(g.verify.count, 50); XCTAssertFalse(g.allComplete)
-        XCTAssertEqual(DailyGoals.daysLeft(remaining: 700), 28)
+        XCTAssertEqual(g.verify.count, 2 * DailyGoals.batchSize); XCTAssertFalse(g.allComplete)
+        XCTAssertEqual(DailyGoals.daysLeft(remaining: 700), (700 + DailyGoals.batchSize - 1) / DailyGoals.batchSize)
     }
 
     func testEachBatchIsOneKindOfBrokerAndAnotherBatchTakesTheNextKind() {
@@ -2662,13 +2662,13 @@ final class DailyGoalsTests: XCTestCase {
         let queue = entries.map(\.domain), cal = Calendar(identifier: .gregorian), now = Date()
         var g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, calendar: cal)
         XCTAssertEqual(g.themes, ["people_search"])
-        XCTAssertEqual(g.verify.count, 25)
+        XCTAssertEqual(g.verify.count, DailyGoals.batchSize)
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         XCTAssertTrue(g.verify.allSatisfy { byDomain[$0]?.about?.category == "people_search" }, "a batch is one kind")
         XCTAssertEqual(g.verify.first, "s0.com", "queue order within the kind")
         g = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, batches: 2, calendar: cal)
-        XCTAssertEqual(g.themes, ["people_search", "people_search"], "people search has 40, so the next 15 are still ad tech")
-        XCTAssertEqual(g.verify.count, 40)
+        XCTAssertEqual(g.themes, ["people_search", "people_search"], "people search has 40, so two batches of it fit")
+        XCTAssertEqual(g.verify.count, 2 * DailyGoals.batchSize)
     }
 
     func testThePersonChoosesTheKindForEachBatchAndSeesHowManyAreLeft() {
@@ -2684,7 +2684,7 @@ final class DailyGoalsTests: XCTestCase {
         XCTAssertTrue(g.verify.allSatisfy { Int($0.dropFirst().dropLast(4))! >= 30 })
         // A second batch of a chosen kind: people search then ad tech.
         let two = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["adtech", "people_search"], calendar: cal)
-        XCTAssertEqual(two.themes, ["adtech", "people_search"]); XCTAssertEqual(two.verify.count, 50)
+        XCTAssertEqual(two.themes, ["adtech", "people_search"]); XCTAssertEqual(two.verify.count, 2 * DailyGoals.batchSize)
         // A chosen kind with nothing left falls back instead of an empty batch.
         let none = DailyGoals.build(queue: queue, entries: entries, attempts: [:], now: now, chosen: ["political"], calendar: cal)
         XCTAssertEqual(none.themes, ["people_search"])
@@ -3123,12 +3123,12 @@ final class SkippedSitesTests: XCTestCase {
         let entries = (0..<40).map(site)
         let queue = entries.map(\.domain)
         let plain = DailyGoals.build(queue: queue, entries: entries, attempts: [:])
-        XCTAssertEqual(plain.verify.count, 25)
+        XCTAssertEqual(plain.verify.count, DailyGoals.batchSize)
         XCTAssertTrue(plain.verify.contains("s0.com"))
         let parked = DailyGoals.build(queue: queue, entries: entries, attempts: [:], parked: ["s0"])
-        XCTAssertEqual(parked.verify.count, 25, "the batch still has 25")
+        XCTAssertEqual(parked.verify.count, DailyGoals.batchSize, "the batch still has a full batch")
         XCTAssertFalse(parked.verify.contains("s0.com"))
-        XCTAssertTrue(parked.verify.contains("s25.com"), "the next site fills the gap")
+        XCTAssertTrue(parked.verify.contains("s\(DailyGoals.batchSize).com"), "the next site fills the gap")
     }
 
     func testASkipWaitsAWeekThenComesBackAndIsRemindedAbout() {

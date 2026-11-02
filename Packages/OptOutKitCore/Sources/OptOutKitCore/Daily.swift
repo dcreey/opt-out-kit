@@ -3,13 +3,13 @@ import Foundation
 /// Today's goal: finish a batch of semi-automated sites (fill in and tick the human check). Batches advance by themselves as sites are
 /// finished, so about a month covers every site, and a person who wants to go faster can take another batch.
 public struct DailyGoals: Equatable, Sendable {
-    public static let batchSize = 25
+    public static let batchSize = 15
 
     /// The sites to verify today, in queue order. Sites finished on an earlier day are not in it; ones finished today stay, so the list
     /// does not shift under the person while they work.
     public var verify: [String]
     public var verifyDone: Int
-    /// How many batches have been taken today (1 = the normal 25).
+    /// How many batches have been taken today (1 = the normal 15).
     public var batches: Int
     /// The kind of broker each batch is made of (`BrokerCategory` ids, in batch order): every site in a batch is the same kind, so a
     /// day can be "tackle the ad tech brokers".

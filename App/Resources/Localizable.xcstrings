@@ -7246,25 +7246,25 @@
     }
    }
   },
-  "Each day you work through up to 25 brokers of one kind. Pick the kind you want to tackle today.": {
+  "Each day you work through up to %lld brokers of one kind. Pick the kind you want to tackle today.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Chaque jour, vous traitez jusqu'à 25 courtiers du même type. Choisissez celui que vous voulez traiter aujourd'hui."
+      "value": "Chaque jour, vous traitez jusqu'à %lld courtiers du même type. Choisissez celui que vous voulez traiter aujourd'hui."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cada día trabajas hasta 25 corredores del mismo tipo. Elige el que quieres abordar hoy."
+      "value": "Cada día trabajas hasta %lld corredores del mismo tipo. Elige el que quieres abordar hoy."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Jeden Tag bearbeiten Sie bis zu 25 Broker einer Art. Wählen Sie die Art, die Sie heute angehen möchten."
+      "value": "Jeden Tag bearbeiten Sie bis zu %lld Broker einer Art. Wählen Sie die Art, die Sie heute angehen möchten."
      }
     }
    }

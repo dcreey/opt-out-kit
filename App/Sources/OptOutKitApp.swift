@@ -801,7 +801,7 @@ final class AppModel: ObservableObject {
 
     private static let batchDayKey = "daily.day", batchCountKey = "daily.batches"
 
-    /// How many batches of 25 the person has taken today (back to 1 each new day).
+    /// How many batches the person has taken today (back to 1 each new day).
     var dailyBatches: Int {
         get {
             guard defaults.string(forKey: Self.batchDayKey) == Self.dayString(Date()) else { return 1 }
@@ -837,7 +837,7 @@ final class AppModel: ObservableObject {
         dailyThemes = t; dailyBatches = t.count
     }
 
-    /// Take another 25 of a kind the person picks.
+    /// Take another batch of a kind the person picks.
     func addBatch(kind id: String) {
         var t = dailyGoals.themes; t.append(id)
         dailyThemes = t; dailyBatches = t.count
@@ -945,7 +945,7 @@ final class AppModel: ObservableObject {
 
     private static func dayString(_ d: Date) -> String { let c = Calendar.current.dateComponents([.year, .month, .day], from: d); return "\(c.year ?? 0)-\(c.month ?? 0)-\(c.day ?? 0)" }
 
-    /// Today's goals for the selected person: the next 25 semi-automated sites and the email to the same sites.
+    /// Today's goals for the selected person: the next batch of semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
         let queue = OptOutPlan.verifyQueue(plan, entries: directory)
         let attempts = progress.optOutAttempts, parked = progress.parkedSites()
@@ -956,7 +956,7 @@ final class AppModel: ObservableObject {
         return DailyGoals.build(queue: queue, entries: directory, attempts: attempts, batches: dailyBatches, chosen: dailyThemes, parked: parked)
     }
 
-    /// Sites still waiting for the semi-automated step, and so how many days at 25 a day.
+    /// Sites still waiting for the semi-automated step, and so how many days at one batch a day.
     var verifyRemaining: Int {
         let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites(); let ids = Set(directory.filter { queued.contains($0.domain) && !parked.contains($0.id) }.map(\.id))
         let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a }); return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count

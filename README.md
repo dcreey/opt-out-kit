@@ -11,7 +11,7 @@ only to the broker sites they opt out of.
 ## What the app does
 
 - **A daily queue.** Each day the person picks one *kind* of broker to tackle (18 kinds, such as people search, ad tech, recruiting data, credit and
-  consumer reporting), ranked by how bad the worst case is and how much opting out helps. A day is a batch of up to 25 sites of that kind. Every kind has a
+  consumer reporting), ranked by how bad the worst case is and how much opting out helps. A day is a batch of up to 15 sites of that kind. Every kind has a
   plain-language briefing with a best-case and worst-case example.
 - **Four ways to opt out**, chosen per site from what was actually found:
   - *Automatic*: the app fills in and sends the form itself. Only sites whose form was seen working on a reviewed real send are in this group.
