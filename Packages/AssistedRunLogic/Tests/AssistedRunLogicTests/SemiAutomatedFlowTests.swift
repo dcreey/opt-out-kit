@@ -26,7 +26,8 @@ final class SemiAutomatedFlowTests: XCTestCase {
         func pageText() async -> String { guard !texts.isEmpty else { return "" }; defer { textReads += 1 }; return texts[min(textReads, texts.count - 1)] }
         func changed() async -> Bool { changedScript.isEmpty ? false : changedScript[min(max(0, polls - 1), changedScript.count - 1)] }
         func adoptNewForm() async -> Bool { defer { adopts += 1 }; return adoptScript.isEmpty ? false : adoptScript[min(adopts, adoptScript.count - 1)] }
-        var waitingForCode = false, typing = false
+        var waitingForCode = false, typing = false, presses: Int? = nil
+        func pressesSinceFill() async -> Int? { presses }
         func userIsTyping() async -> Bool { typing }
         func awaitingCode() async -> Bool { waitingForCode }
         func scrollToOptOut() async -> Bool { scrolls += 1; return scrollResult }

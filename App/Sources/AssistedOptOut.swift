@@ -218,6 +218,7 @@ final class WebAssistedPage: AssistedPage {
     }
 
     func refill() async {
+        defer { Task { await notePresses() } }
         if let liveForm {
             textBeforeChoices = await session.visibleText()
             lastFill = await session.fillLive(plan.values)
@@ -273,6 +274,13 @@ final class WebAssistedPage: AssistedPage {
     func awaitingCode() async -> Bool { await session.emptyVerificationCodeBox() }
     func scrollToOptOut() async -> Bool { if await session.userIsTyping() { return false }; return await session.scrollToOptOutControl() }
     func userIsTyping() async -> Bool { await session.userIsTyping() }
+    private var pressBase: Int?
+    /// Called after each fill: presses from here on are the person's, so a confirmation with none of them since was not caused by them.
+    func notePresses() async { pressBase = await session.userPresses() }
+    func pressesSinceFill() async -> Int? {
+        guard let base = pressBase, let now = await session.userPresses() else { return nil }
+        return max(0, now - base)
+    }
 
     func close() { session.close() }
 }
@@ -324,6 +332,7 @@ struct AssistedOptOutView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
+        .sentQuestionAlert(runner.sentQuestion)
         .alert("This page mentions an email", isPresented: Binding(get: { runner.askFollowUp }, set: { _ in })) {
             Button("Yes, track it") { runner.answerFollowUp(track: true) }
             Button("No, it is done") { runner.answerFollowUp(track: false) }

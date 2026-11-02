@@ -13686,6 +13686,29 @@
     }
    }
   },
+  "No, keep waiting": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non, continuer à attendre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No, seguir esperando"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nein, weiter warten"
+     }
+    }
+   }
+  },
   "None of the %lld terms paragraphs we have collected has been reviewed by a person yet, so nothing can be accepted for you. Sites that need terms accepted stay in your hands.": {
    "extractionState": "manual",
    "localizations": {
@@ -18769,29 +18792,6 @@
     }
    }
   },
-  "Show my advertising ID": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Afficher mon identifiant publicitaire"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Mostrar mi identificador de publicidad"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Meine Werbe-ID anzeigen"
-     }
-    }
-   }
-  },
   "Show first": {
    "extractionState": "manual",
    "localizations": {
@@ -18811,6 +18811,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Zuerst zeigen"
+     }
+    }
+   }
+  },
+  "Show my advertising ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Afficher mon identifiant publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrar mi identificador de publicidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meine Werbe-ID anzeigen"
      }
     }
    }
@@ -21456,6 +21479,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Seite oder der Link ist defekt"
+     }
+    }
+   }
+  },
+  "The page shows a confirmation, but we did not see you press anything. If the page sent it, or you sent it, choose Yes.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La page affiche une confirmation, mais nous ne vous avons pas vu appuyer sur quoi que ce soit. Si la page l’a envoyé, ou si vous l’avez envoyé, choisissez Oui."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La página muestra una confirmación, pero no vimos que pulsaras nada. Si la página lo envió, o lo enviaste tú, elige Sí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Seite zeigt eine Bestätigung, aber wir haben nicht gesehen, dass Sie etwas gedrückt haben. Wenn die Seite es gesendet hat oder Sie es gesendet haben, wählen Sie Ja."
      }
     }
    }
@@ -24151,6 +24197,29 @@
     }
    }
   },
+  "Was this sent?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cela a-t-il été envoyé ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Se envió esto?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wurde das gesendet?"
+     }
+    }
+   }
+  },
   "Washington": {
    "extractionState": "manual",
    "localizations": {
@@ -26148,6 +26217,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ja, ich habe sie gesendet"
+     }
+    }
+   }
+  },
+  "Yes, it was sent": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, c’est envoyé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, se envió"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, es wurde gesendet"
      }
     }
    }

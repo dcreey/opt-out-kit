@@ -80,8 +80,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         // Every frame that has inputs tells the session, so a form inside a frame from another site can be read and filled.
         config.userContentController.add(reporter, contentWorld: .page, name: "ookFrame")
         config.userContentController.addUserScript(WKUserScript(source: "(function(){if(window.top===window)return; function r(){try{var n=document.querySelectorAll('input,select,textarea').length; if(n>0) webkit.messageHandlers.ookFrame.postMessage({n:n,href:location.href});}catch(e){}} if(document.readyState==='complete') setTimeout(r,800); else window.addEventListener('load',function(){setTimeout(r,800);}); setTimeout(r,3000);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: false))
-        // The person's own touches and keys (only real ones, never the page's or the app's scripted events) are noted, so the app can leave the page alone while they type.
-        config.userContentController.addUserScript(WKUserScript(source: "(function(){var top=window.top===window; function mark(e){if(!e.isTrusted)return; if(top) window.__ookUserAt=Date.now(); else try{window.top.postMessage('ookUser','*');}catch(x){}} ['pointerdown','touchstart','keydown','beforeinput','input'].forEach(function(n){document.addEventListener(n,mark,true);}); if(top) window.addEventListener('message',function(e){if(e.data==='ookUser') window.__ookUserAt=Date.now();});})();", injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        // The person's own touches and keys (only real ones, never the page's or the app's scripted events) are noted, so the app can leave the page alone while they type,
+        // and tell a confirmation they caused (they pressed a button, a link or Enter) from one the page showed by itself.
+        config.userContentController.addUserScript(WKUserScript(source: "(function(){var top=window.top===window; function tell(m){if(top){ if(m==='ookPress') window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } else try{window.top.postMessage(m,'*');}catch(x){}} ['pointerdown','touchstart','keydown','beforeinput','input'].forEach(function(n){document.addEventListener(n,function(e){ if(e.isTrusted) tell('ookUser'); },true);}); document.addEventListener('click',function(e){ if(!e.isTrusted) return; var t=e.target; if(t&&t.closest&&t.closest('button,[role=button],input[type=submit],input[type=button],input[type=image],a[href]')) tell('ookPress'); },true); document.addEventListener('keydown',function(e){ if(e.isTrusted&&e.key==='Enter'&&e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) tell('ookPress'); },true); if(top) window.addEventListener('message',function(e){ if(e.data==='ookUser') window.__ookUserAt=Date.now(); else if(e.data==='ookPress'){ window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } });})();", injectionTime: .atDocumentStart, forMainFrameOnly: false))
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
         reporter.session = self
@@ -472,6 +473,9 @@ extension WebViewSession {
         """#
         return (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
     }
+
+    /// How many times the person pressed a button, link or Enter on the page (this page load), or nil if it cannot be read.
+    func userPresses() async -> Int? { (try? await webView.evaluateJavaScript("window.__ookPress||0")) as? Int }
 
     func pageChanged() async -> Bool {
         let js = #"""

@@ -11,6 +11,7 @@ final class LinkFiller: ObservableObject {
     @Published var host = ""
     @Published var busy = false
     private var session: WebViewSession?
+    let sentQuestion = SentQuestion()
     /// Bumped when the person cancels (or another page is opened): a load still running for an older number stops quietly.
     private var generation = 0
 
@@ -88,12 +89,12 @@ final class LinkFiller: ObservableObject {
     /// Sends the page's opt-out forms (see `PageSender`). Nil while it is still waiting or if it was stopped; the result once sent.
     func sendWhenReady(isCancelled: @escaping () -> Bool) async -> SubmitOutcome? {
         guard let s = session, let page else { return nil }
-        return await PageSender.sendWhenReady(page: page, autoSubmit: autoSubmit, status: { [weak self] in self?.status = $0 }, isCancelled: isCancelled, stillCurrent: { [weak self] in self?.session === s })
+        return await PageSender.sendWhenReady(page: page, autoSubmit: autoSubmit, status: { [weak self] in self?.status = $0 }, isCancelled: isCancelled, stillCurrent: { [weak self] in self?.session === s }, question: sentQuestion)
     }
 
     func pageText() async -> String { await session?.viewportText() ?? "" }
 
-    func close() { page = nil; session?.close(); session = nil; webView = nil; host = ""; status = "" }
+    func close() { sentQuestion.dismiss(); page = nil; session?.close(); session = nil; webView = nil; host = ""; status = "" }
 }
 
 struct LinkFillerView: View {
@@ -124,6 +125,7 @@ struct LinkFillerView: View {
         .overlay { if showDone { SentCheck().transition(.opacity) } }
         .onAppear { filler.autoSubmit = { model.autoSubmit } }
         .task(id: filler.webView == nil) { await watchForCompletion() }
+        .sentQuestionAlert(filler.sentQuestion)
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
         .confirmationDialog(askTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }), titleVisibility: .visible, presenting: asking) { a in
             Button(isUnknown(a.check) ? "Open it anyway" : "Open it again", role: isUnknown(a.check) ? .destructive : nil) { open(a.url, a.check) }

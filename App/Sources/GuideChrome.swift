@@ -129,3 +129,21 @@ enum PageMenu {
         } label: { Label("My data", systemImage: "person.text.rectangle") }.accessibilityIdentifier("\(idPrefix)-my-data")
     }
 }
+
+
+/// The "Was this sent?" question of `SentQuestion`, the same wording and buttons wherever a flow asks it.
+private struct SentQuestionAlert: ViewModifier {
+    @ObservedObject var question: SentQuestion
+    func body(content: Content) -> some View {
+        content.alert("Was this sent?", isPresented: Binding(get: { question.pending != nil }, set: { if !$0 { question.dismiss() } })) {
+            Button("Yes, it was sent") { question.answer(sent: true) }
+            Button("No, keep waiting", role: .cancel) { question.answer(sent: false) }
+        } message: {
+            Text("The page shows a confirmation, but we did not see you press anything. If the page sent it, or you sent it, choose Yes.")
+        }
+    }
+}
+
+extension View {
+    func sentQuestionAlert(_ question: SentQuestion) -> some View { modifier(SentQuestionAlert(question: question)) }
+}

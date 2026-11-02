@@ -26,6 +26,9 @@ protocol AssistedPage: AnyObject {
     func moreForms() async -> Bool
     /// True when the page shows an empty box for a code sent to the person (a verification step); the request is not done until they type it.
     func awaitingCode() async -> Bool
+    /// How many times the person pressed a button, link or Enter on the page since it was last filled in; nil where the page cannot tell. Zero means a confirmation that
+    /// appears now did not come from them.
+    func pressesSinceFill() async -> Int?
     /// True while the person has the cursor in a box (touched or typed lately): the app clicks, scrolls and fills nothing then.
     func userIsTyping() async -> Bool
     /// How many more opt-out forms this page has after the one on screen.
@@ -35,7 +38,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; func userIsTyping() async -> Bool { false }; var formsRemaining: Int { 0 } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; func userIsTyping() async -> Bool { false }; func pressesSinceFill() async -> Int? { nil }; var formsRemaining: Int { 0 } }
 
 @MainActor
 protocol AssistedDriver {
@@ -72,6 +75,8 @@ protocol SearchPage: AnyObject {
 /// person's only job is the check. It never solves or accepts anything itself.
 @MainActor
 final class AssistedRunner: ObservableObject {
+    /// Asked when a confirmation shows up that the person did not press anything to cause.
+    let sentQuestion = SentQuestion()
     struct Item: Identifiable {
         let entry: DirectoryEntry
         let form: OptOutForm
@@ -201,7 +206,7 @@ final class AssistedRunner: ObservableObject {
     /// Reads what is on screen (see `PageFlow.watch`); the outcome when the new text shows a confirmation, nil otherwise. A form that appeared is noted for the screen.
     private func watch(_ page: AssistedPage, baseline: inout String, force: Bool = false, domChanged: Bool = false) async -> AutoOptOutResult? {
         var scrolls = autoScrolls
-        let seen = await PageFlow.watch(page, baseline: &baseline, autoScrolls: &scrolls, force: force, domChanged: domChanged)
+        let seen = await PageFlow.watch(page, baseline: &baseline, autoScrolls: &scrolls, force: force, domChanged: domChanged, question: sentQuestion)
         autoScrolls = scrolls
         switch seen {
         case .confirmed(let email): return .submitted(awaitingEmail: email)
@@ -258,6 +263,7 @@ final class AssistedRunner: ObservableObject {
     }
 
     func skip(reported: Bool = false) {
+        sentQuestion.dismiss()
         reportedNotWorking = reported; skipFlag = true; resumeNext()
         // Whatever the site was waiting on (the no-form screen, or the offer to email a site that failed), skipping answers it.
         if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
@@ -322,7 +328,7 @@ final class AssistedRunner: ObservableObject {
         }
     }
     func next() { resumeNext() }
-    private func resumeNext() { nextContinuation?.resume(); nextContinuation = nil }
+    private func resumeNext() { sentQuestion.dismiss(); nextContinuation?.resume(); nextContinuation = nil }
 
     private func prepare(_ i: Int) {
         guard items.indices.contains(i), preparing[i] == nil, items[i].searchURL == nil else { return }

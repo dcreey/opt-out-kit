@@ -7,7 +7,7 @@ import OptOutKitCore
 @MainActor
 enum PageSender {
     static func sendWhenReady(page: AssistedPage, autoSubmit: () -> Bool, status: (String) -> Void, isCancelled: () -> Bool, stillCurrent: () -> Bool = { true },
-                              pollSeconds: Double = 1.5, limitSeconds: Double = 600) async -> SubmitOutcome? {
+                              pollSeconds: Double = 1.5, limitSeconds: Double = 600, question: SentQuestion? = nil) async -> SubmitOutcome? {
         status(autoSubmit() ? Loc.t("Your details are filled in. Clear any check below and we will send it.")
                             : Loc.t("Your details are filled in. Check them, solve any check, then press the page's own button to send."))
         var waited: Double = 0, forced = false, baseline: String?, scrolls = 0
@@ -18,7 +18,7 @@ enum PageSender {
             if forced || !autoSubmit() {
                 // The person presses the page's own button; a confirmation that appears is noticed.
                 guard var base = baseline else { baseline = await page.pageText(); continue }
-                let seen = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls)
+                let seen = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls, question: question)
                 baseline = base
                 if case .confirmed(let email) = seen { status(Loc.t("Sent.")); return .submitted(awaitingEmail: email) }
                 continue

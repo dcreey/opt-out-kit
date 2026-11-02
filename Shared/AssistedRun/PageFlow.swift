@@ -49,7 +49,7 @@ enum PageFlow {
     /// Reads what is on screen. A confirmation the person caused (they pressed the page's own button) is the result. Otherwise the screen changed: a new privacy form
     /// may have appeared (a window opened, the next step), which is filled in; or an opt-out button came into view, which is scrolled to (at most twice per site, and
     /// never for the person's own scrolling).
-    static func watch(_ page: AssistedPage, baseline: inout String, autoScrolls: inout Int, force: Bool = false, domChanged: Bool = false) async -> Watched {
+    static func watch(_ page: AssistedPage, baseline: inout String, autoScrolls: inout Int, force: Bool = false, domChanged: Bool = false, question: SentQuestion? = nil) async -> Watched {
         // The person has the cursor in a box: no reading that could fill, click or scroll. The change is looked at once they are done, since the baseline is not moved.
         if await page.userIsTyping() { return .nothing }
         let now = await page.pageText()
@@ -60,6 +60,10 @@ enum PageFlow {
         if case .submitted(let email) = FormRun.classifyConfirmed(added) {
             // A verification code still to type is the next step of the form, not the end of it.
             if await page.awaitingCode() { return .nothing }
+            // Nothing the person pressed since the fill: the site may have shown this by itself, so they are asked rather than assumed to have sent it.
+            if let question, await page.pressesSinceFill() == 0 {
+                return await question.ask(awaitingEmail: email) ? .confirmed(awaitingEmail: email) : .nothing
+            }
             return .confirmed(awaitingEmail: email)
         }
         if await page.adoptNewForm() { return .newFormFilled }

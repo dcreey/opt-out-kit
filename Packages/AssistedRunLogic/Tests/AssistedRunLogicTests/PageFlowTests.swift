@@ -72,6 +72,31 @@ final class PageFlowTests: XCTestCase {
         XCTAssertEqual(after, .newFormFilled, "once they are done the change is handled")
     }
 
+    /// Runs `watch` on a page whose text turns into a confirmation, answering the question when it is asked. Nil answer: the question must not be asked.
+    private func watched(presses: Int?, answer: Bool?) async -> (PageFlow.Watched, asked: Bool) {
+        let page = Page(); page.texts = ["form", "form\nThank you. Your request has been received."]; page.presses = presses
+        let question = SentQuestion()
+        var base = await page.pageText(), scrolls = 0
+        var asked = false
+        let task = Task { @MainActor in await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls, question: question) }
+        for _ in 0..<200 where !asked { await Task.yield(); if question.pending != nil { asked = true; question.answer(sent: answer ?? false) } }
+        return (await task.value, asked)
+    }
+
+    func testAConfirmationTheyDidNotPressAnythingForIsAskedAboutNotAssumed() async {
+        let yes = await watched(presses: 0, answer: true)
+        XCTAssertTrue(yes.asked); XCTAssertEqual(yes.0, .confirmed(awaitingEmail: false), "they said it was sent")
+        let no = await watched(presses: 0, answer: false)
+        XCTAssertTrue(no.asked); XCTAssertEqual(no.0, .nothing, "they said it was not, so the flow keeps waiting")
+    }
+
+    func testAConfirmationAfterAPressIsCertainAndUnknownIsNeverAsked() async {
+        let pressed = await watched(presses: 1, answer: nil)
+        XCTAssertFalse(pressed.asked); XCTAssertEqual(pressed.0, .confirmed(awaitingEmail: false))
+        let unknown = await watched(presses: nil, answer: nil)
+        XCTAssertFalse(unknown.asked); XCTAssertEqual(unknown.0, .confirmed(awaitingEmail: false), "a page that cannot tell keeps the old behaviour")
+    }
+
     func testWatchingFillsANewFormAndScrollsToAnOptOutButtonOnlyForARealChange() async {
         let page = Page(); page.texts = ["form", "form\nA new window with fields"]; page.adoptScript = [true]
         var base = await page.pageText(), scrolls = 0
