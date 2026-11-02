@@ -90,7 +90,7 @@ extension DetailKind {
 
 enum PageMenu {
     /// - fillTitle: "Fill the form again" where the guide fills for you, "Fill in my details" where you start it.
-    /// - details: the person's own details, copied one at a time from "My data", with the advertising ID (MAID) last.
+    /// - details: the person's own details, copied one at a time from "My data", with the advertising ID (MAID) first.
     /// - idPrefix: prefix of the accessibility identifiers (assisted, guided, link).
     @MainActor @ViewBuilder
     static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, details: [DetailGroup] = [], fill: @escaping () async -> Void) -> some View {
@@ -105,16 +105,6 @@ enum PageMenu {
                 .disabled(!canFill).accessibilityIdentifier("\(idPrefix)-\(fillID)")
         }
         Menu {
-            ForEach(details, id: \.kind) { group in
-                Section(group.kind.title) {
-                    ForEach(group.values, id: \.self) { value in
-                        Button(value) {
-                            UIPasteboard.general.string = value
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                }
-            }
             Section("Advertising ID (MAID)") {
                 if let id = AdvertisingID.ifAllowed {
                     Button(id) { AdvertisingID.copy(id) }.accessibilityIdentifier("\(idPrefix)-maid")
@@ -124,6 +114,16 @@ enum PageMenu {
                     Button("Allow the advertising ID in Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                     }.accessibilityIdentifier("\(idPrefix)-maid")
+                }
+            }
+            ForEach(details, id: \.kind) { group in
+                Section(group.kind.title) {
+                    ForEach(group.values, id: \.self) { value in
+                        Button(value) {
+                            UIPasteboard.general.string = value
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
+                    }
                 }
             }
         } label: { Label("My data", systemImage: "person.text.rectangle") }.accessibilityIdentifier("\(idPrefix)-my-data")

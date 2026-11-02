@@ -37,13 +37,12 @@ public enum DetailChoices {
             let street = a.street ?? ""
             let region = [a.state, a.zip ?? ""].filter { !$0.isEmpty }.joined(separator: " ")
             addresses.append([street, a.city, region].filter { !$0.isEmpty }.joined(separator: ", "))
-            addresses += [street, a.city, a.state, a.zip ?? ""]
         }
         add(.address, addresses)
 
         if let b = person.birthdate, b.count == 10 {
             let p = b.split(separator: "-").map(String.init)
-            if p.count == 3 { add(.birthdate, ["\(p[1])/\(p[2])/\(p[0])", b]) }
+            if p.count == 3 { add(.birthdate, ["\(p[1])/\(p[2])/\(p[0])"]) }
         }
         return out
     }

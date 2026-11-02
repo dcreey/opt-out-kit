@@ -115,8 +115,8 @@ final class DetailChoicesTests: XCTestCase {
         XCTAssertEqual(groups[0].values, ["Sam Q Rivera", "Sam", "Rivera", "Sammy"])
         XCTAssertEqual(groups[1].values, ["forms@example.com", "sam@example.com", "work@example.com"])
         XCTAssertEqual(groups[2].values, ["555-0100"])
-        XCTAssertEqual(groups[3].values, ["1 Main St, Austin, TX 78701", "1 Main St", "Austin", "TX", "78701", "Dallas, TX", "Dallas"])
-        XCTAssertEqual(groups[4].values, ["04/09/1990", "1990-04-09"])
+        XCTAssertEqual(groups[3].values, ["1 Main St, Austin, TX 78701", "Dallas, TX"])
+        XCTAssertEqual(groups[4].values, ["04/09/1990"])
     }
 
     func testAProfileWithLittleOnlyOffersWhatItHas() {
