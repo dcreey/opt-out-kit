@@ -66,8 +66,8 @@ final class SolveAndSendUITests: XCTestCase {
         let alert = app.alerts["Was this sent?"]
         XCTAssertTrue(alert.waitForExistence(timeout: 30), "the question is on screen")
         XCTAssertTrue(alert.buttons["Yes, it was sent"].exists)
-        XCTAssertTrue(alert.buttons["No, keep waiting"].exists)
-        alert.buttons["No, keep waiting"].tap()
+        XCTAssertTrue(alert.buttons["No, stay on this page"].exists)
+        alert.buttons["No, stay on this page"].tap()
         XCTAssertFalse(alert.waitForExistence(timeout: 2), "answering closes it")
     }
 }

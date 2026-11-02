@@ -13686,25 +13686,25 @@
     }
    }
   },
-  "No, keep waiting": {
+  "No, stay on this page": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Non, continuer à attendre"
+      "value": "Non, rester sur cette page"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "No, seguir esperando"
+      "value": "No, quedarme en esta página"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nein, weiter warten"
+      "value": "Nein, auf dieser Seite bleiben"
      }
     }
    }

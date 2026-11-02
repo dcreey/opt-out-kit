@@ -137,7 +137,7 @@ private struct SentQuestionAlert: ViewModifier {
     func body(content: Content) -> some View {
         content.alert("Was this sent?", isPresented: Binding(get: { question.pending != nil }, set: { if !$0 { question.dismiss() } })) {
             Button("Yes, it was sent") { question.answer(sent: true) }
-            Button("No, keep waiting", role: .cancel) { question.answer(sent: false) }
+            Button("No, stay on this page", role: .cancel) { question.answer(sent: false) }
         } message: {
             Text("The page shows a confirmation, but we did not see you press anything. If the page sent it, or you sent it, choose Yes.")
         }
