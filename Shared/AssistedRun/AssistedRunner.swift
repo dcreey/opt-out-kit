@@ -24,6 +24,8 @@ protocol AssistedPage: AnyObject {
     func changed() async -> Bool
     /// A page with more than one opt-out form (an email form and a device-ID form side by side): moves on to the next one, filled in and ready. False when none is left.
     func moreForms() async -> Bool
+    /// True when the page shows an empty box for a code sent to the person (a verification step); the request is not done until they type it.
+    func awaitingCode() async -> Bool
     /// How many more opt-out forms this page has after the one on screen.
     var formsRemaining: Int { get }
     func close()
@@ -31,7 +33,7 @@ protocol AssistedPage: AnyObject {
     func present()
 }
 
-extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; var formsRemaining: Int { 0 } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; var formsRemaining: Int { 0 } }
 
 @MainActor
 protocol AssistedDriver {

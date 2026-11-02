@@ -269,6 +269,7 @@ final class WebAssistedPage: AssistedPage {
 
     func pageText() async -> String { await session.viewportText() }
     func changed() async -> Bool { await session.pageChanged() }
+    func awaitingCode() async -> Bool { await session.emptyVerificationCodeBox() }
     func scrollToOptOut() async -> Bool { await session.scrollToOptOutControl() }
 
     func close() { session.close() }

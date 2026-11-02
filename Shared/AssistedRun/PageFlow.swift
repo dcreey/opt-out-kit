@@ -55,7 +55,11 @@ enum PageFlow {
         guard !now.isEmpty, now != baseline || force else { return .nothing }
         let added = FormRun.newText(before: baseline, after: now)
         baseline = now
-        if case .submitted(let email) = FormRun.classifyConfirmed(added) { return .confirmed(awaitingEmail: email) }
+        if case .submitted(let email) = FormRun.classifyConfirmed(added) {
+            // A verification code still to type is the next step of the form, not the end of it.
+            if await page.awaitingCode() { return .nothing }
+            return .confirmed(awaitingEmail: email)
+        }
         if await page.adoptNewForm() { return .newFormFilled }
         if domChanged, autoScrolls < 2, FormRun.mentionsOptOutControl(added) { if await page.scrollToOptOut() { autoScrolls += 1 } }
         return .nothing

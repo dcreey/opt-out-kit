@@ -20,6 +20,9 @@ enum FormRun {
         // or ask are not a confirmation of what happened.
         let kept = text.split(whereSeparator: \.isNewline).map(String.init).filter { !isInstruction($0) }.joined(separator: "\n")
         if text.isEmpty { return .failed("") }
+        // A sub-form that sends a code to the person's email ("Verify Email") is a step, not the end: the page says a code was sent, or asks for it, and the person types it in.
+        // Only what the page reports counts; a form's standing instructions ("submitted only after you enter the code") are already left out of `kept`.
+        if asksForCode(kept) { return .failed("the page is waiting for a code from the person") }
         return kept.isEmpty ? .failed("no success message was shown") : classify(kept)
     }
 
@@ -30,6 +33,12 @@ enum FormRun {
         if line.range(of: "\\byou (agree|state|acknowledge|confirm|certify|consent)\\b|\\bby (submitting|clicking|checking|signing)\\b|\\bi agree\\b|will be (processed|reviewed|handled|completed)|within \\d+ (business )?(days|hours)|select (one|from|your)|list below|your choices|\\(required\\)", options: opts) != nil { return true }
         if line.range(of: "thank you|thanks for|has been (received|submitted|sent|processed)|have been (received|submitted)|was (received|submitted|sent)|successfully|is complete", options: opts) != nil { return false }
         return line.range(of: "^\\s*(note:|\\*)|\\b(if you|if we|when you|once you|until you|before you|after you|clicking|click|select this|does not submit|not submit|only after|to process|unless|you must|please (enter|provide|select|choose))\\b", options: opts) != nil
+    }
+
+    /// New text that says a code was sent to the person, or asks them to type one, so the request is not finished until they do.
+    nonisolated static func asksForCode(_ text: String) -> Bool {
+        text.range(of: "(enter|type|input|submit|paste) (the |your |a |this )?((\\d+|six|four|five)[- ]?(digit|character) |verification |confirmation |one[- ]?time |security |email |e-?mail |authentication )*(code|otp|passcode)|\\botp\\b|(check|look in|see) (your|the) (e-?mail|inbox|messages?)[^.]{0,40}\\bcode|\\bcode (has been |was |is being |will be )?(sent|e-?mailed)|(sent|e-?mailed|emailed) (you |to you |the address[^.]{0,30} )?(an? |the )?([a-z0-9-]+ )?code|[0-9]-digit code",
+                   options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// New text that says the whole opt-out is done (the page a confirmation email's link ends on), stricter than a send confirmation: "thank you" alone is not enough.

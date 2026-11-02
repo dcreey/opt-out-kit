@@ -44,6 +44,24 @@ final class PageFlowTests: XCTestCase {
         XCTAssertEqual(seen, .confirmed(awaitingEmail: false))
     }
 
+    func testAVerifyEmailSubFormIsAStepNotTheEndInEveryFlow() async {
+        for sent in ["Verification code sent. Thank you!", "We have sent a verification code to your email. Enter the code below.", "Thanks! A 6-digit code was emailed to you.", "Check your email for the one-time code."] {
+            XCTAssertTrue(FormRun.asksForCode(sent), sent)
+            if case .submitted = FormRun.classifyConfirmed(sent) { XCTFail("not finished: \(sent)") }
+        }
+        XCTAssertFalse(FormRun.asksForCode("Thank you. Your request has been received."))
+        // Even with wording that reads like a confirmation, an empty code box on the page means the person still has to type the code.
+        let page = Page(); page.texts = ["form", "form\nThank you. Your request has been received."]; page.waitingForCode = true
+        var base = await page.pageText(), scrolls = 0
+        let seen = await PageFlow.watch(page, baseline: &base, autoScrolls: &scrolls)
+        XCTAssertEqual(seen, .nothing)
+        // Once the code is typed and the page confirms, that is the result.
+        let typed = Page(); typed.texts = ["form\nThank you. Your request has been received.", "form\nThank you. Your request has been received.\nYour email is verified. Your request has been processed."]
+        var base2 = await typed.pageText(); var s2 = 0
+        let later = await PageFlow.watch(typed, baseline: &base2, autoScrolls: &s2)
+        XCTAssertEqual(later, .confirmed(awaitingEmail: false))
+    }
+
     func testWatchingFillsANewFormAndScrollsToAnOptOutButtonOnlyForARealChange() async {
         let page = Page(); page.texts = ["form", "form\nA new window with fields"]; page.adoptScript = [true]
         var base = await page.pageText(), scrolls = 0
