@@ -253,6 +253,15 @@ public enum ContactEmail {
         return domain.contains(".") && !domain.hasPrefix(".") && !domain.hasSuffix(".")
     }
 
+    /// An address found on a web page: spaces and the punctuation of the sentence it sat in ("legal@site.com.", "<a@b.com>,") are cut off the end,
+    /// and nil comes back when what is left is not an address. Applied to every address the directory carries.
+    public static func cleaned(_ raw: String?) -> String? {
+        guard let raw else { return nil }
+        let edge = CharacterSet(charactersIn: ".,;:!?-_<>()[]\"'").union(.whitespacesAndNewlines)
+        let t = raw.trimmingCharacters(in: edge)
+        return isValid(t) ? t : nil
+    }
+
     public static func isGmail(_ email: String) -> Bool {
         let domain = email.split(separator: "@").last.map { $0.lowercased() } ?? ""
         return domain == "gmail.com" || domain == "googlemail.com"

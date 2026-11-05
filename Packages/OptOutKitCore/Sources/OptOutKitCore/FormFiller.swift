@@ -146,6 +146,8 @@ public enum FormFiller {
                 else if required { needsYou = needsYou ?? L10n.t("This form asks for your phone's advertising ID, which needs your permission to read.") }
                 continue
             }
+            // "Business relationship information (if applicable)": the business's own address, email and phone are not the person's. Left empty, never required.
+            if has("\\bbusiness\\b.{0,20}(street|address|e-?mail|phone|telephone|city|state|zip|postal|contact|fax)") { continue }
             // A business contact form (company, job title, industry) is not a personal opt-out: only the person could answer it as a business.
             if has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.", field.display) }

@@ -162,6 +162,29 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(today, f.string(from: Date()), "today's date follows the day-first shape")
     }
 
+    /// monitorbase.com: the page was sent on the first letter typed into the check. While the person has the cursor in it, or typed within 3 seconds, it is theirs.
+    func testABotCheckBoxTheyAreTypingInHoldsTheSendUntilTheyStop() async throws {
+        let html = "<html><body><form id=\"f\" onsubmit=\"event.preventDefault()\"><label>Email *<input type=\"email\" name=\"em\"></label><label for=\"cap\">Captcha</label><input id=\"cap\" name=\"cap\"><button type=\"submit\">Submit</button></form></body></html>"
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        _ = await session.discoverForms(waitForFrames: false)
+        let empty = await session.codeBoxInUse()
+        XCTAssertFalse(empty, "an empty box is not in use (it is the empty-box check's)")
+        // The person types "zej" (marked as theirs, like a real keystroke) and still has the cursor in the box.
+        _ = await session.evalLive("(function(){var e=document.getElementById('cap'); e.focus(); e.value='zej'; e.setAttribute('data-ook-user','1'); window.__ookUserAt=Date.now();})()")
+        let typing = await session.codeBoxInUse()
+        XCTAssertTrue(typing, "the first letters are not a finished check")
+        // They stop for a while and leave the box: the send may go.
+        _ = await session.evalLive("(function(){document.getElementById('cap').blur(); window.__ookUserAt=Date.now()-60000;})()")
+        let done = await session.codeBoxInUse()
+        XCTAssertFalse(done)
+        // A box we filled ourselves (no user mark) is never waited on.
+        _ = await session.evalLive("(function(){var e=document.getElementById('cap'); e.removeAttribute('data-ook-user'); e.focus(); window.__ookUserAt=Date.now();})()")
+        let ours = await session.codeBoxInUse()
+        XCTAssertFalse(ours)
+    }
+
     func testAPreviewFillsAndChoosesButSendsNothing() async {
         let report = await FormRun.runLive(url: nil, html: page(), person: pat, dryRun: true, maxWait: 6, capture: false)
         XCTAssertEqual(report.outcome, .filledNotSubmitted)

@@ -745,6 +745,24 @@ extension WebViewSession {
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
+    /// Whether the person is partway through typing a bot-check or code box: it holds something, and the box has the cursor (up to 12 s without a key) or was
+    /// typed in within the last 3 s. A box that is empty is `emptyCodeField`; this is the other half, so the first letter typed never counts as "done".
+    func codeBoxInUse() async -> Bool {
+        let js = #"""
+        (function(){var re=/captcha|security.?code|verification|confirmation.?code|enter the (code|text|characters)|type the (code|characters)|one.?time|otp|passcode|\bcode\b/i, no=/zip|postal|promo|coupon|discount|area|country/i;
+          var idle=Date.now()-(window.__ookUserAt||0);
+          var els=document.querySelectorAll('input[type=text],input:not([type]),input[type=tel],input[type=number]');
+          for(var i=0;i<els.length;i++){var e=els[i],r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||!e.value) continue;
+            var l=(e.name||'')+' '+(e.id||'')+' '+(e.placeholder||'')+' '+(e.getAttribute('aria-label')||'')+' '+(e.autocomplete||'');
+            if(e.id){var lb=document.querySelector('label[for="'+e.id+'"]'); if(lb) l+=' '+lb.innerText;}
+            if(!re.test(l)||no.test(l)) continue;
+            if(e.getAttribute('data-ook-user')!=='1') continue;       // only a box the person typed in; one we filled is not theirs to wait for
+            if((document.activeElement===e&&idle<12000)||idle<3000) return true;}
+          return false;})();
+        """#
+        return ((await evalLive(js)) as? Bool) ?? false
+    }
+
     /// Whether a visible, empty box asks for a code sent to the person ("Verification code", "Enter the code"): a verification step that is not finished yet.
     func emptyVerificationCodeBox() async -> Bool {
         let js = #"""

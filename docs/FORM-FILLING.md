@@ -35,7 +35,20 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    with the same error test as phones (validity, `aria-invalid`, an invalid or error class, a visible message). It then tries day first, year first, dashes,
    dots, no separators and spelled-out months, one at a time, until the error clears; if none does, the first shape goes back. The same user-edit and
    `data-ook-last` protection as rule 3 applies (the box carries `data-ook-dob` with the ISO date).
-5. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
+5. **A business's boxes stay empty.** A box labelled "business" with a street, address, email, phone, city, state, zip, contact or fax in it
+   ("Business Relationship Information (if applicable)", catchlight.ai) is the business's, not the person's: `FormFiller` skips it and never counts it as required.
+6. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
+
+## Not sending while the person is typing
+
+A bot-check or code box the person typed in blocks auto-send: `codeBoxInUse` is true while the box holds something they typed (`data-ook-user`) and it has the
+cursor (up to 12 s without a key) or was typed in within the last 3 s. Before this, only an empty box blocked, so the first letter typed let the send go
+(monitorbase.com). A box the app filled is never waited on. Tapping out of the box or pressing Return ends the wait at once.
+
+## Addresses the directory gives us
+
+Every `contact_email` is cut of sentence punctuation and checked when the directory loads (`ContactEmail.cleaned`: `legal@altrata.com.` becomes
+`legal@altrata.com`; what is not an address is dropped). `testEveryDirectoryAddressIsValidAsWritten` also fails when a `directory/*.yml` carries a bad one.
 
 ## What each rule is protected by
 
@@ -47,6 +60,10 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 | A value the app typed is replaced when the plan changes | `LiveFormTests.testAValueTheAppTypedIsReplacedWhenThePlanChanges` |
 | An error on a phone box is retried in other shapes | `LiveFormTests.testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes` |
 | A date box follows its placeholder and is retried in other shapes (day first) | `LiveFormTests.testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes` |
+| A business's address, email and phone are left empty | `CoreTests.testTheBusinessRelationshipBoxesAreLeftEmptyAndTheirOwnAddressIsStillFilled` |
+| A check the person is typing in holds the send | `LiveFormTests.testABotCheckBoxTheyAreTypingInHoldsTheSendUntilTheyStop` |
+| A date box follows another that had to be retried | `LiveFormTests.testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn` |
+| Directory addresses have no trailing punctuation | `CoreTests.testAnAddressFoundInASentenceLosesTheSentencePunctuation`, `testEveryDirectoryAddressIsValidAsWritten` |
 | Hand-off sites never get a send | `AssistedRunnerTests` (`handsOff`, `blockWidget`) |
 
 ## Auto-completing the run

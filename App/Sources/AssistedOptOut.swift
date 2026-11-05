@@ -192,6 +192,7 @@ final class WebAssistedPage: AssistedPage {
         if let text = await session.pendingCertification() { out.append(.certify(text)) }
         if let why = await session.visibleChallenge() { out.append(.check(why)) }
         if await session.emptyCodeField() { out.append(.check("a code to type")) }
+        if await session.codeBoxInUse() { out.append(.check("a code you are typing")) }      // never send on the first letter of a check the person is still typing
         // A required menu or box the app had no value for (a state list that does not offer the person's state, a request type): the person picks.
         if let liveForm, let what = await session.emptyRequiredChoice(form: liveForm) { out.append(.choose(what)) }
         return out

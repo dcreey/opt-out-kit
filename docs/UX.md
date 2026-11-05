@@ -66,6 +66,15 @@ data is gone. Back up your phone as usual and it comes with it."
 
 Not yet verified on a real backup and restore. An explicit passphrase-protected export is a possible later addition.
 
+## Two walkthroughs
+
+- **First install** (`OnboardingView`): the promise, the email, the place and its rules, terms, the advertising ID (one button to share it with the app, which iOS
+  asks once; afterwards only iOS Settings can change it), automatic protection, and a last page pointing to About. Its final button is plain "Start": the
+  automatic-protection choice was made on the page before. Skip jumps to the first required step not done.
+- **Guided sites** (`GuidedIntro`): shown once before the first Solve and send or manual site, so nothing runs behind it. It shows an example page, the "..."
+  options, what a site needs, why the wording is scary, and the emails that follow. Skip leaves it; neither walkthrough blocks the other.
+- Both are replayed from About ("Replay the walkthrough", "Replay the guided sites walkthrough"), which also holds the advertising ID button.
+
 ## Privacy promise (shown at first launch, and in Settings)
 
 > **Your information never leaves this phone, except to the sites you opt out of.**

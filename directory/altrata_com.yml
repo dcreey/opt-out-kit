@@ -11,7 +11,7 @@ opt_out_url: "https://altrata.com/product-privacy-notice"
 registered_in: [CA, OR, TX]
 signals: [phone_verify]
 profiled: "2026-10-22"
-contact_email: "legal@altrata.com."
+contact_email: "legal@altrata.com"
 contact_email_source: "browser"
 live_form:
   checked: "2026-10-24"

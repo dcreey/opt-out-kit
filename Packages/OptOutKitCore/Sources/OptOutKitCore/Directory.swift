@@ -293,7 +293,11 @@ public extension Registry {
     static func loadDirectory(_ directory: URL) throws -> [DirectoryEntry] {
         let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
             .filter { $0.pathExtension == "yml" }
-        let entries = try files.map { try YAMLDecoder().decode(DirectoryEntry.self, from: String(contentsOf: $0, encoding: .utf8)) }
+        let entries = try files.map { file -> DirectoryEntry in
+            var e = try YAMLDecoder().decode(DirectoryEntry.self, from: String(contentsOf: file, encoding: .utf8))
+            e.contactEmail = ContactEmail.cleaned(e.contactEmail)      // a trailing "." from the sentence it was found in would make the address invalid
+            return e
+        }
         var seen = Set<String>()
         for e in entries where !seen.insert(e.id).inserted { throw RegistryError.duplicateID(e.id) }
         return entries.sorted { $0.domain < $1.domain }

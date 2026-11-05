@@ -589,6 +589,28 @@ final class DirectoryTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
     }
 
+    /// legal@altrata.com. (a sentence's full stop picked up with the address) opened a mail draft to an invalid address.
+    func testAnAddressFoundInASentenceLosesTheSentencePunctuation() {
+        XCTAssertEqual(ContactEmail.cleaned("legal@altrata.com."), "legal@altrata.com")
+        XCTAssertEqual(ContactEmail.cleaned(" <privacy@site.org>, "), "privacy@site.org")
+        XCTAssertEqual(ContactEmail.cleaned("dpo@a.co.uk;"), "dpo@a.co.uk")
+        XCTAssertEqual(ContactEmail.cleaned("privacy@site.com"), "privacy@site.com")
+        XCTAssertNil(ContactEmail.cleaned("not an address."))
+        XCTAssertNil(ContactEmail.cleaned(nil))
+    }
+
+    /// Every privacy address in the directory is a valid address exactly as written, with nothing trailing.
+    func testEveryDirectoryAddressIsValidAsWritten() throws {
+        let files = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
+        for f in files {
+            let text = try String(contentsOf: f, encoding: .utf8)
+            for line in text.split(separator: "\n") where line.hasPrefix("contact_email:") {
+                let v = line.dropFirst("contact_email:".count).trimmingCharacters(in: CharacterSet(charactersIn: " \""))
+                XCTAssertEqual(ContactEmail.cleaned(v), v, "\(f.lastPathComponent): \(v)")
+            }
+        }
+    }
+
     func testGeneratedDirectoryDecodesAndIsComplete() throws {
         let entries = try Registry.loadDirectory(directoryURL)
         XCTAssertGreaterThanOrEqual(entries.count, 200, "the 212 EasyOptOuts sites")
@@ -3002,6 +3024,15 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         let p = plan([("text", "sig", "* Signature"), ("text", "es", "E-Signature"), ("file", "f", "Select a File"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "sig"), ["Pat Example"]); XCTAssertEqual(v(p, "es"), ["Pat Example"])
         XCTAssertNil(v(p, "f"), "a file is never filled")
+    }
+
+    /// catchlight.ai: "Business Relationship Information (if applicable)" must stay empty; only the person's own address, email and phone are filled.
+    func testTheBusinessRelationshipBoxesAreLeftEmptyAndTheirOwnAddressIsStillFilled() {
+        let p = plan([("text", "fn", "First Name"), ("text", "ln", "Last Name"), ("text", "pa", "Street Address, City, State, Zip"), ("email", "pe", "Email Address"), ("tel", "pp", "Phone Number"),
+                      ("text", "bn", "Business Name"), ("text", "ba", "Business Street Address, City, State, Zip"), ("email", "be", "Business Email Address *"), ("tel", "bp", "Business Phone Number")])
+        for n in ["bn", "ba", "be", "bp"] { XCTAssertNil(v(p, n), "\(n) is the business's, not the person's") }
+        for n in ["pa", "pe"] { XCTAssertNotNil(v(p, n), "\(n) is the person's own") }
+        XCTAssertEqual(p.verdict, .ready, "empty business boxes do not stop the form")
     }
 
     func testASubjectAndAMessageBoxGetThePlainRequestAndABusinessFormIsNotPersonal() {
