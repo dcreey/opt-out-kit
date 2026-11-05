@@ -113,6 +113,55 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(email, "new@example.com")
     }
 
+    /// A birthdate or today's date goes in the shape the box shows; a box that rejects it gets the other shapes until it accepts one (day first, like babelstreet).
+    func testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
+          <label>Date of Birth<input name="dob" oninput="this.setAttribute('aria-invalid', /^(0[1-9]|[12]\\d|3[01])\\/(0[1-9]|1[0-2])\\/\\d{4}$/.test(this.value) && +this.value.slice(0,2)>12 ? 'false' : 'true')"></label>
+          <label>Date<input name="today" placeholder="yyyy-mm-dd"></label>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.birthdate = "1992-04-19"
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        func read(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
+        let dob = await read("dob")
+        XCTAssertEqual(dob, "19/04/1992", dob)
+        let today = await read("today")
+        XCTAssertTrue(today.range(of: "^\\d{4}-\\d{2}-\\d{2}$", options: .regularExpression) != nil, "placeholder shape: \(today)")
+    }
+
+    /// Babelstreet: the birthdate rejects month-first, so it is retried day-first; today's date (valid either way) then follows the same shape.
+    func testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
+          <label>Date of Birth<input name="dob" oninput="this.setAttribute('aria-invalid', /^(0[1-9]|[12]\\d|3[01])\\/(0[1-9]|1[0-2])\\/\\d{4}$/.test(this.value) ? 'false' : 'true')"></label>
+          <label>Today's Date *<input name="today"></label>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.birthdate = "1992-04-19"
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        func read(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
+        let dob = await read("dob")
+        XCTAssertEqual(dob, "19/04/1992", dob)
+        let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "dd/MM/yyyy"
+        let today = await read("today")
+        XCTAssertEqual(today, f.string(from: Date()), "today's date follows the day-first shape")
+    }
+
     func testAPreviewFillsAndChoosesButSendsNothing() async {
         let report = await FormRun.runLive(url: nil, html: page(), person: pat, dryRun: true, maxWait: 6, capture: false)
         XCTAssertEqual(report.outcome, .filledNotSubmitted)

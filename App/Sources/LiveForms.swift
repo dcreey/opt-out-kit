@@ -229,6 +229,7 @@ extension WebViewSession {
             if !progressed { break }
         }
         await tryPhoneFormats()
+        await tryDateFormats()
         return (max(total, result.filled), result.unmatchedRequired)
     }
 
@@ -260,6 +261,16 @@ extension WebViewSession {
             if(d.length===10&&pat){var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6); var fs=[d,'1'+d,'+1'+d,a+'-'+b+'-'+c];
               for(var k=0;k<fs.length;k++){try{if(new RegExp('^(?:'+pat+')$').test(fs[k])) return fs[k];}catch(e){break;}}}
             return d;}
+          function isDobBox(el){return el.tagName==='INPUT'&&el.type!=='date'&&/birth|dob|born|\bdate\b/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')+' '+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:'')+' '+(el.closest('label')?el.closest('label').innerText:''))&&!/street|address/i.test((el.name||'')+' '+(el.id||''));}
+          // A birthdate, or today's date, in a text box starts in the shape its placeholder shows (dd/mm/yyyy, yyyy-mm-dd, ...), else month/day/year; a box that then shows an error gets the others (see tryDateFormats).
+          function fmtDob(el,iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return iso; var y=m[1],mo=m[2],d=m[3];
+            var ph=(el.getAttribute('placeholder')||'').toLowerCase(), sep;
+            // No placeholder: the shape may be named elsewhere (a pattern, a data- format, a title, the text near the box, a calendar widget's format).
+            if(!/[dmy]{2}/.test(ph)){var hint=''; [].slice.call(el.attributes).forEach(function(a){if(/format|mask|pattern|title|describedby|date/i.test(a.name)) hint+=' '+a.value;});
+              var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement) hint+=' '+(n.innerText||'').slice(0,200);
+              var f=/\b(dd|mm|yyyy|yy|d|m|y)\s*([\/.\-])\s*(dd|mm|yyyy|yy|d|m|y)\s*[\/.\-]\s*(dd|mm|yyyy|yy|d|m|y)\b/i.exec(hint); if(f) ph=(f[1]+f[2]+f[3]+f[2]+f[4]).toLowerCase();}
+            sep=(ph.match(/[^a-z0-9\s]/)||['/'])[0];
+            if(/^y{2,4}/.test(ph)) return y+sep+mo+sep+d; if(/^d/.test(ph)) return d+sep+mo+sep+y; return mo+sep+d+sep+y;}
           function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
             if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
@@ -282,7 +293,7 @@ extension WebViewSession {
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
             } else if(\#(keepExistingValues ? "true" : "false")&&(el.value||'').trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el); setValue(el,ph?fmtPhone(el,v.candidates[0]):v.candidates[0]); el.setAttribute('data-ook-last',el.value); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
+            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):v.candidates[0]); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',el.value); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
@@ -326,6 +337,67 @@ extension WebViewSession {
             var forms=hasCC(el)?[d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c]:[d,'1'+d,'+1'+d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c,'+1 '+a+' '+b+' '+c,'1-'+a+'-'+b+'-'+c];
             bad++;
             if(step<forms.length){set(el,forms[step]); more=true;} else { set(el,d); }
+          });
+          return JSON.stringify({bad:bad,more:more});})(\#(step));
+        """#
+        guard let out = await evalLive(js) as? String, let d = out.data(using: .utf8), let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return false }
+        return (obj["bad"] as? Int ?? 0) > 0 && obj["more"] as? Bool == true
+    }
+
+    /// Birthdate and today's-date boxes typed into by this fill: one that shows an error (or a mask that mangled the date) is tried again in other date shapes, one at a time,
+    /// until the error clears. A box the person changed is never touched; when no shape works the first shape goes back.
+    func tryDateFormats() async {
+        guard await evalLive("document.querySelector('[data-ook-dob]')!==null") as? Bool == true else { return }
+        try? await Task.sleep(for: .milliseconds(250))
+        for step in 1...14 {
+            guard await dateFormatStep(step) else { break }
+            try? await Task.sleep(for: .milliseconds(250))
+        }
+        await alignDateFormats()
+    }
+
+    /// A page's date boxes share one shape: when a box had to be retried (a birthdate that rejected month/day/year), the other date boxes this fill typed
+    /// (today's date, which month/day/year would not flag because 11/05 is valid either way) are put in the shape that box settled on.
+    private func alignDateFormats() async {
+        let js = #"""
+        (function(){var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+          function forms(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return null; var y=m[1],mo=m[2],d=m[3];
+            return [mo+'/'+d+'/'+y,d+'/'+mo+'/'+y,y+'-'+mo+'-'+d,mo+'-'+d+'-'+y,d+'-'+mo+'-'+y,y+'/'+mo+'/'+d,d+'.'+mo+'.'+y,mo+d+y,d+mo+y,y+mo+d,mn[+mo-1]+' '+(+d)+', '+y,(+d)+' '+mn[+mo-1].slice(0,3)+' '+y,(+mo)+'/'+(+d)+'/'+y];}
+          var boxes=[].slice.call(document.querySelectorAll('[data-ook-dob]')); var learnt=-1;
+          boxes.forEach(function(el){var st=+(el.getAttribute('data-ook-step')||0); if(st>0&&el.value===el.getAttribute('data-ook-last')) learnt=st;});
+          if(learnt<0) return 0; var n=0;
+          boxes.forEach(function(el){if(/[dmy]{2}/i.test(el.getAttribute('placeholder')||'')||el.getAttribute('data-ook-step')||el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
+            var f=forms(el.getAttribute('data-ook-dob')); if(!f) return; var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,f[learnt]);}else{el.value=f[learnt];}
+            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value); el.setAttribute('data-ook-step',String(learnt)); n++;});
+          return n;})();
+        """#
+        _ = await evalLive(js)
+    }
+
+    /// One round of `tryDateFormats`: false when no box is in error or no other shape is left to try.
+    private func dateFormatStep(_ step: Int) async -> Bool {
+        let js = #"""
+        (function(step){var bad=0, more=false;
+          function visible(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'&&(e.innerText||'').trim()!=='';}
+          function invalid(el){
+            if(el.willValidate&&!el.checkValidity()) return true;
+            if(el.getAttribute('aria-invalid')==='true') return true;
+            var cls=(el.className||'')+' '+(el.parentElement?el.parentElement.className||'':''); if(/(^|[\s_-])(is-invalid|invalid|has-error|ng-invalid|error)($|[\s_-])/i.test(cls)) return true;
+            var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement){var errs=n.querySelectorAll('[role=alert],.error,.invalid-feedback,.field-error,.help-block,[class*=error]');
+              for(var i=0;i<errs.length;i++) if(!errs[i].contains(el)&&visible(errs[i])&&/date|birth|dob|format|valid|invalid|required|mm|dd|yyyy/i.test(errs[i].innerText)) return true;}
+            return false;}
+          function set(el,v){var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
+            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value);}
+          [].slice.call(document.querySelectorAll('[data-ook-dob]')).forEach(function(el){
+            if(el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
+            var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(el.getAttribute('data-ook-dob')); if(!m) return; var y=m[1],mo=m[2],d=m[3];
+            ['blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));});
+            if(!invalid(el)) return;
+            var mn=['January','February','March','April','May','June','July','August','September','October','November','December'][+mo-1];
+            var forms=[mo+'/'+d+'/'+y,d+'/'+mo+'/'+y,y+'-'+mo+'-'+d,mo+'-'+d+'-'+y,d+'-'+mo+'-'+y,y+'/'+mo+'/'+d,d+'.'+mo+'.'+y,mo+d+y,d+mo+y,y+mo+d,mn+' '+(+d)+', '+y,(+d)+' '+mn.slice(0,3)+' '+y,(+mo)+'/'+(+d)+'/'+y];
+            bad++;
+            var next=+(el.getAttribute('data-ook-step')||0)+1;
+            if(next<forms.length){el.setAttribute('data-ook-step',String(next)); set(el,forms[next]); more=true;} else { set(el,forms[0]); }
           });
           return JSON.stringify({bad:bad,more:more});})(\#(step));
         """#

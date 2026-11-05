@@ -204,7 +204,7 @@ struct OnboardingView: View {
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
                         .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))
                 } else {
-                    Button(autoOptOut ? Loc.t("Turn on and start") : "Start") {
+                    Button("Start") {      // the choice to turn on automatic protection was made on the page before; this page only points to About
                         commitEmail()
                         onDecide?(false, autoOptOut)
                         onFinish()

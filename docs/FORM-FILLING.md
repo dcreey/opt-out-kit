@@ -30,7 +30,12 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    Every value the app sets is recorded in `data-ook-last`; a later pass overwrites a box only when its value still equals that record. A menu counts as
    holding something once it is off its first option. Separately, a box the person edits themselves is marked `data-ook-user` from a real (trusted) input
    or change event, so the app's own events never count as the person's, and that box is never touched again.
-4. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
+4. **Dates are typed in the shape the box shows, and an error is retried.** A birthdate or "today's date" in a text box (not a native date picker, which takes
+   `yyyy-mm-dd`) goes in as its placeholder shows (`dd/mm/yyyy`, `yyyy-mm-dd`, ...), else month/day/year. After filling, `tryDateFormats` checks each such box
+   with the same error test as phones (validity, `aria-invalid`, an invalid or error class, a visible message). It then tries day first, year first, dashes,
+   dots, no separators and spelled-out months, one at a time, until the error clears; if none does, the first shape goes back. The same user-edit and
+   `data-ook-last` protection as rule 3 applies (the box carries `data-ook-dob` with the ISO date).
+5. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
 
 ## What each rule is protected by
 
@@ -41,6 +46,7 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 | Something the app did not type is not overwritten | same test (last name) |
 | A value the app typed is replaced when the plan changes | `LiveFormTests.testAValueTheAppTypedIsReplacedWhenThePlanChanges` |
 | An error on a phone box is retried in other shapes | `LiveFormTests.testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes` |
+| A date box follows its placeholder and is retried in other shapes (day first) | `LiveFormTests.testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes` |
 | Hand-off sites never get a send | `AssistedRunnerTests` (`handsOff`, `blockWidget`) |
 
 ## Auto-completing the run
