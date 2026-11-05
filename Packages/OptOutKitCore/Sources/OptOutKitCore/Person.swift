@@ -259,6 +259,9 @@ public enum ContactEmail {
         guard let raw else { return nil }
         let edge = CharacterSet(charactersIn: ".,;:!?-_<>()[]\"'").union(.whitespacesAndNewlines)
         let t = raw.trimmingCharacters(in: edge)
+        // An image or script name that has an @ in it ("privacy-how-1@2x.png") is not an address.
+        let tld = t.split(separator: ".").last.map { $0.lowercased() } ?? ""
+        if ["png", "jpg", "jpeg", "gif", "svg", "webp", "css", "js"].contains(tld) { return nil }
         return isValid(t) ? t : nil
     }
 

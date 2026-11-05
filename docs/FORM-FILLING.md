@@ -48,10 +48,12 @@ cursor (up to 12 s without a key) or was typed in within the last 3 s. Before th
 ## Addresses the directory gives us
 
 Every `contact_email` is cut of sentence punctuation and checked when the directory loads (`ContactEmail.cleaned`: `legal@altrata.com.` becomes
-`legal@altrata.com`; what is not an address is dropped). `testEveryDirectoryAddressIsValidAsWritten` also fails when a `directory/*.yml` carries a bad one.
+`legal@altrata.com`; what is not an address, such as an image file name, is dropped). `testEveryDirectoryAddressIsValidAsWritten` also fails when a `directory/*.yml` carries a bad one.
 
 A well-formed address can still be dead: `privacy@agedleadstore.com` bounced (`525 5.7.13 Disabled recipient address`), so the directory now uses the
 `info@agedleadstore.com` its own opt-out page lists. A bounce reported by a person is fixed by editing that site's `contact_email` (and its `contact_email_source`) in `directory/`.
+A scan of every directory address's domain (2026-11-05) found two more: `fullcontact.com`'s was an image file name (`privacy-how-1@2x.png`, removed) and `usdatacorporation.com`'s policy
+misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (shared by eight entries) has no MX record but its host accepts mail, so it stays.
 
 ## What each rule is protected by
 

@@ -600,6 +600,11 @@ final class DirectoryTests: XCTestCase {
     }
 
     /// Every privacy address in the directory is a valid address exactly as written, with nothing trailing.
+    func testAnImageFileNameIsNotAnAddress() {
+        XCTAssertNil(ContactEmail.cleaned("privacy-how-1@2x.png"))
+        XCTAssertEqual(ContactEmail.cleaned("legal@site.org."), "legal@site.org")
+    }
+
     func testEveryDirectoryAddressIsValidAsWritten() throws {
         let files = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
         for f in files {

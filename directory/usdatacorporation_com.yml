@@ -8,7 +8,8 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 opt_out_url: "https://www.usdatacorporation.com/opt-out"
-contact_email: "privacy@usdatacorportion.com"
+# the policy spells its own domain wrong (usdatacorportion.com has no mail server); info@ is on the same page.
+contact_email: "info@usdatacorporation.com"
 contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: [email_contact, email_input, listing_url_input, opt_out_form_found]
