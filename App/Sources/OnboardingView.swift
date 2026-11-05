@@ -29,7 +29,9 @@ struct OnboardingView: View {
     private var rulesRead: Bool { placeKey == nil || placeRead == placeKey }
     /// The "accept site terms" page is only shown when there is something to accept (reviewed terms exist); otherwise it would ask for what cannot be given.
     private var showsTerms: Bool { model.termsReviewedCount > 0 }
-    private var autoIndex: Int { pages.count + (showsTerms ? 3 : 2) }
+    private var autoIndex: Int { pages.count + (showsTerms ? 4 : 3) }
+    /// The last page, which points to About; the Start button is on it.
+    private var lastIndex: Int { autoIndex + 1 }
     /// The first required step that is not done yet: the email, then reading the rules of the person's place. Nil when both are done.
     private var firstUnmetStep: Int? {
         if !emailValid { return pages.count }
@@ -124,6 +126,22 @@ struct OnboardingView: View {
                 }
                 ScrollView {
                     VStack(spacing: 16) {
+                        Image(systemName: "iphone.badge.play").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+                        Text("Opt your phone out of ad tracking").font(.title.bold()).multilineTextAlignment(.center)
+                        Text("Some data brokers opt your phone out by its advertising ID (also called a MAID or IDFA). Share it with Exnay once and it goes only into those opt-outs.")
+                            .multilineTextAlignment(.center)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Next, iOS asks \"Allow Exnay to track you?\" Tap Allow. That is Apple's wording for sharing this one ID.", systemImage: "hand.tap")
+                            Label("We never store it and never send it anywhere else.", systemImage: "lock.shield")
+                        }.font(.callout)
+                        AdIDPermissionControl()
+                        Text("You can skip this. Those brokers will then need it later, and About has the same button.").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 28)
+                }
+                .tag(autoIndex - 1)
+                ScrollView {
+                    VStack(spacing: 16) {
                         Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Automatic protection").font(.title.bold())
                         AutoExplainer()
@@ -145,27 +163,43 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex)
+                ScrollView {
+                    VStack(spacing: 16) {
+                        Image(systemName: "info.circle").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
+                        Text("Your settings are in About").font(.title.bold()).multilineTextAlignment(.center)
+                        Text("Tap About, the last tab, any time to change what you chose here and find more.").multilineTextAlignment(.center)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Your email address and mail app", systemImage: "envelope")
+                            Label("The advertising ID, to share it or copy it", systemImage: "iphone.badge.play")
+                            Label("Automatic protection, your place and its rules", systemImage: "bolt.shield")
+                            Label("Global Privacy Control setup", systemImage: "hand.raised.square")
+                            Label("Replay this walkthrough", systemImage: "play.circle")
+                        }.font(.callout)
+                    }
+                    .padding(.horizontal, 28)
+                }
+                .tag(lastIndex)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .onAppear { if placeRead == nil, model.placeChosenExplicitly { placeRead = placeKey } }       // a walkthrough shown again does not ask to re-read a place already chosen
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {
-                ForEach(0...autoIndex, id: \.self) { i in
+                ForEach(0...lastIndex, id: \.self) { i in
                     Circle().fill(i == index ? Color.accentColor : Color.secondary.opacity(0.35)).frame(width: 8, height: 8)
                 }
             }
             .padding(.top, 8)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Page \(index + 1) of \(autoIndex + 1)")
+            .accessibilityLabel("Page \(index + 1) of \(lastIndex + 1)")
             .accessibilityIdentifier("onboarding-page-dots")
 
             HStack {
                 // The email is required, so Skip goes to it instead of leaving.
                 // Skip jumps to the first required step that is not done, and does nothing only when everything is done.
-                Button("Skip") { commitEmail(); withAnimation { index = firstUnmetStep ?? autoIndex } }.accessibilityIdentifier("onboarding-skip")
+                Button("Skip") { commitEmail(); withAnimation { index = firstUnmetStep ?? lastIndex } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
-                if index < autoIndex {
+                if index < lastIndex {
                     Button("Next") { commitEmail(); withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
                         .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))

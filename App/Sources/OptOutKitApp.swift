@@ -922,6 +922,17 @@ final class AppModel: ObservableObject {
     var gpcSetupDone: Bool { _ = regionTick; return defaults.bool(forKey: Self.gpcKey) }
     func setGPCSetupDone(_ on: Bool) { defaults.set(on, forKey: Self.gpcKey); regionTick += 1 }
 
+    private static let guidedIntroKey = "guided.intro.seen"
+    /// Whether the person has been through the walkthrough of the guided flows (it opens the first time one is used, and About replays it).
+    var guidedIntroSeen: Bool {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-uitest-reset") { return !args.contains("-show-guided-intro") }
+        #endif
+        return defaults.bool(forKey: Self.guidedIntroKey)
+    }
+    func markGuidedIntroSeen() { defaults.set(true, forKey: Self.guidedIntroKey) }
+
     private static let emailLinksKey = "emaillinks.explained"
     /// The first time a request is sent that waits on an email, once: why the email matters and how the Email links tab finishes it.
     var shouldExplainEmailLinks: Bool { !defaults.bool(forKey: Self.emailLinksKey) }

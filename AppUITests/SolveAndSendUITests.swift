@@ -70,4 +70,36 @@ final class SolveAndSendUITests: XCTestCase {
         alert.buttons["No, stay on this page"].tap()
         XCTAssertFalse(alert.waitForExistence(timeout: 2), "answering closes it")
     }
+
+    func testTheFirstGuidedFlowOpensWithAWalkthroughThatCanBePagedThroughOrSkipped() {
+        let args = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com", "-show-guided-intro"]
+        let app = XCUIApplication()
+        app.launchArguments = args
+        app.launch()
+        XCTAssertTrue(app.staticTexts["This is a guided site"].waitForExistence(timeout: 20), "the walkthrough opens before the first site")
+        for _ in 0..<4 { app.buttons["guided-intro-next"].tap() }
+        XCTAssertTrue(app.staticTexts["Emails after you send"].waitForExistence(timeout: 5), "the last page explains the email follow-ups")
+        app.buttons["guided-intro-done"].tap()
+        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 20), "the flow starts once the walkthrough closes")
+
+        let again = XCUIApplication()
+        again.launchArguments = args
+        again.launch()
+        XCTAssertTrue(again.buttons["guided-intro-skip"].waitForExistence(timeout: 20), "it can be skipped")
+        again.buttons["guided-intro-skip"].tap()
+        XCTAssertTrue(again.staticTexts["assisted-site"].waitForExistence(timeout: 20))
+    }
+
+    func testTheGuidedWalkthroughIsReplayedFromAbout() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]
+        app.launch()
+        app.tabBars.buttons["About"].tap()
+        let replay = app.buttons["show-guided-intro"]
+        XCTAssertTrue(replay.waitForExistence(timeout: 10))
+        replay.tap()
+        XCTAssertTrue(app.staticTexts["This is a guided site"].waitForExistence(timeout: 5))
+        app.buttons["guided-intro-skip"].tap()
+        XCTAssertTrue(app.buttons["show-guided-intro"].waitForExistence(timeout: 5), "back on About")
+    }
 }

@@ -78,3 +78,36 @@ struct AdIDExplainer: View {
         .presentationDetents([.large])
     }
 }
+
+
+/// The one place the person is asked to share the advertising ID with this app (Apple's tracking prompt), used by the walkthrough and About.
+/// Before a choice it is a button that raises Apple's prompt; after one it says what was chosen, and after a refusal points to Settings, the only
+/// place iOS lets it be changed.
+struct AdIDPermissionControl: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var status = AdvertisingID.status
+    /// Called after the prompt is answered, so a screen can show the ID.
+    var onAnswered: () -> Void = {}
+
+    private var allowed: Bool { status == .authorized || ProcessInfo.processInfo.arguments.contains("-fake-adid") }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            if allowed {
+                Label("Shared with Exnay", systemImage: "checkmark.circle.fill").foregroundStyle(.green).accessibilityIdentifier("adid-allowed")
+            } else if status == .notDetermined {
+                Button { Task { _ = await AdvertisingID.current(); status = AdvertisingID.status; onAnswered() } } label: {
+                    Label("Allow advertising ID", systemImage: "iphone.badge.play").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("adid-allow")
+            } else {
+                Text("Sharing is off. iOS asks only once, so to change it open Settings, tap Exnay and turn on Allow Tracking. If Allow Tracking is missing, turn on Allow Apps to Request to Track under Privacy & Security, Tracking.")
+                    .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                Button("Open Settings", systemImage: "gearshape") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }.accessibilityIdentifier("adid-settings")
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in if phase == .active { status = AdvertisingID.status } }
+    }
+}

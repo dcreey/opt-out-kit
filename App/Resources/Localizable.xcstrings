@@ -1657,6 +1657,29 @@
     }
    }
   },
+  "A bot check, \"I am human\", which only you can tick": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un contrôle anti-robot, « Je suis humain », que vous seul pouvez cocher"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una comprobación antirrobots, «Soy humano», que solo tú puedes marcar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung, „Ich bin ein Mensch“, die nur du anhaken kannst"
+     }
+    }
+   }
+  },
   "A buyer finds the right person at your company and you get a useful deal or a job lead.": {
    "extractionState": "manual",
    "localizations": {
@@ -3451,6 +3474,29 @@
     }
    }
   },
+  "Allow advertising ID": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Autoriser l'identifiant publicitaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Permitir el identificador de publicidad"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Werbe-ID erlauben"
+     }
+    }
+   }
+  },
   "Allow the advertising ID in Settings": {
    "extractionState": "manual",
    "localizations": {
@@ -3562,6 +3608,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein automatisches Widerspruchssignal"
+     }
+    }
+   }
+  },
+  "An example: the guide on top, the site's page below": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un exemple : le guide en haut, la page du site en dessous"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un ejemplo: la guía arriba, la página del sitio debajo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Beispiel: oben die Anleitung, darunter die Seite der Website"
      }
     }
    }
@@ -4275,6 +4344,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Automatischer Schutz"
+     }
+    }
+   }
+  },
+  "Automatic protection, your place and its rules": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La protection automatique, votre lieu et ses règles"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La protección automática, tu lugar y sus reglas"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Automatischer Schutz, dein Ort und seine Regeln"
      }
     }
    }
@@ -6188,6 +6280,29 @@
     }
    }
   },
+  "Copy link: the page's address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copier le lien : l'adresse de la page"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiar enlace: la dirección de la página"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link kopieren: die Adresse der Seite"
+     }
+    }
+   }
+  },
   "Copy the link from the email": {
    "extractionState": "manual",
    "localizations": {
@@ -7361,6 +7476,29 @@
     }
    }
   },
+  "Each site is a little different. Follow the guide, and tap Next when the page says it is done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque site est un peu différent. Suivez le guide et touchez Suivant quand la page indique que c'est terminé."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada sitio es un poco distinto. Sigue la guía y toca Siguiente cuando la página diga que está hecho."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Seite ist etwas anders. Folge der Anleitung und tippe auf Weiter, wenn die Seite meldet, dass es erledigt ist."
+     }
+    }
+   }
+  },
   "Each site sees only the details its form needs": {
    "extractionState": "manual",
    "localizations": {
@@ -7522,6 +7660,29 @@
     }
    }
   },
+  "Email links finishes it, and the site counts as done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Liens e-mail termine le travail et le site compte comme fait"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enlaces de correo lo termina y el sitio cuenta como hecho"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail-Links erledigt den Rest, und die Seite zählt als erledigt"
+     }
+    }
+   }
+  },
   "Email only": {
    "extractionState": "manual",
    "localizations": {
@@ -7610,6 +7771,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieselben Seiten per E-Mail anschreiben"
+     }
+    }
+   }
+  },
+  "Emails after you send": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les e-mails après l'envoi"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Los correos después de enviar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mails nach dem Senden"
      }
     }
    }
@@ -8166,6 +8350,29 @@
     }
    }
   },
+  "Exnay's guide is the black part on top. The site's own opt-out page is below the gold line. The guide fills the page in for you and tells you what is left for you to do.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le guide d'Exnay est la partie noire en haut. La page de désinscription du site est sous la ligne dorée. Le guide remplit la page pour vous et vous dit ce qu'il reste à faire."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La guía de Exnay es la parte negra de arriba. La página de baja del sitio está debajo de la línea dorada. La guía rellena la página por ti y te dice qué te queda por hacer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Exnay-Anleitung ist der schwarze Teil oben. Die Abmeldeseite der Website liegt unter der goldenen Linie. Die Anleitung füllt die Seite für dich aus und sagt dir, was noch zu tun ist."
+     }
+    }
+   }
+  },
   "Exnay: Opt Out Kit": {
    "extractionState": "manual",
    "localizations": {
@@ -8461,6 +8668,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites ausfüllen"
+     }
+    }
+   }
+  },
+  "Fill the form again: if something was cleared or missed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Remplir à nouveau le formulaire : si quelque chose a été effacé ou oublié"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar de nuevo el formulario: si algo se borró o se pasó por alto"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formular erneut ausfüllen: falls etwas gelöscht oder übersehen wurde"
      }
     }
    }
@@ -9197,6 +9427,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Global Privacy Control"
+     }
+    }
+   }
+  },
+  "Global Privacy Control setup": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La configuration de Global Privacy Control"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La configuración de Global Privacy Control"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Einrichtung von Global Privacy Control"
      }
     }
    }
@@ -11984,6 +12237,29 @@
     }
    }
   },
+  "Many sites send you an email after you submit, with a link or a code to confirm it. Until you tap it, the opt-out is not done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "De nombreux sites vous envoient un e-mail après l'envoi, avec un lien ou un code de confirmation. Tant que vous n'y touchez pas, la désinscription n'est pas terminée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Muchos sitios te envían un correo después de enviar, con un enlace o código para confirmar. Hasta que lo pulses, la baja no está hecha."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Viele Seiten schicken dir nach dem Absenden eine E-Mail mit einem Link oder Code zur Bestätigung. Bis du ihn antippst, ist die Abmeldung nicht erledigt."
+     }
+    }
+   }
+  },
   "Mark as done": {
    "extractionState": "manual",
    "localizations": {
@@ -12582,6 +12858,29 @@
     }
    }
   },
+  "Most opt-out pages open with a wall of legal terms: you must prove who you are, we cannot promise anything, you agree to this and that. A lot of it is written to make you feel you have no right to opt out.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La plupart des pages de désinscription s'ouvrent sur un mur de termes juridiques : vous devez prouver qui vous êtes, nous ne promettons rien, vous acceptez ceci et cela. Beaucoup de ces textes sont écrits pour vous faire croire que vous n'avez pas le droit de vous désinscrire."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La mayoría de las páginas de baja empiezan con un muro de términos legales: debes demostrar quién eres, no prometemos nada, aceptas esto y aquello. Gran parte está escrito para que sientas que no tienes derecho a darte de baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die meisten Abmeldeseiten beginnen mit einer Wand aus Rechtstexten: Du musst beweisen, wer du bist, wir versprechen nichts, du stimmst dem und dem zu. Vieles davon soll dir das Gefühl geben, kein Recht auf Abmeldung zu haben."
+     }
+    }
+   }
+  },
   "Most recent first. City and state are enough; add a street only if you want it sent.": {
    "extractionState": "manual",
    "localizations": {
@@ -12624,6 +12923,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die meisten Websites schützen ihre Formulare mit Bot-Prüfungen, rechnen Sie also damit, dass viele Sie brauchen. Die App sagt Ihnen, welche."
+     }
+    }
+   }
+  },
+  "Most sites want the same few things.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La plupart des sites demandent les mêmes choses."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La mayoría de los sitios piden lo mismo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die meisten Seiten wollen dasselbe."
      }
     }
    }
@@ -12739,6 +13061,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Meine Daten"
+     }
+    }
+   }
+  },
+  "My data: tap any detail to copy it, even your advertising ID, for a box we did not fill": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mes données : touchez une information pour la copier, même votre identifiant publicitaire, pour un champ que nous n'avons pas rempli"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mis datos: toca un dato para copiarlo, incluso tu identificador de publicidad, para un campo que no rellenamos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meine Daten: tippe auf eine Angabe, um sie zu kopieren, auch deine Werbe-ID, für ein Feld, das wir nicht ausgefüllt haben"
      }
     }
    }
@@ -13958,6 +14303,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Funktioniert nicht"
+     }
+    }
+   }
+  },
+  "Not working: tell us what went wrong with this site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ça ne marche pas : dites-nous ce qui a échoué sur ce site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No funciona: cuéntanos qué falló con este sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Funktioniert nicht: sag uns, was bei dieser Seite schiefging"
      }
     }
    }
@@ -15200,6 +15568,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie die Prüfseite in diesem Browser. Sie zeigt, ob das Signal gesendet wird."
+     }
+    }
+   }
+  },
+  "Open the confirmation in your mail, and share or copy its link into Email links": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez la confirmation dans votre messagerie et partagez ou copiez son lien dans Liens e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre la confirmación en tu correo y comparte o copia su enlace en Enlaces de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffne die Bestätigung in deiner Mail und teile oder kopiere ihren Link in E-Mail-Links"
      }
     }
    }
@@ -17090,6 +17481,29 @@
     }
    }
   },
+  "Refresh the page: reload it, and your details are put back": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Actualiser la page : on la recharge et vos informations sont remises"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Actualizar la página: se recarga y se vuelven a poner tus datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite aktualisieren: Sie wird neu geladen und deine Angaben werden wieder eingetragen"
+     }
+    }
+   }
+  },
   "Region (optional)": {
    "extractionState": "manual",
    "localizations": {
@@ -17251,6 +17665,29 @@
     }
    }
   },
+  "Replay the guided sites walkthrough": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revoir la présentation des sites guidés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Repetir la guía de los sitios guiados"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einführung zu geführten Seiten wiederholen"
+     }
+    }
+   }
+  },
   "Replay the walkthrough": {
    "extractionState": "manual",
    "localizations": {
@@ -17270,6 +17707,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Einführung wiederholen"
+     }
+    }
+   }
+  },
+  "Replay this walkthrough": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Revoir cette présentation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Repetir esta guía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Einführung wiederholen"
      }
     }
    }
@@ -18746,6 +19206,29 @@
     }
    }
   },
+  "Shared with Exnay": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Partagé avec Exnay"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Compartido con Exnay"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mit Exnay geteilt"
+     }
+    }
+   }
+  },
   "Shares one opt-out with %lld other sites": {
    "extractionState": "manual",
    "localizations": {
@@ -18765,6 +19248,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Teilt einen Opt-out mit %lld weiteren Websites"
+     }
+    }
+   }
+  },
+  "Sharing is off. iOS asks only once, so to change it open Settings, tap Exnay and turn on Allow Tracking. If Allow Tracking is missing, turn on Allow Apps to Request to Track under Privacy & Security, Tracking.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le partage est désactivé. iOS ne demande qu'une fois : pour le changer, ouvrez Réglages, touchez Exnay et activez Autoriser le suivi. Si Autoriser le suivi est absent, activez Autoriser les demandes de suivi des apps dans Confidentialité et sécurité, Suivi."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El uso compartido está desactivado. iOS solo pregunta una vez: para cambiarlo, abre Ajustes, toca Exnay y activa Permitir seguimiento. Si falta Permitir seguimiento, activa Permitir que las apps soliciten seguimiento en Privacidad y seguridad, Seguimiento."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Teilen ist aus. iOS fragt nur einmal: Öffne zum Ändern die Einstellungen, tippe auf Exnay und schalte „Tracking erlauben“ ein. Fehlt diese Option, schalte unter Datenschutz & Sicherheit, Tracking „Apps erlauben, Tracking anzufordern“ ein."
      }
     }
    }
@@ -18953,6 +19459,29 @@
     }
    }
   },
+  "Site 2 of 15": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Site 2 sur 15"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitio 2 de 15"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite 2 von 15"
+     }
+    }
+   }
+  },
   "Site link": {
    "extractionState": "manual",
    "localizations": {
@@ -19110,6 +19639,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Überspringen"
+     }
+    }
+   }
+  },
+  "Skip or cancel: leave a site for later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passer ou annuler : laisser un site pour plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitir o cancelar: dejar un sitio para más tarde"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Überspringen oder abbrechen: eine Seite für später lassen"
      }
     }
    }
@@ -19409,6 +19961,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manche Broker-Websites zeigen vor ihrem Opt-out-Formular ein Fenster „Ich stimme unseren Bedingungen zu“. Wenn Sie es erlauben, drücken wir diese Schaltfläche für Sie, aber nur, wenn jeder Absatz des Fensters und der verlinkten Bedingungsseiten auf einer Liste steht, die eine Person gelesen und für akzeptabel befunden hat. So laufen mehr Opt-outs ohne Ihr Zutun."
+     }
+    }
+   }
+  },
+  "Some brokers opt your phone out by its advertising ID. Share it with Exnay once to see the ID here so you can copy it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains courtiers désinscrivent votre téléphone grâce à son identifiant publicitaire. Partagez-le une fois avec Exnay pour le voir ici et le copier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos intermediarios dan de baja tu teléfono con su identificador de publicidad. Compártelo una vez con Exnay para verlo aquí y copiarlo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Datenhändler melden dein Telefon über seine Werbe-ID ab. Teile sie einmal mit Exnay, um sie hier zu sehen und zu kopieren."
+     }
+    }
+   }
+  },
+  "Some data brokers opt your phone out by its advertising ID (also called a MAID or IDFA). Share it with Exnay once and it goes only into those opt-outs.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains courtiers en données désinscrivent votre téléphone grâce à son identifiant publicitaire (aussi appelé MAID ou IDFA). Partagez-le une fois avec Exnay : il n'est utilisé que dans ces désinscriptions."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos intermediarios de datos dan de baja tu teléfono con su identificador de publicidad (también llamado MAID o IDFA). Compártelo una vez con Exnay y solo se usará en esas bajas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Datenhändler melden dein Telefon über seine Werbe-ID ab (auch MAID oder IDFA genannt). Teile sie einmal mit Exnay – sie wird nur in diesen Abmeldungen verwendet."
      }
     }
    }
@@ -19731,6 +20329,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Etwas anderes stimmt nicht"
+     }
+    }
+   }
+  },
+  "Sometimes a code or an ID, which you type or copy": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parfois un code ou une pièce d'identité, que vous saisissez ou copiez"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "A veces un código o un ID, que escribes o copias"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manchmal ein Code oder ein Ausweis, den du eingibst oder kopierst"
      }
     }
    }
@@ -20448,6 +21069,29 @@
     }
    }
   },
+  "Tap About, the last tab, any time to change what you chose here and find more.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez À propos, le dernier onglet, à tout moment pour modifier vos choix et trouver d'autres réglages."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca Acerca de, la última pestaña, cuando quieras para cambiar lo que elegiste aquí y encontrar más."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tippe jederzeit auf Info, den letzten Tab, um deine Auswahl zu ändern und mehr zu finden."
+     }
+    }
+   }
+  },
   "Tap Copy, then paste it into the form. It is cleared from the clipboard after a minute.": {
    "extractionState": "manual",
    "localizations": {
@@ -20559,6 +21203,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Tippen Sie auf eine Aufgabe, um vor dem Start genau zu sehen, was sie tut."
+     }
+    }
+   }
+  },
+  "Tap the … button in the guide any time.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez le bouton … du guide à tout moment."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca el botón … de la guía cuando quieras."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tippe jederzeit auf die Schaltfläche … in der Anleitung."
      }
     }
    }
@@ -20766,6 +21433,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Der Tab Websites listet jeden Broker mit seinem Status für jede Person: nicht begonnen, in Bearbeitung, teilweise oder abgemeldet. Broker listen Menschen erneut auf, planen Sie also Nachprüfungen ein; Erinnerungen kommen noch."
+     }
+    }
+   }
+  },
+  "The advertising ID, to share it or copy it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'identifiant publicitaire, à partager ou copier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El identificador de publicidad, para compartirlo o copiarlo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Werbe-ID zum Teilen oder Kopieren"
      }
     }
    }
@@ -21598,6 +22288,29 @@
     }
    }
   },
+  "The scary wording": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le jargon qui fait peur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El lenguaje que asusta"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die einschüchternde Wortwahl"
+     }
+    }
+   }
+  },
   "The site asks bots not to visit, so we left it alone.": {
    "extractionState": "manual",
    "localizations": {
@@ -21897,6 +22610,29 @@
     }
    }
   },
+  "The … menu": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le menu …"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El menú …"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das …-Menü"
+     }
+    }
+   }
+  },
   "Their campaigns stop mailing and emailing you.": {
    "extractionState": "manual",
    "localizations": {
@@ -21939,6 +22675,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Akte wird geleakt oder von einem Stalker oder Betrüger gekauft, oder ein Fehler stuft Sie als Betrugsrisiko ein und Sie werden bei einem Konto abgelehnt, ohne einfache Möglichkeit, den Grund zu sehen oder zu korrigieren."
+     }
+    }
+   }
+  },
+  "Then Send. With Auto-send on, we press it when the page is ready. Turn it off to press it yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puis Envoyer. Avec l'envoi automatique, nous l'appuyons quand la page est prête. Désactivez-le pour le faire vous-même."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Luego Enviar. Con el envío automático activado, lo pulsamos cuando la página está lista. Desactívalo para pulsarlo tú."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dann Senden. Mit automatischem Senden drücken wir es, sobald die Seite bereit ist. Schalte es aus, um selbst zu drücken."
      }
     }
    }
@@ -22771,6 +23530,29 @@
     }
    }
   },
+  "This is a guided site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Voici un site guidé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este es un sitio guiado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das ist eine geführte Seite"
+     }
+    }
+   }
+  },
   "This is my listing": {
    "extractionState": "manual",
    "localizations": {
@@ -23250,6 +24032,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Firmen halten weniger Ihrer Daten."
+     }
+    }
+   }
+  },
+  "Tick \"I am human\", then we send it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cochez « Je suis humain », puis nous l'envoyons."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Marca «Soy humano» y luego lo enviamos."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hake „Ich bin ein Mensch“ an, dann senden wir es."
      }
     }
    }
@@ -25232,6 +26037,29 @@
     }
    }
   },
+  "What a site needs": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce dont un site a besoin"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo que necesita un sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Was eine Seite braucht"
+     }
+    }
+   }
+  },
   "What did you see?": {
    "extractionState": "manual",
    "localizations": {
@@ -25688,6 +26516,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Neuigkeiten"
+     }
+    }
+   }
+  },
+  "When a page says to check your email, we offer to track it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quand une page dit de vérifier vos e-mails, nous proposons de le suivre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cuando una página dice que revises tu correo, te ofrecemos seguirlo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn eine Seite sagt, du sollst deine E-Mails prüfen, bieten wir an, es zu verfolgen"
      }
     }
    }
@@ -26497,6 +27348,29 @@
     }
    }
   },
+  "You can skip this. Those brokers will then need it later, and About has the same button.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous pouvez passer cette étape. Ces courtiers en auront besoin plus tard, et À propos a le même bouton."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puedes omitir este paso. Esos intermediarios lo necesitarán más adelante, y Acerca de tiene el mismo botón."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Du kannst das überspringen. Diese Datenhändler brauchen sie später, und „Info“ hat dieselbe Schaltfläche."
+     }
+    }
+   }
+  },
   "You can switch it on anywhere. Only the states below make sites obey it; elsewhere it is a request that some sites honor anyway and others ignore.": {
    "extractionState": "manual",
    "localizations": {
@@ -26608,6 +27482,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie machen die Schritte, aber jede Aufgabe erledigt 10 oder mehr Seiten, der Aufwand lohnt sich."
+     }
+    }
+   }
+  },
+  "You do. You do not need to read it all, and you do not need to agree to more than the form asks. Fill in the form, send it, and move on. If a page asks for something odd, like a photo of your ID, choose Not working in the … menu or skip the site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous en avez le droit. Inutile de tout lire, ni d'accepter plus que ce que demande le formulaire. Remplissez-le, envoyez-le et passez à la suite. Si une page demande quelque chose d'étrange, comme une photo de votre pièce d'identité, choisissez Ça ne marche pas dans le menu … ou passez le site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí lo tienes. No necesitas leerlo todo ni aceptar más de lo que pide el formulario. Rellénalo, envíalo y sigue. Si una página pide algo raro, como una foto de tu documento, elige No funciona en el menú … u omite el sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Du hast es. Du musst nicht alles lesen und nicht mehr zustimmen, als das Formular verlangt. Fülle es aus, sende es ab und mach weiter. Verlangt eine Seite etwas Ungewöhnliches, etwa ein Foto deines Ausweises, wähle im …-Menü „Funktioniert nicht“ oder überspringe die Seite."
      }
     }
    }
@@ -27509,6 +28406,29 @@
     }
    }
   },
+  "Your email address and mail app": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre adresse e-mail et votre app de messagerie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu correo electrónico y tu app de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Deine E-Mail-Adresse und Mail-App"
+     }
+    }
+   }
+  },
   "Your email and the address of your listing.": {
    "extractionState": "manual",
    "localizations": {
@@ -27597,6 +28517,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Informationen verlassen dieses Telefon nie, außer zu den Websites, bei denen Sie sich abmelden. Es gibt keinen Opt-Out-Kit-Server, kein Konto, keine Analyse und kein Tracking."
+     }
+    }
+   }
+  },
+  "Your name, address and email, which we fill in": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre nom, adresse et e-mail, que nous remplissons"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu nombre, dirección y correo, que rellenamos nosotros"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dein Name, deine Adresse und E-Mail, die wir ausfüllen"
      }
     }
    }
@@ -27896,6 +28839,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre gespeicherten Profile konnten auf diesem Gerät nicht geöffnet werden (%@). Sie sind unverändert."
+     }
+    }
+   }
+  },
+  "Your settings are in About": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vos réglages sont dans À propos"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tus ajustes están en Acerca de"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Deine Einstellungen findest du unter Info"
      }
     }
    }

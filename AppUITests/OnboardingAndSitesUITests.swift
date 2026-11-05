@@ -8,8 +8,19 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
         for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
-        app.buttons["onboarding-done"].tap()
+        app.finishOnboarding()
         XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 5), "the ranked queue is visible after the walkthrough")
+    }
+
+    func testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
+        app.launch()
+        XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
+        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
+        app.enterOnboardingEmail()
+        XCTAssertTrue(app.staticTexts["Automatic protection"].waitForExistence(timeout: 5), "passing the advertising ID page leads on to automatic protection")
+        app.finishOnboarding()
     }
 
     func testChoosingCaliforniaExplainsItsLawsAndOffersDropInTheQueue() {
@@ -21,7 +32,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let field = app.textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
         app.buttons["onboarding-next"].tap()
-        let state = app.buttons["onboarding-state"]
+        let state = app.descendants(matching: .any)["onboarding-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5))
         state.tap()
         app.buttons["California"].tap()
@@ -39,7 +50,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Accept site terms for you?"].waitForExistence(timeout: 5), "the walkthrough asks about accepting terms")
         XCTAssertTrue(app.staticTexts["onboarding-terms-status"].waitForExistence(timeout: 5), "and says whether that is available")
         app.buttons["onboarding-next"].tap()
-        app.buttons["onboarding-done"].tap()
+        app.finishOnboarding()
 
         XCTAssertTrue(app.buttons["next-platform-ca-drop"].waitForExistence(timeout: 5), "the queue leads with California DROP")
         XCTAssertTrue(app.scrollUntilExists(app.buttons["band-1"], maxSwipes: 6), "and its band is the first")
@@ -108,7 +119,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let field = app.textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
         app.buttons["onboarding-next"].tap()
-        let state = app.buttons["onboarding-state"]
+        let state = app.descendants(matching: .any)["onboarding-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5)); state.tap()
         app.buttons["Alaska"].tap()
         var swipes = 0
@@ -170,7 +181,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         first.launch()
         first.buttons["onboarding-skip"].tap()          // Skip goes to the required email page rather than leaving
         first.enterOnboardingEmail()
-        first.buttons["onboarding-done"].tap()
+        first.finishOnboarding()
         first.terminate()
 
         let again = XCUIApplication()

@@ -16,7 +16,7 @@ final class AutoProtectionUITests: XCTestCase {
         XCTAssertEqual(scan.value as? String, "1", "daily scan starts on")
         XCTAssertEqual(opt.value as? String, "1", "weekly opt-out starts on")
         shot(app, "1-first-run-automatic-protection")
-        app.buttons["onboarding-done"].tap()
+        app.finishOnboarding()
 
         app.tabBars.buttons["About"].tap()
         let s2 = app.switches["settings-scan-toggle"]
@@ -37,7 +37,7 @@ final class AutoProtectionUITests: XCTestCase {
             t.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
             XCTAssertEqual(t.value as? String, "0")
         }
-        app.buttons["onboarding-done"].tap()
+        app.finishOnboarding()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
         app.tabBars.buttons["About"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.switches["settings-scan-toggle"]))

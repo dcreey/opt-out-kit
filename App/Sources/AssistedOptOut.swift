@@ -321,6 +321,7 @@ struct AssistedOptOutView: View {
     init(runner: AssistedRunner) { _runner = StateObject(wrappedValue: runner); _handoff = StateObject(wrappedValue: EmailHandoff(runner: runner)) }
     @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
+    @State private var intro = false
 
     var body: some View {
         NavigationStack {
@@ -341,7 +342,12 @@ struct AssistedOptOutView: View {
             Button("Yes, track it") { runner.answerFollowUp(track: true) }
             Button("No, it is done") { runner.answerFollowUp(track: false) }
         } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
-        .task { await runner.run() }
+        .task {
+            intro = !model.guidedIntroSeen
+            while intro { try? await Task.sleep(nanoseconds: 200_000_000) }        // nothing is filled or sent while the walkthrough is open
+            await runner.run()
+        }
+        .guidedIntro($intro) { model.markGuidedIntroSeen(); intro = false }
         .overlay { if showSent { SentCheck().transition(.opacity) } else if showSkipped { SkippedMark().transition(.opacity) } }
         .onChange(of: runner.sentAwaitingEmail) { _, _ in
             guard model.shouldExplainEmailLinks else { return }

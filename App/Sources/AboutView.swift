@@ -4,6 +4,7 @@ import OptOutKitCore
 struct AboutView: View {
     @EnvironmentObject var model: AppModel
     @State private var showApproval = false
+    @State private var showGuidedIntro = false
 
     var body: some View {
         NavigationStack {
@@ -11,6 +12,8 @@ struct AboutView: View {
                 Section {
                     Button("Replay the walkthrough", systemImage: "play.circle") { model.showWalkthrough() }
                         .accessibilityIdentifier("show-walkthrough")
+                    Button("Replay the guided sites walkthrough", systemImage: "play.rectangle") { showGuidedIntro = true }
+                        .accessibilityIdentifier("show-guided-intro")
                 }
                 Section {
                     MailAppPicker()
@@ -68,6 +71,7 @@ struct AboutView: View {
                 }
             }
             .accessibilityIdentifier("about-list")
+            .fullScreenCover(isPresented: $showGuidedIntro) { GuidedIntroView { showGuidedIntro = false } }
             .navigationTitle("About")
         }
     }
@@ -280,8 +284,8 @@ struct AdvertisingIDSection: View {
                 Text(id).font(.system(.callout, design: .monospaced)).lineLimit(1).minimumScaleFactor(0.6).textSelection(.enabled).accessibilityIdentifier("maid-value")
                 Button(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc") { copy(id) }.accessibilityIdentifier("maid-copy")
             } else if status == .notDetermined {
-                Text("Some brokers opt your phone out by its advertising ID. Allow it once to see the ID here so you can copy it.")
-                Button("Show my advertising ID", systemImage: "iphone.badge.play") { Task { await reveal() } }.accessibilityIdentifier("maid-show")
+                Text("Some brokers opt your phone out by its advertising ID. Share it with Exnay once to see the ID here so you can copy it.")
+                AdIDPermissionControl(onAnswered: { Task { await refresh() } })
             } else if status == .authorized {
                 Text("Your phone's advertising ID is switched off or reset, so there is nothing to copy. In Settings, open Privacy & Security, then Apple Advertising, and make sure Personalized Ads is on, or turn tracking back on for Exnay.")
                 openSettingsButton

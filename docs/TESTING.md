@@ -74,6 +74,7 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Flow | Test | Runs |
 |---|---|---|
 | Walkthrough on first install; finish it; does not return; replay from About | `OnboardingAndSitesUITests` | Sim |
+| Walkthrough of the guided flows (Solve and send, manual): opens before the first site, nothing runs behind it, skip, replay from About; the walkthrough's last pages are the advertising ID and the pointer to About | `SolveAndSendUITests`, `OnboardingAndSitesUITests` | Sim |
 | Law pages for California, other states and countries; language switch | `OnboardingAndSitesUITests` | Sim |
 | Both switches on by default; declining turns both off; skipping leaves a banner | `AutoProtectionUITests` | Sim |
 | Birthdate required; legal name and address required to close the editor | `AutoProtectionUITests`, `ProfileEditorUITests` | Sim |

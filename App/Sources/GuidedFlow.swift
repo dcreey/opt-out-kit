@@ -336,6 +336,7 @@ struct GuidedFlowView: View {
     @StateObject var runner: GuidedRunner
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
+    @State private var intro = false
 
     var body: some View {
         // The geometry is read with the safe area intact, so the guide knows how tall the status bar and the camera cut-out are; only
@@ -354,7 +355,12 @@ struct GuidedFlowView: View {
             .ignoresSafeArea(edges: .top)
         }
         .onAppear { runner.autoSubmit = { model.autoSubmit } }
-        .task { await runner.run() }
+        .task {
+            intro = !model.guidedIntroSeen
+            while intro { try? await Task.sleep(nanoseconds: 200_000_000) }        // the guide waits while the walkthrough is open
+            await runner.run()
+        }
+        .guidedIntro($intro) { model.markGuidedIntroSeen(); intro = false }
         .onChange(of: runner.ending) { _, e in if e != nil { dismiss() } }
     }
 }

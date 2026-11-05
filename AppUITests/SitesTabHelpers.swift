@@ -38,12 +38,22 @@ extension XCUIApplication {
         field.tap(); field.typeText(email)
         XCTAssertTrue(buttons["onboarding-next"].isEnabled)
         buttons["onboarding-next"].tap()
-        // The next page asks which state the person lives in (optional); move past it.
-        XCTAssertTrue(buttons["onboarding-state"].waitForExistence(timeout: 5))
+        // The next page asks where the person lives (optional; the state is asked only for the United States); move past it.
+        XCTAssertTrue(descendants(matching: .any)["onboarding-country"].waitForExistence(timeout: 5))
         buttons["onboarding-next"].tap()
         // Then the terms page (accepting site terms for you); move past it without allowing anything.
         XCTAssertTrue(staticTexts["Accept site terms for you?"].waitForExistence(timeout: 5))
         buttons["onboarding-next"].tap()
+        // Then the advertising ID page, which can be passed without sharing it.
+        XCTAssertTrue(buttons["adid-allow"].waitForExistence(timeout: 5) || staticTexts["adid-allowed"].exists)
+        buttons["onboarding-next"].tap()
+    }
+
+    /// From the automatic-protection page: on to the last page, which points to About, and Start.
+    func finishOnboarding() {
+        buttons["onboarding-next"].tap()
+        XCTAssertTrue(staticTexts["Your settings are in About"].waitForExistence(timeout: 5), "the last page points to About")
+        buttons["onboarding-done"].tap()
     }
 }
 
