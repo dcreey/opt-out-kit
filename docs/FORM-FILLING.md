@@ -50,6 +50,9 @@ cursor (up to 12 s without a key) or was typed in within the last 3 s. Before th
 Every `contact_email` is cut of sentence punctuation and checked when the directory loads (`ContactEmail.cleaned`: `legal@altrata.com.` becomes
 `legal@altrata.com`; what is not an address is dropped). `testEveryDirectoryAddressIsValidAsWritten` also fails when a `directory/*.yml` carries a bad one.
 
+A well-formed address can still be dead: `privacy@agedleadstore.com` bounced (`525 5.7.13 Disabled recipient address`), so the directory now uses the
+`info@agedleadstore.com` its own opt-out page lists. A bounce reported by a person is fixed by editing that site's `contact_email` (and its `contact_email_source`) in `directory/`.
+
 ## What each rule is protected by
 
 | Behavior | Test |
