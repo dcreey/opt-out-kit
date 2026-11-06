@@ -3112,10 +3112,9 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertNil(v(plan([("text", "h", "Twitter handle"), ("email", "e", "Email")], person: wide), "h"))
     }
 
-    func testABoxThatAsksForABusinessNameIsLeftEmptyAndAMessageHasAShortFallback() {
+    func testALastNameBesideABusinessNameIsStillFilledAndAMessageHasAShortFallback() {
         let p = plan([("text", "l", "Last Name or Business Name"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")], person: wide)
-        XCTAssertNil(v(p, "l"), "a box that also asks for a business name is left empty")
-        XCTAssertEqual(p.verdict, .ready, "and it does not stop the form")
+        XCTAssertEqual(v(p, "l"), ["Example"])
         XCTAssertEqual(v(p, "m")?.count, 2)
         XCTAssertLessThan(v(p, "m")?.last?.count ?? 999, 100)
     }

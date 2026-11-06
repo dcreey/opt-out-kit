@@ -170,9 +170,8 @@ public enum FormFiller {
             // "Business relationship information (if applicable)": the business's own address, email and phone are not the person's. Left empty, never required.
             if has("\\bbusiness\\b.{0,20}(street|address|e-?mail|phone|telephone|city|state|zip|postal|contact|fax)") { continue }
             // A business contact form (company, job title, industry) is not a personal opt-out: only the person could answer it as a business.
-            if has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
-                // "Last Name or Business Name": a business name is never filled, and a person's last name is left for them to type rather than stopping the form.
-                if required, !has("(first|last|sur|family|given).?name") { needsYou = needsYou ?? L10n.f("This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.", field.display) }
+            if !has("(first|last|sur|family|given).?name"), has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
+                if required { needsYou = needsYou ?? L10n.f("This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.", field.display) }
                 continue
             }
             // Today's date, for forms that ask for it beside a signature or request. Any other date ("date you were contacted", "effective date") is the person's to give.
