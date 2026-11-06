@@ -47,7 +47,7 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
      person's own email (the check reads the visible label, not the field's code name: `wpforms[fields][5][secondary]` is a confirmation).
    - *Previous, former or prior* address, street, city, state or zip uses the person's second address, never the current one again, and is left empty when there is none.
    - *Phone boxes* include "cell", "cellular", "whatsapp" and "sms"; "(including country code)" and similar hints in brackets are not the country.
-   - *Names*: "first and last name" in one box is the full name; "Last Name or Business Name" is the last name; "Street name" is not a person's name.
+   - *Names*: "first and last name" in one box is the full name; a box that also asks for a **business name** ("Last Name or Business Name") is left empty, never filled, and does not stop the form; "Street name" is not a person's name.
    - *A street in two boxes*: "House number" gets the leading number of the street line ("12"), "Street name" the rest ("Main St"). "Street 2" is the second line (empty, "N/A" if required).
    - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
@@ -94,7 +94,7 @@ misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (s
 | "First and last name" is the full name; a previous address is the second one | `CoreTests.testFirstAndLastTogetherIsTheFullNameAndAPreviousAddressIsTheSecondOne` |
 | A street split in two, and a second line | `CoreTests.testAStreetSplitInTwoAndASecondLineAreEachTheirOwnPart` |
 | Only today's-date boxes get today; month and date-time pickers get their own shape | `CoreTests.testOnlyTodaysDateBoxesGetTodayAndEachPickerGetsItsOwnShape` |
-| Age-range menus, second emails, short message fallback, last name beside a business name | `CoreTests.testAnAgeRangeMenuGetsTheAgeToMatch...`, `testALastNameBesideABusinessName...` |
+| Age-range menus, second emails, short message fallback, a box that asks for a business name stays empty | `CoreTests.testAnAgeRangeMenuGetsTheAgeToMatch...`, `testABoxThatAsksForABusinessName...` |
 | Words inside another box's name or a sentence do not make it someone else's (Confirm Email, "handle your request") | `CoreTests.testWordsInsideAnotherBoxsNameOrSentenceDoNotMakeItSomeoneElses` |
 | Month and date-time pickers, an age-bracket menu, a box with a small limit, a rich-text box, a cell number, a split street, an SSN box left empty, all on one page | `LiveFormTests.testEveryKindOfBoxIsFilledInItsOwnShapeAndTheOnesThatAreNotTheirsStayEmpty` |
 | A business's address, email and phone are left empty | `CoreTests.testTheBusinessRelationshipBoxesAreLeftEmptyAndTheirOwnAddressIsStillFilled` |
