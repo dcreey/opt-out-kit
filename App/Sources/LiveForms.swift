@@ -132,12 +132,16 @@ extension WebViewSession {
             if(!t&&e.parentElement) t=(e.parentElement.innerText||'').slice(0,60);
             return t.replace(/\s+/g,' ').trim().slice(0,90);};
           var ctxEl=function(e){var n=e; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var t=(n.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>=25&&t.length<=700) return n;} return e.parentElement||e;};
+          // A rich-text message box (Quill, Draft, a plain contenteditable div) is a box too; it counts as a textarea.
+          var ceSel=',[contenteditable=""],[contenteditable="true"],[role=textbox]:not(input):not(textarea)';
+          var nestedCE=function(e){return e.tagName!=='INPUT'&&e.tagName!=='SELECT'&&e.tagName!=='TEXTAREA'&&!!(e.parentElement&&e.parentElement.closest('[contenteditable=""],[contenteditable="true"],[role=textbox]'));};
+          var ftype=function(e){var t=e.tagName.toLowerCase(); return t==='select'?'select':(t==='textarea'||(t!=='input'&&!('value' in e)))?'textarea':(e.type||'text');};
           var out=[];
           document.querySelectorAll('form').forEach(function(f,i){
             var ftoken='f'+i; f.setAttribute('data-ook-form',ftoken);
-            var fields=[]; f.querySelectorAll('input,select,textarea').forEach(function(e,j){
-              var type=e.tagName.toLowerCase()==='select'?'select':(e.tagName.toLowerCase()==='textarea'?'textarea':(e.type||'text'));
-              if(['hidden','submit','button','image','reset'].indexOf(type)>=0) return;
+            var fields=[]; f.querySelectorAll('input,select,textarea'+ceSel).forEach(function(e,j){
+              var type=ftype(e);
+              if(['hidden','submit','button','image','reset'].indexOf(type)>=0||nestedCE(e)||(type==='textarea'&&e.tagName!=='TEXTAREA'&&!vis(e))) return;
               var token=ftoken+'-'+j; e.setAttribute('data-ook',token);
               var l=label(e);
               fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e)});});
@@ -146,11 +150,13 @@ extension WebViewSession {
             out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
                       text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});});
           // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
-          var loose=[].slice.call(document.querySelectorAll('input,select,textarea')).filter(function(e){
-            return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e);});
+          var loose=[].slice.call(document.querySelectorAll('input,select,textarea'+ceSel)).filter(function(e){
+            return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e)&&!nestedCE(e);});
+          // A rich-text box alone is no form (a comment box); it joins the loose boxes only beside real inputs.
+          if(!loose.some(function(e){return e.tagName==='INPUT'||e.tagName==='SELECT'||e.tagName==='TEXTAREA';})) loose=[];
           if(loose.length>=1&&document.body){
             document.body.setAttribute('data-ook-form','fx'); var lf=[];
-            loose.forEach(function(e,j){var type=e.tagName.toLowerCase()==='select'?'select':(e.tagName.toLowerCase()==='textarea'?'textarea':(e.type||'text'));
+            loose.forEach(function(e,j){var type=ftype(e);
               var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);
               lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true});});
             // The buttons that belong to these inputs: those in the same block of the page, else every button.
@@ -247,7 +253,17 @@ extension WebViewSession {
           // A box or menu the person changed themselves is theirs: later passes leave it alone. Only real input counts, never our own events.
           if(!window.__ookUserWatch){window.__ookUserWatch=true;
             ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
-          function setValue(el,v){var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+          function isCE(el){return el.tagName!=='INPUT'&&el.tagName!=='TEXTAREA'&&el.tagName!=='SELECT'&&!('value' in el);}
+          function getVal(el){return isCE(el)?(el.innerText||''):(el.value||'');}
+          // The first candidate that fits the box's own character limit (a message box with a short limit gets the short request); else the first, cut at a sentence end.
+          function fit(el,c){var ml=(el.maxLength>0)?el.maxLength:(+el.getAttribute('maxlength')||0), c0=String(c[0]);
+            if(!ml||c0.length<=ml) return c0;
+            for(var i=1;i<c.length;i++){var ci=String(c[i]); if(ci.length<=ml) return ci;}
+            var cut=c0.slice(0,ml), k=cut.lastIndexOf('. '); return k>20?cut.slice(0,k+1):cut.trim();}
+          function setValue(el,v){
+            if(isCE(el)){el.focus(); try{document.execCommand('selectAll',false,null); if(!document.execCommand('insertText',false,v)) el.textContent=v;}catch(e){el.textContent=v;}
+              ['input','change','blur'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); return;}
+            var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
             var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
             el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
           // A phone number is typed as plain digits, with no spaces or punctuation. Only a box that shows an error gets other shapes (see tryPhoneFormats).
@@ -271,12 +287,12 @@ extension WebViewSession {
               var f=/\b(dd|mm|yyyy|yy|d|m|y)\s*([\/.\-])\s*(dd|mm|yyyy|yy|d|m|y)\s*[\/.\-]\s*(dd|mm|yyyy|yy|d|m|y)\b/i.exec(hint); if(f) ph=(f[1]+f[2]+f[3]+f[2]+f[4]).toLowerCase();}
             sep=(ph.match(/[^a-z0-9\s]/)||['/'])[0];
             if(/^y{2,4}/.test(ph)) return y+sep+mo+sep+d; if(/^d/.test(ph)) return d+sep+mo+sep+y; return mo+sep+d+sep+y;}
-          function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
+          function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\bcell|whatsapp|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
             if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
             // Whatever is already in a box or menu stays, unless it is exactly what this fill put there before.
             if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
-            else if((el.value||'').trim()!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}
+            else if(getVal(el).trim()!==''&&getVal(el)!==el.getAttribute('data-ook-last')){filled++; return;}
             if(el.tagName==='SELECT'){var done=false;
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
                 for(var i=0;i<el.options.length;i++){var o=el.options[i];
@@ -286,14 +302,21 @@ extension WebViewSession {
                 for(var i2=0;i2<el.options.length;i2++){var o2=el.options[i2], tx=o2.text.trim().toLowerCase(); if(!o2.value&&!tx) continue;
                   var hit=w2.length>2?tx.indexOf(w2)>=0:new RegExp('(^|[^a-z])'+w2+'([^a-z]|$)').test(tx);
                   if(hit&&!/other|not listed|outside/.test(tx)){el.value=o2.value;done=true;break;}}}
+              // An age (or any number) against a menu of brackets: "18-24", "65+", "under 18".
+              if(!done&&/^\d{1,3}$/.test(String(v.candidates[0]||''))){var n3=+v.candidates[0];
+                for(var i3=0;i3<el.options.length&&!done;i3++){var tx3=el.options[i3].text.replace(/,/g,''), r3, lo=null, hi=null;
+                  if(r3=/(\d{1,3})\s*(?:-|–|—|to)\s*(\d{1,3})/.exec(tx3)){lo=+r3[1];hi=+r3[2];}
+                  else if(r3=/(\d{1,3})\s*\+|(\d{1,3})\s*(?:and|or)\s*(?:over|older|above|up)|(?:over|above)\s*(\d{1,3})/i.exec(tx3)){lo=+(r3[1]||r3[2]||r3[3]);hi=999;}
+                  else if(r3=/(?:under|below|younger than)\s*(\d{1,3})/i.exec(tx3)){lo=0;hi=+r3[1]-1;}
+                  if(lo!==null&&n3>=lo&&n3<=hi){el.value=el.options[i3].value;done=true;}}}
               if(!done&&/state|province|region/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||''))){
                 // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
                 for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();
                   if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
-            } else if(\#(keepExistingValues ? "true" : "false")&&(el.value||'').trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):v.candidates[0]); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',el.value); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
+            } else if(\#(keepExistingValues ? "true" : "false")&&getVal(el).trim()!==''){filled++;}
+            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
@@ -583,11 +606,11 @@ extension WebViewSession {
           var label=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;} if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.name||'';
             return t.replace(/\s+/g,' ').replace(/\*|\(required\)/gi,'').trim().slice(0,60);};
-          var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea'));
+          var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea,[contenteditable=""],[contenteditable="true"]'));
           for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
             var req=e.required||e.getAttribute('aria-required')==='true'||/\*/.test(label(e)+(e.closest('label')?e.closest('label').innerText:''));
             if(!req) continue;
-            var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!(e.value||'').trim();
+            var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!((('value' in e)?e.value:e.innerText)||'').trim();
             if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
           return '';})(\#(Self.liveLiteral(token)));
         """#

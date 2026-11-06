@@ -137,6 +137,44 @@ final class LiveFormTests: XCTestCase {
         XCTAssertTrue(today.range(of: "^\\d{4}-\\d{2}-\\d{2}$", options: .regularExpression) != nil, "placeholder shape: \(today)")
     }
 
+    /// The kinds of box that used to be skipped, cut or mistyped: a message box with a small limit, a month picker, a date-and-time picker, an age-bracket menu,
+    /// a rich-text (contenteditable) message box, a split street, a cell number, and an SSN box that must stay empty.
+    func testEveryKindOfBoxIsFilledInItsOwnShapeAndTheOnesThatAreNotTheirsStayEmpty() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
+          <label>Last 4 digits of SSN<input name="ssn"></label>
+          <label>Cell number<input name="cell"></label>
+          <label>House number<input name="hn"></label><label>Street name<input name="sn"></label>
+          <label>Birth month<input type="month" name="bm"></label>
+          <label>Date and time of request<input type="datetime-local" name="dt"></label>
+          <label>Age range<select name="ar"><option value="">Select</option><option value="u18">Under 18</option><option value="a">18-34</option><option value="b">35 - 49</option><option value="c">50+</option></select></label>
+          <label>Message<textarea name="msg" maxlength="90"></textarea></label>
+          <label id="rtl">Details *</label><div id="rte" contenteditable="true" aria-labelledby="rtl" style="border:1px solid #000;min-height:40px"></div>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.birthdate = "1980-01-31"; me.phones = ["312-555-0142"]; me.addresses = [Address(street: "12 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        XCTAssertTrue(form.fields.contains { $0.label.contains("Details") && $0.type == "textarea" }, "the rich-text box is found: \(form.fields.map(\.label))")
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        func read(_ n: String) async -> String { (await session.evalLive("(function(){var e=document.querySelector('[name=\"\(n)\"]'); return e.value;})()") as? String) ?? "" }
+        let ssn = await read("ssn"); XCTAssertEqual(ssn, "", "an SSN box is never filled")
+        let cell = await read("cell"); XCTAssertEqual(cell, "3125550142")
+        let hn = await read("hn"); XCTAssertEqual(hn, "12")
+        let sn = await read("sn"); XCTAssertEqual(sn, "Main St")
+        let bm = await read("bm"); XCTAssertEqual(bm, "1980-01")
+        let dt = await read("dt"); XCTAssertTrue(dt.range(of: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$", options: .regularExpression) != nil, dt)
+        let ar = await read("ar"); XCTAssertEqual(ar, "b", "46 or so falls in a bracket: \(ar)")
+        let msg = await read("msg"); XCTAssertTrue(!msg.isEmpty && msg.count <= 90, "fits the limit: \(msg.count)")
+        let rte = (await session.evalLive("document.getElementById('rte').innerText") as? String) ?? ""
+        XCTAssertTrue(rte.contains("personal information"), "the rich-text box holds the request: \(rte)")
+    }
+
     /// Babelstreet: the birthdate rejects month-first, so it is retried day-first; today's date (valid either way) then follows the same shape.
     func testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn() async throws {
         let html = """

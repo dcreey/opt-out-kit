@@ -3040,6 +3040,85 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(p.verdict, .ready, "empty business boxes do not stop the form")
     }
 
+    // MARK: field-by-field robustness: a box is never given another box's value
+
+    private var wide: Person {
+        var p = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                       addresses: [Address(street: "12 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(street: "9 Oak Ave", city: "Peoria", state: "IL", zip: "61602")],
+                       emails: ["pat@example.com"])
+        p.birthdate = "1980-01-31"; p.phones = ["312-555-0142"]
+        return p
+    }
+
+    func testIdentifiersAndSomeoneElsesNamesAreNeverFilledWithThePersonsOwnDetails() {
+        let p = plan([("text", "a", "Last 4 digits of SSN"), ("text", "b", "Mother's maiden name"), ("text", "c", "Parent/guardian name"), ("text", "d", "State ID number"),
+                      ("text", "e", "Birth place"), ("text", "f", "Facebook profile name"), ("text", "g", "Account number"), ("text", "h", "Gender"),
+                      ("text", "fn", "First Name"), ("email", "em", "Email")], person: wide)
+        for n in ["a", "b", "c", "d", "e", "f", "g", "h"] { XCTAssertNil(v(p, n), "\(n) must stay empty") }
+        XCTAssertEqual(v(p, "fn"), ["Pat"])
+        XCTAssertEqual(p.verdict, .ready, "optional identifiers do not stop the form")
+        // The same boxes, required: only the person can say, so the form is theirs.
+        for label in ["Last 4 digits of SSN *", "Mother's maiden name *", "State ID number *", "Birth place *"] {
+            guard case .needsYou = plan([("text", "x", label), ("email", "em", "Email")], person: wide).verdict else { return XCTFail("\(label) needs the person") }
+        }
+    }
+
+    func testAPhoneBoxThatMentionsACountryCodeIsThePhoneAndACellBoxIsAPhoneToo() {
+        let p = plan([("text", "t", "Telephone number (including country code)"), ("text", "c", "Cell number"), ("select", "cc", "Country")], person: wide)
+        XCTAssertEqual(v(p, "t"), ["312-555-0142"])
+        XCTAssertEqual(v(p, "c"), ["312-555-0142"])
+        XCTAssertEqual(v(p, "cc")?.first, "United States")
+    }
+
+    func testFirstAndLastTogetherIsTheFullNameAndAPreviousAddressIsTheSecondOne() {
+        let p = plan([("text", "n", "Please give your first and last name"), ("text", "s", "Previous address"), ("text", "pc", "Previous city"), ("text", "cs", "Street Address"), ("text", "cc", "City")], person: wide)
+        XCTAssertEqual(v(p, "n"), ["Pat Example"])
+        XCTAssertEqual(v(p, "s"), ["9 Oak Ave"]); XCTAssertEqual(v(p, "pc"), ["Peoria"])
+        XCTAssertEqual(v(p, "cs"), ["12 Main St"]); XCTAssertEqual(v(p, "cc"), ["Springfield"])
+        var one = wide; one.addresses = [one.addresses[0]]
+        XCTAssertNil(v(plan([("text", "s", "Previous address"), ("email", "em", "Email")], person: one), "s"), "no previous address is invented")
+    }
+
+    func testAStreetSplitInTwoAndASecondLineAreEachTheirOwnPart() {
+        let p = plan([("text", "no", "House number"), ("text", "nm", "Street name"), ("text", "l2", "Street 2"), ("text", "l2r", "Address line 2 *")], person: wide)
+        XCTAssertEqual(v(p, "no"), ["12"]); XCTAssertEqual(v(p, "nm"), ["Main St"])
+        XCTAssertNil(v(p, "l2")); XCTAssertEqual(v(p, "l2r"), ["N/A"])
+    }
+
+    func testOnlyTodaysDateBoxesGetTodayAndEachPickerGetsItsOwnShape() {
+        let p = plan([("text", "a", "Date you were contacted"), ("text", "b", "Effective date"), ("text", "c", "Date *"), ("date", "d", "Today's date"), ("month", "e", "Birth month"),
+                      ("datetime-local", "f", "Date and time of request"), ("month", "g", "Month of request"), ("time", "h", "Best time"), ("range", "i", "Importance"), ("color", "j", "Colour")], person: wide)
+        XCTAssertNil(v(p, "a")); XCTAssertNil(v(p, "b"))
+        XCTAssertEqual(v(p, "c")?.first?.count, 10)
+        XCTAssertEqual(v(p, "d")?.first?.count, 10)
+        XCTAssertEqual(v(p, "e"), ["1980-01"], "a month picker takes yyyy-MM")
+        XCTAssertNotNil(v(p, "f")?.first?.range(of: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$", options: .regularExpression))
+        for n in ["h", "i", "j"] { XCTAssertNil(v(p, n), "\(n) has no value the app could know") }
+    }
+
+    func testAnAgeRangeMenuGetsTheAgeToMatchAgainstItsBracketsAndASecondEmailIsLeftEmpty() {
+        let p = plan([("select", "ar", "Age range"), ("text", "ar2", "Age range"), ("email", "e1", "Email"), ("email", "e2", "Alternate email"), ("email", "e3", "Confirm email")], person: wide)
+        XCTAssertEqual(v(p, "ar")?.count, 1); XCTAssertNil(v(p, "ar2"), "a text box asking for a range is not given an exact age")
+        XCTAssertNotNil(v(p, "e1")); XCTAssertNil(v(p, "e2")); XCTAssertNotNil(v(p, "e3"))
+    }
+
+    /// Found by comparing every recorded directory form before and after the rules above: these three were filled before and must stay filled.
+    func testWordsInsideAnotherBoxsNameOrSentenceDoNotMakeItSomeoneElses() {
+        let p = plan([("email", "wpforms[fields][5][secondary]", "Confirm Email"), ("email", "email", "Work email"), ("textarea", "details", "Anything that helps us locate and handle your request."),
+                      ("text", "fn", "First Name")], person: wide)
+        XCTAssertEqual(v(p, "wpforms[fields][5][secondary]"), ["pat@example.com"], "the confirmation box is the person's own email")
+        XCTAssertEqual(v(p, "email"), ["pat@example.com"])
+        XCTAssertNotNil(v(p, "details"), "'handle' in a sentence is not a social handle")
+        XCTAssertNil(v(plan([("text", "h", "Twitter handle"), ("email", "e", "Email")], person: wide), "h"))
+    }
+
+    func testALastNameBesideABusinessNameIsStillFilledAndAMessageHasAShortFallback() {
+        let p = plan([("text", "l", "Last Name or Business Name"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")], person: wide)
+        XCTAssertEqual(v(p, "l"), ["Example"])
+        XCTAssertEqual(v(p, "m")?.count, 2)
+        XCTAssertLessThan(v(p, "m")?.last?.count ?? 999, 100)
+    }
+
     func testASubjectAndAMessageBoxGetThePlainRequestAndABusinessFormIsNotPersonal() {
         let p = plan([("text", "s", "Subject*"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")])
         XCTAssertEqual(v(p, "s"), ["Privacy opt-out and deletion request"])

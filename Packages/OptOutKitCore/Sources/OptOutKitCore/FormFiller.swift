@@ -94,7 +94,7 @@ public enum FormFiller {
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         for field in form.fields {
             // A hint in brackets tells the person what to do, not what the box is: "State (select country first)" is the state, not the country or a first name.
-            let hint = "\\s*\\((select|choose|pick|enter|type|please)[^)]*\\)"
+            let hint = "\\s*\\(((select|choose|pick|enter|type|please)|[^)]*(country code|area code|including|include|e\\.g|example|format|dashes|digits))[^)]*\\)"
             let key = (field.name + " " + field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive]).lowercased()
             if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
             // A live form carries the page's own label first, then " | " and the field's code name; rules about what the box says use the label alone.
@@ -102,13 +102,22 @@ public enum FormFiller {
             // A label can say "(Not required but strongly recommended)" next to a required attribute: the page's own words win.
             let optionalWords = field.label.range(of: "not required|\\(optional\\)|optional\\)", options: [.regularExpression, .caseInsensitive]) != nil
             let required = !optionalWords && (field.label.contains("*") || field.label.lowercased().contains("(required)"))
+            func has(_ pattern: String) -> Bool { key.range(of: pattern, options: .regularExpression) != nil }
+            // The visible label beats the code name: a box labelled "Phone" whose name is `form_fields[email]` is the phone number, not the email.
+            let labelOnly = visibleLabel.lowercased()
+            let phoneWords = "phone|mobile|\\bcell(ular)?\\b|whatsapp|t[ée]l[ée]phone|tel[ée]fono|telefon|handy"
+            let labelPhone = labelOnly.range(of: phoneWords, options: .regularExpression) != nil && labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) == nil
+            let labelEmail = labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) != nil && labelOnly.range(of: phoneWords, options: .regularExpression) == nil
+            // A previous or former address is the second one in the profile (the first is the current one), never the current one again.
+            let previous = has("\\b(previous|prior|former|old|past)\\b.{0,15}(address|street|city|state|zip|postal)|(address|street|city).{0,12}\\b(previous|prior|former)\\b")
+            let address = previous ? person.addresses.dropFirst().first : person.addresses.first
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }
                 if c.isEmpty { if required || field.type == "email" { missing.append(what) } }
                 else { values.append(FieldValue(name: field.name, type: field.type, candidates: c, label: field.label)) }
             }
             switch field.type {
-            case "hidden", "submit", "button", "image", "reset", "password": continue
+            case "hidden", "submit", "button", "image", "reset", "password", "range", "color", "time", "week": continue
             case "checkbox", "radio":
                 if attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") || isSelfIdentityBox(key) {
                     if isSelfIdentityBox(key), person.mayConfirmOwnIdentity() {
@@ -122,6 +131,19 @@ public enum FormFiller {
                 continue
             default: break
             }
+            // Numbers and identifiers only the person holds (SSN, last four digits, licence, passport, order or account numbers): never guessed, never another field's value.
+            if has("\\bssn\\b|social.?security|last.?(4|four)\\b|licen[sc]e|passport|\\bstate.?id\\b|national.?id|\\btax.?id\\b|\\bitin\\b|\\bid.?(number|no\\b|#)|identification.?number|member.?(id|number)|order.?(number|id|no\\b)|reference.?(number|id)|case.?(number|id)|account.?(id|number|no\\b)|claim.?number|policy.?number") {
+                if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }
+                continue
+            }
+            // Someone else's name or a detail the profile does not hold (maiden or parent's name, a nickname, a social profile, gender, birthplace): left empty, never the person's own name.
+            if has("maiden|mother|father|\\bparent|guardian|spouse|emergency|\\balias|nickname|also known|other names?|previous names?|former names?|prior names?|\\bwitness|referr|facebook|twitter|instagram|linkedin|tiktok|snapchat|(twitter|instagram|social|user|account).{0,8}\\bhandle\\b|username|user name|screen.?name|social media|gender|\\bsex\\b|\\brace\\b|ethnic|marital|employer|occupation|salary|income|birth.?(place|city|state|country|town)|place of birth|country of birth|born in") {
+                if required { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
+                continue
+            }
+            // A second email, "if different": optional, so left empty (a required one is the person's own address).
+            if !required, labelOnly.range(of: "alternat|secondary|backup|second e-?mail|other e-?mail|if different", options: .regularExpression) != nil,
+               labelOnly.range(of: "confirm|re-?enter|repeat|verify|retype", options: .regularExpression) == nil { continue }
             if key.contains("agent") || key.contains("on behalf") || key.contains("customer id") || key.contains("account number") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }
                 continue
@@ -139,7 +161,6 @@ public enum FormFiller {
                 continue
             }
             // Field names and labels in English, French, Spanish and German.
-            func has(_ pattern: String) -> Bool { key.range(of: pattern, options: .regularExpression) != nil }
             // The phone's advertising ID, for the sites that opt a device out by it. It is read on the phone only when a form asks.
             if has("\\bmaid\\b|\\bidfa\\b|\\baaid\\b|advertising.?(id|identifier)|mobile.?ad(vertising)?.?(id|identifier)|\\bad.?id\\b|device.?(id|identifier)") {
                 if let advertisingID { put([advertisingID], L10n.noun("Advertising ID")) }
@@ -149,14 +170,27 @@ public enum FormFiller {
             // "Business relationship information (if applicable)": the business's own address, email and phone are not the person's. Left empty, never required.
             if has("\\bbusiness\\b.{0,20}(street|address|e-?mail|phone|telephone|city|state|zip|postal|contact|fax)") { continue }
             // A business contact form (company, job title, industry) is not a personal opt-out: only the person could answer it as a business.
-            if has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
+            if !has("(first|last|sur|family|given).?name"), has("company|organi[sz]ation|business (name|type)|job.?title|industry|department|company size|\\bemployees\\b|\\brole\\b") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for business details (\"%@\"), so it is a business contact form and not a personal opt-out.", field.display) }
                 continue
             }
-            // Today's date, for forms that ask for it beside a signature or request.
-            if has("today.?s date|current date|date of (request|submission)|\\bdate\\b") && !has("birth|dob|born") {
+            // Today's date, for forms that ask for it beside a signature or request. Any other date ("date you were contacted", "effective date") is the person's to give.
+            if has("today.?s date|current date|date of (request|submission)|\\bdate\\b|\\btoday\\b") && !has("birth|dob|born") {
+                let isToday = has("today|current date|date of (request|submission)|(request|submission|signature|signing|signed|submitted).{0,8}date|date.{0,16}(signed|submitted|request)")
+                    || visibleLabel.lowercased().range(of: "^\\s*\\*?\\s*date\\s*(\\*|:|\\(required\\))?\\s*$", options: .regularExpression) != nil
+                if !isToday {
+                    if required { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
+                    continue
+                }
                 let now = Date(); let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX")
-                put(["yyyy-MM-dd", "MM/dd/yyyy", "MMMM d, yyyy"].map { f.dateFormat = $0; return f.string(from: now) }, L10n.noun("Date")); continue
+                // A month or date-and-time picker takes only its own shape; a text box gets the shapes in turn.
+                let shapes = field.type == "month" ? ["yyyy-MM"] : field.type == "datetime-local" ? ["yyyy-MM-dd'T'HH:mm"] : ["yyyy-MM-dd", "MM/dd/yyyy", "MMMM d, yyyy"]
+                put(shapes.map { f.dateFormat = $0; return f.string(from: now) }, L10n.noun("Date")); continue
+            }
+            // A month picker (type=month) takes "yyyy-MM" only: the birth month, else left empty.
+            if field.type == "month" {
+                if has("birth|dob|born"), let b = person.birthdate, b.count == 10 { put([String(b.prefix(7))], L10n.noun("Birth month")) }
+                continue
             }
             // One box for the whole address ("Street Address, City, State, Zip").
             if has("street.{0,12}city.{0,12}state") {
@@ -173,6 +207,11 @@ public enum FormFiller {
                 put([legal], L10n.noun("Signature")); continue
             }
             // Age, or the parts of the birthdate, from the birthdate the person gave.
+            // An age range or group is a menu of brackets: the age goes in as a number and the page's own bracket that holds it is picked.
+            if has("\\bage\\b.{0,10}(range|group|bracket)|age.?(range|group|bracket)") {
+                if field.type == "select", let age = person.age() { put([String(age)], L10n.noun("Age")) }
+                continue
+            }
             if has("\\bage\\b") && !has("manage|message|usage|page|image|stage|average") {
                 if let age = person.age() { put([String(age)], L10n.noun("Age")) } else if required { missing.append(L10n.noun("Birthdate")) }
                 continue
@@ -199,12 +238,12 @@ public enum FormFiller {
                 put([FormFiller.legalBasis(for: person)], L10n.noun("Legal basis")); continue
             }
             if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
-                put([FormFiller.standardRequest(for: person)], L10n.noun("Message")); continue
+                put([FormFiller.standardRequest(for: person), shortRequest], L10n.noun("Message")); continue
             }
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
             // (A form that insists on it gets "N/A": an empty required box stops the form from sending.)
-            if has("address.?(line.?)?2|address2|line.?2|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { if required { put(["N/A"], L10n.noun("Address line 2")) }; continue }
-            if has("country|\\bpays\\b|pa[ií]s\\b") {
+            if has("address.?(line.?)?(2|two)|address2|line.?(2|two)|street.?(address.?)?(line.?)?2\\b|second.?(line|address)|\\b(apt|apartment|suite|unit|floor)\\b|adresse.?2|c/o") { if required { put(["N/A"], L10n.noun("Address line 2")) }; continue }
+            if has("country|\\bpays\\b|pa[ií]s\\b"), !(labelPhone && field.type != "select") {
                 if let code = person.countryCode {
                     if code == "US" { put(["United States", "United States of America", "USA", "US"], L10n.noun("Country")) }
                     else { put([Regions.englishName(code), code, code == "GB" ? "UK" : nil, code == "GB" ? "United Kingdom of Great Britain and Northern Ireland" : nil], L10n.noun("Country")) }
@@ -212,7 +251,6 @@ public enum FormFiller {
                 continue
             }
             // The visible label wins over a field's code name: a postal-code box named "Region-State-Province-2" is still the postal code.
-            let labelOnly = visibleLabel.lowercased()
             if labelOnly.range(of: "\\b(zip|postal)\\b|code postal|c[óo]digo postal|\\bplz\\b", options: .regularExpression) != nil, labelOnly.range(of: "state|province|region|country", options: .regularExpression) == nil {
                 put([address?.zip], L10n.noun("Zip code")); continue
             }
@@ -220,15 +258,23 @@ public enum FormFiller {
             if field.type == "select", has("phone|mobile|tel\\b|ph.?ext|t[ée]l[ée]phone") {
                 put(person.countryCode == "US" || person.countryCode == nil ? ["United States", "United States (+1)", "+1", "US", "USA"] : [Regions.englishName(person.countryCode ?? "")], L10n.noun("Country code")); continue
             }
-            // The visible label beats the code name: a box labelled "Phone" whose name is `form_fields[email]` is the phone number, not the email.
-            let labelPhone = labelOnly.range(of: "phone|mobile|t[ée]l[ée]phone|tel[ée]fono|telefon|handy", options: .regularExpression) != nil && labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) == nil
-            let labelEmail = labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) != nil && labelOnly.range(of: "phone|mobile|t[ée]l[ée]phone|tel[ée]fono|telefon|handy", options: .regularExpression) == nil
             // One box for the whole address ("Full Address", "Complete address"): "full" there is not the full name.
             if has("(full|complete|entire|whole).{0,6}address|address.{0,6}(in full|complete)") && !labelEmail && field.type != "email" {
                 if let a = address, let street = a.street { put(["\(street), \(a.city), \(a.state) \(a.zip ?? "")".trimmingCharacters(in: .whitespaces), street], L10n.noun("Street address")) }
                 else if required { missing.append(L10n.noun("Street address")) }
                 continue
             }
+            // A street split in two boxes: the number ("House number") and the name ("Street name"). "Street name" is not the person's name.
+            if has("(house|street|building).?(no\\b|number|num\\b|#)|street.?number|\\bhouse\\b|street.?name") {
+                let parts = (address?.street ?? "").trimmingCharacters(in: .whitespaces)
+                let m = parts.range(of: "^\\d+[A-Za-z]?(-\\d+)?\\s+", options: .regularExpression)
+                let isName = has("street.?name") && !has("number|\\bno\\b")
+                if isName { put([m.map { String(parts[$0.upperBound...]) } ?? parts], L10n.noun("Street name")) }
+                else { put([m.map { String(parts[..<$0.upperBound]).trimmingCharacters(in: .whitespaces) }], L10n.noun("House number")) }
+                continue
+            }
+            // A name box that asks for first and last together ("first and last name") is the full name, not just the first.
+            if has("(first|given).{0,12}(and|&|/|\\+|,).{0,12}(last|sur|family)|(last|sur|family).{0,12}(and|&|/|\\+|,).{0,12}(first|given)"), !has("middle") { put([legal], L10n.noun("Full name")); continue }
             if labelPhone && field.type != "email" { put([person.phones.first], L10n.noun("Phone number")) }
             else if field.type == "email" || labelEmail || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
             else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
@@ -239,7 +285,7 @@ public enum FormFiller {
                 put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
             else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }
-            else if has("phone|t[ée]l[ée]phone|tel[ée]fono|telefon|handy") || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
+            else if has(phoneWords) || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
             else if has("birth|dob|naissance|nacimiento|geburt") && !has("street|address") { put([person.birthdate], L10n.noun("Birthdate")) }
             else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }
             // A required menu of request choices ("Privacy Choice", "Choose an option") is chosen on the live page, from its own options.
@@ -264,6 +310,9 @@ public enum FormFiller {
         }
         return "I am afforded the right to opt out of the sale and sharing of my personal information, and to have it deleted, under the California Consumer Privacy Act (CCPA), the GDPR where it applies to me, and similar state privacy laws."
     }
+
+    /// The request in one short sentence, for a box with a small character limit.
+    public static let shortRequest = "Please delete my personal information and stop selling or sharing it."
 
     public static func standardRequest(for person: Person) -> String {
         let country = person.countryCode ?? "US"

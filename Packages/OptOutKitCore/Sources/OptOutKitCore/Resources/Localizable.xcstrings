@@ -4325,6 +4325,29 @@
     }
    }
   },
+  "House number": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "numéro de rue"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "número de casa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hausnummer"
+     }
+    }
+   }
+  },
   "Idaho": {
    "extractionState": "manual",
    "localizations": {
@@ -8093,6 +8116,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Straße"
+     }
+    }
+   }
+  },
+  "Street name": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "nom de la rue"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "nombre de la calle"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Straßenname"
      }
     }
    }

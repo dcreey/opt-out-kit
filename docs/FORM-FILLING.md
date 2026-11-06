@@ -38,6 +38,30 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 5. **A business's boxes stay empty.** A box labelled "business" with a street, address, email, phone, city, state, zip, contact or fax in it
    ("Business Relationship Information (if applicable)", catchlight.ai) is the business's, not the person's: `FormFiller` skips it and never counts it as required.
 6. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
+7. **A box is never given another box's value.** `FormFiller.plan` decides by the words of the label, so the order and the exceptions matter:
+   - *Identifiers only the person holds* (SSN, "last 4 digits", licence, passport, state or national ID, tax ID, account, order, reference, case, policy numbers) are
+     left empty; when required they make the form "needs you". They used to match "last" (last name) or "state" (the state code).
+   - *Someone else's or unknown details* (maiden name, mother, father, parent or guardian, spouse, emergency contact, alias, nickname, other or former names, a social
+     profile or handle, gender, race, marital status, employer, occupation, income, birthplace) are left empty; when required, "needs you".
+   - *A second or other email or phone* ("Alternate email", "if different", "Other email addresses") is left empty unless required; a **Confirm email** box is still the
+     person's own email (the check reads the visible label, not the field's code name: `wpforms[fields][5][secondary]` is a confirmation).
+   - *Previous, former or prior* address, street, city, state or zip uses the person's second address, never the current one again, and is left empty when there is none.
+   - *Phone boxes* include "cell", "cellular", "whatsapp" and "sms"; "(including country code)" and similar hints in brackets are not the country.
+   - *Names*: "first and last name" in one box is the full name; "Last Name or Business Name" is the last name; "Street name" is not a person's name.
+   - *A street in two boxes*: "House number" gets the leading number of the street line ("12"), "Street name" the rest ("Main St"). "Street 2" is the second line (empty, "N/A" if required).
+   - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
+     empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
+     colour boxes are never filled.
+   - *Age range or group* menus get the age as a number, and the page's own bracket ("18-34", "35 - 49", "50+", "under 18") that holds it is picked; a text box asking for a range is left empty.
+8. **A box's own limit is respected.** A box with `maxlength` gets the first candidate that fits: the message box takes the short request
+   ("Please delete my personal information and stop selling or sharing it.") when the long one does not fit, and anything else is cut at a sentence end.
+9. **Rich-text message boxes are boxes.** A `contenteditable` or `role=textbox` element is found like a textarea (inside a form, or loose beside real inputs; one alone, such as a comment box,
+   is not a form), filled through the editor's own typing command so it fires the page's events, and counted by the "required box still empty" check.
+10. **Known gaps.** Forms inside web components (shadow DOM) are not found; a multi-select menu gets one option; a format that only the site's server rejects, with
+    nothing shown on the page, cannot be retried.
+
+Every change to these rules is checked against all the forms the directory recorded (`opt_out_form` in `directory/*.yml`, about 2400 boxes): fill each with a test person
+before and after and compare. The last comparison changed 17 boxes, all of them corrections (the two it first got wrong, "Confirm Email" and a textarea saying "handle your request", were fixed and have a test).
 
 ## Not sending while the person is typing
 
@@ -65,6 +89,14 @@ misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (s
 | A value the app typed is replaced when the plan changes | `LiveFormTests.testAValueTheAppTypedIsReplacedWhenThePlanChanges` |
 | An error on a phone box is retried in other shapes | `LiveFormTests.testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes` |
 | A date box follows its placeholder and is retried in other shapes (day first) | `LiveFormTests.testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes` |
+| An identifier, someone else's name or a social profile is never filled with the person's own details | `CoreTests.testIdentifiersAndSomeoneElsesNamesAreNeverFilledWithThePersonsOwnDetails` |
+| A phone box that mentions a country code, or says "cell", is the phone | `CoreTests.testAPhoneBoxThatMentionsACountryCodeIsThePhoneAndACellBoxIsAPhoneToo` |
+| "First and last name" is the full name; a previous address is the second one | `CoreTests.testFirstAndLastTogetherIsTheFullNameAndAPreviousAddressIsTheSecondOne` |
+| A street split in two, and a second line | `CoreTests.testAStreetSplitInTwoAndASecondLineAreEachTheirOwnPart` |
+| Only today's-date boxes get today; month and date-time pickers get their own shape | `CoreTests.testOnlyTodaysDateBoxesGetTodayAndEachPickerGetsItsOwnShape` |
+| Age-range menus, second emails, short message fallback, last name beside a business name | `CoreTests.testAnAgeRangeMenuGetsTheAgeToMatch...`, `testALastNameBesideABusinessName...` |
+| Words inside another box's name or a sentence do not make it someone else's (Confirm Email, "handle your request") | `CoreTests.testWordsInsideAnotherBoxsNameOrSentenceDoNotMakeItSomeoneElses` |
+| Month and date-time pickers, an age-bracket menu, a box with a small limit, a rich-text box, a cell number, a split street, an SSN box left empty, all on one page | `LiveFormTests.testEveryKindOfBoxIsFilledInItsOwnShapeAndTheOnesThatAreNotTheirsStayEmpty` |
 | A business's address, email and phone are left empty | `CoreTests.testTheBusinessRelationshipBoxesAreLeftEmptyAndTheirOwnAddressIsStillFilled` |
 | A check the person is typing in holds the send | `LiveFormTests.testABotCheckBoxTheyAreTypingInHoldsTheSendUntilTheyStop` |
 | A date box follows another that had to be retried | `LiveFormTests.testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn` |
