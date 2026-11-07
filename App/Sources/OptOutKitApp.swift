@@ -499,7 +499,8 @@ final class AppModel: ObservableObject {
     func formPerson(_ person: Person) -> Person {
         guard let email = household.formEmail else { return person }
         var p = person
-        p.emails = [email]
+        // The household's form address goes first (it is what tracks replies); the person's other emails follow, for forms with more than one box.
+        p.emails = [email] + person.emails.filter { $0.lowercased() != email.lowercased() }
         return p
     }
 
@@ -985,10 +986,8 @@ final class AppModel: ObservableObject {
     /// One company: only the details its form (or its kind of company) needs. Several: the plain request with name, email and address.
     func emailBody(for batch: EmailBatch) -> String {
         guard let p = selectedPerson else { return "" }
-        let a = p.currentAddress
-        let street = [a?.street, a?.city, [a?.state, a?.zip].compactMap { $0 }.joined(separator: " ")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
-        guard let details = emailDetails(for: batch) else { return batch.body(name: p.legalName, email: formEmail ?? "", address: street, country: p.countryCode) }
-        return batch.body(name: p.legalName, email: formEmail ?? "", details: details, address: street, phone: p.phones.first, birthdate: p.birthdate, advertisingID: emailAdID, country: p.countryCode)
+        let who = EmailIdentity(person: p, formEmail: formEmail)
+        return batch.body(for: who, details: emailDetails(for: batch), advertisingID: emailAdID)
     }
 
     /// What one company's email carries, or nil for a message to several companies.

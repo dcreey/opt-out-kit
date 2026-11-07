@@ -92,6 +92,10 @@ public enum FormFiller {
         let allKeys = form.fields.map { ($0.name + " " + $0.label).lowercased() }
         let hasPrenom = allKeys.contains { $0.range(of: "pr[ée]nom|first|vorname", options: .regularExpression) != nil }
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
+        // Boxes that ask for a further email or phone ("alternate email", "phone 2") take the next one in the profile, in order.
+        var extraEmails = 0, extraPhones = 0
+        var usedEmails = Set<String>(), usedPhones = Set<String>(), usedAddresses = Set<Int>(), usedNames = Set<UUID>()
+        var messageSlots: [Int] = []
         for field in form.fields {
             // A hint in brackets tells the person what to do, not what the box is: "State (select country first)" is the state, not the country or a first name.
             let hint = "\\s*\\(((select|choose|pick|enter|type|please)|[^)]*(country code|area code|including|include|e\\.g|example|format|dashes|digits))[^)]*\\)"
@@ -110,7 +114,41 @@ public enum FormFiller {
             let labelEmail = labelOnly.range(of: "e-?mail|courriel|correo", options: .regularExpression) != nil && labelOnly.range(of: phoneWords, options: .regularExpression) == nil
             // A previous or former address is the second one in the profile (the first is the current one), never the current one again.
             let previous = has("\\b(previous|prior|former|old|past)\\b.{0,15}(address|street|city|state|zip|postal)|(address|street|city).{0,12}\\b(previous|prior|former)\\b")
-            let address = previous ? person.addresses.dropFirst().first : person.addresses.first
+            // "Previous address 2", "second previous address": the second previous one, and so on.
+            var addressIndex = 0
+            if previous {
+                addressIndex = 1
+                if let m = key.range(of: "(previous|prior|former|old|past)[^0-9]{0,18}([2-9])|([2-9])(nd|rd|th)?\\s*(previous|prior|former)|\\b(second|2nd)\\b.{0,12}(previous|prior|former)", options: .regularExpression) {
+                    let t = String(key[m]); addressIndex = t.contains("second") ? 2 : (t.compactMap { $0.wholeNumberValue }.first ?? 1)
+                } else if has("third|3rd") { addressIndex = 3 }
+            }
+            let address: Address? = addressIndex < person.addresses.count ? person.addresses[addressIndex] : nil
+            if previous, addressIndex < person.addresses.count { usedAddresses.insert(addressIndex) }
+            // Whether this is a further email or phone than the first, and which one.
+            let extraWords = "alternat|secondary|backup|additional|\\bsecond\\b|\\bother\\b|\\banother\\b|\\b(2|two)\\b|2nd"
+            // An example address inside the label ("another@example.com") is a hint, not a word about the box.
+            let extraLabel = labelOnly.replacingOccurrences(of: "\\S+@\\S+", with: "", options: .regularExpression)
+            let isConfirm = labelOnly.range(of: "confirm|re-?enter|repeat|verify|retype|again", options: .regularExpression) != nil
+            let isExtraEmail = !isConfirm && extraLabel.range(of: extraWords, options: .regularExpression) != nil
+            let isExtraPhone = extraLabel.range(of: extraWords, options: .regularExpression) != nil
+            func nextEmail() -> String? {
+                if !isConfirm, extraLabel.range(of: extraWords, options: .regularExpression) != nil {
+                    extraEmails += 1
+                    if extraEmails < person.emails.count { usedEmails.insert(person.emails[extraEmails]); return person.emails[extraEmails] }
+                    return nil
+                }
+                if let e = person.emails.first { usedEmails.insert(e) }
+                return person.emails.first
+            }
+            func nextPhone() -> String? {
+                if extraLabel.range(of: extraWords, options: .regularExpression) != nil {
+                    extraPhones += 1
+                    if extraPhones < person.phones.count { usedPhones.insert(person.phones[extraPhones]); return person.phones[extraPhones] }
+                    return nil
+                }
+                if let e = person.phones.first { usedPhones.insert(e) }
+                return person.phones.first
+            }
             func put(_ candidates: [String?], _ what: String) {
                 let c = candidates.compactMap { $0 }.filter { !$0.isEmpty }
                 if c.isEmpty { if required || field.type == "email" { missing.append(what) } }
@@ -132,8 +170,22 @@ public enum FormFiller {
             default: break
             }
             // Numbers and identifiers only the person holds (SSN, last four digits, licence, passport, order or account numbers): never guessed, never another field's value.
-            if has("\\bssn\\b|social.?security|last.?(4|four)\\b|licen[sc]e|passport|\\bstate.?id\\b|national.?id|\\btax.?id\\b|\\bitin\\b|\\bid.?(number|no\\b|#)|identification.?number|member.?(id|number)|order.?(number|id|no\\b)|reference.?(number|id)|case.?(number|id)|account.?(id|number|no\\b)|claim.?number|policy.?number") {
+            if has("\\bssn\\b|social.?security|last.?(4|four)\\b|licen[sc]e|passport|\\bstate.?id\\b|national.?id|\\btax.?id\\b|\\bitin\\b|\\bid.?(number|no\\b|#)|identification.?number|member.?(id|number)|order.?(number|id|no\\b)|reference.?(number|id)|case.?(number|id)|account.?(id|number|no\\b)|claim.?number|policy.?number|\\bhash(ed)?\\b|\\bsha-?(1|256)\\b|\\bmd5\\b|\\bhex\\b|[0-9]+.?character") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }
+                continue
+            }
+            // The person's own other names (maiden, previous, nickname, alias) go in the boxes that ask for them; a relative's name never does.
+            if !has("mother|father|\\bparent|guardian|spouse|emergency|\\bwitness|referr|\\bfriend"),
+               has("maiden|\\balias|nickname|also known|other names?|previous names?|former names?|prior names?|other.{0,10}names?|names? (used|you have used)|\\bakas?\\b") {
+                let asked = [has("maiden"), has("nickname"), has("previous|former|prior")].filter { $0 }.count
+                let kinds: [NameKind] = asked > 1 ? [.alias, .previousLegal, .maiden, .nickname] : has("maiden") ? [.maiden] : has("nickname") ? [.nickname] : has("previous|former|prior") ? [.previousLegal, .maiden] : [.alias, .previousLegal, .maiden, .nickname]
+                let entries = person.names.filter { kinds.contains($0.kind) && !$0.name.isEmpty }
+                if entries.isEmpty { if required { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) } }
+                else {
+                    let joined = entries.map(\.name).joined(separator: ", ")
+                    for e in entries { usedNames.insert(e.id) }
+                    put([entries.count > 1 ? joined : nil, entries[0].name], L10n.noun("Other names"))
+                }
                 continue
             }
             // Someone else's name or a detail the profile does not hold (maiden or parent's name, a nickname, a social profile, gender, birthplace): left empty, never the person's own name.
@@ -142,8 +194,8 @@ public enum FormFiller {
                 continue
             }
             // A second email, "if different": optional, so left empty (a required one is the person's own address).
-            if !required, labelOnly.range(of: "alternat|secondary|backup|second e-?mail|other e-?mail|if different", options: .regularExpression) != nil,
-               labelOnly.range(of: "confirm|re-?enter|repeat|verify|retype", options: .regularExpression) == nil { continue }
+            if !required, field.type == "email" || labelEmail, labelOnly.range(of: "alternat|secondary|backup|second e-?mail|other e-?mail|if different", options: .regularExpression) != nil,
+               labelOnly.range(of: "confirm|re-?enter|repeat|verify|retype", options: .regularExpression) == nil, extraEmails + 1 >= person.emails.count { continue }
             if key.contains("agent") || key.contains("on behalf") || key.contains("customer id") || key.contains("account number") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }
                 continue
@@ -238,7 +290,9 @@ public enum FormFiller {
                 put([FormFiller.legalBasis(for: person)], L10n.noun("Legal basis")); continue
             }
             if has("message|comments?|details|reason|description|how can we help|tell us|additional (info|information)|\\bnotes?\\b|your request|request type description") && (field.type == "textarea" || required) && !has("email|password|address") {
-                put([FormFiller.standardRequest(for: person), shortRequest], L10n.noun("Message")); continue
+                put([FormFiller.standardRequest(for: person), shortRequest], L10n.noun("Message"))
+                if values.last?.name == field.name { messageSlots.append(values.count - 1) }
+                continue
             }
             // A second address line (apartment, suite, unit) is left empty: the profile holds one street line, and repeating it is wrong.
             // (A form that insists on it gets "N/A": an empty required box stops the form from sending.)
@@ -275,8 +329,18 @@ public enum FormFiller {
             }
             // A name box that asks for first and last together ("first and last name") is the full name, not just the first.
             if has("(first|given).{0,12}(and|&|/|\\+|,).{0,12}(last|sur|family)|(last|sur|family).{0,12}(and|&|/|\\+|,).{0,12}(first|given)"), !has("middle") { put([legal], L10n.noun("Full name")); continue }
-            if labelPhone && field.type != "email" { put([person.phones.first], L10n.noun("Phone number")) }
-            else if field.type == "email" || labelEmail || has("e-?mail|courriel|correo") { put([person.emails.first], L10n.noun("Email address")) }
+            // One box for a whole list ("Other email addresses (one per line)", "Phone numbers"): the others, or all of them, one to a line or comma-separated.
+            if field.type != "email", field.type != "tel", has("e-?mails\\b|email addresses|phone numbers|phones\\b|mobile numbers") {
+                let isEmails = has("e-?mails\\b|email addresses"), others = extraLabel.range(of: extraWords, options: .regularExpression) != nil
+                let all = isEmails ? person.emails : person.phones
+                let list = others ? Array(all.dropFirst()) : all
+                if list.isEmpty { continue }
+                let glue = field.type == "textarea" || has("per line|newline|line.?break") ? "\n" : ", "
+                if isEmails { usedEmails.formUnion(list) } else { usedPhones.formUnion(list) }
+                put([list.joined(separator: glue), list.joined(separator: ", ")], isEmails ? L10n.noun("Email address") : L10n.noun("Phone number")); continue
+            }
+            if labelPhone && field.type != "email" { let v = nextPhone(); if v == nil, isExtraPhone { continue }; put([v], L10n.noun("Phone number")) }
+            else if field.type == "email" || labelEmail || has("e-?mail|courriel|correo") { let v = nextEmail() ?? (required && isExtraEmail ? person.emails.first : nil); if v == nil, isExtraEmail { continue }; put([v], L10n.noun("Email address")) }
             else if has("first|fname|given|pr[ée]nom|vorname") || (has("\\bnombre\\b") && hasApellido) { put([first], L10n.noun("First name")) }
             else if has("last|lname|surname|family|nom de famille|apellido|nachname|familienname") || (has("\\bnom\\b") && hasPrenom) { put([last], L10n.noun("Last name")) }
             else if has("full|\\bname\\b|\\bnom\\b|\\bnombre\\b") { put([legal], L10n.noun("Full name")) }
@@ -285,11 +349,18 @@ public enum FormFiller {
                 put([address?.state, address.flatMap { USStates.name(for: $0.state) }], L10n.noun("State"))
             }
             else if has("zip|postal|code postal|c[óo]digo postal|\\bplz\\b") { put([address?.zip], L10n.noun("Zip code")) }
-            else if has(phoneWords) || field.type == "tel" { put([person.phones.first], L10n.noun("Phone number")) }
+            else if has(phoneWords) || field.type == "tel" { let v = nextPhone(); if v == nil, isExtraPhone { continue }; put([v], L10n.noun("Phone number")) }
             else if has("birth|dob|naissance|nacimiento|geburt") && !has("street|address") { put([person.birthdate], L10n.noun("Birthdate")) }
             else if has("address|street|adresse|direcci[óo]n|stra[ßs]e|\\bcalle\\b|\\brue\\b") { put([address?.street], L10n.noun("Street address")) }
             // A required menu of request choices ("Privacy Choice", "Choose an option") is chosen on the live page, from its own options.
             else if required, field.type != "select" { needsYou = needsYou ?? L10n.f("This form asks for something we do not have (\"%@\").", field.display) }
+        }
+        // Whatever the form had no box for goes into its message box, so every email, phone, name and past address reaches the company.
+        if let line = unplacedDetails(person: person, usedEmails: usedEmails, usedPhones: usedPhones, usedAddresses: usedAddresses, usedNames: usedNames) {
+            for i in messageSlots {
+                let c = values[i].candidates
+                values[i] = FieldValue(name: values[i].name, type: values[i].type, candidates: [c[0] + " " + line] + c, label: values[i].label)
+            }
         }
         if let needsYou { return FillPlan(values: values, verdict: .needsYou(needsYou)) }
         if !missing.isEmpty { return FillPlan(values: values, verdict: .needsData(Array(Set(missing)).sorted())) }
@@ -309,6 +380,29 @@ public enum FormFiller {
             return "I am afforded the right to opt out of the sale and sharing of my personal information, and to have it deleted, under \(Regions.law(forCountry: country)) and the GDPR where it applies to me."
         }
         return "I am afforded the right to opt out of the sale and sharing of my personal information, and to have it deleted, under the California Consumer Privacy Act (CCPA), the GDPR where it applies to me, and similar state privacy laws."
+    }
+
+    /// "I may also appear under: ..." for the details of this person that no box of the form took: other emails, phones, names and previous addresses.
+    /// Nil when there is nothing left over. Used in the form's message box, and nowhere a message box does not exist.
+    static func unplacedDetails(person: Person, usedEmails: Set<String>, usedPhones: Set<String>, usedAddresses: Set<Int>, usedNames: Set<UUID>) -> String? {
+        var parts: [String] = []
+        let emails = person.emails.dropFirst().filter { !usedEmails.contains($0) && !$0.isEmpty }
+        if !emails.isEmpty { parts.append("other emails: " + emails.joined(separator: ", ")) }
+        let phones = person.phones.dropFirst().filter { !usedPhones.contains($0) && !$0.isEmpty }
+        if !phones.isEmpty { parts.append("other phone numbers: " + phones.joined(separator: ", ")) }
+        let names = person.names.filter { $0.kind != .legal && !$0.name.isEmpty && !usedNames.contains($0.id) }
+        if !names.isEmpty { parts.append("other names: " + names.map(\.name).joined(separator: ", ")) }
+        let past = person.addresses.enumerated().filter { $0.offset > 0 && !usedAddresses.contains($0.offset) }.map { Self.oneLine($0.element) }.filter { !$0.isEmpty }
+        if !past.isEmpty { parts.append("previous addresses: " + past.joined(separator: "; ")) }
+        return parts.isEmpty ? nil : "I may also appear under " + parts.joined(separator: "; ") + "."
+    }
+
+    /// One address on one line, with the years it was lived in when known.
+    public static func oneLine(_ a: Address, years: Bool = true) -> String {
+        let region = [a.state, a.zip ?? ""].filter { !$0.isEmpty }.joined(separator: " ")
+        var s = [a.street ?? "", a.city, region].filter { !$0.isEmpty }.joined(separator: ", ")
+        if years, !s.isEmpty, a.fromYear != nil || a.toYear != nil { s += " (\([a.fromYear.map(String.init), a.toYear.map(String.init)].compactMap { $0 }.joined(separator: "-")))" }
+        return s
     }
 
     /// The request in one short sentence, for a box with a small character limit.

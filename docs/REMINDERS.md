@@ -6,7 +6,9 @@ Local notifications that bring a person back to opting out. Code: `Packages/OptO
 ## The schedule
 
 All dates count from the last day a request was sent (`ActivitySummary.lastDay`), or from the first launch when none has been sent yet. Each reminder arrives
-at 18:00 local time.
+in the morning, at a minute between 08:01 and 08:15 local time, on its own calendar day. A request sent at 21:00 therefore gets its streak
+reminder about eleven hours later, at the next calendar day's 08:01-08:15. The minute is spread by a fixed function of the reminder and its day (so
+reminders differ from one another, but replanning does not move one).
 
 | Reminder | Days after the last request | Needs |
 | --- | --- | --- |

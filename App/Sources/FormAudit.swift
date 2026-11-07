@@ -34,9 +34,10 @@ struct AuditSite: Codable {
 
 @MainActor
 enum FormAudit {
-    static let pat = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
-                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"],
-                            phones: ["555-0100"], birthdate: "1980-01-01")
+    static let pat = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .maiden, name: "Pat Smith")],
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(street: "9 Oak Ave", city: "Peoria", state: "IL", zip: "61602", fromYear: 2015, toYear: 2018)],
+                            emails: ["pat@example.com", "pat.old@example.org"],
+                            phones: ["555-0100", "555-0199"], birthdate: "1980-01-01")
 
     /// The first `n` sites of each kind, in the order the daily batch would take them (best first).
     static func firstPerKind(_ n: Int, model: AppModel) -> [String] {

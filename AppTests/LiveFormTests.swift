@@ -175,6 +175,61 @@ final class LiveFormTests: XCTestCase {
         XCTAssertTrue(rte.contains("personal information"), "the rich-text box holds the request: \(rte)")
     }
 
+    /// nyne.ai: "Are you submitting this request for yourself?" is answered Yes (not "No, I am an authorized agent"); a box for a list of phone numbers keeps both.
+    func testForYourselfIsAnsweredYesAndAPhoneListIsNotSquashedIntoOneNumber() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
+          <label>Phone Numbers *<input name="pl"></label>
+          <label>Are you submitting this request for yourself? *<select name="me"><option value="">Select</option><option value="n">No, I am an authorized agent</option><option value="y">Yes, for myself</option></select></label>
+          <fieldset><legend>Are you submitting this request for yourself?</legend><label><input type="radio" name="r" value="n">No, I am an authorized agent</label><label><input type="radio" name="r" value="y">Yes</label></fieldset>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.phones = ["312-555-0142", "773-555-0199"]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        _ = await session.chooseRequestOptions(form: form.token)
+        let pl = (await session.evalLive("document.querySelector('[name=\"pl\"]').value") as? String) ?? ""
+        XCTAssertEqual(pl, "312-555-0142, 773-555-0199", pl)
+        let sel = (await session.evalLive("document.querySelector('[name=\"me\"]').value") as? String) ?? ""
+        XCTAssertEqual(sel, "y", "the menu is answered Yes")
+        let radio = (await session.evalLive("(document.querySelector('[name=\"r\"]:checked')||{}).value") as? String) ?? ""
+        XCTAssertEqual(radio, "y", "the radio is answered Yes")
+    }
+
+    /// A State or Country the page ships with (a default such as "CA") gives way to the person's own; any other pre-filled box, and a State the person typed, stay.
+    func testAStateOrCountryThePageShipsWithGivesWayToThePersonsOwnButOtherPrefilledBoxesStay() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label>First name *<input name="fn" value="Link Name"></label><label>Email *<input type="email" name="em"></label>
+          <label>State *<input name="st" value="CA"></label>
+          <label>Country *<select name="co"><option value="">Select</option><option value="CA">Canada</option><option value="US" selected>United States</option></select></label>
+          <label>Province *<select name="pr"><option value="">Select</option><option value="CA">California</option><option value="IL">Illinois</option></select></label>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first).asOptOutForm(page: URL(string: "https://local.test/")!)
+        _ = await session.fillLive(FormFiller.plan(for: form, signals: nil, person: pat).values, keepExisting: true)
+        func val(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
+        let st = await val("st"), fn = await val("fn"), co = await val("co")
+        XCTAssertEqual(st, pat.addresses.first?.state, "the page's CA is replaced by the person's state")
+        XCTAssertEqual(fn, "Link Name", "a pre-filled name stays")
+        XCTAssertEqual(co, "US", "a country that already matches stays")
+        // A State the person typed over the page's default is theirs and survives a refill.
+        _ = await session.evalLive("(function(){var e=document.querySelector('[name=\"st\"]'); e.value='TX'; e.setAttribute('data-ook-user','1');})()")
+        _ = await session.fillLive(FormFiller.plan(for: form, signals: nil, person: pat).values, keepExisting: true)
+        let after = await val("st")
+        XCTAssertEqual(after, "TX")
+    }
+
     /// Babelstreet: the birthdate rejects month-first, so it is retried day-first; today's date (valid either way) then follows the same shape.
     func testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn() async throws {
         let html = """

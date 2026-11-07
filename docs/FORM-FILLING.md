@@ -37,15 +37,25 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    `data-ook-last` protection as rule 3 applies (the box carries `data-ook-dob` with the ISO date).
 5. **A business's boxes stay empty.** A box labelled "business" with a street, address, email, phone, city, state, zip, contact or fax in it
    ("Business Relationship Information (if applicable)", catchlight.ai) is the business's, not the person's: `FormFiller` skips it and never counts it as required.
-6. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay.
+6. **Pre-filled pages keep their values.** A link from an email often pre-fills a name and email (`keepExisting`); those stay. The one exception is a **State or Country box the page ships with** (completemedicallists.com starts its State on "CA"): a page default is not the person's choice, so it is replaced by the profile's value unless it already agrees or the person typed it (`LiveForms.fillLive`, `pageDefault`).
+   - **"Is this request for yourself?"** (a menu or radios) is answered Yes / "myself", never as an agent (`selfQ` in `chooseRequestOptions`). A box holding a list of phones is typed as the list, not squashed into one number.
 7. **A box is never given another box's value.** `FormFiller.plan` decides by the words of the label, so the order and the exceptions matter:
    - *Identifiers only the person holds* (SSN, "last 4 digits", licence, passport, state or national ID, tax ID, account, order, reference, case, policy numbers) are
      left empty; when required they make the form "needs you". They used to match "last" (last name) or "state" (the state code).
    - *Someone else's or unknown details* (maiden name, mother, father, parent or guardian, spouse, emergency contact, alias, nickname, other or former names, a social
      profile or handle, gender, race, marital status, employer, occupation, income, birthplace) are left empty; when required, "needs you".
-   - *A second or other email or phone* ("Alternate email", "if different", "Other email addresses") is left empty unless required; a **Confirm email** box is still the
-     person's own email (the check reads the visible label, not the field's code name: `wpforms[fields][5][secondary]` is a confirmation).
-   - *Previous, former or prior* address, street, city, state or zip uses the person's second address, never the current one again, and is left empty when there is none.
+   - *A further email or phone* ("Alternate email", "Additional email", "Secondary phone", "Other phone", "Email 2") takes the next one in the profile, in order
+     (the first such box gets the second email, the next the third, and so on); with none left it stays empty unless required. A **Confirm email** box is still the
+     person's own first email (the check reads the visible label, not the field's code name: `wpforms[fields][5][secondary]` is a confirmation).
+   - *Previous, former or prior* address, street, city, state or zip uses the person's second address, never the current one again; "Second previous address" or
+     "Previous address 2" uses the next one, and the box stays empty when there is none.
+   - *The person's own other names*: a "Maiden name" box gets the maiden name, "Nickname" the nickname, "Previous/former name" the previous legal name, and
+     "Other names", "Also known as" or "Aliases" all the other names joined by commas. A relative's maiden name ("mother's maiden name") is never filled.
+   - *A box for a whole list* ("Emails", "Phone Numbers", "Other email addresses (one per line)") gets them all, or only the others when it says other or additional;
+     one to a line in a text area, comma-separated in a text box. An email-type box always gets one address. A hash or "64-character hex" box is never an email.
+     An example address inside a label ("another@example.com") is a hint, not the word "another".
+   - *What the form has no box for* is added to its message box: "I may also appear under other emails: ...; other phone numbers: ...; other names: ...; previous
+     addresses: ... (years)." Only the leftovers are listed, so a form that already has boxes for them does not repeat them, and a form with no message box gets nothing extra.
    - *Phone boxes* include "cell", "cellular", "whatsapp" and "sms"; "(including country code)" and similar hints in brackets are not the country.
    - *Names*: "first and last name" in one box is the full name; "Last Name or Business Name" is the last name; "Street name" is not a person's name.
    - *A street in two boxes*: "House number" gets the leading number of the street line ("12"), "Street name" the rest ("Main St"). "Street 2" is the second line (empty, "N/A" if required).
@@ -61,7 +71,16 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
     nothing shown on the page, cannot be retried.
 
 Every change to these rules is checked against all the forms the directory recorded (`opt_out_form` in `directory/*.yml`, about 2400 boxes): fill each with a test person
-before and after and compare. The last comparison changed 17 boxes, all of them corrections (the two it first got wrong, "Confirm Email" and a textarea saying "handle your request", were fixed and have a test).
+before and after and compare. The multi-value comparison (a person with three emails, two phones, three addresses and a maiden name and nickname) changed 10 boxes across the recorded forms, all of them improvements: alternate phone, nickname/maiden name, "Emails"/"Phone Numbers" lists, and one hash box that used to get an email now stays empty. The one before changed 17 boxes, all of them corrections (the two it first got wrong, "Confirm Email" and a textarea saying "handle your request", were fixed and have a test).
+
+## Opt-out emails carry the whole profile
+
+The person used for forms (`AppModel.formPerson`) puts the household's own form address first and keeps every other email of the profile after it, so further email boxes and the "other emails" line still have them.
+
+Every opt-out email (the batch message to several companies and the single-company message) is built from `EmailIdentity`, which lists the current name, email and
+address, then the history: "Other names I have used", "Other email addresses I have used" and "Previous addresses" (with the years when known). A company that asks for a
+phone number also gets "Other phone numbers"; a company matched by advertising ID (ad tech, location data) gets the names and emails but no postal history. The same body is used by the
+Email screen, the assisted run and the automatic run (`emailBody(for:)`).
 
 ## Not sending while the person is typing
 
@@ -95,6 +114,9 @@ misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (s
 | A street split in two, and a second line | `CoreTests.testAStreetSplitInTwoAndASecondLineAreEachTheirOwnPart` |
 | Only today's-date boxes get today; month and date-time pickers get their own shape | `CoreTests.testOnlyTodaysDateBoxesGetTodayAndEachPickerGetsItsOwnShape` |
 | Age-range menus, second emails, short message fallback, last name beside a business name | `CoreTests.testAnAgeRangeMenuGetsTheAgeToMatch...`, `testALastNameBesideABusinessName...` |
+| Several email, phone and previous-address boxes take the profile's values in order; other names fill their own boxes; leftovers go in the message | `CoreTests.testSeveralBoxesForTheSameKindTakeTheProfilesValuesInOrder`, `testPreviousAddressesAndOtherNamesFillTheirOwnBoxes`, `testWhatTheFormHasNoBoxForGoesInItsMessage` |
+| A box for a whole list gets the list; a hash box stays empty | `CoreTests.testABoxForAWholeListGetsTheListAndAHashBoxStaysEmpty` |
+| An opt-out email carries every name, email and past address (phones only for companies that ask) | `CoreTests.testAnEmailCarriesEveryNameEmailPhoneAndPastAddress` |
 | Words inside another box's name or a sentence do not make it someone else's (Confirm Email, "handle your request") | `CoreTests.testWordsInsideAnotherBoxsNameOrSentenceDoNotMakeItSomeoneElses` |
 | Month and date-time pickers, an age-bracket menu, a box with a small limit, a rich-text box, a cell number, a split street, an SSN box left empty, all on one page | `LiveFormTests.testEveryKindOfBoxIsFilledInItsOwnShapeAndTheOnesThatAreNotTheirsStayEmpty` |
 | A business's address, email and phone are left empty | `CoreTests.testTheBusinessRelationshipBoxesAreLeftEmptyAndTheirOwnAddressIsStillFilled` |

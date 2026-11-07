@@ -15,8 +15,16 @@ public struct PlannedReminder: Equatable, Sendable {
 /// at most once: there is no repeating trigger, and a later request moves every date forward (the cycle starts again). Dates already past are dropped,
 /// never fired late.
 public enum Reminders {
-    /// Local time of day a reminder arrives.
-    public static let hour = 18
+    /// Local time of day a reminder arrives: the morning, between 08:01 and 08:15. The minute is spread by a fixed function of the reminder and its day, so it
+    /// differs from one reminder to the next but does not change when the set is replanned (every launch and every return to the app).
+    public static let hour = 8
+    public static let minutes = 1...15
+    static func minute(id: String, on date: Date, calendar: Calendar) -> Int {
+        let c = calendar.dateComponents([.year, .month, .day], from: date)
+        var seed = (c.year ?? 0) &* 372 &+ (c.month ?? 0) &* 31 &+ (c.day ?? 0)
+        for u in id.unicodeScalars { seed = seed &* 31 &+ Int(u.value) }
+        return minutes.lowerBound + abs(seed % minutes.count)
+    }
     public static let idPrefix = "reminder-"
     /// Days after the last request: a streak nudge, then three days, a week and a month; after that one every 30 days.
     static let offsets: [(stage: ReminderStage, days: Int)] = [(.streak, 1), (.threeDays, 3), (.week, 7), (.month, 30)]
@@ -33,7 +41,7 @@ public enum Reminders {
         return steps.compactMap { step in
             if step.stage == .streak && streak < 1 { return nil }
             guard let date = calendar.date(byAdding: .day, value: step.days, to: day),
-                  let fire = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: date), fire > now else { return nil }
+                  let fire = calendar.date(bySettingHour: hour, minute: minute(id: step.id, on: date, calendar: calendar), second: 0, of: date), fire > now else { return nil }
             let text = message(step.stage, streak: streak, target: target)
             return PlannedReminder(id: idPrefix + step.id, stage: step.stage, fireDate: fire, title: text.title, body: text.body)
         }

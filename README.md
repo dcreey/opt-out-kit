@@ -17,7 +17,7 @@ only to the broker sites they opt out of.
   - *Automatic*: the app fills in and sends the form itself. Only sites whose form was seen working on a reviewed real send are in this group.
   - *Semi-automatic*: the app opens the live form and fills it in; the person clears a bot check or a confirm step and presses the page's own button.
   - *Guided*: the app opens the page and walks the person through it, because the form needs something the app cannot supply.
-  - *Email*: one opt-out email to the privacy addresses of the day's sites, sent from the person's own mail app.
+  - *Email*: one opt-out email to the privacy addresses of the day's sites, sent from the person's own mail app, with the person's other names, emails and previous addresses so a record held under any of them is found.
 - **Email links tab.** Some opt-outs finish with a link in an email. The person pastes it; the app checks it against the directory and the sites already
   finished, loads it, and fills in the form. A Share extension (`ShareExtension/`) lets the person share a link from a mail app straight to Exnay, which opens this tab through the `exnay://link?u=…` URL scheme; if the system blocks the hop, the link is copied for Paste. Requests that said an email would follow are tracked until the person finishes them.
 - **Official one-request services.** California's DROP is a platform task: one request that reaches every registered California broker.

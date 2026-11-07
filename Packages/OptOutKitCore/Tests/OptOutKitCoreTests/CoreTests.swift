@@ -600,6 +600,23 @@ final class DirectoryTests: XCTestCase {
     }
 
     /// Every privacy address in the directory is a valid address exactly as written, with nothing trailing.
+    func testAnEmailCarriesEveryNameEmailPhoneAndPastAddress() {
+        var p = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .maiden, name: "Pat Smith")],
+                       addresses: [Address(street: "12 Main St", city: "Springfield", state: "IL", zip: "62701", fromYear: 2018), Address(street: "3 Elm Rd", city: "Chicago", state: "IL", zip: "60601", fromYear: 2010, toYear: 2014)],
+                       emails: ["pat@example.com", "old@example.org"])
+        p.phones = ["312-555-0142", "773-555-0199"]
+        let who = EmailIdentity(person: p, formEmail: "pat+optoutkit@gmail.com")
+        let batch = EmailBatch(address: "a@b.com", addresses: ["a@b.com"], domains: ["b.com"], entryIDs: ["b"])
+        let several = batch.body(for: who)
+        XCTAssertTrue(several.contains("Address: 12 Main St, Springfield, IL 62701\n"), "the current address has no years")
+        for line in ["Other names I have used: Pat Smith", "Other email addresses I have used: pat@example.com, old@example.org", "Previous addresses: 3 Elm Rd, Chicago, IL 60601 (2010-2014)"] { XCTAssertTrue(several.contains(line), line) }
+        XCTAssertFalse(several.contains("773-555-0199"), "phones go only to a company that asks for them")
+        let one = batch.body(for: who, details: EmailDetails(address: true, phone: true))
+        XCTAssertTrue(one.contains("Phone: 312-555-0142") && one.contains("Other phone numbers: 773-555-0199") && one.contains("Previous addresses: 3 Elm Rd"))
+        let ads = batch.body(for: who, details: EmailDetails(advertisingID: true), advertisingID: "AAAA-1")
+        XCTAssertTrue(ads.contains("Other email addresses I have used") && !ads.contains("Previous addresses"), "an ad-ID company gets no postal history")
+    }
+
     func testAnImageFileNameIsNotAnAddress() {
         XCTAssertNil(ContactEmail.cleaned("privacy-how-1@2x.png"))
         XCTAssertEqual(ContactEmail.cleaned("legal@site.org."), "legal@site.org")
@@ -3050,6 +3067,56 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         return p
     }
 
+    private var many: Person {
+        var p = wide
+        p.emails = ["pat@example.com", "pat.old@example.org", "pat.work@example.net"]
+        p.phones = ["312-555-0142", "773-555-0199"]
+        p.names += [NameEntry(kind: .maiden, name: "Pat Smith"), NameEntry(kind: .nickname, name: "Patty")]
+        p.addresses.append(Address(street: "3 Elm Rd", city: "Chicago", state: "IL", zip: "60601", fromYear: 2010, toYear: 2014))
+        return p
+    }
+
+    func testSeveralBoxesForTheSameKindTakeTheProfilesValuesInOrder() {
+        let p = plan([("email", "e1", "Email"), ("email", "e2", "Confirm email"), ("email", "e3", "Alternate email"), ("email", "e4", "Additional email"), ("email", "e5", "Other email"),
+                      ("tel", "p1", "Phone"), ("tel", "p2", "Secondary phone"), ("tel", "p3", "Other phone")], person: many)
+        XCTAssertEqual(v(p, "e1"), ["pat@example.com"]); XCTAssertEqual(v(p, "e2"), ["pat@example.com"], "a confirmation repeats the first")
+        XCTAssertEqual(v(p, "e3"), ["pat.old@example.org"]); XCTAssertEqual(v(p, "e4"), ["pat.work@example.net"]); XCTAssertNil(v(p, "e5"), "no fourth email is invented")
+        XCTAssertEqual(v(p, "p1"), ["312-555-0142"]); XCTAssertEqual(v(p, "p2"), ["773-555-0199"]); XCTAssertNil(v(p, "p3"))
+        XCTAssertNil(v(plan([("email", "e1", "Email"), ("email", "e3", "Alternate email")], person: wide), "e3"), "one email: the alternate stays empty")
+    }
+
+    func testABoxForAWholeListGetsTheListAndAHashBoxStaysEmpty() {
+        let p = plan([("text", "a", "Emails*"), ("textarea", "b", "Other email addresses (one per line)"), ("textarea", "c", "Other phone numbers (one per line)"), ("text", "d", "Phone Numbers *"),
+                      ("text", "h", "64-character hex hash"), ("email", "e", "another@example.com"), ("text", "n", "e.g. nickname, maiden name")], person: many)
+        XCTAssertEqual(v(p, "a")?.first, "pat@example.com, pat.old@example.org, pat.work@example.net")
+        XCTAssertEqual(v(p, "b")?.first, "pat.old@example.org\npat.work@example.net"); XCTAssertEqual(v(p, "c")?.first, "773-555-0199")
+        XCTAssertEqual(v(p, "d")?.first, "312-555-0142, 773-555-0199"); XCTAssertNil(v(p, "h"), "a hash is not an email")
+        XCTAssertEqual(v(p, "e"), ["pat@example.com"], "an example address in a label is not the word another")
+        XCTAssertEqual(v(p, "n")?.first, "Pat Smith, Patty")
+        XCTAssertNil(v(plan([("textarea", "b", "Other email addresses (one per line)"), ("email", "e", "Email")], person: wide), "b"), "one email: nothing to list")
+    }
+
+    func testPreviousAddressesAndOtherNamesFillTheirOwnBoxes() {
+        let p = plan([("text", "a", "Previous address"), ("text", "b", "Second previous address"), ("text", "c", "Previous address 3"), ("text", "d", "Maiden name"), ("text", "e", "Other names used"),
+                      ("text", "f", "Nickname"), ("text", "g", "Mother's maiden name")], person: many)
+        XCTAssertEqual(v(p, "a"), ["9 Oak Ave"]); XCTAssertEqual(v(p, "b"), ["3 Elm Rd"]); XCTAssertNil(v(p, "c"), "there is no third previous address")
+        XCTAssertEqual(v(p, "d")?.last, "Pat Smith"); XCTAssertEqual(v(p, "f")?.last, "Patty")
+        XCTAssertEqual(v(p, "e")?.first, "Pat Smith, Patty"); XCTAssertNil(v(p, "g"), "someone else's maiden name is never filled")
+        XCTAssertNil(v(plan([("text", "d", "Maiden name"), ("email", "em", "Email")], person: wide), "d"), "no maiden name in the profile: left empty")
+    }
+
+    func testWhatTheFormHasNoBoxForGoesInItsMessage() {
+        let p = plan([("email", "e1", "Email"), ("textarea", "m", "Message")], person: many)
+        let m = v(p, "m")?.first ?? ""
+        XCTAssertTrue(m.contains("pat.old@example.org") && m.contains("pat.work@example.net") && m.contains("773-555-0199") && m.contains("Pat Smith") && m.contains("Patty"))
+        XCTAssertTrue(m.contains("9 Oak Ave") && m.contains("3 Elm Rd, Chicago, IL 60601 (2010-2014)"), "previous addresses with their years")
+        var plain = wide; plain.addresses = [plain.addresses[0]]
+        XCTAssertEqual(v(plan([("email", "e1", "Email"), ("textarea", "m", "Message")], person: plain), "m")?.first, FormFiller.standardRequest(for: plain), "nothing extra to say")
+        let placed = plan([("email", "e1", "Email"), ("email", "e2", "Alternate email"), ("email", "e3", "Additional email"), ("tel", "p", "Phone"), ("tel", "p2", "Other phone"),
+                           ("text", "o", "Other names"), ("text", "a", "Previous address"), ("text", "a2", "Previous address 2"), ("textarea", "m", "Message")], person: many)
+        XCTAssertEqual(v(placed, "m")?.first, FormFiller.standardRequest(for: many), "everything already has its own box")
+    }
+
     func testIdentifiersAndSomeoneElsesNamesAreNeverFilledWithThePersonsOwnDetails() {
         let p = plan([("text", "a", "Last 4 digits of SSN"), ("text", "b", "Mother's maiden name"), ("text", "c", "Parent/guardian name"), ("text", "d", "State ID number"),
                       ("text", "e", "Birth place"), ("text", "f", "Facebook profile name"), ("text", "g", "Account number"), ("text", "h", "Gender"),
@@ -3115,7 +3182,7 @@ final class FormFillerMoreFieldsTests: XCTestCase {
     func testALastNameBesideABusinessNameIsStillFilledAndAMessageHasAShortFallback() {
         let p = plan([("text", "l", "Last Name or Business Name"), ("textarea", "m", "Message (required)"), ("text", "fn", "First Name"), ("email", "e", "Email")], person: wide)
         XCTAssertEqual(v(p, "l"), ["Example"])
-        XCTAssertEqual(v(p, "m")?.count, 2)
+        XCTAssertEqual(v(p, "m")?.count, 3, "the request with the past address added, the request, and the short one")
         XCTAssertLessThan(v(p, "m")?.last?.count ?? 999, 100)
     }
 

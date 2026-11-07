@@ -3,7 +3,7 @@
 `App/Sources/FormAudit.swift` (debug builds only) opens each site's page the way a real run does, fills the form from a complete made-up
 profile and never sends it. It writes `results.json` and a picture of the filled form per site to the app's Documents/audit folder. Launch the app
 on the simulator with `-audit-first-per-kind 3`, `-audit-all` or `-audit-domains a.com,b.com`; the run is parallel, resumes where it stopped, and
-gives each site 75 seconds.
+gives each site 75 seconds. The made-up profile (Pat Example) has a maiden name, two emails, two phones and a previous address, so the multi-value rules in [FORM-FILLING.md](FORM-FILLING.md) show up in the pictures.
 
 Each result records the page that opened, whether a form was found, every field with its label, whether it is required and whether it was filled,
 anything that would stop a person (a bot check, a certification box, a typed code, a menu with no choice for them), and the dry-run outcome.

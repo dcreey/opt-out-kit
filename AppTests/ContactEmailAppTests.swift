@@ -27,7 +27,7 @@ final class ContactEmailAppTests: XCTestCase {
         return p
     }
 
-    func testAGmailAddressIsTaggedAndReplacesEveryProfilesOwnAddress() throws {
+    func testAGmailAddressIsTaggedAndLeadsEveryProfilesOwnAddresses() throws {
         let m = model()
         let me = complete(m, name: "Me")
         let mum = complete(m, name: "Mum", relationship: .parent)
@@ -36,7 +36,8 @@ final class ContactEmailAppTests: XCTestCase {
         m.setContactEmail("pat@gmail.com")
         XCTAssertEqual(m.formEmail, "pat@gmail.com")
         XCTAssertEqual(m.formPerson(me).emails, ["pat@gmail.com"])
-        XCTAssertEqual(m.formPerson(mumWithOwn).emails, ["pat@gmail.com"], "family forms use the one address too")
+        XCTAssertEqual(m.formPerson(mumWithOwn).emails.first, "pat@gmail.com", "family forms lead with the one address too (replies and confirmations arrive there)")
+        XCTAssertEqual(m.formPerson(mumWithOwn).emails, ["pat@gmail.com", "mum@example.com"], "the profile's own addresses follow, for forms with more than one email box")
         m.setContactEmail("pat@example.com")
         XCTAssertEqual(m.formEmail, "pat@example.com", "other providers are left alone")
     }

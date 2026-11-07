@@ -246,7 +246,7 @@ extension WebViewSession {
     private func fillLiveOnce(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
         let normal = values.filter { $0.type != FormFiller.confirmIdentityType }
         if values.contains(where: { $0.type == FormFiller.confirmIdentityType }) { _ = await tickIdentityBoxes() }
-        let payload = normal.map { ["name": $0.name, "candidates": $0.candidates] as [String: Any] }
+        let payload = normal.map { ["name": $0.name, "candidates": $0.candidates, "label": $0.label] as [String: Any] }
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return (0, []) }
         let js = #"""
         (function(values){var filled=0, unmatched=[];
@@ -291,7 +291,13 @@ extension WebViewSession {
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
             if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
             // Whatever is already in a box or menu stays, unless it is exactly what this fill put there before.
-            if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
+            // The one exception: a State or Country the page ships with (a default such as "CA") gives way to the person's own, since a page default is not the person's choice.
+            var stateish=/\b(state|province|country)\b/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''))&&!/birth|born|issu|licen|incorporat|e-?mail|phone/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''));
+            var shown=(el.tagName==='SELECT'?((el.options[el.selectedIndex]||{}).text||'')+'|'+el.value:getVal(el)).toLowerCase();
+            var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});});
+            var pageDefault=stateish&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
+            if(pageDefault){/* falls through to be filled */}
+            else if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
             else if(getVal(el).trim()!==''&&getVal(el)!==el.getAttribute('data-ook-last')){filled++; return;}
             if(el.tagName==='SELECT'){var done=false;
               for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
@@ -315,8 +321,8 @@ extension WebViewSession {
                   if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
-            } else if(\#(keepExistingValues ? "true" : "false")&&getVal(el).trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){var ph=isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
+            } else if(\#(keepExistingValues ? "true" : "false")&&!pageDefault&&getVal(el).trim()!==''){filled++;}
+            else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
@@ -544,6 +550,8 @@ extension WebViewSession {
           var groups={};
           f.querySelectorAll('input[type=radio]').forEach(function(r){(groups[r.name||('g'+Math.random())]=groups[r.name||'']||[]).push(r);});
           var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
+          // "Are you submitting this request for yourself?" is the opposite question: Yes is the person's answer.
+          var selfQ=/for (yourself|myself)|request for (yourself|yourself or)|are you (the )?(person|individual|consumer) (whose|this)/i;
           var removal=/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i;
           Object.keys(groups).forEach(function(k){var rs=groups[k];
             // The page may start on its gentler choice ("Your privacy choices"); "Remove my information" is the one that takes a listing off.
@@ -559,7 +567,8 @@ extension WebViewSession {
             var pick=null;
             // "Are you an authorized agent / acting on behalf of someone?": the person is asking for themselves, so the answer is No.
             var ctx=((rs[0].closest('fieldset')||rs[0].closest('div')||{innerText:''}).innerText||'').slice(0,200)+' '+(rs[0].name||'');
-            if(agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
+            if(selfQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var ls=label(rs[q]); if(/^\s*(yes|myself|me|my own)\b/i.test(ls)&&!/agent|behalf|represent/i.test(ls)) pick=rs[q];}}
+            if(!pick&&agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
             for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)) pick=rs[i];}
             // "Remove my information" (a person-search site taking a listing off) beats a plain "do not sell" choice beside it: it is the stronger opt-out.
             for(var i=0;i<rs.length&&!pick;i++){var ti=title(rs[i]); if(/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i.test(ti)) pick=rs[i];}
@@ -578,8 +587,9 @@ extension WebViewSession {
             if(/state|country|province|region/.test(l)||s.options.length>=40) return;
             if((s.selectedIndex>0 && s.value)||touched(s)||autoDone(s)) return;
             var best=-1,bestScore=0;
-            var isAgentQ=agentQ.test(l+' '+near);
+            var isSelfQ=selfQ.test(l+' '+near), isAgentQ=!isSelfQ&&agentQ.test(l+' '+near);
             for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
+              if(isSelfQ&&/^\s*(yes|myself|me|my own)\b/i.test(t)&&!/agent|behalf|represent/i.test(t)) sc=5;
               if(isAgentQ&&/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(t)) sc=5;
               if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=2;
               if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,3);          // deleting the data beats opting out of its sale

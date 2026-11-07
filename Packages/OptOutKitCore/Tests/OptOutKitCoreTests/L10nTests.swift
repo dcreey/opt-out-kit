@@ -72,17 +72,35 @@ final class RemindersTests: XCTestCase {
     func testEachMissStageFiresOnceOnItsOwnDay() {
         let plan = Reminders.plan(lastActive: day(1), streak: 4, target: .people_search, now: day(1), calendar: cal)
         XCTAssertEqual(plan.prefix(4).map(\.stage), [.streak, .threeDays, .week, .month])
-        XCTAssertEqual(plan.prefix(4).map { cal.dateComponents([.month, .day, .hour], from: $0.fireDate) }.map { "\($0.month!)-\($0.day!) \($0.hour!)" },
-                       ["1-2 18", "1-4 18", "1-8 18", "1-31 18"])
+        XCTAssertEqual(plan.prefix(4).map { cal.dateComponents([.month, .day], from: $0.fireDate) }.map { "\($0.month!)-\($0.day!)" },
+                       ["1-2", "1-4", "1-8", "1-31"])
+        for p in plan {
+            let t = cal.dateComponents([.hour, .minute], from: p.fireDate)
+            XCTAssertEqual(t.hour, 8, "reminders arrive in the morning")
+            XCTAssertTrue((1...15).contains(t.minute!), "between 8:01 and 8:15, got \(t.minute!)")
+        }
+        let again = Reminders.plan(lastActive: day(1), streak: 4, target: .people_search, now: day(1, hour: 10), calendar: cal)
+        XCTAssertEqual(plan.map(\.fireDate), again.map(\.fireDate), "replanning does not move a reminder")
+        XCTAssertGreaterThan(Set(plan.map { cal.component(.minute, from: $0.fireDate) }).count, 1, "the minutes are spread, not all the same")
         XCTAssertEqual(Set(plan.map(\.id)).count, plan.count, "every reminder has its own id, so none repeats")
         XCTAssertEqual(plan.filter { $0.stage == .threeDays }.count, 1, "the 3-day miss is not repeated every 3 days")
+    }
+
+    /// Opted out at 21:00; the next morning's reminder is about eleven hours later, never skipped to a later day.
+    func testAnOptOutAtNineInTheEveningStillGetsTheNextMorningsReminder() {
+        let night = day(1, hour: 21)
+        let plan = Reminders.plan(lastActive: night, streak: 1, target: nil, now: night, calendar: cal)
+        let first = try! XCTUnwrap(plan.first)
+        XCTAssertEqual(first.stage, .streak)
+        let hours = first.fireDate.timeIntervalSince(night) / 3600
+        XCTAssertTrue(hours > 10.9 && hours < 11.3, "\(hours) hours")
     }
 
     func testAfterTheFirstMonthItRepeatsMonthlyAndNeverMoreOftenThanThat() {
         let plan = Reminders.plan(lastActive: day(1), streak: 1, target: nil, now: day(1), calendar: cal, monthlyRepeats: 3)
         let months = plan.filter { $0.stage == .month }.map(\.fireDate)
         XCTAssertEqual(months.count, 4)
-        for (a, b) in zip(months, months.dropFirst()) { XCTAssertEqual(cal.dateComponents([.day], from: a, to: b).day, 30) }
+        for (a, b) in zip(months, months.dropFirst()) { XCTAssertEqual(cal.dateComponents([.day], from: cal.startOfDay(for: a), to: cal.startOfDay(for: b)).day, 30) }
     }
 
     func testAnotherOptOutRestartsTheCycleAndPastDatesAreNeverFiredLate() {
