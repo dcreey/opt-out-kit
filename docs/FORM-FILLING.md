@@ -75,6 +75,12 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 Every change to these rules is checked against all the forms the directory recorded (`opt_out_form` in `directory/*.yml`, about 2400 boxes): fill each with a test person
 before and after and compare. The multi-value comparison (a person with three emails, two phones, three addresses and a maiden name and nickname) changed 10 boxes across the recorded forms, all of them improvements: alternate phone, nickname/maiden name, "Emails"/"Phone Numbers" lists, and one hash box that used to get an email now stays empty. The one before changed 17 boxes, all of them corrections (the two it first got wrong, "Confirm Email" and a textarea saying "handle your request", were fixed and have a test).
 
+## One form, one submission
+
+A form is sent once, however many emails, phones, addresses or names the profile holds. The app never submits the same form again to cover another value: repeat
+requests to one site can look like spam and get the person blocked. Extra values go into the form's own boxes (including boxes added with its "Add another" button)
+and, for whatever has no box, into the message box as "I may also appear under other emails: …". A form with neither simply gets the first value of each kind.
+
 ## Opt-out emails carry the whole profile
 
 The person used for forms (`AppModel.formPerson`) puts the household's own form address first and keeps every other email of the profile after it, so further email boxes and the "other emails" line still have them.
