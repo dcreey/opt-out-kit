@@ -208,7 +208,7 @@ enum FormAudit {
         if let step = await session.advanceToRequestForm() { site.blockers.append("step: " + step) }
         let forms = await session.discoverFormsDeep()
         let context = await session.pageContext()
-        guard let form = LiveFormPicker.pick(forms, pageContext: context) else { site.outcome = "no opt-out form found on the page (\(forms.count) forms seen)"; return site }
+        guard var form = LiveFormPicker.pick(forms, pageContext: context) else { site.outcome = "no opt-out form found on the page (\(forms.count) forms seen)"; return site }
         site.formFound = true; session.chosenForm = form.token
         site.title = await session.pageTitle(); site.formText = form.text; site.buttons = form.buttons
         let person = model.formPerson(pat)
@@ -218,7 +218,16 @@ enum FormAudit {
         case .needsData(let what): site.planVerdict = "needs data: " + what.joined(separator: ", ")
         case .needsYou(let why): site.planVerdict = "needs you: " + why
         }
-        let fill = await session.fillLive(plan.values)
+        var fill = await session.fillLive(plan.values)
+        // Same step as the real flows: more emails or phones than boxes → press the page's "Add another" button, read the form again, fill the new boxes.
+        let presses = await session.addAnotherBoxes(form: form.token, emails: person.emails.count, phones: person.phones.count)
+        if presses > 0, let again = LiveFormPicker.pick(await session.discoverForms(), pageContext: await session.pageContext()) {
+            form = again; session.chosenForm = again.token
+            let grown = FormFiller.plan(for: again.asOptOutForm(page: page), signals: nil, person: person)
+            let more = await session.fillLive(grown.values, keepExisting: true)
+            fill = (max(fill.filled, more.filled), more.unmatchedRequired)
+        }
+        if presses > 0 { site.blockers.append("pressed an Add another button \(presses) time(s)") }
         let options = await session.chooseRequestOptions(form: form.token, ownerMayConfirm: true)
         _ = await session.chooseCustomMenus(state: "Illinois")
         _ = await session.chooseTileButtons()

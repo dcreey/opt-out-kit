@@ -182,7 +182,15 @@ extension WebViewSession {
         let page = webView.url ?? URL(string: "https://invalid.example/")!
         let plan = FormFiller.plan(for: picked.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
         // Fill what we can even when the form also asks for something we do not hold: the person completes the rest.
-        let fill = await fillLive(plan.values, keepExisting: true)
+        var fill = await fillLive(plan.values, keepExisting: true)
+        // More emails or phones than boxes: press the page's "Add another" button, read the form again and fill the new boxes too.
+        if await addAnotherBoxes(form: picked.token, emails: person.emails.count, phones: person.phones.count) > 0,
+           let again = LiveFormPicker.pick(await discoverForms(), pageContext: await pageContext()) {
+            chosenForm = again.token
+            let grown = FormFiller.plan(for: again.asOptOutForm(page: page), signals: nil, person: person, advertisingID: advertisingID)
+            let more = await fillLive(grown.values, keepExisting: true)
+            fill = (max(fill.filled, more.filled), more.unmatchedRequired)
+        }
         if fill.filled > 0 {
             _ = await chooseRequestOptions(form: picked.token, ownerMayConfirm: person.mayConfirmOwnIdentity())
             _ = await chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? ""))
@@ -328,6 +336,64 @@ extension WebViewSession {
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
         return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
+    }
+
+    /// A form with one email box or one phone box often has an "Add another email" / "+ Add phone" button. When the profile holds more emails or phones than the
+    /// form has boxes, presses that button (one press per box needed, one box kind at a time) so the extra value has a place to go. Returns how many presses it made;
+    /// the caller then reads the form again and fills the new boxes. Never presses a button that could send the form: a <button> with no type (it submits), a
+    /// submit button, a link that goes somewhere, or anything worded as remove, delete, clear, send, submit, cancel or opt out.
+    func addAnotherBoxes(form token: String, emails: Int, phones: Int) async -> Int {
+        let wantE = min(emails, 5), wantP = min(phones, 5)
+        guard wantE > 1 || wantP > 1 else { return 0 }
+        let js = #"""
+        (function(token,wantE,wantP){
+          var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return false;
+          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none';};
+          function lab(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
+            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t+' '+(e.getAttribute('aria-label')||'')+' '+(e.placeholder||'')).replace(/\s+/g,' ');}
+          function kind(e){var t=e.type||'text'; if(['hidden','checkbox','radio','submit','button','file','image','reset'].indexOf(t)>=0) return '';
+            var s=(e.name||'')+' '+(e.id||'')+' '+lab(e);
+            if(/confirm|verify|re-?enter|retype|repeat/i.test(s)) return '';
+            if(t==='email'||/e-?mail/i.test(s)) return 'e'; if(t==='tel'||/phone|mobile|\bcell\b|telephone/i.test(s)) return 'p'; return '';}
+          function boxes(k){return [].slice.call(f.querySelectorAll('input')).filter(function(e){return vis(e)&&kind(e)===k;});}
+          function press(k,kw){var bs=boxes(k); if(!bs.length) return false; var last=bs[bs.length-1];
+            var near=last; for(var up=0;up<3&&near.parentElement&&near.parentElement!==f;up++) near=near.parentElement;
+            var other=k==='e'?'p':'e';
+            var cands=[].slice.call(f.querySelectorAll('button,a,[role=button],input[type=button],span,div')).filter(function(b){
+              if(!vis(b)||b.children.length>3) return false;
+              var t=((b.innerText||b.value||'')+' '+(b.getAttribute('aria-label')||'')+' '+(b.getAttribute('title')||'')).replace(/\s+/g,' ').trim();
+              if(!t||t.length>60||/remove|delete|clear|submit|send|cancel|opt.?out|minus|^[-x\u2212\u00d7]$/i.test(t)) return false;
+              if(b.tagName==='BUTTON'&&b.getAttribute('type')!=='button') return false;
+              if(b.tagName==='INPUT'&&b.type!=='button') return false;
+              if(b.getAttribute('type')==='submit') return false;
+              if(b.tagName==='A'){var h=b.getAttribute('href')||''; if(h&&h!=='#'&&!/^javascript:/i.test(h)) return false;}
+              if(b.hasAttribute('disabled')||b.getAttribute('aria-disabled')==='true') return false;
+              var n=+(b.getAttribute('data-ook-added')||0); if(n>=5) return false;
+              if(new RegExp('(add|another|more|\\+).{0,25}(' + kw + ')|(' + kw + ').{0,25}(add|another|more)\\b','i').test(t)) return true;
+              // A bare "Add another" / "+" counts only when it sits right beside this kind of box and no box of the other kind.
+              if(/^\+?\s*(add( another| more)?|another|more|\+)\s*$/i.test(t)&&near.contains(b)){
+                var inNear=[].slice.call(near.querySelectorAll('input')).some(function(e){return vis(e)&&kind(e)===other;}); return !inNear;}
+              return false;});
+            // An outer wrapper with the same words is not the button: keep the innermost candidates, real buttons and links first.
+            cands=cands.filter(function(c){return !cands.some(function(o){return o!==c&&c.contains(o);});});
+            var rank=function(c){return (c.tagName==='BUTTON'||c.tagName==='A'||c.tagName==='INPUT'||c.getAttribute('role')==='button')?0:1;};
+            cands.sort(function(a,b){return rank(a)-rank(b);});
+            if(!cands.length) return false; var b=cands[0];
+            b.setAttribute('data-ook-added',String((+(b.getAttribute('data-ook-added')||0))+1)); b.scrollIntoView({block:'center'}); b.click(); return true;}
+          // A page can cap its boxes (two extra emails at most) while the button stays: a press that added no box of its kind ends the pressing for that kind.
+          var st=window.__ookAdd=window.__ookAdd||{};
+          function go(k,want,kw){var n=boxes(k).length; if(!(n>0&&n<want)) return false; if(st[token+k]!==undefined&&n<=st[token+k]) return false; var ok=press(k,kw); if(ok) st[token+k]=n; return ok;}
+          if(go('e',wantE,'e-?mail')) return true;
+          if(go('p',wantP,'phone|number|mobile|cell')) return true;
+          return false;})(\#(String(reflecting: token)),\#(wantE),\#(wantP));
+        """#
+        var presses = 0
+        for _ in 0..<8 {
+            guard await evalLive(js) as? Bool == true else { break }
+            presses += 1
+            try? await Task.sleep(for: .milliseconds(600))
+        }
+        return presses
     }
 
     /// Looks at the phone boxes this fill typed into; one that shows an error (a failed pattern, an invalid flag, a visible error message) is tried

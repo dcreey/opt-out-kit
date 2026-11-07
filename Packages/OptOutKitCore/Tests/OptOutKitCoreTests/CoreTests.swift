@@ -3085,6 +3085,31 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertNil(v(plan([("email", "e1", "Email"), ("email", "e3", "Alternate email")], person: wide), "e3"), "one email: the alternate stays empty")
     }
 
+    /// A box added by an "Add another email / phone" button repeats the label of the one before it; it takes the next value, and with none left it repeats the first as before.
+    func testABoxClonedByAddAnotherTakesTheNextValue() {
+        let p = plan([("email", "e1", "Email *"), ("email", "e2", "Email"), ("email", "e3", "Email"), ("email", "e4", "Email"),
+                      ("tel", "p1", "Phone"), ("tel", "p2", "Phone"), ("tel", "p3", "Phone")], person: many)
+        XCTAssertEqual(v(p, "e1"), ["pat@example.com"]); XCTAssertEqual(v(p, "e2"), ["pat.old@example.org"]); XCTAssertEqual(v(p, "e3"), ["pat.work@example.net"])
+        XCTAssertEqual(v(p, "e4"), ["pat@example.com"], "no fourth email: the box repeats the first, as a confirmation would")
+        XCTAssertEqual(v(p, "p1"), ["312-555-0142"]); XCTAssertEqual(v(p, "p2"), ["773-555-0199"]); XCTAssertEqual(v(p, "p3"), ["312-555-0142"])
+        // businessregistry.com: the main box is named `email`; the further ones are named `emails`, labelled only by an example address, and cloned by its Add email button.
+        let named = plan([("email", "email", "Email address (required)"), ("email", "emails", "another@example.com"), ("email", "emails", "another@example.com")], person: many)
+        XCTAssertEqual(v(named, "email"), ["pat@example.com"])
+        XCTAssertEqual(named.values.filter { $0.name == "emails" }.compactMap(\.candidates.first), ["pat.old@example.org", "pat.work@example.net"], "the plural box and its clone take the next values in order")
+        let br = plan([("text", "website", "website"), ("email", "reply_email", "Contact / reply email (optional)"), ("text", "full_name", "Full name (required)"), ("text", "alt_names", "e.g. nickname, maiden name"),
+                       ("email", "email", "Email address (required)"), ("email", "emails", "another@example.com"), ("text", "hashed_emails", "64-character hex hash"), ("text", "phone", "Phone number (optional)"), ("text", "phones", "+1 (555) 000-0001")], person: many)
+        XCTAssertEqual(v(br, "reply_email"), ["pat@example.com"]); XCTAssertEqual(v(br, "email"), ["pat@example.com"], "the primary box is the first email")
+        XCTAssertEqual(v(br, "emails"), ["pat.old@example.org"], "businessregistry.com's further-emails box takes the second email")
+        // A live form's `name` is only its token; the code name follows the label after " | ".
+        let live = plan([("text", "f0-1", "Contact / reply email (optional) | reply_email"), ("email", "f0-4", "Email address (required) | email"), ("email", "f0-5", "another@example.com | emails"),
+                         ("email", "f0-6", "another@example.com | emails")], person: many)
+        XCTAssertEqual(v(live, "f0-4"), ["pat@example.com"]); XCTAssertEqual(v(live, "f0-5"), ["pat.old@example.org"]); XCTAssertEqual(v(live, "f0-6"), ["pat.work@example.net"])
+        let holders = plan([("email", "h1", "you@email.com"), ("email", "h2", "you@email.com")], person: many)
+        XCTAssertEqual(v(holders, "h2"), ["pat@example.com"], "boxes that show only an example address are not clones")
+        let one = plan([("email", "e1", "Email"), ("email", "e2", "Email")], person: wide)
+        XCTAssertEqual(v(one, "e2"), v(one, "e1"), "with a single email both boxes still get it")
+    }
+
     func testABoxForAWholeListGetsTheListAndAHashBoxStaysEmpty() {
         let p = plan([("text", "a", "Emails*"), ("textarea", "b", "Other email addresses (one per line)"), ("textarea", "c", "Other phone numbers (one per line)"), ("text", "d", "Phone Numbers *"),
                       ("text", "h", "64-character hex hash"), ("email", "e", "another@example.com"), ("text", "n", "e.g. nickname, maiden name")], person: many)

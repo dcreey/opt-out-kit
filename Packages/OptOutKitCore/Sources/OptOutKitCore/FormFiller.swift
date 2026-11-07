@@ -94,6 +94,8 @@ public enum FormFiller {
         let hasApellido = allKeys.contains { $0.range(of: "apellido", options: .regularExpression) != nil }
         // Boxes that ask for a further email or phone ("alternate email", "phone 2") take the next one in the profile, in order.
         var extraEmails = 0, extraPhones = 0
+        // A box added by an "Add another" button repeats the label of the one before it ("Email", "Email"): it takes the next value when the profile has one.
+        var seenEmailLabels = Set<String>(), seenPhoneLabels = Set<String>(), seenEmailNames = Set<String>(), seenPhoneNames = Set<String>(), emailBoxes = 0
         var usedEmails = Set<String>(), usedPhones = Set<String>(), usedAddresses = Set<Int>(), usedNames = Set<UUID>()
         var messageSlots: [Int] = []
         for field in form.fields {
@@ -131,8 +133,17 @@ public enum FormFiller {
             let isConfirm = labelOnly.range(of: "confirm|re-?enter|repeat|verify|retype|again", options: .regularExpression) != nil
             let isExtraEmail = !isConfirm && extraLabel.range(of: extraWords, options: .regularExpression) != nil
             let isExtraPhone = extraLabel.range(of: extraWords, options: .regularExpression) != nil
+            let norm = extraLabel.lowercased().replacingOccurrences(of: "[^a-z]", with: "", options: .regularExpression)
+            // The page's own code name for the box: after " | " in a live label, else the recorded field name (a live field's `name` is only its token).
+            let codeName = (field.label.components(separatedBy: " | ").dropFirst().joined(separator: " | ").trimmingCharacters(in: .whitespaces).nonEmpty ?? field.name).lowercased()
             func nextEmail() -> String? {
-                if !isConfirm, extraLabel.range(of: extraWords, options: .regularExpression) != nil {
+                // Clones share the earlier box's label or its code name (`emails`, `emails[]`); a plural `emails` after the main email box is the list of further ones.
+                let byLabel = !isConfirm && !norm.isEmpty && !seenEmailLabels.insert(norm).inserted
+                let byName = !isConfirm && !codeName.isEmpty && !seenEmailNames.insert(codeName).inserted
+                let plural = emailBoxes > 0 && !isConfirm && codeName.range(of: "(^|[^a-z])emails([^a-z]|$)", options: .regularExpression) != nil
+                if !isConfirm { emailBoxes += 1 }
+                let repeated = (byLabel || byName || plural) && extraEmails + 1 < person.emails.count
+                if !isConfirm, repeated || extraLabel.range(of: extraWords, options: .regularExpression) != nil {
                     extraEmails += 1
                     if extraEmails < person.emails.count { usedEmails.insert(person.emails[extraEmails]); return person.emails[extraEmails] }
                     return nil
@@ -141,7 +152,10 @@ public enum FormFiller {
                 return person.emails.first
             }
             func nextPhone() -> String? {
-                if extraLabel.range(of: extraWords, options: .regularExpression) != nil {
+                let byLabel = !norm.isEmpty && !seenPhoneLabels.insert(norm).inserted
+                let byName = !codeName.isEmpty && !seenPhoneNames.insert(codeName).inserted
+                let repeated = (byLabel || byName) && extraPhones + 1 < person.phones.count
+                if repeated || extraLabel.range(of: extraWords, options: .regularExpression) != nil {
                     extraPhones += 1
                     if extraPhones < person.phones.count { usedPhones.insert(person.phones[extraPhones]); return person.phones[extraPhones] }
                     return nil
@@ -421,4 +435,9 @@ public enum FormFiller {
 
     /// A marker value (not a real field) that tells the web view to tick plain "I am this person" boxes.
     public static let confirmIdentityType = "confirm-identity"
+}
+
+
+private extension String {
+    var nonEmpty: String? { isEmpty ? nil : self }
 }

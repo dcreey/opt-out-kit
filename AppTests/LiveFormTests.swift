@@ -230,6 +230,81 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(after, "TX")
     }
 
+    /// A form with one email box and one phone box and an "Add another" button for each: the buttons are pressed, and every email and phone has a box.
+    func testAddAnotherEmailAndPhoneButtonsArePressedAndTheNewBoxesFilled() async throws {
+        let html = """
+        <html><body><h1>Opt out of the sale of my personal information</h1>
+        <form id="f" onsubmit="event.preventDefault(); window.sent=true;">
+          <label>First name *<input name="fn"></label><label>Last name *<input name="ln"></label>
+          <div id="emails"><label>Email *<input type="email" name="em"></label></div>
+          <button type="button" onclick="var d=document.createElement('div'); d.innerHTML='<label>Email<input type=email name=em2></label>'; document.getElementById('emails').appendChild(d);">Add another email</button>
+          <div id="phones"><label>Phone<input type="tel" name="ph"></label></div>
+          <a href="#" onclick="var d=document.createElement('div'); d.innerHTML='<label>Phone<input type=tel name=ph2></label>'; document.getElementById('phones').appendChild(d); return false;">+ Add phone</a>
+          <button type="button" onclick="this.parentNode.removeChild(this)">Remove</button>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com", "pat.old@example.org"]; me.phones = ["312-555-0142", "773-555-0199"]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let filled = await session.scanAndFill(person: me)
+        XCTAssertGreaterThan(filled, 0)
+        func val(_ n: String) async -> String { (await session.evalLive("(document.querySelector('[name=\"\(n)\"]')||{}).value") as? String) ?? "(missing)" }
+        let em = await val("em"), em2 = await val("em2"), ph = await val("ph"), ph2 = await val("ph2")
+        XCTAssertEqual(em, "pat@example.com")
+        XCTAssertEqual(em2, "pat.old@example.org", "the second email has a box now")
+        XCTAssertEqual(ph, "3125550142")
+        XCTAssertEqual(ph2, "7735550199", "the second phone has a box now")
+        let sent = (await session.evalLive("window.sent===true") as? Bool) ?? false
+        XCTAssertFalse(sent, "pressing the add buttons sends nothing")
+        let removed = (await session.evalLive("[].slice.call(document.querySelectorAll('button')).some(function(b){return b.innerText==='Remove';})") as? Bool) ?? false
+        XCTAssertTrue(removed, "a Remove button is never pressed")
+    }
+
+    /// businessregistry.com caps its extra email boxes while the "Add email" button stays: pressing stops once a press adds no box, and the boxes named `emails` take the next emails.
+    func testAPageThatCapsItsExtraBoxesIsNotPressedForeverAndNamedEmailBoxesTakeTheNextValues() async throws {
+        let html = """
+        <html><body><h1>Opt out of the sale of my personal information</h1>
+        <form id="f" onsubmit="event.preventDefault()">
+          <label>Full name *<input name="full_name"></label>
+          <label>Email address *<input type="email" name="email"></label>
+          <div id="more"><input type="email" name="emails" placeholder="another@example.com"></div>
+          <div class="add-wrap"><button type="button" onclick="window.presses=(window.presses||0)+1; var m=document.getElementById('more'); if(m.children.length<2){var i=document.createElement('input'); i.type='email'; i.name='emails'; i.placeholder='another@example.com'; m.appendChild(i);}">+ Add email</button></div>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.emails = ["pat@example.com", "pat.b@example.org", "pat.c@example.org", "pat.d@example.org", "pat.e@example.org"]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let filled = await session.scanAndFill(person: me)
+        XCTAssertGreaterThan(filled, 0)
+        let presses = (await session.evalLive("window.presses||0") as? Int) ?? -1
+        XCTAssertLessThanOrEqual(presses, 3, "pressing stops once the page adds no more boxes (pressed \(presses) times)")
+        let vals = (await session.evalLive("JSON.stringify([].slice.call(document.querySelectorAll('[name=emails]')).map(function(e){return e.value;}))") as? String) ?? ""
+        XCTAssertEqual(vals, "[\"pat.b@example.org\",\"pat.c@example.org\"]")
+    }
+
+    /// A button with no type inside a form submits it, so even one named "Add another email" is left alone; the form is never sent by the add step.
+    func testAnAddButtonThatWouldSubmitTheFormIsNotPressed() async throws {
+        let html = """
+        <html><body><h1>Opt out of the sale of my personal information</h1>
+        <form id="f" onsubmit="event.preventDefault(); window.sent=true;">
+          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
+          <button onclick="window.clicked=true">Add another email</button>
+          <button type="submit">Opt out</button></form></body></html>
+        """
+        var me = pat; me.emails = ["pat@example.com", "pat.old@example.org"]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        let n = await session.addAnotherBoxes(form: form.token, emails: 2, phones: 0)
+        XCTAssertEqual(n, 0)
+        let state = (await session.evalLive("String(window.clicked===true)+String(window.sent===true)") as? String) ?? ""
+        XCTAssertEqual(state, "falsefalse")
+    }
+
     /// Babelstreet: the birthdate rejects month-first, so it is retried day-first; today's date (valid either way) then follows the same shape.
     func testAnotherDateBoxFollowsTheShapeARetriedDateBoxSettledOn() async throws {
         let html = """

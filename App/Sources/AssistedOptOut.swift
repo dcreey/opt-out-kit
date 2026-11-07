@@ -175,6 +175,8 @@ final class WebAssistedPage: AssistedPage {
         _ = await session.chooseCustomMenus(state: stateName)
         _ = await session.chooseAutocomplete(state: stateName)
         _ = await session.chooseTileButtons()
+        // More emails or phones than boxes: press the page's "Add another" button; the form then reads as a new one and its new boxes are filled.
+        if await session.addAnotherBoxes(form: new.token, emails: person.emails.count, phones: person.phones.count) > 0 { _ = await adoptNewForm() }
         return true
     }
 
