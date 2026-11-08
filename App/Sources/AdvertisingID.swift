@@ -16,7 +16,12 @@ enum AdvertisingID {
         if ProcessInfo.processInfo.arguments.contains("-fake-adid") { return "11111111-2222-3333-4444-555555555555" }
         #endif
         var status = ATTrackingManager.trackingAuthorizationStatus
-        if status == .notDetermined { status = await ATTrackingManager.requestTrackingAuthorization() }
+        // Apple shows the prompt only while the app is in the foreground. Asked from a background run, iOS answers "denied" without showing anything, and the person
+        // is then never offered the switch again. So the app never asks unless it is on screen; it waits for a later time it is.
+        if status == .notDetermined {
+            guard UIApplication.shared.applicationState == .active else { return nil }
+            status = await ATTrackingManager.requestTrackingAuthorization()
+        }
         guard status == .authorized else { return nil }
         let id = ASIdentifierManager.shared().advertisingIdentifier
         return id.uuidString == "00000000-0000-0000-0000-000000000000" ? nil : id.uuidString
