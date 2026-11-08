@@ -1,30 +1,41 @@
 import SwiftUI
 import OptOutKitCore
 
-/// Edits one person's profile. Changes save as you type, and everything is stored encrypted on this phone.
+/// Edits one person's profile. Nothing is saved while editing: the edits are kept in this screen and written once, when the person taps Done or Continue
+/// or closes the screen. Everything is stored encrypted on this phone.
 struct PersonEditorView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @State private var person: Person
     /// Told the person as typed, on every change, so a host's Done or Continue button can follow it. Cheap: it never writes the model.
     var onDraft: ((Person) -> Void)?
+    /// The household email as typed (the owner's profile only); written with the rest when the editor is done.
+    var onEmailDraft: ((String) -> Void)?
+    @State private var email: String
     @State private var confirmDelete = false
     // The three parts of the legal name are edited separately; the stored name is them joined (see `Person.composeLegalName`).
     @State private var first: String
     @State private var middle: String
     @State private var last: String
 
-    init(person: Person, onDraft: ((Person) -> Void)? = nil) {
+    init(person: Person, contactEmail: String = "", onDraft: ((Person) -> Void)? = nil, onEmailDraft: ((String) -> Void)? = nil) {
         self.onDraft = onDraft
+        self.onEmailDraft = onEmailDraft
+        _email = State(initialValue: contactEmail)
         _person = State(initialValue: person)
         _first = State(initialValue: person.legalFirst)
         _middle = State(initialValue: person.legalMiddle)
         _last = State(initialValue: person.legalLast)
     }
 
+    /// The one write: the profile and, on the owner's profile, the email, in a single save. Does nothing when nothing changed.
     private func commit() {
-        if model.household.people.first(where: { $0.id == person.id }) != person { model.update(person) }
+        let personChanged = model.household.people.first(where: { $0.id == person.id }) != person
+        let emailChanged = person.relationship == .me && email != model.contactEmail
+        if personChanged || emailChanged { model.saveProfile(person, contactEmail: emailChanged ? email : nil) }
     }
+
+    private var formEmailOK: Bool { person.relationship == .me ? ContactEmail.isValid(email.trimmingCharacters(in: .whitespaces)) : model.formEmail != nil }
 
     var body: some View {
         Form {
@@ -58,8 +69,10 @@ struct PersonEditorView: View {
                         .font(.footnote)
                 }
             }
-            StringListSection(title: "Phones", hint: "Optional", addLabel: Loc.t("Add phone"),
-                              items: $person.phones, keyboard: .phonePad)
+            StringListSection(title: "Other email addresses", hint: "Optional. Other addresses you have used. A form with more than one email box gets them in order, and any left over are listed in its message box, so a site can find you under any of them.",
+                              addLabel: Loc.t("Add email"), items: $person.emails, keyboard: .emailAddress, identifier: "other-email")
+            StringListSection(title: "Phones", hint: "Optional. Shown as (773) 633-1564 while you type; forms get plain digits.", addLabel: Loc.t("Add phone"),
+                              items: $person.phones, keyboard: .phonePad, format: PhoneFormat.display, identifier: "phone")
             if model.people.count > 1 {
                 Section {
                     Button("Delete this person", role: .destructive) { confirmDelete = true }
@@ -78,11 +91,11 @@ struct PersonEditorView: View {
             if args.contains("-uitest-reset"), !args.contains("-uitest-require-birthdate"), person.birthdate == nil { person.birthdate = "1985-03-14" }
         }
         #endif
-        // The model is written when the person leaves a field, taps Done or Save, or leaves the screen, not while typing (each write rebuilds the plan and
-        // saves the encrypted file). The host reads the live draft, so its Done button does not wait for a write.
+        // The model is written only when the person taps Done or Continue (the host) or leaves the screen: never while typing or on leaving a field
+        // (each write rebuilds the plan and saves the encrypted file). The host reads the live draft, so its Done button does not wait for a write.
         .onChange(of: person) { _, new in onDraft?(new) }
-        .onAppear { onDraft?(person) }
-        .onReceive(NotificationCenter.default.publisher(for: UITextField.textDidEndEditingNotification)) { _ in commit() }
+        .onChange(of: email) { _, new in if person.relationship == .me { onEmailDraft?(new) } }
+        .onAppear { onDraft?(person); if person.relationship == .me { onEmailDraft?(email) } }
         .onDisappear { commit() }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
@@ -161,7 +174,11 @@ struct PersonEditorView: View {
             }.accessibilityIdentifier("current-country")
             HStack {
                 TextField("City", text: currentAddress(\.city, default: "")).accessibilityIdentifier("current-city")
-                TextField((person.countryCode ?? "US") == "US" ? "State" : "Region (optional)", text: currentAddress(\.state, default: "")).frame(maxWidth: (person.countryCode ?? "US") == "US" ? 70 : 150).accessibilityIdentifier("current-state")
+                if (person.countryCode ?? "US") == "US" {
+                    StatePicker(state: currentAddress(\.state, default: "")).accessibilityIdentifier("current-state")
+                } else {
+                    TextField("Region (optional)", text: currentAddress(\.state, default: "")).frame(maxWidth: 150).accessibilityIdentifier("current-state")
+                }
             }
             TextField((person.countryCode ?? "US") == "US" ? "ZIP code" : "Postal code", text: Binding(
                 get: { person.addresses.first?.zip ?? "" },
@@ -172,7 +189,7 @@ struct PersonEditorView: View {
                 .keyboardType(.numbersAndPunctuation).textContentType(.postalCode).accessibilityIdentifier("current-zip")
             BirthdatePicker(birthdate: $person.birthdate)
             if person.relationship == .me { emailRows }
-            let missing = person.missingRequiredDetails + (person.relationship == .me && model.formEmail == nil ? [L10n.noun("Email address")] : [])
+            let missing = person.missingRequiredDetails + (person.relationship == .me && !formEmailOK ? [L10n.noun("Email address")] : [])
             if !missing.isEmpty {
                 Label("Still needed: \(missing.joined(separator: ", ")).", systemImage: "exclamationmark.circle")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("missing-details")
@@ -186,7 +203,7 @@ struct PersonEditorView: View {
 
     /// The household's one email, asked for on the owner's profile. It goes on every form for everyone.
     @ViewBuilder private var emailRows: some View {
-        TextField("Your email address", text: Binding(get: { model.contactEmail }, set: { model.setContactEmail($0) }))
+        TextField("Your email address", text: $email)
             .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
             .textContentType(.emailAddress).accessibilityIdentifier("contact-email")
         Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
@@ -233,7 +250,11 @@ struct PersonEditorView: View {
                             set: { person.addresses[i].street = $0.isEmpty ? nil : $0 }))
                         HStack {
                             TextField("City", text: $person.addresses[i].city)
-                            TextField("State", text: $person.addresses[i].state).frame(maxWidth: 70)
+                            if (person.addresses[i].country ?? "US").uppercased() == "US" {
+                                StatePicker(state: $person.addresses[i].state).accessibilityIdentifier("previous-state-\(i)")
+                            } else {
+                                TextField("Region", text: $person.addresses[i].state).frame(maxWidth: 110)
+                            }
                         }
                         TextField("ZIP code", text: Binding(
                             get: { person.addresses[i].zip ?? "" },
@@ -269,14 +290,22 @@ struct StringListSection: View {
     let addLabel: String
     @Binding var items: [String]
     var keyboard: UIKeyboardType = .default
+    /// Reshapes what is typed (a phone number's brackets and dash); nil leaves it as typed.
+    var format: ((String) -> String)?
+    var identifier = ""
 
     var body: some View {
         Section {
             ForEach(items.indices, id: \.self) { i in
-                TextField(title, text: $items[i]).keyboardType(keyboard)
+                TextField(title, text: Binding(get: { items[i] }, set: { items[i] = format?($0) ?? $0 }))
+                    .keyboardType(keyboard)
+                    .textInputAutocapitalization(keyboard == .emailAddress ? .never : nil)
+                    .autocorrectionDisabled(keyboard == .emailAddress)
+                    .accessibilityIdentifier(identifier.isEmpty ? "" : "\(identifier)-\(i)")
             }
             .onDelete { items.remove(atOffsets: $0) }
             Button(addLabel, systemImage: "plus") { items.append("") }
+                .accessibilityIdentifier(identifier.isEmpty ? "" : "add-\(identifier)")
         } header: {
             Text(title)
         } footer: {
@@ -335,5 +364,22 @@ struct BirthdatePicker: View {
             .pickerStyle(.menu)
             Text("Sent only to sites whose form asks for it.").font(.footnote).foregroundStyle(.secondary)
         }
+    }
+}
+
+
+/// A menu of the fifty states and DC (two-letter code stored), with "State" shown until one is chosen. A stored value that is not a code (older data) is shown as it is.
+struct StatePicker: View {
+    @Binding var state: String
+
+    var body: some View {
+        let code = USStates.code(for: state) ?? ""
+        Picker("State", selection: Binding(get: { code.isEmpty ? state : code }, set: { state = $0 })) {
+            Text("State").tag("")
+            if code.isEmpty, !state.isEmpty { Text(state).tag(state) }
+            ForEach(USStates.all, id: \.code) { Text("\($0.name) (\($0.code))").tag($0.code) }
+        }
+        .pickerStyle(.menu).labelsHidden().fixedSize()
+        .accessibilityLabel("State")
     }
 }

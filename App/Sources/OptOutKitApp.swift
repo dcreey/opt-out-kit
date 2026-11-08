@@ -490,6 +490,13 @@ final class AppModel: ObservableObject {
     /// What "My data" in the page menu of every flow offers to copy.
     var pageDetails: [DetailGroup] { selectedPerson.map { DetailChoices.groups(for: $0, email: formEmail) } ?? [] }
 
+    /// The editor's single write: the profile and, when given, the household email, saved together once.
+    func saveProfile(_ person: Person, contactEmail: String?) {
+        household.update(person)
+        if let contactEmail { household.setContactEmail(contactEmail) }
+        save()
+    }
+
     func setContactEmail(_ email: String) {
         household.setContactEmail(email)
         save()

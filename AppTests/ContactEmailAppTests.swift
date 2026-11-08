@@ -42,6 +42,19 @@ final class ContactEmailAppTests: XCTestCase {
         XCTAssertEqual(m.formEmail, "pat@example.com", "other providers are left alone")
     }
 
+    /// The profile editor writes once, when it is done: the profile and the household email together.
+    func testTheProfileEditorsSingleWriteSavesTheProfileAndTheEmailTogether() throws {
+        let m = model()
+        var me = complete(m, name: "Me")
+        me.phones = ["7736331564"]
+        m.saveProfile(me, contactEmail: "pat@example.com")
+        XCTAssertEqual(m.people.first { $0.id == me.id }?.phones, ["7736331564"])
+        XCTAssertEqual(m.formEmail, "pat@example.com")
+        var other = me; other.phones = []
+        m.saveProfile(other, contactEmail: nil)
+        XCTAssertEqual(m.formEmail, "pat@example.com", "no email given: the household's is left alone")
+    }
+
     func testAProfileIsOnlyReadyWithItsDetailsAndTheHouseholdEmail() throws {
         let m = model()
         let me = m.people.first { $0.relationship == .me }!

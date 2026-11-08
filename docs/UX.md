@@ -25,10 +25,13 @@ Ask once, store only on the phone. Collect what brokers match on, because a miss
 |---|---|---|
 | Names | Matching; brokers list "Bob" and "Robert" separately | An unlimited list, each tagged legal, previous legal, maiden, nickname or other |
 | Relationship | Links the person to the owner | Dropdown of family relationships (parent, child, sibling, spouse, cousin, other family and so on); no friends; not shown for the owner |
-| Current and previous addresses | Matching; most brokers key on address | City, state and years lived; full street only if the user adds it |
-| Emails | Confirmation links | Offer alias addresses for brokers that allow one opt-out per email |
-| Phones | Some matching, phone-code steps | Optional |
+| Current and previous addresses | Matching; most brokers key on address | City, state and years lived; full street only if the user adds it. A US state is chosen from a menu of the fifty states and DC (two-letter code stored); another country keeps a free-text region |
+| Emails | Confirmation links | The household email (owner's profile) plus an "Other email addresses" list on every profile ("Add email"): forms with more than one email box take them in order, the rest go in the message box. Offer alias addresses for brokers that allow one opt-out per email |
+| Phones | Some matching, phone-code steps | Optional; shown as (773) 633-1564 while typed (`PhoneFormat.display`), forms still get plain digits |
 | Birthdate | Some forms require it | Optional; sent only to brokers whose YAML lists it |
+
+**When edits are saved.** Nothing is written while the profile is being edited, not even on leaving a field. The edits (including the household email) stay in the
+editor and are written once, in one save, when the person taps Done or Continue or closes the editor (`AppModel.saveProfile`).
 
 Relatives are not a field: add a relative as another person (with a relationship) and they get their own profile and
 queue.

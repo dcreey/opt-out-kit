@@ -24,12 +24,25 @@ extension XCUIApplication {
             f.tap(); f.typeText(text)
         }
         type("legal-first", first); type("legal-last", last)
-        type("current-street", street); type("current-city", city); type("current-state", state); type("current-zip", zip)
+        type("current-street", street); type("current-city", city); chooseState(state); type("current-zip", zip)
         if let email { type("contact-email", email) }
     }
 }
 
 extension XCUIApplication {
+    /// Chooses a state (two-letter code) in the profile editor's state menu.
+    func chooseState(_ code: String) {
+        let menu = buttons["current-state"].exists ? buttons["current-state"] : descendants(matching: .any)["current-state"]
+        var tries = 0
+        while !menu.exists && tries < 10 { swipeDown(); tries += 1 }
+        XCTAssertTrue(menu.waitForExistence(timeout: 5), "current-state")
+        if (menu.value as? String)?.contains(code) == true || menu.label.contains(code) { return }
+        menu.tap()
+        let item = descendants(matching: .any).matching(NSPredicate(format: "label ENDSWITH %@", "(\(code))")).firstMatch
+        XCTAssertTrue(item.waitForExistence(timeout: 5), "state \(code) in the menu")
+        item.tap()          // the menu scrolls to it
+    }
+
     /// On the walkthrough's email page (the sixth): types the required email address and continues.
     func enterOnboardingEmail(_ email: String = "pat@example.com") {
         let field = textFields["onboarding-email"]

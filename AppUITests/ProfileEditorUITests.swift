@@ -14,7 +14,7 @@ final class ProfileEditorUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["privacy-note"].waitForExistence(timeout: 5)
                       || app.otherElements["privacy-note"].waitForExistence(timeout: 1))
         XCTAssertTrue(app.textFields["current-city"].waitForExistence(timeout: 3), "the current address is its own required field")
-        XCTAssertTrue(app.textFields["current-state"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["current-state"].exists, "the state is chosen from a menu")
         var down = 0
         while !app.buttons["add-name"].isHittable && down < 10 { app.swipeUp(); down += 1 }
         app.buttons["add-name"].tap()

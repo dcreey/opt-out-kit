@@ -83,6 +83,8 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Both switches on by default; declining turns both off; skipping leaves a banner | `AutoProtectionUITests` | Sim |
 | Birthdate required; legal name and address required to close the editor | `AutoProtectionUITests`, `ProfileEditorUITests` | Sim |
 | Add a relative, switch accounts, profile survives relaunch | `ProfileEditorUITests` | Sim |
+| The editor's single write saves the profile and the household email together | `ContactEmailAppTests.testTheProfileEditorsSingleWriteSavesTheProfileAndTheEmailTogether` | Sim |
+| A phone is shown as (773) 633-1564 while typed; the state menu lists 51 states | `PhoneFormatTests` | Mac |
 | Minor or public figure is never searched | `SafetyFlagsUITests` | Sim |
 | Sites tab: search, grouping, status page, scan | `OnboardingAndSitesUITests`, `BrokerListUITests` | Sim |
 | Guided flow: steps advance, Cancel, Not working, site view links | `GuidedFlowUITests`, `GuidedRunnerTests` | Sim |

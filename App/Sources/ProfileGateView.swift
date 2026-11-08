@@ -10,16 +10,17 @@ struct ProfileGateView: View {
     @State private var askNow = false
     /// The profile as typed so far (the model is only written when a field is left or Continue is tapped).
     @State private var draft: Person?
+    @State private var emailDraft: String?
 
     private var person: Person? { model.selectedPerson }
-    private var ready: Bool { (draft ?? person).map { $0.isComplete && model.formEmail != nil } ?? false }
+    private var ready: Bool { (draft ?? person).map { $0.isComplete && ContactEmail.isValid((emailDraft ?? model.contactEmail).trimmingCharacters(in: .whitespaces)) } ?? false }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 banner
                 if let person {
-                    PersonEditorView(person: person, onDraft: { draft = $0 })
+                    PersonEditorView(person: person, contactEmail: model.contactEmail, onDraft: { draft = $0 }, onEmailDraft: { emailDraft = $0 })
                         .id(person.id)
                 } else {
                     Text("Add a person first.")
@@ -63,7 +64,7 @@ struct ProfileGateView: View {
 
     private func finish() {
         guard let person else { return }
-        if let draft { model.update(draft) }          // written now, in the background
+        if let draft { model.saveProfile(draft, contactEmail: emailDraft) }          // written now, in the background
         // Only the current address is on file: prompt once for the earlier ones before carrying on.
         if person.addresses.count < 2, !askedAboutPrevious {
             askedAboutPrevious = true

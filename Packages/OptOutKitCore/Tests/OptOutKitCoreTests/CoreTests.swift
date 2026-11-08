@@ -3538,3 +3538,26 @@ final class LegalBasisFillTests: XCTestCase {
         XCTAssertTrue(melissa.contains("opt_out_url: \"https://apps.melissa.com/user/consumerprivacy.aspx\""))
     }
 }
+
+final class PhoneFormatTests: XCTestCase {
+    func testAUSPhoneIsShownAsItIsTyped() {
+        XCTAssertEqual(PhoneFormat.display("7"), "7")
+        XCTAssertEqual(PhoneFormat.display("773"), "773")
+        XCTAssertEqual(PhoneFormat.display("7736"), "(773) 6")
+        XCTAssertEqual(PhoneFormat.display("773633"), "(773) 633")
+        XCTAssertEqual(PhoneFormat.display("7736331"), "(773) 633-1")
+        XCTAssertEqual(PhoneFormat.display("2164083170"), "(216) 408-3170")
+        XCTAssertEqual(PhoneFormat.display("(773) 633-1564"), "(773) 633-1564")
+        XCTAssertEqual(PhoneFormat.display("+1 773 633 1564"), "(773) 633-1564")
+        XCTAssertEqual(PhoneFormat.display("1-773-633-1564"), "(773) 633-1564")
+        XCTAssertEqual(PhoneFormat.display("(773) 6"), "(773) 6")
+        XCTAssertEqual(PhoneFormat.display("(773) "), "773", "backspacing over the bracket and space leaves the digits")
+        XCTAssertEqual(PhoneFormat.display("+44 20 7946 0958"), "+44 20 7946 0958", "international numbers are left alone")
+        XCTAssertEqual(PhoneFormat.display(""), "")
+    }
+    func testAllFiftyOneStatesAreListedInNameOrder() {
+        XCTAssertEqual(USStates.all.count, 51)
+        XCTAssertEqual(USStates.all.first?.code, "AL")
+        XCTAssertEqual(USStates.all.first { $0.code == "IL" }?.name, "Illinois")
+    }
+}

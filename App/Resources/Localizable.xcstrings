@@ -2899,6 +2899,29 @@
     }
    }
   },
+  "Add email": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ajouter un e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Añadir correo electrónico"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "E-Mail-Adresse hinzufügen"
+     }
+    }
+   }
+  },
   "Add more addresses": {
    "extractionState": "manual",
    "localizations": {
