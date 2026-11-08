@@ -179,7 +179,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let first = XCUIApplication()
         first.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         first.launch()
-        first.buttons["onboarding-skip"].tap()          // Skip goes to the required email page rather than leaving
+        for _ in 0..<3 { first.tapNextOnboarding() }          // there is no Skip: each page is scrolled to its end, then Next
         first.enterOnboardingEmail()
         first.finishOnboarding()
         first.terminate()

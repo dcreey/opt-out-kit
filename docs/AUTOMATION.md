@@ -52,7 +52,7 @@ it. See `docs/PLATFORMS.md`.
 ## One email for every form
 
 The first-run walkthrough has a required "Your email address" page (Next and Start stay disabled until it looks like an address;
-Skip goes to that page instead of leaving). That one address is put on every opt-out form and every data-deletion request, for the
+there is no Skip). That one address is put on every opt-out form and every data-deletion request, for the
 owner and for every family profile; a family member's own address is not used. It can be changed on the owner's profile.
 
 For Gmail (`gmail.com` and `googlemail.com`) the app adds `+optoutkit` before the `@`: `you@gmail.com` becomes

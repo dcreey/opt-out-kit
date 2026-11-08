@@ -50,21 +50,21 @@ extension XCUIApplication {
         XCTAssertFalse(buttons["onboarding-next"].isEnabled, "cannot go on without an email address")
         field.tap(); field.typeText(email)
         XCTAssertTrue(buttons["onboarding-next"].isEnabled)
-        buttons["onboarding-next"].tap()
+        tapNextOnboarding()
         // The next page asks where the person lives (optional; the state is asked only for the United States); move past it.
         XCTAssertTrue(descendants(matching: .any)["onboarding-country"].waitForExistence(timeout: 5))
-        buttons["onboarding-next"].tap()
+        tapNextOnboarding()
         // Then the terms page (accepting site terms for you); move past it without allowing anything.
         XCTAssertTrue(staticTexts["Accept site terms for you?"].waitForExistence(timeout: 5))
-        buttons["onboarding-next"].tap()
+        tapNextOnboarding()
         // Then the advertising ID page, which can be passed without sharing it.
         XCTAssertTrue(buttons["adid-allow"].waitForExistence(timeout: 5) || staticTexts["adid-allowed"].exists)
-        buttons["onboarding-next"].tap()
+        tapNextOnboarding()
     }
 
     /// From the automatic-protection page: on to the last page, which points to About, and Start.
     func finishOnboarding() {
-        buttons["onboarding-next"].tap()
+        tapNextOnboarding()
         XCTAssertTrue(staticTexts["Your settings are in About"].waitForExistence(timeout: 5), "the last page points to About")
         buttons["onboarding-done"].tap()
     }
@@ -96,5 +96,14 @@ extension XCUIApplication {
         let open = buttons["open-flow"]
         XCTAssertTrue(open.waitForExistence(timeout: 5))
         open.tap()
+    }
+}
+
+extension XCUIApplication {
+    /// Every walkthrough page must be scrolled to its bottom before Next works: scrolls until it is enabled, then taps it.
+    func tapNextOnboarding() {
+        var swipes = 0
+        while !buttons["onboarding-next"].isEnabled && swipes < 12 { swipeUp(); swipes += 1 }
+        buttons["onboarding-next"].tap()
     }
 }

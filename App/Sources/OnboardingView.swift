@@ -16,6 +16,15 @@ struct OnboardingView: View {
     let onFinish: () -> Void
     @EnvironmentObject var model: AppModel
     @State private var index = 0
+    /// The pages the person has scrolled to the bottom of. A page's Next is off until then, and there is no Skip.
+    @State private var reached: Set<Int> = []
+    /// Placed last on a page, in a lazy stack: it appears (and marks the page read) only once the bottom is on screen.
+    private func endMarker(_ page: Int) -> some View {
+        Color.clear.frame(height: 1).onAppear { reached.insert(page) }
+    }
+    private func canLeave(_ page: Int) -> Bool {
+        reached.contains(page) && !(page == pages.count && !emailValid) && !(page == pages.count + 1 && !rulesRead)
+    }
     /// The place whose rules the person has scrolled to the end of. Choosing a different place asks them to read again.
     @State private var placeRead: String?
     @FocusState private var emailFocused: Bool
@@ -64,7 +73,7 @@ struct OnboardingView: View {
             TabView(selection: $index) {
                 ForEach(pages) { page in
                     ScrollView {
-                        VStack(spacing: 18) {
+                        LazyVStack(spacing: 18) {
                             Image(systemName: page.symbol).font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                             Text(page.title).font(.title.bold()).multilineTextAlignment(.center)
                             Text(page.body).multilineTextAlignment(.center)
@@ -72,13 +81,14 @@ struct OnboardingView: View {
                                 ForEach(page.bullets, id: \.self) { Label($0, systemImage: "checkmark.circle").font(.callout) }
                             }
                             .padding(.top, 4)
+                            endMarker(page.id)
                         }
                         .padding(.horizontal, 28)
                     }
                     .tag(page.id)
                 }
                 ScrollView {
-                    VStack(spacing: 16) {
+                    LazyVStack(spacing: 16) {
                         Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Your email address").font(.title.bold())
                         Text("Required. This one address goes on every opt-out form and every data-deletion request.")
@@ -99,6 +109,7 @@ struct OnboardingView: View {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
                                 .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-email-needed")
                         }
+                        endMarker(pages.count)
                     }
                     .padding(.horizontal, 28)
                 }
@@ -116,16 +127,17 @@ struct OnboardingView: View {
                             Label("Scroll to the bottom to continue.", systemImage: "arrow.down.circle")
                                 .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-state-scroll-hint")
                         }
+                        endMarker(pages.count + 1)
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(pages.count + 1)
                 if showsTerms {
-                    ScrollView { TermsOnboardingPage().padding(.horizontal, 28) }
+                    ScrollView { LazyVStack { TermsOnboardingPage().padding(.horizontal, 28); endMarker(pages.count + 2) } }
                         .tag(pages.count + 2)
                 }
                 ScrollView {
-                    VStack(spacing: 16) {
+                    LazyVStack(spacing: 16) {
                         Image(systemName: "iphone.badge.play").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Opt your phone out of ad tracking").font(.title.bold()).multilineTextAlignment(.center)
                         Text("Some data brokers opt your phone out by its advertising ID (also called a MAID or IDFA). Share it with Exnay once and it goes only into those opt-outs.")
@@ -136,12 +148,13 @@ struct OnboardingView: View {
                         }.font(.callout)
                         AdIDPermissionControl()
                         Text("You can skip this. Those brokers will then need it later, and About has the same button.").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        endMarker(autoIndex - 1)
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex - 1)
                 ScrollView {
-                    VStack(spacing: 16) {
+                    LazyVStack(spacing: 16) {
                         Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Automatic protection").font(.title.bold())
                         AutoExplainer()
@@ -159,12 +172,13 @@ struct OnboardingView: View {
                             Button { withAnimation { index = pages.count + 1 } } label: { Label("Choose where you live and read the rules to start", systemImage: "mappin.and.ellipse") }
                                 .buttonStyle(.bordered).accessibilityIdentifier("onboarding-fix-place")
                         }
+                        endMarker(autoIndex)
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex)
                 ScrollView {
-                    VStack(spacing: 16) {
+                    LazyVStack(spacing: 16) {
                         Image(systemName: "info.circle").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
                         Text("Your settings are in About").font(.title.bold()).multilineTextAlignment(.center)
                         Text("Tap About, the last tab, any time to change what you chose here and find more.").multilineTextAlignment(.center)
@@ -175,12 +189,15 @@ struct OnboardingView: View {
                             Label("Global Privacy Control setup", systemImage: "hand.raised.square")
                             Label("Replay this walkthrough", systemImage: "play.circle")
                         }.font(.callout)
+                        endMarker(lastIndex)
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(lastIndex)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            // Swiping forward past a page not yet read to its bottom (or not yet filled in) snaps back; going back is always allowed.
+            .onChange(of: index) { old, new in if new > old, !canLeave(old) { withAnimation { index = old } } }
             .onAppear {
                 // Their saved email counts at once (a walkthrough shown again), not only after the email page has been drawn.
                 if emailDraft.isEmpty { emailDraft = model.contactEmail }
@@ -198,18 +215,20 @@ struct OnboardingView: View {
             .accessibilityLabel("Page \(index + 1) of \(lastIndex + 1)")
             .accessibilityIdentifier("onboarding-page-dots")
 
+            // Every page must be scrolled to its bottom before the next one, and there is no Skip.
+            if !reached.contains(index) {
+                Label("Scroll to the bottom to continue.", systemImage: "arrow.down.circle")
+                    .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-scroll-hint")
+            }
             HStack {
-                // The email is required, so Skip goes to it instead of leaving.
-                // Skip jumps to the first required step that is not done, and does nothing only when everything is done.
-                Button("Skip") { commitEmail(); withAnimation { index = firstUnmetStep ?? lastIndex } }.accessibilityIdentifier("onboarding-skip")
                 Spacer()
                 if index < lastIndex {
                     Button("Next") { commitEmail(); withAnimation { index += 1 } }
                         .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
-                        .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))
+                        .disabled(!canLeave(index))
                 } else {
                     Button("Start") {      // the choice to turn on automatic protection was made on the page before; this page only points to About
-                        // Never a dead button: with the email or the place's rules still missing, Start takes the person to that page instead of doing nothing.
+                        // Never a dead end: with the email or the place's rules still missing, Start takes the person to that page.
                         if let step = firstUnmetStep { withAnimation { index = step }; return }
                         commitEmail()
                         onDecide?(false, autoOptOut)
@@ -218,6 +237,7 @@ struct OnboardingView: View {
                         if autoOptOut { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { model.requireProfile { } } }
                     }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
+                    .disabled(!reached.contains(lastIndex))
                 }
             }
             .padding()

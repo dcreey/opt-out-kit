@@ -73,7 +73,7 @@ Not yet verified on a real backup and restore. An explicit passphrase-protected 
 
 - **First install** (`OnboardingView`): the promise, the email, the place and its rules, terms, the advertising ID (one button to share it with the app, which iOS
   asks once; afterwards only iOS Settings can change it), automatic protection, and a last page pointing to About. Its final button is plain "Start": the
-  automatic-protection choice was made on the page before. Skip jumps to the first required step not done.
+  automatic-protection choice was made on the page before. There is no Skip: every page must be scrolled to its bottom before Next works (a short page counts at once), swiping forward past an unread page snaps back, and a hint says "Scroll to the bottom to continue." Start, on the last page, takes the person to the email or the place's rules if either is still missing.
 - **Guided sites** (`GuidedIntro`): shown once before the first Solve and send or manual site, so nothing runs behind it. It shows an example page, the "..."
   options, what a site needs, why the wording is scary, and the emails that follow. Skip leaves it; neither walkthrough blocks the other.
 - The first walkthrough's **Start** button is never disabled. When the email or the reading of the place's rules is still missing, Start takes the person to that page; a replayed walkthrough counts the saved email and an already chosen place as done from the first page.
