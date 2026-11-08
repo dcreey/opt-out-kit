@@ -296,6 +296,16 @@ extension WebViewSession {
             sep=(ph.match(/[^a-z0-9\s]/)||['/'])[0];
             if(/^y{2,4}/.test(ph)) return y+sep+mo+sep+d; if(/^d/.test(ph)) return d+sep+mo+sep+y; return mo+sep+d+sep+y;}
           function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\bcell|whatsapp|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
+          // A phone split over three boxes (area code, prefix, line number: limits 3, 3 and 4) gets one part per box, never the whole number in each.
+          function splitSeg(el,v){var ml=(el.maxLength>0)?el.maxLength:0; if(el.tagName!=='INPUT'||ml<3||ml>4) return null;
+            var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){
+              var L=[].slice.call(n.querySelectorAll('input')).filter(function(e){return ['hidden','checkbox','radio','submit','button','file','image','reset'].indexOf(e.type)<0&&e.maxLength>0&&e.maxLength<=4;});
+              if(L.length>3) return null;
+              if(L.length===3&&L[0].maxLength===3&&L[1].maxLength===3&&L[2].maxLength===4){var i=L.indexOf(el); if(i<0) return null;
+                var fv=null; for(var k=0;k<values.length;k++){if(values[k].name===L[0].getAttribute('data-ook')) fv=values[k];}
+                var d=String(((fv||v).candidates||[])[0]||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return null;
+                return [d.slice(0,3),d.slice(3,6),d.slice(6)][i];}}
+            return null;}
           values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
             if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
             // Whatever is already in a box or menu stays, unless it is exactly what this fill put there before.
@@ -330,7 +340,7 @@ extension WebViewSession {
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
             } else if(\#(keepExistingValues ? "true" : "false")&&!pageDefault&&getVal(el).trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); setValue(el,ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
+            else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); var seg=ph?splitSeg(el,v):null; setValue(el,seg!==null?seg:ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph&&seg===null) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),

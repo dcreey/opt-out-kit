@@ -77,6 +77,33 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(last, "Smith-Jones")
     }
 
+    /// roundsky.com: one phone number over three boxes (limits 3, 3 and 4). Each takes its part; the whole number never goes in every box.
+    func testAPhoneSplitOverThreeBoxesGetsOnePartInEach() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label for="Name">FIRST NAME *</label><input id="Name" name="Name" placeholder="Ex : John" required>
+          <label for="LName">LAST NAME *</label><input id="LName" name="LName" placeholder="Ex : Smith" required>
+          <label for="Email">EMAIL *</label><input id="Email" type="email" name="Email" required>
+          <label for="Phone">PHONE</label>
+          <div><input id="Phone" type="tel" name="Phone" maxlength="3" placeholder="Ex : 855">
+          <input id="Phone2" type="tel" name="Phone2" maxlength="3" placeholder="Ex : 826">
+          <input id="Phone3" type="tel" name="Phone3" maxlength="4" placeholder="Ex : 6284"></div>
+          <button type="submit">Submit</button></form></body></html>
+        """
+        var me = pat; me.phones = ["+1 773 633 1564"]
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        let forms = await session.discoverForms(waitForFrames: false)
+        let form = try XCTUnwrap(forms.first)
+        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
+        _ = await session.fillLive(plan.values)
+        _ = await session.fillLive(plan.values, keepExisting: true)
+        func read(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
+        let parts = [await read("Phone"), await read("Phone2"), await read("Phone3")]
+        XCTAssertEqual(parts, ["773", "633", "1564"])
+    }
+
     /// Plain digits go in first; a box that then shows an error gets the other shapes until it accepts one.
     func testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes() async throws {
         let html = """

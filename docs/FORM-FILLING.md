@@ -59,6 +59,7 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    - *What the form has no box for* is added to its message box: "I may also appear under other emails: ...; other phone numbers: ...; other names: ...; previous
      addresses: ... (years)." Only the leftovers are listed, so a form that already has boxes for them does not repeat them, and a form with no message box gets nothing extra.
    - *Phone boxes* include "cell", "cellular", "whatsapp" and "sms"; "(including country code)" and similar hints in brackets are not the country.
+   - *A phone split over three boxes* (area code, prefix, line number: character limits 3, 3 and 4, as on roundsky.com) gets one part in each, `773`, `633`, `1564`, never the whole number in every box. It applies to exactly that 3-3-4 group of boxes, and these boxes are not retried in other formats.
    - *Names*: "first and last name" in one box is the full name; "Last Name or Business Name" is the last name; "Street name" is not a person's name.
    - *A street in two boxes*: "House number" gets the leading number of the street line ("12"), "Street name" the rest ("Main St"). "Street 2" is the second line (empty, "N/A" if required).
    - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
@@ -115,6 +116,7 @@ misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (s
 | Something the app did not type is not overwritten | same test (last name) |
 | A value the app typed is replaced when the plan changes | `LiveFormTests.testAValueTheAppTypedIsReplacedWhenThePlanChanges` |
 | An error on a phone box is retried in other shapes | `LiveFormTests.testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes` |
+| A phone split over three boxes (3, 3, 4 characters) gets one part per box | `LiveFormTests.testAPhoneSplitOverThreeBoxesGetsOnePartInEach` |
 | A date box follows its placeholder and is retried in other shapes (day first) | `LiveFormTests.testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes` |
 | An identifier, someone else's name or a social profile is never filled with the person's own details | `CoreTests.testIdentifiersAndSomeoneElsesNamesAreNeverFilledWithThePersonsOwnDetails` |
 | A phone box that mentions a country code, or says "cell", is the phone | `CoreTests.testAPhoneBoxThatMentionsACountryCodeIsThePhoneAndACellBoxIsAPhoneToo` |
