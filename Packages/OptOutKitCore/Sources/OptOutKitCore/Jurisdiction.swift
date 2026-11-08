@@ -237,9 +237,11 @@ public extension Jurisdiction {
 
         // 4. Privacy law
         if let law = privacyLaw {
+            let when = law.effective ?? ""
             var line = law.isInEffect()
-                ? L10n.f("%@'s privacy law, the %@ (in effect since %@), gives residents the right to delete their data and to opt out of its sale.", place, law.name, law.effective)
-                : L10n.f("%@'s privacy law, the %@ (takes effect %@), gives residents the right to delete their data and to opt out of its sale. Until then, brokers are not required to honor it.", place, law.name, law.effective)
+                ? (when.isEmpty ? L10n.f("%@'s privacy law, the %@, gives residents the right to delete their data and to opt out of its sale.", place, law.name)
+                                : L10n.f("%@'s privacy law, the %@ (in effect since %@), gives residents the right to delete their data and to opt out of its sale.", place, law.name, when))
+                : L10n.f("%@'s privacy law, the %@ (takes effect %@), gives residents the right to delete their data and to opt out of its sale. Until then, brokers are not required to honor it.", place, law.name, when)
             if law.narrow == true { line += " " + L10n.t("It applies only to very large platforms, so it rarely reaches data brokers.") }
             else if law.isInEffect(), law.name.contains("Maryland") { line += " " + L10n.t("Applies to processing from 2026-04-01.") }
             out.append(.init(symbol: "scroll", text: line))

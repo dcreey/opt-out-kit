@@ -76,6 +76,8 @@ Not yet verified on a real backup and restore. An explicit passphrase-protected 
   automatic-protection choice was made on the page before. Skip jumps to the first required step not done.
 - **Guided sites** (`GuidedIntro`): shown once before the first Solve and send or manual site, so nothing runs behind it. It shows an example page, the "..."
   options, what a site needs, why the wording is scary, and the emails that follow. Skip leaves it; neither walkthrough blocks the other.
+- The first walkthrough's **Start** button is never disabled. When the email or the reading of the place's rules is still missing, Start takes the person to that page; a replayed walkthrough counts the saved email and an already chosen place as done from the first page.
+- **Advertising ID refused:** iOS asks once. After a refusal the walkthrough page and About show the same text and an Open Settings button: Settings, Privacy & Security, Tracking, switch Exnay on (first switch on Allow Apps to Request to Track if Exnay is not listed), or Allow Tracking in the app's own Settings page when it is shown. Without it, forms that ask for the ID go without it.
 - Both are replayed from About ("Replay the walkthrough", "Replay the guided sites walkthrough"), which also holds the advertising ID button.
 
 ## Privacy promise (shown at first launch, and in Settings)

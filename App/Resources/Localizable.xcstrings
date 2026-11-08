@@ -645,6 +645,29 @@
     }
    }
   },
+  "%@'s privacy law, the %@, gives residents the right to delete their data and to opt out of its sale.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La loi sur la vie privée de %@, la %@, donne aux résidents le droit de supprimer leurs données et de refuser leur vente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La ley de privacidad de %@, la %@, da a los residentes el derecho a eliminar sus datos y a oponerse a su venta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das Datenschutzgesetz von %@, der %@, gibt Einwohnern das Recht, ihre Daten zu löschen und dem Verkauf zu widersprechen."
+     }
+    }
+   }
+  },
   "%@'s privacy law, the %@ (in effect since %@), gives residents the right to delete their data and to opt out of its sale.": {
    "extractionState": "manual",
    "localizations": {
@@ -19275,25 +19298,25 @@
     }
    }
   },
-  "Sharing is off. iOS asks only once, so to change it open Settings, tap Exnay and turn on Allow Tracking. If Allow Tracking is missing, turn on Allow Apps to Request to Track under Privacy & Security, Tracking.": {
+  "Sharing is off, and iOS asks only once. To turn it on, open Settings, then Privacy & Security, then Tracking, and switch Exnay on. If Exnay is not in that list, first switch on Allow Apps to Request to Track. You can also open Settings, tap Exnay and turn on Allow Tracking if it is shown there. Without it, forms that ask for the ID are sent without it.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Le partage est désactivé. iOS ne demande qu'une fois : pour le changer, ouvrez Réglages, touchez Exnay et activez Autoriser le suivi. Si Autoriser le suivi est absent, activez Autoriser les demandes de suivi des apps dans Confidentialité et sécurité, Suivi."
+      "value": "Le partage est désactivé, et iOS ne demande qu'une fois. Pour l'activer, ouvrez Réglages, puis Confidentialité et sécurité, puis Suivi, et activez Exnay. Si Exnay n'est pas dans la liste, activez d'abord Autoriser les demandes de suivi des apps. Vous pouvez aussi ouvrir Réglages, toucher Exnay et activer Autoriser le suivi s'il y figure. Sans cela, les formulaires qui demandent l'identifiant sont envoyés sans lui."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "El uso compartido está desactivado. iOS solo pregunta una vez: para cambiarlo, abre Ajustes, toca Exnay y activa Permitir seguimiento. Si falta Permitir seguimiento, activa Permitir que las apps soliciten seguimiento en Privacidad y seguridad, Seguimiento."
+      "value": "El uso compartido está desactivado y iOS solo pregunta una vez. Para activarlo, abra Ajustes, luego Privacidad y seguridad, luego Rastreo, y active Exnay. Si Exnay no aparece en la lista, active primero Permitir que las apps soliciten rastrear. También puede abrir Ajustes, tocar Exnay y activar Permitir rastreo si aparece. Sin él, los formularios que piden el identificador se envían sin él."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Das Teilen ist aus. iOS fragt nur einmal: Öffne zum Ändern die Einstellungen, tippe auf Exnay und schalte „Tracking erlauben“ ein. Fehlt diese Option, schalte unter Datenschutz & Sicherheit, Tracking „Apps erlauben, Tracking anzufordern“ ein."
+      "value": "Das Teilen ist aus, und iOS fragt nur einmal. Zum Einschalten öffnen Sie Einstellungen, dann Datenschutz & Sicherheit, dann Tracking, und schalten Exnay ein. Steht Exnay nicht in der Liste, schalten Sie zuerst „Apps erlauben, Tracking anzufragen“ ein. Sie können auch Einstellungen öffnen, Exnay antippen und „Tracking erlauben“ einschalten, falls es dort steht. Ohne das werden Formulare, die die ID verlangen, ohne sie gesendet."
      }
     }
    }

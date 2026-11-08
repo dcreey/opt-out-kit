@@ -28,6 +28,19 @@ final class L10nTests: XCTestCase {
         XCTAssertEqual(L10n.f("Covered by %@ until %@", "California DROP", "Jan 20"), "Abgedeckt von California DROP bis Jan 20")
     }
 
+    /// An optional value must never reach a sentence ("in effect since Optional(\"2020-01-01\")").
+    func testNoPlaceTellsItsLawWithAnOptionalInTheText() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let js = try JurisdictionLoader.load(directory: root.appendingPathComponent("jurisdictions"))
+        let ps = try PlatformLoader.load(directory: root.appendingPathComponent("platforms"))
+        let summary = JurisdictionLoader.loadSummary(root.appendingPathComponent("registries/summary.json"))
+        L10n.language = "en"
+        for j in js { for line in j.statements(summary: summary, platforms: ps, others: js).map(\.text) {
+            XCTAssertFalse(line.contains("Optional("), "\(j.id): \(line)")
+        } }
+    }
+
     func testAStatesLawIsToldInTheChosenLanguage() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()

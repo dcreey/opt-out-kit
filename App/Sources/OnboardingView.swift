@@ -181,7 +181,11 @@ struct OnboardingView: View {
                 .tag(lastIndex)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .onAppear { if placeRead == nil, model.placeChosenExplicitly { placeRead = placeKey } }       // a walkthrough shown again does not ask to re-read a place already chosen
+            .onAppear {
+                // Their saved email counts at once (a walkthrough shown again), not only after the email page has been drawn.
+                if emailDraft.isEmpty { emailDraft = model.contactEmail }
+                if placeRead == nil, model.placeChosenExplicitly { placeRead = placeKey }
+            }       // a walkthrough shown again does not ask to re-read a place already chosen
 
             // Our own page dots, below the content: the system ones sit on top of it and cover the last lines.
             HStack(spacing: 8) {
@@ -205,6 +209,8 @@ struct OnboardingView: View {
                         .disabled((index == pages.count && !emailValid) || (index == pages.count + 1 && !rulesRead))
                 } else {
                     Button("Start") {      // the choice to turn on automatic protection was made on the page before; this page only points to About
+                        // Never a dead button: with the email or the place's rules still missing, Start takes the person to that page instead of doing nothing.
+                        if let step = firstUnmetStep { withAnimation { index = step }; return }
                         commitEmail()
                         onDecide?(false, autoOptOut)
                         onFinish()
@@ -212,7 +218,6 @@ struct OnboardingView: View {
                         if autoOptOut { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { model.requireProfile { } } }
                     }
                     .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
-                    .disabled(!emailValid || !rulesRead)
                 }
             }
             .padding()

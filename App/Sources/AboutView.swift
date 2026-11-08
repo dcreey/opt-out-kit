@@ -290,8 +290,7 @@ struct AdvertisingIDSection: View {
                 Text("Your phone's advertising ID is switched off or reset, so there is nothing to copy. In Settings, open Privacy & Security, then Apple Advertising, and make sure Personalized Ads is on, or turn tracking back on for Exnay.")
                 openSettingsButton
             } else {
-                Text("You asked Exnay not to track you, so it cannot read the ID. iOS only asks once. To change your mind, open Settings, tap Exnay, and turn on Allow Tracking.")
-                openSettingsButton
+                AdIDPermissionControl(onAnswered: { Task { await refresh() } })
             }
         } header: { Text("Advertising ID") } footer: {
             Text("Also called a MAID or IDFA. It is used only to fill brokers' opt-out forms that ask for it, and Exnay never stores it or sends it anywhere else.")
