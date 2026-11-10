@@ -7,15 +7,17 @@ bucket: "direct"
 tier: null
 automation: "blocked"
 confidence: "n/a"
-opt_out_url: null
+opt_out_url: "https://www.fastbackgroundcheck.com/optout"
 signals: [bot_check_on_home]
 profiled: "2026-10-21"
 search_check:
   status: "blocked"
   checked: "2026-10-20"
-live_form:
-  checked: "2026-10-24"
-  found: false
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-09"
+  found: true
+  page: "https://www.fastbackgroundcheck.com/optout"
+  blockers: ["check:a bot check"]

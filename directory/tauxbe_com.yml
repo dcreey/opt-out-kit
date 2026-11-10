@@ -8,16 +8,14 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.tauxbe.com/privacy-policy"
-contact_email: "privacy@tauxbe.com"
-contact_email_source: "page"
 registered_in: [CA]
 signals: [email_only_wording, id_required, phone_verify]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 about: {"category": "consumer_reporting", "summary": "Tauxbe Data Inc. is a background-screening and consumer-reporting company. Discover Tauxbe Data's comprehensive background screening data services. Offering accurate, up-to-date data access for background checks, tailored for CRAs and trust & safety professionals. Its own pages mention phone numbers, email addresses, age or birthdate, relatives and household members, job title and employer, income or wealth. Its policy names these buyers or recipients: business customers and sales teams; government and law enforcement.", "tracks": ["phone", "email", "age", "relatives", "employment", "income", "property", "criminal", "purchases", "interests", "online", "social"], "sells_to": ["businesses", "government"], "sells_note": "‍ ‍Third Parties to Whom We Share, Sell, or Disclose Personal Information ‍TXB may share, sell, or otherwise disclose the personal information we collect about you to: Our Customers.", "source": "https://www.tauxbe.com/privacy-policy"}
 priority: 61
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-09"
+  found: false

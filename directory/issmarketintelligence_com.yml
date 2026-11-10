@@ -7,15 +7,15 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: null
+opt_out_url: "https://www.iss-stoxx.com/legal/"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 about: {"category": "b2b", "summary": "Asset International, Inc. is a business-contact and sales-data provider. Discover powerful market intelligence solutions designed for the financial services industry—insights to drive decision-making and growth. Its own pages mention shopping and purchase behavior. Its policy does not name who it sells to.", "tracks": ["purchases"], "sells_to": [], "source": "https://www.issmarketintelligence.com/"}
 priority: 22
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-09"
+  found: false

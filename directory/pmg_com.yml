@@ -8,18 +8,18 @@ tier: null
 automation: "unknown"
 confidence: "low"
 # The recorded opt-out page (https://www.texasattorneygeneral.gov/consumer-protection/file-consumer-complaint/consumer-privacy-rights) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
-opt_out_url: null
+opt_out_url: "https://www.pmg.com/do-not-sell-or-share-my-personal-information"
 contact_email: "dpo@pmg.com"
 contact_email_source: "policy"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-26"
-  found: false
-  blockers: []
 about: {"category": "marketing_services", "summary": "PMG Worldwide, LLC is a marketing and direct-mail services company. PMG is a leading independent advertising agency and platform company engineered for impact—uniting strategy, media, data, creative, and technology to drive modern marketing and... Its own pages mention devices and online activity, precise location, social media profiles. Its policy does not name who it sells to.", "tracks": ["online", "location", "social"], "sells_to": [], "source": "https://www.pmg.com/"}
 priority: 22
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "AU", "NZ", "GLOBAL"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention Privacy Act 1988; its pages mention New Zealand Privacy Act; it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-09"
+  found: false
+  blockers: []

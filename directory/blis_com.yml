@@ -7,13 +7,10 @@ bucket: "registry"
 tier: null
 automation: "blocked"
 confidence: "n/a"
-opt_out_url: null
+opt_out_url: "https://blis.com/ccpa-opt-out/"
 registered_in: [CA, TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 about: {"category": "adtech", "summary": "Blis Global Ltd is an advertising technology company. The only omnichannel DSP to combine T-Mobile app data with real-world movement & spending habits. Unlock incremental audiences to deliver precision at scale. Its own pages mention email addresses, devices and online activity, social media profiles. Its policy does not name who it sells to.", "tracks": ["email", "online", "social"], "sells_to": [], "source": "https://blis.com/us/"}
 priority: 25
 persistence: {"result": "unknown", "reup_months": 6}
@@ -21,3 +18,6 @@ contact_email: "privacy@blis.com"
 contact_email_source: "browser"
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as Blis Global Limited; on the UK ICO register of fee payers as Blis Global Ltd (ref ZA113120)", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-09"
+  found: false
