@@ -70,7 +70,7 @@ protocol SearchPage: AnyObject {
 
 // MARK: The queue
 
-/// Walks a list of sites one at a time: loads the form, fills it in, waits for the person to clear the bot check (or accept
+/// Walks a list of sites one at a time: loads the form, fills it in, waits for the person to clear the human check (or accept
 /// terms themselves), then sends it and reads the confirmation. The next site is loaded in the background meanwhile, so the
 /// person's only job is the check. It never solves or accepts anything itself.
 @MainActor
@@ -94,8 +94,11 @@ final class AssistedRunner: ObservableObject {
         /// Sites whose only form is a name search: removal is requested on each record's own page, so the person finds their records and files each one.
         var perRecordForm: Bool { Self.perRecordDomains.contains(entry.domain) }
         static let perRecordDomains: Set<String> = ["open-public-records.com"]
+        /// A form a real page load showed to ask for something only the person can give (business details, an agent's, a file or a signature, questions the app cannot read):
+        /// the app fills in what it can, and the person completes it and presses the page's own button.
+        var needsPerson: Bool { !Set(entry.liveForm?.blockers ?? []).isDisjoint(with: ["business", "agent", "other", "file"]) }
         /// Sites where the app never presses send: the person finishes in the page.
-        var handsOff: Bool { blockWidget || perRecordForm }
+        var handsOff: Bool { blockWidget || perRecordForm || needsPerson }
         var id: String { entry.id }
     }
 
@@ -123,8 +126,18 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var page: AssistedPage?
     @Published private(set) var finished = false
     @Published private(set) var results: [String: AutoOptOutResult] = [:]
-    /// True while the person is asked whether the page's email step should be tracked, after they tapped Mark as done.
-    @Published var askFollowUp = false
+    /// "Is it completely done?", asked when a site looks sent and the page does not say with confidence that nothing more is coming.
+    let finishQuestion = FinishQuestion()
+    /// True where a person is on screen to answer (Solve and send, Email links); the background run never asks, so it never waits.
+    var asksAboutFollowUp = false
+    private var followUpAsked = false
+    /// The person said (from the … menu) that this site has another email step: whatever is saved for it says so, and nothing more is asked about it.
+    private var emailStepFlagged = false
+    func flagEmailStep() {
+        emailStepFlagged = true; followUpAsked = true; finishQuestion.dismiss()
+        // Already saved as sent (the confirmation was noticed): save it again as waiting on an email.
+        if let item = current, case .submitted(false)? = results[item.id] { correct(item, to: .submitted(awaitingEmail: true)) }
+    }
     /// A short line about something the app did by itself (a new form appeared and was filled), shown under the instruction.
     @Published private(set) var notice: String?
     private var markedDone: AutoOptOutResult?
@@ -194,9 +207,32 @@ final class AssistedRunner: ObservableObject {
         // A confirmation was already noticed and is waiting for the person: Mark as done is their go-ahead, the same as Next site.
         if awaitingNext { resumeNext(); return }
         let text = await page?.pageText() ?? ""
-        if FormRun.mentionsEmailFollowUp(text) { askFollowUp = true } else { finishMarked(email: false) }
+        // Their own tap says it is done; the question is only whether an email still follows. A page that says so with confidence needs no question.
+        if FormRun.finishIsCertain(text) || !asksAboutFollowUp && !FormRun.mentionsEmailFollowUp(text) { finishMarked(email: false); return }
+        let site = current?.entry.domain ?? ""
+        followUpAsked = true
+        switch await finishQuestion.ask(site: site, pageSaidEmail: FormRun.mentionsEmailFollowUp(text), allowsNotYet: true) {
+        case .done: finishMarked(email: false)
+        case .emailFollows, .unsure: finishMarked(email: true)
+        case .notYet: break
+        }
     }
-    func answerFollowUp(track: Bool) { askFollowUp = false; finishMarked(email: track) }
+
+    /// A send was confirmed with no email step. With a person on screen and a page that does not say it is entirely finished, they are asked; an email step
+    /// (or "not sure") makes the result "sent, waiting on an email". Nil: nothing changes.
+    private func askAboutFollowUp(_ item: Item, _ outcome: AutoOptOutResult) async -> AutoOptOutResult? {
+        guard asksAboutFollowUp, !followUpAsked, !revisiting, case .submitted(false) = outcome else { return nil }
+        followUpAsked = true
+        let text = await page?.pageText() ?? ""
+        if FormRun.finishIsCertain(text) { return nil }
+        // Moving on without answering (skip, stop) counts as "not sure": the site waits on an email rather than being counted entirely done.
+        let answer = await finishQuestion.ask(site: item.entry.domain, pageSaidEmail: false, allowsNotYet: false)
+        return answer == .done ? nil : .submitted(awaitingEmail: true)
+    }
+    /// Saves a changed answer over what was saved when the confirmation was first noticed.
+    private func correct(_ item: Item, to result: AutoOptOutResult) {
+        results[item.id] = result; sentAwaitingEmail += 1; onResult(item.entry, result)
+    }
     private func finishMarked(email: Bool) {
         markedDone = .submitted(awaitingEmail: email)
         phase = .sent(awaitingEmail: email)
@@ -256,14 +292,14 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var goingBack = false
     func back() {
         guard canGoBack else { return }
-        goBack = true; skipFlag = true
+        goBack = true; skipFlag = true; finishQuestion.dismiss()
         goingBack = true; index -= 1; phase = .loading          // the screen moves to the earlier site at once; its page follows
         resumeNext()
         if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
     }
 
     func skip(reported: Bool = false) {
-        sentQuestion.dismiss()
+        sentQuestion.dismiss(); finishQuestion.dismiss()
         reportedNotWorking = reported; skipFlag = true; resumeNext()
         // Whatever the site was waiting on (the no-form screen, or the offer to email a site that failed), skipping answers it.
         if emailOffer != nil { emailOffer = nil; emailContinuation?.resume(); emailContinuation = nil }
@@ -363,7 +399,7 @@ final class AssistedRunner: ObservableObject {
     /// One site, from loading its page to its result. Returns without a result when the person went back.
     private func process(_ i: Int) async {
         do {
-            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; emailFoundOnPage = false; autoScrolls = 0; page = nil; markedDone = nil; askFollowUp = false; notice = nil; listingChoice = .none
+            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; emailFoundOnPage = false; autoScrolls = 0; page = nil; markedDone = nil; followUpAsked = false; emailStepFlagged = false; notice = nil; listingChoice = .none
             if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
             if items[i].emailOnly { goingBack = false; await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
@@ -460,8 +496,8 @@ final class AssistedRunner: ObservableObject {
                     if more { pageForms.current += 1; phase = .loading; attempts = 0; continue }
                     phase = .sent(awaitingEmail: sentEmail); outcome = .submitted(awaitingEmail: sentEmail)
                 case .handToPerson:
-                    // A bot check that refuses a scripted press (reCAPTCHA v3) is not retried: the person presses the page's own button, and we notice the result.
-                    forceManual = true; notice = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.")
+                    // A human check that refuses a scripted press (reCAPTCHA v3) is not retried: the person presses the page's own button, and we notice the result.
+                    forceManual = true; notice = Loc.t("The site's human check did not accept an automatic send. Press its Submit button yourself.")
                     continue
                 case .nextStep, .checkAppeared:
                     continue      // a check appeared after sending (or the next step of the form came up): go round again
@@ -501,8 +537,12 @@ final class AssistedRunner: ObservableObject {
                 case .dryRun: outcome = .dryRunReady
                 }
             }
-            let final = outcome ?? .challenged("the check came back")
-            if !recordedEarly {
+            var final = outcome ?? .challenged("the check came back")
+            if recordedEarly {
+                // Saved when the confirmation was noticed; the question comes now, with the confirmation still on screen, and a changed answer is saved over it.
+                if let asked = await askAboutFollowUp(items[i], final) { final = asked; correct(items[i], to: asked) }
+            } else {
+                if let asked = await askAboutFollowUp(items[i], final) { final = asked }
                 record(items[i], final)
                 await offerEmailIfNeeded(items[i], final)
                 // The sent check is on screen meanwhile; the page it came from stays under it for a moment.
@@ -525,6 +565,7 @@ final class AssistedRunner: ObservableObject {
             switch result { case .submitted, .emailed: break; default: return }
         }
         if emailedFlag, case .needsYou("skipped") = result { result = .emailed; celebrate += 1; emailedFlag = false }
+        if emailStepFlagged, case .submitted(false) = result { result = .submitted(awaitingEmail: true) }
         results[item.id] = result
         switch result {
         case .submitted(let email): celebrate += 1; previousNote = nil; if email { sentAwaitingEmail += 1 }

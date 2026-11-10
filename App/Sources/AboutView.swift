@@ -72,7 +72,7 @@ struct AboutView: View {
             }
             .accessibilityIdentifier("about-list")
             .fullScreenCover(isPresented: $showGuidedIntro) { GuidedIntroView { showGuidedIntro = false } }
-            .navigationTitle("About")
+            .navigationTitle("Settings")
         }
     }
 }

@@ -8,7 +8,7 @@ enum SendStep: Equatable {
     case sent(awaitingEmail: Bool, moreForms: Bool)
     /// The form moved on to its next step (Next, then Submit): fill it and press again.
     case nextStep
-    /// The page's bot check refuses a scripted press (a score-based reCAPTCHA): only the person's own press can get past it.
+    /// The page's human check refuses a scripted press (a score-based reCAPTCHA): only the person's own press can get past it.
     case handToPerson
     /// A check or a prompt came up after pressing: the person clears it and the send is tried again.
     case checkAppeared(String)

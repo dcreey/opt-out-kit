@@ -21,7 +21,7 @@ and wait one second between fetches to the same site. It never submits a form.
 
 | Result | How it is decided |
 |---|---|
-| **blocked / robots / unreachable** | A bot check page, a robots.txt that disallows the site, or no reply |
+| **blocked / robots / unreachable** | A human check page, a robots.txt that disallows the site, or no reply |
 | **C** | Phone, ID, file upload, login, or a page built by JavaScript |
 | **B** | A bot-check widget (reCAPTCHA, Turnstile, hCaptcha and others) on the opt-out page |
 | **A** | An email or listing-URL field and none of the above |
@@ -42,7 +42,7 @@ with the reason; regenerate it with `broker-pipeline --directory directory --met
 | Group | Meaning | Sites (2026-10-21) |
 |---|---|---|
 | Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 121 (82 loaded and measured clear, 39 not yet measured but with no bot-check script) |
-| Semi-automated, with prompts for you | We fill in and send; a visible bot check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 51 |
+| Semi-automated, with prompts for you | We fill in and send; a visible human check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 51 |
 | Guided, you do the steps | The page is found but needs something only you can do (login, ID), or has no readable form, or is a hand-written walkthrough | 612 |
 | Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 69 |
 
@@ -56,7 +56,7 @@ stops and asks, and that site moves to Semi-automated.
 
 **Listing-based walkthroughs (Spokeo).** Some opt-out forms want the address of the person's own listing on the site. The app
 searches the site for them (never for minors or public figures), the person taps their own result and then "This is my listing"
-(it never guesses which one is theirs), and the app fills in the form with that address and their email. They clear the bot check,
+(it never guesses which one is theirs), and the app fills in the form with that address and their email. They clear the human check,
 the app sends it and they confirm the email. Only 3 of the 109 found forms need a listing address (Spokeo, FreePeopleDirectory, which
 sends its removals to Spokeo, and yellowbook.com, which has no name search so stays Guided). Other hand-written walkthroughs stay
 Guided: PeopleConnect needs a login-style email step and phone checks, and FastPeopleSearch's form asks who is submitting and
@@ -67,7 +67,7 @@ PeopleConnect covers TruthFinder, Instant Checkmate, Intelius and US Search). Co
 under the flow that clears them, and a scan that finds a listing on any of them shows one row for the flow.
 
 **"I am this person" boxes.** The account owner (the "Me" profile) can allow the app to tick a plain box that says they are the
-person the request is about (About, "Confirm 'I am this person' boxes for me"; off until they turn it on). It never applies to
+person the request is about (Settings, "Confirm 'I am this person' boxes for me"; off until they turn it on). It never applies to
 family profiles, never to minors, and never to legal certifications ("under penalty of perjury"), agent statements or terms.
 Those always stay with the person.
 
@@ -126,7 +126,7 @@ changed shows up as a FAIL.
 headless Chromium (Playwright, installed in git-ignored `.tools-venv` and `.tools-browsers`; setup:
 `python3 -m venv .tools-venv && .tools-venv/bin/pip install playwright && PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers
 .tools-venv/bin/playwright install chromium`). It runs the made-up and known-name searches in a real browser, declines cookie
-banners, never accepts terms, never tries to pass a bot check, and records one of: `calibrated` (with `needs_browser: true`),
+banners, never accepts terms, never tries to pass a human check, and records one of: `calibrated` (with `needs_browser: true`),
 `terms_gate`, `blocked` or `undifferentiated`.
 
 Result on 2026-10-21 for the 108 sites tried: **0 calibrated, 64 still not distinguishable** (the first pass also reported 44 as

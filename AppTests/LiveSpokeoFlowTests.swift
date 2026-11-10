@@ -4,7 +4,7 @@ import OptOutKitCore
 @testable import OptOutKit
 
 /// The Spokeo semi-automated flow on the real site, end to end, WITHOUT sending: search for the person, pick a listing, open the
-/// opt-out form, fill it in, show the bot check. The page's send is replaced by one that cannot send. Runs only when asked:
+/// opt-out form, fill it in, show the human check. The page's send is replaced by one that cannot send. Runs only when asked:
 /// TEST_RUNNER_OPTOUT_LIVE=1. The profile is made up; the name is a common one so the search has results to pick from.
 @MainActor
 final class LiveSpokeoFlowTests: XCTestCase {
@@ -102,7 +102,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
         try await Task.sleep(nanoseconds: 1_500_000_000)
         await shot(web, "3-filled-form")
 
-        // 4. A bot check stops it for the person. Nothing was sent.
+        // 4. A human check stops it for the person. Nothing was sent.
         let blockers = await page.blockers()
         print("LIVESPOKEO blockers: \(blockers) currentStep=\(runner.flow.current?.title ?? "done")")
         task.cancel()

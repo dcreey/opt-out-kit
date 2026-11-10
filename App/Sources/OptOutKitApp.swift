@@ -878,16 +878,30 @@ final class AppModel: ObservableObject {
     }
 
     func markFollowUpDone(_ entryID: String) {
-        household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(OptOutAttempt(date: Date(), outcome: "email_done"), site: entryID) }
+        household.mutateProgress(for: selectedID) { p in
+            p.recordOptOutAttempt(OptOutAttempt(date: FollowUps.nextDate(p.optOutAttempts[entryID] ?? []), outcome: "email_done"), site: entryID)
+        }
         save()
     }
 
+    /// The site has another email step still to come (or the person cannot tell): it goes back on the waiting list, however many steps it already finished.
+    func addFollowUpStep(_ entryID: String) {
+        household.mutateProgress(for: selectedID) { p in
+            p.recordOptOutAttempt(OptOutAttempt(date: FollowUps.nextDate(p.optOutAttempts[entryID] ?? []), outcome: "submitted_email"), site: entryID)
+        }
+        save()
+    }
+
+    /// How many email steps of this site are finished.
+    func followUpStepsDone(_ entryID: String) -> Int { FollowUps.stepsDone(progress.optOutAttempts[entryID] ?? []) }
+
     /// A form was sent from a pasted link and the page showed it went through. A site that was waiting on its email just finishes that step; a site that was
     /// not waiting on anything (the person sent it somewhere else, or it was never in the queue) is recorded as sent now, so it counts as done like any other.
-    func completeFromLink(_ entryID: String) {
-        guard let entry = directory.first(where: { $0.id == entryID }), let me = selectedPerson else { markFollowUpDone(entryID); return }
-        if pendingFollowUps.contains(where: { $0.entry.id == entryID }) { markFollowUpDone(entryID) }
-        else { recordAssisted(entry, .submitted(awaitingEmail: false), for: me) }
+    /// `moreEmail`: this step is finished but the site has another email step still to come (or the person cannot tell), so it stays on the waiting list.
+    func completeFromLink(_ entryID: String, moreEmail: Bool = false) {
+        guard let entry = directory.first(where: { $0.id == entryID }), let me = selectedPerson else { markFollowUpDone(entryID); if moreEmail { addFollowUpStep(entryID) }; return }
+        if pendingFollowUps.contains(where: { $0.entry.id == entryID }) { markFollowUpDone(entryID); if moreEmail { addFollowUpStep(entryID) } }
+        else { recordAssisted(entry, .submitted(awaitingEmail: moreEmail), for: me) }
     }
 
     func checkLink(_ url: URL) -> LinkCheck { LinkCheck.check(url, entries: directory, attempts: progress.optOutAttempts) }
@@ -906,7 +920,7 @@ final class AppModel: ObservableObject {
     /// Mail, and each other app on this phone that we know how to open with a message ready.
     var installedMailApps: [MailApp] {
         MailApp.allCases.filter { app in
-            if app == .mail { return true }
+            if app == .mail || app == .other { return true }          // "Another mail app" is the phone's default mail app, whichever it is
             guard let scheme = app.probeScheme, let url = URL(string: scheme + "://") else { return false }
             return UIApplication.shared.canOpenURL(url)
         }
@@ -1519,10 +1533,16 @@ final class AppModel: ObservableObject {
     private func save() {
         guard storageProblem == nil else { return }
         let snapshot = household, store = store
+        // A save asked for as the app is closing must finish: iOS is told the app still has work to do until the file is written.
+        var background = UIBackgroundTaskIdentifier.invalid
+        background = UIApplication.shared.beginBackgroundTask(withName: "save-profile") {
+            UIApplication.shared.endBackgroundTask(background); background = .invalid
+        }
         saveQueue.async { [weak self] in
             do { try store.save(snapshot) } catch {
                 DispatchQueue.main.async { self?.storageProblem = Loc.f("Could not save: %@", error) }
             }
+            DispatchQueue.main.async { if background != .invalid { UIApplication.shared.endBackgroundTask(background); background = .invalid } }
         }
     }
 }
@@ -1539,13 +1559,13 @@ struct FakeScanFetcher: PageFetcher {
 
 
 #if DEBUG
-/// UI tests use this so they never contact a real site: every other site "sends", the rest are stopped by a bot check.
+/// UI tests use this so they never contact a real site: every other site "sends", the rest are stopped by a human check.
 struct FakeSubmitter: FormSubmitter {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         if dryRun { return .filledNotSubmitted }
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-fake-submit-delay"), args.indices.contains(i + 1), let secs = Double(args[i + 1]) { try? await Task.sleep(nanoseconds: UInt64(secs * 1_000_000_000)) }
-        return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a bot check")
+        return form.page.absoluteString.count % 2 == 0 ? .submitted(awaitingEmail: true) : .challenged("a human check")
     }
 
     /// A drawn stand-in for the page, so the review screens have something to show without loading a site.
@@ -1588,7 +1608,7 @@ final class FakeAssistedPage: AssistedPage {
     var webView: WKWebView? { view }
     init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Opt out of example.com</h1><p>Email</p><input value='you@example.com' style='width:100%;font-size:18px'><p>Full name</p><input value='Pat Example' style='width:100%;font-size:18px'><br><br><button style='font-size:18px'>Submit request</button></body></html>", baseURL: nil) }
     // -uitest-fake-hold keeps the check up, so a test can work on the screen without the site sending itself meanwhile.
-    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= (ProcessInfo.processInfo.arguments.contains("-uitest-fake-hold") ? 10_000 : 2) ? [.check("a bot check")] : [] }
+    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= (ProcessInfo.processInfo.arguments.contains("-uitest-fake-hold") ? 10_000 : 2) ? [.check("a human check")] : [] }
     func refill() async {}
     func send() async -> SubmitOutcome { .submitted(awaitingEmail: ProcessInfo.processInfo.arguments.contains("-uitest-fake-email")) }
     func close() {}
@@ -1612,7 +1632,7 @@ final class FakeGuidedPage: GuidedPage {
     func currentURL() -> URL? { URL(string: "https://fake.example/page") }
     func visibleText() async -> String { "Fake opt-out page" }
     func fill(_ values: [FieldValue]) async -> Int { values.count }
-    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a bot check")] : [] }
+    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a human check")] : [] }
     func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: true) }
     func close() {}
 }

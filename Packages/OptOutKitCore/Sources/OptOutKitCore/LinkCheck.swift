@@ -43,6 +43,19 @@ public enum FollowUps {
             .max { $0.date < $1.date }?.outcome == "submitted_email"
     }
 
+    /// How many email steps the person has finished for this request since it was last sent: the notes "email_done" after the newest plain send.
+    /// A site can ask for several (confirm the address, then confirm the identity); each one finished adds a note and each new one found adds "submitted_email" again.
+    public static func stepsDone(_ history: [OptOutAttempt]) -> Int {
+        let lastSend = history.filter { $0.outcome == "submitted" }.map(\.date).max() ?? .distantPast
+        return history.filter { $0.outcome == "email_done" && $0.date > lastSend }.count
+    }
+
+    /// When a note about this request that follows the newest one should be dated: now, but never at or before the newest note, so "newest" is never a tie.
+    public static func nextDate(_ history: [OptOutAttempt], now: Date = Date()) -> Date {
+        guard let last = history.map(\.date).max(), last >= now else { return now }
+        return last.addingTimeInterval(1)
+    }
+
     /// When the request was last finished: sent with nothing more to do, or its email step done.
     public static func completedOn(_ history: [OptOutAttempt]) -> Date? {
         guard !isPending(history) else { return nil }

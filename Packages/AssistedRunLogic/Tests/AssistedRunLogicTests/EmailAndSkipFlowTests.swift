@@ -11,7 +11,7 @@ import OptOutKitCore
 ///   including the "This site did not go through" dialog. Yes saves the site as emailed; No saves nothing.
 /// - In-app Mail composer: Send saves the site as emailed; Cancel saves nothing. The result counts even if the sheet cleared its own state first.
 /// - Emailed from a live form page: the site ends as Emailed (green check), never as Skipped, and the run moves to the next site.
-/// - A No on a form page keeps the site open. A No on a failed site's offer moves on. A No on the no-form screen keeps waiting.
+/// - A No on a form page keeps the site open. A No on a failed site's offer stays on it until Mark as done, Not now or Skip. A No on the no-form screen keeps waiting.
 /// - An answer to a question that was never asked, or a second answer to the same one, changes nothing and saves once.
 ///
 /// Skip
@@ -70,7 +70,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
     private func wait(_ cond: @autoclosure () -> Bool) async { for _ in 0..<600 where !cond() { try? await Task.sleep(nanoseconds: 5_000_000) } }
     private func batch(_ r: AssistedRunner, _ host: String) -> EmailBatch { EmailBatch.single(entries: [r.current!.entry]).first! }
     private let url = URL(string: "mailto:privacy@a.example")!
-    private let waiting = [[AssistedBlocker.check("a bot check")]]       // the page stays up until the person acts
+    private let waiting = [[AssistedBlocker.check("a human check")]]       // the page stays up until the person acts
 
     // MARK: emailing a site that has a form
 
@@ -422,7 +422,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
 
     func testAConfirmationNoticedWhileWaitingOnACheckAlsoWaitsForNext() async {
         let log = Log()
-        let page = FakePage(blockers: [[.check("a bot check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
+        let page = FakePage(blockers: [[.check("a human check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
         let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
         r.autoSubmit = { false }; r.watchInterval = 0.02
         let run = Task { @MainActor in await r.run() }
@@ -454,7 +454,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
     func testMarkAsDoneOnASiteTheAppIsStillWaitingOnMovesOnToo() async {
         let log = Log()
         let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)],
-                          Driver(["a.example": FakePage(blockers: [[.check("a bot check")]]), "b.example": FakePage(blockers: [[]])]), log)
+                          Driver(["a.example": FakePage(blockers: [[.check("a human check")]]), "b.example": FakePage(blockers: [[]])]), log)
         let run = Task { @MainActor in await r.run() }
         await wait(r.phase == .waitingForCheck)
         await r.markDone()
@@ -481,7 +481,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
 
     func testAutoSendOnMovesOnByItselfEvenWhenThePersonPressedThePagesButton() async {
         let log = Log()
-        let page = FakePage(blockers: [[.check("a bot check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
+        let page = FakePage(blockers: [[.check("a human check")]]); page.texts = ["Opt out form", "Opt out form", "Your request has been received. Thank you."]
         let (r, _) = make([item("a.example", email: nil), item("b.example", email: nil)], Driver(["a.example": page, "b.example": FakePage(blockers: [[]])]), log)
         r.autoSubmit = { true }; r.watchInterval = 0.02; r.pauseAfterSent = 0
         let run = Task { @MainActor in await r.run() }
@@ -518,7 +518,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         XCTAssertEqual(log.rows.first?.1, .needsYou(AssistedRunner.noForm))
     }
 
-    // MARK: a bot check that refuses a scripted press
+    // MARK: a human check that refuses a scripted press
 
     func testAReCAPTCHAThatRejectsTheAutomaticSendIsHandedToThePersonAndNotRetried() async {
         let log = Log()
@@ -562,7 +562,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
     }
 
     func testEmailLinksWaitsForTheCheckBeforeSending() async {
-        let page = FakePage(blockers: [[.check("a bot check")], [.check("a bot check")], []])
+        let page = FakePage(blockers: [[.check("a human check")], [.check("a human check")], []])
         let (r, _) = await send(page)
         XCTAssertEqual(r, .submitted(awaitingEmail: false)); XCTAssertEqual(page.sends, 1)
         XCTAssertGreaterThanOrEqual(page.polls, 3, "it did not send while the check was up")

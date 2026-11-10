@@ -75,12 +75,17 @@ final class EmailHandoffTests: XCTestCase {
         rig.runner.skip(); await join(rig)
     }
 
-    func testNoAfterAFailedSiteMovesOn() async {
+    func testNoAfterAFailedSiteStaysUntilThePersonMarksItDone() async {
         let rig = await start(noForm: false)
         openExternal(rig)
         rig.handoff.answer(sent: false)
+        XCTAssertFalse(rig.runner.finished, "No never moves the run on by itself")
+        XCTAssertNotNil(rig.runner.emailOffer, "the offer comes back for the person to answer")
+        openExternal(rig); rig.handoff.answer(sent: false)        // asked again, still No
+        XCTAssertFalse(rig.runner.finished); XCTAssertNotNil(rig.runner.emailOffer)
+        rig.runner.answerEmailOffer(sent: true)                    // their own tap on Mark as done
         await join(rig)
-        XCTAssertEqual(rig.marked.count, 0); XCTAssertTrue(rig.runner.finished)
+        XCTAssertTrue(rig.runner.finished); XCTAssertEqual(rig.marked.count, 0)
     }
 
     func testNoLinkToOpenDoesNotLeaveTheOfferStuck() async {

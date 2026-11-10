@@ -15,7 +15,7 @@ final class WebSearchPage: SearchPage {
 /// The real thing: a web view the person can see and use for the one step only they can do.
 @MainActor
 struct WebAssistedDriver: AssistedDriver {
-    /// Test hook: render this HTML instead of loading the site, so a test can imitate a form and a bot check.
+    /// Test hook: render this HTML instead of loading the site, so a test can imitate a form and a human check.
     var htmlOverride: String?
     private static var reasons: [String: String] = [:]
     func failureReason(for form: OptOutForm) -> String? { Self.reasons[form.page.absoluteString] }
@@ -304,6 +304,7 @@ struct AssistedOptOutView: View {
     @State private var showSent = false
     @State private var showSkipped = false
     @StateObject private var handoff: EmailHandoff
+    @StateObject private var browserHandoff = BrowserHandoff()
     private var livePage: WebAssistedPage? { runner.page as? WebAssistedPage }
     private var liveSearch: WebSearchPage? { runner.searchPage as? WebSearchPage }
     /// The web view of whichever page is on screen (the scripted pages UI tests use have one too).
@@ -341,10 +342,7 @@ struct AssistedOptOutView: View {
         // Simulator work and its UI test: `-show-sent-question` puts the "Was this sent?" question on screen as soon as the screen opens.
         .task { if ProcessInfo.processInfo.arguments.contains("-show-sent-question") { try? await Task.sleep(nanoseconds: 3_000_000_000); _ = await runner.sentQuestion.ask(awaitingEmail: false) } }
         #endif
-        .alert("This page mentions an email", isPresented: Binding(get: { runner.askFollowUp }, set: { _ in })) {
-            Button("Yes, track it") { runner.answerFollowUp(track: true) }
-            Button("No, it is done") { runner.answerFollowUp(track: false) }
-        } message: { Text("A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?") }
+        .finishQuestionAlert(runner.finishQuestion)
         .task {
             intro = !model.guidedIntroSeen
             while intro { try? await Task.sleep(nanoseconds: 200_000_000) }        // nothing is filled or sent while the walkthrough is open
@@ -364,7 +362,10 @@ struct AssistedOptOutView: View {
             Button("Mark as done") { runner.answerEmailOffer(sent: true) }.accessibilityIdentifier("assisted-offer-mark-done")
             Button("Not now", role: .cancel) { runner.answerEmailOffer(sent: false) }
         } message: { Text("We have an email address for this site. Send your opt-out by email instead, and we mark it done. If you already did, tap Mark as done.") }
-        .onAppear { handoff.markEmailed = { model.markEmailed($0) }; runner.autoSubmit = { model.autoSubmit } }
+        .onAppear { handoff.markEmailed = { model.markEmailed($0) }; runner.autoSubmit = { model.autoSubmit }; runner.asksAboutFollowUp = true }
+        .browserHandoffAlert(browserHandoff) {
+            if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } }
+        }
         .alert("Did you send it?", isPresented: Binding(get: { handoff.confirming != nil }, set: { _ in })) {
             Button("Yes, I sent it") { handoff.answer(sent: true) }
             Button("No", role: .cancel) { handoff.answer(sent: false) }
@@ -408,7 +409,7 @@ struct AssistedOptOutView: View {
                     // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
                     HStack(spacing: 10) {
                         Menu {
-                            PageMenu.items(web: pageWebView ?? searchWebView, idPrefix: "assisted", details: model.pageDetails) { await runner.page?.refill() }
+                            PageMenu.items(web: pageWebView ?? searchWebView, idPrefix: "assisted", details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { runner.flagEmailStep(); if let item = runner.current { model.addFollowUpStep(item.entry.id) } }) { await runner.page?.refill() }
                             if let entry = runner.current?.entry, entry.contactEmail != nil {
                                 Button { emailInstead(entry) } label: { Label("Send an email instead", systemImage: "envelope") }.accessibilityIdentifier("assisted-email-instead")
                             }

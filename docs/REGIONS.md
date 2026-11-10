@@ -60,7 +60,7 @@ headless browser, looks in the rendered page for links and options named in a la
 parameter, and opens language menus (buttons labelled Language, globes, a current-language code) to see what is inside. It is merged into the same list (adds only).
 After it ran, 78 sites are offered in a language other than English and 60 have a translated opt-out page. It found real ones: OneTrust webforms with a language
 switcher, and translated privacy pages on criteo.com. Translated pages on a tracker or analytics host are dropped, and a picker with more than 15 languages adds no
-region tags. A menu that opens only after a hover, or sits behind a bot check, is still missed.
+region tags. A menu that opens only after a hover, or sits behind a human check, is still missed.
 
 ### Worldwide brokers
 

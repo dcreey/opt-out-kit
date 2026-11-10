@@ -5,11 +5,11 @@ anything by this feature, and no real person's details were used.
 
 ## What counts as automatic
 
-A site is automatic only when its form was loaded on a real page and nothing blocked it. If a person might have to solve anything (a bot check, a terms prompt, a confirmation box), it is semi-automated. A site whose form has never been loaded is also semi-automated until a real load shows it is clear, and a site where an automatic send was stopped by a check moves to semi-automated by itself. The owner's own plain "I am this person" box is ticked automatically (never for family profiles).
+A site is automatic only when its form was loaded on a real page and nothing blocked it. If a person might have to solve anything (a human check, a terms prompt, a confirmation box), it is semi-automated. A site whose form has never been loaded is also semi-automated until a real load shows it is clear, and a site where an automatic send was stopped by a check moves to semi-automated by itself. The owner's own plain "I am this person" box is ticked automatically (never for family profiles).
 
 ## Measured on real pages (2026-10-22)
 
-All 172 forms the app can fill in were loaded on a real page in the simulator with a made-up profile, filled in, and closed without sending anything: 143 had nothing blocking them, 19 showed a visible bot check, 9 a confirmation box and 1 both. These are written to each site's `live_check`. A check that only appears after sending cannot be seen this way; if a send is ever stopped by one, that site moves to semi-automated on its own. Data Axle's family of sites (data-axle.com, donorbase.com, exactdata.com, usadata.com) only has a note that the broker may verify identity and may contact the person about the request; for the account owner that is treated like the plain "I am this person" box, so those sites are automatic for the owner and still semi-automated for family profiles.
+All 172 forms the app can fill in were loaded on a real page in the simulator with a made-up profile, filled in, and closed without sending anything: 143 had nothing blocking them, 19 showed a visible human check, 9 a confirmation box and 1 both. These are written to each site's `live_check`. A check that only appears after sending cannot be seen this way; if a send is ever stopped by one, that site moves to semi-automated on its own. Data Axle's family of sites (data-axle.com, donorbase.com, exactdata.com, usadata.com) only has a note that the broker may verify identity and may contact the person about the request; for the account owner that is treated like the plain "I am this person" box, so those sites are automatic for the owner and still semi-automated for family profiles.
 
 ## Nothing runs without a profile
 
@@ -20,6 +20,12 @@ Every way of opting someone out (the automatic run, the assisted run, guides, sc
 Groups run in this order: an official removal service for the person's state or country (California DROP today), then our automatic opt-out, semi-automated, guided and manual. A site is listed in the first group that handles it and in no later one; two official services never list the same site. The same order decides what the weekly run skips.
 
 ## How sites are grouped
+
+**Forms that need the person (2026-11-09).** A form a real page load showed to ask for an authorized agent's details, questions the app cannot read, or a file or signature is
+**semi-automated**, not guided: Solve and send fills in what it can and then never presses send; the person completes the rest in the page and presses the page's own button, and the
+confirmation is noticed as usual (`Item.needsPerson` makes it hands-off). Two things stay guided: a **business** form (20 sites; it is a contact form, not a personal opt-out, so nothing
+personal is put into it) and any site that carries a caution (Clearview's face photo is never uploaded for the person). Sites on the sign-up survey's list stay guided too (`jungroup.com`'s
+recorded form was dropped for that reason). Email-only sites are their own group ("Email only"), not semi-automated.
 
 The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (121 of 853 sites), **Semi-automated, with
 prompts for you** (51), **Guided, you do the steps** (612, including the hand-written walkthroughs) and **Manual, you find the page** (69).
@@ -35,7 +41,7 @@ See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was 
 
 Both are off until the person answers a first-run question (last page of the walkthrough, or a banner on the Queue tab if they
 skipped it). The page has both switches on by default and says exactly what will be sent. Either can be turned off in
-About, and every run is listed under "Automatic activity". "Preview" fills every form and sends nothing.
+Settings, and every run is listed under "Automatic activity". "Preview" fills every form and sends nothing.
 
 ## Required profile details
 
@@ -80,7 +86,7 @@ Other published guides say the same: [Cloaked](https://help.cloaked.app/hc/en-us
   rather than copying its text into this repository.
 - **California DROP** ([privacy.ca.gov/drop](https://privacy.ca.gov/drop/)): since January 2026 a California resident can send one
   deletion request to every registered broker, and brokers have had to process requests since August 2026. It needs state identity
-  verification, so the app links to it (About, "Also worth doing") instead of automating it.
+  verification, so the app links to it (Settings, "Also worth doing") instead of automating it.
 
 ## Spokeo, end to end (checked 2026-10-22, nothing sent)
 
@@ -95,11 +101,11 @@ send was replaced by one that cannot send, and it was never reached. Screenshots
 - Only the fields a form asks for are filled (name, email, city, state and so on), taken from the person's own profile.
 - A site is sent at most once per week. A failed or stopped attempt does not count as sent.
 - If a look in the last 30 days found no listing on a site, nothing is sent there (no handing data to a site that lacks it).
-- A visible bot check (reCAPTCHA puzzle or checkbox, hCaptcha, Cloudflare check) or a terms prompt **stops the run for that
+- A visible human check (reCAPTCHA puzzle or checkbox, hCaptcha, Cloudflare check) or a terms prompt **stops the run for that
   site**. It is never solved or accepted.
 - Legal acknowledgement and certification checkboxes are never ticked; a form that requires one is left to the person. The one
   exception is a plain "I confirm that I am the person associated with this email" box on the **account owner's own** profile, and
-  only after they turn on "Confirm 'I am this person' boxes for me" in About. Never for family profiles or minors.
+  only after they turn on "Confirm 'I am this person' boxes for me" in Settings. Never for family profiles or minors.
 - Logins, ID checks, phone verification, uploads and "agent / on behalf of" forms are left to the person.
 - "Sent" is reported only when the site shows a success message. Otherwise the result is "no confirmation" or "refused".
 - Minors and public figures are still opted out (an opt-out is not a search) but are never scanned.
@@ -124,7 +130,7 @@ need the person. It does **not** solve CAPTCHAs; that is a design rule, not a ga
 
 ## Solve and send, and the guided screen
 
-For forms behind a bot check the app does everything except the check. **Solve and send** loads each site's real form in a visible
+For forms behind a human check the app does everything except the check. **Solve and send** loads each site's real form in a visible
 browser and fills it in. It scrolls the check into view and waits. The person solves it (and accepts any terms or ticks any
 certification box themselves). The app then sends the form, reads the confirmation and moves on, with the next site already
 loading. A check, terms prompt or certification box is detected on the live page, never assumed. Checked on real pages with a

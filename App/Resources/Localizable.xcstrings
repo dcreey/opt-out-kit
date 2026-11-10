@@ -1565,7 +1565,7 @@
     }
    }
   },
-  "A bot check (Cloudflare Turnstile)": {
+  "A human check (Cloudflare Turnstile)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1588,7 +1588,7 @@
     }
    }
   },
-  "A bot check (DataDome)": {
+  "A human check (DataDome)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1611,7 +1611,7 @@
     }
    }
   },
-  "A bot check (PerimeterX)": {
+  "A human check (PerimeterX)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1634,7 +1634,7 @@
     }
    }
   },
-  "A bot check (hCaptcha)": {
+  "A human check (hCaptcha)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1657,7 +1657,7 @@
     }
    }
   },
-  "A bot check (reCAPTCHA)": {
+  "A human check (reCAPTCHA)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1680,7 +1680,7 @@
     }
    }
   },
-  "A bot check, \"I am human\", which only you can tick": {
+  "A human check, \"I am human\", which only you can tick": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -1791,29 +1791,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine vor Jahren fallengelassene Anschuldigung taucht auf, wenn ein Arbeitgeber oder Vermieter Ihren Namen sucht, und man verlangt Geld für die Entfernung."
-     }
-    }
-   }
-  },
-  "A confirmation or verification email looks like it is coming. Track it, and the app reminds you to finish it in Email links?": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Un e-mail de confirmation ou de vérification semble en route. Le suivre ? L'app vous rappellera de le terminer dans Liens d'e-mail."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Parece que viene un correo de confirmación o verificación. ¿Lo seguimos? La app le recordará terminarlo en Enlaces de correo."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Es scheint eine Bestätigungs- oder Verifizierungs-E-Mail unterwegs zu sein. Nachverfolgen? Die App erinnert Sie in E-Mail-Links daran, sie abzuschließen."
      }
     }
    }
@@ -2186,7 +2163,7 @@
     }
    }
   },
-  "A plain form we can fill in and send, with no bot check seen.": {
+  "A plain form we can fill in and send, with no human check seen.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -2508,25 +2485,25 @@
     }
    }
   },
-  "About": {
+  "Settings": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "À propos"
+      "value": "Réglages"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Acerca de"
+      "value": "Ajustes"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Info"
+      "value": "Einstellungen"
      }
     }
    }
@@ -7177,6 +7154,305 @@
     }
    }
   },
+  "Is it completely done?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Est-ce entièrement terminé ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Está completamente terminado?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ist es ganz abgeschlossen?"
+     }
+    }
+   }
+  },
+  "Yes, completely done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, entièrement terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, completamente terminado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, ganz abgeschlossen"
+     }
+    }
+   }
+  },
+  "An email is still to come": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un e-mail doit encore arriver"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún falta un correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es kommt noch eine E-Mail"
+     }
+    }
+   }
+  },
+  "I am not sure": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Je ne suis pas sûr"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No estoy seguro"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ich bin nicht sicher"
+     }
+    }
+   }
+  },
+  "This page mentions an email. Some sites send more than one, each with a step to do. If you are not sure, say so and we keep it on your waiting list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette page mentionne un e-mail. Certains sites en envoient plusieurs, chacun avec une étape à faire. Si vous n’êtes pas sûr, dites-le et nous le gardons dans votre liste d’attente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta página menciona un correo. Algunos sitios envían más de uno, cada uno con un paso por hacer. Si no estás seguro, dilo y lo mantenemos en tu lista de espera."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diese Seite erwähnt eine E-Mail. Manche Seiten senden mehrere, jede mit einem Schritt. Wenn du nicht sicher bist, sag es, und wir behalten sie auf deiner Warteliste."
+     }
+    }
+   }
+  },
+  "Some sites send an email afterwards with one more step, sometimes more than one. If you are not sure, say so and we keep it on your waiting list.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites envoient ensuite un e-mail avec une étape de plus, parfois plusieurs. Si vous n’êtes pas sûr, dites-le et nous le gardons dans votre liste d’attente."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios envían después un correo con un paso más, a veces varios. Si no estás seguro, dilo y lo mantenemos en tu lista de espera."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Seiten senden danach eine E-Mail mit einem weiteren Schritt, manchmal mehrere. Wenn du nicht sicher bist, sag es, und wir behalten sie auf deiner Warteliste."
+     }
+    }
+   }
+  },
+  "There is another email step": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il y a une autre étape par e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hay otro paso por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es gibt einen weiteren E-Mail-Schritt"
+     }
+    }
+   }
+  },
+  "%lld email steps finished so far; waiting on the next": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld étapes par e-mail terminées ; en attente de la suivante"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld pasos por correo terminados; esperando el siguiente"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld E-Mail-Schritte erledigt; warte auf den nächsten"
+     }
+    }
+   }
+  },
+  "That was the last step": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "C’était la dernière étape"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ese fue el último paso"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Das war der letzte Schritt"
+     }
+    }
+   }
+  },
+  "Done, and another email step is coming": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Terminé, et une autre étape par e-mail arrive"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hecho, y viene otro paso por correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erledigt, und ein weiterer E-Mail-Schritt kommt"
+     }
+    }
+   }
+  },
+  "You opened this site in your browser. Say yes only if you finished the request there.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez ouvert ce site dans votre navigateur. Répondez oui seulement si vous y avez terminé la demande."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abriste este sitio en tu navegador. Di que sí solo si terminaste la solicitud allí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Du hast diese Seite in deinem Browser geöffnet. Sag nur Ja, wenn du die Anfrage dort abgeschlossen hast."
+     }
+    }
+   }
+  },
+  "Open in my browser": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir dans mon navigateur"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir en mi navegador"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In meinem Browser öffnen"
+     }
+    }
+   }
+  },
+  "Did you complete it?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L’avez-vous terminé ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Lo completaste?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hast du es abgeschlossen?"
+     }
+    }
+   }
+  },
   "Disaster agencies see where people are moving to send help, or a traffic app reroutes you.": {
    "extractionState": "manual",
    "localizations": {
@@ -10903,25 +11179,25 @@
     }
    }
   },
-  "It tells you the few steps that need you: bot checks, email links, ID": {
+  "It tells you the few steps that need you: an \"I am not a robot\" box, a link in an email, or an ID": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Elle vous signale les rares étapes qui vous concernent : vérifications anti-robot, liens e-mail, pièce d’identité"
+      "value": "Elle vous indique les rares étapes qui vous concernent : une case « Je ne suis pas un robot », un lien dans un e-mail ou une pièce d'identité"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Te avisa de los pocos pasos que te necesitan: verificaciones anti-bot, enlaces de correo, identificación"
+      "value": "Te indica los pocos pasos que te necesitan: una casilla «No soy un robot», un enlace en un correo o un documento de identidad"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Sie zeigt Ihnen die wenigen Schritte, die Sie brauchen: Bot-Prüfungen, E-Mail-Links, Ausweis"
+      "value": "Sie zeigt dir die wenigen Schritte, die dich brauchen: ein „Ich bin kein Roboter“-Feld, ein Link in einer E-Mail oder ein Ausweis"
      }
     }
    }
@@ -12950,7 +13226,7 @@
     }
    }
   },
-  "Most sites guard their forms with bot checks, so expect many to need you. The app tells you which.": {
+  "Most sites guard their forms with human checks, so expect many to need you. The app tells you which.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -14054,29 +14330,6 @@
     }
    }
   },
-  "No, it is done": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Non, c'est terminé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "No, ya está hecho"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nein, es ist erledigt"
-     }
-    }
-   }
-  },
   "No, stay on this page": {
    "extractionState": "manual",
    "localizations": {
@@ -14767,25 +15020,25 @@
     }
    }
   },
-  "On. You can turn it off in About.": {
+  "On. You can turn it off in Settings.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Activé. Vous pouvez le désactiver dans À propos."
+      "value": "Activé. Vous pouvez le désactiver dans Réglages."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Activado. Puedes desactivarlo en Acerca de."
+      "value": "Activado. Puedes desactivarlo en Ajustes."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Eingeschaltet. Sie können es unter Info ausschalten."
+      "value": "An. Du kannst es in den Einstellungen ausschalten."
      }
     }
    }
@@ -19298,25 +19551,25 @@
     }
    }
   },
-  "Sharing is off, and iOS asks only once. To turn it on, open Settings, then Privacy & Security, then Tracking, and switch Exnay on. If Exnay is not in that list, first switch on Allow Apps to Request to Track. You can also open Settings, tap Exnay and turn on Allow Tracking if it is shown there. Without it, forms that ask for the ID are sent without it.": {
+  "Sharing is off. If iOS never asked you, \"Allow Apps to Request to Track\" is switched off on this phone: open Settings, then Privacy & Security, then Tracking, switch it on, and come back here. If you tapped Don't Allow, switch Exnay on in that same Tracking list. The button below opens Exnay's own page in Settings, so tap Settings at the top left to reach the main list. Without it, forms that ask for the ID are sent without it.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Le partage est désactivé, et iOS ne demande qu'une fois. Pour l'activer, ouvrez Réglages, puis Confidentialité et sécurité, puis Suivi, et activez Exnay. Si Exnay n'est pas dans la liste, activez d'abord Autoriser les demandes de suivi des apps. Vous pouvez aussi ouvrir Réglages, toucher Exnay et activer Autoriser le suivi s'il y figure. Sans cela, les formulaires qui demandent l'identifiant sont envoyés sans lui."
+      "value": "Le partage est désactivé. Si iOS ne vous a jamais posé la question, « Autoriser les demandes de suivi des apps » est désactivé sur ce téléphone : ouvrez Réglages, puis Confidentialité et sécurité, puis Suivi, activez-le et revenez ici. Si vous avez touché Ne pas autoriser, activez Exnay dans la même liste Suivi. Le bouton ci-dessous ouvre la page d'Exnay dans Réglages : touchez Réglages en haut à gauche pour atteindre la liste principale. Sans cela, les formulaires qui demandent l'identifiant sont envoyés sans lui."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "El uso compartido está desactivado y iOS solo pregunta una vez. Para activarlo, abra Ajustes, luego Privacidad y seguridad, luego Rastreo, y active Exnay. Si Exnay no aparece en la lista, active primero Permitir que las apps soliciten rastrear. También puede abrir Ajustes, tocar Exnay y activar Permitir rastreo si aparece. Sin él, los formularios que piden el identificador se envían sin él."
+      "value": "El uso compartido está desactivado. Si iOS nunca te preguntó, «Permitir que las apps soliciten rastrear» está desactivado en este teléfono: abre Ajustes, luego Privacidad y seguridad, luego Rastreo, actívalo y vuelve aquí. Si tocaste No permitir, activa Exnay en esa misma lista de Rastreo. El botón de abajo abre la página de Exnay en Ajustes: toca Ajustes arriba a la izquierda para llegar a la lista principal. Sin esto, los formularios que piden el identificador se envían sin él."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Das Teilen ist aus, und iOS fragt nur einmal. Zum Einschalten öffnen Sie Einstellungen, dann Datenschutz & Sicherheit, dann Tracking, und schalten Exnay ein. Steht Exnay nicht in der Liste, schalten Sie zuerst „Apps erlauben, Tracking anzufragen“ ein. Sie können auch Einstellungen öffnen, Exnay antippen und „Tracking erlauben“ einschalten, falls es dort steht. Ohne das werden Formulare, die die ID verlangen, ohne sie gesendet."
+      "value": "Das Teilen ist aus. Wenn iOS dich nie gefragt hat, ist „Apps erlauben, Tracking anzufordern“ auf diesem Telefon ausgeschaltet: Öffne Einstellungen, dann Datenschutz & Sicherheit, dann Tracking, schalte es ein und komm hierher zurück. Wenn du „Nicht erlauben“ getippt hast, schalte Exnay in derselben Tracking-Liste ein. Die Schaltfläche unten öffnet die Seite von Exnay in den Einstellungen; tippe oben links auf Einstellungen, um zur Hauptliste zu kommen. Ohne das werden Formulare, die die ID verlangen, ohne sie gesendet."
      }
     }
    }
@@ -19413,7 +19666,7 @@
     }
    }
   },
-  "Shows a bot check before anything else": {
+  "Shows a human check before anything else": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -19942,7 +20195,7 @@
     }
    }
   },
-  "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.": {
+  "Solve the human check, tick any confirmation box and accept terms yourself if asked. We wait for you.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -20816,7 +21069,7 @@
     }
    }
   },
-  "Stopped by a bot check or terms prompt": {
+  "Stopped by a human check or terms prompt": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -21115,25 +21368,25 @@
     }
    }
   },
-  "Tap About, the last tab, any time to change what you chose here and find more.": {
+  "Tap Settings, the last tab, any time to change what you chose here and find more.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Touchez À propos, le dernier onglet, à tout moment pour modifier vos choix et trouver d'autres réglages."
+      "value": "Touchez Réglages, le dernier onglet, à tout moment pour modifier vos choix et en savoir plus."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Toca Acerca de, la última pestaña, cuando quieras para cambiar lo que elegiste aquí y encontrar más."
+      "value": "Toca Ajustes, la última pestaña, cuando quieras para cambiar lo que elegiste aquí y ver más."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Tippe jederzeit auf Info, den letzten Tab, um deine Auswahl zu ändern und mehr zu finden."
+      "value": "Tippe jederzeit auf Einstellungen, den letzten Tab, um deine Auswahl hier zu ändern und mehr zu finden."
      }
     }
    }
@@ -21506,7 +21759,7 @@
     }
    }
   },
-  "The app fills in the form and sends it. You solve the bot check (and confirm an email if the site sends one).": {
+  "The app fills in the form and sends it. You solve the human check (and confirm an email if the site sends one).": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -22173,7 +22426,7 @@
     }
    }
   },
-  "The page mentions a bot check and we have not loaded it to see whether one appears.": {
+  "The page mentions a human check and we have not loaded it to see whether one appears.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -22587,7 +22840,7 @@
     }
    }
   },
-  "The site's bot check did not accept an automatic send. Press its Submit button yourself.": {
+  "The site's human check did not accept an automatic send. Press its Submit button yourself.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -23300,6 +23553,29 @@
     }
    }
   },
+  "This form asks for a file or a signature. We fill in what we can; you add the file and press the page's own button.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce formulaire demande un fichier ou une signature. Nous remplissons ce que nous pouvons ; vous ajoutez le fichier et appuyez sur le bouton de la page."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este formulario pide un archivo o una firma. Rellenamos lo que podemos; tú añades el archivo y pulsas el botón de la página."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieses Formular verlangt eine Datei oder eine Unterschrift. Wir füllen aus, was wir können; du fügst die Datei hinzu und drückst die Schaltfläche der Seite."
+     }
+    }
+   }
+  },
   "This form asks for a file or a signature, so we take you to the page and walk you through it.": {
    "extractionState": "manual",
    "localizations": {
@@ -23323,25 +23599,25 @@
     }
    }
   },
-  "This form asks for an authorized agent's details, so we take you to the page and walk you through it.": {
+  "This form asks for an authorized agent's details. We fill in what we can; you finish the rest in the page and press its own button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ce formulaire demande les coordonnées d'un mandataire : nous vous emmenons sur la page et vous guidons."
+      "value": "Ce formulaire demande les coordonnées d'un mandataire. Nous remplissons ce que nous pouvons ; vous terminez dans la page et appuyez sur son bouton."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Este formulario pide datos de un representante autorizado, así que te llevamos a la página y te guiamos."
+      "value": "Este formulario pide los datos de un representante autorizado. Rellenamos lo que podemos; tú terminas en la página y pulsas su botón."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dieses Formular fragt nach den Angaben eines Bevollmächtigten, daher führen wir Sie zur Seite und begleiten Sie."
+      "value": "Dieses Formular verlangt die Angaben eines Bevollmächtigten. Wir füllen aus, was wir können; du beendest den Rest in der Seite und drückst deren Schaltfläche."
      }
     }
    }
@@ -23507,25 +23783,25 @@
     }
    }
   },
-  "This form has questions the app cannot read, so we take you to the page and walk you through it.": {
+  "This form has questions the app cannot read. We fill in what we can; you answer the rest in the page and press its own button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ce formulaire pose des questions que l'app ne peut pas lire : nous vous emmenons sur la page et vous guidons."
+      "value": "Ce formulaire pose des questions que l'app ne peut pas lire. Nous remplissons ce que nous pouvons ; vous répondez au reste dans la page et appuyez sur son bouton."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Este formulario tiene preguntas que la app no puede leer, así que te llevamos a la página y te guiamos."
+      "value": "Este formulario tiene preguntas que la app no puede leer. Rellenamos lo que podemos; tú respondes el resto en la página y pulsas su botón."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dieses Formular hat Fragen, die die App nicht lesen kann, daher führen wir Sie zur Seite und begleiten Sie."
+      "value": "Dieses Formular hat Fragen, die die App nicht lesen kann. Wir füllen aus, was wir können; du beantwortest den Rest in der Seite und drückst deren Schaltfläche."
      }
     }
    }
@@ -23848,29 +24124,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Seite hat %lld Opt-out-Formulare. Wir senden jedes: Formular %lld von %lld."
-     }
-    }
-   }
-  },
-  "This page mentions an email": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cette page mentionne un e-mail"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Esta página menciona un correo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Diese Seite erwähnt eine E-Mail"
      }
     }
    }
@@ -27118,6 +27371,29 @@
     }
    }
   },
+  "Yes, I completed it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, je l’ai terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, lo completé"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, ich habe es abgeschlossen"
+     }
+    }
+   }
+  },
   "Yes, it was sent": {
    "extractionState": "manual",
    "localizations": {
@@ -27137,29 +27413,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ja, es wurde gesendet"
-     }
-    }
-   }
-  },
-  "Yes, track it": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Oui, le suivre"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sí, seguirlo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ja, nachverfolgen"
      }
     }
    }
@@ -27394,25 +27647,25 @@
     }
    }
   },
-  "You can skip this. Those brokers will then need it later, and About has the same button.": {
+  "You can skip this. Those brokers will then need it later, and Settings has the same button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Vous pouvez passer cette étape. Ces courtiers en auront besoin plus tard, et À propos a le même bouton."
+      "value": "Vous pouvez passer. Ces courtiers en auront besoin plus tard, et Réglages a le même bouton."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Puedes omitir este paso. Esos intermediarios lo necesitarán más adelante, y Acerca de tiene el mismo botón."
+      "value": "Puedes omitirlo. Esos intermediarios lo necesitarán después, y Ajustes tiene el mismo botón."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Du kannst das überspringen. Diese Datenhändler brauchen sie später, und „Info“ hat dieselbe Schaltfläche."
+      "value": "Du kannst das überspringen. Diese Händler brauchen es dann später, und die Einstellungen haben dieselbe Schaltfläche."
      }
     }
    }
@@ -27624,7 +27877,7 @@
     }
    }
   },
-  "You handle bot checks, phone codes and ID steps yourself. If a page is broken, tap Not working.": {
+  "You handle human checks, phone codes and ID steps yourself. If a page is broken, tap Not working.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -27923,7 +28176,7 @@
     }
    }
   },
-  "You solve the bot check, and pick your own listing if the site asks. We never do that for you.": {
+  "You solve the human check, and pick your own listing if the site asks. We never do that for you.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -28889,25 +29142,25 @@
     }
    }
   },
-  "Your settings are in About": {
+  "Your settings are in Settings": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Vos réglages sont dans À propos"
+      "value": "Vos réglages sont dans Réglages"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Tus ajustes están en Acerca de"
+      "value": "Tus ajustes están en Ajustes"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Deine Einstellungen findest du unter Info"
+      "value": "Deine Einstellungen findest du in den Einstellungen"
      }
     }
    }

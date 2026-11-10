@@ -27,7 +27,7 @@ public struct FillPlan: Equatable, Sendable {
 }
 
 public enum FormFiller {
-    /// Tags from the profiler that mean a person must act. A bot check is NOT here: it is detected when the page is
+    /// Tags from the profiler that mean a person must act. A human check is NOT here: it is detected when the page is
     /// actually loaded, because many are invisible and pass for a real browser, and a visible one stops the run then.
     static let humanOnlySignals: [String: String] = [
         "login_required": "needs an account login",

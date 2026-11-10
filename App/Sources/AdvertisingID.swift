@@ -106,7 +106,7 @@ struct AdIDPermissionControl: View {
                 }
                 .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("adid-allow")
             } else {
-                Text("Sharing is off, and iOS asks only once. To turn it on, open Settings, then Privacy & Security, then Tracking, and switch Exnay on. If Exnay is not in that list, first switch on Allow Apps to Request to Track. You can also open Settings, tap Exnay and turn on Allow Tracking if it is shown there. Without it, forms that ask for the ID are sent without it.")
+                Text("Sharing is off. If iOS never asked you, \"Allow Apps to Request to Track\" is switched off on this phone: open Settings, then Privacy & Security, then Tracking, switch it on, and come back here. If you tapped Don't Allow, switch Exnay on in that same Tracking list. The button below opens Exnay's own page in Settings, so tap Settings at the top left to reach the main list. Without it, forms that ask for the ID are sent without it.")
                     .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 Button("Open Settings", systemImage: "gearshape") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }

@@ -21,7 +21,7 @@ struct CoachGuide: Identifiable {
     static var semiAutomatic: CoachGuide {
         CoachGuide(id: "semi", symbol: "hand.point.up.left", title: Loc.t("How a semi-automated task works"), points: [
             Loc.t("The app fills in the site's form with only the details it asks for."),
-            Loc.t("You solve the bot check, and pick your own listing if the site asks. We never do that for you."),
+            Loc.t("You solve the human check, and pick your own listing if the site asks. We never do that for you."),
             Loc.t("Some sites email you a link to confirm. That tap is yours too."),
             FollowUpNote.text,
         ])
@@ -38,7 +38,7 @@ struct CoachGuide: Identifiable {
         CoachGuide(id: "manual", symbol: "figure.walk", title: Loc.t("How a manual task works"), points: [
             Loc.t("The guide stays at the top of the screen and the site's own page sits below it."),
             Loc.t("It shows one step at a time. Tap Copy to copy your details, paste them into the site, then tap Next step."),
-            Loc.t("You handle bot checks, phone codes and ID steps yourself. If a page is broken, tap Not working."),
+            Loc.t("You handle human checks, phone codes and ID steps yourself. If a page is broken, tap Not working."),
         ])
     }
 }

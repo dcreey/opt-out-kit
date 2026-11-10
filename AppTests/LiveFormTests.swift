@@ -630,7 +630,7 @@ final class LiveFormTests: XCTestCase {
         let none = try await challenge(solved)
         XCTAssertNil(none, "the check already passed: its token is there")
         let unsolved = try await challenge(solved.replacingOccurrences(of: "value='TOKEN'", with: "value=''"))
-        XCTAssertEqual(unsolved, "a bot check", "without a token the same line is a real check")
+        XCTAssertEqual(unsolved, "a human check", "without a token the same line is a real check")
     }
 
     func testAPlainPageIsNotACheck() async throws {

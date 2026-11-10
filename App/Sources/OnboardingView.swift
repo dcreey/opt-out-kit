@@ -22,6 +22,8 @@ struct OnboardingView: View {
     private func endMarker(_ page: Int) -> some View {
         Color.clear.frame(height: 1).onAppear { reached.insert(page) }
     }
+    /// The furthest page that exists to swipe to: only one past the current page once it is done, so a swipe forward has nothing to land on.
+    private var pageLimit: Int { canLeave(index) ? index + 1 : index }
     private func canLeave(_ page: Int) -> Bool {
         reached.contains(page) && !(page == pages.count && !emailValid) && !(page == pages.count + 1 && !rulesRead)
     }
@@ -51,7 +53,7 @@ struct OnboardingView: View {
     private let pages: [Page] = [
         Page(id: 0, symbol: "bolt.shield", title: Loc.t("We remove your data for you"),
              body: Loc.t("Exnay sends opt-out requests to data brokers on its own, from as many websites as it can. You only step in where a site needs a person."),
-             bullets: [Loc.t("Every month it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: bot checks, email links, ID")]),
+             bullets: [Loc.t("Every month it fills in and sends opt-out forms by itself"), Loc.t("It tells you the few steps that need you: an \"I am not a robot\" box, a link in an email, or an ID")]),
         Page(id: 1, symbol: "lock.shield", title: Loc.t("Your data stays on this phone"),
              body: Loc.t("There is no Exnay server, no account and no tracking. What you enter is encrypted on this phone. The app only talks to the broker sites themselves, to opt you out."),
              bullets: [Loc.t("Open source: anyone can audit the code"), Loc.t("Lost phone with no backup means lost data; a normal iPhone backup carries it"), Loc.t("Each site sees only the details its form needs")]),
@@ -71,7 +73,7 @@ struct OnboardingView: View {
             }
             .padding(.horizontal)
             TabView(selection: $index) {
-                ForEach(pages) { page in
+                ForEach(pages.filter { $0.id <= pageLimit }) { page in
                     ScrollView {
                         LazyVStack(spacing: 18) {
                             Image(systemName: page.symbol).font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
@@ -87,6 +89,7 @@ struct OnboardingView: View {
                     }
                     .tag(page.id)
                 }
+                if pages.count <= pageLimit {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         Image(systemName: "envelope.badge.shield.half.filled").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
@@ -103,7 +106,7 @@ struct OnboardingView: View {
                                             Text(EmailExplainer.text).font(.footnote).foregroundStyle(.secondary)
                         VStack(alignment: .leading, spacing: 4) {
                             MailAppPicker()
-                            Text("When we prepare an email to a company, it opens in this app. You can change it any time in About.").font(.footnote).foregroundStyle(.secondary)
+                            Text("When we prepare an email to a company, it opens in this app. You can change it any time in Settings.").font(.footnote).foregroundStyle(.secondary)
                         }
                         if !emailValid {
                             Label("Enter a valid email address to continue.", systemImage: "exclamationmark.circle")
@@ -114,6 +117,8 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(pages.count)
+                }
+                if pages.count + 1 <= pageLimit {
                 ScrollView {
                     // Lazy, so the end marker only appears once the person has scrolled to the bottom.
                     LazyVStack(spacing: 16) {
@@ -132,10 +137,12 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(pages.count + 1)
-                if showsTerms {
+                }
+                if showsTerms, pages.count + 2 <= pageLimit {
                     ScrollView { LazyVStack { TermsOnboardingPage().padding(.horizontal, 28); endMarker(pages.count + 2) } }
                         .tag(pages.count + 2)
                 }
+                if autoIndex - 1 <= pageLimit {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         Image(systemName: "iphone.badge.play").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
@@ -147,12 +154,14 @@ struct OnboardingView: View {
                             Label("We never store it and never send it anywhere else.", systemImage: "lock.shield")
                         }.font(.callout)
                         AdIDPermissionControl()
-                        Text("You can skip this. Those brokers will then need it later, and About has the same button.").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        Text("You can skip this. Those brokers will then need it later, and Settings has the same button.").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
                         endMarker(autoIndex - 1)
                     }
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex - 1)
+                }
+                if autoIndex <= pageLimit {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         Image(systemName: "bolt.shield").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
@@ -177,11 +186,13 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(autoIndex)
+                }
+                if lastIndex <= pageLimit {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         Image(systemName: "info.circle").font(.system(size: 64)).foregroundStyle(.tint).padding(.top, 40)
-                        Text("Your settings are in About").font(.title.bold()).multilineTextAlignment(.center)
-                        Text("Tap About, the last tab, any time to change what you chose here and find more.").multilineTextAlignment(.center)
+                        Text("Your settings are in Settings").font(.title.bold()).multilineTextAlignment(.center)
+                        Text("Tap Settings, the last tab, any time to change what you chose here and find more.").multilineTextAlignment(.center)
                         VStack(alignment: .leading, spacing: 10) {
                             Label("Your email address and mail app", systemImage: "envelope")
                             Label("The advertising ID, to share it or copy it", systemImage: "iphone.badge.play")
@@ -194,6 +205,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                 }
                 .tag(lastIndex)
+                }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             // Swiping forward past a page not yet read to its bottom (or not yet filled in) snaps back; going back is always allowed.
@@ -221,10 +233,9 @@ struct OnboardingView: View {
                     .font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("onboarding-scroll-hint")
             }
             HStack {
-                Spacer()
                 if index < lastIndex {
-                    Button("Next") { commitEmail(); withAnimation { index += 1 } }
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-next")
+                    Button { commitEmail(); withAnimation { index += 1 } } label: { Text("Next").font(.headline).frame(maxWidth: .infinity, minHeight: 36) }
+                        .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("onboarding-next")
                         .disabled(!canLeave(index))
                 } else {
                     Button("Start") {      // the choice to turn on automatic protection was made on the page before; this page only points to About
@@ -236,7 +247,7 @@ struct OnboardingView: View {
                         // They said yes: ask for what is missing now, instead of leaving automatic opt-out switched on but waiting.
                         if autoOptOut { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { model.requireProfile { } } }
                     }
-                    .buttonStyle(.borderedProminent).accessibilityIdentifier("onboarding-done")
+                    .buttonStyle(.borderedProminent).controlSize(.large).font(.headline).frame(maxWidth: .infinity, minHeight: 36).accessibilityIdentifier("onboarding-done")
                     .disabled(!reached.contains(lastIndex))
                 }
             }
@@ -289,8 +300,11 @@ struct StateRulesView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Where we found this").font(.footnote.bold())
                         ForEach(j.sourceLinks) { link in
-                            Link(destination: URL(string: link.url)!) {
-                                Label("\(link.title) (\(URL(string: link.url)?.host ?? ""))", systemImage: "link").font(.caption)
+                            // A link whose address cannot be read is left out, not trusted with a force unwrap.
+                            if let url = URL(string: link.url) {
+                                Link(destination: url) {
+                                    Label("\(link.title) (\(url.host ?? ""))", systemImage: "link").font(.caption)
+                                }
                             }
                         }
                     }
@@ -370,7 +384,7 @@ struct TermsOnboardingPage: View {
 
     @ViewBuilder private var status: some View {
         if model.termsActive {
-            Label("On. You can turn it off in About.", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+            Label("On. You can turn it off in Settings.", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                 .accessibilityIdentifier("onboarding-terms-status")
             Button("Turn off", role: .destructive) { model.revokeTerms() }.accessibilityIdentifier("onboarding-terms-off")
         } else if model.termsReviewedCount > 0 {

@@ -53,8 +53,15 @@ enum FormRun {
     }
 
     /// Whether a page says an email will follow with more to do (a confirmation link, a verification message, "check your inbox").
+    /// Wording that only says the site may write to you, or asks to "confirm your identity" without an email, is not enough.
     nonisolated static func mentionsEmailFollowUp(_ text: String) -> Bool {
-        text.lowercased().range(of: "check your (e-?mail|inbox|spam)|(emailed|e-?mailed|sent) (you |the address[^.]{0,30})?an? (confirmation|verification) (link|e-?mail|message)|confirm your (e-?mail|request|identity)|(sent|send|sending|email|emailed|e-?mail) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| have| are going to)? (send|email|receive)[^.]{0,40}(e-?mail|link)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
+        text.lowercased().range(of: "check your (e-?mail|inbox|spam)|(emailed|e-?mailed|sent) (you |the address[^.]{0,30})?an? (confirmation|verification) (link|e-?mail|message)|confirm your (e-?mail|request)|(sent|sending|emailed|e-?mailed) (you )?an? (e-?mail|message|link)|(we|you)('ll| will| are going to)? (send|email|receive) (you )?(an? )?[^.]{0,40}(confirmation|verification|follow-?up) (e-?mail|link|message)|verif(y|ication)[^.]{0,30}(e-?mail|link)|follow-?up e-?mail|link (in|from) (the|that|our|this) e-?mail|click (on )?the (confirmation )?link|e-?mail (with|containing) (a |the )?(link|instructions|next steps)|additional (information|steps) (will be|is|are) (sent|required)", options: .regularExpression) != nil
+    }
+
+    /// True when the page says, with confidence, that the whole request is finished and no email follows: its text says so and does not mention an email step.
+    /// Anything less and a person is asked ("Is it completely done?").
+    nonisolated static func finishIsCertain(_ text: String) -> Bool {
+        looksFinished(text) && !mentionsEmailFollowUp(text)
     }
 
     nonisolated static func classify(_ text: String) -> SubmitOutcome {

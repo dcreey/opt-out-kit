@@ -3,7 +3,7 @@ import Foundation
 public enum SubmitOutcome: Equatable, Sendable {
     case submitted(awaitingEmail: Bool)   // a success message was seen; awaitingEmail when it asks for an email confirmation
     case filledNotSubmitted               // dry run: the form was filled and left unsent
-    case challenged(String)               // a visible bot check, terms prompt or similar stopped the run; never solved or accepted
+    case challenged(String)               // a visible human check, terms prompt or similar stopped the run; never solved or accepted
     case rejected(String)                 // the site refused or flagged a field
     case failed(String)                   // no success message was seen, so nothing is claimed
 }
@@ -77,7 +77,7 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
 }
 
 /// Sends opt-out requests automatically for the sites whose form we found, and says plainly what it could not do.
-/// Rules it keeps: it never solves a bot check or accepts terms; it sends nothing to a site where a recent look found no
+/// Rules it keeps: it never solves a human check or accepts terms; it sends nothing to a site where a recent look found no
 /// listing; it sends each site at most once per `minInterval`; and a person's details go only to forms that ask for them.
 public struct AutoOptOut: Sendable {
     public static let defaultMinInterval: TimeInterval = 30 * 86_400

@@ -31,7 +31,7 @@ Ask once, store only on the phone. Collect what brokers match on, because a miss
 | Birthdate | Some forms require it | Optional; sent only to brokers whose YAML lists it |
 
 **When edits are saved.** Nothing is written while the profile is being edited, not even on leaving a field. The edits (including the household email) stay in the
-editor and are written once, in one save, when the person taps Done or Continue or closes the editor (`AppModel.saveProfile`).
+editor and are written once, in one save, when the person taps Done or Continue, closes the editor, or leaves or closes the app (home, the app switcher; the scene is no longer active) (`AppModel.saveProfile`). The write is wrapped in a background task so iOS lets it finish as the app closes.
 
 Relatives are not a field: add a relative as another person (with a relationship) and they get their own profile and
 queue.
@@ -69,17 +69,19 @@ data is gone. Back up your phone as usual and it comes with it."
 
 Not yet verified on a real backup and restore. An explicit passphrase-protected export is a possible later addition.
 
+The last tab is **Settings** (it was called About): the mail app, advertising ID, automatic protection, "Send forms for me by default", accepting site terms (with its Turn off), the walkthrough replays and the information about the app all live there.
+
 ## Two walkthroughs
 
 - **First install** (`OnboardingView`): the promise, the email, the place and its rules, terms, the advertising ID (one button to share it with the app, which iOS
-  asks once; afterwards only iOS Settings can change it), automatic protection, and a last page pointing to About. Its final button is plain "Start": the
-  automatic-protection choice was made on the page before. There is no Skip: every page must be scrolled to its bottom before Next works (a short page counts at once), swiping forward past an unread page snaps back, and a hint says "Scroll to the bottom to continue." Start, on the last page, takes the person to the email or the place's rules if either is still missing.
+  asks once; afterwards only iOS Settings can change it), automatic protection, and a last page pointing to Settings. Its final button is plain "Start": the
+  automatic-protection choice was made on the page before. There is no Skip: every page must be scrolled to its bottom before Next works (a short page counts at once), the next page does not exist to swipe to until the current one is read (a forward swipe just stops; going back is always allowed), and a hint says "Scroll to the bottom to continue." Start, on the last page, takes the person to the email or the place's rules if either is still missing.
 - **Guided sites** (`GuidedIntro`): shown once before the first Solve and send or manual site, so nothing runs behind it. It shows an example page, the "..."
   options, what a site needs, why the wording is scary, and the emails that follow. Skip leaves it; neither walkthrough blocks the other.
 - The first walkthrough's **Start** button is never disabled. When the email or the reading of the place's rules is still missing, Start takes the person to that page; a replayed walkthrough counts the saved email and an already chosen place as done from the first page.
 - **The prompt is only raised on screen.** Apple's tracking prompt shows only while the app is in the foreground; asked from a background run, iOS answers "denied" without showing it and never offers the switch again. `AdvertisingID.current()` therefore asks only when the app is active and otherwise returns nil, leaving the choice open for the next time the app is on screen (a form that asks for the ID, the walkthrough page, or About).
-- **Advertising ID refused:** iOS asks once. After a refusal the walkthrough page and About show the same text and an Open Settings button: Settings, Privacy & Security, Tracking, switch Exnay on (first switch on Allow Apps to Request to Track if Exnay is not listed), or Allow Tracking in the app's own Settings page when it is shown. Without it, forms that ask for the ID go without it.
-- Both are replayed from About ("Replay the walkthrough", "Replay the guided sites walkthrough"), which also holds the advertising ID button.
+- **Advertising ID refused:** iOS asks once. After a refusal the walkthrough page and Settings show the same text and an Open Settings button: Settings, Privacy & Security, Tracking, switch Exnay on (first switch on Allow Apps to Request to Track if Exnay is not listed), or Allow Tracking in the app's own Settings page when it is shown. Without it, forms that ask for the ID go without it.
+- Both are replayed from Settings ("Replay the walkthrough", "Replay the guided sites walkthrough"), which also holds the advertising ID button.
 
 ## Privacy promise (shown at first launch, and in Settings)
 
@@ -102,6 +104,10 @@ reproducible-build note in the repo.
 | **4. Email or letter** | No form; email or mail only | Drafts the message from the profile; opens the share sheet | Sends it | Covered-person and expungement requests, small brokers |
 | **5. Hard steps** | Phone code, ID upload, account | Coaching card: what will happen, what to redact | Does the step | MyLife, WhitePages, PimEyes-style sites |
 | **Blocked** | Cloudflare returns 403 to scripts | Nothing scripted; opens in real Safari View Controller | Passes the check like any visit | About 14% of probed sites, including BeenVerified, Intelius, WhitePages |
+
+Every guide's … menu (Solve and send, the guided steps, Email links) has **Open in my browser**: the page goes to the phone's default browser, and "Did you complete it?" is already waiting when the person returns, as with another mail app. Yes finishes the site the way that flow finishes one (Mark as done, the guided Finish, Mark completed); No changes nothing.
+
+**Is it completely done?** A site that looks sent may still email a link, sometimes several. So in every flow with a person on screen (Solve and send, the guided steps, Email links) a confirmation is believed on its own only when the page says the whole request is finished and mentions no email. Otherwise the person is asked: *Yes, completely done*; *An email is still to come*; *I am not sure* (kept on the waiting list); and, after they tapped Mark as done or Mark completed, *Not yet*. The … menu of each of those flows also has **There is another email step**, and the Email links waiting list's Done button asks whether that was the last step or another is coming; steps finished so far are shown. The background run has nobody to ask, so it keeps the older rule: an email step only when the page says so.
 
 Type 1 is the best ratio: it removes the most sites for the least effort, so it goes first in the queue and gets the
 biggest reward ("51 sites cleared").

@@ -17,7 +17,7 @@ public enum OptOutMethod: String, CaseIterable, Sendable {
     public var explanation: String {
         switch self {
         case .automatic: return L10n.t("The app fills in the site's form and sends it on its own.")
-        case .semiAutomatic: return L10n.t("The app fills in the form and sends it. You solve the bot check (and confirm an email if the site sends one).")
+        case .semiAutomatic: return L10n.t("The app fills in the form and sends it. You solve the human check (and confirm an email if the site sends one).")
         case .emailOnly: return L10n.t("This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.")
         case .guided: return L10n.t("The app opens the right page and walks you through each step. Some steps need things only you can do.")
         case .manual: return L10n.t("We could not read this site's opt-out page. Look for its privacy or \"do not sell\" link and follow it yourself.")
@@ -45,9 +45,13 @@ public enum OptOutMethods {
         // questions the app cannot read). These hold whether the form was read from the page or found live.
         if let live = e.liveForm {
             if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
-            if live.blockers.contains("agent") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for an authorized agent's details, so we take you to the page and walk you through it.")) }
-            if live.blockers.contains("other") { return MethodVerdict(method: .guided, reason: L10n.t("This form has questions the app cannot read, so we take you to the page and walk you through it.")) }
-            if live.blockers.contains("file") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("agent") { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for an authorized agent's details. We fill in what we can; you finish the rest in the page and press its own button.")) }
+            if live.blockers.contains("other") { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form has questions the app cannot read. We fill in what we can; you answer the rest in the page and press its own button.")) }
+            if live.blockers.contains("file") {
+                // A face photo or a signature is never handed over for the person: a site that carries a caution stays guided.
+                if e.caution != nil { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
+                return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for a file or a signature. We fill in what we can; you add the file and press the page's own button."))
+            }
         }
         guard let form = e.optOutForm else {
             if let live = e.liveForm, live.found {
@@ -87,7 +91,7 @@ public enum OptOutMethods {
                 if run.result == "failed" {
                     return MethodVerdict(method: .guided, reason: L10n.f("A real run on %@ did not go through (%@), so you do this one with a guide.", run.date, run.note ?? "-"))
                 }
-                // Confirmed counts unless the page also shows something this person must clear (a bot check, a box they may not tick).
+                // Confirmed counts unless the page also shows something this person must clear (a human check, a box they may not tick).
                 let personMustClear = (e.liveCheck?.blockers ?? []).contains { b in
                     !(b.hasPrefix("certify:") && confirmingIdentity && FormFiller.isSelfIdentityBox(String(b.dropFirst(8))))
                 }
@@ -105,14 +109,14 @@ public enum OptOutMethods {
                 // Never loaded on a real page, so we cannot promise nothing will ask for a check. Anything a person might have to
                 // solve is not fully automated: it is semi-automated until a real load shows the form is clear.
                 if signals.contains(where: { $0.hasPrefix("captcha_") }) {
-                    return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The page mentions a bot check and we have not loaded it to see whether one appears."))
+                    return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The page mentions a human check and we have not loaded it to see whether one appears."))
                 }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We have not loaded this form on a real page yet, so a check might appear. You solve it if one does."))
             }
             // Measured: what really blocked the form when the page was loaded.
             for blocker in live.blockers {
                 if blocker.hasPrefix("certify:"), confirmingIdentity, FormFiller.isSelfIdentityBox(String(blocker.dropFirst(8))) { continue }
-                let what = blocker.hasPrefix("check") ? "a bot check" : blocker.hasPrefix("terms") ? "a terms prompt" : "a confirmation box"
+                let what = blocker.hasPrefix("check") ? "a human check" : blocker.hasPrefix("terms") ? "a terms prompt" : "a confirmation box"
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.f("We fill in and send the form; the page shows %@ that you handle.", what))
             }
             // Nothing blocked the form at load, but a real send is what proves a site takes it with no human check: until a reviewed real run

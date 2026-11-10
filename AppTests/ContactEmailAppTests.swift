@@ -82,3 +82,44 @@ final class ContactEmailAppTests: XCTestCase {
         }
     }
 }
+
+@MainActor
+final class BrowserHandoffTests: XCTestCase {
+    func testOpeningAsksAtOnceAndYesFinishesNoDoesNot() {
+        let h = BrowserHandoff()
+        var opened: [URL] = []
+        h.open(URL(string: "https://example.com/optout")!) { opened.append($0) }
+        XCTAssertTrue(h.asking); XCTAssertEqual(opened.count, 1)
+        var finished = 0
+        h.answer(completed: false) { finished += 1 }
+        XCTAssertFalse(h.asking); XCTAssertEqual(finished, 0)
+        h.open(URL(string: "https://example.com/optout")!) { _ in }
+        h.answer(completed: true) { finished += 1 }
+        XCTAssertEqual(finished, 1)
+    }
+
+    func testOnlyWebAddressesOpen() {
+        let h = BrowserHandoff()
+        h.open(URL(string: "file:///etc/passwd")!) { _ in XCTFail("not a web page") }
+        XCTAssertFalse(h.asking)
+    }
+}
+
+import SwiftUI
+
+final class RowFieldTests: XCTestCase {
+    private struct Row { var name: String }
+
+    func testARowDeletedUnderTheBindingGivesTheDefaultAndIgnoresStoresInsteadOfTrapping() {
+        var rows = [Row(name: "a"), Row(name: "b")]
+        let list = Binding(get: { rows }, set: { rows = $0 })
+        let second = RowField.binding(list, 1, \Row.name, default: "")
+        XCTAssertEqual(second.wrappedValue, "b")
+        second.wrappedValue = "B"; XCTAssertEqual(rows[1].name, "B")
+        rows.remove(at: 1)                                        // the row is deleted; SwiftUI still holds its binding
+        XCTAssertEqual(second.wrappedValue, "", "no trap: the default")
+        second.wrappedValue = "late"; XCTAssertEqual(rows.count, 1, "a late store is ignored")
+        rows.removeAll()
+        XCTAssertEqual(RowField.binding(list, 0, \Row.name, default: "x").wrappedValue, "x")
+    }
+}

@@ -210,7 +210,7 @@ The POC is done when one person on an iPhone can opt out of three brokers, one p
 ## Risks and open questions
 
 - **Breakage.** Opt-out pages change often; [BADBOOL](https://github.com/yaelwrites/Big-Ass-Data-Broker-Opt-Out-List) warns the same. Mitigation: a last-verified date on every broker, a "report broken step" button, and easy pull requests.
-- **Bot checks.** Brokers may challenge or block webviews, and even the real browser. Mitigation: milestone 2 measures it before the app is built around a surface.
+- **Human checks.** Brokers may challenge or block webviews, and even the real browser. Mitigation: milestone 2 measures it before the app is built around a surface.
 - **Disclosure to remove.** Opt-outs usually require handing over data. Mitigation: the user confirms a listing first, the app sends the minimum, and it shows exactly what each broker will receive.
 - **Terms of service.** Some brokers refuse agents. The app automates nothing, the user submits their own data, and PeopleConnect stays fully user-driven. Needs a legal read before release.
 - **Manipulative flows.** Brokers use dark patterns (EPIC has a [2026 report](https://epic.org/wp-content/uploads/2026/05/Good-Luck-Opting-Out-Manipulative-Design-Patterns-in-Opt-Out-Processes.pdf) listed in BADBOOL). The guide should name the trap, such as "don't buy a report".

@@ -93,11 +93,11 @@ public enum Describe {
     ] }
 
     private static var profiled: [String: String] { [
-        "captcha_turnstile": L10n.t("A bot check (Cloudflare Turnstile)"),
-        "captcha_recaptcha": L10n.t("A bot check (reCAPTCHA)"),
-        "captcha_hcaptcha": L10n.t("A bot check (hCaptcha)"),
-        "captcha_perimeterx": L10n.t("A bot check (PerimeterX)"),
-        "captcha_datadome": L10n.t("A bot check (DataDome)"),
+        "captcha_turnstile": L10n.t("A human check (Cloudflare Turnstile)"),
+        "captcha_recaptcha": L10n.t("A human check (reCAPTCHA)"),
+        "captcha_hcaptcha": L10n.t("A human check (hCaptcha)"),
+        "captcha_perimeterx": L10n.t("A human check (PerimeterX)"),
+        "captcha_datadome": L10n.t("A human check (DataDome)"),
         "email_input": L10n.t("Asks for your email"),
         "name_input": L10n.t("Asks for your name"),
         "listing_url_input": L10n.t("Asks for the link to your listing"),
@@ -111,7 +111,7 @@ public enum Describe {
         "email_contact": L10n.t("Lists an email address for requests"),
         "script_rendered_page": L10n.t("Page is built by JavaScript"),
         "script_rendered_form": L10n.t("Form is built by JavaScript"),
-        "bot_check_on_home": L10n.t("Shows a bot check before anything else"),
+        "bot_check_on_home": L10n.t("Shows a human check before anything else"),
     ] }
 
     public static func signal(_ tag: String) -> String {

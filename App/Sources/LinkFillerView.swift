@@ -106,6 +106,8 @@ struct LinkFillerView: View {
     @State private var showTour = false
     @State private var finished = false
     @State private var showDone = false
+    @StateObject private var browserHandoff = BrowserHandoff()
+    @StateObject private var finishQuestion = FinishQuestion()
     var startLink: String = ""
 
     var body: some View {
@@ -177,9 +179,15 @@ struct LinkFillerView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.entry.name).font(.body)
                                 Text(Loc.f("Sent %@; look for their email", item.since.formatted(date: .abbreviated, time: .omitted))).font(.caption).foregroundStyle(.secondary)
+                                let steps = model.followUpStepsDone(item.entry.id)
+                                if steps > 0 { Text(Loc.f("%lld email steps finished so far; waiting on the next", steps)).font(.caption).foregroundStyle(.secondary) }
                             }
                             Spacer()
-                            Button("Done") { model.markFollowUpDone(item.entry.id) }.buttonStyle(.bordered)
+                            // Finishing a step: another may follow (a site can send several), so the person says which.
+                            Menu("Done") {
+                                Button("That was the last step") { model.markFollowUpDone(item.entry.id) }.accessibilityIdentifier("followup-last-\(item.entry.domain)")
+                                Button("Done, and another email step is coming") { model.markFollowUpDone(item.entry.id); model.addFollowUpStep(item.entry.id) }.accessibilityIdentifier("followup-more-\(item.entry.domain)")
+                            }.buttonStyle(.bordered).accessibilityIdentifier("followup-done-\(item.entry.domain)")
                         }
                     }
                 } header: { Text("Waiting on an email") } footer: { Text("These sites said they would email you with more to do. Paste the link from that email above, or tap Done if you finished it another way.") }
@@ -193,7 +201,7 @@ struct LinkFillerView: View {
             GuideSurface(topInset: 0) {
                 HStack(spacing: 10) {
                     Menu {
-                        PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy, details: model.pageDetails) {
+                        PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy, details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { if case .known(let id, _, _, _)? = check { model.addFollowUpStep(id) } }) {
                             if let me = model.selectedPerson { model.requireProfile { Task { await filler.fill(person: model.formPerson(me), termsPolicy: model.makeTermsPolicy()) } } }
                         }
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
@@ -213,12 +221,14 @@ struct LinkFillerView: View {
             GuideBoundary()
             WebViewHost(webView: web)
         }
+        .browserHandoffAlert(browserHandoff) { if case .known(let id, _, _, _)? = check { Task { await finish(id) } } else { returnToChooser() } }
+        .finishQuestionAlert(finishQuestion)
     }
 
     /// Mark completed is always there: it finishes the request for the site the link matched, or it is dimmed and the line below says why it cannot.
     private var markCompletedButton: some View {
         let matched: String? = { if case .known(let id, _, _, _)? = check { return id } else { return nil } }()
-        return Button { if let matched { complete(matched) } } label: { Text("Mark completed") }
+        return Button { if let matched { Task { await finish(matched) } } } label: { Text("Mark completed") }
             .font(.callout.bold())
             .disabled(matched == nil || showDone).opacity(matched == nil ? 0.45 : 1).accessibilityIdentifier("link-finished")
     }
@@ -251,10 +261,23 @@ struct LinkFillerView: View {
         }
     }
 
-    /// The request is finished: the site leaves the waiting list, the green check shows, and the tab goes back to an empty link box.
-    private func complete(_ id: String) {
+    /// Asks "Is it completely done?" first unless the page says with confidence that it is; "not yet" leaves the person where they are.
+    private func finish(_ id: String) async {
         guard !showDone else { return }
-        model.completeFromLink(id)
+        let text = await filler.pageText()
+        if FormRun.finishIsCertain(text) { complete(id); return }
+        let name = { if case .known(_, let n, _, _)? = check { return n } else { return filler.host } }()
+        switch await finishQuestion.ask(site: name, pageSaidEmail: FormRun.mentionsEmailFollowUp(text), allowsNotYet: true) {
+        case .done: complete(id)
+        case .emailFollows, .unsure: complete(id, moreEmail: true)
+        case .notYet: break
+        }
+    }
+
+    /// The request is finished: the site leaves the waiting list, the green check shows, and the tab goes back to an empty link box.
+    private func complete(_ id: String, moreEmail: Bool = false) {
+        guard !showDone else { return }
+        model.completeFromLink(id, moreEmail: moreEmail)
         withAnimation { showDone = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation { showDone = false }; returnToChooser() }
     }
@@ -270,7 +293,8 @@ struct LinkFillerView: View {
             let added = FormRun.newText(before: baseline, after: now)
             baseline = now
             if FormRun.looksFinished(added) {
-                if case .known(let id, _, _, _)? = check { complete(id) }
+                // Finished with no word of an email: done. Finished but mentioning an email: asked, since another step may follow.
+                if case .known(let id, _, _, _)? = check { if FormRun.finishIsCertain(added) { complete(id) } else { await finish(id) } }
                 else { withAnimation { showDone = true }; DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { withAnimation { showDone = false }; returnToChooser() } }
                 return
             }

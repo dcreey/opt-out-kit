@@ -8,7 +8,7 @@ public struct PlanTask: Identifiable, Equatable, Sendable {
         case site(String)          // a directory site, by entry id (the lead site when sites share one opt-out)
         case automatic             // every site the app opts out of by itself: one task, one run
         case emails                // every site that takes opt-outs by email: one task, one message per address
-        case verify                // every form that only needs the person to tick a bot check: one task, one tap per page
+        case verify                // every form that only needs the person to tick a human check: one task, one tap per page
     }
     public var kind: Kind
     public var title: String

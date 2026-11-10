@@ -415,7 +415,7 @@
     }
    }
   },
-  "A bot check (Cloudflare Turnstile)": {
+  "A human check (Cloudflare Turnstile)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -438,7 +438,7 @@
     }
    }
   },
-  "A bot check (DataDome)": {
+  "A human check (DataDome)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -461,7 +461,7 @@
     }
    }
   },
-  "A bot check (PerimeterX)": {
+  "A human check (PerimeterX)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -484,7 +484,7 @@
     }
    }
   },
-  "A bot check (hCaptcha)": {
+  "A human check (hCaptcha)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -507,7 +507,7 @@
     }
    }
   },
-  "A bot check (reCAPTCHA)": {
+  "A human check (reCAPTCHA)": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -7660,7 +7660,7 @@
     }
    }
   },
-  "Shows a bot check before anything else": {
+  "Shows a human check before anything else": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -7821,7 +7821,7 @@
     }
    }
   },
-  "Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you.": {
+  "Solve the human check, tick any confirmation box and accept terms yourself if asked. We wait for you.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -8281,7 +8281,7 @@
     }
    }
   },
-  "The app fills in the form and sends it. You solve the bot check (and confirm an email if the site sends one).": {
+  "The app fills in the form and sends it. You solve the human check (and confirm an email if the site sends one).": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -8534,7 +8534,7 @@
     }
    }
   },
-  "The page mentions a bot check and we have not loaded it to see whether one appears.": {
+  "The page mentions a human check and we have not loaded it to see whether one appears.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
@@ -8971,48 +8971,48 @@
     }
    }
   },
-  "This form asks for a file or a signature, so we take you to the page and walk you through it.": {
+  "This form asks for a file or a signature. We fill in what we can; you add the file and press the page's own button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ce formulaire demande un fichier ou une signature : nous vous emmenons sur la page et vous guidons."
+      "value": "Ce formulaire demande un fichier ou une signature. Nous remplissons ce que nous pouvons ; vous ajoutez le fichier et appuyez sur le bouton de la page."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Este formulario pide un archivo o una firma, así que te llevamos a la página y te guiamos."
+      "value": "Este formulario pide un archivo o una firma. Rellenamos lo que podemos; tú añades el archivo y pulsas el botón de la página."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dieses Formular verlangt eine Datei oder Unterschrift, daher führen wir Sie zur Seite und begleiten Sie."
+      "value": "Dieses Formular verlangt eine Datei oder eine Unterschrift. Wir füllen aus, was wir können; du fügst die Datei hinzu und drückst die Schaltfläche der Seite."
      }
     }
    }
   },
-  "This form asks for an authorized agent's details, so we take you to the page and walk you through it.": {
+  "This form asks for an authorized agent's details. We fill in what we can; you finish the rest in the page and press its own button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ce formulaire demande les coordonnées d'un mandataire : nous vous emmenons sur la page et vous guidons."
+      "value": "Ce formulaire demande les coordonnées d'un mandataire. Nous remplissons ce que nous pouvons ; vous terminez dans la page et appuyez sur son bouton."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Este formulario pide datos de un representante autorizado, así que te llevamos a la página y te guiamos."
+      "value": "Este formulario pide los datos de un representante autorizado. Rellenamos lo que podemos; tú terminas en la página y pulsas su botón."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dieses Formular fragt nach den Angaben eines Bevollmächtigten, daher führen wir Sie zur Seite und begleiten Sie."
+      "value": "Dieses Formular verlangt die Angaben eines Bevollmächtigten. Wir füllen aus, was wir können; du beendest den Rest in der Seite und drückst deren Schaltfläche."
      }
     }
    }
@@ -9036,29 +9036,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieses Formular fragt nach Geschäftsangaben („%@“); es ist ein Geschäftskontaktformular und kein persönliches Opt-out."
-     }
-    }
-   }
-  },
-  "This form asks for business details, so we take you to the page and walk you through it.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ce formulaire demande des informations professionnelles : nous vous emmenons sur la page et vous guidons."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Este formulario pide datos de empresa, así que te llevamos a la página y te guiamos."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dieses Formular fragt nach Geschäftsangaben, daher führen wir Sie zur Seite und begleiten Sie."
      }
     }
    }
@@ -9178,25 +9155,25 @@
     }
    }
   },
-  "This form has questions the app cannot read, so we take you to the page and walk you through it.": {
+  "This form has questions the app cannot read. We fill in what we can; you answer the rest in the page and press its own button.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ce formulaire pose des questions que l'app ne peut pas lire : nous vous emmenons sur la page et vous guidons."
+      "value": "Ce formulaire pose des questions que l'app ne peut pas lire. Nous remplissons ce que nous pouvons ; vous répondez au reste dans la page et appuyez sur son bouton."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Este formulario tiene preguntas que la app no puede leer, así que te llevamos a la página y te guiamos."
+      "value": "Este formulario tiene preguntas que la app no puede leer. Rellenamos lo que podemos; tú respondes el resto en la página y pulsas su botón."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dieses Formular hat Fragen, die die App nicht lesen kann, daher führen wir Sie zur Seite und begleiten Sie."
+      "value": "Dieses Formular hat Fragen, die die App nicht lesen kann. Wir füllen aus, was wir können; du beantwortest den Rest in der Seite und drückst deren Schaltfläche."
      }
     }
    }

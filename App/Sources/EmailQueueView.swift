@@ -107,7 +107,7 @@ struct EmailQueueView: View {
     }
 }
 
-/// The forms that only need a bot check ticked. Each page is loaded and filled in for the person in turn; they tick the box, the app sends it.
+/// The forms that only need a human check ticked. Each page is loaded and filled in for the person in turn; they tick the box, the app sends it.
 struct VerifyQueueView: View {
     @EnvironmentObject var model: AppModel
     let domains: [String]

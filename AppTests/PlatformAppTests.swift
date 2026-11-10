@@ -258,7 +258,7 @@ final class RunReportTests: XCTestCase {
     func testAnAllSentRunIsAllSucceededAndAMixedOneListsWhatNeedsThePerson() {
         let ok = RunReport(person: "Me", rows: [row("a", .submitted(awaitingEmail: false)), row("b", .submitted(awaitingEmail: true)), row("c", .tooSoon(until: Date()))])
         XCTAssertTrue(ok.allSucceeded); XCTAssertEqual(ok.sent, 2); XCTAssertEqual(ok.attempted, 2, "a site skipped as recently sent was not tried")
-        let mixed = RunReport(person: "Me", rows: [row("a", .submitted(awaitingEmail: false)), row("b", .failed("no confirmation")), row("c", .challenged("bot check")), row("d", .skippedNotListed)])
+        let mixed = RunReport(person: "Me", rows: [row("a", .submitted(awaitingEmail: false)), row("b", .failed("no confirmation")), row("c", .challenged("human check")), row("d", .skippedNotListed)])
         XCTAssertFalse(mixed.allSucceeded)
         XCTAssertEqual(mixed.attempted, 3); XCTAssertEqual(mixed.sent, 1)
         XCTAssertEqual(mixed.needYou.map(\.id), ["b", "c"])

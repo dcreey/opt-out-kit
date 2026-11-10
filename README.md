@@ -15,7 +15,7 @@ only to the broker sites they opt out of.
   plain-language briefing with a best-case and worst-case example.
 - **Four ways to opt out**, chosen per site from what was actually found:
   - *Automatic*: the app fills in and sends the form itself. Only sites whose form was seen working on a reviewed real send are in this group.
-  - *Semi-automatic*: the app opens the live form and fills it in; the person clears a bot check or a confirm step and presses the page's own button.
+  - *Semi-automatic*: the app opens the live form and fills it in; the person clears a human check or a confirm step and presses the page's own button.
   - *Guided*: the app opens the page and walks the person through it, because the form needs something the app cannot supply.
   - *Email*: one opt-out email to the privacy addresses of the day's sites, sent from the person's own mail app, with the person's other names, emails and previous addresses so a record held under any of them is found.
 - **Email links tab.** Some opt-outs finish with a link in an email. The person pastes it; the app checks it against the directory and the sites already
@@ -35,7 +35,7 @@ See [docs/REGIONS.md](docs/REGIONS.md) and [docs/FUTURE-WORK.md](docs/FUTURE-WOR
 
 ## What it will not do
 
-- It never solves a bot check, accepts terms on someone's behalf without a reviewed list, or fills in a sign-up, newsletter, demo or contact form. Sites whose
+- It never solves a human check, accepts terms on someone's behalf without a reviewed list, or fills in a sign-up, newsletter, demo or contact form. Sites whose
   form turned out to be one are moved to guided, and a test fails if one is set to be filled automatically.
 - It never sends a person's details anywhere but the broker being opted out of.
 - It does not give legal advice. Broker pages change often; the directory records when each was last checked.
@@ -44,7 +44,7 @@ See [docs/REGIONS.md](docs/REGIONS.md) and [docs/FUTURE-WORK.md](docs/FUTURE-WOR
 
 | Path | What is in it |
 |---|---|
-| `App/` | The SwiftUI app: queue, sites, email links, About, the live-form engine (`LiveForms.swift`), the audit harness (`FormAudit.swift`, debug only) |
+| `App/` | The SwiftUI app: queue, sites, email links, Settings, the live-form engine (`LiveForms.swift`), the audit harness (`FormAudit.swift`, debug only) |
 | `Packages/OptOutKitCore/` | The core Swift package: planning and ranking, method classification, form filling, regions, jurisdictions, persistence, tests |
 | `directory/` | One YAML file per broker site: form, live-form findings, run checks, about, category, persistence, regions, languages, contact email |
 | `brokers/`, `platforms/` | Hand-written walkthroughs, and one-request services such as California DROP |

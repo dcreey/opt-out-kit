@@ -4,7 +4,7 @@ import Yams
 /// How far a site can be automated, as judged by tools/profile_brokers.py from the shape of its opt-out page.
 public enum Automation: String, Codable, Sendable {
     case scriptable          // plain form: a script could drive it
-    case guided              // a person must do part of it (bot check, phone, ID, email only)
+    case guided              // a person must do part of it (human check, phone, ID, email only)
     case needsBrowser = "needs_browser"   // built by JavaScript; needs a real browser even to read
     case blocked             // refuses plain requests
     case robotsDisallowed = "robots_disallowed"
@@ -145,7 +145,7 @@ public struct LiveCheck: Codable, Equatable, Hashable, Sendable {
 }
 
 /// What opening the site's page in a real browser (scripts running) found when the crawler had not read a form: whether an opt-out form is
-/// there, on which page, and what a person would have to clear before sending (a bot check, a terms prompt, a confirmation box).
+/// there, on which page, and what a person would have to clear before sending (a human check, a terms prompt, a confirmation box).
 public struct LiveFormCheck: Codable, Equatable, Hashable, Sendable {
     public var checked: String
     public var found: Bool

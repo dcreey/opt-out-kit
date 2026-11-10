@@ -2,7 +2,7 @@ import Foundation
 import OptOutKitCore
 
 /// Sends the opt-out forms of one page the person is looking at (Email links): waits for them to clear what the page asks, sends each opt-out form in turn through
-/// the same page code Solve and send uses, and reads the answer. With sending for the person off, or when the page's bot check refuses a scripted press, the person
+/// the same page code Solve and send uses, and reads the answer. With sending for the person off, or when the page's human check refuses a scripted press, the person
 /// presses the page's own button and the confirmation is noticed. Nil while still waiting or if stopped.
 @MainActor
 enum PageSender {
@@ -32,7 +32,7 @@ enum PageSender {
                 if more { continue }                                         // another opt-out form on the same page
                 status(Loc.t("Sent.")); return .submitted(awaitingEmail: sentEmail)
             case .handToPerson:
-                forced = true; baseline = await page.pageText(); status(Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself."))
+                forced = true; baseline = await page.pageText(); status(Loc.t("The site's human check did not accept an automatic send. Press its Submit button yourself."))
             case .nextStep, .checkAppeared:
                 continue                                                     // a check appeared, or the form moved on to its next step
             case .notConfirmed:

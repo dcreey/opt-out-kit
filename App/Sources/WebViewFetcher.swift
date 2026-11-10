@@ -5,7 +5,7 @@ import OptOutKitCore
 /// Reads pages the way a browser does: it loads them in a hidden WKWebView, lets their JavaScript run, waits for the
 /// page to stop changing, then returns what a person would see. This reaches sites whose results arrive after a
 /// "loading" page, which a plain request cannot read. Each fetch gets its own private session (no cookies kept, none
-/// shared), and nothing is shown on screen. A site that shows a bot check still shows it; we report that, never solve it.
+/// shared), and nothing is shown on screen. A site that shows a human check still shows it; we report that, never solve it.
 struct WebViewFetcher: PageFetcher {
     var maxWait: TimeInterval = 14
     /// Decides whether an "I agree to our terms" prompt may be accepted for the person. Nil means never: the prompt is
@@ -314,7 +314,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
 // MARK: Opt-out forms
 
 /// Fills in a site's real opt-out form from a person's profile and sends it. It stops, and says so, at anything a person
-/// must handle: a visible bot check, a terms prompt, a form it cannot fill. It never solves a challenge, never ticks a
+/// must handle: a visible human check, a terms prompt, a form it cannot fill. It never solves a challenge, never ticks a
 /// legal acknowledgement, and only reports "sent" when the site shows a success message.
 extension WebFormSubmitter {
     /// What the page said after sending, judged only on the lines that were not there before.
@@ -449,7 +449,7 @@ extension WebViewSession {
     func declineBanner() async -> Bool { await declineConsentBanner() }
     func hasTermsPrompt() async -> Bool { await findTermsGate() != nil }
 
-    /// Brings the bot check into view so the person does not have to hunt for it.
+    /// Brings the human check into view so the person does not have to hunt for it.
     func scrollChallengeIntoView() async {
         let js = #"""
         (function(){var f=[].slice.call(document.querySelectorAll('iframe')).filter(function(x){
@@ -515,7 +515,7 @@ extension WebViewSession {
         return inside.isEmpty ? page : page + "\n" + inside
     }
 
-    /// A bot check a person has to act on, as opposed to an invisible one that passes by itself. Never solved here.
+    /// A human check a person has to act on, as opposed to an invisible one that passes by itself. Never solved here.
     func visibleChallenge() async -> String? {
         let js = #"""
         (function(){
@@ -524,7 +524,7 @@ extension WebViewSession {
           var solved=[].some.call(document.querySelectorAll('input[name="cf-turnstile-response"],textarea[name="g-recaptcha-response"],textarea[name="h-captcha-response"]'),function(e){return !!e.value;});
           // The page says its reCAPTCHA refused the send (a score-based one rejects scripted presses): only the person's own tap on the page's button can get past it.
           if(/recaptcha[^.]{0,40}(missing|invalid|failed|expired|could not be verified)|failed (the )?recaptcha/.test(text)) return 'a reCAPTCHA that rejected the automatic send';
-          if(!solved&&/anti-?spam check|wait for the (anti-?spam|security) check|confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a bot check';
+          if(!solved&&/anti-?spam check|wait for the (anti-?spam|security) check|confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a human check';
           var ts=document.querySelector('.cf-turnstile,[class*="turnstile" i],[id*="turnstile" i]');
           if(ts){var tr=ts.getBoundingClientRect(),tt=document.querySelector('input[name="cf-turnstile-response"]'); if(tr.width>0&&tr.height>0&&(!tt||!tt.value)) return 'a Cloudflare check';}
           var frames=document.querySelectorAll('iframe');

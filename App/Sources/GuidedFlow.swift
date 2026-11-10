@@ -125,6 +125,20 @@ final class GuidedRunner: ObservableObject {
     @Published private(set) var webView: WKWebView?
 
     let siteName: String
+    /// "Is it completely done?" after a send the page did not call finished; asked only where a person is on screen (the guided screen sets `asksAboutFollowUp`).
+    let finishQuestion = FinishQuestion()
+    var asksAboutFollowUp = false
+    private var emailStepFlagged = false
+    /// The person said (from the … menu) that this site has another email step.
+    func flagEmailStep() { emailStepFlagged = true; finishQuestion.dismiss() }
+    var siteID: String { flow.plan.siteID }
+    private func emailAfterSend(_ email: Bool) async -> Bool {
+        if email || emailStepFlagged { return true }
+        guard asksAboutFollowUp else { return false }
+        let text = await page.visibleText()
+        if FormRun.finishIsCertain(text) { return false }
+        return await finishQuestion.ask(site: siteName, pageSaidEmail: false, allowsNotYet: false) != .done
+    }
     private let page: GuidedPage
     private var fillValues: [FieldValue]
     private let person: Person
@@ -132,7 +146,7 @@ final class GuidedRunner: ObservableObject {
     /// Asked when the send step comes up: whether to press the page's own button. The screen sets it from the person's checkbox.
     var autoSubmit: () -> Bool = { true }
     private var manualBaseline: String?
-    /// The page's bot check refused a scripted press: from here the person presses the page's own button.
+    /// The page's human check refused a scripted press: from here the person presses the page's own button.
     private var forceManual = false
     private let onSent: (AutoOptOutResult) -> Void
     private let onIssue: (IssueKind) -> Void
@@ -286,19 +300,21 @@ final class GuidedRunner: ObservableObject {
             // The person sends it themselves: nothing is pressed, and a confirmation that appears afterwards is noticed.
             let now = await page.visibleText()
             guard let base = manualBaseline else { manualBaseline = now; status = Loc.t("Your details are filled in. Press the page's own button yourself; we will notice the confirmation, or tap Next step."); break }
-            if case .submitted(let email) = FormRun.classifyConfirmed(FormRun.newText(before: base, after: now)) {
+            if case .submitted(let said) = FormRun.classifyConfirmed(FormRun.newText(before: base, after: now)) {
+                let email = await emailAfterSend(said)
                 onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
             }
         case .send:
             _ = await page.fill(fillValues)
             switch await page.send(fillValues) {
-            case .submitted(let email):
+            case .submitted(let said):
+                let email = await emailAfterSend(said)
                 onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
             case .challenged(let why) where why.contains(PageFlow.rejectedMarker):
                 forceManual = true; manualBaseline = nil
-                status = Loc.t("The site's bot check did not accept an automatic send. Press its Submit button yourself.")
+                status = Loc.t("The site's human check did not accept an automatic send. Press its Submit button yourself.")
             case .challenged(let why): status = Loc.f("The site wants another check: %@. Solve it and we will send again.", why)
             case .rejected(let why), .failed(let why):
                 status = Loc.f("We could not confirm it was sent (%@). Finish it yourself in the page, then tap Next step.", why)
@@ -322,6 +338,9 @@ final class GuidedRunner: ObservableObject {
         }
         if flow.isFinished, ending == nil, before != nil { finish(.finished) }
     }
+
+    /// The person finished the request in their own browser and said so.
+    func finishedInBrowser() { finish(.finished) }
 
     private func finish(_ e: Ending) {
         guard ending == nil else { return }
@@ -379,13 +398,14 @@ struct GuidedPanel: View {
     var topInset: CGFloat = 0
     var maxStepHeight: CGFloat = 140
     @State private var stepHeight: CGFloat = 0
+    @StateObject private var browserHandoff = BrowserHandoff()
 
     var body: some View {
         VStack(spacing: 0) {
             GuideSurface(topInset: topInset) {
                 HStack(spacing: 10) {
                     Menu {
-                        PageMenu.items(web: runner.webView, idPrefix: "guided", details: model.pageDetails) { runner.fillAgain() }
+                        PageMenu.items(web: runner.webView, idPrefix: "guided", details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { runner.flagEmailStep(); model.addFollowUpStep(runner.siteID) }) { runner.fillAgain() }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in
                                 Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")
@@ -429,6 +449,9 @@ struct GuidedPanel: View {
             }
             GuideBoundary()
         }
+        .browserHandoffAlert(browserHandoff) { runner.finishedInBrowser() }
+        .finishQuestionAlert(runner.finishQuestion)
+        .onAppear { runner.asksAboutFollowUp = true }
     }
 }
 

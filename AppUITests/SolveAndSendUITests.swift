@@ -94,7 +94,7 @@ final class SolveAndSendUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]
         app.launch()
-        app.tabBars.buttons["About"].tap()
+        app.tabBars.buttons["Settings"].tap()
         let replay = app.buttons["show-guided-intro"]
         XCTAssertTrue(replay.waitForExistence(timeout: 10))
         replay.tap()

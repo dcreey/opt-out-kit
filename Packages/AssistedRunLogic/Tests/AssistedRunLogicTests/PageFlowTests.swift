@@ -12,7 +12,7 @@ final class PageFlowTests: XCTestCase {
             (.submitted(awaitingEmail: true), .sent(awaitingEmail: true, moreForms: false)),
             (.challenged(PageFlow.nextStepMarker), .nextStep),
             (.challenged("a reCAPTCHA that rejected the automatic send"), .handToPerson),
-            (.challenged("a bot check"), .checkAppeared("a bot check")),
+            (.challenged("a human check"), .checkAppeared("a human check")),
             (.rejected("bad field"), .notConfirmed(.rejected("bad field"))),
             (.failed("no success message was shown"), .notConfirmed(.failed("no success message was shown"))),
             (.filledNotSubmitted, .dryRun),

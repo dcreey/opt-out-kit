@@ -210,7 +210,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["About"].tap()
+        app.tabBars.buttons["Settings"].tap()
         app.buttons["show-walkthrough"].tap()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 5))
     }

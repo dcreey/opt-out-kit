@@ -114,7 +114,7 @@ final class AssistedRunnerTests: XCTestCase {
     }
 
     func testItTimesOutInsteadOfWaitingForever() async {
-        let page = ScriptedPage(blockers: [[.check("a bot check")]])
+        let page = ScriptedPage(blockers: [[.check("a human check")]])
         let sink = Sink()
         let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": page, "b.example": ScriptedPage()]), sink)
         await r.run()
@@ -124,7 +124,7 @@ final class AssistedRunnerTests: XCTestCase {
     }
 
     func testSkipMovesOnWithoutSending() async {
-        let page = ScriptedPage(blockers: [[.check("a bot check")]])
+        let page = ScriptedPage(blockers: [[.check("a human check")]])
         let sink = Sink()
         let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": page, "b.example": ScriptedPage()]), sink)
         r.waitLimit = 30
@@ -139,7 +139,7 @@ final class AssistedRunnerTests: XCTestCase {
 
     func testSkippingTheLastSiteEndsTheRun() async {
         let sink = Sink()
-        let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": ScriptedPage(), "b.example": ScriptedPage(blockers: [[.check("a bot check")]])]), sink)
+        let r = runner(["a.example", "b.example"], ScriptedDriver(["a.example": ScriptedPage(), "b.example": ScriptedPage(blockers: [[.check("a human check")]])]), sink)
         r.waitLimit = 30
         let task = Task { @MainActor in await r.run() }
         for _ in 0..<200 where r.index < 1 { try? await Task.sleep(nanoseconds: 10_000_000) }
@@ -168,7 +168,7 @@ final class AssistedRunnerTests: XCTestCase {
     }
 
     func testTheNextSiteLoadsWhileThePersonStillWorksOnTheCurrentOne() async {
-        let slow = ScriptedPage(blockers: [[.check("a bot check")], [.check("a bot check")], [.check("a bot check")], []])
+        let slow = ScriptedPage(blockers: [[.check("a human check")], [.check("a human check")], [.check("a human check")], []])
         let driver = ScriptedDriver(["a.example": slow, "b.example": ScriptedPage()])
         let r = runner(["a.example", "b.example"], driver, Sink())
         let task = Task { @MainActor in await r.run() }
@@ -425,5 +425,31 @@ final class PrematureDoneTests: XCTestCase {
         }
         XCTAssertEqual(FormRun.classifyConfirmed("There was a problem with your submission. The reCAPTCHA response was missing or invalid."), .rejected("the site showed an error after sending"))
         XCTAssertEqual(FormRun.classifyConfirmed(consent + "\nThank you. Your request has been submitted."), .submitted(awaitingEmail: false))
+    }
+}
+
+/// When a page says an email follows, and when it says with confidence that nothing does.
+final class FollowUpDetectionTests: XCTestCase {
+    func testRealConfirmationsThatPromiseAnEmailAreDetected() {
+        for t in ["Thank you. We have sent a verification email to your address. Click the link to confirm your request.",
+                  "Check your inbox for a confirmation link.", "A follow-up email will be sent with the next steps.",
+                  "We will send you a confirmation email shortly.", "You will receive a verification link by email.",
+                  "Please confirm your email address to complete the opt-out."] {
+            XCTAssertTrue(FormRun.mentionsEmailFollowUp(t), t)
+        }
+    }
+
+    func testBoilerplateAndPlainThanksAreNotAnEmailPromise() {
+        for t in ["Thank you. Your request has been received.", "We may send you emails about our services. You can unsubscribe at any time.",
+                  "We may need to confirm your identity before we act on a request.", "Your opt-out was processed. Allow up to 45 days."] {
+            XCTAssertFalse(FormRun.mentionsEmailFollowUp(t), t)
+        }
+    }
+
+    func testOnlyAPageThatSaysEverythingIsFinishedIsCertain() {
+        XCTAssertTrue(FormRun.finishIsCertain("Your removal request has been completed. You are all set."))
+        XCTAssertFalse(FormRun.finishIsCertain("Thank you. Your request has been received."), "thanks alone is not proof")
+        XCTAssertFalse(FormRun.finishIsCertain("Your request is complete once you click the link in the email we sent you."), "an email is still to come")
+        XCTAssertFalse(FormRun.finishIsCertain(""))
     }
 }

@@ -15,7 +15,7 @@ struct RootView: View {
             BrokerListView().tabItem { Label("Queue", systemImage: "list.bullet") }.tag(0)
             SitesView().tabItem { Label("Sites", systemImage: "magnifyingglass") }.tag(1)
             LinkFillerView(startLink: debugLink ?? "").tabItem { Label("Email links", systemImage: "envelope.open") }.badge(model.pendingFollowUps.count).tag(2)
-            AboutView().tabItem { Label("About", systemImage: "info.circle") }.tag(3)
+            AboutView().tabItem { Label("Settings", systemImage: "gearshape") }.tag(3)
         }
         .onChange(of: model.incomingLink) { _, link in if link != nil { tab = 2 } }
         #if DEBUG

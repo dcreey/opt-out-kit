@@ -5,6 +5,7 @@ import OptOutKitCore
 /// or closes the screen. Everything is stored encrypted on this phone.
 struct PersonEditorView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @State private var person: Person
     /// Told the person as typed, on every change, so a host's Done or Continue button can follow it. Cheap: it never writes the model.
@@ -97,6 +98,8 @@ struct PersonEditorView: View {
         .onChange(of: email) { _, new in if person.relationship == .me { onEmailDraft?(new) } }
         .onAppear { onDraft?(person); if person.relationship == .me { onEmailDraft?(email) } }
         .onDisappear { commit() }
+        // Closing or leaving the app (home, the app switcher, a call) saves what is typed, so a first profile is never lost to the app being closed.
+        .onChange(of: scenePhase) { _, phase in if phase != .active { commit() } }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
         }
@@ -138,6 +141,9 @@ struct PersonEditorView: View {
             person.names[legalIndex()].name = Person.composeLegalName(first: first, middle: last.trimmingCharacters(in: .whitespaces).isEmpty ? "" : middle, last: last)
         })
     }
+
+    private func nameBinding<T>(_ i: Int, _ kp: WritableKeyPath<NameEntry, T>, default d: T) -> Binding<T> { RowField.binding($person.names, i, kp, default: d) }
+    private func addressBinding<T>(_ i: Int, _ kp: WritableKeyPath<Address, T>, default d: T) -> Binding<T> { RowField.binding($person.addresses, i, kp, default: d) }
 
     private func currentAddress<T>(_ keyPath: WritableKeyPath<Address, T>, default value: T) -> Binding<T> {
         Binding(get: { person.addresses.first?[keyPath: keyPath] ?? value },
@@ -214,13 +220,13 @@ struct PersonEditorView: View {
     private var otherNamesSection: some View {
         Section {
             ForEach(person.names.indices, id: \.self) { i in
-                if person.names[i].kind != .legal {
+                if person.names.indices.contains(i), person.names[i].kind != .legal {
                     VStack(alignment: .leading) {
-                        Picker("Type", selection: $person.names[i].kind) {
+                        Picker("Type", selection: nameBinding(i, \.kind, default: .nickname)) {
                             ForEach(NameKind.allCases.filter { $0 != .legal }, id: \.self) { Text($0.label).tag($0) }
                         }
                         .pickerStyle(.menu)
-                        TextField("Name", text: $person.names[i].name)
+                        TextField("Name", text: nameBinding(i, \.name, default: ""))
                             .accessibilityIdentifier("name-\(i)")
                     }
                 }
@@ -243,26 +249,26 @@ struct PersonEditorView: View {
     private var previousAddressesSection: some View {
         Section {
             ForEach(person.addresses.indices, id: \.self) { i in
-                if i > 0 {
+                if i > 0, person.addresses.indices.contains(i) {
                     VStack(alignment: .leading) {
                         TextField("Street (optional)", text: Binding(
-                            get: { person.addresses[i].street ?? "" },
-                            set: { person.addresses[i].street = $0.isEmpty ? nil : $0 }))
+                            get: { addressBinding(i, \.street, default: nil).wrappedValue ?? "" },
+                            set: { addressBinding(i, \.street, default: nil).wrappedValue = $0.isEmpty ? nil : $0 }))
                         HStack {
-                            TextField("City", text: $person.addresses[i].city)
-                            if (person.addresses[i].country ?? "US").uppercased() == "US" {
-                                StatePicker(state: $person.addresses[i].state).accessibilityIdentifier("previous-state-\(i)")
+                            TextField("City", text: addressBinding(i, \.city, default: ""))
+                            if (addressBinding(i, \.country, default: nil).wrappedValue ?? "US").uppercased() == "US" {
+                                StatePicker(state: addressBinding(i, \.state, default: "")).accessibilityIdentifier("previous-state-\(i)")
                             } else {
-                                TextField("Region", text: $person.addresses[i].state).frame(maxWidth: 110)
+                                TextField("Region", text: addressBinding(i, \.state, default: "")).frame(maxWidth: 110)
                             }
                         }
                         TextField("ZIP code", text: Binding(
-                            get: { person.addresses[i].zip ?? "" },
-                            set: { person.addresses[i].zip = $0.isEmpty ? nil : $0 }))
+                            get: { addressBinding(i, \.zip, default: nil).wrappedValue ?? "" },
+                            set: { addressBinding(i, \.zip, default: nil).wrappedValue = $0.isEmpty ? nil : $0 }))
                             .keyboardType(.numbersAndPunctuation).textContentType(.postalCode)
                         HStack {
-                            TextField("From year", value: $person.addresses[i].fromYear, format: .number.grouping(.never))
-                            TextField("To year", value: $person.addresses[i].toYear, format: .number.grouping(.never))
+                            TextField("From year", value: addressBinding(i, \.fromYear, default: nil), format: .number.grouping(.never))
+                            TextField("To year", value: addressBinding(i, \.toYear, default: nil), format: .number.grouping(.never))
                         }.keyboardType(.numberPad)
                     }
                 }
@@ -297,7 +303,8 @@ struct StringListSection: View {
     var body: some View {
         Section {
             ForEach(items.indices, id: \.self) { i in
-                TextField(title, text: Binding(get: { items[i] }, set: { items[i] = format?($0) ?? $0 }))
+                TextField(title, text: Binding(get: { items.indices.contains(i) ? items[i] : "" },
+                                               set: { if items.indices.contains(i) { items[i] = format?($0) ?? $0 } }))
                     .keyboardType(keyboard)
                     .textInputAutocapitalization(keyboard == .emailAddress ? .never : nil)
                     .autocorrectionDisabled(keyboard == .emailAddress)
@@ -381,5 +388,16 @@ struct StatePicker: View {
         }
         .pickerStyle(.menu).labelsHidden().fixedSize()
         .accessibilityLabel("State")
+    }
+}
+
+
+/// A binding to one field of the row at index `i` of a list that survives the row being deleted. SwiftUI can still ask a row it is about to remove for its
+/// value (or hand it one to store) after the array has already shrunk, and `list[i]` then traps ("Index out of range") and ends the app; this gives the
+/// default and ignores the store instead.
+enum RowField {
+    static func binding<E, T>(_ list: Binding<[E]>, _ i: Int, _ kp: WritableKeyPath<E, T>, default d: T) -> Binding<T> {
+        Binding(get: { list.wrappedValue.indices.contains(i) ? list.wrappedValue[i][keyPath: kp] : d },
+                set: { if list.wrappedValue.indices.contains(i) { list.wrappedValue[i][keyPath: kp] = $0 } })
     }
 }

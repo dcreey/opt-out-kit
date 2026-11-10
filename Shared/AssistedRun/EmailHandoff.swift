@@ -40,5 +40,6 @@ final class EmailHandoff: ObservableObject {
         markEmailed(batch)
         if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { runner.finishByEmail() }
     }
-    private func declined() { if runner.emailOffer != nil { runner.answerEmailOffer(sent: false) } }
+    /// "No" never moves the run on: the offer (Write the email / Mark as done / Not now) is shown again and the person decides. Only their own tap on one of those leaves the site.
+    private func declined() {}
 }

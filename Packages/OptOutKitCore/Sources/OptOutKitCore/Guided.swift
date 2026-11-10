@@ -7,7 +7,7 @@ public struct GuidedStep: Equatable, Identifiable, Sendable {
         case copy(field: String)
         case instruction
         case autofill                       // the app fills the form
-        case clearBlockers                  // the person ticks a certification, accepts terms or solves a bot check
+        case clearBlockers                  // the person ticks a certification, accepts terms or solves a human check
         case send                           // the app presses submit once the blockers are cleared
         case waitForEmail(subject: String?, minutes: Int?)
         case confirm
@@ -197,7 +197,7 @@ public enum GuidedPlanner {
         add(L10n.t("Open your own listing"), L10n.f("We searched %@ for you by name. Tap the result that is you, then tap \"This is my listing\". You never need to buy a report: the opt-out only needs the address of that page. If none is you, tap Not working.", entry.domain), .pickListing(search: search))
         add(L10n.t("Open the opt-out page"), entry.domain, .openPage(form.page), .pageLoaded)
         add(L10n.t("We fill in your details"), L10n.t("Your email and the address of your listing."), .autofill, .formFilled)
-        add(L10n.t("Clear the check"), L10n.t("Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
+        add(L10n.t("Clear the check"), L10n.t("Solve the human check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
         add(L10n.t("We send it"), L10n.t("Then we look for the site's confirmation."), .send, .formSent)
         var p = GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
         p.listingFields = form.fields.filter(FormFiller.isListingField).map(\.name)
@@ -213,7 +213,7 @@ public enum GuidedPlanner {
         if let form = entry.optOutForm {
             add(L10n.t("Open the opt-out page"), entry.domain, .openPage(form.page), .pageLoaded)
             add(L10n.t("We fill in your details"), L10n.t("Only the fields this form asks for."), .autofill, .formFilled)
-            add(L10n.t("Clear the check"), L10n.t("Solve the bot check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
+            add(L10n.t("Clear the check"), L10n.t("Solve the human check, tick any confirmation box and accept terms yourself if asked. We wait for you."), .clearBlockers, .blockersCleared)
             add(L10n.t("We send it"), L10n.t("Then we look for the site's confirmation."), .send, .formSent)
             return GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
         }

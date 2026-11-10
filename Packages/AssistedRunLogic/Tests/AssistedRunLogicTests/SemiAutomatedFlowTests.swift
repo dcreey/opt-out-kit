@@ -92,7 +92,7 @@ final class SemiAutomatedFlowTests: XCTestCase {
     // MARK: what each blocker shows, and that nothing is sent until it is gone
 
     func testEachBlockerShowsItsOwnPhaseAndNothingIsSentWhileItIsUp() async {
-        let cases: [(AssistedBlocker, AssistedRunner.Phase)] = [(.terms, .waitingForTerms), (.certify("I certify"), .waitingForCertification), (.choose("Request type"), .waitingForChoice("Request type")), (.check("a bot check"), .waitingForCheck)]
+        let cases: [(AssistedBlocker, AssistedRunner.Phase)] = [(.terms, .waitingForTerms), (.certify("I certify"), .waitingForCertification), (.choose("Request type"), .waitingForChoice("Request type")), (.check("a human check"), .waitingForCheck)]
         for (blocker, phase) in cases {
             let page = Page(blockers: [[blocker], [blocker], [blocker], []]); let sink = Sink()
             let r = make([item("a.example")], Driver(["a.example": page]), sink)
@@ -165,14 +165,14 @@ final class SemiAutomatedFlowTests: XCTestCase {
     }
 
     func testACheckThatAppearsAfterSendingIsWaitedForAgainThenSentAgain() async {
-        let page = Page(sends: [.challenged("a bot check"), .challenged("a bot check"), .submitted(awaitingEmail: false)]); let sink = Sink()
+        let page = Page(sends: [.challenged("a human check"), .challenged("a human check"), .submitted(awaitingEmail: false)]); let sink = Sink()
         let r = make([item("a.example")], Driver(["a.example": page]), sink)
         await finish(start(r), r)
         XCTAssertEqual(page.sends, 3); XCTAssertEqual(sink.results, [.submitted(awaitingEmail: false)])
     }
 
     func testAPageThatKeepsChallengingStopsAfterThreeAttempts() async {
-        let page = Page(sends: [.challenged("a bot check")]); let sink = Sink()
+        let page = Page(sends: [.challenged("a human check")]); let sink = Sink()
         let r = make([item("a.example")], Driver(["a.example": page]), sink)
         await finish(start(r), r)
         XCTAssertEqual(page.sends, 3, "three tries")
@@ -235,16 +235,66 @@ final class SemiAutomatedFlowTests: XCTestCase {
         XCTAssertEqual(sink.results, [.submitted(awaitingEmail: false)])
     }
 
-    func testMarkAsDoneOnAPageThatMentionsAnEmailAsksWhetherToTrackIt() async {
-        for track in [true, false] {
+    func testMarkAsDoneOnAPageThatMentionsAnEmailAsksWhetherAnEmailFollows() async {
+        let cases: [(FinishQuestion.Answer, AutoOptOutResult)] = [(.emailFollows, .submitted(awaitingEmail: true)), (.unsure, .submitted(awaitingEmail: true)), (.done, .submitted(awaitingEmail: false))]
+        for (answer, expected) in cases {
             let page = Page(blockers: [[.check("c")]]); page.texts = ["Check your email to confirm your request."]; let sink = Sink()
-            let r = make([item("a.example")], Driver(["a.example": page]), sink)
+            let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
             let run = start(r); await until(r.phase == .waitingForCheck)
-            await r.markDone()
-            XCTAssertTrue(r.askFollowUp, "the person is asked")
-            r.answerFollowUp(track: track); await finish(run, r)
-            XCTAssertEqual(sink.results, [.submitted(awaitingEmail: track)])
+            let tap = Task { @MainActor in await r.markDone() }
+            await until(r.finishQuestion.pending != nil)
+            XCTAssertEqual(r.finishQuestion.pending?.pageSaidEmail, true); XCTAssertEqual(r.finishQuestion.pending?.allowsNotYet, true)
+            r.finishQuestion.answer(answer); await tap.value; await finish(run, r)
+            XCTAssertEqual(sink.results, [expected], "\(answer)")
         }
+    }
+
+    func testMarkAsDoneThenNotYetKeepsTheSiteOpen() async {
+        let page = Page(blockers: [[.check("c")]]); page.texts = ["Thanks."]; let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
+        let run = start(r); await until(r.phase == .waitingForCheck)
+        let tap = Task { @MainActor in await r.markDone() }
+        await until(r.finishQuestion.pending != nil)
+        r.finishQuestion.answer(.notYet); await tap.value
+        XCTAssertTrue(sink.results.isEmpty); XCTAssertFalse(r.finished)
+        r.skip(); await finish(run, r)
+    }
+
+    func testAPageThatSaysItIsEntirelyDoneIsNotAskedAbout() async {
+        let page = Page(); page.texts = ["Your removal request has been completed. You are all set."]; let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
+        await finish(start(r), r)
+        XCTAssertNil(r.finishQuestion.pending); XCTAssertEqual(sink.results, [.submitted(awaitingEmail: false)])
+    }
+
+    func testASendWithNoWordOnWhatFollowsIsAskedAboutWhereAPersonIsOnScreen() async {
+        let cases: [(FinishQuestion.Answer, AutoOptOutResult)] = [(.done, .submitted(awaitingEmail: false)), (.emailFollows, .submitted(awaitingEmail: true)), (.unsure, .submitted(awaitingEmail: true))]
+        for (answer, expected) in cases {
+            let page = Page(); page.texts = ["Thank you. Your request was received."]; let sink = Sink()
+            let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
+            let run = start(r)
+            await until(r.finishQuestion.pending != nil)
+            XCTAssertEqual(r.finishQuestion.pending?.site, "a.example"); XCTAssertEqual(r.finishQuestion.pending?.allowsNotYet, false)
+            XCTAssertTrue(sink.results.isEmpty, "nothing is saved as done before the answer")
+            r.finishQuestion.answer(answer); await finish(run, r)
+            XCTAssertEqual(sink.results, [expected], "\(answer)")
+        }
+    }
+
+    func testSkippingWhileAskedCountsAsNotSure() async {
+        let page = Page(); page.texts = ["Thank you. Your request was received."]; let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
+        let run = start(r)
+        await until(r.finishQuestion.pending != nil)
+        r.skip(); await finish(run, r)
+        XCTAssertEqual(sink.results.first, .submitted(awaitingEmail: true), "a send that was never confirmed finished waits on an email")
+    }
+
+    func testTheBackgroundRunNeverAsksAnything() async {
+        let page = Page(); page.texts = ["Thank you. Your request was received."]; let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink)     // asksAboutFollowUp stays false
+        await finish(start(r), r)
+        XCTAssertNil(r.finishQuestion.pending); XCTAssertEqual(sink.results, [.submitted(awaitingEmail: false)])
     }
 
     // MARK: sites that are not a plain form
@@ -382,5 +432,20 @@ final class SemiAutomatedFlowTests: XCTestCase {
             else { await until(r.awaitingNext); try? await Task.sleep(nanoseconds: 120_000_000); XCTAssertEqual(r.index, 0, "Auto-send off: it waits for Next site"); r.next(); await until(r.index == 1) }
             r.skip(); await finish(run, r)
         }
+    }
+}
+
+/// A form a real page load showed to need the person (an agent's details, questions the app cannot read, a file): the app fills in and never presses send.
+@MainActor
+final class NeedsPersonTests: XCTestCase {
+    func testOnlyThoseFormsAreHandsOff() {
+        func item(_ blockers: [String]) -> AssistedRunner.Item {
+            let f = OptOutForm(page: URL(string: "https://x.example/optout")!, method: "post", action: nil, fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+            var e = DirectoryEntry(id: "x_example", domain: "x.example", name: "X", bucket: "direct", tier: .B, automation: .guided, optOutForm: f, contactEmail: nil)
+            e.liveForm = LiveFormCheck(checked: "2026-11-09", found: true, page: "https://x.example/optout", blockers: blockers)
+            return AssistedRunner.Item(entry: e, form: f, plan: FillPlan(values: [], verdict: .ready))
+        }
+        for b in ["agent", "other", "file", "business"] { XCTAssertTrue(item([b]).handsOff, b) }
+        XCTAssertFalse(item([]).handsOff); XCTAssertFalse(item(["check:a human check"]).handsOff, "a human check the person clears is the ordinary semi-automated case")
     }
 }

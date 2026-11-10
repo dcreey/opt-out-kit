@@ -88,14 +88,70 @@ extension DetailKind {
     }
 }
 
+/// "Is it completely done?" (`FinishQuestion`): the same words and buttons in every flow that has a person on screen.
+private struct FinishQuestionAlert: ViewModifier {
+    @ObservedObject var question: FinishQuestion
+    func body(content: Content) -> some View {
+        let ask = question.pending
+        content.alert("Is it completely done?", isPresented: Binding(get: { ask != nil }, set: { if !$0 { question.dismiss() } })) {
+            Button("Yes, completely done") { question.answer(.done) }.accessibilityIdentifier("finish-done")
+            Button("An email is still to come") { question.answer(.emailFollows) }.accessibilityIdentifier("finish-email")
+            Button("I am not sure") { question.answer(.unsure) }.accessibilityIdentifier("finish-unsure")
+            if ask?.allowsNotYet == true { Button("Not yet", role: .cancel) { question.answer(.notYet) }.accessibilityIdentifier("finish-not-yet") }
+        } message: {
+            Text(ask?.pageSaidEmail == true
+                 ? "This page mentions an email. Some sites send more than one, each with a step to do. If you are not sure, say so and we keep it on your waiting list."
+                 : "Some sites send an email afterwards with one more step, sometimes more than one. If you are not sure, say so and we keep it on your waiting list.")
+        }
+    }
+}
+
+extension View {
+    func finishQuestionAlert(_ question: FinishQuestion) -> some View { modifier(FinishQuestionAlert(question: question)) }
+}
+
+/// "Open in my browser" from a guide's … menu: the page goes to the phone's default browser, and the question "Did you complete it?" is already waiting when the
+/// person comes back, as with another mail app. Yes finishes the site the way that flow finishes one; No changes nothing and the guide stays where it was.
+@MainActor
+final class BrowserHandoff: ObservableObject {
+    @Published var asking = false
+    func open(_ url: URL, launch: (URL) -> Void = { UIApplication.shared.open($0) }) {
+        guard url.scheme == "https" || url.scheme == "http" else { return }
+        asking = true
+        launch(url)
+    }
+    func answer(completed: Bool, finish: () -> Void) { asking = false; if completed { finish() } }
+}
+
+private struct BrowserHandoffAlert: ViewModifier {
+    @ObservedObject var handoff: BrowserHandoff
+    let onCompleted: () -> Void
+    func body(content: Content) -> some View {
+        content.alert("Did you complete it?", isPresented: Binding(get: { handoff.asking }, set: { _ in })) {
+            Button("Yes, I completed it") { handoff.answer(completed: true, finish: onCompleted) }.accessibilityIdentifier("browser-handoff-yes")
+            Button("No", role: .cancel) { handoff.answer(completed: false, finish: onCompleted) }.accessibilityIdentifier("browser-handoff-no")
+        } message: { Text("You opened this site in your browser. Say yes only if you finished the request there.") }
+    }
+}
+
+extension View {
+    func browserHandoffAlert(_ handoff: BrowserHandoff, onCompleted: @escaping () -> Void) -> some View { modifier(BrowserHandoffAlert(handoff: handoff, onCompleted: onCompleted)) }
+}
+
 enum PageMenu {
     /// - fillTitle: "Fill the form again" where the guide fills for you, "Fill in my details" where you start it.
     /// - details: the person's own details, copied one at a time from "My data", with the advertising ID (MAID) first.
     /// - idPrefix: prefix of the accessibility identifiers (assisted, guided, link).
     @MainActor @ViewBuilder
-    static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, details: [DetailGroup] = [], fill: @escaping () async -> Void) -> some View {
+    static func items(web: WKWebView?, fillTitle: LocalizedStringKey = "Fill the form again", idPrefix: String, fillID: String = "fill-again", canFill: Bool = true, details: [DetailGroup] = [], browser: BrowserHandoff? = nil, anotherEmailStep: (() -> Void)? = nil, fill: @escaping () async -> Void) -> some View {
         if let url = web?.url {
             Button { UIPasteboard.general.string = url.absoluteString } label: { Label("Copy link", systemImage: "link") }
+            if let browser {
+                Button { browser.open(url) } label: { Label("Open in my browser", systemImage: "safari") }.accessibilityIdentifier("\(idPrefix)-open-browser")
+            }
+        }
+        if let anotherEmailStep {
+            Button(action: anotherEmailStep) { Label("There is another email step", systemImage: "envelope.badge") }.accessibilityIdentifier("\(idPrefix)-email-step")
         }
         if let web {
             Button {

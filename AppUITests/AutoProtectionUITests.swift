@@ -18,7 +18,7 @@ final class AutoProtectionUITests: XCTestCase {
         shot(app, "1-first-run-automatic-protection")
         app.finishOnboarding()
 
-        app.tabBars.buttons["About"].tap()
+        app.tabBars.buttons["Settings"].tap()
         let s2 = app.switches["settings-scan-toggle"]
         XCTAssertTrue(app.scrollUntilExists(s2))
         XCTAssertEqual(s2.value as? String, "1")
@@ -39,7 +39,7 @@ final class AutoProtectionUITests: XCTestCase {
         }
         app.finishOnboarding()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
-        app.tabBars.buttons["About"].tap()
+        app.tabBars.buttons["Settings"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.switches["settings-scan-toggle"]))
         XCTAssertEqual(app.switches["settings-scan-toggle"].value as? String, "0")
     }
@@ -62,7 +62,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
         app.buttons["Done"].tap()
-        app.tabBars.buttons["About"].tap()
+        app.tabBars.buttons["Settings"].tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()

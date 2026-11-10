@@ -25,3 +25,5 @@ registries/inbox/
 pipeline/region-pages/
 .rendered-html/
 .dry-live-scan*/
+.guess/
+.live-guess/

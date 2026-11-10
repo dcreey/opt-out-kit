@@ -26,7 +26,7 @@ final class AssistedQueueTests: XCTestCase {
 }
 
 
-// MARK: The real web view, against a local page that imitates a bot check cleared by a person
+// MARK: The real web view, against a local page that imitates a human check cleared by a person
 
 @MainActor
 final class WebAssistedDriverTests: XCTestCase {
@@ -137,7 +137,7 @@ final class WebAssistedDriverTests: XCTestCase {
         var sawCheck = false
         let watcher = Task { @MainActor in while !runner.finished { if runner.phase == .waitingForCheck { sawCheck = true }; try? await Task.sleep(nanoseconds: 50_000_000) } }
         await runner.run(); watcher.cancel()
-        XCTAssertTrue(sawCheck, "the bot check was shown to the person first")
+        XCTAssertTrue(sawCheck, "the human check was shown to the person first")
         XCTAssertEqual(sink.rows.first?.1, .submitted(awaitingEmail: false), "after the check cleared it was sent and the confirmation was read")
     }
 

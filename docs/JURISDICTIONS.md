@@ -4,7 +4,7 @@ Opt-Out Kit is organized around the **law where the person lives**. For every US
 date, whether the state makes data brokers register, whether it offers one request that reaches all of them, and what privacy law
 its residents have. The walkthrough shows the person their state's version ("Your state requires brokers to register themselves; we
 pull these registries", "Your state has an automatic opt-out for all of these registries; we integrate with it to simplify it", "We
-also go beyond your state's registry..."), and About keeps it one tap away.
+also go beyond your state's registry..."), and Settings keeps it one tap away.
 
 Countries will use the same shape (`kind: country`) in the same folder. They are not researched yet.
 

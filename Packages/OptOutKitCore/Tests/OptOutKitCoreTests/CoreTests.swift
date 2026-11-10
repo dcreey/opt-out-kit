@@ -1204,7 +1204,7 @@ final class AutoOptOutTests: XCTestCase {
 
     func testOnlyAttemptsThatReachedTheSiteAreRemembered() {
         XCTAssertEqual(AutoOptOut.attempt(for: .submitted(awaitingEmail: true), now: t0)?.outcome, "submitted_email")
-        XCTAssertEqual(AutoOptOut.attempt(for: .challenged("bot check"), now: t0)?.outcome, "challenged")
+        XCTAssertEqual(AutoOptOut.attempt(for: .challenged("human check"), now: t0)?.outcome, "challenged")
         XCTAssertNil(AutoOptOut.attempt(for: .needsYou("login"), now: t0))
         XCTAssertNil(AutoOptOut.attempt(for: .skippedNotListed, now: t0))
         XCTAssertNil(AutoOptOut.attempt(for: .needsData(["email"]), now: t0))
@@ -2362,7 +2362,7 @@ final class MeasuredAutomaticTests: XCTestCase {
         XCTAssertNotNil(axle.liveCheck)
         XCTAssertEqual(OptOutMethods.classify(axle, confirmingIdentity: true).method, .semiAutomatic, "unproven by a real run, so a person confirms")
         XCTAssertFalse(OptOutMethods.classify(axle, confirmingIdentity: true).reason.contains("page shows"), "its identity note is not a blocker for the owner")
-        // Sites with a visible bot check never count as automatic.
+        // Sites with a visible human check never count as automatic.
         let withCheck = entries.filter { $0.liveCheck?.blockers.contains { $0.hasPrefix("check") } == true }
         XCTAssertFalse(withCheck.isEmpty)
         for e in withCheck { XCTAssertNotEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic, e.domain) }
@@ -2533,7 +2533,7 @@ final class RunCheckTests: XCTestCase {
         XCTAssertEqual(confirmed, ["abovedata.io", "acronymix.com", "advancedbackgroundchecks.com", "alphonso.tv", "apollo.io", "attribits.com", "backgroundcheckers.net", "checksecrets.com", "convex.com", "donorbureau.com", "draup.com", "everleads.com", "gatewaydata.io", "getliminal.com", "inmar.com", "inmatessearcher.com", "lionsharemarketing.com", "liveintent.com", "m1-data.com", "marketingarchitects.com", "mugshotlook.com", "networx.com", "peoplesearch123.com", "peoplesearcher.com", "peoplesearchusa.org", "personsearchers.com", "popacta.com", "privaterecords.net", "privatereports.com", "publicsearcher.com", "scileads.com", "sealedrecords.net", "secretinfo.org", "semantiqhealth.com", "statsocial.com", "stirista.com", "subgraph.tech", "torusvotersystems.com", "truthrecord.org", "upcell.io", "weinform.org"])
         // The failed marks from the first reviewed run were cleared: most of those failures were the app's own (wrong form, cookie prompt,
         // unticked choices) and were fixed, so the next real run decides.
-        XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a bot check")
+        XCTAssertEqual(entries.filter { $0.runCheck?.result == "failed" }.count, 6, "only what a reviewed redo showed is blocked by a human check")
     }
 }
 
@@ -3269,8 +3269,8 @@ final class LiveFormAutomaticTests: XCTestCase {
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, "no reviewed run yet")
         e.runCheck = RunCheck(date: "2026-10-26", result: "confirmed", note: "it said thank you")
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
-        e.liveForm?.blockers = ["check:a bot check"]
-        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, "a bot check on the page keeps it with the person")
+        e.liveForm?.blockers = ["check:a human check"]
+        XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .semiAutomatic, "a human check on the page keeps it with the person")
         e.liveForm?.blockers = []
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true, challengedBefore: true).method, .semiAutomatic)
     }
@@ -3559,5 +3559,59 @@ final class PhoneFormatTests: XCTestCase {
         XCTAssertEqual(USStates.all.count, 51)
         XCTAssertEqual(USStates.all.first?.code, "AL")
         XCTAssertEqual(USStates.all.first { $0.code == "IL" }?.name, "Illinois")
+    }
+}
+
+
+final class FollowUpStepsTests: XCTestCase {
+    private func at(_ n: Int, _ o: String) -> OptOutAttempt { OptOutAttempt(date: Date(timeIntervalSince1970: Double(n)), outcome: o) }
+
+    func testASiteCanAskForSeveralEmailStepsInARow() {
+        var h = [at(1, "submitted_email")]
+        XCTAssertTrue(FollowUps.isPending(h)); XCTAssertEqual(FollowUps.stepsDone(h), 0)
+        h.append(at(2, "email_done"))
+        XCTAssertFalse(FollowUps.isPending(h)); XCTAssertEqual(FollowUps.stepsDone(h), 1)
+        h.append(at(3, "submitted_email"))            // "there is another email step"
+        XCTAssertTrue(FollowUps.isPending(h), "back on the waiting list"); XCTAssertEqual(FollowUps.stepsDone(h), 1, "the finished step is remembered")
+        h.append(at(4, "email_done"))
+        XCTAssertFalse(FollowUps.isPending(h)); XCTAssertEqual(FollowUps.stepsDone(h), 2)
+    }
+
+    func testANewPlainSendStartsTheCountAgain() {
+        let h = [at(1, "submitted_email"), at(2, "email_done"), at(5, "submitted")]
+        XCTAssertEqual(FollowUps.stepsDone(h), 0)
+    }
+
+    func testANoteWrittenRightAfterAnotherIsNeverATie() {
+        let now = Date(timeIntervalSince1970: 100)
+        let h = [OptOutAttempt(date: now, outcome: "email_done")]
+        XCTAssertGreaterThan(FollowUps.nextDate(h, now: now), now)
+        XCTAssertEqual(FollowUps.nextDate([], now: now), now)
+        let later = h + [OptOutAttempt(date: FollowUps.nextDate(h, now: now), outcome: "submitted_email")]
+        XCTAssertTrue(FollowUps.isPending(later))
+    }
+}
+
+
+final class FormsNeedingThePersonTests: XCTestCase {
+    private func entry(_ blockers: [String], caution: Bool = false) throws -> DirectoryEntry {
+        var e = DirectoryEntry(id: "x_example", domain: "x.example", name: "X", bucket: "direct", tier: .B, automation: .guided, optOutForm: nil, contactEmail: nil)
+        e.liveForm = LiveFormCheck(checked: "2026-11-09", found: true, page: "https://x.example/optout", blockers: blockers)
+        if caution { e.caution = CautionInfo(kind: "biometric") }
+        return e
+    }
+
+    func testAFormAskingForAnAgentQuestionsOrAFileIsSemiAutomatedWeFillWhatWeCanAndThePersonFinishes() throws {
+        for b in ["agent", "other", "file"] {
+            XCTAssertEqual(OptOutMethods.classify(try entry([b])).method, .semiAutomatic, b)
+        }
+    }
+
+    func testABusinessFormIsStillAGuideBecauseItIsNotAPersonalOptOut() throws {
+        XCTAssertEqual(OptOutMethods.classify(try entry(["business"])).method, .guided)
+    }
+
+    func testAFileOnASiteWithACautionIsStillAGuide() throws {
+        XCTAssertEqual(OptOutMethods.classify(try entry(["file"], caution: true)).method, .guided, "a face photo is never uploaded for the person")
     }
 }

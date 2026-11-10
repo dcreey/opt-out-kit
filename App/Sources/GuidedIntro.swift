@@ -31,7 +31,7 @@ struct GuidedIntroView: View {
                     Text("Most sites want the same few things.")
                     VStack(alignment: .leading, spacing: 12) {
                         Label("Your name, address and email, which we fill in", systemImage: "person.text.rectangle")
-                        Label("A bot check, \"I am human\", which only you can tick", systemImage: "checkmark.square")
+                        Label("A human check, \"I am human\", which only you can tick", systemImage: "checkmark.square")
                         Label("Sometimes a code or an ID, which you type or copy", systemImage: "number")
                         Label("Then Send. With Auto-send on, we press it when the page is ready. Turn it off to press it yourself.", systemImage: "bolt.fill")
                     }.font(.callout)

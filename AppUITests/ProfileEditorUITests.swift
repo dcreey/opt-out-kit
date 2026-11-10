@@ -74,6 +74,8 @@ final class ProfileEditorUITests: XCTestCase {
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.tap()
         name.typeText("Pat")
+        XCUIDevice.shared.press(.home)          // leaving the app saves what is typed (nothing is written while typing)
+        sleep(2)
         app.terminate()
 
         let again = launch(reset: false)

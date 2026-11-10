@@ -6,7 +6,7 @@ on the simulator with `-audit-first-per-kind 3`, `-audit-all` or `-audit-domains
 gives each site 75 seconds. The made-up profile (Pat Example) has a maiden name, two emails, two phones and a previous address, so the multi-value rules in [FORM-FILLING.md](FORM-FILLING.md) show up in the pictures. The audit also presses a form's "Add another email / phone" buttons (the same step as the real flows) and notes it in the blockers. Sites with such buttons: businessregistry.com (Add email, Add phone, Add former address), lexisnexis.com ("+").
 
 Each result records the page that opened, whether a form was found, every field with its label, whether it is required and whether it was filled,
-anything that would stop a person (a bot check, a certification box, a typed code, a menu with no choice for them), and the dry-run outcome.
+anything that would stop a person (a human check, a certification box, a typed code, a menu with no choice for them), and the dry-run outcome.
 
 `docs/audits/` keeps the results of the runs we made. What the first full run showed (755 sites):
 

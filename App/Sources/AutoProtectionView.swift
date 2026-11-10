@@ -7,7 +7,7 @@ struct AutoExplainer: View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Every month, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.", systemImage: "paperplane")
             Label("It never solves a CAPTCHA, never makes an account or pays, and leaves anything that needs a login, ID, a phone call or a certification to you. Some sites email you a link to confirm; that click is yours.", systemImage: "hand.raised")
-            Label("Most sites guard their forms with bot checks, so expect many to need you. The app tells you which.", systemImage: "info.circle")
+            Label("Most sites guard their forms with human checks, so expect many to need you. The app tells you which.", systemImage: "info.circle")
             Label("It runs when the app is open and, when iOS allows, in the background. You can turn it off any time.", systemImage: "switch.2")
         }
         .font(.footnote)
