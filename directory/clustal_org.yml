@@ -7,7 +7,7 @@ bucket: "direct"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.clustal.org/"
+opt_out_url: "https://www.clustal.org/privacy-control/"
 signals: [name_input]
 profiled: "2026-10-21"
 search_check:

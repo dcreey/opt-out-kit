@@ -7,6 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
+contact_email: "support@worldwideinformation.com"
 opt_out_url: null
 registered_in: [TX]
 signals: [script_rendered_page]

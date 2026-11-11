@@ -18,6 +18,13 @@ search_check:
   ignore_location: false
   calibration: {"listed_name": "John Smith", "city": "Springfield", "state": "IL"}
   checked: "2026-10-20"
+closed:
+  checked: "2026-11-11"
+  evidence:
+    - "Checked by hand 2026-11-11: the site is gone"
+    - "try 1 https://quickpeopletrace.com: HTTP 301; https://www.quickpeopletrace.com: HTTP 410 Gone"
+    - "try 2 https://quickpeopletrace.com: HTTP 301; https://www.quickpeopletrace.com: HTTP 410 Gone"
+    - "HTTP 410 means the page was removed on purpose and is not coming back"
 live_form:
   checked: "2026-10-24"
   found: false

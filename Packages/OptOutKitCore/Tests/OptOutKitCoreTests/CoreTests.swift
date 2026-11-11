@@ -648,6 +648,14 @@ final class DirectoryTests: XCTestCase {
         }
     }
 
+    func testEverySiteWithNoRouteYetIsMarkedToFindLaterAndNoOtherSiteIs() throws {
+        let entries = try Registry.loadDirectory(directoryURL).filter { $0.closed == nil && $0.excluded == nil }
+        let stray = entries.filter { OptOutMethods.classify($0).method == .manual && $0.findLater != true }.map(\.domain)
+        XCTAssertTrue(stray.isEmpty, "manual but not marked find_later: \(stray.sorted())")
+        let wrong = entries.filter { $0.findLater == true && OptOutMethods.classify($0).method != .manual }.map(\.domain)
+        XCTAssertTrue(wrong.isEmpty, "marked find_later but has a route: \(wrong.sorted())")
+    }
+
     func testFoundFormsDecodeWithTheirFields() throws {
         let entries = try Registry.loadDirectory(directoryURL)
         let withForm = entries.filter { $0.optOutForm != nil }

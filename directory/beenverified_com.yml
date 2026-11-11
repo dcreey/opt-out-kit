@@ -7,7 +7,7 @@ bucket: "direct"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.beenverified.com/"
+opt_out_url: "https://www.beenverified.com/svc/optout/search/optouts"
 contact_email: "dpo@beenverified.com"
 contact_email_source: "policy"
 registered_in: [CA, OR, TX]

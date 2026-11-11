@@ -442,7 +442,7 @@ struct DirectoryInfoView: View {
         case .automatic: return Loc.t("We fill in the form and send it")
         case .semiAutomatic: return Loc.t("We fill in the form; you clear the check")
         case .emailOnly: return Loc.t("We write the message; you send it")
-        case .manual: return Loc.t("We open the site; you find its opt-out link")
+        case .manual: return Loc.t("Nothing to do yet: we will find its link or email later")
         }
     }
 

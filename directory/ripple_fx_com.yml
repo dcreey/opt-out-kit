@@ -7,6 +7,7 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
+contact_email: "launch@ripple-fx.com"
 opt_out_url: null
 registered_in: [CA]
 signals: [captcha_recaptcha]

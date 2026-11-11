@@ -49,6 +49,7 @@ final class SemiAutomatedFlowTests: XCTestCase {
         var pages: [String: [Page?]]               // per host: what each prepare returns, the last repeating
         var searches: [String: Search] = [:]
         var reasons: [String: String] = [:]
+        var held: [String: Page] = [:]               // what prepareHeld returns per host (a page opened and held for the person)
         private(set) var prepared: [String] = [], listingURLs: [URL?] = []
         init(_ pages: [String: Page?]) { self.pages = pages.mapValues { [$0] } }
         func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { await prepare(form, plan: plan, listingURL: nil) }
@@ -59,6 +60,7 @@ final class SemiAutomatedFlowTests: XCTestCase {
             pages[host] = list
             return next
         }
+        func prepareHeld(_ form: OptOutForm, plan: FillPlan, fillNothing: Bool) async -> AssistedPage? { if let h = held[form.page.host ?? ""] { return h }; return await prepare(form, plan: plan) }
         func openSearch(_ url: URL) async -> SearchPage? { searches[url.host ?? ""] }
         func failureReason(for form: OptOutForm) -> String? { reasons[form.page.host ?? ""] }
     }
@@ -247,6 +249,18 @@ final class SemiAutomatedFlowTests: XCTestCase {
             r.finishQuestion.answer(answer); await tap.value; await finish(run, r)
             XCTAssertEqual(sink.results, [expected], "\(answer)")
         }
+    }
+
+    func testAPageWhoseFormCannotBeReadAndWithNoEmailIsOpenedAndHeldNotSkippedAndNeverSent() async {
+        let page = Page(blockers: [[]]); page.texts = ["Opt out here."]; let sink = Sink()
+        let d = Driver(["a.example": nil]); d.reasons["a.example"] = "noform"; d.held["a.example"] = page
+        let r = make([item("a.example")], d, sink)
+        let run = start(r)
+        await until(r.page != nil)
+        XCTAssertNotNil(r.page, "the page is on screen for the person"); XCTAssertEqual(page.sends, 0)
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertEqual(page.sends, 0, "nothing is sent for the person on a held page"); XCTAssertTrue(sink.results.isEmpty)
+        r.skip(); await finish(run, r)
     }
 
     func testMarkAsDoneThenNotYetKeepsTheSiteOpen() async {

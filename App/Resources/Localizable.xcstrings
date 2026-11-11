@@ -12352,29 +12352,6 @@
     }
    }
   },
-  "Manual, you find the page": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manuel : vous trouvez la page"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manual: tú encuentras la página"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manuell: Sie finden die Seite selbst"
-     }
-    }
-   }
-  },
   "Many sites email you a link or a code after you send the form, and only remove you once you confirm it. The email can take a few minutes, so look in your spam folder too.": {
    "extractionState": "manual",
    "localizations": {
@@ -14625,6 +14602,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Hier ist nichts weiter zu tun. Manche Seiten senden einen Bestätigungslink per E-Mail; dieser Tipp ist Ihre."
+     }
+    }
+   }
+  },
+  "Nothing to do yet: we will find its link or email later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien à faire pour l'instant : nous trouverons son lien ou son e-mail plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nada que hacer por ahora: encontraremos su enlace o correo más adelante"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vorerst nichts zu tun: Wir finden den Link oder die E-Mail später"
      }
     }
    }
@@ -25987,29 +25987,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir brauchen die aktuelle Adresse und den rechtlichen Namen, weil jedes Formular sie verlangt. Frühere Adressen sind optional, finden aber mehr Einträge."
-     }
-    }
-   }
-  },
-  "We open the site; you find its opt-out link": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nous ouvrons le site ; vous trouvez son lien de retrait"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Abrimos el sitio; tú encuentras su enlace de baja"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Wir öffnen die Website; Sie finden den Opt-out-Link"
      }
     }
    }

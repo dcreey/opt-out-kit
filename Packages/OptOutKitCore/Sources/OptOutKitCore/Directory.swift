@@ -272,6 +272,8 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var profiled: String?
     /// True for a site whose page must never have anything of the person's put into it (its form is a sign-up, search or contact form, not a request): the page is shown and the person does the rest.
     public var noFill: Bool?
+    /// True for a site with no usable page and no email yet: its link or address is to be found by hand later, so it is not a task today.
+    public var findLater: Bool?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
@@ -286,7 +288,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
         case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, caution, persistence, regions, languages, regionalSites = "regional_sites", about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
-        case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent", noFill = "no_fill"
+        case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent", noFill = "no_fill", findLater = "find_later"
     }
 }
 

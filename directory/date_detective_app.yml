@@ -8,6 +8,7 @@ tier: null
 automation: "robots_disallowed"
 confidence: "n/a"
 opt_out_url: null
+find_later: true   # no page or email found by the scan of 2026-11-11: to be found by hand
 registered_in: [CA, OR]
 signals: []
 profiled: "2026-10-22"

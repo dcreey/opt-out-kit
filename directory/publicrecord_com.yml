@@ -7,6 +7,7 @@ bucket: "direct"
 tier: "B"
 automation: "guided"
 confidence: "medium"
+contact_email: "support@publicrecord.com"
 opt_out_url: null
 registered_in: [CA]
 signals: [captcha_hcaptcha, captcha_recaptcha]

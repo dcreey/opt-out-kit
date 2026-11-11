@@ -17,7 +17,7 @@ def field(s, key):
     return m.group(1) if m else ""
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--out", default=".guess/site-review.html"); ap.add_argument("--skip", default="", help="comma-separated domains already settled (tagged or corrected): left out"); ap.add_argument("--no-email-only", action="store_true", help="leave out sites that already have an email address as a way out"); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--out", default=".guess/site-review.html"); ap.add_argument("--skip", default="", help="comma-separated domains already settled (tagged or corrected): left out"); ap.add_argument("--no-email-only", action="store_true", help="leave out sites that already have an email address as a way out"); ap.add_argument("--hide-later", action="store_true", help="leave out sites marked find_later"); a = ap.parse_args()
     skip = set(x.strip() for x in a.skip.split(",") if x.strip())
     sites = []
     for f in sorted(glob.glob("directory/*.yml")):
@@ -35,6 +35,7 @@ def main():
         if field(s, "domain") in skip: continue
         url, mail = field(s, "opt_out_url"), field(s, "contact_email")
         if a.no_email_only and mail: continue
+        if a.hide_later and re.search(r"^find_later: true", s, re.M): continue
         sig = re.search(r"^signals: \[([^\]]*)\]", s, re.M); sig = [x.strip() for x in sig.group(1).split(",")] if sig else []
         why = ("A form on its page asks for business details, so the app only walks you to it" if business else
                "Its page has no form the app can read" if url else "No opt-out page on file" + (" (the site blocked our scan)" if "wall" in blockers else ""))

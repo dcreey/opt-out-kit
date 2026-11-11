@@ -4808,6 +4808,29 @@
     }
    }
   },
+  "Later, no route yet": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Plus tard, pas encore de voie"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Más adelante, aún sin vía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Später, noch kein Weg"
+     }
+    }
+   }
+  },
   "Lead generation": {
    "extractionState": "manual",
    "localizations": {
@@ -5195,29 +5218,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Maine"
-     }
-    }
-   }
-  },
-  "Manual, you find the page": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manuel : vous trouvez la page"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manual: tú encuentras la página"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manuell: Sie finden die Seite selbst"
      }
     }
    }
@@ -9795,6 +9795,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wir gehen über das Register eines einzelnen Landes hinaus: Unsere Liste kombiniert jedes Register, das wir lesen können (bisher US-Bundesstaaten), mit weiteren bekannten Brokern – insgesamt %@ Websites. Viele sind US-Unternehmen, die das Recht Ihres Landes womöglich nicht beachten müssen, doch die meisten nehmen Opt-out-Anfragen von jedem an, und diese App sendet sie ihnen."
+     }
+    }
+   }
+  },
+  "We have not found a page or an email for this site yet. It is not a task today: we will find the link or address and unlock it later.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas encore trouvé de page ni d'e-mail pour ce site. Ce n'est pas une tâche aujourd'hui : nous trouverons le lien ou l'adresse et le débloquerons plus tard."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no hemos encontrado una página ni un correo para este sitio. Hoy no es una tarea: encontraremos el enlace o la dirección y lo desbloquearemos más adelante."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben für diese Website noch keine Seite und keine E-Mail gefunden. Heute ist es keine Aufgabe: Wir finden den Link oder die Adresse und schalten sie später frei."
      }
     }
    }

@@ -7,6 +7,7 @@ bucket: "registry"
 tier: null
 automation: "blocked"
 confidence: "n/a"
+contact_email: "info@victorywaves.com"
 opt_out_url: "https://www.victorywaves.com/legal/privacy-choices"
 registered_in: [OR, TX]
 signals: [bot_check_on_home]

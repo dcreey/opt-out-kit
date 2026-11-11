@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: null
+opt_out_url: "https://heartbeat.ai/optout"
 registered_in: [CA, OR, TX]
 signals: [captcha_turnstile, script_rendered_page]
 profiled: "2026-10-22"

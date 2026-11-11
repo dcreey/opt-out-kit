@@ -7,6 +7,7 @@ bucket: "indirect"
 tier: "B"
 automation: "guided"
 confidence: "medium"
+contact_email: "privacy@beenverified.com"
 opt_out_url: null
 signals: [captcha_recaptcha, name_input]
 profiled: "2026-10-21"

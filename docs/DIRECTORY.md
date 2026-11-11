@@ -44,7 +44,7 @@ with the reason; regenerate it with `broker-pipeline --directory directory --met
 | Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 121 (82 loaded and measured clear, 39 not yet measured but with no bot-check script) |
 | Semi-automated, with prompts for you | We fill in and send; a visible human check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 51 |
 | Semi-automated, page held for you | The page is found but has no readable form, needs login or ID, asks for business details or carries a caution: the app opens it, fills what it can (nothing when `no_fill` or caution), never sends; you finish and tap Mark as done. `Directory.pageMode` is `form`, `fillsAndHolds` or `showsOnly`. The hand-written walkthroughs are in this group too; a site with a page and an email uses the page, the email is its fallback. A link that is only the site's front page is not a page: email-only when there is an address, else manual | most of the former Guided group |
-| Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 69 |
+| Later, no route yet | No page and no email after the page, policy and email scans (marked `find_later: true`; a test requires every such site to be marked and no other). Not a task today: its link or address is found by hand and the site unlocked later | 36 |
 
 **Measured, not guessed.** A reCAPTCHA or Turnstile script on a page is only a hint: most are invisible. So
 `AppTests/LiveAssistedPreviewTests` loads every fillable form with a made-up profile and sends nothing, and
@@ -183,3 +183,7 @@ applovin, illumin, quotefinders, clearcompany, everyjoe, the BeenVerified family
 Second full crawl (2026-11-11, 227 sites): 90 with a candidate link (87 before), 60 with only an email, 12 with only a Contact Us page, 54 with no policy page, 3 with nothing, 8 timed out. New real finds:
 `experience.com` (a SixFifty request portal), `theorg.com/opt-out`, `intalytics.com` (`dilicheckrep.com/data-request/`, a form: semi-automated), plus applovin and everyjoe. The 12 Contact Us pages (the arrest-records family and a few
 others) were recorded as each site's page (guided). Left out as not the site's own: Fullstory, Omniture and a state attorney general's portal.
+
+## find_later
+
+`find_later: true` marks a site (the "Later, no route yet" group; `OptOutMethods` returns manual for exactly these, `testEverySiteWithNoRouteYetIsMarkedToFindLater…` checks it) with no usable page and no email after the email scan (`tools/find_any_emails.py`): its page or address is to be found by hand later. It changes nothing in the app (the site stays manual); `tools/build_site_review.py --hide-later` leaves these out of the review page.

@@ -7,7 +7,7 @@ bucket: "indirect"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: "https://www.govwarrantsearch.org/contact.php"
+opt_out_url: "https://www.govwarrantsearch.org/contact"
 signals: [script_rendered_page]
 profiled: "2026-10-21"
 search_check:

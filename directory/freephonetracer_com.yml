@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "low"
 opt_out_url: null
+find_later: true   # no page or email found by the scan of 2026-11-11: to be found by hand
 signals: [phone_input]
 profiled: "2026-10-21"
 search_check:

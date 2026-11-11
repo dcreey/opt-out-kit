@@ -8,6 +8,7 @@ tier: null
 automation: "unknown"
 confidence: "none"
 opt_out_url: null
+find_later: true   # no page or email found by the scan of 2026-11-11: to be found by hand
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

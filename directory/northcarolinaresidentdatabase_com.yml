@@ -8,6 +8,7 @@ tier: "C"
 automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.northcarolinaresidentdatabase.com/"
+find_later: true   # no page or email found by the scan of 2026-11-11: to be found by hand
 signals: [id_required, name_input]
 profiled: "2026-10-21"
 search_check:

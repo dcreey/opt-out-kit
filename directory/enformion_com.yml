@@ -7,7 +7,8 @@ bucket: "registry"
 tier: null
 automation: "blocked"
 confidence: "n/a"
-opt_out_url: "https://www.enformion.com/do-not-sell/"
+# Checked in a browser 2026-11-11: this is Enformion's live privacy portal (Opt-out, Delete, Know, Correct), also for Tracers.com and Endato.com.
+opt_out_url: "https://enformnstaging.wpengine.com/opt-out/"
 registered_in: [CA, OR, TX]
 signals: [bot_check_on_home]
 profiled: "2026-10-22"

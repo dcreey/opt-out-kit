@@ -9,7 +9,7 @@ public enum OptOutMethod: String, CaseIterable, Sendable {
         case .automatic: return L10n.t("Automatic opt-out")
         case .semiAutomatic: return L10n.t("Semi-automated, with prompts for you")
         case .emailOnly: return L10n.t("Email only, you send one message")
-        case .manual: return L10n.t("Manual, you find the page")
+        case .manual: return L10n.t("Later, no route yet")
         }
     }
 
@@ -18,7 +18,7 @@ public enum OptOutMethod: String, CaseIterable, Sendable {
         case .automatic: return L10n.t("The app fills in the site's form and sends it on its own.")
         case .semiAutomatic: return L10n.t("The app opens the page and fills in what it can. You solve the human check, finish anything it cannot fill, and tap Mark as done (and confirm an email if the site sends one).")
         case .emailOnly: return L10n.t("This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.")
-        case .manual: return L10n.t("We could not read this site's opt-out page. Look for its privacy or \"do not sell\" link and follow it yourself.")
+                case .manual: return L10n.t("We have not found a page or an email for this site yet. It is not a task today: we will find the link or address and unlock it later.")
         }
     }
 }

@@ -14,6 +14,13 @@ search_check:
   status: "undifferentiated"
   candidate: {"method": "GET", "url": "https://backgroundcheckme.org/?firstName={first}&lastName={last}&state={state}", "body": null}
   checked: "2026-10-21"
+closed:
+  checked: "2026-11-11"
+  evidence:
+    - "Checked by hand 2026-11-11: every link on backgroundcheckme.org is dead (the home page still answers HTTP 200)"
+    - "The opt-out and privacy links lead nowhere, so there is no working way to opt out"
+    - "try 1 https://backgroundcheckme.org and https://www.backgroundcheckme.org: HTTP 200 but all links dead"
+    - "try 2 https://backgroundcheckme.org and https://www.backgroundcheckme.org: HTTP 200 but all links dead"
 live_form:
   checked: "2026-10-24"
   found: false

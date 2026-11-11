@@ -353,7 +353,7 @@ final class LanguageAppTests: XCTestCase {
         m.setLanguage("fr")
         XCTAssertEqual(m.language, "fr")
         XCTAssertEqual(Loc.t("Next step"), "Étape suivante")
-        XCTAssertEqual(OptOutMethod.manual.title, "Manuel : vous trouvez la page", "words from the core package follow the same choice")
+        XCTAssertEqual(OptOutMethod.manual.title, "Plus tard, pas encore de voie", "words from the core package follow the same choice")
         m.setLanguage("de")
         XCTAssertEqual(Loc.f("Step %lld of %lld", 2, 5), "Schritt 2 von 5")
         let ca = try XCTUnwrap(m.jurisdiction(code: "CA"))

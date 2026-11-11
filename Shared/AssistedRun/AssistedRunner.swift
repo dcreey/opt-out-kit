@@ -171,6 +171,8 @@ final class AssistedRunner: ObservableObject {
     static let noForm = "the site has no online opt-out form we can fill, and we have no email address for it, so it was skipped"
     /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
     @Published private(set) var sentAwaitingEmail = 0
+    /// Sites whose form could not be read but whose page was opened and held for the person: nothing is ever sent on them.
+    private var heldFallback = Set<Int>()
     private enum ListingChoice { case none, mine, notListed }
     private var listingChoice = ListingChoice.none
     /// How often the screen is read for a confirmation the person caused themselves (pressing the page's own button, a message appearing without a new page).
@@ -406,7 +408,7 @@ final class AssistedRunner: ObservableObject {
     /// One site, from loading its page to its result. Returns without a result when the person went back.
     private func process(_ i: Int) async {
         do {
-            index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; emailFoundOnPage = false; autoScrolls = 0; page = nil; markedDone = nil; followUpAsked = false; emailStepFlagged = false; notice = nil; listingChoice = .none
+            heldFallback.remove(i); index = i; phase = .loading; skipFlag = false; emailedFlag = false; recordedEarly = false; awaitingNext = false; emailFoundOnPage = false; autoScrolls = 0; page = nil; markedDone = nil; followUpAsked = false; emailStepFlagged = false; notice = nil; listingChoice = .none
             if revisiting { notice = Loc.t("You came back to this site. Nothing is sent unless you do it yourself.") }
             if items[i].emailOnly { goingBack = false; await waitForEmail(items[i]); return }
             if let search = items[i].searchURL {
@@ -425,7 +427,13 @@ final class AssistedRunner: ObservableObject {
                 await offerEmailIfNeeded(items[i], .needsYou("skipped"))
                 return
             }
-            guard let ready = await preparing[i]?.value else {
+            var firstTry = await preparing[i]?.value
+            // A page that loaded but whose form we cannot read, with no address to write to: opened and held for the person (filled as far as possible, never sent) rather than skipped.
+            if firstTry == nil, driver.failureReason(for: items[i].form) == "noform", items[i].entry.contactEmail == nil, driver.discoveredEmail(for: items[i].form) == nil,
+               let held = await driver.prepareHeld(items[i].form, plan: items[i].plan, fillNothing: items[i].mode == .showsOnly) {
+                firstTry = held; heldFallback.insert(i)
+            }
+            guard let ready = firstTry else {
                 goingBack = false
                 let noForm = driver.failureReason(for: items[i].form) == "noform"
                 // The page loaded but holds no form we can fill, and the site gives an address: say so, and let the person send the email from here.
@@ -494,8 +502,8 @@ final class AssistedRunner: ObservableObject {
                 await ready.refill()
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
-            let manual = !revisiting && !items[i].handsOff && (!autoSubmit() || forceManual)
-            let step: SendStep = items[i].handsOff || revisiting || manual ? .notConfirmed(.failed("waiting for you to finish in the page")) : await PageFlow.sendOnce(ready)
+            let manual = !revisiting && !items[i].handsOff && !heldFallback.contains(i) && (!autoSubmit() || forceManual)
+            let step: SendStep = items[i].handsOff || heldFallback.contains(i) || revisiting || manual ? .notConfirmed(.failed("waiting for you to finish in the page")) : await PageFlow.sendOnce(ready)
             switch step {
                 case .sent(let email, let more):
                     sentForms += 1; sentEmail = sentEmail || email

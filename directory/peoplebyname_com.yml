@@ -7,7 +7,7 @@ bucket: "direct"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.peoplebyname.com/"
+opt_out_url: "https://www.peoplebyname.com/remove.php"
 signals: [phone_input, phone_verify]
 profiled: "2026-10-21"
 search_check:

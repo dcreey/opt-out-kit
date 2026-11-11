@@ -7,7 +7,8 @@ bucket: "direct"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: null
+contact_email: "support@whitepages.com"
+opt_out_url: "https://whitepagesprivacy.zendesk.com/hc/en-us/requests/new"
 signals: []
 profiled: "2026-10-21"
 search_check:
