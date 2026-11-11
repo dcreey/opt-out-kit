@@ -10420,13 +10420,13 @@
     }
    }
   },
-  "You reported this site as not working (%@).": {
+  "You marked this site as not working (%@).": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Vous avez signalé que ce site ne fonctionne pas (%@)."
+      "value": "Vous avez marqué ce site comme ne fonctionnant pas (%@)."
      }
     },
     "es": {
@@ -10438,7 +10438,7 @@
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Sie haben diese Website als nicht funktionierend gemeldet (%@)."
+      "value": "Du hast diese Seite als nicht funktionierend markiert (%@)."
      }
     }
    }

@@ -399,6 +399,7 @@ struct GuidedPanel: View {
     var maxStepHeight: CGFloat = 140
     @State private var stepHeight: CGFloat = 0
     @StateObject private var browserHandoff = BrowserHandoff()
+    @AppStorage("guide.collapsed") private var guideCollapsed = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -414,17 +415,22 @@ struct GuidedPanel: View {
                         Button(role: .destructive) { runner.cancel() } label: { Label("Cancel", systemImage: "xmark.circle") }.accessibilityIdentifier("guided-cancel")
                     } label: { Image(systemName: "ellipsis.circle").font(.title2) }
                         .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("guided-more")
-                    Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
-                        .accessibilityIdentifier("guided-progress")
+                    GuideCollapseButton(collapsed: $guideCollapsed)
+                    if guideCollapsed {
+                        Text(runner.siteName).font(.subheadline.bold()).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.6).layoutPriority(-1).accessibilityIdentifier("guided-progress")
+                    } else {
+                        Text(runner.flow.progressLabel ?? Loc.t("All done")).font(.caption.bold()).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                            .accessibilityIdentifier("guided-progress")
+                    }
                     Spacer()
-                    if runner.flow.index > 0 { Button("Back") { runner.back() }.font(.callout).accessibilityIdentifier("guided-back") }
+                    if runner.flow.index > 0 { Button("Back") { runner.back() }.buttonStyle(GuideSecondaryStyle()).accessibilityIdentifier("guided-back") }
                     if case .copy? = runner.flow.current?.action {
-                        Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }.font(.callout).accessibilityIdentifier("guided-copy")
+                        Button("Copy", systemImage: "doc.on.doc") { runner.copyCurrent() }.buttonStyle(GuideSecondaryStyle()).accessibilityIdentifier("guided-copy")
                     }
                     Button(nextTitle) { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("guided-next")
                 }
-                ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1))).tint(Color.exnayGold)
-                if let step = runner.flow.current {
+                if !guideCollapsed { ProgressView(value: Double(runner.flow.index), total: Double(max(runner.flow.total, 1))).tint(Color.exnayGold) }
+                if !guideCollapsed, let step = runner.flow.current {
                     // The whole instruction is shown; a long one scrolls instead of being cut off with an ellipsis.
                     ScrollView {
                         VStack(alignment: .leading, spacing: 4) {
@@ -441,8 +447,8 @@ struct GuidedPanel: View {
                     .frame(height: min(max(stepHeight, 20), maxStepHeight))
                     .onPreferenceChange(StepHeightKey.self) { stepHeight = $0 }
                 }
-                AutoSubmitToggle().padding(.top, 4)
-                if let status = runner.status {
+                if !guideCollapsed { AutoSubmitToggle().padding(.top, 4) }
+                if !guideCollapsed, let status = runner.status {
                     Label(status, systemImage: "checkmark.circle").font(.caption).foregroundStyle(.green).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("guided-status")
                 }

@@ -123,3 +123,44 @@ final class RowFieldTests: XCTestCase {
         XCTAssertEqual(RowField.binding(list, 0, \Row.name, default: "x").wrappedValue, "x")
     }
 }
+
+@MainActor
+final class FirstRunResumeTests: XCTestCase {
+    private func model(defaults: UserDefaults = UserDefaults(suiteName: "ook.test.\(UUID())")!, url: URL = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")) -> AppModel {
+        AppModel(store: HouseholdStore(url: url, keys: FixedKey()), defaults: defaults)
+    }
+
+    func testAnUnfinishedProfileBringsTheSetupBackAfterTheAppIsReopenedUntilItIsDone() {
+        let defaults = UserDefaults(suiteName: "ook.test.\(UUID())")!
+        let first = model(defaults: defaults)
+        first.finishAnnouncements()                         // the walkthrough was finished; the profile never was (the app closed or crashed)
+        first.resumeSetupIfNeeded()
+        XCTAssertTrue(first.showProfileGate, "an incomplete profile reopens the setup")
+        first.profileGateFinished(completed: false)         // "Not now": not for this launch, but the setup is still not done
+        XCTAssertFalse(first.showProfileGate)
+        let second = model(defaults: defaults)
+        second.finishAnnouncements(); second.resumeSetupIfNeeded()
+        XCTAssertTrue(second.showProfileGate, "and again on the next launch")
+        second.profileGateFinished(completed: true)
+        let third = model(defaults: defaults)
+        third.finishAnnouncements(); third.resumeSetupIfNeeded()
+        XCTAssertFalse(third.showProfileGate, "once the setup is done it does not come back")
+    }
+
+    func testTheSetupDoesNotOpenOverTheWalkthrough() {
+        let m = model()                                     // a fresh install: the walkthrough is pending
+        m.resumeSetupIfNeeded()
+        XCTAssertFalse(m.showProfileGate)
+    }
+
+    func testEmptyRowsAreDroppedWhenAProfileIsSaved() {
+        var p = Person(displayName: "Me", relationship: .me)
+        p.names = [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .nickname, name: "  "), NameEntry(kind: .nickname, name: "Patty")]
+        p.phones = ["(773) 633-1564", ""]; p.emails = ["", "pat@example.com"]
+        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(city: "", state: ""), Address(city: "Peoria", state: "IL")]
+        let q = PersonEditorView.pruned(p)
+        XCTAssertEqual(q.names.map(\.name), ["Pat Example", "Patty"])
+        XCTAssertEqual(q.phones, ["(773) 633-1564"]); XCTAssertEqual(q.emails, ["pat@example.com"])
+        XCTAssertEqual(q.addresses.map(\.city), ["Springfield", "Peoria"], "a started earlier address stays; an empty one goes")
+    }
+}

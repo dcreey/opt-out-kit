@@ -108,6 +108,7 @@ struct LinkFillerView: View {
     @State private var showDone = false
     @StateObject private var browserHandoff = BrowserHandoff()
     @StateObject private var finishQuestion = FinishQuestion()
+    @AppStorage("guide.collapsed") private var guideCollapsed = false
     var startLink: String = ""
 
     var body: some View {
@@ -115,7 +116,7 @@ struct LinkFillerView: View {
             VStack(spacing: 0) {
                 if filler.webView == nil { chooser }
                 if let web = filler.webView { loaded(web) }
-                else if !filler.status.isEmpty { Text(filler.status).font(.footnote).foregroundStyle(.secondary).padding() }
+                else if !filler.status.isEmpty { guideText(filler.status).font(.footnote).foregroundStyle(.secondary).padding() }
             }
             .navigationTitle("Email links")
             .toolbarColorScheme(filler.webView != nil ? .dark : nil, for: .navigationBar)          // the guide above the page is black: the title stays readable on it
@@ -207,16 +208,17 @@ struct LinkFillerView: View {
                         Button(role: .destructive) { returnToChooser() } label: { Label("Change link", systemImage: "link") }.accessibilityIdentifier("link-change")
                     } label: { Image(systemName: "ellipsis.circle").font(.title2) }
                         .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("link-more")
+                    GuideCollapseButton(collapsed: $guideCollapsed)
                     Image(systemName: "lock.fill").foregroundStyle(.green).font(.caption)
                     Text(filler.host).font(.caption.bold()).foregroundStyle(.white.opacity(0.8)).lineLimit(1)
                     Spacer(minLength: 4)
                     markCompletedButton
                 }
-                matchLine
-                if !filler.status.isEmpty {
-                    Text(filler.status).font(.caption).foregroundStyle(.white.opacity(0.75)).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-status")
+                if !guideCollapsed { matchLine }
+                if !guideCollapsed, !filler.status.isEmpty {
+                    guideText(filler.status).font(.caption).foregroundStyle(.white.opacity(0.75)).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-status")
                 }
-                AutoSubmitToggle()
+                if !guideCollapsed { AutoSubmitToggle() }
             }
             GuideBoundary()
             WebViewHost(webView: web)
@@ -229,7 +231,7 @@ struct LinkFillerView: View {
     private var markCompletedButton: some View {
         let matched: String? = { if case .known(let id, _, _, _)? = check { return id } else { return nil } }()
         return Button { if let matched { Task { await finish(matched) } } } label: { Text("Mark completed") }
-            .font(.callout.bold())
+            .buttonStyle(GuideSecondaryStyle())
             .disabled(matched == nil || showDone).opacity(matched == nil ? 0.45 : 1).accessibilityIdentifier("link-finished")
     }
 

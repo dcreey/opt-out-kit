@@ -69,6 +69,28 @@ data is gone. Back up your phone as usual and it comes with it."
 
 Not yet verified on a real backup and restore. An explicit passphrase-protected export is a possible later addition.
 
+**Profile editor, after the tester feedback (2026-11-09).** What is typed is also kept as a sealed **draft** (`ProfileDraftStore`, its own small file) a second after typing stops, and comes
+back when the editor reopens after a crash or a close; saving the profile removes it (nothing else is rewritten while typing, so there is no lag). The **first-run setup is remembered**: until the profile is
+complete (or its setup screen is finished once) the profile screen reopens at every launch, after the walkthrough (`resumeSetupIfNeeded`; "Not now" skips it for that session only). Every other name,
+previous address, phone and email has a visible red minus button, and one that was added and left empty is dropped when the profile is saved. A previous address asks only for city, state and ZIP code
+(no street, no from/to years: the fields stay in the data, the screen no longer asks). The current address still needs a street, because most forms ask for it. The country list is built once per language.
+
+**ZIP code fills the place.** Typing a five-digit US ZIP code in an address fills the city and state when they are empty, or are still what the previous ZIP filled in; it never overwrites what the person typed
+(`ZipLookup`, a bundled table of 40,977 ZIP codes from GeoNames, CC BY 4.0, credited in Settings; nothing typed leaves the phone, so there is no street autocomplete, which would send it to Apple).
+
+**The guided walkthrough's pages** each start with one bold line, the thing to take away ("A site is not finished until you tap the link in its email."), and the lines under it explain it: the … menu lists every
+item in plain words (including Open in my browser and There is another email step), "human check" is explained as the "I am not a robot" box or puzzle, and the emails page says where to look, how to bring the
+link into Exnay, and that some sites send more than one.
+
+**Nothing is reported anywhere.** The app has no server and sends no reports, so no wording says or suggests otherwise. "Not working" in the … menu only marks the site on this phone and sets it aside to try again later
+(the word is "marked", never "reported"; the walkthrough says "Nothing is sent anywhere"); "Look a site up yourself and mark what you see" is likewise kept on the phone.
+
+**Roll the guide up.** A ^ beside the … button (Solve and send, the guided steps, Email links) folds the black guide to one row: the site's name (with its place in the list, such as 1/2) takes the place of
+"Site 1 of 2" in the top bar, beside the buttons, and nothing else of the guide shows, so the site's page has the room; the progress bar, instruction, notes, "Send an email instead" and Auto-send come back when it is
+unrolled. In Solve and send, rolled up, an envelope button before Mark as done does "Send an email instead" (it is in the … menu too), shown only for a site that has an address to write to. The guide's second buttons (Mark as done, the envelope, Back, Copy, Mark completed) are gold-outlined capsules (`GuideSecondaryStyle`) beside the solid gold primary one, and never cut short: the site's name shrinks first. One choice for every guide, kept between sites and after the app is closed. **My data** ends with **Applicable law**: the exact sentence
+the app types into a box that asks which law gives the person this right (`FormFiller.legalBasis`), to paste where it could not reach. On forewarn.com that box is hidden until the person ticks the basis for
+the request themselves (their claim, never ticked for them); it is then filled, and the box about a threat of harm never is (`testForewarnsLawBox...`).
+
 The last tab is **Settings** (it was called About): the mail app, advertising ID, automatic protection, "Send forms for me by default", accepting site terms (with its Turn off), the walkthrough replays and the information about the app all live there.
 
 ## Two walkthroughs

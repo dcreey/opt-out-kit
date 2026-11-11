@@ -142,17 +142,19 @@ final class DetailChoicesTests: XCTestCase {
                        emails: ["sam@example.com", "SAM@example.com", "work@example.com"], phones: ["555-0100"], birthdate: "1990-04-09")
         p.confirmsOwnIdentity = true
         let groups = DetailChoices.groups(for: p, email: "forms@example.com")
-        XCTAssertEqual(groups.map(\.kind), [.name, .email, .phone, .address, .birthdate])
+        XCTAssertEqual(groups.map(\.kind), [.name, .email, .phone, .address, .birthdate, .law])
         XCTAssertEqual(groups[0].values, ["Sam Q Rivera"])
         XCTAssertEqual(groups[1].values, ["forms@example.com", "sam@example.com", "work@example.com"])
         XCTAssertEqual(groups[2].values, ["555-0100"])
         XCTAssertEqual(groups[3].values, ["1 Main St, Austin, TX 78701", "Dallas, TX"])
         XCTAssertEqual(groups[4].values, ["04/09/1990"])
+        XCTAssertEqual(groups[5].values, [FormFiller.legalBasis(for: p)], "the applicable law is exactly the sentence the app types into a box that asks for it")
+        XCTAssertTrue(groups[5].values[0].contains("California Consumer Privacy Act"))
     }
 
     func testAProfileWithLittleOnlyOffersWhatItHas() {
         let groups = DetailChoices.groups(for: Person(displayName: "Alex", names: []))
-        XCTAssertEqual(groups.map(\.kind), [.name])
+        XCTAssertEqual(groups.map(\.kind), [.name, .law])
         XCTAssertEqual(groups[0].values, ["Alex"])
     }
 }

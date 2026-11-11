@@ -61,6 +61,7 @@ struct RootView: View {
             if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
         }
         #endif
+        .task { try? await Task.sleep(nanoseconds: 700_000_000); model.resumeSetupIfNeeded() }          // the first run picks up where a crash or a close left it
         .onChange(of: model.requestedTab) { _, t in if let t { tab = t; model.requestedTab = nil } }
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
         .sheet(item: $model.runReport) { report in RunReportSheet(report: report) { model.runReport = nil } }

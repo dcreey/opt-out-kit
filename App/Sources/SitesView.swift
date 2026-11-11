@@ -108,7 +108,7 @@ struct SitesView: View {
                     .disabled(model.searchBlockedReason != nil)
                     .accessibilityIdentifier("quick-checks")
                 } footer: {
-                    Text("Look a site up yourself in 20 seconds and tell us what you see. Each look earns points.")
+                    Text("Look a site up yourself in 20 seconds and mark what you see. Each look earns points.")
                 }
                 Section {
                     Button { model.requireProfile { showScan = true } } label: {
@@ -200,7 +200,7 @@ struct SitesView: View {
                 let n = Directory.familySize(of: e, in: model.directory)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
                 if let note = platformNote(for: e) { Text(note).font(.caption).foregroundStyle(.teal) }
-                if model.activeIssue(for: e.id) != nil { Text("Reported not working").font(.caption).foregroundStyle(.red) }
+                if model.activeIssue(for: e.id) != nil { Text("Marked as not working").font(.caption).foregroundStyle(.red) }
             }
             Spacer()
         }
@@ -260,7 +260,7 @@ struct BrokerInfoView: View {
                 }
             }
             if let issue = model.activeIssue(for: broker.id) {
-                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             Section {
@@ -511,7 +511,7 @@ struct DirectoryInfoView: View {
                 if model.isSkippedForever(entry.id) {
                     Label("Skipped for good", systemImage: "forward.end").font(.headline).foregroundStyle(.secondary).accessibilityIdentifier("site-state")
                 } else if let back = model.progress.skipReturns(entry.id) {
-                    Label(skip.reason == .notWorking ? "Reported as not working" : "Skipped", systemImage: "forward").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
+                    Label(skip.reason == .notWorking ? "Marked as not working" : "Skipped", systemImage: "forward").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
                     Text(Loc.f("Comes back to your list on %@.", back.formatted(date: .abbreviated, time: .omitted))).font(.footnote).foregroundStyle(.secondary)
                 }
             } else {
@@ -533,7 +533,7 @@ struct DirectoryInfoView: View {
             }
             if let review, let person, review.hasScreenshot { SiteScreenshot(item: review, person: person) }
             if let issue = model.activeIssue(for: entry.id) {
-                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             if model.progress.isParked(entry.id) {

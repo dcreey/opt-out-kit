@@ -222,7 +222,7 @@ struct SkippedSitesView: View {
     }
 
     private func status(_ row: (entry: DirectoryEntry, skip: SiteSkip, returns: Date?, forever: Bool)) -> String {
-        let why = row.skip.reason == .notWorking ? Loc.t("Reported as not working") : Loc.t("Skipped")
+        let why = row.skip.reason == .notWorking ? Loc.t("Marked as not working") : Loc.t("Skipped")
         if row.forever { return Loc.f("%@ · skipped for good", why) }
         if let back = row.returns { return Loc.f("%@ · comes back %@", why, back.formatted(date: .abbreviated, time: .omitted)) }
         return Loc.f("%@ · ready to try again", why)

@@ -3615,3 +3615,65 @@ final class FormsNeedingThePersonTests: XCTestCase {
         XCTAssertEqual(OptOutMethods.classify(try entry(["file"], caution: true)).method, .guided, "a face photo is never uploaded for the person")
     }
 }
+
+final class ProfileDraftTests: XCTestCase {
+    private func store() -> ProfileDraftStore {
+        ProfileDraftStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("draft-\(UUID().uuidString).sealed"), keys: FixedKey())
+    }
+
+    func testADraftComesBackAfterTheAppIsClosedAndIsGoneOnceCleared() throws {
+        let s = store()
+        XCTAssertNil(s.load())
+        var p = Person(displayName: "Me", relationship: .me); p.names = [NameEntry(kind: .legal, name: "Pat Example")]
+        try s.save(ProfileDraft(personID: p.id, person: p, email: "pat@example.com"))
+        let back = try XCTUnwrap(s.load())
+        XCTAssertEqual(back.person.legalName, "Pat Example"); XCTAssertEqual(back.email, "pat@example.com"); XCTAssertEqual(back.personID, p.id)
+        s.clear(); XCTAssertNil(s.load())
+    }
+
+    func testADraftIsSealedNotPlainText() throws {
+        let s = store(); var p = Person(displayName: "Me", relationship: .me); p.names = [NameEntry(kind: .legal, name: "Zelda Quux")]
+        try s.save(ProfileDraft(personID: p.id, person: p, email: "z@example.com"))
+        let raw = try Data(contentsOf: s.url)
+        XCTAssertNil(String(decoding: raw, as: UTF8.self).range(of: "Zelda"))
+    }
+
+    func testADraftThatCannotBeReadIsIgnoredNotFatal() throws {
+        let s = store(); try Data("not a draft".utf8).write(to: s.url)
+        XCTAssertNil(s.load())
+    }
+}
+
+final class ZipLookupTests: XCTestCase {
+    func testAZipCodeGivesItsCityAndState() {
+        XCTAssertEqual(ZipLookup.place(for: "62701"), ZipLookup.Place(city: "Springfield", state: "IL"))
+        XCTAssertEqual(ZipLookup.place(for: "60614")?.city, "Chicago")
+        XCTAssertEqual(ZipLookup.place(for: "90210")?.state, "CA")
+        XCTAssertEqual(ZipLookup.place(for: " 62701-1234")?.city, "Springfield", "a ZIP+4 and stray spaces still work")
+    }
+
+    func testAnythingElseGivesNothing() {
+        for z in ["", "6270", "abcde", "00000", "627011x", "٦٢٧٠١"] { XCTAssertNil(ZipLookup.place(for: z), z) }
+    }
+
+    func testEveryPlaceHasAStateTheStatePickerKnows() {
+        for z in ["99501", "96701", "20001", "10001", "33101"] {
+            let state = try? XCTUnwrap(ZipLookup.place(for: z)?.state)
+            XCTAssertNotNil(state.flatMap { USStates.name(for: $0) }, z)
+        }
+    }
+}
+
+final class ThisNationFlowTests: XCTestCase {
+    func testEveryjoeIsWalkedThroughThisNationsFindYourRecordSteps() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let brokers = try Registry.load(directory: root.appendingPathComponent("brokers"))
+        let every = try XCTUnwrap(entries.first { $0.domain == "everyjoe.com" })
+        XCTAssertNil(every.optOutForm, "its page's only form is a name search: pressing Send on it removes nothing")
+        XCTAssertEqual(every.optOutURL?.absoluteString, "https://www.thisnation.com/do-not-sell/")
+        let broker = try XCTUnwrap(brokers.first { $0.id == "thisnation" })
+        XCTAssertEqual(broker.covers, ["everyjoe.com"])
+        XCTAssertTrue(broker.steps.contains { $0.waitForEmail != nil }, "the removal is confirmed by an email")
+    }
+}

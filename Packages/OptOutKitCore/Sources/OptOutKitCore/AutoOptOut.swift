@@ -96,7 +96,7 @@ public struct AutoOptOut: Sendable {
         guard let form = entry.optOutForm else { return (.needsYou(L10n.t("No opt-out form found for this site yet.")), nil) }
         if let hold, now < hold.until { return (.coveredByPlatform(name: hold.name, until: hold.until), nil) }
         if let issue = progress.activeIssue(for: entry.id, now: now) {
-            return (.needsYou(L10n.f("You reported this site as not working (%@).", issue.kind.label.lowercased())), nil)
+            return (.needsYou(L10n.f("You marked this site as not working (%@).", issue.kind.label.lowercased())), nil)
         }
         if let last = progress.optOutAttempts[entry.id]?.filter(\.wasSubmitted).map(\.date).max() {
             // Inside a run period, a site that already went through in it is handled: every run in the period leaves it alone, and the next period starts afresh.

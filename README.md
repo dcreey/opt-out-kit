@@ -85,6 +85,10 @@ Working: the queue and daily flow, the live-form engine, about 27 sites confirme
 languages, the translations. Still open: many semi-automatic forms have only been dry-run; OneTrust privacy-portal forms whose Submit button starts disabled;
 walled people-search sites; non-US sends. Brokers re-list people, so check back on opted-out sites.
 
+## Data credits
+
+ZIP code places come from the GeoNames postal code data (geonames.org, Creative Commons Attribution 4.0), bundled as `Packages/OptOutKitCore/Sources/OptOutKitCore/Resources/zips-us.tsv`.
+
 ## More
 
 [docs/DESIGN.md](docs/DESIGN.md) (design), [docs/AUTOMATION.md](docs/AUTOMATION.md) (what is automatic and why), [docs/DIRECTORY.md](docs/DIRECTORY.md) (directory format),

@@ -1680,29 +1680,6 @@
     }
    }
   },
-  "A human check, \"I am human\", which only you can tick": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Un contrôle anti-robot, « Je suis humain », que vous seul pouvez cocher"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una comprobación antirrobots, «Soy humano», que solo tú puedes marcar"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung, „Ich bin ein Mensch“, die nur du anhaken kannst"
-     }
-    }
-   }
-  },
   "A buyer finds the right person at your company and you get a useful deal or a job lead.": {
    "extractionState": "manual",
    "localizations": {
@@ -3516,6 +3493,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Werbe-ID erlauben"
+     }
+    }
+   }
+  },
+  "Show the whole guide": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Afficher tout le guide"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mostrar toda la guía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ganzen Guide anzeigen"
+     }
+    }
+   }
+  },
+  "Roll the guide up": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Replier le guide"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Plegar la guía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Guide einklappen"
+     }
+    }
+   }
+  },
+  "Applicable law": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Loi applicable"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ley aplicable"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Geltendes Gesetz"
      }
     }
    }
@@ -6303,29 +6349,6 @@
     }
    }
   },
-  "Copy link: the page's address": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Copier le lien : l'adresse de la page"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Copiar enlace: la dirección de la página"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Link kopieren: die Adresse der Seite"
-     }
-    }
-   }
-  },
   "Copy the link from the email": {
    "extractionState": "manual",
    "localizations": {
@@ -7798,29 +7821,6 @@
     }
    }
   },
-  "Each site is a little different. Follow the guide, and tap Next when the page says it is done.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Chaque site est un peu différent. Suivez le guide et touchez Suivant quand la page indique que c'est terminé."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cada sitio es un poco distinto. Sigue la guía y toca Siguiente cuando la página diga que está hecho."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jede Seite ist etwas anders. Folge der Anleitung und tippe auf Weiter, wenn die Seite meldet, dass es erledigt ist."
-     }
-    }
-   }
-  },
   "Each site sees only the details its form needs": {
    "extractionState": "manual",
    "localizations": {
@@ -7978,29 +7978,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "E-Mail-Links"
-     }
-    }
-   }
-  },
-  "Email links finishes it, and the site counts as done": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Liens e-mail termine le travail et le site compte comme fait"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Enlaces de correo lo termina y el sitio cuenta como hecho"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "E-Mail-Links erledigt den Rest, und die Seite zählt als erledigt"
      }
     }
    }
@@ -8672,29 +8649,6 @@
     }
    }
   },
-  "Exnay's guide is the black part on top. The site's own opt-out page is below the gold line. The guide fills the page in for you and tells you what is left for you to do.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Le guide d'Exnay est la partie noire en haut. La page de désinscription du site est sous la ligne dorée. Le guide remplit la page pour vous et vous dit ce qu'il reste à faire."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La guía de Exnay es la parte negra de arriba. La página de baja del sitio está debajo de la línea dorada. La guía rellena la página por ti y te dice qué te queda por hacer."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die Exnay-Anleitung ist der schwarze Teil oben. Die Abmeldeseite der Website liegt unter der goldenen Linie. Die Anleitung füllt die Seite für dich aus und sagt dir, was noch zu tun ist."
-     }
-    }
-   }
-  },
   "Exnay: Opt Out Kit": {
    "extractionState": "manual",
    "localizations": {
@@ -8990,29 +8944,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites ausfüllen"
-     }
-    }
-   }
-  },
-  "Fill the form again: if something was cleared or missed": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Remplir à nouveau le formulaire : si quelque chose a été effacé ou oublié"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Rellenar de nuevo el formulario: si algo se borró o se pasó por alto"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Formular erneut ausfüllen: falls etwas gelöscht oder übersehen wurde"
      }
     }
    }
@@ -12260,25 +12191,25 @@
     }
    }
   },
-  "Look a site up yourself in 20 seconds and tell us what you see. Each look earns points.": {
+  "Look a site up yourself in 20 seconds and mark what you see. Each look earns points.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cherchez un site vous-même en 20 secondes et dites-nous ce que vous voyez. Chaque vérification rapporte des points."
+      "value": "Cherchez vous-même un site en 20 secondes et notez ce que vous voyez. Chaque recherche rapporte des points."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Busca un sitio tú mismo en 20 segundos y cuéntanos lo que ves. Cada comprobación da puntos."
+      "value": "Busca un sitio tú mismo en 20 segundos y anota lo que ves. Cada búsqueda da puntos."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Suchen Sie eine Website selbst in 20 Sekunden und sagen Sie uns, was Sie sehen. Jede Prüfung bringt Punkte."
+      "value": "Such selbst in 20 Sekunden nach einer Seite und halte fest, was du siehst. Jede Suche bringt Punkte."
      }
     }
    }
@@ -12555,29 +12486,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Manuell: Sie finden die Seite selbst"
-     }
-    }
-   }
-  },
-  "Many sites send you an email after you submit, with a link or a code to confirm it. Until you tap it, the opt-out is not done.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "De nombreux sites vous envoient un e-mail après l'envoi, avec un lien ou un code de confirmation. Tant que vous n'y touchez pas, la désinscription n'est pas terminée."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Muchos sitios te envían un correo después de enviar, con un enlace o código para confirmar. Hasta que lo pulses, la baja no está hecha."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Viele Seiten schicken dir nach dem Absenden eine E-Mail mit einem Link oder Code zur Bestätigung. Bis du ihn antippst, ist die Abmeldung nicht erledigt."
      }
     }
    }
@@ -13180,48 +13088,25 @@
     }
    }
   },
-  "Most opt-out pages open with a wall of legal terms: you must prove who you are, we cannot promise anything, you agree to this and that. A lot of it is written to make you feel you have no right to opt out.": {
+  "Most recent first. City, state and ZIP code are enough.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "La plupart des pages de désinscription s'ouvrent sur un mur de termes juridiques : vous devez prouver qui vous êtes, nous ne promettons rien, vous acceptez ceci et cela. Beaucoup de ces textes sont écrits pour vous faire croire que vous n'avez pas le droit de vous désinscrire."
+      "value": "Les plus récentes d'abord. La ville, l'État et le code postal suffisent."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "La mayoría de las páginas de baja empiezan con un muro de términos legales: debes demostrar quién eres, no prometemos nada, aceptas esto y aquello. Gran parte está escrito para que sientas que no tienes derecho a darte de baja."
+      "value": "Las más recientes primero. Basta con la ciudad, el estado y el código postal."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Die meisten Abmeldeseiten beginnen mit einer Wand aus Rechtstexten: Du musst beweisen, wer du bist, wir versprechen nichts, du stimmst dem und dem zu. Vieles davon soll dir das Gefühl geben, kein Recht auf Abmeldung zu haben."
-     }
-    }
-   }
-  },
-  "Most recent first. City and state are enough; add a street only if you want it sent.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Le plus récent d'abord. La ville et l'État suffisent ; n'ajoutez une rue que si vous voulez qu'elle soit envoyée."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Lo más reciente primero. Basta con ciudad y estado; añade una calle solo si quieres que se envíe."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Das Neueste zuerst. Stadt und Bundesstaat genügen; fügen Sie eine Straße nur hinzu, wenn sie gesendet werden soll."
+      "value": "Zuletzt zuerst. Stadt, Bundesstaat und Postleitzahl genügen."
      }
     }
    }
@@ -13245,29 +13130,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die meisten Websites schützen ihre Formulare mit Bot-Prüfungen, rechnen Sie also damit, dass viele Sie brauchen. Die App sagt Ihnen, welche."
-     }
-    }
-   }
-  },
-  "Most sites want the same few things.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La plupart des sites demandent les mêmes choses."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La mayoría de los sitios piden lo mismo."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die meisten Seiten wollen dasselbe."
      }
     }
    }
@@ -13383,29 +13245,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Meine Daten"
-     }
-    }
-   }
-  },
-  "My data: tap any detail to copy it, even your advertising ID, for a box we did not fill": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Mes données : touchez une information pour la copier, même votre identifiant publicitaire, pour un champ que nous n'avons pas rempli"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Mis datos: toca un dato para copiarlo, incluso tu identificador de publicidad, para un campo que no rellenamos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Meine Daten: tippe auf eine Angabe, um sie zu kopieren, auch deine Werbe-ID, für ein Feld, das wir nicht ausgefüllt haben"
      }
     }
    }
@@ -14606,25 +14445,600 @@
     }
    }
   },
-  "Not working: tell us what went wrong with this site": {
+  "A human check: the \"I am not a robot\" box or a picture puzzle. Only you can pass it": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Ça ne marche pas : dites-nous ce qui a échoué sur ce site"
+      "value": "Une vérification humaine : la case « Je ne suis pas un robot » ou un puzzle d'images. Vous seul pouvez la passer"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "No funciona: cuéntanos qué falló con este sitio"
+      "value": "Una comprobación humana: la casilla «No soy un robot» o un rompecabezas de imágenes. Solo tú puedes pasarla"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Funktioniert nicht: sag uns, was bei dieser Seite schiefging"
+      "value": "Eine Menschen-Prüfung: das Feld „Ich bin kein Roboter“ oder ein Bilderrätsel. Nur du kannst sie bestehen"
+     }
+    }
+   }
+  },
+  "A site is not finished until you tap the link in its email.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un site n'est pas terminé tant que vous n'avez pas touché le lien de son e-mail."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un sitio no está terminado hasta que toques el enlace de su correo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Seite ist erst fertig, wenn du den Link in ihrer E-Mail angetippt hast."
+     }
+    }
+   }
+  },
+  "Copy link: copy this page's web address": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copier le lien : copier l'adresse web de cette page"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiar enlace: copia la dirección web de esta página"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link kopieren: die Webadresse dieser Seite kopieren"
+     }
+    }
+   }
+  },
+  "Each site is a little different, so read the guide's line each time.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Chaque site est un peu différent : lisez chaque fois la ligne du guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada sitio es un poco distinto, así que lee cada vez la línea de la guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Seite ist ein bisschen anders, lies also jedes Mal die Zeile des Guides."
+     }
+    }
+   }
+  },
+  "Exnay opens the page and fills it in. When the page says you are done, tap Mark completed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exnay ouvre la page et la remplit. Quand la page indique que c'est terminé, touchez Marquer comme terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exnay abre la página y la rellena. Cuando la página diga que has terminado, toca Marcar como completado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exnay öffnet die Seite und füllt sie aus. Wenn die Seite sagt, dass du fertig bist, tippe auf „Als erledigt markieren“"
+     }
+    }
+   }
+  },
+  "Fill the form again: if the page cleared a box or we missed one": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Remplir à nouveau le formulaire : si la page a effacé une case ou si nous en avons manqué une"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rellenar de nuevo: si la página borró una casilla o se nos escapó una"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Formular erneut ausfüllen: wenn die Seite ein Feld geleert hat oder wir eines vergessen haben"
+     }
+    }
+   }
+  },
+  "Follow the black guide on top. The site's own page is below it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Suivez le guide noir en haut. La page du site est en dessous."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sigue la guía negra de arriba. La página del sitio está debajo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Folge dem schwarzen Guide oben. Die Seite der Website ist darunter."
+     }
+    }
+   }
+  },
+  "If something goes wrong, tap the … button in the guide.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si quelque chose ne va pas, touchez le bouton … dans le guide."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si algo sale mal, toca el botón … de la guía."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn etwas schiefgeht, tippe im Guide auf die Schaltfläche …."
+     }
+    }
+   }
+  },
+  "Many sites email you a link or a code after you send the form, and only remove you once you confirm it. The email can take a few minutes, so look in your spam folder too.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beaucoup de sites vous envoient un lien ou un code par e-mail après l'envoi du formulaire, et ne vous suppriment qu'une fois que vous avez confirmé. L'e-mail peut mettre quelques minutes ; regardez aussi dans vos indésirables."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Muchos sitios te envían un enlace o un código por correo después de enviar el formulario, y solo te eliminan cuando lo confirmas. El correo puede tardar unos minutos, así que mira también en spam."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Viele Seiten schicken dir nach dem Absenden einen Link oder Code per E-Mail und entfernen dich erst, wenn du ihn bestätigst. Die E-Mail kann ein paar Minuten brauchen; schau auch im Spam-Ordner nach."
+     }
+    }
+   }
+  },
+  "Most opt-out pages open with a wall of legal terms: you must prove who you are, we cannot promise anything, you agree to this and that. Much of it is written to make you feel you have no right to opt out. You do.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La plupart des pages de retrait s'ouvrent sur un mur de termes juridiques : vous devez prouver qui vous êtes, nous ne promettons rien, vous acceptez ceci et cela. Beaucoup est écrit pour vous faire croire que vous n'avez pas le droit de vous retirer. Vous l'avez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La mayoría de las páginas de baja empiezan con un muro de términos legales: debes probar quién eres, no prometemos nada, aceptas esto y aquello. Gran parte está escrita para que sientas que no tienes derecho a darte de baja. Sí lo tienes."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die meisten Opt-out-Seiten beginnen mit einer Wand aus Rechtstexten: du musst beweisen, wer du bist, wir versprechen nichts, du stimmst dem und jenem zu. Vieles davon soll dir das Gefühl geben, du hättest kein Recht auf Opt-out. Doch, das hast du."
+     }
+    }
+   }
+  },
+  "Most sites need the same few things.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La plupart des sites demandent les mêmes quelques choses."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La mayoría de los sitios necesitan las mismas pocas cosas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die meisten Seiten brauchen dieselben wenigen Dinge."
+     }
+    }
+   }
+  },
+  "My data: tap your name, address, phone or email to copy it, then paste it into a box we did not fill. Your advertising ID is here too": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mes données : touchez votre nom, adresse, téléphone ou e-mail pour le copier, puis collez-le dans une case que nous n'avons pas remplie. Votre identifiant publicitaire est aussi là"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mis datos: toca tu nombre, dirección, teléfono o correo para copiarlo y pégalo en una casilla que no rellenamos. Tu identificador publicitario también está aquí"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Meine Daten: tippe auf deinen Namen, deine Adresse, Telefonnummer oder E-Mail, um sie zu kopieren, und füge sie in ein Feld ein, das wir nicht ausgefüllt haben. Deine Werbe-ID ist auch hier"
+     }
+    }
+   }
+  },
+  "Not working: the page is broken. Pick what went wrong and Exnay sets this site aside to try again later. Nothing is sent anywhere": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne fonctionne pas : la page est cassée. Choisissez ce qui n'a pas marché et Exnay met ce site de côté pour réessayer plus tard. Rien n'est envoyé nulle part"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No funciona: la página está rota. Elige qué falló y Exnay deja este sitio aparte para reintentarlo más tarde. No se envía nada a ningún sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Funktioniert nicht: die Seite ist kaputt. Wähle, was schiefging, und Exnay legt diese Seite für später beiseite. Es wird nichts irgendwohin gesendet"
+     }
+    }
+   }
+  },
+  "Open in my browser: finish in Safari or your usual browser. When you come back we ask whether you finished": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrir dans mon navigateur : terminez dans Safari ou votre navigateur habituel. À votre retour, nous demandons si vous avez terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abrir en mi navegador: termina en Safari o en tu navegador habitual. Al volver te preguntamos si terminaste"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In meinem Browser öffnen: beende es in Safari oder deinem üblichen Browser. Wenn du zurückkommst, fragen wir, ob du fertig bist"
+     }
+    }
+   }
+  },
+  "Open the email in your mail app. Press and hold its link, tap Share, and choose Exnay. Or copy the link and paste it into the Email links tab": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ouvrez l'e-mail dans votre app de messagerie. Appuyez longuement sur son lien, touchez Partager et choisissez Exnay. Ou copiez le lien et collez-le dans l'onglet Liens e-mail"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abre el correo en tu app de correo. Mantén pulsado su enlace, toca Compartir y elige Exnay. O copia el enlace y pégalo en la pestaña Enlaces de correo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffne die E-Mail in deiner Mail-App. Halte den Link gedrückt, tippe auf Teilen und wähle Exnay. Oder kopiere den Link und füge ihn im Tab „E-Mail-Links“ ein"
+     }
+    }
+   }
+  },
+  "Refresh the page: reload it and fill your details in again": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Actualiser la page : la recharger et remplir à nouveau vos informations"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Actualizar la página: recárgala y vuelve a rellenar tus datos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite neu laden: sie neu laden und deine Angaben erneut ausfüllen"
+     }
+    }
+   }
+  },
+  "Skip or cancel: leave this site and come back to it later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passer ou annuler : quitter ce site et y revenir plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitir o cancelar: deja este sitio y vuelve más tarde"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Überspringen oder abbrechen: diese Seite verlassen und später wiederkommen"
+     }
+    }
+   }
+  },
+  "Some sites send more than one email. If another comes, tap There is another email step in the … menu, and the site stays on your list": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Certains sites envoient plus d'un e-mail. Si un autre arrive, touchez Il y a une autre étape par e-mail dans le menu …, et le site reste sur votre liste"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Algunos sitios envían más de un correo. Si llega otro, toca Hay otro paso por correo en el menú … y el sitio sigue en tu lista"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manche Seiten schicken mehr als eine E-Mail. Wenn noch eine kommt, tippe im …-Menü auf „Es gibt einen weiteren E-Mail-Schritt“, und die Seite bleibt auf deiner Liste"
+     }
+    }
+   }
+  },
+  "Sometimes a code or an ID. You type or copy it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Parfois un code ou une pièce d'identité. Vous le tapez ou le copiez"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "A veces un código o un documento de identidad. Lo escribes o lo copias"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Manchmal ein Code oder ein Ausweis. Du tippst oder kopierst ihn"
+     }
+    }
+   }
+  },
+  "The guide fills the page in for you and tells you the one thing left for you to do. When the page says it is done, tap Next.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le guide remplit la page pour vous et vous dit la seule chose qu'il reste à faire. Quand la page indique que c'est terminé, touchez Suivant."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La guía rellena la página por ti y te dice lo único que te queda por hacer. Cuando la página diga que está hecho, toca Siguiente."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Der Guide füllt die Seite für dich aus und sagt dir das Eine, das noch für dich bleibt. Wenn die Seite sagt, dass es erledigt ist, tippe auf Weiter."
+     }
+    }
+   }
+  },
+  "Then Send. With Auto-send on, we press the page's Send button once the checks are done. Turn it off to press it yourself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Puis Envoyer. Avec l'envoi automatique, nous appuyons sur le bouton Envoyer de la page une fois les vérifications faites. Désactivez-le pour appuyer vous-même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Luego Enviar. Con el envío automático, pulsamos el botón Enviar de la página cuando las comprobaciones están hechas. Desactívalo para pulsarlo tú"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dann Senden. Mit Auto-Senden drücken wir den Senden-Knopf der Seite, sobald die Prüfungen erledigt sind. Schalte es aus, um selbst zu drücken"
+     }
+    }
+   }
+  },
+  "There is another email step: the site said it will email you more than once": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il y a une autre étape par e-mail : le site a dit qu'il vous écrira plus d'une fois"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hay otro paso por correo: el sitio dijo que te escribirá más de una vez"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es gibt einen weiteren E-Mail-Schritt: die Seite hat gesagt, dass sie dir mehr als einmal schreibt"
+     }
+    }
+   }
+  },
+  "When the page says to check your email, we ask whether an email follows. Say yes, and the site goes on your waiting list": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quand la page dit de vérifier vos e-mails, nous demandons si un e-mail suit. Dites oui, et le site passe sur votre liste d'attente"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cuando la página diga que revises tu correo, preguntamos si llega un correo. Di que sí y el sitio pasa a tu lista de espera"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn die Seite sagt, du sollst deine E-Mails prüfen, fragen wir, ob eine E-Mail folgt. Sag Ja, und die Seite kommt auf deine Warteliste"
+     }
+    }
+   }
+  },
+  "You do not need to read it all, and you do not need to agree to more than the form asks. Fill in the form, send it, and move on. If a page asks for something odd, like a photo of your ID, choose Not working in the … menu or skip the site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous n'avez pas à tout lire, ni à accepter plus que ce que le formulaire demande. Remplissez-le, envoyez-le et passez à la suite. Si une page demande quelque chose d'étrange, comme une photo de votre pièce d'identité, choisissez Ne fonctionne pas dans le menu … ou passez le site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No necesitas leerlo todo ni aceptar más de lo que pide el formulario. Rellénalo, envíalo y sigue. Si una página pide algo raro, como una foto de tu documento, elige No funciona en el menú … u omite el sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Du musst nicht alles lesen und nicht mehr zustimmen, als das Formular verlangt. Fülle es aus, sende es ab und geh weiter. Wenn eine Seite etwas Seltsames verlangt, etwa ein Foto deines Ausweises, wähle im …-Menü „Funktioniert nicht“ oder überspringe die Seite."
+     }
+    }
+   }
+  },
+  "You have the right to opt out, whatever the page says.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez le droit de vous retirer, quoi que dise la page."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tienes derecho a darte de baja, diga lo que diga la página."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Du hast das Recht auf Opt-out, was auch immer die Seite sagt."
+     }
+    }
+   }
+  },
+  "Your name, address and email. We fill these in": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Votre nom, adresse et e-mail. Nous les remplissons"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tu nombre, dirección y correo. Los rellenamos nosotros"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dein Name, deine Adresse und E-Mail. Die füllen wir aus"
      }
     }
    }
@@ -15867,29 +16281,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnen Sie die Prüfseite in diesem Browser. Sie zeigt, ob das Signal gesendet wird."
-     }
-    }
-   }
-  },
-  "Open the confirmation in your mail, and share or copy its link into Email links": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ouvrez la confirmation dans votre messagerie et partagez ou copiez son lien dans Liens e-mail"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Abre la confirmación en tu correo y comparte o copia su enlace en Enlaces de correo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Öffne die Bestätigung in deiner Mail und teile oder kopiere ihren Link in E-Mail-Links"
      }
     }
    }
@@ -17780,29 +18171,6 @@
     }
    }
   },
-  "Refresh the page: reload it, and your details are put back": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Actualiser la page : on la recharge et vos informations sont remises"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Actualizar la página: se recarga y se vuelven a poner tus datos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Seite aktualisieren: Sie wird neu geladen und deine Angaben werden wieder eingetragen"
-     }
-    }
-   }
-  },
   "Region (optional)": {
    "extractionState": "manual",
    "localizations": {
@@ -17914,6 +18282,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Beziehung"
+     }
+    }
+   }
+  },
+  "Remove": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Supprimer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quitar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entfernen"
      }
     }
    }
@@ -18033,13 +18424,13 @@
     }
    }
   },
-  "Reported not working": {
+  "Marked as not working": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Signalé comme ne fonctionnant pas"
+      "value": "Marqué comme ne fonctionnant pas"
      }
     },
     "es": {
@@ -18051,7 +18442,7 @@
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Als nicht funktionierend gemeldet"
+      "value": "Als nicht funktionierend markiert"
      }
     }
    }
@@ -19942,29 +20333,6 @@
     }
    }
   },
-  "Skip or cancel: leave a site for later": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Passer ou annuler : laisser un site pour plus tard"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Omitir o cancelar: dejar un sitio para más tarde"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Überspringen oder abbrechen: eine Seite für später lassen"
-     }
-    }
-   }
-  },
   "Skip this one": {
    "extractionState": "manual",
    "localizations": {
@@ -20632,29 +21000,6 @@
     }
    }
   },
-  "Sometimes a code or an ID, which you type or copy": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Parfois un code ou une pièce d'identité, que vous saisissez ou copiez"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "A veces un código o un ID, que escribes o copias"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Manchmal ein Code oder ein Ausweis, den du eingibst oder kopierst"
-     }
-    }
-   }
-  },
   "Source": {
    "extractionState": "manual",
    "localizations": {
@@ -21184,29 +21529,6 @@
     }
    }
   },
-  "Street (optional)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Rue (facultatif)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Calle (opcional)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Straße (optional)"
-     }
-    }
-   }
-  },
   "Street address": {
    "extractionState": "manual",
    "localizations": {
@@ -21502,29 +21824,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Tippen Sie auf eine Aufgabe, um vor dem Start genau zu sehen, was sie tut."
-     }
-    }
-   }
-  },
-  "Tap the … button in the guide any time.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Touchez le bouton … du guide à tout moment."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Toca el botón … de la guía cuando quieras."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Tippe jederzeit auf die Schaltfläche … in der Anleitung."
      }
     }
    }
@@ -22974,29 +23273,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Akte wird geleakt oder von einem Stalker oder Betrüger gekauft, oder ein Fehler stuft Sie als Betrugsrisiko ein und Sie werden bei einem Konto abgelehnt, ohne einfache Möglichkeit, den Grund zu sehen oder zu korrigieren."
-     }
-    }
-   }
-  },
-  "Then Send. With Auto-send on, we press it when the page is ready. Turn it off to press it yourself.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Puis Envoyer. Avec l'envoi automatique, nous l'appuyons quand la page est prête. Désactivez-le pour le faire vous-même."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Luego Enviar. Con el envío automático activado, lo pulsamos cuando la página está lista. Desactívalo para pulsarlo tú."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dann Senden. Mit automatischem Senden drücken wir es, sobald die Seite bereit ist. Schalte es aus, um selbst zu drücken."
      }
     }
    }
@@ -25186,6 +25462,29 @@
     }
    }
   },
+  "ZIP code places: GeoNames data, CC BY 4.0": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Villes des codes postaux : données GeoNames, CC BY 4.0"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lugares de los códigos postales: datos de GeoNames, CC BY 4.0"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Orte der Postleitzahlen: GeoNames-Daten, CC BY 4.0"
+     }
+    }
+   }
+  },
   "Virginia": {
    "extractionState": "manual",
    "localizations": {
@@ -26819,29 +27118,6 @@
     }
    }
   },
-  "When a page says to check your email, we offer to track it": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Quand une page dit de vérifier vos e-mails, nous proposons de le suivre"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cuando una página dice que revises tu correo, te ofrecemos seguirlo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Wenn eine Seite sagt, du sollst deine E-Mails prüfen, bieten wir an, es zu verfolgen"
-     }
-    }
-   }
-  },
   "When on, a guide presses a form's own send button once the checks are cleared. Each guide has a \"Send it for me\" box to change this for the rest of the session. Turned off, you press the button yourself.": {
    "extractionState": "manual",
    "localizations": {
@@ -27785,29 +28061,6 @@
     }
    }
   },
-  "You do. You do not need to read it all, and you do not need to agree to more than the form asks. Fill in the form, send it, and move on. If a page asks for something odd, like a photo of your ID, choose Not working in the … menu or skip the site.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Vous en avez le droit. Inutile de tout lire, ni d'accepter plus que ce que demande le formulaire. Remplissez-le, envoyez-le et passez à la suite. Si une page demande quelque chose d'étrange, comme une photo de votre pièce d'identité, choisissez Ça ne marche pas dans le menu … ou passez le site."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sí lo tienes. No necesitas leerlo todo ni aceptar más de lo que pide el formulario. Rellénalo, envíalo y sigue. Si una página pide algo raro, como una foto de tu documento, elige No funciona en el menú … u omite el sitio."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Du hast es. Du musst nicht alles lesen und nicht mehr zustimmen, als das Formular verlangt. Fülle es aus, sende es ab und mach weiter. Verlangt eine Seite etwas Ungewöhnliches, etwa ein Foto deines Ausweises, wähle im …-Menü „Funktioniert nicht“ oder überspringe die Seite."
-     }
-    }
-   }
-  },
   "You find your listing first": {
    "extractionState": "manual",
    "localizations": {
@@ -28084,13 +28337,13 @@
     }
    }
   },
-  "You reported this site as not working (%@).": {
+  "You marked this site as not working (%@).": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Vous avez signalé que ce site ne fonctionne pas (%@)."
+      "value": "Vous avez marqué ce site comme ne fonctionnant pas (%@)."
      }
     },
     "es": {
@@ -28102,18 +28355,18 @@
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Sie haben diese Website als nicht funktionierend gemeldet (%@)."
+      "value": "Du hast diese Seite als nicht funktionierend markiert (%@)."
      }
     }
    }
   },
-  "You reported this site as not working: %@.": {
+  "You marked this site as not working: %@.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Vous avez signalé que ce site ne fonctionne pas : %@."
+      "value": "Vous avez marqué ce site comme ne fonctionnant pas : %@."
      }
     },
     "es": {
@@ -28125,7 +28378,7 @@
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Sie haben diese Website als nicht funktionierend gemeldet: %@."
+      "value": "Du hast diese Seite als nicht funktionierend markiert: %@."
      }
     }
    }
@@ -28816,29 +29069,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ihre Informationen verlassen dieses Telefon nie, außer zu den Websites, bei denen Sie sich abmelden. Es gibt keinen Opt-Out-Kit-Server, kein Konto, keine Analyse und kein Tracking."
-     }
-    }
-   }
-  },
-  "Your name, address and email, which we fill in": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Votre nom, adresse et e-mail, que nous remplissons"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Tu nombre, dirección y correo, que rellenamos nosotros"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dein Name, deine Adresse und E-Mail, die wir ausfüllen"
      }
     }
    }

@@ -11,7 +11,7 @@ struct BrokerDetailView: View {
     var body: some View {
         List {
             if let issue = model.activeIssue(for: broker.id) {
-                Label("You reported this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
                     .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
             }
             if !model.progress.isDone(broker.id) {

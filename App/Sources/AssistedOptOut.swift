@@ -302,6 +302,7 @@ struct AssistedOptOutView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
+    @AppStorage("guide.collapsed") private var guideCollapsed = false
     @State private var showSkipped = false
     @StateObject private var handoff: EmailHandoff
     @StateObject private var browserHandoff = BrowserHandoff()
@@ -439,21 +440,35 @@ struct AssistedOptOutView: View {
                             Button(role: .destructive) { dismiss() } label: { Label("Stop", systemImage: "xmark.circle") }
                         } label: { Image(systemName: "ellipsis.circle").font(.title2) }
                             .accessibilityLabel(Loc.t("More")).accessibilityIdentifier("assisted-more")
-                        Text("Site \(runner.index + 1) of \(runner.items.count)").font(.caption.bold()).foregroundStyle(.white.opacity(0.7))
+                        GuideCollapseButton(collapsed: $guideCollapsed)
+                        if guideCollapsed {
+                            // Rolled up: the site's name is in the top bar, with its place in the list, and nothing else of the guide shows.
+                            Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.6).layoutPriority(-1).accessibilityIdentifier("assisted-site")
+                            Text("\(runner.index + 1)/\(runner.items.count)").font(.caption.bold()).foregroundStyle(.white.opacity(0.6)).fixedSize()
+                        } else {
+                            Text("Site \(runner.index + 1) of \(runner.items.count)").font(.caption.bold()).foregroundStyle(.white.opacity(0.7))
+                        }
                         Spacer()
                         if case .pickingListing = runner.phase {
                             Button("Not listed") { runner.notListed() }.font(.callout).lineLimit(1).minimumScaleFactor(0.7).accessibilityIdentifier("assisted-not-listed")
                             Button("This is me") { runner.confirmListing() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-my-profile")
                         } else {
-                            if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.font(.callout.bold()).accessibilityIdentifier("assisted-mark-done") }
+                            // Rolled up, the "Send an email instead" shortcut is an envelope here, only for a site that has an address to write to.
+                            if guideCollapsed, let entry = runner.current?.entry, entry.contactEmail != nil, !runner.finished, runner.phase != .noForm, runner.phase != .loading {
+                                Button { emailInstead(entry) } label: { Image(systemName: "envelope") }
+                                    .buttonStyle(GuideSecondaryStyle())
+                                    .accessibilityLabel(Loc.t("Send an email instead")).accessibilityIdentifier("assisted-email-icon")
+                            }
+                            if canMarkDone || runner.emailOffer != nil { Button("Mark as done") { if runner.emailOffer != nil { runner.answerEmailOffer(sent: true) } else { Task { await runner.markDone() } } }.buttonStyle(GuideSecondaryStyle()).accessibilityIdentifier("assisted-mark-done") }
                             if runner.awaitingNext || runner.phase == .reviewing || runner.phase == .manualSend || { if case .needsMore = runner.phase { return true } else { return false } }() { Button("Next site") { runner.next() }.buttonStyle(GuidePrimaryStyle()).accessibilityIdentifier("assisted-next") }
                         }
                     }
-                    ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold)
-                    Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).foregroundStyle(.white).accessibilityIdentifier("assisted-site")
-                    VStack(alignment: .leading, spacing: 6) {
+                    if !guideCollapsed { ProgressView(value: Double(runner.index), total: Double(max(runner.items.count, 1))).tint(Color.exnayGold) }
+                    if !guideCollapsed { Text(runner.current?.entry.domain ?? "").font(.subheadline.bold()).foregroundStyle(.white).accessibilityIdentifier("assisted-site") }
+                    if !guideCollapsed { VStack(alignment: .leading, spacing: 6) {
                         Label(instruction, systemImage: icon).font(.caption).foregroundStyle(tint).fixedSize(horizontal: false, vertical: true)
                                 .accessibilityIdentifier("assisted-instruction")
+                        if !guideCollapsed {
                         if let previous = runner.previousNote {
                             HStack(alignment: .top) {
                                 Label(previous, systemImage: "arrow.uturn.backward.circle").font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
@@ -477,8 +492,10 @@ struct AssistedOptOutView: View {
                             AutoSubmitToggle()
                         }
                         .padding(.top, 6)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 GuideBoundary()
                 Group {

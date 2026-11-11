@@ -2,7 +2,7 @@ import Foundation
 
 /// Everything the app knows about a person that can be put into a form box, grouped the way a person looks for it.
 /// The "My data" entry in every flow's … menu lists these; tapping one copies it so it can be pasted into any box.
-public enum DetailKind: String, CaseIterable, Sendable { case name, email, phone, address, birthdate }
+public enum DetailKind: String, CaseIterable, Sendable { case name, email, phone, address, birthdate, law }
 
 public struct DetailGroup: Equatable, Sendable {
     public let kind: DetailKind
@@ -40,6 +40,9 @@ public enum DetailChoices {
             let p = b.split(separator: "-").map(String.init)
             if p.count == 3 { add(.birthdate, ["\(p[1])/\(p[2])/\(p[0])"]) }
         }
+
+        // The applicable law: exactly the sentence the app types into a box that asks which law gives the person this right, so a box it could not reach can be pasted the same.
+        add(.law, [FormFiller.legalBasis(for: person)])
         return out
     }
 }

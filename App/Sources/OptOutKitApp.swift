@@ -283,10 +283,15 @@ final class AppModel: ObservableObject {
     func setOwnerCountry(_ code: String?) { household.setOwnerCountry(code); save() }
 
     /// Every place the app has rules for as a country, by name in the chosen language, plus the United States.
+    /// Sorting a few hundred names by the person's language is not free, and the profile editor asks on every keystroke: built once per language.
+    private var countryOptionsCache: (language: String, items: [(code: String, name: String)])?
     var countryOptions: [(code: String, name: String)] {
+        if let c = countryOptionsCache, c.language == language { return c.items }
         var items = jurisdictions.filter { $0.kind == "country" }.map { (code: $0.code, name: $0.displayName) }
         items.append((code: "US", name: Locale(identifier: language).localizedString(forRegionCode: "US") ?? "United States"))
-        return items.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+        let sorted = items.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+        countryOptionsCache = (language, sorted)
+        return sorted
     }
 
     /// The rules that apply to the owner: their state if they live in the US, else their country, else nothing yet.
@@ -491,6 +496,30 @@ final class AppModel: ObservableObject {
     var pageDetails: [DetailGroup] { selectedPerson.map { DetailChoices.groups(for: $0, email: formEmail) } ?? [] }
 
     /// The editor's single write: the profile and, when given, the household email, saved together once.
+    // MARK: The profile being typed (kept for a crash) and the first-run setup
+
+    private var draftStore: ProfileDraftStore { ProfileDraftStore(url: store.url.deletingLastPathComponent().appendingPathComponent("profile-draft.sealed"), keys: store.keyProvider) }
+
+    /// Keeps what is typed in the profile editor, sealed, off the main thread. Not the profile itself: nothing is rebuilt and the household is not rewritten.
+    func saveDraft(_ person: Person, email: String) {
+        let draft = ProfileDraft(personID: person.id, person: person, email: email), drafts = draftStore
+        saveQueue.async { try? drafts.save(draft) }
+    }
+    /// What was typed for this person and never saved (the app closed or crashed first), or nil.
+    func loadDraft(for id: UUID) -> ProfileDraft? { saveQueue.sync { draftStore.load() }.flatMap { $0.personID == id ? $0 : nil } }
+    func clearDraft() { let drafts = draftStore; saveQueue.async { drafts.clear() } }
+
+    private static let setupDoneKey = "setup.profile.done"
+    /// After a crash or a close in the middle of the first-run setup, the profile screen comes back: the first run is not over until the profile is complete.
+    /// Not during UI tests, which open the app on a bare profile on purpose, unless a test asks (`-uitest-resume-setup`).
+    func resumeSetupIfNeeded() {
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains(where: { $0.hasPrefix("-uitest") }), !args.contains("-uitest-resume-setup") { return }
+        guard case .nothing = pending, !showProfileGate, storageProblem == nil, !defaults.bool(forKey: Self.setupDoneKey) else { return }
+        if let p = selectedPerson, isReady(p) { defaults.set(true, forKey: Self.setupDoneKey); return }
+        showProfileGate = true
+    }
+
     func saveProfile(_ person: Person, contactEmail: String?) {
         household.update(person)
         if let contactEmail { household.setContactEmail(contactEmail) }
@@ -546,6 +575,7 @@ final class AppModel: ObservableObject {
     /// The gate was finished: close it and carry on with what the person was doing.
     func profileGateFinished(completed: Bool) {
         showProfileGate = false
+        if completed { defaults.set(true, forKey: Self.setupDoneKey) }
         let next = afterProfile; afterProfile = nil
         if completed { next?(); Task { await runDueAutomation() } }
     }

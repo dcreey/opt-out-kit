@@ -11,42 +11,43 @@ struct GuidedIntroView: View {
     var body: some View {
         VStack(spacing: 0) {
             TabView(selection: $index) {
-                page(symbol: "rectangle.split.1x2", title: "This is a guided site") {
-                    Text("Exnay's guide is the black part on top. The site's own opt-out page is below the gold line. The guide fills the page in for you and tells you what is left for you to do.")
+                page(symbol: "rectangle.split.1x2", title: "This is a guided site", lead: "Follow the black guide on top. The site's own page is below it.") {
+                    Text("The guide fills the page in for you and tells you the one thing left for you to do. When the page says it is done, tap Next.")
                     GuidedIntroExample()
-                    Text("Each site is a little different. Follow the guide, and tap Next when the page says it is done.").font(.footnote).foregroundStyle(.secondary)
+                    Text("Each site is a little different, so read the guide's line each time.").font(.footnote).foregroundStyle(.secondary)
                 }.tag(0)
-                page(symbol: "ellipsis.circle", title: "The … menu") {
-                    Text("Tap the … button in the guide any time.")
+                page(symbol: "ellipsis.circle", title: "The … menu", lead: "If something goes wrong, tap the … button in the guide.") {
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Copy link: the page's address", systemImage: "link")
-                        Label("Refresh the page: reload it, and your details are put back", systemImage: "arrow.clockwise")
-                        Label("Fill the form again: if something was cleared or missed", systemImage: "square.and.pencil")
-                        Label("My data: tap any detail to copy it, even your advertising ID, for a box we did not fill", systemImage: "person.text.rectangle")
-                        Label("Not working: tell us what went wrong with this site", systemImage: "exclamationmark.bubble")
-                        Label("Skip or cancel: leave a site for later", systemImage: "forward")
+                        Label("Copy link: copy this page's web address", systemImage: "link")
+                        Label("Open in my browser: finish in Safari or your usual browser. When you come back we ask whether you finished", systemImage: "safari")
+                        Label("Refresh the page: reload it and fill your details in again", systemImage: "arrow.clockwise")
+                        Label("Fill the form again: if the page cleared a box or we missed one", systemImage: "square.and.pencil")
+                        Label("My data: tap your name, address, phone or email to copy it, then paste it into a box we did not fill. Your advertising ID is here too", systemImage: "person.text.rectangle")
+                        Label("There is another email step: the site said it will email you more than once", systemImage: "envelope.badge")
+                        Label("Not working: the page is broken. Pick what went wrong and Exnay sets this site aside to try again later. Nothing is sent anywhere", systemImage: "exclamationmark.bubble")
+                        Label("Skip or cancel: leave this site and come back to it later", systemImage: "forward")
                     }.font(.callout)
                 }.tag(1)
-                page(symbol: "checklist", title: "What a site needs") {
-                    Text("Most sites want the same few things.")
+                page(symbol: "checklist", title: "What a site needs", lead: "Most sites need the same few things.") {
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Your name, address and email, which we fill in", systemImage: "person.text.rectangle")
-                        Label("A human check, \"I am human\", which only you can tick", systemImage: "checkmark.square")
-                        Label("Sometimes a code or an ID, which you type or copy", systemImage: "number")
-                        Label("Then Send. With Auto-send on, we press it when the page is ready. Turn it off to press it yourself.", systemImage: "bolt.fill")
+                        Label("Your name, address and email. We fill these in", systemImage: "person.text.rectangle")
+                        Label("A human check: the \"I am not a robot\" box or a picture puzzle. Only you can pass it", systemImage: "checkmark.square")
+                        Label("Sometimes a code or an ID. You type or copy it", systemImage: "number")
+                        Label("Then Send. With Auto-send on, we press the page's Send button once the checks are done. Turn it off to press it yourself", systemImage: "bolt.fill")
                     }.font(.callout)
                 }.tag(2)
-                page(symbol: "exclamationmark.triangle", title: "The scary wording") {
-                    Text("Most opt-out pages open with a wall of legal terms: you must prove who you are, we cannot promise anything, you agree to this and that. A lot of it is written to make you feel you have no right to opt out.")
-                    Text("You do. You do not need to read it all, and you do not need to agree to more than the form asks. Fill in the form, send it, and move on. If a page asks for something odd, like a photo of your ID, choose Not working in the … menu or skip the site.")
+                page(symbol: "exclamationmark.triangle", title: "The scary wording", lead: "You have the right to opt out, whatever the page says.") {
+                    Text("Most opt-out pages open with a wall of legal terms: you must prove who you are, we cannot promise anything, you agree to this and that. Much of it is written to make you feel you have no right to opt out. You do.")
+                    guideText(Loc.t("You do not need to read it all, and you do not need to agree to more than the form asks. Fill in the form, send it, and move on. If a page asks for something odd, like a photo of your ID, choose Not working in the … menu or skip the site."))
                         .font(.callout)
                 }.tag(3)
-                page(symbol: "envelope.badge", title: "Emails after you send") {
-                    Text("Many sites send you an email after you submit, with a link or a code to confirm it. Until you tap it, the opt-out is not done.")
+                page(symbol: "envelope.badge", title: "Emails after you send", lead: "A site is not finished until you tap the link in its email.") {
+                    Text("Many sites email you a link or a code after you send the form, and only remove you once you confirm it. The email can take a few minutes, so look in your spam folder too.")
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("When a page says to check your email, we offer to track it", systemImage: "bell")
-                        Label("Open the confirmation in your mail, and share or copy its link into Email links", systemImage: "envelope.open")
-                        Label("Email links finishes it, and the site counts as done", systemImage: "checkmark.circle")
+                        Label("When the page says to check your email, we ask whether an email follows. Say yes, and the site goes on your waiting list", systemImage: "bell")
+                        Label("Open the email in your mail app. Press and hold its link, tap Share, and choose Exnay. Or copy the link and paste it into the Email links tab", systemImage: "envelope.open")
+                        Label("Exnay opens the page and fills it in. When the page says you are done, tap Mark completed", systemImage: "checkmark.circle")
+                        Label { guideText(Loc.t("Some sites send more than one email. If another comes, tap There is another email step in the … menu, and the site stays on your list")) } icon: { Image(systemName: "arrow.triangle.2.circlepath") }
                     }.font(.callout)
                 }.tag(4)
             }
@@ -72,11 +73,13 @@ struct GuidedIntroView: View {
         }
     }
 
-    private func page<C: View>(symbol: String, title: LocalizedStringKey, @ViewBuilder _ content: () -> C) -> some View {
+    /// `lead` is the one thing to take from the page, in bold under the title; the rest explains it.
+    private func page<C: View>(symbol: String, title: String, lead: String, @ViewBuilder _ content: () -> C) -> some View {
         ScrollView {
             VStack(spacing: 16) {
                 Image(systemName: symbol).font(.system(size: 56)).foregroundStyle(.tint).padding(.top, 32)
-                Text(title).font(.title.bold()).multilineTextAlignment(.center)
+                guideText(Loc.t(title)).font(.title.bold()).multilineTextAlignment(.center)
+                guideText(Loc.t(lead)).font(.title3.bold()).multilineTextAlignment(.center).accessibilityIdentifier("guided-intro-lead")
                 content()
             }
             .multilineTextAlignment(.center)

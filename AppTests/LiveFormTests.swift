@@ -77,6 +77,51 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(last, "Smith-Jones")
     }
 
+    /// forewarn.com: the "which law gives you this right" box is hidden until the person ticks a basis for the request. The app never ticks it (that is their claim to
+    /// make), types the plain statement of the privacy laws into the law box once it shows, and never touches the box about a threat of harm.
+    func testForewarnsLawBoxGetsTheApplicableLawOnceThePersonRevealsItAndTheThreatBoxStaysEmpty() async throws {
+        let html = """
+        <html><body><form id="f" onsubmit="event.preventDefault()">
+          <label for="FirstName">Name*</label><input id="FirstName" name="First Name">
+          <input id="LastName" name="Last Name">
+          <label for="Email">Email Address*</label><input id="Email" type="email" name="Email">
+          <label class="d-flex"><input id="legalRight" name="legalRight" type="checkbox" required
+            onchange="document.getElementById('legal-right-wrapper').style.display=this.checked?'block':'none'">
+            <span>I am an individual afforded a legal right to non-disclosure/opt-out due to a risk of harm or similar threat.</span></label>
+          <div id="legal-right-wrapper" style="display: none;">
+            <label class="my-3"><strong>Please specify the particular law that affords you protection and provide sufficient support for FOREWARN to determine whether you fall within the categories of persons protected by the law.</strong></label>
+            <textarea id="legalInfo" name="legalInfo" placeholder="Please cite the particular, applicable law that affords you protection"></textarea></div>
+          <label class="d-flex"><input id="personlRisk" name="personlRisk" type="checkbox"><span>I am an individual otherwise subject to a serious risk of physical harm.</span></label>
+          <div id="threat-wrapper" style="display: none;">
+            <label>Please describe the threat against you, and any supporting documentation you possess substantiating the threat</label>
+            <textarea id="threatInfo" name="threatInfo"></textarea></div>
+          <button type="submit">Submit</button></form></body></html>
+        """
+        let session = WebViewSession.make()
+        defer { session.close() }
+        try await session.loadHTML(html)
+        func plan() async throws -> FillPlan {
+            let forms = await session.discoverForms(waitForFrames: false)
+            let form = try XCTUnwrap(forms.first)
+            return FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: pat)
+        }
+        func read(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
+        _ = await session.fillLive(try await plan().values)
+        let ticked = (await session.evalLive("document.querySelector('[name=legalRight]').checked") as? Bool) ?? true
+        XCTAssertFalse(ticked, "the basis for the request is the person's claim: never ticked for them")
+        // The person ticks the basis; the law box shows; the next fill puts the applicable law in it.
+        _ = await session.evalLive("(function(){var c=document.querySelector('[name=legalRight]'); c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true})); return 1;})()")
+        _ = await session.fillLive(try await plan().values, keepExisting: true)
+        let law = await read("legalInfo")
+        XCTAssertEqual(law, FormFiller.legalBasis(for: pat), "the applicable law is typed into the law box")
+        XCTAssertGreaterThan(law.count, 50)
+        // The threat box is never filled, even when the person reveals it.
+        _ = await session.evalLive("(function(){var c=document.querySelector('[name=personlRisk]'); c.checked=true; document.getElementById('threat-wrapper').style.display='block'; return 1;})()")
+        _ = await session.fillLive(try await plan().values, keepExisting: true)
+        let threat = await read("threatInfo")
+        XCTAssertEqual(threat, "", "the box about a threat of harm is never filled")
+    }
+
     /// roundsky.com: one phone number over three boxes (limits 3, 3 and 4). Each takes its part; the whole number never goes in every box.
     func testAPhoneSplitOverThreeBoxesGetsOnePartInEach() async throws {
         let html = """

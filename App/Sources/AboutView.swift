@@ -54,6 +54,7 @@ struct AboutView: View {
                     Text("Anyone can audit exactly what this app does.")
                     Link("View the code on GitHub", destination: AppInfo.repoURL)
                     Text("The repository is private until the pre-release checks finish.").font(.footnote).foregroundStyle(.secondary)
+                    Link("ZIP code places: GeoNames data, CC BY 4.0", destination: URL(string: "https://www.geonames.org")!)
                 }
                 // The California DROP link only matters to someone who chose California.
                 if model.showsCaliforniaDrop {

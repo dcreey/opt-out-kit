@@ -6,6 +6,9 @@ import OptOutKitCore
 struct PersonEditorView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.scenePhase) private var scenePhase
+    @State private var draftTask: Task<Void, Never>?
+    /// What a ZIP code filled in for each address (by row), so a later ZIP replaces it without overwriting what the person typed themselves.
+    @State private var zipFilled: [Int: ZipLookup.Place] = [:]
     @Environment(\.dismiss) private var dismiss
     @State private var person: Person
     /// Told the person as typed, on every change, so a host's Done or Continue button can follow it. Cheap: it never writes the model.
@@ -29,11 +32,45 @@ struct PersonEditorView: View {
         _last = State(initialValue: person.legalLast)
     }
 
-    /// The one write: the profile and, on the owner's profile, the email, in a single save. Does nothing when nothing changed.
+    /// A name, phone, email or earlier address that was added and left empty is dropped when saving, so an accidental tap on "Add" leaves nothing behind.
+    static func pruned(_ person: Person) -> Person {
+        var p = person
+        func blank(_ s: String?) -> Bool { (s ?? "").trimmingCharacters(in: .whitespaces).isEmpty }
+        p.names.removeAll { $0.kind != .legal && blank($0.name) }
+        p.phones.removeAll { blank($0) }
+        p.emails.removeAll { blank($0) }
+        if p.addresses.count > 1 {
+            p.addresses = [p.addresses[0]] + p.addresses.dropFirst().filter { !(blank($0.street) && blank($0.city) && blank($0.state) && blank($0.zip)) }
+        }
+        return p
+    }
+
+    /// The one write: the profile and, on the owner's profile, the email, in a single save. Does nothing when nothing changed. Once it is written the kept draft is not needed.
     private func commit() {
-        let personChanged = model.household.people.first(where: { $0.id == person.id }) != person
+        draftTask?.cancel()
+        let toSave = Self.pruned(person)
+        let personChanged = model.household.people.first(where: { $0.id == person.id }) != toSave
         let emailChanged = person.relationship == .me && email != model.contactEmail
-        if personChanged || emailChanged { model.saveProfile(person, contactEmail: emailChanged ? email : nil) }
+        if personChanged || emailChanged { model.saveProfile(toSave, contactEmail: emailChanged ? email : nil) }
+        model.clearDraft()
+    }
+
+    /// A moment after typing stops, what is typed is kept (sealed, in a small file of its own) so a crash or a close does not lose it. Nothing else is rebuilt or written.
+    private func keepDraft() {
+        draftTask?.cancel()
+        let p = person, e = email
+        draftTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_200_000_000)
+            if !Task.isCancelled { model.saveDraft(p, email: e) }
+        }
+    }
+
+    /// Typed earlier and never saved (the app closed or crashed): comes back.
+    private func restoreDraft() {
+        guard let d = model.loadDraft(for: person.id), d.person != person else { return }
+        person = d.person
+        first = d.person.legalFirst; middle = d.person.legalMiddle; last = d.person.legalLast
+        if person.relationship == .me, !d.email.isEmpty { email = d.email }
     }
 
     private var formEmailOK: Bool { person.relationship == .me ? ContactEmail.isValid(email.trimmingCharacters(in: .whitespaces)) : model.formEmail != nil }
@@ -94,9 +131,9 @@ struct PersonEditorView: View {
         #endif
         // The model is written only when the person taps Done or Continue (the host) or leaves the screen: never while typing or on leaving a field
         // (each write rebuilds the plan and saves the encrypted file). The host reads the live draft, so its Done button does not wait for a write.
-        .onChange(of: person) { _, new in onDraft?(new) }
-        .onChange(of: email) { _, new in if person.relationship == .me { onEmailDraft?(new) } }
-        .onAppear { onDraft?(person); if person.relationship == .me { onEmailDraft?(email) } }
+        .onChange(of: person) { _, new in onDraft?(new); keepDraft() }
+        .onChange(of: email) { _, new in if person.relationship == .me { onEmailDraft?(new) }; keepDraft() }
+        .onAppear { restoreDraft(); onDraft?(person); if person.relationship == .me { onEmailDraft?(email) } }
         .onDisappear { commit() }
         // Closing or leaving the app (home, the app switcher, a call) saves what is typed, so a first profile is never lost to the app being closed.
         .onChange(of: scenePhase) { _, phase in if phase != .active { commit() } }
@@ -140,6 +177,18 @@ struct PersonEditorView: View {
             set(new)
             person.names[legalIndex()].name = Person.composeLegalName(first: first, middle: last.trimmingCharacters(in: .whitespaces).isEmpty ? "" : middle, last: last)
         })
+    }
+
+    /// A US ZIP code of five digits fills in the city and state when they are empty, or are still what the last ZIP filled in. Never over what was typed by hand.
+    private func fillFromZip(_ i: Int) {
+        guard person.addresses.indices.contains(i) else { return }
+        let a = person.addresses[i]
+        guard (a.country ?? person.countryCode ?? "US").uppercased() == "US", let place = ZipLookup.place(for: a.zip ?? "") else { return }
+        let before = zipFilled[i]
+        func empty(_ s: String) -> Bool { s.trimmingCharacters(in: .whitespaces).isEmpty }
+        if empty(a.city) || a.city == before?.city { person.addresses[i].city = place.city }
+        if empty(a.state) || a.state == before?.state { person.addresses[i].state = place.state }
+        zipFilled[i] = place
     }
 
     private func nameBinding<T>(_ i: Int, _ kp: WritableKeyPath<NameEntry, T>, default d: T) -> Binding<T> { RowField.binding($person.names, i, kp, default: d) }
@@ -191,6 +240,7 @@ struct PersonEditorView: View {
                 set: { v in
                     if person.addresses.isEmpty { person.addresses.append(Address(city: "", state: "")) }
                     person.addresses[0].zip = v.isEmpty ? nil : v
+                    fillFromZip(0)
                 }))
                 .keyboardType(.numbersAndPunctuation).textContentType(.postalCode).accessibilityIdentifier("current-zip")
             BirthdatePicker(birthdate: $person.birthdate)
@@ -222,10 +272,14 @@ struct PersonEditorView: View {
             ForEach(person.names.indices, id: \.self) { i in
                 if person.names.indices.contains(i), person.names[i].kind != .legal {
                     VStack(alignment: .leading) {
-                        Picker("Type", selection: nameBinding(i, \.kind, default: .nickname)) {
-                            ForEach(NameKind.allCases.filter { $0 != .legal }, id: \.self) { Text($0.label).tag($0) }
+                        HStack {
+                            Picker("Type", selection: nameBinding(i, \.kind, default: .nickname)) {
+                                ForEach(NameKind.allCases.filter { $0 != .legal }, id: \.self) { Text($0.label).tag($0) }
+                            }
+                            .pickerStyle(.menu)
+                            Spacer()
+                            RemoveRowButton(identifier: "remove-name-\(i)") { if person.names.indices.contains(i), person.names[i].kind != .legal { person.names.remove(at: i) } }
                         }
-                        .pickerStyle(.menu)
                         TextField("Name", text: nameBinding(i, \.name, default: ""))
                             .accessibilityIdentifier("name-\(i)")
                     }
@@ -251,9 +305,6 @@ struct PersonEditorView: View {
             ForEach(person.addresses.indices, id: \.self) { i in
                 if i > 0, person.addresses.indices.contains(i) {
                     VStack(alignment: .leading) {
-                        TextField("Street (optional)", text: Binding(
-                            get: { addressBinding(i, \.street, default: nil).wrappedValue ?? "" },
-                            set: { addressBinding(i, \.street, default: nil).wrappedValue = $0.isEmpty ? nil : $0 }))
                         HStack {
                             TextField("City", text: addressBinding(i, \.city, default: ""))
                             if (addressBinding(i, \.country, default: nil).wrappedValue ?? "US").uppercased() == "US" {
@@ -262,14 +313,13 @@ struct PersonEditorView: View {
                                 TextField("Region", text: addressBinding(i, \.state, default: "")).frame(maxWidth: 110)
                             }
                         }
-                        TextField("ZIP code", text: Binding(
-                            get: { addressBinding(i, \.zip, default: nil).wrappedValue ?? "" },
-                            set: { addressBinding(i, \.zip, default: nil).wrappedValue = $0.isEmpty ? nil : $0 }))
-                            .keyboardType(.numbersAndPunctuation).textContentType(.postalCode)
                         HStack {
-                            TextField("From year", value: addressBinding(i, \.fromYear, default: nil), format: .number.grouping(.never))
-                            TextField("To year", value: addressBinding(i, \.toYear, default: nil), format: .number.grouping(.never))
-                        }.keyboardType(.numberPad)
+                            TextField("ZIP code", text: Binding(
+                                get: { addressBinding(i, \.zip, default: nil).wrappedValue ?? "" },
+                                set: { addressBinding(i, \.zip, default: nil).wrappedValue = $0.isEmpty ? nil : $0; fillFromZip(i) }))
+                                .keyboardType(.numbersAndPunctuation).textContentType(.postalCode)
+                            RemoveRowButton(identifier: "remove-address-\(i)") { if i > 0, person.addresses.indices.contains(i) { person.addresses.remove(at: i) } }
+                        }
                     }
                 }
             }
@@ -284,7 +334,7 @@ struct PersonEditorView: View {
         } header: {
             Text("Previous addresses")
         } footer: {
-            Text("Most recent first. City and state are enough; add a street only if you want it sent.")
+            Text("Most recent first. City, state and ZIP code are enough.")
         }
     }
 }
@@ -303,12 +353,15 @@ struct StringListSection: View {
     var body: some View {
         Section {
             ForEach(items.indices, id: \.self) { i in
-                TextField(title, text: Binding(get: { items.indices.contains(i) ? items[i] : "" },
-                                               set: { if items.indices.contains(i) { items[i] = format?($0) ?? $0 } }))
-                    .keyboardType(keyboard)
-                    .textInputAutocapitalization(keyboard == .emailAddress ? .never : nil)
-                    .autocorrectionDisabled(keyboard == .emailAddress)
-                    .accessibilityIdentifier(identifier.isEmpty ? "" : "\(identifier)-\(i)")
+                HStack {
+                    TextField(title, text: Binding(get: { items.indices.contains(i) ? items[i] : "" },
+                                                   set: { if items.indices.contains(i) { items[i] = format?($0) ?? $0 } }))
+                        .keyboardType(keyboard)
+                        .textInputAutocapitalization(keyboard == .emailAddress ? .never : nil)
+                        .autocorrectionDisabled(keyboard == .emailAddress)
+                        .accessibilityIdentifier(identifier.isEmpty ? "" : "\(identifier)-\(i)")
+                    RemoveRowButton(identifier: identifier.isEmpty ? "" : "remove-\(identifier)-\(i)") { if items.indices.contains(i) { items.remove(at: i) } }
+                }
             }
             .onDelete { items.remove(atOffsets: $0) }
             Button(addLabel, systemImage: "plus") { items.append("") }
@@ -399,5 +452,17 @@ enum RowField {
     static func binding<E, T>(_ list: Binding<[E]>, _ i: Int, _ kp: WritableKeyPath<E, T>, default d: T) -> Binding<T> {
         Binding(get: { list.wrappedValue.indices.contains(i) ? list.wrappedValue[i][keyPath: kp] : d },
                 set: { if list.wrappedValue.indices.contains(i) { list.wrappedValue[i][keyPath: kp] = $0 } })
+    }
+}
+
+
+/// A visible way to take a row back out (a name, phone, email or earlier address added by mistake), beside the row itself.
+struct RemoveRowButton: View {
+    var identifier = ""
+    let action: () -> Void
+    var body: some View {
+        Button(role: .destructive, action: action) { Image(systemName: "minus.circle.fill").foregroundStyle(.red).imageScale(.large) }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Remove").accessibilityIdentifier(identifier)
     }
 }

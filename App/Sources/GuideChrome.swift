@@ -38,12 +38,34 @@ struct GuideSurface<Content: View>: View {
     }
 }
 
+/// The ^ beside the guide's … button: rolls the guide up to its top row and one line, so the site's page gets the room. The choice is kept for every guide.
+struct GuideCollapseButton: View {
+    @Binding var collapsed: Bool
+    var body: some View {
+        Button { withAnimation(.easeInOut(duration: 0.2)) { collapsed.toggle() } } label: {
+            Image(systemName: collapsed ? "chevron.down.circle" : "chevron.up.circle").font(.title2)
+        }
+        .accessibilityLabel(collapsed ? Loc.t("Show the whole guide") : Loc.t("Roll the guide up")).accessibilityIdentifier("guide-collapse")
+    }
+}
+
 /// The primary button of the guide: gold with dark words.
 struct GuidePrimaryStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.callout.bold()).foregroundStyle(Color.black).lineLimit(1).minimumScaleFactor(0.7)
             .padding(.horizontal, 14).padding(.vertical, 8)
             .background(Color.exnayGold.opacity(configuration.isPressed ? 0.7 : 1), in: Capsule())
+    }
+}
+
+/// The guide's second button (Mark as done, the envelope, Back, Copy): a gold outline in a capsule, so it reads as a button next to the solid gold primary one.
+struct GuideSecondaryStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.font(.callout.bold()).foregroundStyle(Color.exnayGold).lineLimit(1).fixedSize()      // never cut short: the site's name gives way instead
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            .background(Color.exnayGold.opacity(0.14), in: Capsule())
+            .overlay(Capsule().stroke(Color.exnayGold, lineWidth: 1))
+            .opacity(configuration.isPressed ? 0.7 : 1)
     }
 }
 
@@ -84,6 +106,7 @@ extension DetailKind {
         case .phone: "Phone"
         case .address: "Address"
         case .birthdate: "Birth date"
+        case .law: "Applicable law"
         }
     }
 }
@@ -136,6 +159,14 @@ private struct BrowserHandoffAlert: ViewModifier {
 
 extension View {
     func browserHandoffAlert(_ handoff: BrowserHandoff, onCompleted: @escaping () -> Void) -> some View { modifier(BrowserHandoffAlert(handoff: handoff, onCompleted: onCompleted)) }
+}
+
+/// Text in which each "…" that stands for the guide's menu button is drawn as that button (the circled dots), so the instruction shows the thing to tap.
+func guideText(_ s: String) -> Text {
+    let parts = s.components(separatedBy: "…")
+    var t = Text(verbatim: parts[0])
+    for part in parts.dropFirst() { t = t + Text(Image(systemName: "ellipsis.circle")) + Text(verbatim: part) }
+    return t
 }
 
 enum PageMenu {
