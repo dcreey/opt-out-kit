@@ -7,7 +7,8 @@ bucket: "indirect"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://www.searchusapeople.com/cpra-privacy/"
+# Corrected by hand 2026-11-11: /data-removal-request/ links to the InfoTracer site (same company), where the person finds their record and removes it.
+opt_out_url: "https://infotracer.com/do-not-sell-share-my-personal-information/"
 family: "infotracer_com"
 family_parent: "infotracer.com"
 signals: [id_required, name_input]

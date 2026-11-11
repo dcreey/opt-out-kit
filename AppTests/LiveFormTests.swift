@@ -122,6 +122,33 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(threat, "", "the box about a threat of harm is never filled")
     }
 
+    /// theorg.com: the opt-out page is a sentence and one "Continue" button; the form comes after it. The button is pressed on an opt-out page only when nothing else is
+    /// on screen and it is the only one; the same word in a cookie prompt, or on a page that is not an opt-out, is never pressed.
+    func testABareContinueOnAnOptOutPageIsPressedAndOneInACookiePromptOrOnAnotherPageIsNot() async throws {
+        func html(title: String, cookie: Bool) -> String {
+            """
+            <html><head><title>\(title)</title></head><body>
+            \(cookie ? "<div id=\"cookie-banner\"><button id=\"cb\">Continue</button></div>" : "<p>Your privacy matters to us.</p><button id=\"go\" onclick=\"document.getElementById('f').style.display='block'; this.remove()\">Continue</button>")
+            <form id="f" style="display:none" onsubmit="event.preventDefault()"><label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label><button type="submit">Submit request</button></form>
+            </body></html>
+            """
+        }
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html(title: "Opt-out | Example", cookie: false))
+        let clicked = await session.advanceToRequestForm()
+        XCTAssertEqual(clicked, "Continue")
+        let shown = (await session.evalLive("getComputedStyle(document.getElementById('f')).display") as? String) ?? ""
+        XCTAssertEqual(shown, "block", "the form is there after the button")
+
+        try await session.loadHTML(html(title: "Welcome | Example", cookie: false))
+        let other = await session.advanceToRequestForm()
+        XCTAssertTrue(other == nil || other == "", "a Continue on a page that is not an opt-out is left alone")
+
+        try await session.loadHTML(html(title: "Opt-out | Example", cookie: true))
+        let banner = await session.advanceToRequestForm()
+        XCTAssertTrue(banner == nil || banner == "", "a Continue in a cookie prompt is never pressed")
+    }
+
     /// roundsky.com: one phone number over three boxes (limits 3, 3 and 4). Each takes its part; the whole number never goes in every box.
     func testAPhoneSplitOverThreeBoxesGetsOnePartInEach() async throws {
         let html = """

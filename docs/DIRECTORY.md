@@ -43,7 +43,7 @@ with the reason; regenerate it with `broker-pipeline --directory directory --met
 |---|---|---|
 | Automatic opt-out | A form we fill in and send; nothing blocked it when its real page was loaded | 121 (82 loaded and measured clear, 39 not yet measured but with no bot-check script) |
 | Semi-automated, with prompts for you | We fill in and send; a visible human check, terms prompt or confirmation box needs you, or you tap your own listing first (see below) | 51 |
-| Guided, you do the steps | The page is found but needs something only you can do (login, ID), or has no readable form, or is a hand-written walkthrough | 612 |
+| Semi-automated, page held for you | The page is found but has no readable form, needs login or ID, asks for business details or carries a caution: the app opens it, fills what it can (nothing when `no_fill` or caution), never sends; you finish and tap Mark as done. `Directory.pageMode` is `form`, `fillsAndHolds` or `showsOnly`. The hand-written walkthroughs are in this group too; a site with a page and an email uses the page, the email is its fallback. A link that is only the site's front page is not a page: email-only when there is an address, else manual | most of the former Guided group |
 | Manual, you find the page | No opt-out page found (site blocked us, needs a browser, did not respond, or nothing there) | 69 |
 
 **Measured, not guessed.** A reCAPTCHA or Turnstile script on a page is only a hint: most are invisible. So
@@ -58,8 +58,8 @@ stops and asks, and that site moves to Semi-automated.
 searches the site for them (never for minors or public figures), the person taps their own result and then "This is my listing"
 (it never guesses which one is theirs), and the app fills in the form with that address and their email. They clear the human check,
 the app sends it and they confirm the email. Only 3 of the 109 found forms need a listing address (Spokeo, FreePeopleDirectory, which
-sends its removals to Spokeo, and yellowbook.com, which has no name search so stays Guided). Other hand-written walkthroughs stay
-Guided: PeopleConnect needs a login-style email step and phone checks, and FastPeopleSearch's form asks who is submitting and
+sends its removals to Spokeo, and yellowbook.com, which has no name search so runs its hand-written steps). Other hand-written walkthroughs stay
+step by step (semi-automatic, no separate Guided method): PeopleConnect needs a login-style email step and phone checks, and FastPeopleSearch's form asks who is submitting and
 requires a legal acknowledgement box.
 
 **One site, several names.** A hand-written flow can clear other sites with `covers:` (Spokeo covers FreePeopleDirectory;

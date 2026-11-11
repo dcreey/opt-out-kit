@@ -45,6 +45,9 @@ protocol AssistedDriver {
     func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage?
     /// Same, for a form that asks for the address of the person's own listing, which they picked on the site.
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage?
+    /// A site with no form the app reads, or one it must not fill: the page is opened and kept open for the person. `fillNothing` puts nothing of theirs in it; otherwise the app
+    /// clicks through to a request form when the page hides one behind a button, and fills what it finds. Nil only when the page will not load.
+    func prepareHeld(_ form: OptOutForm, plan: FillPlan, fillNothing: Bool) async -> AssistedPage?
     /// The site's search results for the person, to pick their own listing from. Nil when none can be opened.
     func openSearch(_ url: URL) async -> SearchPage?
     /// Why the last `prepare` of this form returned nothing: "noform" when the page loaded but holds no opt-out form we can fill (a contact form, or only an email address), nil when it would not load.
@@ -54,6 +57,7 @@ protocol AssistedDriver {
 }
 
 extension AssistedDriver {
+    func prepareHeld(_ form: OptOutForm, plan: FillPlan, fillNothing: Bool) async -> AssistedPage? { await prepare(form, plan: plan) }
     func failureReason(for form: OptOutForm) -> String? { nil }
     func discoveredEmail(for form: OptOutForm) -> String? { nil }
     func prepare(_ form: OptOutForm, plan: FillPlan, listingURL: URL?) async -> AssistedPage? { await prepare(form, plan: plan) }
@@ -94,11 +98,13 @@ final class AssistedRunner: ObservableObject {
         /// Sites whose only form is a name search: removal is requested on each record's own page, so the person finds their records and files each one.
         var perRecordForm: Bool { Self.perRecordDomains.contains(entry.domain) }
         static let perRecordDomains: Set<String> = ["open-public-records.com"]
-        /// A form a real page load showed to ask for something only the person can give (business details, an agent's, a file or a signature, questions the app cannot read):
-        /// the app fills in what it can, and the person completes it and presses the page's own button.
-        var needsPerson: Bool { !Set(entry.liveForm?.blockers ?? []).isDisjoint(with: ["business", "agent", "other", "file"]) }
+        /// What is done on this site's page: a readable form is filled and sent; a page with no readable form (or a form that needs the person) is filled as far as it can be and held;
+        /// a page nothing of the person's may go into is only shown. See `PageMode`.
+        var mode: PageMode { entry.pageMode }
+        /// True when no form of this site is known: the page is opened, it is clicked through to a request form when one hides behind a button, and the person does the rest.
+        var noReadableForm: Bool { !entry.hasKnownForm && !emailOnly }
         /// Sites where the app never presses send: the person finishes in the page.
-        var handsOff: Bool { blockWidget || perRecordForm || needsPerson }
+        var handsOff: Bool { blockWidget || perRecordForm || mode != .form }
         var id: String { entry.id }
     }
 
@@ -371,6 +377,7 @@ final class AssistedRunner: ObservableObject {
         let item = items[i]
         preparing[i] = Task {
             defer { loadedPages.insert(i) }
+            if item.noReadableForm || item.mode == .showsOnly { return await driver.prepareHeld(item.form, plan: item.plan, fillNothing: item.mode == .showsOnly) }
             if let page = await driver.prepare(item.form, plan: item.plan) { return page }
             if let fallback = item.fallbackForm { return await driver.prepare(fallback, plan: item.plan) }
             return nil

@@ -245,7 +245,7 @@ struct BrokerListView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text(broker.name).font(.headline)
-                Text(broker.isVerified ? "Guided" : Loc.t("Guided · unverified"))
+                Text(broker.isVerified ? Loc.t("Opened for you") : Loc.t("Opened for you · unverified"))
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()

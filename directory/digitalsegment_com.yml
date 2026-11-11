@@ -7,6 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "guided"
 confidence: "medium"
+contact_email: "info@digitalsegment.com"
 opt_out_url: "https://www.digitalsegment.com/2026/10/19/edge-governance-in-practice-balancing-speed-real-time-data-apis-and-data-privacy/"
 registered_in: [TX]
 signals: [account_hint, captcha_recaptcha, email_contact, email_input, mail_option, opt_out_form_found, phone_verify]

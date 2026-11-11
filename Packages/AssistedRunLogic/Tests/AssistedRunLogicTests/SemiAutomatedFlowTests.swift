@@ -448,4 +448,14 @@ final class NeedsPersonTests: XCTestCase {
         for b in ["agent", "other", "file", "business"] { XCTAssertTrue(item([b]).handsOff, b) }
         XCTAssertFalse(item([]).handsOff); XCTAssertFalse(item(["check:a human check"]).handsOff, "a human check the person clears is the ordinary semi-automated case")
     }
+
+    func testAPageWithNoReadableFormIsHeldForThePersonAndAShowOnlyPageFillsNothing() {
+        let f = OptOutForm(page: URL(string: "https://y.example/optout")!, method: "post", action: nil, fields: [], hops: 1)
+        var e = DirectoryEntry(id: "y_example", domain: "y.example", name: "Y", bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, contactEmail: nil)
+        let held = AssistedRunner.Item(entry: e, form: f, plan: FillPlan(values: [], verdict: .ready))
+        XCTAssertTrue(held.noReadableForm); XCTAssertTrue(held.handsOff); XCTAssertEqual(held.mode, .fillsAndHolds)
+        e.noFill = true
+        let shown = AssistedRunner.Item(entry: e, form: f, plan: FillPlan(values: [], verdict: .ready))
+        XCTAssertEqual(shown.mode, .showsOnly); XCTAssertTrue(shown.handsOff)
+    }
 }

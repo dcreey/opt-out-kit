@@ -14,7 +14,7 @@ public enum Automation: String, Codable, Sendable {
     public var label: String {
         switch self {
         case .scriptable: return L10n.t("Could be scripted")
-        case .guided: return L10n.t("Guided walkthrough")
+        case .guided: return L10n.t("Opened for you")
         case .needsBrowser: return L10n.t("Needs a real browser")
         case .blocked: return L10n.t("Blocks automated requests")
         case .robotsDisallowed: return L10n.t("Asks bots not to visit")
@@ -270,6 +270,8 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var registeredIn: [String]?    // two-letter codes of the states whose broker registry lists this site
     public var signals: [String]?
     public var profiled: String?
+    /// True for a site whose page must never have anything of the person's put into it (its form is a sign-up, search or contact form, not a request): the page is shown and the person does the rest.
+    public var noFill: Bool?
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
@@ -284,7 +286,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
         case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, caution, persistence, regions, languages, regionalSites = "regional_sites", about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
-        case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent"
+        case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent", noFill = "no_fill"
     }
 }
 
@@ -329,5 +331,29 @@ public enum Directory {
     public static func familySize(of entry: DirectoryEntry, in entries: [DirectoryEntry]) -> Int {
         guard let f = entry.family else { return 1 }
         return entries.filter { $0.family == f }.count
+    }
+}
+
+
+/// What the semi-automated flow does with a site's page. Every site with a page is semi-automated; this says how much the app does on it.
+public enum PageMode: Equatable, Sendable {
+    /// A form the app reads: it fills it in, the person clears whatever the page shows, and it is sent.
+    case form
+    /// The app fills in whatever it can read on the page and never presses send: the person does the rest and says when it is done (no readable form; a form that asks for an
+    /// agent's details, questions the app cannot read, or a file).
+    case fillsAndHolds
+    /// The page is shown and nothing of the person's is put into it: a business contact form, a site that carries a caution (a face photo), a page the survey found to be a sign-up form.
+    case showsOnly
+}
+
+public extension DirectoryEntry {
+    /// Whether a form is known on this site's page: read by the crawl, or found when the live page was loaded.
+    var hasKnownForm: Bool { optOutForm != nil || liveForm?.found == true }
+
+    var pageMode: PageMode {
+        let blockers = Set(liveForm?.blockers ?? [])
+        if noFill == true || caution != nil || blockers.contains("business") { return .showsOnly }
+        if !hasKnownForm || !blockers.isDisjoint(with: ["agent", "other", "file"]) || runCheck?.result == "failed" { return .fillsAndHolds }
+        return .form
     }
 }

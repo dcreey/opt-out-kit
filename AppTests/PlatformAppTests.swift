@@ -244,7 +244,7 @@ final class AutomaticRunAppTests: XCTestCase {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         guard let entry = m.directory.first(where: { m.method(for: $0).method == .automatic }) else { return XCTFail("no automatic site") }
-        for (outcome, expected) in [("failed", OptOutMethod.guided), ("rejected", .guided), ("challenged", .semiAutomatic)] {
+        for (outcome, expected) in [("failed", OptOutMethod.semiAutomatic), ("rejected", .semiAutomatic), ("challenged", .semiAutomatic)] {
             m.resetProgressForTesting()
             m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: outcome, detail: "x"), site: entry.id)
             XCTAssertEqual(m.method(for: entry).method, expected, outcome)
@@ -289,7 +289,7 @@ final class RunReviewAppTests: XCTestCase {
         XCTAssertEqual(m.screenshot(for: first, person: me), Data([1, 2, 3, 4]))
         let entry = try XCTUnwrap(m.directory.first { $0.id == first.id })
         m.markLooksWrong(first, for: me)
-        XCTAssertEqual(m.method(for: entry).method, .guided, "a site the person says did not finish moves to a guide")
+        XCTAssertEqual(m.method(for: entry).method, .semiAutomatic, "a site the person says did not finish moves to semi-automatic")
         XCTAssertFalse(m.reviewItems(for: me).first { $0.id == first.id }?.worked ?? true)
     }
 }
@@ -307,7 +307,7 @@ final class CoachGuideAppTests: XCTestCase {
         XCTAssertTrue(m.shouldCoach("sites"))
         XCTAssertNil(CoachGuide.forMethod(.automatic))
         XCTAssertEqual(CoachGuide.forMethod(.semiAutomatic)?.id, "semi")
-        XCTAssertEqual(CoachGuide.forMethod(.guided)?.id, "manual")
+        XCTAssertEqual(CoachGuide.forMethod(.manual)?.id, "manual")
         XCTAssertEqual(CoachGuide.forMethod(.manual)?.id, "manual")
         XCTAssertTrue(Set(CoachGuide.allIDs).isSuperset(of: ["sites", "semi", "manual"]))
     }
@@ -353,7 +353,7 @@ final class LanguageAppTests: XCTestCase {
         m.setLanguage("fr")
         XCTAssertEqual(m.language, "fr")
         XCTAssertEqual(Loc.t("Next step"), "Étape suivante")
-        XCTAssertEqual(OptOutMethod.guided.title, "Guidé : vous faites les étapes", "words from the core package follow the same choice")
+        XCTAssertEqual(OptOutMethod.manual.title, "Manuel : vous trouvez la page", "words from the core package follow the same choice")
         m.setLanguage("de")
         XCTAssertEqual(Loc.f("Step %lld of %lld", 2, 5), "Schritt 2 von 5")
         let ca = try XCTUnwrap(m.jurisdiction(code: "CA"))

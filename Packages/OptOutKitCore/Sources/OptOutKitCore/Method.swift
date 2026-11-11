@@ -2,14 +2,13 @@ import Foundation
 
 /// How a site's opt-out gets done, in terms of who does the work. This is what people see; the provisional A-D tiers stay internal.
 public enum OptOutMethod: String, CaseIterable, Sendable {
-    case automatic, semiAutomatic, emailOnly, guided, manual
+    case automatic, semiAutomatic, emailOnly, manual
 
     public var title: String {
         switch self {
         case .automatic: return L10n.t("Automatic opt-out")
         case .semiAutomatic: return L10n.t("Semi-automated, with prompts for you")
         case .emailOnly: return L10n.t("Email only, you send one message")
-        case .guided: return L10n.t("Guided, you do the steps")
         case .manual: return L10n.t("Manual, you find the page")
         }
     }
@@ -17,9 +16,8 @@ public enum OptOutMethod: String, CaseIterable, Sendable {
     public var explanation: String {
         switch self {
         case .automatic: return L10n.t("The app fills in the site's form and sends it on its own.")
-        case .semiAutomatic: return L10n.t("The app fills in the form and sends it. You solve the human check (and confirm an email if the site sends one).")
+        case .semiAutomatic: return L10n.t("The app opens the page and fills in what it can. You solve the human check, finish anything it cannot fill, and tap Mark as done (and confirm an email if the site sends one).")
         case .emailOnly: return L10n.t("This site takes opt-outs by email and has no form. The app writes one message per address, naming every site it handles; you read it and tap Send.")
-        case .guided: return L10n.t("The app opens the right page and walks you through each step. Some steps need things only you can do.")
         case .manual: return L10n.t("We could not read this site's opt-out page. Look for its privacy or \"do not sell\" link and follow it yourself.")
         }
     }
@@ -44,18 +42,18 @@ public enum OptOutMethods {
         // What a real page load showed that only the person can answer (a business field, an agent, a file, a state menu without their state,
         // questions the app cannot read). These hold whether the form was read from the page or found live.
         if let live = e.liveForm {
-            if live.blockers.contains("business") { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for business details, so we take you to the page and walk you through it.")) }
+            if live.blockers.contains("business") { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for business details, so nothing of yours is filled in: we show you the page and you decide.")) }
             if live.blockers.contains("agent") { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for an authorized agent's details. We fill in what we can; you finish the rest in the page and press its own button.")) }
             if live.blockers.contains("other") { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form has questions the app cannot read. We fill in what we can; you answer the rest in the page and press its own button.")) }
             if live.blockers.contains("file") {
-                // A face photo or a signature is never handed over for the person: a site that carries a caution stays guided.
-                if e.caution != nil { return MethodVerdict(method: .guided, reason: L10n.t("This form asks for a file or a signature, so we take you to the page and walk you through it.")) }
+                // A face photo or a signature is never handed over for the person: on a site that carries a caution nothing is filled in at all.
+                if e.caution != nil { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for a file or a signature, so nothing of yours is filled in: we show you the page.")) }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("This form asks for a file or a signature. We fill in what we can; you add the file and press the page's own button."))
             }
         }
         guard let form = e.optOutForm else {
             if let live = e.liveForm, live.found {
-                if e.runCheck?.result == "failed" { return MethodVerdict(method: .guided, reason: L10n.t("A real run did not go through, so you do this one with a guide.")) }
+                if e.runCheck?.result == "failed" { return MethodVerdict(method: .semiAutomatic, reason: L10n.t("A real run did not go through, so we fill in what we can and you finish it in the page.")) }
                 // A form found on the live page that a reviewed real run showed to be confirmed, with nothing on it a person must clear.
                 let mustClear = live.blockers.contains { $0.hasPrefix("check") || $0.hasPrefix("certify") || $0.hasPrefix("terms") || $0 == "code" }
                 if let run = e.runCheck, run.result == "confirmed", !failedBefore, !challengedBefore, !mustClear {
@@ -63,10 +61,18 @@ public enum OptOutMethods {
                 }
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The opt-out form appears when the page loads in a browser. We fill it in; you clear any check it shows."))
             }
+            // A link that is only the site's front page holds nothing to fill: email when there is an address, else we open the site and the person looks.
+            if let url = e.optOutURL, url.path.isEmpty || url.path == "/", url.query == nil {
+                if let mail = e.contactEmail { return MethodVerdict(method: .emailOnly, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail)) }
+                return MethodVerdict(method: .manual, reason: L10n.t("We could not find an opt-out page on this site."))
+            }
+            if e.optOutURL != nil {
+                if let mail = e.contactEmail { return MethodVerdict(method: .semiAutomatic, reason: L10n.f("We found the opt-out page: we open it, fill in what we can, and you do the rest and tap Mark as done. If the page does not work, write to %@ instead.", mail)) }
+                return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We found the opt-out page but cannot read its form: we open it, click through to the form if it hides behind a button, fill in what we can, and you do the rest and tap Mark as done."))
+            }
             if let mail = e.contactEmail {
                 return MethodVerdict(method: .emailOnly, reason: L10n.f("This site takes opt-outs by email: write to %@. We prepare the message for you.", mail))
             }
-            if e.optOutURL != nil { return MethodVerdict(method: .guided, reason: L10n.t("We found the opt-out page, but the app cannot fill in its form for you, so we take you there and walk you through it.")) }
             switch e.automation {
             case .blocked: return MethodVerdict(method: .manual, reason: L10n.t("The site refuses automated visits, so we could not find its opt-out page."))
             case .needsBrowser: return MethodVerdict(method: .manual, reason: L10n.t("The site is built so that we could not read it to find the opt-out page."))
@@ -80,8 +86,8 @@ public enum OptOutMethods {
         let listing: URL? = FormFiller.needsListing(form) && e.hasListingSearch ? URL(string: "https://example.com/listing") : nil
         let plan = FormFiller.plan(for: form, signals: signals, person: complete(confirmingIdentity: confirmingIdentity), listingURL: listing)
         switch plan.verdict {
-        case .needsYou(let why): return MethodVerdict(method: .guided, reason: why)
-        case .needsData(let what): return MethodVerdict(method: .guided, reason: L10n.f("The form asks for %@, which we do not hold.", what.joined(separator: ", ")))
+        case .needsYou(let why): return MethodVerdict(method: .semiAutomatic, reason: why)
+        case .needsData(let what): return MethodVerdict(method: .semiAutomatic, reason: L10n.f("The form asks for %@, which we do not hold.", what.joined(separator: ", ")))
         case .ready:
             if listing != nil {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("We search the site for you; you tap your own listing and clear the check, and we fill in and send the rest."))
@@ -89,7 +95,7 @@ public enum OptOutMethods {
             // A reviewed real run beats every guess made from reading the page.
             if let run = e.runCheck {
                 if run.result == "failed" {
-                    return MethodVerdict(method: .guided, reason: L10n.f("A real run on %@ did not go through (%@), so you do this one with a guide.", run.date, run.note ?? "-"))
+                    return MethodVerdict(method: .semiAutomatic, reason: L10n.f("A real run on %@ did not go through (%@), so we fill the form in and you send it yourself.", run.date, run.note ?? "-"))
                 }
                 // Confirmed counts unless the page also shows something this person must clear (a human check, a box they may not tick).
                 let personMustClear = (e.liveCheck?.blockers ?? []).contains { b in
@@ -100,7 +106,7 @@ public enum OptOutMethods {
                 }
             }
             if failedBefore {
-                return MethodVerdict(method: .guided, reason: L10n.t("The app tried this site automatically and it did not go through, so you do it with a guide."))
+                return MethodVerdict(method: .semiAutomatic, reason: L10n.t("The app tried this site automatically and it did not go through, so we fill it in and you send it yourself."))
             }
             if challengedBefore {
                 return MethodVerdict(method: .semiAutomatic, reason: L10n.t("A recent automatic send was stopped by a check on the site, so you solve it."))
@@ -134,9 +140,9 @@ public enum OptOutMethods {
         return classify(b)
     }
 
-    /// A hand-written broker flow without a fillable form always has steps a person takes part in.
+    /// A hand-written broker flow without a fillable form is still semi-automatic: its steps open the pages and fill what they can.
     public static func classify(_ b: Broker) -> MethodVerdict {
-        MethodVerdict(method: .guided, reason: L10n.f("A hand-written walkthrough with %@ steps.", b.steps.count))
+        MethodVerdict(method: .semiAutomatic, reason: L10n.f("A hand-written flow with %@ steps: the app opens each page and fills in what it can, and you do the rest.", b.steps.count))
     }
 
     public static func markdown(brokers: [Broker], entries: [DirectoryEntry]) -> String {

@@ -10,6 +10,7 @@ confidence: "medium"
 # The recorded opt-out page (https://www.cotality.com/legal/privacy-policy) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
 opt_out_url: null
 contact_email: "privacy@cotality.com"
+no_fill: true
 registered_in: [TX]
 signals: [email_contact, email_only_wording, phone_verify]
 profiled: "2026-10-22"

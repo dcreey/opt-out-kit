@@ -7,6 +7,7 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
+contact_email: "support@peoplewhiz.com"
 opt_out_url: "https://www.peoplewhiz.com:443/privacy"
 registered_in: [CA]
 signals: [captcha_turnstile, mail_option]

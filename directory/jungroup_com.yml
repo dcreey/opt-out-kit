@@ -11,6 +11,7 @@ confidence: "low"
 opt_out_url: "https://jungroup.com/optout"
 contact_email: "privacy@jungroup.com"
 contact_email_source: "policy"
+no_fill: true
 registered_in: [CA]
 signals: [email_input, opt_out_form_found]
 profiled: "2026-10-22"

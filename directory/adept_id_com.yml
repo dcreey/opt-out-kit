@@ -9,6 +9,7 @@ automation: "guided"
 confidence: "medium"
 opt_out_url: "https://www.adept-id.com/opt-out-preferences/"
 opt_out_form: {"page": "https://www.adept-id.com/opt-out-preferences/", "method": "post", "action": "https://www.adept-id.com/opt-out-preferences/#wpcf7-f40-o2", "fields": [{"type": "email", "name": "useremail", "label": "Subscribe"}], "hops": 0}
+no_fill: true
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, captcha_turnstile, email_input, listing_url_input, opt_out_form_found, portal_osano]
 profiled: "2026-10-22"

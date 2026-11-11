@@ -1187,7 +1187,7 @@ final class AppModel: ObservableObject {
                 return item
             }
             // A form the crawl could not read but a real page load found: the live page decides what is filled, so a stand-in form is enough.
-            guard let form = entry.optOutForm ?? entry.liveForm?.page.flatMap(URL.init(string:)).map({ OptOutForm(page: $0, method: "post", action: nil, fields: [], hops: 1) }) else { return nil }
+            guard let form = entry.optOutForm ?? (entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL).map({ OptOutForm(page: $0, method: "post", action: nil, fields: [], hops: 1) }) else { return nil }
             // Shown in the person's language when the site offers its opt-out page in it; the original page is the fallback.
             var shown = form, fallback: OptOutForm?
             if let local = Regions.localizedPage(for: entry, language: Loc.language, country: ownerCountry), local != form.page {

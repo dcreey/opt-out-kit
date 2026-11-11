@@ -1601,14 +1601,14 @@ final class OptOutMethodTests: XCTestCase {
     }
 
     func testThingsOnlyAPersonCanDoMakeItGuided() {
-        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["login_required"])).method, .guided)
-        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["id_required"])).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["login_required"])).method, .semiAutomatic)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: ["id_required"])).method, .semiAutomatic)
         let listing = [FormField(type: "text", name: "listing_url", label: "Link to your listing"), FormField(type: "email", name: "email", label: "Email")]
-        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], fields: listing)).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], fields: listing)).method, .semiAutomatic)
     }
 
     func testAPageWithoutAFormIsGuidedAndNothingFoundIsManual() {
-        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], form: false)).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(entry(signals: [], form: false)).method, .semiAutomatic)
         for a in [Automation.blocked, .needsBrowser, .unreachable, .unknown, .robotsDisallowed] {
             let v = OptOutMethods.classify(entry(signals: [], form: false, url: false, automation: a))
             XCTAssertEqual(v.method, .manual, "\(a)")
@@ -1699,7 +1699,7 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         e.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
         e.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(e, confirmingIdentity: true).method, .automatic)
-        XCTAssertEqual(OptOutMethods.classify(e).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(e).method, .semiAutomatic)
     }
 }
 
@@ -1736,7 +1736,7 @@ final class MeasuredMethodTests: XCTestCase {
         var e = entry([], live: LiveCheck(checked: "d", blockers: []))
         e.runCheck = RunCheck(date: "2026-10-23", result: "confirmed")
         XCTAssertEqual(OptOutMethods.classify(e).method, .automatic)
-        XCTAssertEqual(OptOutMethods.classify(e, failedBefore: true).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(e, failedBefore: true).method, .semiAutomatic)
     }
 
     func testASendThatWasChallengedMovesTheSiteToSemiAutomated() {
@@ -1853,11 +1853,11 @@ final class ListingFlowTests: XCTestCase {
 
     func testListingSitesAreSemiAutomatedOnlyWhenTheyCanBeSearched() {
         XCTAssertEqual(OptOutMethods.classify(entry()).method, .semiAutomatic)
-        XCTAssertEqual(OptOutMethods.classify(entry(search: false)).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(entry(search: false)).method, .semiAutomatic)
         let spokeo = Broker(id: "spokeo", name: "Spokeo", tier: .A, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil)
         let other = Broker(id: "peopleconnect", name: "PC", tier: .C, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil)
         XCTAssertEqual(OptOutMethods.classify(spokeo, in: [entry()]).method, .semiAutomatic)
-        XCTAssertEqual(OptOutMethods.classify(other, in: [entry()]).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(other, in: [entry()]).method, .semiAutomatic)
     }
 }
 
@@ -2316,12 +2316,12 @@ final class PlanTests: XCTestCase {
 
     func testTheQueueRanksTasksInTheOrderTheUserAsked() {
         let tasks = [
-            task("global-manual", .manual), task("local-manual-small", .guided, sites: 2, states: ["TX"]), task("global-semi", .semiAutomatic),
-            task("local-manual-big", .guided, sites: 12, states: ["TX"]), task("country-semi", .semiAutomatic, states: ["OH"]),
+            task("global-manual", .manual), task("local-manual-small", .manual, sites: 2, states: ["TX"]), task("global-semi", .semiAutomatic),
+            task("local-manual-big", .manual, sites: 12, states: ["TX"]), task("country-semi", .semiAutomatic, states: ["OH"]),
             task("local-semi", .semiAutomatic, states: ["TX"]), task("auto", .automatic, sites: 40, kind: .automatic),
             task("drop", nil, sites: 600, kind: .platform("ca-drop")), task("country-manual-big", .manual, sites: 11, states: ["OH"]),
         ]
-        let steps = [PlanStep(kind: .method(.guided), title: "", explanation: "", tasks: tasks)]
+        let steps = [PlanStep(kind: .method(.manual), title: "", explanation: "", tasks: tasks)]
         let queue = OptOutPlan.queue(steps, local: ["TX"], countryHasRegistries: true)
         XCTAssertEqual(queue.flatMap { $0.tasks.map(\.title) },
                        ["drop", "auto", "local-semi", "country-semi", "local-manual-big", "country-manual-big", "global-semi", "local-manual-small", "global-manual"])
@@ -2329,7 +2329,7 @@ final class PlanTests: XCTestCase {
     }
 
     func testOutsideACountryWithRegistriesNothingIsLocalOrCountryLevel() {
-        let steps = [PlanStep(kind: .method(.guided), title: "", explanation: "", tasks: [task("a", .semiAutomatic, states: ["TX"]), task("b", .guided, sites: 20, states: ["TX"])])]
+        let steps = [PlanStep(kind: .method(.manual), title: "", explanation: "", tasks: [task("a", .semiAutomatic, states: ["TX"]), task("b", .manual, sites: 20, states: ["TX"])])]
         let queue = OptOutPlan.queue(steps, local: [], countryHasRegistries: false)
         XCTAssertEqual(queue.map(\.rank), [.globalSemi, .globalManual])
     }
@@ -2427,7 +2427,7 @@ final class RunCheckTests: XCTestCase {
 
     func testAReviewedRealRunOutranksEveryGuess() {
         XCTAssertEqual(OptOutMethods.classify(clean(nil)).method, .semiAutomatic, "clean at load, nothing proven by a real run")
-        XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "failed", note: "a cookie banner covered the form"))).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "failed", note: "a cookie banner covered the form"))).method, .semiAutomatic)
         XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed"))).method, .automatic)
         XCTAssertEqual(OptOutMethods.classify(clean(RunCheck(date: "2026-10-23", result: "confirmed")), challengedBefore: true).method, .semiAutomatic,
                        "a later check still moves it")
@@ -2444,7 +2444,7 @@ final class RunCheckTests: XCTestCase {
             let text = form.fields.map { $0.name + " " + $0.label }.joined(separator: " ")
             guard signup.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { continue }
             let m = OptOutMethods.classify(e).method
-            XCTAssertTrue(m == .guided || m == .manual || m == .emailOnly, "\(e.domain) has a form with sign-up wording (\(text.prefix(120))) but is \(m)")
+            XCTAssertTrue(m == .manual || m == .emailOnly || e.pageMode == .showsOnly, "\(e.domain) has a form with sign-up wording (and is not marked no_fill: nothing of the person's may be put in it) (\(text.prefix(120))) but is \(m)")
         }
     }
 
@@ -2511,11 +2511,11 @@ final class RunCheckTests: XCTestCase {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
-        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com ocean.io pitchbook.com pmg.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
+        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com ocean.io pitchbook.com pmg.com spycloud.com swoop.com verisk.com".split(separator: " ").map(String.init)
         for d in flagged {
             guard let e = entries.first(where: { $0.domain == d }) else { XCTFail("\(d) is missing"); continue }
             let m = OptOutMethods.classify(e).method
-            XCTAssertTrue(m == .guided || m == .manual || m == .emailOnly, "\(d) must not be automatic or semi-automatic, is \(m)"); XCTAssertNil(e.optOutForm, d)
+            XCTAssertTrue(m == .manual || m == .emailOnly || e.pageMode == .showsOnly, "\(d) must not be automatic or semi-automatic, is \(m)"); XCTAssertNil(e.optOutForm, d)
         }
     }
 
@@ -2561,13 +2561,27 @@ final class SharedTargetTests: XCTestCase {
 }
 
 final class EmailOnlyAndAddressTests: XCTestCase {
-    func testASiteThatTakesOptOutsByEmailIsAGuideWithTheAddress() {
+    func testASiteWithAPageAndAnEmailIsSemiAutomaticWithTheEmailAsFallbackAndOneWithOnlyAnEmailIsEmailOnly() {
         var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
                                optOutURL: URL(string: "https://x.example/dnsmi"), signals: [])
         e.contactEmail = "privacy@x.example"
         let v = OptOutMethods.classify(e)
-        XCTAssertEqual(v.method, .emailOnly)
+        XCTAssertEqual(v.method, .semiAutomatic)
         XCTAssertTrue(v.reason.contains("privacy@x.example"), v.reason)
+        e.optOutURL = nil
+        let mailOnly = OptOutMethods.classify(e)
+        XCTAssertEqual(mailOnly.method, .emailOnly)
+        XCTAssertTrue(mailOnly.reason.contains("privacy@x.example"), mailOnly.reason)
+    }
+
+    func testALinkThatIsOnlyTheFrontPageIsEmailOnlyWithAnAddressAndManualWithout() {
+        var e = DirectoryEntry(id: "x", domain: "x.example", name: "x", bucket: "direct", tier: .B, automation: .guided,
+                               optOutURL: URL(string: "https://x.example/"), signals: [])
+        XCTAssertEqual(OptOutMethods.classify(e).method, .manual)
+        e.contactEmail = "privacy@x.example"
+        XCTAssertEqual(OptOutMethods.classify(e).method, .emailOnly)
+        e.optOutURL = URL(string: "https://x.example/privacy/optout")
+        XCTAssertEqual(OptOutMethods.classify(e).method, .semiAutomatic)
     }
 
     func testASecondAddressLineStaysEmptyAndCountryIsFilledForAUSAddress() {
@@ -2753,7 +2767,7 @@ final class CoverageReportTests: XCTestCase {
             var tag = "\(v.method)"
             if e.optOutForm == nil { tag += e.contactEmail != nil ? "+emailonly" : (e.optOutURL != nil ? "+pageNoForm" : "+nopage") }
             counts[tag, default: 0] += 1
-            if v.method == .guided || v.method == .manual { reasons[String(v.reason.prefix(90)), default: 0] += 1 }
+            if v.method == .manual { reasons[String(v.reason.prefix(90)), default: 0] += 1 }
         }
         print("COVERAGE", counts.sorted { $0.key < $1.key })
         for (r, n) in reasons.sorted(by: { $0.value > $1.value }).prefix(40) { print("REASON \(n) \(r)") }
@@ -3245,7 +3259,7 @@ final class UnlockLaterNotInTheQueueTests: XCTestCase {
         // A live form whose real page asked only a person's business details is guided, not semi-automated.
         let business = entries.filter { $0.liveForm?.found == true && ($0.liveForm?.blockers.contains("business") ?? false) }
         XCTAssertFalse(business.isEmpty)
-        XCTAssertTrue(business.allSatisfy { OptOutMethods.classify($0, confirmingIdentity: true).method == .guided })
+        XCTAssertTrue(business.allSatisfy { OptOutMethods.classify($0, confirmingIdentity: true).method == .semiAutomatic && $0.pageMode == .showsOnly })
     }
 }
 
@@ -3257,7 +3271,8 @@ final class CautionTests: XCTestCase {
         let cv = try XCTUnwrap(entries.first { $0.domain == "clearview.ai" })
         XCTAssertEqual(cv.caution?.kind, "biometric")
         XCTAssertFalse(cv.caution?.sources.isEmpty ?? true)
-        XCTAssertEqual(OptOutMethods.classify(cv, confirmingIdentity: true).method, .guided, "a face photo is never uploaded for the person")
+        XCTAssertEqual(OptOutMethods.classify(cv, confirmingIdentity: true).method, .semiAutomatic)
+        XCTAssertEqual(cv.pageMode, .showsOnly, "a face photo is never uploaded for the person: nothing is filled in")
         XCTAssertTrue(cv.caution?.summary.contains("never uploads a photo") ?? false)
     }
 }
@@ -3609,11 +3624,13 @@ final class FormsNeedingThePersonTests: XCTestCase {
     }
 
     func testABusinessFormIsStillAGuideBecauseItIsNotAPersonalOptOut() throws {
-        XCTAssertEqual(OptOutMethods.classify(try entry(["business"])).method, .guided)
+        XCTAssertEqual(OptOutMethods.classify(try entry(["business"])).method, .semiAutomatic)
+        XCTAssertEqual(try entry(["business"]).pageMode, .showsOnly, "a business form has nothing of the person put into it")
     }
 
     func testAFileOnASiteWithACautionIsStillAGuide() throws {
-        XCTAssertEqual(OptOutMethods.classify(try entry(["file"], caution: true)).method, .guided, "a face photo is never uploaded for the person")
+        XCTAssertEqual(OptOutMethods.classify(try entry(["file"], caution: true)).method, .semiAutomatic)
+        XCTAssertEqual(try entry(["file"], caution: true).pageMode, .showsOnly, "a face photo is never uploaded for the person")
     }
 }
 

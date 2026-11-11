@@ -9,6 +9,7 @@ automation: "blocked"
 confidence: "n/a"
 # The recorded opt-out page (https://pitchbook.com/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
 opt_out_url: null
+no_fill: true
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

@@ -10,6 +10,7 @@ confidence: "medium"
 # Checked by hand 2026-10-26: https://www.intentiq.com/opt-out/ is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
 opt_out_url: "https://www.intentiq.com/opt-out/"
 contact_email: "privacy@intentiq.com"
+no_fill: true
 registered_in: [CA, OR, TX]
 signals: [captcha_recaptcha, email_contact, email_input, email_only_wording, opt_out_form_found]
 profiled: "2026-10-22"

@@ -31,7 +31,7 @@ struct CoachGuide: Identifiable {
         switch m {
         case .automatic: return nil
         case .semiAutomatic: return .semiAutomatic
-        case .emailOnly, .guided, .manual: return .manual
+        case .emailOnly, .manual: return .manual
         }
     }
     static var manual: CoachGuide {

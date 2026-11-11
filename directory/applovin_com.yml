@@ -9,6 +9,7 @@ automation: "unknown"
 confidence: "low"
 # The recorded opt-out page (https://applovin.com/en) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
 opt_out_url: "https://legal.applovin.com/privacy/"
+no_fill: true
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"

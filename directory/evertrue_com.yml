@@ -10,6 +10,7 @@ confidence: "low"
 # The recorded opt-out page (https://www.evertrue.com/privacy-policy/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
 opt_out_url: null
 contact_email: "privacy@evertrue.com"
+no_fill: true
 registered_in: [CA, TX]
 signals: [email_contact, email_only_wording, phone_verify, script_rendered_form]
 profiled: "2026-10-22"

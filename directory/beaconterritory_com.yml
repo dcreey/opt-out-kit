@@ -7,6 +7,7 @@ bucket: "registry"
 tier: "D"
 automation: "guided"
 confidence: "low"
+contact_email: "support@beaconterritory.com"
 opt_out_url: "https://www.beaconterritory.com/texas-privacy-rights/"
 registered_in: [TX]
 signals: [email_contact, email_only_wording]

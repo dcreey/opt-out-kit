@@ -28,7 +28,7 @@ personal is put into it) and any site that carries a caution (Clearview's face p
 recorded form was dropped for that reason). Email-only sites are their own group ("Email only"), not semi-automated.
 
 The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (121 of 853 sites), **Semi-automated, with
-prompts for you** (51), **Guided, you do the steps** (612, including the hand-written walkthroughs) and **Manual, you find the page** (69).
+prompts for you** (51 before the change; it now also holds the former Guided group: page-only sites and the hand-written walkthroughs, held for you; sites with a page and an email use the page) and **Manual, you find the page** (69).
 The groups come from a real page load of each form with a made-up profile (nothing sent), not from captcha scripts on the page.
 See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was placed and why.
 
@@ -137,7 +137,7 @@ loading. A check, terms prompt or certification box is detected on the live page
 made-up profile and no sending: SmartBackgroundChecks and Spokeo show a reCAPTCHA checkbox, SmartBackgroundChecks also a
 certification box, and coloradoarrests.org has no blocker.
 
-**Guided flows** (hand-written broker steps, or a directory site) open full screen: the browser takes the top three quarters and
+**Step-by-step flows (the hand-written walkthroughs, and any page held for you)** (hand-written broker steps, or a directory site) open full screen: the browser takes the top three quarters and
 the app's panel the bottom quarter, showing "Step N of M", the current step, and Cancel, Back, Next step and Not working. Where it
 can, the app finishes a step by itself when it sees the page load, a copy, or a navigation (`done_when:` in a broker file); steps it
 cannot detect, such as clicking an emailed link, use the Next button. "Not working" records why (broken link, needs a login,

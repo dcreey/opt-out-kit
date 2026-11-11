@@ -415,121 +415,6 @@
     }
    }
   },
-  "A human check (Cloudflare Turnstile)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Une vérification anti-robot (Cloudflare Turnstile)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una verificación anti-bots (Cloudflare Turnstile)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung (Cloudflare Turnstile)"
-     }
-    }
-   }
-  },
-  "A human check (DataDome)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Une vérification anti-robot (DataDome)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una verificación anti-bots (DataDome)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung (DataDome)"
-     }
-    }
-   }
-  },
-  "A human check (PerimeterX)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Une vérification anti-robot (PerimeterX)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una verificación anti-bots (PerimeterX)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung (PerimeterX)"
-     }
-    }
-   }
-  },
-  "A human check (hCaptcha)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Une vérification anti-robot (hCaptcha)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una verificación anti-bots (hCaptcha)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung (hCaptcha)"
-     }
-    }
-   }
-  },
-  "A human check (reCAPTCHA)": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Une vérification anti-robot (reCAPTCHA)"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Una verificación anti-bots (reCAPTCHA)"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eine Bot-Prüfung (reCAPTCHA)"
-     }
-    }
-   }
-  },
   "A buyer finds the right person at your company and you get a useful deal or a job lead.": {
    "extractionState": "manual",
    "localizations": {
@@ -714,6 +599,29 @@
     }
    }
   },
+  "A hand-written flow with %@ steps: the app opens each page and fills in what it can, and you do the rest.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un parcours écrit à la main en %@ étapes : l'appli ouvre chaque page et remplit ce qu'elle peut, vous faites le reste."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Un recorrido escrito a mano con %@ pasos: la app abre cada página y rellena lo que puede, y tú haces el resto."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein handgeschriebener Ablauf mit %@ Schritten: Die App öffnet jede Seite und füllt aus, was sie kann; den Rest erledigen Sie."
+     }
+    }
+   }
+  },
   "A hand-written walkthrough with %@ steps.": {
    "extractionState": "manual",
    "localizations": {
@@ -733,6 +641,121 @@
      "stringUnit": {
       "state": "translated",
       "value": "Eine von Hand geschriebene Anleitung mit %@ Schritten."
+     }
+    }
+   }
+  },
+  "A human check (Cloudflare Turnstile)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (Cloudflare Turnstile)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (Cloudflare Turnstile)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (Cloudflare Turnstile)"
+     }
+    }
+   }
+  },
+  "A human check (DataDome)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (DataDome)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (DataDome)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (DataDome)"
+     }
+    }
+   }
+  },
+  "A human check (PerimeterX)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (PerimeterX)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (PerimeterX)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (PerimeterX)"
+     }
+    }
+   }
+  },
+  "A human check (hCaptcha)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (hCaptcha)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (hCaptcha)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (hCaptcha)"
+     }
+    }
+   }
+  },
+  "A human check (reCAPTCHA)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une vérification anti-robot (reCAPTCHA)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una verificación anti-bots (reCAPTCHA)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Bot-Prüfung (reCAPTCHA)"
      }
     }
    }
@@ -4141,52 +4164,6 @@
     }
    }
   },
-  "Guided walkthrough": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Parcours guidé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Recorrido guiado"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Geführte Anleitung"
-     }
-    }
-   }
-  },
-  "Guided, you do the steps": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Guidé : vous faites les étapes"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Guiado: tú haces los pasos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Geführt: Sie erledigen die Schritte"
-     }
-    }
-   }
-  },
   "Hawaii": {
    "extractionState": "manual",
    "localizations": {
@@ -6648,6 +6625,29 @@
     }
    }
   },
+  "Opened for you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Page ouverte pour vous"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Página abierta para ti"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für Sie geöffnet"
+     }
+    }
+   }
+  },
   "Oregon": {
    "extractionState": "manual",
    "localizations": {
@@ -8281,29 +8281,6 @@
     }
    }
   },
-  "The app fills in the form and sends it. You solve the human check (and confirm an email if the site sends one).": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "L'appli remplit le formulaire et l'envoie. Vous passez la vérification anti-robot (et confirmez un e-mail si le site en envoie un)."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La app rellena el formulario y lo envía. Tú superas la verificación anti-bots (y confirmas un correo si el sitio envía uno)."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die App füllt das Formular aus und sendet es. Sie bestehen die Bot-Prüfung (und bestätigen eine E-Mail, falls die Website eine schickt)."
-     }
-    }
-   }
-  },
   "The app fills in the form; you only solve the check. These brokers are registered where you live, so the law backs your request.": {
    "extractionState": "manual",
    "localizations": {
@@ -8373,25 +8350,25 @@
     }
    }
   },
-  "The app opens the right page and walks you through each step. Some steps need things only you can do.": {
+  "The app opens the page and fills in what it can. You solve the human check, finish anything it cannot fill, and tap Mark as done (and confirm an email if the site sends one).": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "L'appli ouvre la bonne page et vous guide à chaque étape. Certaines étapes exigent des choses que vous seul pouvez faire."
+      "value": "L'appli ouvre la page et remplit ce qu'elle peut. Vous réglez la vérification humaine, terminez ce qu'elle ne peut pas remplir et touchez « Marquer comme fait » (et confirmez un e-mail si le site en envoie un)."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "La app abre la página correcta y te guía en cada paso. Algunos pasos requieren cosas que solo tú puedes hacer."
+      "value": "La app abre la página y rellena lo que puede. Tú resuelves la verificación humana, terminas lo que no pueda rellenar y tocas «Marcar como hecho» (y confirmas un correo si el sitio envía uno)."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Die App öffnet die richtige Seite und führt Sie durch jeden Schritt. Manche Schritte verlangen Dinge, die nur Sie tun können."
+      "value": "Die App öffnet die Seite und füllt aus, was sie kann. Sie lösen die Prüfung, erledigen den Rest und tippen auf „Als erledigt markieren“ (und bestätigen eine E-Mail, falls die Website eine sendet)."
      }
     }
    }
@@ -9776,6 +9753,29 @@
     }
    }
   },
+  "We found the opt-out page: we open it, fill in what we can, and you do the rest and tap Mark as done. If the page does not work, write to %@ instead.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous avons trouvé la page de retrait : nous l'ouvrons, remplissons ce que nous pouvons, et vous faites le reste puis touchez « Marquer comme fait ». Si la page ne fonctionne pas, écrivez plutôt à %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encontramos la página de baja: la abrimos, rellenamos lo que podemos y tú haces el resto y tocas «Marcar como hecho». Si la página no funciona, escribe a %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir haben die Opt-out-Seite gefunden: Wir öffnen sie, füllen aus, was wir können, und Sie erledigen den Rest und tippen auf „Als erledigt markieren“. Wenn die Seite nicht funktioniert, schreiben Sie stattdessen an %@."
+     }
+    }
+   }
+  },
   "We go beyond any one country's registry: our list combines every registry we can read (US states so far) with other known brokers, %@ sites in all. Many of them are US companies that may not have to follow your country's law, but most accept opt-out requests from anyone and this app sends them.": {
    "extractionState": "manual",
    "localizations": {
@@ -10397,29 +10397,6 @@
     }
    }
   },
-  "You must submit it yourself": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Vous devez le soumettre vous-même"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Debes enviarlo tú mismo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sie müssen es selbst absenden"
-     }
-    }
-   }
-  },
   "You marked this site as not working (%@).": {
    "extractionState": "manual",
    "localizations": {
@@ -10439,6 +10416,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Du hast diese Seite als nicht funktionierend markiert (%@)."
+     }
+    }
+   }
+  },
+  "You must submit it yourself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous devez le soumettre vous-même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Debes enviarlo tú mismo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie müssen es selbst absenden"
      }
     }
    }

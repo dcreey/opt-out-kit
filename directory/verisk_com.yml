@@ -9,6 +9,7 @@ automation: "needs_browser"
 confidence: "low"
 # The recorded opt-out page (https://www.verisk.com/) is a sign-up, search or contact page, not an opt-out (survey 2026-10-26); the site waits to be unlocked.
 opt_out_url: null
+no_fill: true
 registered_in: [TX]
 signals: [script_rendered_page]
 profiled: "2026-10-22"

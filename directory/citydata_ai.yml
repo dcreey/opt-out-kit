@@ -11,6 +11,7 @@ confidence: "medium"
 opt_out_url: "https://www.citydata.ai/privacy/"
 contact_email: "privacy@citydata.ai"
 contact_email_source: "policy"
+no_fill: true
 registered_in: [CA]
 signals: [email_input, phone_verify]
 profiled: "2026-10-22"

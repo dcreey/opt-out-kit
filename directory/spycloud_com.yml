@@ -11,6 +11,7 @@ confidence: "low"
 opt_out_url: "https://spycloud.com/legal/dsar/"
 contact_email: "legal@spycloud.com"
 contact_email_source: "policy"
+no_fill: true
 registered_in: [CA]
 signals: [email_input]
 profiled: "2026-10-22"

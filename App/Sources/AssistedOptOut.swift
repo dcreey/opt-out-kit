@@ -55,10 +55,27 @@ struct WebAssistedDriver: AssistedDriver {
         return await prepareLoaded(session: session, form: form, plan: plan, listingURL: listingURL)
     }
 
+    /// A site with no readable form, or one nothing of the person's may be put into: the page is loaded and kept open. `fillNothing` shows it as it is (no terms are accepted, nothing is
+    /// clicked or filled); otherwise it is clicked through to a request form when one hides behind a button, filled as far as it can be, and held for the person to finish.
+    func prepareHeld(_ form: OptOutForm, plan: FillPlan, fillNothing: Bool) async -> AssistedPage? {
+        let session = WebViewSession.make()
+        Self.reasons[form.page.absoluteString] = nil; Self.foundEmails[form.page.absoluteString] = nil
+        do {
+            if let htmlOverride { try await session.loadHTML(htmlOverride) } else { try await session.load(URLRequest(url: form.page), within: 15) }
+        } catch { NSLog("OOK load failed %@: %@", form.page.absoluteString, "\(error)"); session.close(); return nil }
+        await session.settlePage(maxWait: 10)
+        _ = await session.denyCookies()
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        _ = await session.denyCookies()
+        await session.hideConsentOverlays()
+        if fillNothing { return WebAssistedPage(session: session, plan: FillPlan(values: [], verdict: .ready)) }
+        return await prepareLoaded(session: session, form: form, plan: plan, holdWithoutForm: true)
+    }
+
     /// Everything after the page has loaded: finding the opt-out form, the others beside it, filling them in. Solve and send and Email links both use this, so a
     /// kind of page one of them can handle is handled by the other. `keepOpenWithoutForm` leaves the page on screen for the person when no form is found;
     /// `advanceOnlyWithoutForm` (a page already holding its form, as an emailed link's page does) clicks through to a request form only when none is there.
-    func prepareLoaded(session: WebViewSession, form: OptOutForm, plan: FillPlan, listingURL: URL? = nil, keepOpenWithoutForm: Bool = false, advanceOnlyWithoutForm: Bool = false) async -> AssistedPage? {
+    func prepareLoaded(session: WebViewSession, form: OptOutForm, plan: FillPlan, listingURL: URL? = nil, keepOpenWithoutForm: Bool = false, advanceOnlyWithoutForm: Bool = false, holdWithoutForm: Bool = false) async -> AssistedPage? {
         let page = WebAssistedPage(session: session, plan: plan)
         page.termsPolicy = termsPolicy
         if let person {
@@ -72,6 +89,7 @@ struct WebAssistedDriver: AssistedDriver {
                 // No form and (perhaps) no address on file: an address on the page itself can still be offered.
                 Self.foundEmails[form.page.absoluteString] = ContactEmailPicker.best(await session.pageEmails(), pageHost: form.page.host ?? "")
                 NSLog("OOK no form %@: %@", form.page.absoluteString, found.map { "[\($0.fields.filter(\.visible).map(\.label).joined(separator: ",")) | \($0.buttons.joined(separator: ","))]" }.joined(separator: " "))
+                if holdWithoutForm { await session.scrollChallengeIntoView(); return page }          // the person works on the page itself; nothing is sent for them
                 if !keepOpenWithoutForm { session.close() }
                 return nil
             }

@@ -11,6 +11,7 @@ confidence: "medium"
 opt_out_url: "https://www.archives.com/optout"
 contact_email: "privacy@archives.com"
 contact_email_source: "page"
+no_fill: true
 signals: [captcha_recaptcha, email_input, listing_url_input, login_required, name_input]
 profiled: "2026-10-21"
 search_check:

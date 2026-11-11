@@ -9,6 +9,7 @@ automation: "scriptable"
 confidence: "medium"
 # Checked by hand 2026-10-26: https://app.fideo.ai/your-privacy-choices/ is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
 opt_out_url: "https://app.fideo.ai/your-privacy-choices/"
+no_fill: true
 registered_in: [CA, OR, TX]
 signals: [email_input, name_input]
 profiled: "2026-10-22"

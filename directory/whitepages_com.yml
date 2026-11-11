@@ -7,8 +7,8 @@ bucket: "direct"
 tier: "C"
 automation: "guided"
 confidence: "medium"
-# Checked by hand 2026-10-26: https://www.whitepages.com/your-privacy-choices is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
-opt_out_url: "https://www.whitepages.com/your-privacy-choices"
+# Corrected by hand 2026-11-11: the privacy-choices page leads to Whitepages' own request form on Zendesk; the app opens that form, fills what it can and never sends.
+opt_out_url: "https://whitepagesprivacy.zendesk.com/hc/en-us/requests/new"
 registered_in: [CA, OR, TX]
 signals: [account_hint, captcha_datadome, captcha_turnstile, mail_option, name_input, phone_input]
 profiled: "2026-10-21"

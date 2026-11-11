@@ -13,10 +13,10 @@ only to the broker sites they opt out of.
 - **A daily queue.** Each day the person picks one *kind* of broker to tackle (18 kinds, such as people search, ad tech, recruiting data, credit and
   consumer reporting), ranked by how bad the worst case is and how much opting out helps. A day is a batch of up to 15 sites of that kind. Every kind has a
   plain-language briefing with a best-case and worst-case example.
-- **Four ways to opt out**, chosen per site from what was actually found:
+- **Three ways to opt out (plus manual)**, chosen per site from what was actually found:
   - *Automatic*: the app fills in and sends the form itself. Only sites whose form was seen working on a reviewed real send are in this group.
   - *Semi-automatic*: the app opens the live form and fills it in; the person clears a human check or a confirm step and presses the page's own button.
-  - *Guided*: the app opens the page and walks the person through it, because the form needs something the app cannot supply.
+  - *Semi-automatic also covers pages with no readable form*: the app opens the page, clicks through a "Continue" button when the form hides behind one, fills what it can and never presses send; the person finishes and taps Mark as done. Sites that ask for business details or carry a caution show the page and put nothing of the person's in (`no_fill`). The five hand-written broker walkthroughs count as semi-automatic too. A site with both a page and an email address uses the page first, with the email as the fallback; email-only is for sites with no page. There is no separate "guided" method any more.
   - *Email*: one opt-out email to the privacy addresses of the day's sites, sent from the person's own mail app, with the person's other names, emails and previous addresses so a record held under any of them is found.
 - **Email links tab.** Some opt-outs finish with a link in an email. The person pastes it; the app checks it against the directory and the sites already
   finished, loads it, and fills in the form. A Share extension (`ShareExtension/`) lets the person share a link from a mail app straight to Exnay, which opens this tab through the `exnay://link?u=…` URL scheme; if the system blocks the hop, the link is copied for Paste. Requests that said an email would follow are tracked until the person finishes them.
