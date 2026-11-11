@@ -19,8 +19,10 @@ live_check:
 about: {"category": "adtech", "summary": "ONAUDIENCE LTD is an advertising technology company. OnAudience fuels digital campaigns and business solutions through high-quality data with global reach. Privacy-safe & GDPR-compliant data. Its own pages mention phone numbers, email addresses, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "online"], "sells_to": [], "source": "https://onaudience.com/do-not-sell-my-personal-info/"}
 priority: 23
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Follow us Products Audience Data AI Audiences OnAudience Curate Data Enrichment Raw Data Cookieless solutions Company About us Partners Careers Contact For Startups Resources Blog Case studies Audience Guides Privacy Privacy Center Privacy ", "source": "https://onaudience.com/do-not-sell-my-personal-info/"}
-live_form:
-  checked: "2026-10-25"
-  found: false
 regions: {"list": ["US", "EU", "UK"], "evidence": "listed on the IAB Europe TCF vendor list as OnAudience Ltd; on the UK ICO register of fee payers as Onaudience Ltd (ref ZA926133)", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://onaudience.com/opt-out/"
+  blockers: ["check:a bot check"]

@@ -5,6 +5,9 @@ struct AboutView: View {
     @EnvironmentObject var model: AppModel
     @State private var showApproval = false
     @State private var showGuidedIntro = false
+    #if DEBUG
+    @State private var showSiteReview = false
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -15,6 +18,11 @@ struct AboutView: View {
                     Button("Replay the guided sites walkthrough", systemImage: "play.rectangle") { showGuidedIntro = true }
                         .accessibilityIdentifier("show-guided-intro")
                 }
+                #if DEBUG
+                Section {
+                    Button("Site review (admin, debug builds only)", systemImage: "checklist") { showSiteReview = true }.accessibilityIdentifier("site-review")
+                }
+                #endif
                 Section {
                     MailAppPicker()
                 } header: { Text("Email") } footer: { Text("Opt-out emails we prepare open in this app, ready for you to read and send.") }
@@ -73,6 +81,9 @@ struct AboutView: View {
             }
             .accessibilityIdentifier("about-list")
             .fullScreenCover(isPresented: $showGuidedIntro) { GuidedIntroView { showGuidedIntro = false } }
+            #if DEBUG
+            .fullScreenCover(isPresented: $showSiteReview) { SiteReviewView(entries: model.directory) }
+            #endif
             .navigationTitle("Settings")
         }
     }

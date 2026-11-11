@@ -18,8 +18,10 @@ search_check:
 about: {"category": "people_search", "summary": "Spy Labs AdCo, LLC is a people-search and public-records site. Spy Dialer is a free phone number lookup with no charge, no sign-up. Run a reverse phone lookup on any cell, landline, or VOIP number instantly. Its own pages mention names and aliases, home addresses, phone numbers, email addresses, age or birthdate, relatives and household members. Its policy names these buyers or recipients: banks, lenders and insurers; advertisers and marketers.", "tracks": ["name", "address", "phone", "email", "age", "relatives", "property", "interests", "online", "location", "credit"], "sells_to": ["lenders", "advertisers"], "sells_note": "We may disclose your personal information to our professional advisors, such as lawyers, auditors, and insurers, when necessary.", "source": "https://www.spydialer.com/privacy.aspx"}
 priority: 73
 persistence: {"result": "unknown", "reup_months": 6}
-live_form:
-  checked: "2026-10-25"
-  found: false
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://www.spydialer.com/optout"
+  blockers: ["check:a bot check"]

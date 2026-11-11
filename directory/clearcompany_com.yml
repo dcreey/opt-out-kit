@@ -7,9 +7,9 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://clearcompany.com/cookies"
-contact_email: "dpo@clearcompany.com"
+contact_email: "privacy@clearcompany.com"
 contact_email_source: "policy"
+opt_out_url: "https://clearcompany.com/cookies"
 registered_in: [CA, OR]
 signals: [email_contact, portal_osano]
 profiled: "2026-10-22"

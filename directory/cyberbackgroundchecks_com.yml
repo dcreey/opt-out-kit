@@ -7,7 +7,7 @@ bucket: "direct"
 tier: null
 automation: "blocked"
 confidence: "n/a"
-opt_out_url: null
+opt_out_url: "https://www.cyberbackgroundchecks.com/do-not-sell"
 signals: [bot_check_on_home]
 profiled: "2026-10-21"
 search_check:

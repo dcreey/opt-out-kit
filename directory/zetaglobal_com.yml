@@ -7,13 +7,10 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.zetaglobal.com/"
+opt_out_url: "https://privacyportal-cdn.onetrust.com/dsarwebform/bc2d3301-11a5-4de5-b15e-ce796187a352/d0720d0f-d427-4a7d-a773-5d6793229f15.html"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-25"
-  found: false
 about: {"category": "marketing_data", "summary": "Zeta Global is a marketing data provider. Zeta Global unifies identity, data and AI in one marketing cloud, so enterprise brands can acquire, grow and retain customers across every channel. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.zetaglobal.com/"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
@@ -21,3 +18,8 @@ contact_email: "privacy@zetaglobal.com"
 contact_email_source: "browser"
 regions: {"list": ["US", "EU", "UK", "FR"], "evidence": "listed on the IAB Europe TCF vendor list as Zeta Global Corp.; on the UK ICO register of fee payers as Zeta Global Ltd. (ref ZB693344); offers its site in French", "checked": "2026-10-26"}
 languages: {"list": ["en", "es", "fr"], "pages": {"en": "https://www.zetaglobal.com/", "es": "https://www.zetaglobal.com/es/", "fr": "https://www.zetaglobal.com/fr/"}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://privacyportal-cdn.onetrust.com/dsarwebform/bc2d3301-11a5-4de5-b15e-ce796187a352/d0720d0f-d427-4a7d-a773-5d6793229f15.html"
+  blockers: ["check:a bot check"]

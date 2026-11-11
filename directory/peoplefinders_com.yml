@@ -21,5 +21,7 @@ regions: {"list": ["US"], "evidence": "registered with a US state; nothing found
 regional_sites: [{"has_form": true, "how": "probed country domain that links back to peoplefinders.com", "privacy_page": "https://houseofpeoplefinders.com/privacy-statement/", "region": "NL", "url": "https://houseofpeoplefinders.com/"}]
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
 live_form:
-  checked: "2026-11-09"
-  found: false
+  checked: "2026-11-11"
+  found: true
+  page: "https://www.peoplefinders.com/opt-out"
+  blockers: ["check:a bot check"]

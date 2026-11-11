@@ -8,6 +8,7 @@ struct RootView: View {
     @State private var debugLink: String?
     #if DEBUG
     @State private var debugSemi: DebugSemi?
+    @State private var showSiteReview = false
     #endif
 
     var body: some View {
@@ -52,11 +53,13 @@ struct RootView: View {
                 let items = model.verifyItems(domains: args[i + 1].split(separator: ",").map(String.init), for: me)
                 debugSemi = DebugSemi(runner: AssistedRunner(items: items, driver: model.makeAssistedDriver()) { _, _ in })
             }
+            if args.contains("-site-review") { showSiteReview = true }          // the temporary admin screen: mark each site's opt-out page
             if let i = args.firstIndex(of: "-open-link-filler"), args.indices.contains(i + 1) { debugLink = args[i + 1]; tab = 2 }
             if args.contains("-uitest-demo-run") { await model.runDemoOptOut() }
             if args.contains("-uitest-demo-review") { await model.runDemoOptOut(); model.runReport = nil; showDemoReview = true }
         }
         .fullScreenCover(item: $debugSemi) { box in AssistedOptOutView(runner: box.runner) }
+        .fullScreenCover(isPresented: $showSiteReview) { SiteReviewView(entries: model.directory) }
         .sheet(isPresented: $showDemoReview) {
             if let me = model.people.first(where: { $0.relationship == .me }) { NavigationStack { RunReviewView(person: me) } }
         }

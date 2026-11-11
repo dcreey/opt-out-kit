@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: null
+opt_out_url: "https://biointelli.com/contact/"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, listing_url_input, name_input, phone_input]
 profiled: "2026-10-22"

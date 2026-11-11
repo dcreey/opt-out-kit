@@ -16,9 +16,11 @@ profiled: "2026-10-22"
 about: {"category": "b2b", "summary": "Windfall Data, Inc. is a business-contact and sales-data provider. Windfall is a people intelligence and AI company that gives go-to-market teams actionable data to find, engage, and convert their next best customers. Its own pages mention phone numbers, email addresses, income or wealth, shopping and purchase behavior, devices and online activity. Its policy does not name who it sells to.", "tracks": ["phone", "email", "income", "purchases", "online"], "sells_to": [], "source": "https://www.windfall.com/your-privacy-choices"}
 priority: 38
 persistence: {"result": "unknown", "reup_months": 12}
-live_form:
-  checked: "2026-10-25"
-  found: false
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to windfall.com", "privacy_page": null, "region": "AU", "url": "https://windfall.com.au/"}]
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://my.datasubject.com/AkrxLuYOww/60579"
+  blockers: []

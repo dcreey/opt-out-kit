@@ -156,3 +156,30 @@ a missing robots.txt (404) allows. The crawl stays at about one request per seco
 For every site without an automatic check, the app's Quick checks screen sends the person to look for themselves and asks
 what they saw. It pays points for looking, not for the answer (5 for "not found", 3 for an honest "I'm listed"), keeps
 only the latest look per site, and never leaves the phone. Levels run from Exposed to Off the Grid.
+
+
+## Manual review of the sites with no readable form
+
+`tools/build_site_review.py` builds a one-page review tool (`tools/site_review_template.html`) from `directory/*.yml`: one card per site that has no readable form (267 on 2026-11-11), most important first.
+Each card opens the page we have, the site, and a search for its opt-out page, and takes one tag: right page with the form, right site but another page, find my record first, email only, needs login/ID/phone,
+no online opt-out, site gone, or skip, plus the right URL, an email address and a note. Tags are kept in the page's shared database (and the browser), so they can be read back and applied to `directory/`.
+
+The same review can be done inside the app, in a debug build (the simulator): launch with `-site-review`, or Settings, "Site review (admin, debug builds only)" (`SiteReviewView`). It looks like a guided flow:
+the site's page under the guide, "This is the page" records the page on screen (and moves on), a Kind menu says what it is (a form on the page, search for my record first, email only, needs login/ID/phone,
+no online opt-out, site gone), with optional email and note boxes; the … menu has quick "No online opt-out" and "Site gone", Skip, Previous site, the site's home page, a search for its opt-out page, and the export:
+Copy all tags as JSON, Share, or read `Documents/site-review.json` in the app's container (`xcrun simctl get_app_container booted dev.optoutkit.app data`). "Import tags from the clipboard" takes the JSON copied from the web
+review page, so sites already tagged there are skipped. Both use the same fields: `d`, `tag`, `url`, `email`, `note`, `at`. Covered by `SiteReviewTests`.
+
+## The policy crawl and its regression set
+
+`tools/policy_links.py` reads each site's own privacy policy and lists every link, email and frame in it, scored for how much it looks like a request. After the first run missed routes that a person found by
+hand, it learned: it scrolls to the very bottom and waits (footers are built late); it reads links inside shadow DOM; it presses "Do Not Sell" and "Your Privacy Choices" buttons and reads what opens; it follows
+policy-to-policy links up to four pages deep on the same company's domains (a legal site, a California notice); it records a Contact Us page for sites with no form and no email (`contact_routes`, the request goes in
+the contact form) and the sentences that give a postal address, a phone number or a setting in an app (`route_sentences`); it scores a link whose path says do-not-sell, opt-out or remove-my even with no link text; and it
+knows more portal vendors (BigID, DataGrail, Clym, Securiti, SayMine and others). `tools/crawl_regression.json` lists sites whose real route a person found (crexi, cyberbackgroundchecks, affordablebackgroundchecks,
+applovin, illumin, quotefinders, clearcompany, everyjoe, the BeenVerified family, peoplefinders, familytreenow) and `tools/check_crawl.py` runs the crawl blind (ignoring the page on file) against them; 11 of 11 on
+2026-11-11, from 7 of 11 before. Add each site a person corrects to that list, and run the check before trusting a change to the crawl.
+
+Second full crawl (2026-11-11, 227 sites): 90 with a candidate link (87 before), 60 with only an email, 12 with only a Contact Us page, 54 with no policy page, 3 with nothing, 8 timed out. New real finds:
+`experience.com` (a SixFifty request portal), `theorg.com/opt-out`, `intalytics.com` (`dilicheckrep.com/data-request/`, a form: semi-automated), plus applovin and everyjoe. The 12 Contact Us pages (the arrest-records family and a few
+others) were recorded as each site's page (guided). Left out as not the site's own: Fullstory, Omniture and a state attorney general's portal.

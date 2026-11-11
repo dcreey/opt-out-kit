@@ -7,19 +7,19 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.cognism.com/"
+opt_out_url: "https://cognism.privacy.saymine.io/cognism"
 contact_email: "privacy@cognism.com"
 contact_email_source: "policy"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: true
-  page: "https://cognism.privacy.saymine.io/cognism"
-  blockers: ["check:a bot check", "business"]
 about: {"category": "b2b", "summary": "Cognism is a business-contact and sales-data provider. Cognism is a leader in premium sales intelligence, setting a new standard for data quality and compliance, trusted by over +4000 customers worldwide. Its own pages mention devices and online activity. Its policy does not name who it sells to.", "tracks": ["online"], "sells_to": [], "source": "https://www.cognism.com/"}
 priority: 28
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK", "DE", "FR", "GLOBAL"], "evidence": "its pages mention GDPR; its pages mention UK GDPR; offers its site in German; offers its site in French; it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["de", "en", "fr"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://cognism.privacy.saymine.io/cognism"
+  blockers: ["check:a bot check"]

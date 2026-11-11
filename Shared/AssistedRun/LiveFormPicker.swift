@@ -53,12 +53,19 @@ enum LiveFormPicker {
     }
     private static let ownWords = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|unsubscribe|delete|remove|erase", options: .caseInsensitive)
 
+    /// Sites whose way to opt out is their contact form (they have no request form and no email), so it is the form to fill: the request goes in its message box.
+    /// Matched against the page's address and title (`pageContext`). Never a general rule: a contact form is refused everywhere else.
+    static let contactFormRoutes: [String] = ["affordable background checks"]
+
     /// How likely a form is the opt-out form: opt-out wording and several identity fields count for it, marketing wording against it.
     static func score(_ f: LiveForm, pageContext: String = "") -> Int {
         let fields = f.fields.filter { $0.visible && !["hidden", "submit", "button", "image", "password"].contains($0.type) }
         guard !fields.isEmpty else { return -100 }       // a form wrapper can have no size while its fields show; only the fields count
         let buttons = f.buttons.joined(separator: " ")
         let heading = f.text
+        // A site that takes opt-outs only through its contact form: that form (name, email, a message box) is the one, and its own button does not matter.
+        if contactFormRoutes.contains(where: { pageContext.lowercased().contains($0) }), fields.contains(where: { $0.type == "textarea" }),
+           fields.contains(where: { $0.type == "email" || has(identity, $0.label + " " + $0.name) }) { return 6 }
         // A sign-up, demo or contact form is refused outright unless its own button says opt-out ("Unsubscribe" is one); the page's privacy wording does not rescue it.
         if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) && !has(strongOptOut, heading) { return -100 }
         // The words around the inputs say "newsletter" or "delivered to your inbox": a subscription box, whatever its button says.

@@ -7,17 +7,17 @@ bucket: "registry"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: "https://mrginc.com/"
+opt_out_url: "https://mrginc.com/do-not-sell-my-personal-information"
 registered_in: [OR, TX]
 signals: [captcha_recaptcha, script_rendered_page]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: true
-  page: "https://mrginc.com/request-portal/"
-  blockers: ["check:a bot check", "terms", "business"]
 about: {"category": "marketing_services", "summary": "Media Resource Group LLC is a marketing and direct-mail services company. Looking for customers? Our custom-built marketing campaigns reach targeted, engaged consumers who are in need of a variety of goods and services. Contact us today. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, property and vehicles, interests and demographics. Its policy names these buyers or recipients: advertisers and marketers; other data brokers and resellers.", "tracks": ["address", "phone", "email", "age", "property", "interests", "online"], "sells_to": ["advertisers", "brokers"], "sells_note": "To exercise your right to opt-out of our sale of your personal information to third parties, targeted advertising, and profiling, please submit a verifiable User request to us by either: Submitting your request at https://www.mrginc.com/do-", "source": "https://mrgstaging.com/policy/mrgprivacy.html"}
 priority: 36
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU"], "evidence": "its pages mention General Data Protection Regulation", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://mrginc.com/do-not-sell-my-personal-information"
+  blockers: ["check:a bot check"]

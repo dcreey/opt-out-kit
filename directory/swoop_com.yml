@@ -22,6 +22,8 @@ regions: {"list": ["US"], "evidence": "registered with a US state; nothing found
 regional_sites: [{"has_form": false, "how": "probed country domain that links back to swoop.com", "privacy_page": null, "region": "AU", "url": "https://www.swoop.com.au/"}, {"has_form": false, "how": "probed country domain that links back to swoop.com", "privacy_page": null, "region": "BR", "url": "https://swoop.com.br/"}]
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
 live_form:
-  checked: "2026-10-26"
+  checked: "2026-11-11"
   found: false
   blockers: []
+contact_email: "privacyrights@swoop.com"
+contact_email_source: "browser"

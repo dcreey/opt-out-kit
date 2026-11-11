@@ -19,8 +19,10 @@ live_check:
 about: {"category": "marketing_services", "summary": "Carry Technologies Inc. is a marketing and direct-mail services company. Hightouch is the Agentic Marketing Platform powered by the industry-leading Composable CDP: AI marketing that actually knows your brand, customers, and business. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, shopping and purchase behavior. Its policy names these buyers or recipients: business customers and sales teams; advertisers and marketers; other data brokers and resellers.", "tracks": ["address", "phone", "email", "age", "employment", "purchases", "interests", "online", "social"], "sells_to": ["businesses", "advertisers", "brokers"], "sells_note": "The disclosure of this information may constitute a \"sale\" or \"sharing\" of personal information under certain state privacy laws (including for purposes of cross-context behavioral advertising).", "source": "https://hightouch.com/privacy-policy"}
 priority: 45
 persistence: {"result": "unknown", "reup_months": 12}
-live_form:
-  checked: "2026-10-25"
-  found: false
 regions: {"list": ["US", "EU", "UK", "FR"], "evidence": "its pages mention European Economic Area; its pages mention United Kingdom; offers its site in French", "checked": "2026-10-26"}
 languages: {"list": ["en", "es", "fr"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://preferences.hightouch.com/"
+  blockers: []

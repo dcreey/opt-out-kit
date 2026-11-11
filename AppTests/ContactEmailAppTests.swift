@@ -164,3 +164,34 @@ final class FirstRunResumeTests: XCTestCase {
         XCTAssertEqual(q.addresses.map(\.city), ["Springfield", "Peoria"], "a started earlier address stays; an empty one goes")
     }
 }
+
+#if DEBUG
+@MainActor
+final class SiteReviewTests: XCTestCase {
+    private func entries() throws -> [DirectoryEntry] {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        return try Registry.loadDirectory(root.appendingPathComponent("directory"))
+    }
+
+    func testTheQueueIsTheSitesWithNoReadableFormMostImportantFirst() throws {
+        let rows = SiteReview.rows(from: try entries())
+        XCTAssertGreaterThan(rows.count, 100)
+        XCTAssertFalse(rows.contains { $0.domain == "peoplefinders.com" }, "a site with a readable form is not asked about")
+        let all = try entries()
+        let pri = rows.compactMap { r in all.first { $0.id == r.id }?.priority ?? 0 }
+        XCTAssertEqual(pri, pri.sorted(by: >), "most important first")
+    }
+
+    func testTagsFromTheWebPageAreMergedAndTheNewerOneWins() throws {
+        let review = SiteReview(entries: try entries())
+        let first = try XCTUnwrap(review.rows.first)
+        let json = #"[{"d":"\#(first.domain)","tag":"ok","url":"https://x.example/optout","at":"2099-01-01T00:00:00Z"}]"#
+        XCTAssertEqual(review.importJSON(json), 1)
+        XCTAssertTrue(review.isDone(first)); XCTAssertEqual(review.tags[first.domain]?.url, "https://x.example/optout")
+        let older = #"[{"d":"\#(first.domain)","tag":"none","at":"2000-01-01T00:00:00Z"}]"#
+        XCTAssertEqual(review.importJSON(older), 0, "an older tag never replaces a newer one")
+        XCTAssertNotEqual(review.current?.domain, first.domain, "the queue moves past a site that is done")
+        try? FileManager.default.removeItem(at: review.file)
+    }
+}
+#endif

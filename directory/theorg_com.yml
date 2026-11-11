@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: "https://theorg.com/opt-out/position-select"
+opt_out_url: "https://theorg.com/opt-out"
 contact_email: "privacy@theorg.com"
 contact_email_source: "policy"
 registered_in: [CA, OR, TX]

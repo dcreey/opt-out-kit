@@ -7,17 +7,19 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: "https://www.quotefinders.com/privacy/sharing/index.html"
+opt_out_url: "https://submit-irm.trustarc.com/services/validation/ba69a833-aa21-48f7-aaa5-a50f5e99a090"
 contact_email: "privacy@quotefinders.com"
 contact_email_source: "policy"
 registered_in: [TX]
 signals: [portal_trustarc]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-24"
-  found: false
 about: {"category": "lead_generation", "summary": "BRIGHT POLICY, LLC is a lead-generation company. QuoteFinders is unavailable. Its own pages mention age or birthdate, property and vehicles, devices and online activity. Its policy names these buyers or recipients: advertisers and marketers.", "tracks": ["age", "property", "online"], "sells_to": ["advertisers"], "sells_note": "Applicable data privacy laws provide residents of certain jurisdictions (or, in some cases, their authorized agents) with the right to opt out of “targeted advertising,” “selling,” or “sharing” of personal information.", "source": "https://www.quotefinders.com/privacy/sharing/index.html"}
 priority: 32
 persistence: {"result": "temporary", "reup_months": 6, "quote": "Also, if you clear your cookies on this browser or use another browser or device, you may need to opt out again.", "source": "https://www.quotefinders.com/privacy/sharing/index.html"}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://submit-irm.trustarc.com/services/validation/ba69a833-aa21-48f7-aaa5-a50f5e99a090"
+  blockers: ["check:a bot check"]

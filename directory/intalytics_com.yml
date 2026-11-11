@@ -7,19 +7,19 @@ bucket: "registry"
 tier: "B"
 automation: "guided"
 confidence: "medium"
-opt_out_url: "https://kalibrate.com/intalytics/"
+opt_out_url: "https://dilicheckrep.com/data-request/"
 contact_email: "privacy@kalibrate.com"
 contact_email_source: "policy"
 registered_in: [CA]
 signals: [captcha_recaptcha, email_input, name_input, phone_input]
 profiled: "2026-10-22"
-live_form:
-  checked: "2026-10-23"
-  found: true
-  page: "https://kalibrate.com/intalytics/"
-  blockers: ["check:a bot check", "business"]
 about: {"category": "other", "summary": "Intalytics, Inc. is a property and real-estate data company. In 2021, Kalibrate acquired Intalytics to help bolster its consulting and software capabilities and answer even more customers' business questions. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; employers and recruiters.", "tracks": ["address", "phone", "email", "age", "employment", "education", "property", "criminal", "purchases", "interests", "online", "location", "health", "social"], "sells_to": ["advertisers", "employers"], "sells_note": "Annex 1 – Recruitment and Candidate Privacy Notice This Annex supplements the Kalibrate Website Privacy Policy and sets out how we collect, use, disclose and retain personal data in connection with our recruitment and candidate activities.", "source": "https://kalibrate.com/privacy-policy/"}
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US", "EU", "UK"], "evidence": "its pages mention GDPR; its pages mention UK GDPR", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://dilicheckrep.com/data-request/"
+  blockers: ["check:a bot check"]

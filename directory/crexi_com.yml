@@ -7,7 +7,7 @@ bucket: "registry"
 tier: "C"
 automation: "needs_browser"
 confidence: "low"
-opt_out_url: "https://www.crexi.com:443/"
+opt_out_url: "https://crexi.bigidprivacy.cloud/consumer/#/o2TCsG9LJ7/1"
 registered_in: [TX]
 signals: [script_rendered_page]
 profiled: "2026-10-22"

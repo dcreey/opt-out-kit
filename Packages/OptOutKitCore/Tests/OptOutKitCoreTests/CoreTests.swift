@@ -2506,11 +2506,12 @@ final class RunCheckTests: XCTestCase {
     }
 
     /// The 2026-10-26 survey of every opt-out page found these pointing at a newsletter, trial, search or contact form: none may be filled by the app.
+    /// (attomdata.com, finsum.com and finthrive.com left the list on 2026-11-11: their policies link to real request forms, a CCPA portal, a Smartsheet privacy request form and a OneTrust web form, now their pages.)
     func testSitesTheSurveyFoundPointingAtSignUpFormsAreNeverFilled() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let entries = try Registry.loadDirectory(dir)
-        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com attomdata.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai finsum.com finthrive.com idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com ocean.io pitchbook.com pmg.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
+        let flagged = "agedleadstore.com amplemarket.com applovin.com archives.com bluedatalead.com citydata.ai coasttechnology.com convergemarketing.com cotality.com dresdendirect.com enrichlayer.com evertrue.com fideo.ai idatabasesolutions.com intentiq.com internetbrands.com jungroup.com jwx.com lead-enhance.com ocean.io pitchbook.com pmg.com spycloud.com swoop.com verisk.com whitepages.com".split(separator: " ").map(String.init)
         for d in flagged {
             guard let e = entries.first(where: { $0.domain == d }) else { XCTFail("\(d) is missing"); continue }
             let m = OptOutMethods.classify(e).method
@@ -3238,7 +3239,7 @@ final class UnlockLaterNotInTheQueueTests: XCTestCase {
         let planned = Set(steps.flatMap { $0.tasks.flatMap(\.domains) })
         let covered = Set(brokers.flatMap { $0.covers ?? [] })
         let nothing = entries.filter { $0.optOutForm == nil && $0.liveForm?.found != true && $0.contactEmail == nil && $0.optOutURL == nil && $0.family == nil && $0.template == nil && !covered.contains($0.domain) }        // a family or template member is handled by its group
-        XCTAssertGreaterThan(nothing.count, 50)
+        XCTAssertGreaterThan(nothing.count, 20)        // 46 on 2026-11-11, after the policy crawl gave many of the 100+ that had none a page; the point is that some still have no route
         XCTAssertTrue(nothing.allSatisfy { !planned.contains($0.domain) }, "sites with no route yet must not be tasks: \(nothing.filter { planned.contains($0.domain) }.map(\.domain))")
         XCTAssertTrue(OptOutPlan.locked(steps, entries: entries).contains { nothing.map(\.domain).contains($0.domain) })
         // A live form whose real page asked only a person's business details is guided, not semi-automated.
@@ -3675,5 +3676,18 @@ final class ThisNationFlowTests: XCTestCase {
         let broker = try XCTUnwrap(brokers.first { $0.id == "thisnation" })
         XCTAssertEqual(broker.covers, ["everyjoe.com"])
         XCTAssertTrue(broker.steps.contains { $0.waitForEmail != nil }, "the removal is confirmed by an email")
+    }
+}
+
+final class FamilyTreeNowFlowTests: XCTestCase {
+    func testFamilyTreeNowGoesToItsOwnOptOutPageAndIsWalkedThroughSearchingForYourRecord() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        let brokers = try Registry.load(directory: root.appendingPathComponent("brokers"))
+        let e = try XCTUnwrap(entries.first { $0.domain == "familytreenow.com" })
+        XCTAssertEqual(e.optOutURL?.absoluteString, "https://www.familytreenow.com/optout", "the page its own site and a person's review point to")
+        XCTAssertNotEqual(e.liveForm?.found, true, "its privacy-rights page is a widget, not the opt-out")
+        let b = try XCTUnwrap(brokers.first { $0.id == "familytreenow" })
+        XCTAssertEqual(b.steps.first?.open?.absoluteString, "https://www.familytreenow.com/optout")
     }
 }

@@ -27,3 +27,5 @@ pipeline/region-pages/
 .dry-live-scan*/
 .guess/
 .live-guess/
+.live-*/
+.dir-proposed/

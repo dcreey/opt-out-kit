@@ -91,4 +91,14 @@ final class LiveFormPickerTests: XCTestCase {
         let intro = "/webform/1/2 Privacy Web Form You may have rights with respect to your personal information. Complete this form to exercise these rights."
         XCTAssertEqual(LiveFormPicker.pick([portal], pageContext: intro)?.token, "p")
     }
+
+    /// affordablebackgroundchecks.com: no request form and no email, only a contact form. On that site the contact form is the opt-out (the request goes in its message box);
+    /// its people search above it is not, and on any other site a contact form is still refused.
+    func testTheContactFormOfASiteThatTakesRequestsOnlyThereIsPickedAndNoOtherContactFormIs() {
+        let search = form("f0", [(type: "text", label: "FIRST NAME"), (type: "text", label: "LAST NAME"), (type: "select-one", label: "state")], buttons: ["Search Now"])
+        let contact = form("f1", [(type: "text", label: "YOUR NAME"), (type: "email", label: "YOUR EMAIL"), (type: "select-one", label: "subject"), (type: "textarea", label: "YOUR MESSAGE")], buttons: ["Send Message"])
+        let page = "/contact.php Contact Us | Affordable Background Checks"
+        XCTAssertEqual(LiveFormPicker.pick([search, contact], pageContext: page)?.token, "f1")
+        XCTAssertNil(LiveFormPicker.pick([search, contact], pageContext: "/contact Contact Us | Some Other Site"), "a contact form is refused anywhere else")
+    }
 }

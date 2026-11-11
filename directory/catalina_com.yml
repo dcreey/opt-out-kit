@@ -7,7 +7,7 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: null
+opt_out_url: "https://www.catalina.com/contact/sales"
 registered_in: [CA, OR, TX]
 signals: []
 profiled: "2026-10-22"

@@ -14,10 +14,12 @@ profiled: "2026-10-22"
 about: {"category": "location_data", "summary": "Pen-Link, Ltd. is a device and location data company. Penlink’s platform simplifies data for precise insights, supporting investigations. Trusted Innovation for Intelligent Decisions. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, criminal and court records. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.", "tracks": ["address", "phone", "email", "age", "employment", "criminal", "purchases", "interests", "online", "location", "social", "credit"], "sells_to": ["advertisers", "businesses"], "sells_note": "We may use De-Identified Information for any purpose, including without limitation for research and marketing purposes, and may also disclose such data to any third parties, including advertisers, partners, and sponsors.", "source": "https://www.penlink.com/privacy-policy/"}
 priority: 63
 persistence: {"result": "unknown", "reup_months": 6}
-live_form:
-  checked: "2026-10-25"
-  found: false
 contact_email: "privacy@penlink.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU", "UK", "DE", "FR", "GLOBAL"], "evidence": "its pages mention GDPR; its pages mention United Kingdom; offers its site in German; offers its site in French; it was found in 4 regions besides the US, which suggests it serves people worldwide", "checked": "2026-10-26"}
 languages: {"list": ["de", "en", "es", "fr", "pt"], "pages": {"de": "https://www.penlink.com/de/your-privacy-choices/", "en": "https://www.penlink.com/your-privacy-choices/", "es": "https://www.penlink.com/es/your-privacy-choices/", "fr": "https://www.penlink.com/fr/your-privacy-choices/", "pt": "https://www.penlink.com/pt/your-privacy-choices/"}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://www.penlink.com/your-privacy-choices/"
+  blockers: []

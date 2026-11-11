@@ -8,18 +8,19 @@ tier: "A"
 automation: "scriptable"
 confidence: "low"
 # Checked by hand 2026-10-26: https://finsum.com/what-we-do/your-privacy-choices is a real privacy-choices or opt-out page, so the app opens it and the person completes it (a guide, no form is filled for them).
-opt_out_url: "https://finsum.com/what-we-do/your-privacy-choices"
+opt_out_url: "https://app.smartsheet.com/b/form/48a44f05a4644a1f824601e77ad1719d"
 registered_in: [CA]
 signals: [email_input]
 profiled: "2026-10-22"
 contact_email: "privacy@broadridge.com"
 contact_email_source: "browser"
-live_form:
-  checked: "2026-10-26"
-  found: false
-  blockers: []
 about: {"category": "financial", "summary": "AdvisorTarget, LLC is a financial and credit data company. Finsum. Its own pages mention home addresses, phone numbers, email addresses, income or wealth, property and vehicles, devices and online activity. Its policy names these buyers or recipients: government and law enforcement.", "tracks": ["address", "phone", "email", "income", "property", "online"], "sells_to": ["government"], "sells_note": "Certain New Jersey active and retired law enforcement personnel and other persons covered by Daniel’s Law have the right to request that companies not disclose or re-disclose their home addresses and unpublished telephone numbers on the Int", "source": "https://www.finsum.com/what-we-do/your-privacy-choices"}
 priority: 43
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://app.smartsheet.com/b/form/48a44f05a4644a1f824601e77ad1719d"
+  blockers: []

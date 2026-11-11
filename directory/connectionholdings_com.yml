@@ -7,7 +7,7 @@ bucket: "registry"
 tier: null
 automation: "unknown"
 confidence: "low"
-opt_out_url: null
+opt_out_url: "https://connectionholdings.com/contact-us/"
 registered_in: [CA]
 signals: []
 profiled: "2026-10-22"

@@ -19,10 +19,12 @@ live_check:
 about: {"category": "b2b", "summary": "Graph8 Inc. is a business-contact and sales-data provider. graph8 finds buyers and runs campaigns on one buyer graph. My Desk hands each rep a ranked day: meeting prep, follow-ups, and deal actions, with context. Its own pages mention phone numbers, email addresses, age or birthdate, job title and employer, devices and online activity, social media profiles. Its policy names these buyers or recipients: banks, lenders and insurers; government and law enforcement; advertisers and marketers.", "tracks": ["phone", "email", "age", "employment", "online", "social", "credit"], "sells_to": ["lenders", "government", "advertisers"], "sells_note": "Our corporate affiliates; lawyers, auditors, bankers, and insurers in the course of their services to us; law enforcement and government authorities where we believe disclosure is required by law or necessary to protect rights, safety, or p", "source": "https://graph8.com/terms/#privacy-policy"}
 priority: 48
 persistence: {"result": "unknown", "reup_months": 12}
-live_form:
-  checked: "2026-10-25"
-  found: false
 contact_email: "privacy@graph8.com"
 contact_email_source: "page"
 regions: {"list": ["US", "EU", "UK", "CA"], "evidence": "its pages mention EEA; its pages mention United Kingdom; its pages mention CASL", "checked": "2026-10-26"}
 languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
+live_form:
+  checked: "2026-11-11"
+  found: true
+  page: "https://dsr.trustsuperset.com/?orgId=408c45e6-e16c-4fdd-b6ac-876e2e3f9d8f"
+  blockers: []
