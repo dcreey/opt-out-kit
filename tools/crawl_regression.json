@@ -1,0 +1,14 @@
+{
+ "_note": "Sites whose real opt-out route a person found by hand (2026-11-11), and what the policy crawl (tools/policy_links.py) must find for each. A change to the crawl is run against this list (tools/check_crawl.py) before it is trusted.",
+ "crexi.com": {"link": "bigidprivacy.cloud"},
+ "cyberbackgroundchecks.com": {"link": "cyberbackgroundchecks.com/do-not-sell"},
+ "affordablebackgroundchecks.com": {"contact": "contact.php"},
+ "applovin.com": {"email": "dataprotection@applovin.com"},
+ "illumin.com": {"link": "support.illumin.com/privacyrequest"},
+ "quotefinders.com": {"link": "submit-irm.trustarc.com"},
+ "clearcompany.com": {"email": "privacy@clearcompany.com"},
+ "everyjoe.com": {"link": "thisnation.com/do-not-sell"},
+ "bumper.com": {"link": "/svc/optout"},
+ "peoplefinders.com": {"link": "peoplefinders.com/opt-out"},
+ "familytreenow.com": {"link": "familytreenow.com/optout"}
+}

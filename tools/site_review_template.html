@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opt-out Page Review</title>
+<style>
+/* Layout: one site card at a time under a progress bar; big tag buttons; a list to jump around. */
+:root {
+  --paper: #f4f5f2; --card: #ffffff; --ink: #1b2024; --muted: #5d676e; --line: #d9ddd8;
+  --accent: #1d5f8a; --accent-ink: #ffffff; --good: #1f7a4d; --warn: #a15c00; --bad: #a3322b;
+  --chip: #e8ece8; --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14181b; --card: #1d2327; --ink: #e8ece9; --muted: #98a3a9; --line: #2f383d;
+    --accent: #6fb3e0; --accent-ink: #0f1a22; --good: #62c28d; --warn: #e0a24a; --bad: #e77c73; --chip: #283036; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14181b; --card: #1d2327; --ink: #e8ece9; --muted: #98a3a9; --line: #2f383d;
+  --accent: #6fb3e0; --accent-ink: #0f1a22; --good: #62c28d; --warn: #e0a24a; --bad: #e77c73; --chip: #283036; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.45; }
+body { padding: 16px; max-width: 760px; margin: 0 auto; }
+h1 { font-size: 20px; margin: 0 0 4px; text-wrap: balance; }
+.sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+.bar { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+.stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin: 8px 0 12px; font-variant-numeric: tabular-nums; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.filters button, .nav button, .tools button { font: inherit; }
+.pill { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; }
+.pill[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.domain { font-size: 24px; font-weight: 600; word-break: break-all; margin: 0; }
+.name { color: var(--muted); margin: 2px 0 10px; }
+.why { border-left: 3px solid var(--warn); padding: 2px 10px; margin: 10px 0; font-size: 15px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px; }
+.chip { background: var(--chip); border-radius: 6px; padding: 2px 8px; font-size: 12.5px; color: var(--muted); }
+.links { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+a.btn { display: inline-block; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--accent); color: var(--accent); text-decoration: none; font-weight: 600; font-size: 15px; }
+a.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.url { font-family: var(--font-mono); font-size: 13px; color: var(--muted); word-break: break-all; margin: 4px 0 0; }
+.tags { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0 10px; }
+@media (max-width: 440px) { .tags { grid-template-columns: 1fr; } }
+.tag { text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 10px 12px; cursor: pointer; font: inherit; display: flex; gap: 10px; align-items: baseline; }
+.tag kbd { font-family: var(--font-mono); font-size: 12px; background: var(--chip); border-radius: 4px; padding: 1px 6px; color: var(--muted); }
+.tag small { display: block; color: var(--muted); font-size: 12.5px; }
+.tag[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.tag.ok[aria-pressed="true"] { border-color: var(--good); box-shadow: inset 0 0 0 2px var(--good); }
+.tag.bad[aria-pressed="true"] { border-color: var(--bad); box-shadow: inset 0 0 0 2px var(--bad); }
+label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+input[type=text], input[type=url], textarea { width: 100%; font: inherit; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+textarea { min-height: 56px; resize: vertical; }
+.nav { display: flex; gap: 8px; justify-content: space-between; margin-top: 14px; }
+.nav button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+.nav button.next { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.saved { font-size: 13px; color: var(--good); min-height: 18px; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 8px; align-items: center; }
+details { margin-top: 16px; }
+summary { cursor: pointer; color: var(--muted); }
+.list { display: grid; gap: 4px; margin-top: 8px; }
+.row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 7px 10px; cursor: pointer; font: inherit; text-align: left; }
+.row span:last-child { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.row.on { border-color: var(--accent); }
+.done { color: var(--good); }
+#export { width: 100%; min-height: 120px; font-family: var(--font-mono); font-size: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>Opt-out Page Review</h1>
+<p class="sub">Open each site's page, decide what it is, and tag it. Tags save as you go and I can read them from here.</p>
+
+<div class="bar" role="progressbar" aria-label="Sites tagged"><i id="barfill"></i></div>
+<div class="stats"><span id="statDone">0 tagged</span><span id="statLeft">0 left</span><span id="statSync">saving in this browser</span></div>
+
+<div class="filters" id="filters" role="group" aria-label="Show">
+  <button class="pill" data-f="todo" aria-pressed="true">To do</button>
+  <button class="pill" data-f="all" aria-pressed="false">All</button>
+  <button class="pill" data-f="done" aria-pressed="false">Tagged</button>
+</div>
+
+<section class="card" id="card" aria-live="polite"></section>
+
+<div class="nav">
+  <button id="prev" type="button">Back</button>
+  <button id="next" class="next" type="button">Next</button>
+</div>
+
+<div class="tools">
+  <button class="pill" id="copyBtn" type="button">Copy all tags as JSON</button>
+  <span class="saved" id="toolMsg"></span>
+</div>
+<textarea id="export" hidden readonly aria-label="Exported tags"></textarea>
+
+<details>
+  <summary>Jump to a site</summary>
+  <div class="list" id="list"></div>
+</details>
+
+<script>
+const SITES = /*SITES*/[];
+const TAGS = [
+  { k: "ok", t: "Right page, it has the form", h: "This URL is the opt-out form.", cls: "ok" },
+  { k: "other-page", t: "Right site, other page", h: "Paste the right URL below.", url: true },
+  { k: "search-first", t: "Find my record first", h: "Search, open my record, then a form. Paste the URL.", url: true },
+  { k: "email", t: "Email only", h: "Opt-out is by email. Put the address below.", email: true },
+  { k: "account", t: "Needs login, ID or phone", h: "A person has to do it." },
+  { k: "none", t: "No online opt-out", h: "Mail, phone or nothing.", cls: "bad" },
+  { k: "dead", t: "Site gone or broken", h: "Does not load, or not a data broker.", cls: "bad" },
+  { k: "skip", t: "Skip for now", h: "Come back to it." }
+];
+const LABEL = Object.fromEntries(TAGS.map(t => [t.k, t.t]));
+const LS = "optout-review-v1";
+const state = { tags: {}, filter: "todo", pos: 0, db: null };
+
+const $ = id => document.getElementById(id);
+const docId = d => d.replace(/[^a-z0-9]/gi, "_");
+function loadLocal() { try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) { return {}; } }
+function saveLocal() { try { localStorage.setItem(LS, JSON.stringify(state.tags)); } catch (e) {} }
+
+function visible() {
+  return SITES.filter(s => {
+    const t = state.tags[s.d];
+    const done = t && t.tag && t.tag !== "skip";
+    if (state.filter === "todo") return !done;
+    if (state.filter === "done") return !!done;
+    return true;
+  });
+}
+function counts() {
+  const done = SITES.filter(s => state.tags[s.d] && state.tags[s.d].tag && state.tags[s.d].tag !== "skip").length;
+  return { done, left: SITES.length - done };
+}
+function current() { const v = visible(); if (state.pos >= v.length) state.pos = Math.max(0, v.length - 1); return v[state.pos]; }
+
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat().forEach(c => n.append(c));
+  return n;
+}
+function searchUrl(s) { return "https://duckduckgo.com/?q=" + encodeURIComponent(s.d + " opt out do not sell my personal information"); }
+
+function render() {
+  const { done, left } = counts();
+  $("barfill").style.width = (SITES.length ? 100 * done / SITES.length : 0) + "%";
+  $("statDone").textContent = done + " tagged";
+  $("statLeft").textContent = left + " left of " + SITES.length;
+  document.querySelectorAll("#filters .pill").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === state.filter)));
+  const card = $("card"); card.replaceChildren();
+  const s = current();
+  if (!s) { card.append(el("p", { text: state.filter === "todo" ? "Every site is tagged. Copy the tags below and send them to me." : "Nothing here." })); renderList(); return; }
+  const t = state.tags[s.d] || {};
+  const v = visible();
+  card.append(
+    el("p", { class: "sub", text: "Site " + (state.pos + 1) + " of " + v.length }),
+    el("h2", { class: "domain", text: s.d }),
+    el("p", { class: "name", text: s.n && s.n !== s.d ? s.n : "" }),
+    el("div", { class: "why", text: s.w }),
+    s.s.length ? el("div", { class: "chips" }, s.s.map(x => el("span", { class: "chip", text: x }))) : "",
+    el("div", { class: "links" },
+      s.u ? el("a", { class: "btn primary", href: s.u, target: "_blank", rel: "noopener", text: "Open the page we have" }) : "",
+      el("a", { class: "btn", href: "https://" + s.d, target: "_blank", rel: "noopener", text: "Open the site" }),
+      el("a", { class: "btn", href: searchUrl(s), target: "_blank", rel: "noopener", text: "Search for the opt-out page" })),
+    s.u ? el("p", { class: "url", text: s.u }) : el("p", { class: "url", text: "No page on file" }),
+    s.e ? el("p", { class: "url", text: "Email on file: " + s.e }) : ""
+  );
+  const grid = el("div", { class: "tags", role: "group", "aria-label": "Tag this site" });
+  TAGS.forEach((tg, i) => {
+    grid.append(el("button", { type: "button", class: "tag " + (tg.cls || ""), "aria-pressed": String(t.tag === tg.k), "data-k": tg.k, onclick: () => choose(s, tg.k) },
+      el("kbd", { text: String(i + 1) }), el("span", {}, tg.t, el("small", { text: tg.h }))));
+  });
+  card.append(grid);
+  card.append(
+    el("label", { for: "fUrl", text: "URL (the right page, or the page where the record search starts)" }),
+    el("input", { id: "fUrl", type: "url", inputmode: "url", autocomplete: "off", value: t.url || "", placeholder: "https://", oninput: e => patch(s, { url: e.target.value.trim() }) }),
+    el("label", { for: "fEmail", text: "Email address to write to (if the opt-out is by email)" }),
+    el("input", { id: "fEmail", type: "text", inputmode: "email", autocomplete: "off", value: t.email || "", placeholder: "privacy@example.com", oninput: e => patch(s, { email: e.target.value.trim() }) }),
+    el("label", { for: "fNote", text: "Note (anything I should know: steps, what the page asks for)" }),
+    el("textarea", { id: "fNote", oninput: e => patch(s, { note: e.target.value }) }, t.note || ""),
+    el("div", { class: "saved", id: "savedMsg", text: t.tag ? "Tagged: " + LABEL[t.tag] + (t.auto ? " (worked out from what you entered)" : "") : "" })
+  );
+  renderList();
+}
+function renderList() {
+  const list = $("list"); list.replaceChildren();
+  const cur = current();
+  SITES.forEach(s => {
+    const t = state.tags[s.d];
+    list.append(el("button", { type: "button", class: "row" + (cur && cur.d === s.d ? " on" : ""), onclick: () => { state.filter = "all"; state.pos = SITES.indexOf(s); render(); window.scrollTo(0, 0); } },
+      el("span", { text: s.d }), el("span", { class: t && t.tag && t.tag !== "skip" ? "done" : "", text: t && t.tag ? LABEL[t.tag] : "" })));
+  });
+}
+
+// A site whose URL or email was filled in counts as tagged even if no tag button was pressed: the tag is worked out from what was entered.
+function infer(s, t) {
+  if (!t || t.tag) return t;
+  const url = (t.url || "").trim(), email = (t.email || "").trim();
+  if (!url && !email) return t;
+  let tag = "email";
+  if (url) tag = url === s.u ? "ok" : (/search/i.test(url + " " + (t.note || "")) ? "search-first" : "other-page");
+  return Object.assign({}, t, { tag, auto: true });
+}
+let writeTimer = null;
+function patch(s, obj) {
+  let t = Object.assign({}, state.tags[s.d] || {}, obj, { d: s.d, at: new Date().toISOString() });
+  if (obj.tag === undefined && t.auto) delete t.tag;          // a tag worked out earlier is worked out again from the new values
+  t = infer(s, t); if (obj.tag !== undefined) delete t.auto;
+  state.tags[s.d] = t; saveLocal();
+  clearTimeout(writeTimer); writeTimer = setTimeout(() => remote(t), 500);
+}
+function choose(s, k) {
+  const t = state.tags[s.d] || {};
+  const url = t.url || (k === "ok" ? s.u : "");
+  patch(s, { tag: k, url: url || "" });
+  if (k === "ok") { /* leave the URL as the one we have */ }
+  render();
+  const m = $("savedMsg"); if (m) m.textContent = "Tagged: " + LABEL[k];
+  if (k !== "other-page" && k !== "search-first" && k !== "email") setTimeout(() => go(1), 250);
+}
+function go(n) { clearTimeout(writeTimer); const cur = current(); if (cur && state.tags[cur.d]) remote(state.tags[cur.d]); const v = visible(); state.pos = Math.min(Math.max(0, state.pos + n), Math.max(0, v.length - 1)); render(); window.scrollTo(0, 0); }
+
+async function remote(t) {
+  if (!state.db) return;
+  try { await state.db.collection("tags").doc(docId(t.d)).set(t); $("statSync").textContent = "saved here and in the shared copy"; }
+  catch (e) { $("statSync").textContent = "saved in this browser only (the shared copy is unavailable)"; }
+}
+function rowsOf(snap) {
+  const out = []; if (!snap) return out;
+  const arr = snap.docs || (Array.isArray(snap) ? snap : null);
+  const one = d => out.push(typeof d.data === "function" ? d.data() : (d.data || d));
+  if (arr) arr.forEach(one); else if (snap.forEach) snap.forEach(one);
+  return out;
+}
+async function connect() {
+  try {
+    const c = window.claude && await Promise.race([window.claude.use("db"), new Promise(r => setTimeout(() => r(null), 10000))]);
+    if (!c) return;
+    state.db = c;
+    const col = c.collection("tags");
+    col.onSnapshot(snap => {
+      let changed = false;
+      rowsOf(snap).forEach(t => { if (t && t.d && (!state.tags[t.d] || (t.at || "") > (state.tags[t.d].at || ""))) { const site = SITES.find(x => x.d === t.d); const u = site ? infer(site, t) : t; state.tags[t.d] = u; changed = true; if (u !== t) remote(u); } });
+      if (changed) { saveLocal(); if (!document.activeElement || !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); }
+      $("statSync").textContent = "saved here and in the shared copy";
+    });
+    // Anything tagged in this browser before the shared copy was there goes up too.
+    Object.values(state.tags).forEach(t => remote(t));
+  } catch (e) { $("statSync").textContent = "saved in this browser only"; }
+}
+
+document.querySelectorAll("#filters .pill").forEach(b => b.addEventListener("click", () => { state.filter = b.dataset.f; state.pos = 0; render(); }));
+$("next").addEventListener("click", () => go(1));
+$("prev").addEventListener("click", () => go(-1));
+$("copyBtn").addEventListener("click", async () => {
+  const data = JSON.stringify(Object.values(state.tags), null, 1);
+  const box = $("export"); box.hidden = false; box.value = data;
+  try { await navigator.clipboard.writeText(data); $("toolMsg").textContent = "Copied " + Object.keys(state.tags).length + " tags."; }
+  catch (e) { box.select(); $("toolMsg").textContent = "Select the text below and copy it."; }
+});
+document.addEventListener("keydown", e => {
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "ArrowRight" || e.key === "j") go(1);
+  else if (e.key === "ArrowLeft" || e.key === "k") go(-1);
+  else if (/^[1-8]$/.test(e.key)) { const s = current(); if (s) choose(s, TAGS[Number(e.key) - 1].k); }
+});
+
+state.tags = loadLocal();
+SITES.forEach(s => { const t = state.tags[s.d]; if (t && !t.tag) { const u = infer(s, t); if (u.tag) { state.tags[s.d] = u; setTimeout(() => remote(u), 1500); } } });
+saveLocal();
+render();
+connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+id: familytreenow
+name: FamilyTreeNow
+tier: C
+signals: [search_first, captcha]
+fields: [full_name]
+steps:
+  - open: https://www.familytreenow.com/optout
+  - say: "Search for yourself: type your first and last name, choose your state and tap Search."
+    confirm: true
+  - say: "Find the record that is you and tap its Opt Out button, then confirm. If a check (\"I am not a robot\") comes up, complete it yourself."
+    confirm: true
+  - say: "If more than one record is you (an old address, a maiden name), repeat for each one."
+    confirm: true
+recheck_days: 120
+verified: null   # the page is behind a Cloudflare check for scripts, so the steps follow what the site tells people to do; confirm on the first real run (url from the review of 2026-11-11)
