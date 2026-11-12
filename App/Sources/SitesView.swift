@@ -436,6 +436,7 @@ struct DirectoryInfoView: View {
     @State private var browserURL: URL?
     @State private var guide: GuidedRunner?
     @State private var healing = false
+    @State private var copied = false
     private var resolvedEntry: DirectoryEntry { model.resolved(entry) }
     private var subtitle: String {
         switch model.method(for: entry).method {
@@ -446,99 +447,177 @@ struct DirectoryInfoView: View {
         }
     }
 
-    /// Whether an opt-out here lasts, from the company's own policy, and when we will ask the person to repeat it. (Last sent and due dates are in the status block.)
-    @ViewBuilder private var persistenceRows: some View {
-        let info = entry.persistence
-        let months = entry.reupMonths ?? 12
-        switch info?.result {
-        case "permanent": Label("The company says it keeps your opt-out, so you should not need to repeat it.", systemImage: "infinity").foregroundStyle(.green)
-        case "temporary": Label(Loc.f("The company says the data can come back. We will ask you to repeat this every %lld months.", months), systemImage: "arrow.clockwise").foregroundStyle(.orange)
-        default: Label(Loc.f("The company does not say whether it lasts. Most brokers collect data again, so we will ask you to repeat this after %lld months.", months), systemImage: "questionmark.circle").foregroundStyle(.secondary)
+    private var sentDate: Date? { entry.lastSent(in: model.progress.optOutAttempts) }
+    private var isDone: Bool { entry.isCurrent(attempts: model.progress.optOutAttempts) }
+    private static func day(_ d: Date) -> String { d.formatted(date: .abbreviated, time: .omitted) }
+
+    /// Where the site stands, in a word or three, and its colour.
+    private var statusText: (String, Color) {
+        if isDone { return (sentDate.map { Loc.f("Done %@", $0.formatted(.dateTime.month(.abbreviated).day())) } ?? Loc.t("Done"), .green) }
+        if model.progress.isParked(entry.id) {
+            if model.isSkippedForever(entry.id) { return (Loc.t("Skipped for good"), .secondary) }
+            if let back = model.progress.skipReturns(entry.id) { return (Loc.f("Skipped until %@", Self.day(back)), .orange) }
         }
-        if let q = info?.quote { Text("\u{201C}\(q)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+        return (sentDate == nil ? Loc.t("Not done yet") : Loc.t("Due again"), .orange)
     }
 
-    /// Who the company is in a few lines; what it tracks and who it buys from are one tap away.
+    /// Where the company works for this person: the header's few words and the first card's sentence.
+    private var region: RegionSummary { Regions.summary(for: entry, country: model.ownerCountry, localStates: model.localStates) }
+
+    /// The title header: the site's name, and one line with its status.
+    private var titleHeader: some View {
+        let (status, color) = statusText
+        return VStack(spacing: 0) {
+            Text(verbatim: entry.domain).font(.headline).lineLimit(1)
+            Text(verbatim: status).foregroundColor(color).font(.caption2.bold()).lineLimit(1).minimumScaleFactor(0.7)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("site-state")
+    }
+
+    /// Top right: copy the opt-out link, and the check mark that marks the site done by hand (or takes that back).
+    @ToolbarContentBuilder private var headerButtons: some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if let url = model.effectiveURL(for: entry) {
+                Button {
+                    UIPasteboard.general.string = url.absoluteString
+                    copied = true
+                    Task { try? await Task.sleep(nanoseconds: 1_500_000_000); copied = false }
+                } label: { Image(systemName: copied ? "checkmark" : "link") }
+                    .accessibilityLabel(Loc.t("Copy link")).accessibilityIdentifier("site-link")
+            }
+            let byHand = model.wasMarkedByHand(entry.id)
+            Button {
+                if !isDone { model.markSiteDone(entry.id) } else if byHand { model.unmarkSiteDone(entry.id) }
+            } label: { Image(systemName: isDone ? "checkmark.circle.fill" : "circle").foregroundStyle(isDone ? Color.green : Color.secondary) }
+                .disabled(isDone && !byHand)
+                .accessibilityLabel(isDone ? Loc.t("Undo") : Loc.t("Mark as done"))
+                .accessibilityIdentifier(isDone ? "site-undo-done" : "site-mark-done")
+        }
+    }
+
+    /// The one action, on its own, with the email beside it when the site takes one.
+    @ViewBuilder private var actionSection: some View {
+        Section {
+            GuideButton(title: isDone ? Loc.t("Opt out again") : Loc.t("Opt out"), subtitle: subtitle, compact: true) {
+                model.requireProfile { guide = model.guidedRunner(for: entry) }
+            }
+        } footer: {
+            VStack(alignment: .leading, spacing: 4) {
+                if let mail = entry.contactEmail, let url = Self.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: entry.domain) {
+                    Link(destination: url) { Label("Write the email to \(mail)", systemImage: "envelope") }.font(.footnote).accessibilityIdentifier("write-email")
+                }
+                Text(isDone ? (model.wasMarkedByHand(entry.id) ? Loc.t("Tap the green check at the top right to undo.") : "") : Loc.t("Did it yourself? Tap the circle at the top right to mark it done."))
+                    .font(.caption2)
+            }
+        }
+    }
+
+    /// Whether the company reaches this person, in a few words with a tracking icon (red and broadcasting when it does, struck through when not),
+    /// then where it works and how we know.
+    private var regionRow: some View {
+        let r = region
+        return Label {
+            Text(verbatim: r.headline).bold().foregroundColor(r.inRegion ? .primary : .secondary) + Text(verbatim: ": " + r.detail)
+        } icon: {
+            Image(systemName: r.inRegion ? "dot.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
+                .foregroundStyle(r.inRegion ? Color.red : Color.secondary)
+        }
+        .font(.footnote).labelStyle(TightLabel()).fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .combine).accessibilityIdentifier("site-region")
+    }
+
+    /// Who the company is, readable without tapping: kind and priority, one sentence, what it tracks and who it sells to. The rest is folded.
     @ViewBuilder private func aboutSection(_ about: BrokerAbout) -> some View {
         Section {
-            if let cat = entry.brokerCategory { Label(cat.title, systemImage: "building.2").font(.caption.bold()).foregroundStyle(.tint) }
-            Text(about.summary).font(.subheadline).fixedSize(horizontal: false, vertical: true)
-            if let score = entry.priority {
-                Label(Loc.f("%@ (%lld of 100)", BrokerPriority.tier(score), score), systemImage: "flag.fill")
-                    .font(.caption.bold()).foregroundStyle(score >= 60 ? .red : score >= 45 ? .orange : .secondary)
-            }
-            if !about.tracks.isEmpty {
-                DisclosureGroup("What they track") {
-                    ForEach(about.tracks, id: \.self) { Text(DataKind(rawValue: $0)?.title ?? $0).font(.subheadline) }
-                    Text("From the company's own privacy policy and pages.").font(.caption).foregroundStyle(.secondary)
+            let (first, rest) = Self.firstSentence(about.summary)
+            Label(first, systemImage: entry.brokerCategory?.symbol ?? BrokerCategory.other.symbol).font(.subheadline).labelStyle(TightLabel())
+                .fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("site-summary")
+            regionRow
+            Group {
+                if !about.tracks.isEmpty {
+                    Label { Text(Loc.t("Tracks")).bold() + Text(verbatim: ": " + about.tracks.map { DataKind(rawValue: $0)?.title ?? $0 }.joined(separator: ", ")) }
+                        icon: { Image(systemName: "eye") }
+                        .font(.footnote).foregroundStyle(.secondary).labelStyle(TightLabel()).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("site-tracks")
                 }
+                Label { Text(Loc.t("Sells to")).bold() + Text(verbatim: ": " + (about.sellsTo.isEmpty ? Loc.t("not named in its policy") : about.sellsTo.map { BuyerKind(rawValue: $0)?.title ?? $0 }.joined(separator: ", "))) }
+                    icon: { Image(systemName: "dollarsign.circle") }
+                    .font(.footnote).foregroundStyle(.secondary).labelStyle(TightLabel()).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("site-sells-to")
             }
-            DisclosureGroup("Who they sell to") {
-                if about.sellsTo.isEmpty { Text("Its policy does not name who it sells to.").foregroundStyle(.secondary) }
-                ForEach(about.sellsTo, id: \.self) { Text(BuyerKind(rawValue: $0)?.title ?? $0).font(.subheadline) }
-                if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
-                if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
-            }
-            if let cat = entry.brokerCategory {
-                DisclosureGroup("What this kind of company does") {
-                    Text(cat.whatItMeans).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                    CaseExamples(category: cat)
+            if !rest.isEmpty || about.sellsNote != nil || about.source != nil || entry.brokerCategory != nil {
+                DisclosureGroup("More about them") {
+                    if !rest.isEmpty { Text(rest).font(.footnote).fixedSize(horizontal: false, vertical: true) }
+                    if let note = about.sellsNote { Text("\u{201C}\(note)\u{201D}").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+                    if let cat = entry.brokerCategory {
+                        Text(cat.whatItMeans).font(.footnote).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        CaseExamples(category: cat)
+                    }
+                    if let src = about.source, let url = URL(string: src) { Link(destination: url) { Label("Read their policy", systemImage: "doc.text") }.font(.caption) }
                 }
+                .font(.footnote)
             }
-        } header: { Text("Who they are") }
+        }
     }
 
-    /// Where this site stands for the person: done or not, the link to do it, when it was last done and when it comes due again, and the screenshot.
-    @ViewBuilder private var statusSection: some View {
-        let attempts = model.progress.optOutAttempts
-        let sent = entry.lastSent(in: attempts)
-        let done = entry.isCurrent(attempts: attempts)
-        let skip = model.progress.isParked(entry.id) ? model.progress.lastSkip(entry.id) : nil
+    /// The first sentence of a summary, and the rest.
+    static func firstSentence(_ text: String) -> (String, String) {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var i = t.startIndex
+        while i < t.endIndex {
+            if ".!?".contains(t[i]) {
+                let n = t.index(after: i)
+                if n == t.endIndex { return (t, "") }
+                if t[n] == " " { return (String(t[...i]), String(t[n...]).trimmingCharacters(in: .whitespaces)) }
+            }
+            i = t.index(after: i)
+        }
+        return (t, "")
+    }
+
+    /// What is left of the old status block: why it was skipped, a last failed run, the screenshot, a reported problem.
+    @ViewBuilder private var statusExtras: some View {
+        let sent = entry.lastSent(in: model.progress.optOutAttempts)
         let person = model.selectedPerson
         let review = person.flatMap { model.reviewItem(entryID: entry.id, for: $0) }
+        let failed = sent == nil && review?.worked == false
+        let screenshot = review?.hasScreenshot == true
+        let issue = model.activeIssue(for: entry.id)
+        let parked = model.progress.isParked(entry.id)
+        if failed || screenshot || issue != nil || parked {
+            Section {
+                if failed, let review { Text(review.label).font(.footnote).foregroundStyle(.orange) }
+                if let review, let person, review.hasScreenshot { SiteScreenshot(item: review, person: person) }
+                if let issue {
+                    Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
+                        .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
+                }
+                if parked { Button("Bring this site back to my list") { model.bringBack(entry.id) }.accessibilityIdentifier("site-bring-back") }
+            }
+        }
+    }
+
+    /// Right below the description: whether an opt-out here lasts, and once done when it was done and when to repeat it.
+    @ViewBuilder private var lastingSection: some View {
+        let info = entry.persistence
+        let months = entry.reupMonths ?? 12
         Section {
-            if done {
-                HStack {
-                    Label("Done", systemImage: "checkmark.circle.fill").font(.headline).foregroundStyle(.green).accessibilityIdentifier("site-state")
-                    Spacer()
-                    // A "done" the person set by hand can be taken back; one the app sent cannot.
-                    if model.wasMarkedByHand(entry.id) {
-                        Button("Undo") { model.unmarkSiteDone(entry.id) }.font(.caption).buttonStyle(.bordered).controlSize(.mini).accessibilityIdentifier("site-undo-done")
-                    }
+            switch info?.result {
+            case "permanent": Label(Loc.t("It lasts: the company keeps your opt-out."), systemImage: "infinity").foregroundStyle(.green)
+            case "temporary": Label(Loc.f("Repeat every %lld months: the company says the data can come back.", months), systemImage: "arrow.clockwise").foregroundStyle(.orange)
+            default: Label(Loc.f("Repeat every %lld months: the company does not say if it lasts.", months), systemImage: "arrow.clockwise")
+            }
+            if let sent = sentDate {
+                if let due = entry.reupDate(after: sent) {
+                    Label(Loc.f("Done %@ · repeat around %@", Self.day(sent), Self.day(due)), systemImage: "calendar").font(.footnote.bold())
+                } else {
+                    Label(Loc.f("Done %@ · no need to repeat", Self.day(sent)), systemImage: "calendar").font(.footnote.bold())
                 }
-            } else if let skip {
-                if model.isSkippedForever(entry.id) {
-                    Label("Skipped for good", systemImage: "forward.end").font(.headline).foregroundStyle(.secondary).accessibilityIdentifier("site-state")
-                } else if let back = model.progress.skipReturns(entry.id) {
-                    Label(skip.reason == .notWorking ? "Marked as not working" : "Skipped", systemImage: "forward").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
-                    Text(Loc.f("Comes back to your list on %@.", back.formatted(date: .abbreviated, time: .omitted))).font(.footnote).foregroundStyle(.secondary)
-                }
-            } else {
-                Label(sent == nil ? "Not done yet" : "Due again", systemImage: "circle").font(.headline).foregroundStyle(.orange).accessibilityIdentifier("site-state")
             }
-            if let url = model.effectiveURL(for: entry) {
-                Button("Open the opt-out page", systemImage: "safari") { browserURL = url }.accessibilityIdentifier("site-link")
-            }
-            if !done {
-                Button { model.markSiteDone(entry.id) } label: { Label("Mark as done", systemImage: "checkmark") }
-                    .font(.caption).buttonStyle(.bordered).controlSize(.mini).accessibilityIdentifier("site-mark-done")
-            }
-            if let sent {
-                LabeledContent("Last done", value: sent.formatted(date: .abbreviated, time: .omitted))
-                if let due = entry.reupDate(after: sent) { LabeledContent("Do it again around", value: due.formatted(date: .abbreviated, time: .omitted)) }
-                else { LabeledContent("Do it again", value: Loc.t("Not needed: it lasts")) }
-            } else if let last = review, last.worked == false {
-                Text(last.label).font(.footnote).foregroundStyle(.orange)
-            }
-            if let review, let person, review.hasScreenshot { SiteScreenshot(item: review, person: person) }
-            if let issue = model.activeIssue(for: entry.id) {
-                Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")
-                    .font(.footnote).foregroundStyle(.red).accessibilityIdentifier("reported-issue")
-            }
-            if model.progress.isParked(entry.id) {
-                Button("Bring this site back to my list") { model.bringBack(entry.id) }.accessibilityIdentifier("site-bring-back")
-            }
-        } header: { Text("Status") }
+            if let q = info?.quote { Text("\u{201C}\(q)\u{201D}").font(.caption).foregroundStyle(.secondary).lineLimit(3) }
+        } header: { Text("How long an opt-out lasts") }
+        .font(.footnote)
     }
 
     /// The detail most people never need, folded away: how it works, how long it lasts, where it operates, the form, what we noticed, the source.
@@ -556,7 +635,6 @@ struct DirectoryInfoView: View {
                         Text(verdict.reason).font(.footnote)
                         Text(verdict.method.explanation).font(.footnote).foregroundStyle(.secondary)
                     }
-                    detail("How long an opt-out lasts") { persistenceRows }
                     if worldwide || !places.isEmpty || !others.isEmpty {
                         detail("Where it operates") {
                             if worldwide { Label("Serves people worldwide", systemImage: "globe") }
@@ -607,17 +685,8 @@ struct DirectoryInfoView: View {
 
     var body: some View {
         List {
-            statusSection
-            // What to do: the guide, and the email when the site takes one.
-            Section {
-                GuideButton(title: Loc.t("Opt out with a guide"), subtitle: subtitle) {
-                    model.requireProfile { guide = model.guidedRunner(for: entry) }
-                }
-                if let mail = entry.contactEmail, let url = Self.mailto(mail, person: model.selectedPerson, email: model.formEmail, site: entry.domain) {
-                    Link(destination: url) { Label("Write the email to \(mail)", systemImage: "envelope").frame(maxWidth: .infinity) }
-                        .accessibilityIdentifier("write-email")
-                }
-            }
+            actionSection
+            statusExtras
             if let caution = entry.caution {
                 Section {
                     Label(caution.title, systemImage: "exclamationmark.triangle.fill").font(.headline).foregroundStyle(.orange)
@@ -648,12 +717,21 @@ struct DirectoryInfoView: View {
                     }
                 }.accessibilityIdentifier("platform-cover")
             }
-            if let about = entry.about { aboutSection(about) }
+            if let about = entry.about { aboutSection(about) } else {
+                Section { regionRow }
+            }
+            lastingSection
             moreDetails
         }
+        .listSectionSpacing(.compact)
+        .contentMargins(.top, 4, for: .scrollContent)
         .navigationTitle(entry.domain)
         .coach(CoachGuide.forMethod(model.method(for: entry).method))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) { titleHeader }
+            headerButtons
+        }
         .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
         .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in
             GuidedFlowView(runner: box.runner)
@@ -818,23 +896,41 @@ struct QuickCheckView: View {
 }
 
 /// The way into any site: big, full width, and always the first thing on the page.
+/// An icon and text with a small gap, top-aligned, for a sentence that wraps.
+struct TightLabel: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) { configuration.icon.foregroundStyle(.tint).frame(width: 24); configuration.title }
+    }
+}
+
+private struct RowStyle: ViewModifier {
+    let plain: Bool
+    func body(content: Content) -> some View {
+        if plain { content.listRowInsets(EdgeInsets()).listRowBackground(Color.clear) } else { content }
+    }
+}
+
 struct GuideButton: View {
     let title: String
     let subtitle: String
+    var compact = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                Label(title, systemImage: "rectangle.bottomthird.inset.filled").font(.title3.bold())
-                Text(subtitle).font(.footnote)
+            if compact {
+                Text(title).font(.headline).frame(maxWidth: .infinity)
+            } else {
+                VStack(spacing: 4) {
+                    Label(title, systemImage: "rectangle.bottomthird.inset.filled").font(.title3.bold())
+                    Text(subtitle).font(.footnote)
+                }
+                .frame(maxWidth: .infinity).padding(.vertical, 10)
             }
-            .frame(maxWidth: .infinity).padding(.vertical, 10)
         }
         .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
+        .controlSize(compact ? .regular : .large)
+        .modifier(RowStyle(plain: true))
         .accessibilityIdentifier("guide-me")
     }
 }

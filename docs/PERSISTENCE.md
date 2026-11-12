@@ -22,7 +22,7 @@ shown to the person so they can judge it.
 
 ## What the app does
 
-- Each site page shows whether the opt-out lasts, the sentence behind it, when the last request was sent and when it is due again.
+- Each site page has a "How long an opt-out lasts" section right below the company description: whether it lasts, the sentence behind it, and once done one line with the date it was done and the date to repeat (or "no need to repeat"). The line under the site's name in the title header shows only the status ("Done Nov 11, 2026").
 - A request holds until its re-up date. After that the site is back in the daily batches for its kind of broker, and the welcome-back summary says
   how many are due. Sites whose policy says the opt-out lasts never come back.
 - Nothing is repeated automatically: the person does it again in their next batch.

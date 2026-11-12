@@ -26,6 +26,30 @@ public enum BrokerCategory: String, CaseIterable, Sendable {
         case .other: return L10n.t("Other data company")
         }
     }
+
+    /// The SF Symbol shown beside this kind of company, one per kind.
+    public var symbol: String {
+        switch self {
+        case .people_search: return "person.text.rectangle"
+        case .arrests: return "building.columns"
+        case .consumer_reporting: return "checklist"
+        case .marketing_data: return "megaphone"
+        case .b2b: return "briefcase"
+        case .adtech: return "display"
+        case .healthcare: return "cross.case"
+        case .financial: return "creditcard"
+        case .fraud_identity: return "person.badge.shield.checkmark"
+        case .real_estate: return "house"
+        case .genealogy: return "tree"
+        case .lead_generation: return "target"
+        case .political: return "flag.2.crossed"
+        case .recruiting: return "person.2"
+        case .automotive: return "car"
+        case .location_data: return "location"
+        case .marketing_services: return "envelope.open"
+        case .other: return "square.stack.3d.up"
+        }
+    }
 }
 
 

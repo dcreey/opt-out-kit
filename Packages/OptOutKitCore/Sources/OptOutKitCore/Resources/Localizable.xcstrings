@@ -11040,6 +11040,282 @@
      }
     }
    }
+  },
+  "In your state (%@)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans votre État (%@)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En tu estado (%@)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Ihrem Bundesstaat (%@)"
+     }
+    }
+   }
+  },
+  "In your area": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans votre zone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En tu zona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Ihrer Gegend"
+     }
+    }
+   }
+  },
+  "Not in your area": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas dans votre zone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No en tu zona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht in Ihrer Gegend"
+     }
+    }
+   }
+  },
+  "Worldwide": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans le monde entier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En todo el mundo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weltweit"
+     }
+    }
+   }
+  },
+  "The United States": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Les États-Unis"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estados Unidos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die USA"
+     }
+    }
+   }
+  },
+  "registered as a data broker in %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "inscrit comme courtier en données en %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "registrado como corredor de datos en %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "als Datenhändler registriert in %@"
+     }
+    }
+   }
+  },
+  "registered as a data broker in %lld states (%@)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "inscrit comme courtier en données dans %lld États (%@)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "registrado como corredor de datos en %lld estados (%@)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "als Datenhändler in %lld Bundesstaaten registriert (%@)"
+     }
+    }
+   }
+  },
+  "listed by US opt-out services; its site names no other place": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "listé par des services de retrait américains ; son site ne cite aucun autre lieu"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "listado por servicios de baja de EE. UU.; su sitio no nombra otro lugar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "von US-Opt-out-Diensten gelistet; die Website nennt keinen anderen Ort"
+     }
+    }
+   }
+  },
+  "%@. How we know: %@.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@. Comment nous le savons : %@."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@. Cómo lo sabemos: %@."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@. Woher wir das wissen: %@."
+     }
+    }
+   }
+  },
+  "the US": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "les États-Unis"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "EE. UU."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "die USA"
+     }
+    }
+   }
+  },
+  "the EU": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "l'UE"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "la UE"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "die EU"
+     }
+    }
+   }
+  },
+  "the UK": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "le Royaume-Uni"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "el Reino Unido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "das Vereinigte Königreich"
+     }
+    }
+   }
   }
  },
  "version": "1.0"

@@ -3716,3 +3716,41 @@ final class FamilyTreeNowFlowTests: XCTestCase {
         XCTAssertEqual(b.steps.first?.open?.absoluteString, "https://www.familytreenow.com/optout")
     }
 }
+
+final class RegionSummaryTests: XCTestCase {
+    private func entry(regions: [String]?, evidence: String? = nil, registered: [String]? = nil) throws -> DirectoryEntry {
+        var e = try JSONDecoder().decode(DirectoryEntry.self, from: Data(#"{"id":"x","domain":"x.com","name":"X","bucket":"registry","automation":"scriptable"}"#.utf8))
+        e.regions = regions.map { RegionScope(list: $0, evidence: evidence) }
+        e.registeredIn = registered
+        return e
+    }
+
+    func testHeaderSaysWhetherItReachesThePerson() throws {
+        let ca = try entry(regions: ["US", "GLOBAL"], evidence: "on the UK ICO register; its pages mention POPIA", registered: ["CA"])
+        XCTAssertEqual(Regions.summary(for: ca, country: "US", localStates: ["CA"]).headline, "In your state (CA)")
+        XCTAssertEqual(Regions.summary(for: ca, country: "US", localStates: ["NY"]).headline, "In your area")
+        XCTAssertTrue(Regions.summary(for: ca, country: "JP", localStates: []).inRegion, "worldwide reaches everyone")
+        let usOnly = try entry(regions: ["US"])
+        let fr = Regions.summary(for: usOnly, country: "FR", localStates: [])
+        XCTAssertFalse(fr.inRegion); XCTAssertEqual(fr.headline, "Not in your area")
+    }
+
+    func testDetailSaysWhereAndHowWeKnow() throws {
+        let ca = try entry(regions: ["US", "GLOBAL"], evidence: "on the UK ICO register; its pages mention POPIA", registered: ["CA"])
+        XCTAssertEqual(Regions.summary(for: ca, country: "US", localStates: []).detail,
+                       "Worldwide. How we know: registered as a data broker in California; on the UK ICO register.")
+        let many = try entry(regions: ["US", "EU"], registered: ["VT", "CA"])
+        XCTAssertEqual(Regions.summary(for: many, country: "US", localStates: []).detail,
+                       "The US, the EU. How we know: registered as a data broker in 2 states (CA, VT).")
+        let bare = try entry(regions: nil)
+        XCTAssertEqual(Regions.summary(for: bare, country: "US", localStates: []).detail,
+                       "The United States. How we know: listed by US opt-out services; its site names no other place.")
+    }
+}
+
+final class BrokerCategorySymbolTests: XCTestCase {
+    func testEachKindHasItsOwnIcon() {
+        let symbols = BrokerCategory.allCases.map(\.symbol)
+        XCTAssertEqual(Set(symbols).count, symbols.count, "one icon per kind of company")
+    }
+}

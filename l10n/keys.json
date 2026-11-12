@@ -1285,7 +1285,26 @@
   "across %lld days. Every request counts.",
   "and emailed %lld more as a second route",
   "you@example.com",
-  "“%@”"
+  "“%@”",
+  "Done %@",
+  "Back %@",
+  "Copied",
+  "Copy link",
+  "Worldwide",
+  "Opt out again",
+  "Opt out",
+  "More about them",
+  "Done %@ · repeat around %@",
+  "Done %@ · no need to repeat",
+  "Skipped until %@",
+  "Tracks",
+  "Sells to",
+  "not named in its policy",
+  "It lasts: the company keeps your opt-out.",
+  "Repeat every %lld months: the company says the data can come back.",
+  "Repeat every %lld months: the company does not say if it lasts.",
+  "Tap the green check at the top right to undo.",
+  "Did it yourself? Tap the circle at the top right to mark it done."
  ],
  "core": [
   "%@ does not run a data broker registry, so there is no official list of brokers to pull.",
@@ -1767,6 +1786,18 @@
   "Your work email and phone number can be bought by salespeople you have never heard of. Opting out cuts cold calls and spam to your work address.",
   "Your work number and email are sold to hundreds of sales teams and scammers, and you spend your days deleting cold outreach or fending off someone impersonating your boss.",
   "ZIP code for a previous address",
-  "Zip code"
+  "Zip code",
+  "In your state (%@)",
+  "In your area",
+  "Not in your area",
+  "Worldwide",
+  "The United States",
+  "registered as a data broker in %@",
+  "registered as a data broker in %lld states (%@)",
+  "listed by US opt-out services; its site names no other place",
+  "%@. How we know: %@.",
+  "the US",
+  "the EU",
+  "the UK"
  ]
 }

@@ -95,3 +95,47 @@ public enum Regions {
     /// The name of a language for display, in English.
     public static func languageName(_ code: String) -> String { Locale(identifier: "en_US").localizedString(forLanguageCode: code) ?? code }
 }
+
+/// What the site page says about where a broker works: a few words for the header (does it reach this person?) and one sentence for
+/// the first card (where it works and how we know).
+public struct RegionSummary: Equatable, Sendable {
+    public var inRegion: Bool
+    public var headline: String
+    public var detail: String
+}
+
+public extension Regions {
+    /// `country` is the person's country (nil counts as the US); `localStates` the US states they live or have lived in.
+    static func summary(for e: DirectoryEntry, country: String?, localStates: Set<String>) -> RegionSummary {
+        let registered = e.registeredIn ?? []
+        let ownState = registered.first { localStates.contains($0) }
+        let reaches = Self.reaches(e, country: country)
+        let usPerson = (country ?? "US").uppercased() == "US"
+        let headline: String
+        if let ownState, usPerson { headline = L10n.f("In your state (%@)", ownState) }
+        else if reaches { headline = L10n.t("In your area") }
+        else { headline = L10n.t("Not in your area") }
+
+        let list = e.regions?.list ?? []
+        let places: String
+        if list.contains("GLOBAL") { places = L10n.t("Worldwide") }
+        else if list.isEmpty { places = L10n.t("The United States") }
+        else { let p = list.map(placeName).joined(separator: ", "); places = p.prefix(1).uppercased() + p.dropFirst() }
+
+        var how: [String] = []
+        if registered.count == 1, let s = registered.first { how.append(L10n.f("registered as a data broker in %@", USStates.name(for: s) ?? s)) }
+        else if registered.count > 1 { how.append(L10n.f("registered as a data broker in %lld states (%@)", registered.count, registered.sorted().joined(separator: ", "))) }
+        if let first = e.regions?.evidence?.split(separator: ";").first.map({ $0.trimmingCharacters(in: .whitespaces) }), !first.isEmpty { how.append(first) }
+        if how.isEmpty { how.append(L10n.t("listed by US opt-out services; its site names no other place")) }
+        return RegionSummary(inRegion: reaches, headline: headline, detail: L10n.f("%@. How we know: %@.", places, how.joined(separator: "; ")))
+    }
+
+    private static func placeName(_ code: String) -> String {
+        switch code.uppercased() {
+        case "US": return L10n.t("the US")
+        case "EU": return L10n.t("the EU")
+        case "UK", "GB": return L10n.t("the UK")
+        default: return Locale.current.localizedString(forRegionCode: code) ?? code
+        }
+    }
+}

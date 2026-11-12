@@ -116,6 +116,16 @@ Make it true in the build, not only in the copy: no analytics SDKs, no network c
 optional registry fetch (off by default), a CI check that fails if a networking library or tracker is added, and a
 reproducible-build note in the repo.
 
+## The site page
+
+Built to be read without tapping and, for most sites, without scrolling:
+
+1. **Title header**: the site's name, and one line under it: its status (Done with its date, Not done yet, Due again, Skipped until a date). Top right: a link button that copies the opt-out page's address, and a circle that marks the site done by hand; it turns into a green check, and tapping that undoes a hand mark (a send the app made cannot be undone).
+2. **The action on its own**: one button, "Opt out", or "Opt out again" when the opt-out is current, with no subtitle. Under it, the email link when the site takes one and a small note: "Did it yourself? Tap the circle at the top right to mark it done."
+3. **Who they are**, shown in full (no category or priority line): one sentence about the company beside its kind's icon (one icon per kind, `BrokerCategory.symbol`), then on its own row between dividers whether the broker reaches this person and where it operates (`Regions.summary`): a tracking icon, red and broadcasting when it reaches them and grey and struck through when not, then in bold "In your state (CA)" when it is on the registry of a state they live or lived in, "In your area" when its region tags cover their country (or it works worldwide), else "Not in your area", followed by where it works and how we know ("In your area: Worldwide. How we know: registered as a data broker in California; on the UK ICO register…"). Then what it tracks (eye icon) and who it sells to (dollar icon), each on its own row with its icon in the same column. "More about them" folds the rest of the summary, the policy quote, what this kind of company does and the policy link.
+4. **How long an opt-out lasts**: one line (lasts, or repeat every N months and why), and once done the done date and the repeat date on one line.
+5. **More details**: everything else.
+
 ## Flow types
 
 | Type | When | What the app automates | What the user does | Brokers it covers (from the probe) |

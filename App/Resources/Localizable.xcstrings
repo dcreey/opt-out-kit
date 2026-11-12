@@ -29578,6 +29578,443 @@
      }
     }
    }
+  },
+  "Done %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fait le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hecho el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erledigt am %@"
+     }
+    }
+   }
+  },
+  "Back %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retour le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vuelve el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zurück am %@"
+     }
+    }
+   }
+  },
+  "Copied": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copié"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Kopiert"
+     }
+    }
+   }
+  },
+  "Copy link": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copier le lien"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Copiar enlace"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Link kopieren"
+     }
+    }
+   }
+  },
+  "Worldwide": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans le monde entier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En todo el mundo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Weltweit"
+     }
+    }
+   }
+  },
+  "Opt out again": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se retirer à nouveau"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Darse de baja de nuevo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erneut abmelden"
+     }
+    }
+   }
+  },
+  "Opt out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se retirer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Darse de baja"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Abmelden"
+     }
+    }
+   }
+  },
+  "More about them": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En savoir plus"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Más sobre ellos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mehr über sie"
+     }
+    }
+   }
+  },
+  "Done %@ · repeat around %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fait le %@ · à refaire vers le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hecho el %@ · repetir hacia el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erledigt am %@ · wiederholen um den %@"
+     }
+    }
+   }
+  },
+  "Done %@ · no need to repeat": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fait le %@ · inutile de refaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hecho el %@ · no hace falta repetir"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erledigt am %@ · keine Wiederholung nötig"
+     }
+    }
+   }
+  },
+  "Skipped until %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ignoré jusqu'au %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitido hasta el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Übersprungen bis %@"
+     }
+    }
+   }
+  },
+  "Tracks": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Collecte"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Recopila"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erfasst"
+     }
+    }
+   }
+  },
+  "Sells to": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vend à"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vende a"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Verkauft an"
+     }
+    }
+   }
+  },
+  "not named in its policy": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "non précisé dans sa politique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "no se indica en su política"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "in der Richtlinie nicht genannt"
+     }
+    }
+   }
+  },
+  "It lasts: the company keeps your opt-out.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Durable : l'entreprise conserve votre retrait."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es duradero: la empresa conserva tu baja."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dauerhaft: Das Unternehmen behält Ihren Opt-out bei."
+     }
+    }
+   }
+  },
+  "Repeat every %lld months: the company says the data can come back.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À refaire tous les %lld mois : l'entreprise dit que les données peuvent revenir."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Repetir cada %lld meses: la empresa dice que los datos pueden volver."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle %lld Monate wiederholen: Laut Unternehmen können die Daten zurückkommen."
+     }
+    }
+   }
+  },
+  "Repeat every %lld months: the company does not say if it lasts.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À refaire tous les %lld mois : l'entreprise ne dit pas si cela dure."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Repetir cada %lld meses: la empresa no dice si es duradero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle %lld Monate wiederholen: Das Unternehmen sagt nicht, ob es dauerhaft ist."
+     }
+    }
+   }
+  },
+  "Tap the green check at the top right to undo.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Touchez la coche verte en haut à droite pour annuler."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca la marca verde arriba a la derecha para deshacer."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tippen Sie oben rechts auf das grüne Häkchen, um es rückgängig zu machen."
+     }
+    }
+   }
+  },
+  "Did it yourself? Tap the circle at the top right to mark it done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous l'avez fait vous-même ? Touchez le cercle en haut à droite pour le marquer comme fait."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Lo hiciste tú? Toca el círculo arriba a la derecha para marcarlo como hecho."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Selbst erledigt? Tippen Sie oben rechts auf den Kreis, um es als erledigt zu markieren."
+     }
+    }
+   }
   }
  },
  "version": "1.0"
