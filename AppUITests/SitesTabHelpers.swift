@@ -1,10 +1,13 @@
 import XCTest
 
 extension XCUIApplication {
-    /// The Sites list is a long ranked queue, so find a site by typing in its search box.
+    /// The Sites tab shows only a few sites, so find one by search: the tab's search field opens the search screen, whose field takes the text.
     func searchSites(_ text: String) {
-        let search = textFields["sites-search"]
-        XCTAssertTrue(search.waitForExistence(timeout: 10))
+        let open = buttons["sites-search"]
+        XCTAssertTrue(open.waitForExistence(timeout: 10))
+        open.tap()
+        let search = textFields["site-search-field"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
         search.tap()
         search.typeText(text)
     }

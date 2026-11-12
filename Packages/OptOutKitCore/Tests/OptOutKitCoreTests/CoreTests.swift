@@ -3754,3 +3754,54 @@ final class BrokerCategorySymbolTests: XCTestCase {
         XCTAssertEqual(Set(symbols).count, symbols.count, "one icon per kind of company")
     }
 }
+
+final class SiteFilterTests: XCTestCase {
+    private let day: TimeInterval = 86_400
+    private func entry(_ id: String, category: String? = nil, tracks: [String] = [], sells: [String] = []) throws -> DirectoryEntry {
+        var e = try JSONDecoder().decode(DirectoryEntry.self, from: Data(#"{"id":"\#(id)","domain":"\#(id).com","name":"\#(id.capitalized) Data","bucket":"registry","automation":"scriptable"}"#.utf8))
+        if let category { e.about = BrokerAbout(category: category, summary: "S.", tracks: tracks, sellsTo: sells) }
+        return e
+    }
+
+    func testStatusIsSkippedThenDoneWhileTheSendHoldsElseUpNext() throws {
+        let e = try entry("a", category: "people_search")          // repeats every 6 months
+        let t0 = Date()
+        var p = OptOutKitCore.Progress()
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0), .todo)
+        p.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "submitted"), site: "a")
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0 + day), .done)
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: true, now: t0 + 200 * day), .todo, "a send that ran out is due again, as on the site page")
+        p.skipSite("a", reason: .skipped, on: t0 + 200 * day)
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0 + 201 * day), .skipped)
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0 + 210 * day), .todo, "back after its week")
+        let covered = try entry("b")
+        XCTAssertEqual(SiteStatus.of(covered, progress: OptOutKitCore.Progress(), taskDone: true), .done, "finished through a shared task with no send of its own")
+    }
+
+    func testEachFilterNarrowsAndTextMatchesAddressOrName() throws {
+        let e = try entry("acme", category: "people_search", tracks: ["address", "phone"], sells: ["landlords"])
+        func ok(_ f: SiteFilter, status: SiteStatus = .todo, region: Bool = true, method: OptOutMethod? = .semiAutomatic, entry: DirectoryEntry? = nil) -> Bool {
+            f.accepts(domain: "acme.com", entry: entry ?? e, status: status, inRegion: region, method: method)
+        }
+        XCTAssertTrue(ok(SiteFilter()))
+        XCTAssertFalse(SiteFilter().narrowed)
+        XCTAssertTrue(ok(SiteFilter(status: .done), status: .done))
+        XCTAssertFalse(ok(SiteFilter(status: .done), status: .skipped))
+        var f = SiteFilter(); f.inRegion = false
+        XCTAssertFalse(ok(f)); XCTAssertTrue(ok(f, region: false))
+        f = SiteFilter(); f.category = .people_search; XCTAssertTrue(ok(f)); f.category = .financial; XCTAssertFalse(ok(f))
+        f = SiteFilter(); f.data = .phone; XCTAssertTrue(ok(f)); f.data = .health; XCTAssertFalse(ok(f))
+        f = SiteFilter(); f.buyer = .landlords; XCTAssertTrue(ok(f)); f.buyer = .lenders; XCTAssertFalse(ok(f))
+        f = SiteFilter(); f.method = .emailOnly; XCTAssertFalse(ok(f)); XCTAssertTrue(ok(f, method: .emailOnly))
+        f = SiteFilter(); f.category = .people_search
+        XCTAssertFalse(ok(f, entry: try entry("acme")), "a site we know nothing about fails a filter on what it is")
+        f = SiteFilter(); f.text = "  ACME "; XCTAssertTrue(ok(f))
+        f.text = "acme data"; XCTAssertTrue(ok(f), "the company's name matches too")
+        f.text = "zzz"; XCTAssertFalse(ok(f))
+        f.text = "peopleconnect"
+        XCTAssertTrue(f.accepts(domain: "truthfinder.com", entry: nil, status: .todo, inRegion: true, method: nil, alsoNamed: "PeopleConnect (TruthFinder, Intelius)"),
+                      "a flow's own name finds the sites it handles")
+        f = SiteFilter(status: .done); f.text = "q"; f.inRegion = true; f.clear()
+        XCTAssertFalse(f.narrowed); XCTAssertEqual(f.text, "q", "clearing filters keeps the search text")
+    }
+}

@@ -116,6 +116,16 @@ Make it true in the build, not only in the copy: no analytics SDKs, no network c
 optional registry fetch (off by default), a CI check that fails if a networking library or tracker is added, and a
 reproducible-build note in the repo.
 
+## The Sites tab
+
+Short by default, with the whole list one tap away:
+
+1. **A search field** at the top. It is a button that looks like one: tapping it opens the search screen with its field already focused (the filter button at the top right opens the same screen without the keyboard).
+2. **Three groups**, ten sites each: **Done** (newest send first), **Skipped** (newest skip first, with "Skipped until" its return date or "Skipped for good") and **Up next** (in the order the home page takes them). A site is done while its send still holds (`DirectoryEntry.isCurrent`, as on the site page); once due again it is back in Up next marked "Due again". A site set aside is Skipped even if it was sent before (`SiteStatus.of`). A group with more than ten has **See all N**, which opens the search screen with that status already chosen.
+3. Then the sites that unlock later, the ones that no longer respond, quick checks and the listing scan, as before.
+
+**The search screen** lists every site, in sections by status, and searches the web address, the company's name and the name of the walkthrough or official service that handles it ("peopleconnect" finds TruthFinder and the other PeopleConnect sites). Under the field the filter chips, all in view at once (they wrap onto a second line rather than scroll sideways, `ChipFlow`), filter it: **Status** (Up next, Skipped, Done), **Region** (In your area or Not in your area, the same answer as the site page's region row), **Type** of company, what it **Tracks**, who it **Sells to**, and **Method** (Automatic, Semi-automatic, Email). A chosen chip turns blue and shows its value; an x before the chips clears them all (the search text stays). The footer says how many of all the sites are showing. The rules are `SiteFilter` in Core; the screen's choices are kept by the Sites tab, so they survive the screen being redrawn.
+
 ## The site page
 
 Built to be read without tapping and, for most sites, without scrolling:

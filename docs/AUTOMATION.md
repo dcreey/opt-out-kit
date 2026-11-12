@@ -27,7 +27,7 @@ confirmation is noticed as usual (`Item.needsPerson` makes it hands-off). Two th
 personal is put into it) and any site that carries a caution (Clearview's face photo is never uploaded for the person). Sites on the sign-up survey's list stay guided too (`jungroup.com`'s
 recorded form was dropped for that reason). Email-only sites are their own group ("Email only"), not semi-automated.
 
-The Sites tab no longer shows tiers. Each section says who does the work: **Automatic opt-out** (121 of 853 sites), **Semi-automated, with
+The Sites tab no longer shows tiers or method groups: it groups sites by where they stand (Done, Skipped, Up next), and who does the work is a filter on its search screen (`docs/UX.md`). The methods are **Automatic opt-out** (121 of 853 sites), **Semi-automated, with
 prompts for you** (51 before the change; it now also holds the former Guided group: page-only sites and the hand-written walkthroughs, held for you; sites with a page and an email use the page) and **Later, no route yet** (36 sites with no page and no email, not tasks until a link is found).
 The groups come from a real page load of each form with a made-up profile (nothing sent), not from captcha scripts on the page.
 See `docs/DIRECTORY.md` and `pipeline/opt-out-methods.md` for how each site was placed and why.

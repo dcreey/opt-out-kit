@@ -1,146 +1,313 @@
 import SwiftUI
 import OptOutKitCore
 
-/// One site in the Sites tab's lists: which task finishes it, and when it was sent if it was.
+/// One site in the Sites tab's lists: which task finishes it, where it stands, and the date that goes with that (sent, or set aside).
 struct SiteRow: Identifiable {
     let domain: String
+    let entry: DirectoryEntry?
     let task: PlanTask?
+    let status: SiteStatus
     let date: Date?
+    /// Whether the company reaches the person (`RegionSummary.inRegion`), worked out once with the row.
+    let inRegion: Bool
     var id: String { domain }
+    /// The name of the hand-written flow or official service that handles this site, which search also matches.
+    var handlerName: String? {
+        switch task?.kind { case .flow?, .platform?: return task?.title; default: return nil }
+    }
+}
+
+/// Every site once, split by where it stands: up next in queue order (what comes next on the home page first), skipped and done newest first.
+struct SiteRows {
+    var todo: [SiteRow] = []
+    var skipped: [SiteRow] = []
+    var done: [SiteRow] = []
+    func rows(_ s: SiteStatus) -> [SiteRow] { switch s { case .todo: return todo; case .skipped: return skipped; case .done: return done } }
+    var count: Int { todo.count + skipped.count + done.count }
 }
 
 extension AppModel {
-    /// Every site once, in queue order (what comes next on the home page first), split into the ones already sent and the ones still to do.
-    /// Done sites are newest first; those with no date (covered by an official service, or emailed) come last.
-    func siteRows() -> (done: [SiteRow], todo: [SiteRow]) {
+    func siteRows() -> SiteRows {
         let byDomain = entryByDomain
-        var seen = Set<String>(), done: [SiteRow] = [], todo: [SiteRow] = []
-        func sent(_ entryID: String?) -> Date? { entryID.flatMap { progress.optOutAttempts[$0] }?.filter(\.wasSubmitted).map(\.date).max() }
+        let p = progress, country = ownerCountry, local = localStates
+        var seen = Set<String>(), out = SiteRows()
         for band in queue {
             for task in band.tasks {
                 let taskDone = isDone(task)
-                var leadDate: Date?
-                if case .site(let id) = task.kind { leadDate = sent(id) }
                 for d in task.domains where seen.insert(d).inserted {
-                    let date = sent(byDomain[d]?.id) ?? (taskDone ? leadDate : nil)
-                    if date != nil || taskDone { done.append(SiteRow(domain: d, task: task, date: date)) }
-                    else { todo.append(SiteRow(domain: d, task: task, date: nil)) }
+                    let e = byDomain[d]
+                    let status = SiteStatus.of(e, progress: p, taskDone: taskDone)
+                    let reach = e.map { Regions.summary(for: $0, country: country, localStates: local).inRegion } ?? ((country ?? "US") == "US")
+                    switch status {
+                    case .todo: out.todo.append(SiteRow(domain: d, entry: e, task: task, status: status, date: nil, inRegion: reach))
+                    case .skipped: out.skipped.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e.flatMap { p.lastSkip($0.id)?.date }, inRegion: reach))
+                    case .done: out.done.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e?.lastSent(in: p.optOutAttempts), inRegion: reach))
+                    }
                 }
             }
         }
-        done.sort { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
-        return (done, todo)
+        // Done sites with no date of their own (covered by an official service, or emailed) come last.
+        out.done.sort { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+        out.skipped.sort { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+        return out
+    }
+}
+
+extension SiteStatus {
+    var title: String {
+        switch self { case .todo: return Loc.t("Up next"); case .skipped: return Loc.t("Skipped"); case .done: return Loc.t("Done") }
+    }
+}
+
+extension OptOutMethod {
+    /// A word or two for a filter chip.
+    var shortTitle: String {
+        switch self {
+        case .automatic: return Loc.t("Automatic")
+        case .semiAutomatic: return Loc.t("Semi-automatic")
+        case .emailOnly: return Loc.t("Email")
+        case .manual: return Loc.t("No route yet")
+        }
     }
 }
 
 struct SiteRowView: View {
     @EnvironmentObject var model: AppModel
     let row: SiteRow
-    let completed: Bool
 
     var body: some View {
         HStack(alignment: .top) {
-            Image(systemName: completed ? "checkmark.circle.fill" : "circle").foregroundStyle(completed ? .green : .secondary).padding(.top, 2)
+            Image(systemName: symbol).foregroundStyle(color).padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.domain).font(.headline)
-                if completed {
-                    Text(row.date.map { Loc.f("Sent %@", Loc.date($0)) } ?? Loc.t("Done")).font(.caption).foregroundStyle(.secondary)
-                } else if let task = row.task {
-                    Text(task.method?.title ?? task.title).font(.caption).foregroundStyle(.secondary)
-                }
+                Text(detail).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
         }
         .accessibilityElement(children: .combine)
     }
+
+    private var symbol: String {
+        switch row.status { case .done: return "checkmark.circle.fill"; case .skipped: return "arrow.uturn.right.circle"; case .todo: return "circle" }
+    }
+    private var color: Color {
+        switch row.status { case .done: return .green; case .skipped: return .orange; case .todo: return .secondary }
+    }
+    private var detail: String {
+        switch row.status {
+        case .done: return row.date.map { Loc.f("Sent %@", Loc.date($0)) } ?? Loc.t("Done")
+        case .skipped:
+            guard let e = row.entry else { return Loc.t("Skipped") }
+            if model.isSkippedForever(e.id) { return Loc.t("Skipped for good") }
+            return model.progress.skipReturns(e.id).map { Loc.f("Skipped until %@", Loc.date($0)) } ?? Loc.t("Skipped")
+        case .todo:
+            if let e = row.entry, e.lastSent(in: model.progress.optOutAttempts) != nil { return Loc.t("Due again") }
+            return row.task.map { $0.method?.title ?? $0.title } ?? ""
+        }
+    }
 }
 
-/// The few sites the Sites tab shows by default: the ten most recent done, the ten next to do, and a way into the whole list of each.
+/// The rows of a list of sites. The first row of each task carries the task's id (`task-…`), so a shared task is found once.
+struct SiteRowsList: View {
+    let rows: [SiteRow]
+    var body: some View {
+        var seen = Set<String>()
+        ForEach(rows) { row in
+            if let task = row.task {
+                let lead = seen.insert(task.id).inserted
+                NavigationLink(value: task) { SiteRowView(row: row) }
+                    .accessibilityIdentifier(lead ? "task-\(task.id)" : "site-\(row.domain)")
+            } else { SiteRowView(row: row) }
+        }
+    }
+}
+
+/// The few sites the Sites tab shows by default: the ten most recent done, the ten most recently skipped and the ten next to do,
+/// each with a way into the search screen with that status already chosen.
 struct SiteOverviewSections: View {
     @EnvironmentObject var model: AppModel
+    let rows: SiteRows
+    /// Opens the search screen with this status chosen.
+    let seeAll: (SiteStatus) -> Void
     var body: some View {
-        let rows = model.siteRows()
-        group(title: Loc.t("Done"), rows: rows.done, completed: true, mode: .completed, empty: Loc.t("Nothing sent yet. Sites you finish show up here, newest first."))
-        group(title: Loc.t("Up next"), rows: rows.todo, completed: false, mode: .todo, empty: Loc.t("Everything is done. Check back later: listings come back."))
+        group(.done, empty: Loc.t("Nothing sent yet. Sites you finish show up here, newest first."))
+        group(.skipped, empty: Loc.t("Nothing skipped. Sites you set aside show up here."))
+        group(.todo, empty: Loc.t("Everything is done. Check back later: listings come back."))
     }
 
     @ViewBuilder
-    private func group(title: String, rows: [SiteRow], completed: Bool, mode: SiteListView.Mode, empty: String) -> some View {
+    private func group(_ status: SiteStatus, empty: String) -> some View {
+        let list = rows.rows(status)
         Section {
-            if rows.isEmpty { Text(empty).font(.footnote).foregroundStyle(.secondary) }
-            ForEach(rows.prefix(10)) { row in
-                if let task = row.task {
-                    NavigationLink(value: task) { SiteRowView(row: row, completed: completed) }.accessibilityIdentifier("site-\(row.domain)")
-                } else { SiteRowView(row: row, completed: completed) }
-            }
-            if rows.count > 10 {
-                NavigationLink { SiteListView(mode: mode) } label: {
-                    Label(completed ? Loc.f("Search all %lld done", rows.count) : Loc.f("Search all %lld to do", rows.count), systemImage: "magnifyingglass")
-                }.accessibilityIdentifier(completed ? "all-done-sites" : "all-todo-sites")
+            if list.isEmpty { Text(empty).font(.footnote).foregroundStyle(.secondary) }
+            SiteRowsList(rows: Array(list.prefix(10)))
+            if list.count > 10 {
+                Button { seeAll(status) } label: {
+                    HStack {
+                        Label(Loc.f("See all %lld", list.count), systemImage: "line.3.horizontal.decrease.circle")
+                        Spacer()
+                        Image(systemName: "chevron.right").font(.footnote.bold()).foregroundStyle(.tertiary)
+                    }.contentShape(Rectangle())
+                }.accessibilityIdentifier("all-\(status.rawValue)-sites")
             }
         } header: {
-            Text("\(title) (\(rows.count))").font(.subheadline.bold()).textCase(nil)
+            Text("\(status.title) (\(list.count))").font(.subheadline.bold()).textCase(nil)
         }
     }
 }
 
-/// Every done (or still to do) site, with a search box and the same filters as the Sites tab.
-struct SiteListView: View {
-    enum Mode { case completed, todo }
+/// Every site, searched and filtered: by where it stands (chosen already when opened from one of the Sites tab's groups), whether the
+/// company reaches the person, what kind of company it is, what it tracks, who it sells to and how its opt-out is done.
+/// The search screen, as a place on the Sites tab's navigation path.
+struct SiteSearchRoute: Hashable {}
+
+/// What the search screen is showing. The Sites tab owns it, so the choices survive SwiftUI rebuilding the pushed screen.
+@MainActor
+final class SiteSearchState: ObservableObject {
+    @Published var filter = SiteFilter()
+    @Published var rows = SiteRows()
+    /// Set when the screen is opened from the tab's search field: the field takes focus once the push has finished.
+    var focusPending = false
+
+    func open(status: SiteStatus?, focus: Bool) {
+        filter = SiteFilter(status: status)
+        focusPending = focus
+    }
+}
+
+struct SiteSearchView: View {
     @EnvironmentObject var model: AppModel
-    let mode: Mode
-    @State private var search = ""
-    @State private var fCategory: BrokerCategory?
-    @State private var fData: DataKind?
-    @State private var fBuyer: BuyerKind?
-    private var filtering: Bool { fCategory != nil || fData != nil || fBuyer != nil }
+    @ObservedObject var state: SiteSearchState
+    @FocusState private var focused: Bool
+    private var filter: SiteFilter { state.filter }
+    private var rows: SiteRows { state.rows }
 
     var body: some View {
-        let all = mode == .completed ? model.siteRows().done : model.siteRows().todo
-        let byDomain = model.entryByDomain
-        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
-        let rows = all.filter { row in
-            if filtering, !(byDomain[row.domain]?.matches(category: fCategory, data: fData, buyer: fBuyer) ?? false) { return false }
-            return q.isEmpty || row.domain.lowercased().contains(q) || (byDomain[row.domain]?.name.lowercased().contains(q) ?? false)
-        }
+        let shown = SiteStatus.allCases.filter { filter.status == nil || filter.status == $0 }
+        let results = Dictionary(uniqueKeysWithValues: shown.map { s in
+            (s, rows.rows(s).filter { filter.accepts(domain: $0.domain, entry: $0.entry, status: $0.status, inRegion: $0.inRegion, method: $0.task?.method, alsoNamed: $0.handlerName) })
+        })
+        let total = results.values.reduce(0) { $0 + $1.count }
         List {
             Section {
                 HStack {
                     Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                    TextField("Search by name or web address", text: $search).textInputAutocapitalization(.never).autocorrectionDisabled()
-                        .accessibilityIdentifier("site-list-search")
+                    TextField("Search by name or web address", text: $state.filter.text)
+                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .focused($focused)
+                        .accessibilityIdentifier("site-search-field")
+                    if !filter.text.isEmpty { Button { state.filter.text = "" } label: { Image(systemName: "xmark.circle.fill") }.buttonStyle(.plain).foregroundStyle(.secondary) }
                 }
+                filterChips.listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0))
             } footer: {
-                Text(Loc.f("Showing %lld of %lld sites.", rows.count, all.count))
+                Text(Loc.f("Showing %lld of %lld sites.", total, rows.count)).accessibilityIdentifier("site-search-count")
             }
-            Section {
-                ForEach(rows) { row in
-                    if let task = row.task {
-                        NavigationLink(value: task) { SiteRowView(row: row, completed: mode == .completed) }
-                    } else { SiteRowView(row: row, completed: mode == .completed) }
+            ForEach(shown, id: \.self) { s in
+                if let list = results[s], !list.isEmpty {
+                    Section {
+                        SiteRowsList(rows: list)
+                    } header: {
+                        Text("\(s.title) (\(list.count))").font(.subheadline.bold()).textCase(nil)
+                    }
                 }
             }
-        }
-        .navigationTitle(mode == .completed ? Loc.t("Done sites") : Loc.t("Sites to do"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Picker("Type of company", selection: $fCategory) {
-                        Text("Any type").tag(BrokerCategory?.none)
-                        ForEach(BrokerCategory.allCases, id: \.self) { Text($0.title).tag(BrokerCategory?.some($0)) }
-                    }
-                    Picker("Data they collect", selection: $fData) {
-                        Text("Any data").tag(DataKind?.none)
-                        ForEach(DataKind.allCases, id: \.self) { Text($0.title).tag(DataKind?.some($0)) }
-                    }
-                    Picker("Who they sell to", selection: $fBuyer) {
-                        Text("Anyone").tag(BuyerKind?.none)
-                        ForEach(BuyerKind.allCases, id: \.self) { Text($0.title).tag(BuyerKind?.some($0)) }
-                    }
-                    if filtering { Button("Clear filters", role: .destructive) { fCategory = nil; fData = nil; fBuyer = nil } }
-                } label: { Image(systemName: filtering ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle") }
+            if total == 0, rows.count > 0 {
+                Section { Text("No site matches that search.").foregroundStyle(.secondary) }
             }
         }
+        .navigationTitle(Loc.t("Search sites"))
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear { state.rows = model.siteRows() }
+        .task {
+            guard state.focusPending else { return }
+            state.focusPending = false
+            // Focus set during the push animation is dropped, so wait for it to finish.
+            try? await Task.sleep(nanoseconds: 450_000_000)
+            focused = true
+        }
+    }
+
+    private var filterChips: some View {
+        // Every chip in view at once: they wrap onto a second line instead of scrolling sideways.
+        ChipFlow(spacing: 8) {
+            Group {
+                if filter.narrowed {
+                    Button { state.filter.clear() } label: { Image(systemName: "xmark").font(.footnote.bold()).padding(7).background(Circle().fill(Color(.secondarySystemFill))) }
+                        .buttonStyle(.plain).accessibilityLabel(Loc.t("Clear filters")).accessibilityIdentifier("filter-clear")
+                }
+                chip(Loc.t("Status"), $state.filter.status, SiteStatus.allCases, { $0.title }, any: Loc.t("Any status"), id: "filter-status")
+                chip(Loc.t("Region"), $state.filter.inRegion, [true, false], { $0 ? Loc.t("In your area") : Loc.t("Not in your area") }, any: Loc.t("Anywhere"), id: "filter-region")
+                chip(Loc.t("Type"), $state.filter.category, BrokerCategory.allCases, { $0.title }, any: Loc.t("Any type"), id: "filter-type")
+                chip(Loc.t("Tracks"), $state.filter.data, DataKind.allCases, { $0.title }, any: Loc.t("Any data"), id: "filter-tracks")
+                chip(Loc.t("Sells to"), $state.filter.buyer, BuyerKind.allCases, { $0.title }, any: Loc.t("Anyone"), id: "filter-sells")
+                chip(Loc.t("Method"), $state.filter.method, [.automatic, .semiAutomatic, .emailOnly], { $0.shortTitle }, any: Loc.t("Any method"), id: "filter-method")
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private func chip<T: Hashable>(_ name: String, _ value: Binding<T?>, _ options: [T], _ title: @escaping (T) -> String, any: String, id: String) -> some View {
+        let set = value.wrappedValue != nil
+        return Menu {
+            option(any, chosen: !set) { value.wrappedValue = nil }
+            ForEach(options, id: \.self) { o in option(title(o), chosen: value.wrappedValue == o) { value.wrappedValue = o } }
+        } label: {
+            HStack(spacing: 4) {
+                Text(value.wrappedValue.map(title) ?? name).lineLimit(1).truncationMode(.tail)
+                Image(systemName: "chevron.down").font(.caption2.bold())
+            }
+            .font(.footnote.weight(.medium))
+            .frame(maxWidth: 220)
+            .padding(.horizontal, 11).padding(.vertical, 6)
+            .foregroundStyle(set ? Color.white : Color.primary)
+            .background(Capsule().fill(set ? Color.accentColor : Color(.secondarySystemFill)))
+        }
+        .accessibilityIdentifier(id)
+    }
+
+    @ViewBuilder private func option(_ text: String, chosen: Bool, _ pick: @escaping () -> Void) -> some View {
+        Button(action: pick) { if chosen { Label(text, systemImage: "checkmark") } else { Text(text) } }
+    }
+}
+
+/// Lays its views out left to right and starts a new line when the next one does not fit.
+struct ChipFlow: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let rows = arrange(width: proposal.width ?? .infinity, subviews)
+        let height = rows.map(\.height).reduce(0, +) + spacing * CGFloat(max(rows.count - 1, 0))
+        let width = rows.map(\.width).max() ?? 0
+        return CGSize(width: proposal.width ?? width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for row in arrange(width: bounds.width, subviews) {
+            var x = bounds.minX
+            for i in row.items {
+                let size = subviews[i].sizeThatFits(.unspecified)
+                subviews[i].place(at: CGPoint(x: x, y: y + (row.height - size.height) / 2), proposal: ProposedViewSize(size))
+                x += size.width + spacing
+            }
+            y += row.height + spacing
+        }
+    }
+
+    private struct Row { var items: [Int] = []; var width: CGFloat = 0; var height: CGFloat = 0 }
+
+    private func arrange(width: CGFloat, _ subviews: Subviews) -> [Row] {
+        var rows: [Row] = [Row()]
+        for i in subviews.indices {
+            let size = subviews[i].sizeThatFits(.unspecified)
+            let needed = rows[rows.count - 1].items.isEmpty ? size.width : rows[rows.count - 1].width + spacing + size.width
+            if needed > width, !rows[rows.count - 1].items.isEmpty { rows.append(Row()) }
+            var row = rows[rows.count - 1]
+            row.width = row.items.isEmpty ? size.width : row.width + spacing + size.width
+            row.height = max(row.height, size.height)
+            row.items.append(i)
+            rows[rows.count - 1] = row
+        }
+        return rows
     }
 }

@@ -3796,6 +3796,29 @@
     }
    }
   },
+  "Any method": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toutes les méthodes"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquier método"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jede Methode"
+     }
+    }
+   }
+  },
   "Any paragraph nobody has reviewed, including a changed one": {
    "extractionState": "manual",
    "localizations": {
@@ -3815,6 +3838,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jeder Absatz, den niemand geprüft hat, auch ein geänderter"
+     }
+    }
+   }
+  },
+  "Any status": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les statuts"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cualquier estado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jeder Status"
      }
     }
    }
@@ -3953,6 +3999,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Alles, was ein Prüfer ausgeschlossen hat"
+     }
+    }
+   }
+  },
+  "Anywhere": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Partout"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cualquier lugar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Überall"
      }
     }
    }
@@ -4367,6 +4436,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Auto-Senden an"
+     }
+    }
+   }
+  },
+  "Automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Automático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Automatisch"
      }
     }
    }
@@ -7499,6 +7591,29 @@
     }
    }
   },
+  "Due again": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À refaire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Toca repetir"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wieder fällig"
+     }
+    }
+   }
+  },
   "Each day you work through up to %lld brokers of one kind. Pick the kind you want to tackle today.": {
    "extractionState": "manual",
    "localizations": {
@@ -8281,6 +8396,29 @@
     }
    }
   },
+  "Everything is done. Check back later: listings come back.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tout est fait. Revenez plus tard : les fiches reviennent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todo está hecho. Vuelve más tarde: los perfiles reaparecen."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alles erledigt. Schau später wieder vorbei: Einträge kommen zurück."
+     }
+    }
+   }
+  },
   "Everything left: manual tasks for brokers registered elsewhere. Do these last.": {
    "extractionState": "manual",
    "localizations": {
@@ -8875,6 +9013,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Filter"
+     }
+    }
+   }
+  },
+  "Filter sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Filtrer les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Filtrar sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seiten filtern"
      }
     }
    }
@@ -10623,6 +10784,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "In dieser App"
+     }
+    }
+   }
+  },
+  "In your area": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dans votre zone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En tu zona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In Ihrer Gegend"
      }
     }
    }
@@ -12812,6 +12996,29 @@
     }
    }
   },
+  "Method": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Méthode"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Método"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Methode"
+     }
+    }
+   }
+  },
   "Michigan": {
    "extractionState": "manual",
    "localizations": {
@@ -14077,6 +14284,29 @@
     }
    }
   },
+  "No route yet": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas encore de moyen"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún sin vía"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch kein Weg"
+     }
+    }
+   }
+  },
   "No screenshot": {
    "extractionState": "manual",
    "localizations": {
@@ -14303,6 +14533,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nicht gefunden"
+     }
+    }
+   }
+  },
+  "Not in your area": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas dans votre zone"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No en tu zona"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht in Ihrer Gegend"
      }
     }
    }
@@ -14602,6 +14855,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Hier ist nichts weiter zu tun. Manche Seiten senden einen Bestätigungslink per E-Mail; dieser Tipp ist Ihre."
+     }
+    }
+   }
+  },
+  "Nothing sent yet. Sites you finish show up here, newest first.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien d’envoyé pour l’instant. Les sites terminés apparaissent ici, les plus récents en premier."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún no se ha enviado nada. Los sitios que termines aparecen aquí, los más recientes primero."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch nichts gesendet. Erledigte Seiten erscheinen hier, die neuesten zuerst."
+     }
+    }
+   }
+  },
+  "Nothing skipped. Sites you set aside show up here.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien de mis de côté. Les sites que vous mettez de côté apparaissent ici."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nada omitido. Los sitios que dejes a un lado aparecen aquí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nichts übersprungen. Seiten, die du zurückstellst, erscheinen hier."
      }
     }
    }
@@ -17734,6 +18033,29 @@
     }
    }
   },
+  "Region": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Région"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Región"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Region"
+     }
+    }
+   }
+  },
   "Region (optional)": {
    "extractionState": "manual",
    "localizations": {
@@ -18654,6 +18976,29 @@
     }
    }
   },
+  "Search sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechercher des sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscar sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seiten suchen"
+     }
+    }
+   }
+  },
   "Search sites by name or web address": {
    "extractionState": "manual",
    "localizations": {
@@ -18746,6 +19091,29 @@
     }
    }
   },
+  "See all %lld": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Voir les %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ver los %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle %lld ansehen"
+     }
+    }
+   }
+  },
   "Semi-automated, anywhere": {
    "extractionState": "manual",
    "localizations": {
@@ -18834,6 +19202,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Halbautomatisch, mit Aufforderungen an Sie"
+     }
+    }
+   }
+  },
+  "Semi-automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Semiautomático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatisch"
      }
     }
    }
@@ -19087,6 +19478,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesendet"
+     }
+    }
+   }
+  },
+  "Sent %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet am %@"
      }
     }
    }
@@ -19643,6 +20057,29 @@
     }
    }
   },
+  "Showing %lld of %lld sites.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites sur %lld affichés."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se muestran %lld de %lld sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld Seiten angezeigt."
+     }
+    }
+   }
+  },
   "Showing %lld of %lld tasks": {
    "extractionState": "manual",
    "localizations": {
@@ -20007,6 +20444,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Website überspringen"
+     }
+    }
+   }
+  },
+  "Skipped": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mis de côté"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitido"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Übersprungen"
+     }
+    }
+   }
+  },
+  "Skipped for good": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mis de côté pour de bon"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Omitido para siempre"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Endgültig übersprungen"
      }
     }
    }
@@ -20950,6 +21433,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bundesstaaten, die Websites zur Beachtung verpflichten"
+     }
+    }
+   }
+  },
+  "Status": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Statut"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Estado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Status"
      }
     }
    }
@@ -24998,6 +25504,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Später freischalten"
+     }
+    }
+   }
+  },
+  "Up next": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À faire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pendientes"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Als Nächstes"
      }
     }
    }

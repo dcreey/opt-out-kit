@@ -24,80 +24,60 @@ extension StatusSummary {
     }
 }
 
-/// Every broker in the registry with its status across all profiles.
+/// Every broker in the registry with its status across all profiles. The tab shows the ten most recent sites in each group; the search
+/// field opens the search screen, which lists every site with its filters.
 struct SitesView: View {
     @EnvironmentObject var model: AppModel
-    @State private var search = ""
     @State private var showScan = false
     @State private var showQuick = false
-    @State private var fCategory: BrokerCategory?
-    @State private var fData: DataKind?
-    @State private var fBuyer: BuyerKind?
-    private var filtering: Bool { fCategory != nil || fData != nil || fBuyer != nil }
-    private var overview: Bool { !filtering && search.trimmingCharacters(in: .whitespaces).isEmpty }
+    /// Everything on this tab pushes by value (the search screen, then a site's task from it): mixing a pushed-by-flag screen with
+    /// value links made a tapped site's page fail to open.
+    @State private var path = NavigationPath()
+    @StateObject private var search = SiteSearchState()
+
+    private func showSearch(status: SiteStatus? = nil, focus: Bool) {
+        search.open(status: status, focus: focus)
+        path.append(SiteSearchRoute())
+    }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
-                    HStack {
-                        Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                        TextField("Search all sites by name or web address", text: $search)
-                            .textInputAutocapitalization(.never).autocorrectionDisabled()
-                            .accessibilityIdentifier("sites-search")
-                        if !search.isEmpty { Button { search = "" } label: { Image(systemName: "xmark.circle.fill") }.buttonStyle(.plain).foregroundStyle(.secondary) }
+                    // Looks like a search field; tapping it opens the search screen with its field focused.
+                    Button { showSearch(focus: true) } label: {
+                        HStack {
+                            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                            Text(Loc.t("Search sites")).foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("sites-search")
                 } footer: {
                     Text("Tracking \(model.totalSites) sites. Below: the ones you finished most recently and the ones up next, in the order the home page takes them. Search to find any site.")
                         .accessibilityIdentifier("sites-total")
                 }
-                // Without a search or filter the tab shows only the sites sent most recently and the ones up next; searching or filtering lists matching tasks as before.
-                if overview { SiteOverviewSections() }
-                let queue = overview ? [] : model.queue
-                ForEach(queue) { band in
-                    let tasks = band.tasks.filter { visible($0) }
-                    if !tasks.isEmpty {
-                        Section {
-                            ForEach(tasks) { task in
-                                NavigationLink(value: task) { PlanTaskRow(task: task) }.accessibilityIdentifier("task-\(task.id)")
-                            }
-                        } header: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(band.rank.rawValue). \(band.rank.title)").font(.subheadline.bold()).textCase(nil)
-                                    .accessibilityIdentifier("band-\(band.rank.rawValue)")
-                                Text(tasks.count == band.tasks.count ? bandSummary(band) : Loc.f("Showing %lld of %lld tasks", tasks.count, band.tasks.count))
-                                    .font(.caption).textCase(nil)
-                            }
-                        } footer: {
-                            Text(band.rank.explanation)
-                        }
+                SiteOverviewSections(rows: model.siteRows()) { showSearch(status: $0, focus: false) }
+                let locked = model.lockedSites
+                if !locked.isEmpty {
+                    Section {
+                        NavigationLink { LockedSitesView(sites: locked) } label: {
+                            Label(Loc.f("%lld sites unlock later", locked.count), systemImage: "lock")
+                        }.accessibilityIdentifier("locked-sites")
+                    } footer: {
+                        Text("We have not found a way to opt out of these yet: no form, page or email. They become tasks the day we do.")
                     }
                 }
-                if !search.isEmpty, !queue.contains(where: { $0.tasks.contains { visible($0) } }) {
-                    Section { Text("No site matches that search.").foregroundStyle(.secondary) }
-                }
-                if !filtering, search.isEmpty || !model.lockedSites.filter({ closedVisible($0) }).isEmpty {
-                    let locked = model.lockedSites.filter { closedVisible($0) }
-                    if !locked.isEmpty {
-                        Section {
-                            NavigationLink { LockedSitesView(sites: locked) } label: {
-                                Label(Loc.f("%lld sites unlock later", locked.count), systemImage: "lock")
-                            }.accessibilityIdentifier("locked-sites")
-                        } footer: {
-                            Text("We have not found a way to opt out of these yet: no form, page or email. They become tasks the day we do.")
-                        }
-                    }
-                }
-                if !filtering, search.isEmpty || closedMatches {
-                    let closed = model.closedSites.filter { closedVisible($0) }
-                    if !closed.isEmpty {
-                        Section {
-                            NavigationLink { ClosedSitesView(sites: closed) } label: {
-                                Label(Loc.f("%lld sites no longer respond", closed.count), systemImage: "wifi.slash")
-                            }.accessibilityIdentifier("closed-sites")
-                        } footer: {
-                            Text("These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.")
-                        }
+                let closed = model.closedSites
+                if !closed.isEmpty {
+                    Section {
+                        NavigationLink { ClosedSitesView(sites: closed) } label: {
+                            Label(Loc.f("%lld sites no longer respond", closed.count), systemImage: "wifi.slash")
+                        }.accessibilityIdentifier("closed-sites")
+                    } footer: {
+                        Text("These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.")
                     }
                 }
                 Section {
@@ -128,26 +108,12 @@ struct SitesView: View {
             .navigationTitle("Sites")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Type of company", selection: $fCategory) {
-                            Text("Any type").tag(BrokerCategory?.none)
-                            ForEach(BrokerCategory.allCases, id: \.self) { Text($0.title).tag(BrokerCategory?.some($0)) }
-                        }
-                        Picker("Data they collect", selection: $fData) {
-                            Text("Any data").tag(DataKind?.none)
-                            ForEach(DataKind.allCases, id: \.self) { Text($0.title).tag(DataKind?.some($0)) }
-                        }
-                        Picker("Who they sell to", selection: $fBuyer) {
-                            Text("Anyone").tag(BuyerKind?.none)
-                            ForEach(BuyerKind.allCases, id: \.self) { Text($0.title).tag(BuyerKind?.some($0)) }
-                        }
-                        if filtering { Button("Clear filters", role: .destructive) { fCategory = nil; fData = nil; fBuyer = nil } }
-                    } label: {
-                        Image(systemName: filtering ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                    }
-                    .accessibilityIdentifier("sites-filter")
+                    Button { showSearch(focus: false) } label: { Image(systemName: "line.3.horizontal.decrease.circle") }
+                        .accessibilityLabel(Loc.t("Filter sites"))
+                        .accessibilityIdentifier("sites-filter")
                 }
             }
+            .navigationDestination(for: SiteSearchRoute.self) { _ in SiteSearchView(state: search) }
             .planDestinations()
             .coach(.sites)
             .sheet(isPresented: $showScan) { ExposureView() }
@@ -171,25 +137,6 @@ struct SitesView: View {
                 Text("Top level").font(.caption).foregroundStyle(.secondary)
             }
         }
-    }
-
-    /// Whether a task passes the search and the to-do filter. A shared task matches on any site it handles.
-    private func visible(_ task: PlanTask) -> Bool {
-        if filtering {
-            // A shared task passes when any site it handles fits.
-            let byDomain = model.entryByDomain
-            guard task.domains.contains(where: { byDomain[$0]?.matches(category: fCategory, data: fData, buyer: fBuyer) ?? false }) else { return false }
-        }
-        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !q.isEmpty else { return true }
-        return task.title.lowercased().contains(q) || task.domains.contains { $0.lowercased().contains(q) }
-    }
-
-    private var closedMatches: Bool { model.closedSites.contains { closedVisible($0) } }
-
-    private func closedVisible(_ e: DirectoryEntry) -> Bool {
-        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
-        return q.isEmpty || e.domain.lowercased().contains(q) || e.name.lowercased().contains(q)
     }
 
     private func directoryRow(_ e: DirectoryEntry) -> some View {

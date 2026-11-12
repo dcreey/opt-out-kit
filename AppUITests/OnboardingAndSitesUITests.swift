@@ -101,13 +101,41 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launchArguments = ["-uitest-reset"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
-        let search = app.textFields["sites-search"]
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("spo")
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        let open = app.buttons["sites-search"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5))
+        open.tap()
+        XCTAssertTrue(app.textFields["site-search-field"].waitForExistence(timeout: 5), "the search field opens the search screen")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3), "with its field focused")
+        app.textFields["site-search-field"].typeText("spo")
         XCTAssertTrue(app.buttons["keyboard-done"].waitForExistence(timeout: 3), "a Done button sits above the keyboard")
         app.buttons["keyboard-done"].tap()
         XCTAssertFalse(app.keyboards.firstMatch.waitForExistence(timeout: 1), "and puts the keyboard away")
+    }
+
+    func testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        let all = app.buttons["all-todo-sites"]
+        XCTAssertTrue(app.scrollUntilExists(all, maxSwipes: 8), "more than ten sites to do: a link to see them all")
+        all.tap()
+        let status = app.buttons["filter-status"]
+        XCTAssertTrue(status.waitForExistence(timeout: 5))
+        XCTAssertTrue(status.label.contains("Up next"), "the status is chosen already: \(status.label)")
+        XCTAssertTrue(app.buttons["filter-clear"].exists, "and can be cleared")
+        for id in ["filter-region", "filter-type", "filter-tracks", "filter-sells", "filter-method"] {
+            XCTAssertTrue(app.buttons[id].exists, id)
+        }
+        XCTAssertFalse(app.keyboards.firstMatch.exists, "opened from a group, the field is not focused")
+        let count = app.staticTexts["site-search-count"].label
+        app.buttons["filter-region"].tap()
+        let choice = app.buttons["Not in your area"]
+        XCTAssertTrue(choice.waitForExistence(timeout: 3))
+        choice.tap()
+        XCTAssertTrue(app.buttons["filter-region"].label.contains("Not in your area"), "the chip shows the choice: \(app.buttons["filter-region"].label)")
+        XCTAssertTrue(app.buttons["filter-status"].label.contains("Up next"), "and the status stays chosen")
+        XCTAssertNotEqual(app.staticTexts["site-search-count"].label, count, "the list narrows")
     }
 
     func testAStateWithNoLawPointsToStrongerStatesWithExamples() {
