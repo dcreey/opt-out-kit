@@ -132,12 +132,22 @@ final class GuidedRunner: ObservableObject {
     /// The person said (from the … menu) that this site has another email step.
     func flagEmailStep() { emailStepFlagged = true; finishQuestion.dismiss() }
     var siteID: String { flow.plan.siteID }
-    private func emailAfterSend(_ email: Bool) async -> Bool {
+    /// Whether an email follows the send; nil when the person says it is not done yet (nothing is recorded and the guide stays on the page).
+    private func emailAfterSend(_ email: Bool) async -> Bool? {
         if email || emailStepFlagged { return true }
         guard asksAboutFollowUp else { return false }
         let text = await page.visibleText()
         if FormRun.finishIsCertain(text) { return false }
-        return await finishQuestion.ask(site: siteName, pageSaidEmail: false, allowsNotYet: false) != .done
+        switch await finishQuestion.ask(site: siteName, pageSaidEmail: false, allowsNotYet: true) {
+        case .done: return false
+        case .emailFollows, .unsure: return true
+        case .notYet: return nil
+        }
+    }
+    /// "Not yet": the page is left as it is. From here the person finishes it themselves; a confirmation that appears later is noticed, and nothing is pressed again.
+    private func stayAfterNotYet() async {
+        forceManual = true; manualBaseline = await page.visibleText()
+        status = Loc.t("Finish it in the page. We will notice the confirmation, or tap Next step.")
     }
     private let page: GuidedPage
     private var fillValues: [FieldValue]
@@ -245,7 +255,7 @@ final class GuidedRunner: ObservableObject {
     func run() async {
         guard !started else { return }
         started = true
-        if case .openPage(let url)? = flow.current?.action { await page.load(url); openedSteps.insert(flow.current!.id) }
+        if case .openPage(let url)? = flow.current?.action, let stepID = flow.current?.id { await page.load(url); openedSteps.insert(stepID) }   // the step can change or end while the page loads
         else if case .pickListing(let search)? = flow.current?.action { await page.load(search) }
         else if let url = firstURL { await page.load(url) }
         webView = page.webView
@@ -301,7 +311,7 @@ final class GuidedRunner: ObservableObject {
             let now = await page.visibleText()
             guard let base = manualBaseline else { manualBaseline = now; status = Loc.t("Your details are filled in. Press the page's own button yourself; we will notice the confirmation, or tap Next step."); break }
             if case .submitted(let said) = FormRun.classifyConfirmed(FormRun.newText(before: base, after: now)) {
-                let email = await emailAfterSend(said)
+                guard let email = await emailAfterSend(said) else { await stayAfterNotYet(); break }
                 onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
             }
@@ -309,7 +319,7 @@ final class GuidedRunner: ObservableObject {
             _ = await page.fill(fillValues)
             switch await page.send(fillValues) {
             case .submitted(let said):
-                let email = await emailAfterSend(said)
+                guard let email = await emailAfterSend(said) else { await stayAfterNotYet(); break }
                 onSent(.submitted(awaitingEmail: email)); status = email ? Loc.t("Sent. Check your email for a link.") : "Sent."
                 apply(.formSent(awaitingEmail: email))
             case .challenged(let why) where why.contains(PageFlow.rejectedMarker):

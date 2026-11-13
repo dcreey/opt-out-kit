@@ -83,7 +83,11 @@ struct WebAssistedDriver: AssistedDriver {
                 if LiveFormPicker.pick(await session.discoverFormsDeep(), pageContext: await session.pageContext()) == nil { _ = await session.advanceToRequestForm(loose: true) }
             } else { _ = await session.advanceToRequestForm() }
             if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
-            let found = await session.discoverFormsDeep()
+            if await session.chooseRightsPicker() { try? await Task.sleep(nanoseconds: 800_000_000) }
+            var found = await session.discoverFormsDeep()
+            // Only a form for a later step is showing (its email box is switched off): the page's intro button opens the real one.
+            if LiveFormPicker.pick(found, pageContext: await session.pageContext()) == nil, found.contains(where: { $0.fields.contains { $0.type == "email" && $0.disabled == true } }),
+               await session.pressIntroNext() { found = await session.discoverFormsDeep() }
             guard let live = LiveFormPicker.pick(found, pageContext: await session.pageContext()) else {
                 Self.reasons[form.page.absoluteString] = "noform"
                 // No form and (perhaps) no address on file: an address on the page itself can still be offered.

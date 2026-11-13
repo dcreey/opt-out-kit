@@ -8,6 +8,8 @@ gives each site 75 seconds. The made-up profile (Pat Example) has a maiden name,
 Each result records the page that opened, whether a form was found, every field with its label, whether it is required and whether it was filled,
 anything that would stop a person (a human check, a certification box, a typed code, a menu with no choice for them), and the dry-run outcome.
 
+**Chrome load check** (2026-11-13, `tools/chrome_load_check/`, results in `docs/audits/chrome-load-2026-11-13.md`): all 408 sites with a form on file opened in real Chrome and read with the app's picking rules, typing and sending nothing. 325 had a form picked, 76 none (many are portals in a frame, which this check does not read), 3 were blocked by a bot check in headless Chrome, 4 pages are gone (404/410) and 1 timed out.
+
 `docs/audits/` keeps the results of the runs we made. What the first full run showed (755 sites):
 
 - 384 forms filled with nothing required left empty, 133 with a required field left empty, and 234 where no form was found on the page.

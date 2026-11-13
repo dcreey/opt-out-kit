@@ -234,7 +234,15 @@ final class AssistedRunner: ObservableObject {
         let text = await page?.pageText() ?? ""
         if FormRun.finishIsCertain(text) { return nil }
         // Moving on without answering (skip, stop) counts as "not sure": the site waits on an email rather than being counted entirely done.
-        let answer = await finishQuestion.ask(site: item.entry.domain, pageSaidEmail: false, allowsNotYet: false)
+        var answer = await finishQuestion.ask(site: item.entry.domain, pageSaidEmail: false, allowsNotYet: true)
+        // "Not yet": the person stays on the page (nothing moves on) until Next site, Skip or Mark as done; the question then comes once more.
+        while answer == .notYet, !skipFlag {
+            awaitingNext = true
+            await withCheckedContinuation { nextContinuation = $0 }
+            awaitingNext = false
+            if skipFlag { break }
+            answer = await finishQuestion.ask(site: item.entry.domain, pageSaidEmail: false, allowsNotYet: true)
+        }
         return answer == .done ? nil : .submitted(awaitingEmail: true)
     }
     /// Saves a changed answer over what was saved when the confirmation was first noticed.

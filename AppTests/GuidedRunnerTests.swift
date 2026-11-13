@@ -14,7 +14,8 @@ private final class ScriptedGuidedPage: GuidedPage {
     private(set) var scans = 0
     private(set) var loaded: [URL] = [], fills = 0, sends = 0, polls = 0, closed = false
     var webView: WKWebView? { nil }
-    func load(_ url: URL) async { loaded.append(url); self.url = url }
+    var whileLoading: (() -> Void)?
+    func load(_ url: URL) async { loaded.append(url); self.url = url; whileLoading?() }
     func currentURL() -> URL? { url }
     func visibleText() async -> String { text }
     func fill(_ values: [FieldValue]) async -> Int { fills += 1; return fillCount }
@@ -81,6 +82,18 @@ final class GuidedRunnerTests: XCTestCase {
         XCTAssertEqual(page.scans, 1, "one scan per page, not one per poll")
         XCTAssertEqual(r.flow.index, 1)
         r.cancel(); await task.value
+    }
+
+    /// Crash reports from builds 37 and 40: the person tapped Next while the first page was still loading, the flow ended, and the runner unwrapped a step that was gone.
+    func testTheFlowEndingWhileTheFirstPageLoadsDoesNotCrash() async {
+        let page = ScriptedGuidedPage(), log = Log()
+        let b = Broker(id: "one", name: "One", tier: .C, covers: nil, signals: nil, fields: nil,
+                       steps: [Step(open: URL(string: "https://x.example/start")!)], recheckDays: 30, verified: nil)
+        let r = runner(GuidedPlanner.plan(for: b), page: page, log: log)
+        page.whileLoading = { r.next(); r.next() }
+        await r.run()
+        XCTAssertEqual(page.loaded.count, 1)
+        XCTAssertNotNil(r.ending, "the run ends cleanly")
     }
 
     func testLoadingThePageFinishesTheOpenStepAndTheCountIsShown() async {
@@ -421,5 +434,23 @@ final class ListingGuideTests: XCTestCase {
         let log = await page.visibleText()
         XCTAssertTrue(log.contains("A-SENT:pat@example.com"), log)
         XCTAssertTrue(outcome == .submitted(awaitingEmail: false) || { if case .failed = outcome { return true } else { return false } }(), "\(outcome)")
+    }
+}
+
+@MainActor
+final class NextSiteOfferTests: XCTestCase {
+    private func entry(_ d: String) -> DirectoryEntry {
+        DirectoryEntry(id: d, domain: d, name: d, bucket: "direct", tier: .B, automation: .guided, signals: [])
+    }
+    private func row(_ d: String, _ e: DirectoryEntry?) -> SiteRow {
+        SiteRow(domain: d, entry: e, task: nil, status: .todo, date: nil, inRegion: true)
+    }
+
+    func testTheOfferIsTheFirstSiteStillUpNextThatWasNotJustWalkedThrough() {
+        var rows = SiteRows()
+        rows.todo = [row("a.example", entry("a.example")), row("none.example", nil), row("b.example", entry("b.example")), row("c.example", entry("c.example"))]
+        XCTAssertEqual(rows.nextToOffer(excluding: ["a.example"])?.domain, "b.example", "skips the site just finished and rows with no page of their own")
+        XCTAssertEqual(rows.nextToOffer(excluding: ["a.example", "b.example"])?.domain, "c.example")
+        XCTAssertNil(rows.nextToOffer(excluding: ["a.example", "b.example", "c.example"]), "nothing left: no question is asked")
     }
 }

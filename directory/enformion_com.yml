@@ -20,5 +20,5 @@ languages: {"list": ["en"], "pages": {}, "checked": "2026-10-26"}
 live_form:
   checked: "2026-11-11"
   found: true
-  page: "https://www.enformion.com/do-not-sell/"
+  page: "https://www.enformion.com/opt-out/"
   blockers: []

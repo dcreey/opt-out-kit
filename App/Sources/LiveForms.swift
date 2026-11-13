@@ -136,6 +136,7 @@ extension WebViewSession {
           var ceSel=',[contenteditable=""],[contenteditable="true"],[role=textbox]:not(input):not(textarea)';
           var nestedCE=function(e){return e.tagName!=='INPUT'&&e.tagName!=='SELECT'&&e.tagName!=='TEXTAREA'&&!!(e.parentElement&&e.parentElement.closest('[contenteditable=""],[contenteditable="true"],[role=textbox]'));};
           var ftype=function(e){var t=e.tagName.toLowerCase(); return t==='select'?'select':(t==='textarea'||(t!=='input'&&!('value' in e)))?'textarea':(e.type||'text');};
+          var headOf=function(f){var n=f;for(var i=0;i<6&&n&&n!==document.body;i++,n=n.parentElement){var p=n.previousElementSibling;for(var j=0;j<8&&p;j++,p=p.previousElementSibling){if(/^H[1-6]$/.test(p.tagName))return (p.innerText||'').replace(/\s+/g,' ').trim().slice(0,80);var h=p.querySelector&&p.querySelector('h1,h2,h3,h4,h5,h6');if(h)return (h.innerText||'').replace(/\s+/g,' ').trim().slice(0,80);}}return '';};
           var out=[];
           document.querySelectorAll('form').forEach(function(f,i){
             var ftoken='f'+i; f.setAttribute('data-ook-form',ftoken);
@@ -144,11 +145,11 @@ extension WebViewSession {
               if(['hidden','submit','button','image','reset'].indexOf(type)>=0||nestedCE(e)||(type==='textarea'&&e.tagName!=='TEXTAREA'&&!vis(e))) return;
               var token=ftoken+'-'+j; e.setAttribute('data-ook',token);
               var l=label(e);
-              fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e)});});
+              fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e),disabled:!!e.disabled});});
             var buttons=[]; f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]').forEach(function(b){
               if(vis(b)) buttons.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
             out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
-                      text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});});
+                      text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600),head:headOf(f)});});
           // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
           var loose=[].slice.call(document.querySelectorAll('input,select,textarea'+ceSel)).filter(function(e){
             return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e)&&!nestedCE(e);});
@@ -158,11 +159,11 @@ extension WebViewSession {
             document.body.setAttribute('data-ook-form','fx'); var lf=[];
             loose.forEach(function(e,j){var type=ftype(e);
               var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);
-              lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true});});
+              lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true,disabled:!!e.disabled});});
             // The buttons that belong to these inputs: those in the same block of the page, else every button.
             var box=ctxEl(loose[0]); var lb=[]; box.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
             if(!lb.length) document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600)});}
+            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600),head:headOf(box)});}
           return JSON.stringify(out);})();
         """#
         guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8) else { return [] }
@@ -232,6 +233,24 @@ extension WebViewSession {
             await settlePage(maxWait: 5)
         }
         return clicked
+    }
+
+    /// A page whose request form is behind an intro step ("Click the button below to start this process": Next) and which already shows a later-step form
+    /// beside it (one with its email box switched off): presses the one Next / Continue / Start button so the form that asks for the person's address opens.
+    /// Only on a page about opting out, only when exactly one such button shows, and never one in a cookie or consent prompt. Returns true when it pressed it.
+    func pressIntroNext() async -> Bool {
+        let js = #"""
+        (function(){
+          if(!/opt.?out|do.?not.?sell|remove|ccpa|privacy.?(request|rights|choices)/i.test(location.pathname+' '+document.title)) return false;
+          var cs=[].slice.call(document.querySelectorAll('button,a,[role=button]')).filter(function(e){var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
+            return /^(continue|next|get started|begin|proceed|start)$/i.test(t)&&r.width>0&&r.height>0&&!e.disabled&&!e.closest('form,[id*=cookie i],[class*=cookie i],[id*=consent i],[class*=consent i],[class*=cmp i],[id*=onetrust i],[role=dialog],[aria-modal=true]');});
+          if(cs.length!==1) return false;
+          cs[0].scrollIntoView({block:'center'}); cs[0].click(); return true;})();
+        """#
+        guard (try? await webView.evaluateJavaScript(js)) as? Bool == true else { return false }
+        try? await Task.sleep(nanoseconds: 2_500_000_000)
+        await settlePage(maxWait: 5)
+        return true
     }
 
     /// Fills the values the plan chose, finding each field by its token.
@@ -324,7 +343,10 @@ extension WebViewSession {
             var shown=(el.tagName==='SELECT'?((el.options[el.selectedIndex]||{}).text||'')+'|'+el.value:getVal(el)).toLowerCase();
             var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});});
             var pageDefault=stateish&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
-            if(pageDefault){/* falls through to be filled */}
+            // An email box that ships holding something that is not an address (a page's own "opt-out" or "your email") is not the person's: their address replaces it.
+            var wantsAt=v.candidates.length&&v.candidates[0]!==null&&String(v.candidates[0]).indexOf('@')>0;
+            var junkEmail=wantsAt&&el.tagName!=='SELECT'&&(el.type==='email'||/e-?mail/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||'')))&&getVal(el).trim()!==''&&getVal(el).indexOf('@')<0;
+            if(pageDefault||junkEmail){/* falls through to be filled */}
             else if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
             else if(getVal(el).trim()!==''&&getVal(el)!==el.getAttribute('data-ook-last')){filled++; return;}
             if(el.tagName==='SELECT'){var done=false;
@@ -349,7 +371,7 @@ extension WebViewSession {
                   if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
               if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
               else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
-            } else if(\#(keepExistingValues ? "true" : "false")&&!pageDefault&&getVal(el).trim()!==''){filled++;}
+            } else if(\#(keepExistingValues ? "true" : "false")&&!pageDefault&&!junkEmail&&getVal(el).trim()!==''){filled++;}
             else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); var seg=ph?splitSeg(el,v):null; setValue(el,seg!==null?seg:ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph&&seg===null) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
           return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
         """#
@@ -551,6 +573,26 @@ extension WebViewSession {
           if(!names.length||!phones.length) return false;
           var n=names.filter(function(e){return /^(A|BUTTON)$/.test(e.tagName)||e.getAttribute('role')==='tab';})[0]||names.filter(function(e){return e.children.length===0;})[0]||names[0]; if(n.getAttribute('aria-selected')==='true'||/\bactive\b|\bselected\b/.test(n.className||'')) return false;
           n.click(); return true;})();
+        """#
+        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+    }
+
+    /// A page that keeps all its privacy forms hidden until a menu outside any form is set ("Select From Available Forms": Right to Opt-out, Right to Delete, Right to Know):
+    /// picks the opt-out choice (else deletion) so that form shows. Never touches a menu the person set, never a menu inside a form, never access or correction.
+    /// Returns true when it changed one.
+    func chooseRightsPicker() async -> Bool {
+        let js = #"""
+        (function(){var changed=false;
+          [].slice.call(document.querySelectorAll('select')).forEach(function(s){
+            if(changed||s.closest('form')||s.getAttribute('data-ook-user')==='1'||s.getAttribute('data-ook-auto')==='1') return;
+            var r=s.getBoundingClientRect(); if(r.width<=0||r.height<=0) return;
+            var o=[].slice.call(s.options), bad=/opt.?in|\bknow\b|access|correct|portab|copy of|subscribe/i;
+            var pick=o.filter(function(x){return /opt.?out|do not sell|don.?t sell/i.test(x.text)&&!bad.test(x.text);})[0]
+                  ||o.filter(function(x){return /\b(delet|eras|remov)\w*/i.test(x.text)&&!bad.test(x.text);})[0];
+            if(!pick||s.value===pick.value) return;
+            s.setAttribute('data-ook-auto','1'); s.value=pick.value;
+            s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); changed=true;});
+          return changed;})();
         """#
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }

@@ -382,6 +382,10 @@ struct DirectoryInfoView: View {
     var alsoHandles: [String] = []
     @State private var browserURL: URL?
     @State private var guide: GuidedRunner?
+    /// The site after this one, offered when a guide ends as finished; `guided` holds the domains already walked through here so none is offered twice.
+    @State private var nextOffer: DirectoryEntry?
+    @State private var askNext = false
+    @State private var guided = Set<String>()
     @State private var healing = false
     @State private var copied = false
     private var resolvedEntry: DirectoryEntry { model.resolved(entry) }
@@ -680,9 +684,24 @@ struct DirectoryInfoView: View {
             headerButtons
         }
         .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
-        .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { guide = nil } })) { box in
+        .fullScreenCover(item: Binding(get: { guide.map(GuideBox.init) }, set: { if $0 == nil { endGuide() } }), onDismiss: { if nextOffer != nil { askNext = true } }) { box in
             GuidedFlowView(runner: box.runner)
         }
+        .confirmationDialog(Loc.f("Open %@ next?", nextOffer?.domain ?? ""), isPresented: $askNext, titleVisibility: .visible) {
+            Button(Loc.t("Open the next site")) {
+                if let next = nextOffer { guided.insert(next.domain); model.requireProfile { guide = model.guidedRunner(for: next) } }
+                nextOffer = nil
+            }.accessibilityIdentifier("next-site-yes")
+            Button(Loc.t("Not now"), role: .cancel) { nextOffer = nil }.accessibilityIdentifier("next-site-no")
+        }
+    }
+
+    /// The guide closed. If the person finished it, offer the next site that is still up next (never one already walked through here).
+    private func endGuide() {
+        let finished = guide?.ending == .finished
+        guided.insert(entry.domain)
+        guide = nil
+        nextOffer = finished ? model.siteRows().nextToOffer(excluding: guided) : nil
     }
 }
 

@@ -24,6 +24,8 @@ struct SiteRows {
     var done: [SiteRow] = []
     func rows(_ s: SiteStatus) -> [SiteRow] { switch s { case .todo: return todo; case .skipped: return skipped; case .done: return done } }
     var count: Int { todo.count + skipped.count + done.count }
+    /// The first site still up next that has a page of its own and is not in `walked`: what "Open the next site?" offers after a guide is finished.
+    func nextToOffer(excluding walked: Set<String>) -> DirectoryEntry? { todo.compactMap(\.entry).first { !walked.contains($0.domain) } }
 }
 
 extension AppModel {

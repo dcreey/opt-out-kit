@@ -10,6 +10,8 @@ struct LiveField: Decodable, Equatable {
     var label: String
     var required: Bool
     var visible: Bool
+    /// The page switched the box off. An email box that is disabled cannot take the person's address: that form is a later step (Peoplefinders' record form, after the emailed link).
+    var disabled: Bool?
 }
 
 struct LiveForm: Decodable, Equatable {
@@ -22,6 +24,8 @@ struct LiveForm: Decodable, Equatable {
     var text: String
     /// The words around the form's inputs (the nearest block of text that holds them): a newsletter box says so there, whatever its button says.
     var ctx: String?
+    /// The heading just above the form, outside it ("Contact Us", "What to report"): not part of the form's own text.
+    var head: String?
 
     /// The form as the filler understands it. Each field is named by its token, and its label carries the page's own name for it, so the
     /// same synonyms that read a stored form read this one.
@@ -37,8 +41,15 @@ enum LiveFormPicker {
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
     private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a|get my [a-z ]*(guide|report)|show my report|free (guide|report)", options: .caseInsensitive)
     /// Newsletter and marketing language in the words around a form's inputs.
-    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscrib(e|ing|ed)|receive (updates|news|emails?)|and receive|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to", options: .caseInsensitive)
+    private static let signupContext = try! NSRegularExpression(pattern: "newsletter|(?<!un)subscrib(e|ing|ed)|receive (updates|news|emails?)|and receive|in your inbox|to your inbox|stay (updated|in the loop)|get (the )?(latest|updates)|join our|sign.?up for|free trial|updates (and|&) insights|delivered to|receive (communications|marketing)|agree to receive", options: .caseInsensitive)
     private static let strongOptOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|privacy (request|choices|rights)|delete my|deletion request|erasure|data subject|remove (me|my)", options: .caseInsensitive)
+    private static let businessField = try! NSRegularExpression(pattern: "(business|work|corporate|company) e-?mail|\\bindustry\\b|job (title|function|role)|company size|number of employees", options: .caseInsensitive)
+    /// Words of a form that is about something else (a sales quote, a consultation, a report to the site, a robot check). A generic "Submit Request" button does not rescue it; only an opt-out or deletion wording of its own does.
+    private static let notOptOut = try! NSRegularExpression(pattern: "get a quote|request a (consultation|quote)|consultation|speak with|schedule a|what to report|contact(ing)? us|thank you for contacting|send (us )?a? ?message|put some numbers|confirm you are human|verify you are human", options: .caseInsensitive)
+    /// A box of type password that really asks for a password (an account), not one that only hides what is typed (the last four digits of a social security number, a phone number).
+    private static let passwordWord = try! NSRegularExpression(pattern: "pass\\s*word|passwort|contrase", options: .caseInsensitive)
+    private static let maskedData = try! NSRegularExpression(pattern: "ssn|social|last (4|four)|phone|digit|\\bpin\\b|\\btel\\b|mobile", options: .caseInsensitive)
+    private static let navigationToggle = try! NSRegularExpression(pattern: "navigation|\\bmenu\\b|submenu|hamburger", options: .caseInsensitive)
     private static let deceasedForm = try! NSRegularExpression(pattern: "deceased|decedent|late (husband|wife|mother|father)|passed away", options: .caseInsensitive)
     private static let identity = try! NSRegularExpression(pattern: "first|last|name|email|e-mail|address|zip|postal|phone|city", options: .caseInsensitive)
 
@@ -63,9 +74,17 @@ enum LiveFormPicker {
         guard !fields.isEmpty else { return -100 }       // a form wrapper can have no size while its fields show; only the fields count
         let buttons = f.buttons.joined(separator: " ")
         let heading = f.text
+        // A form whose email box is switched off is not the one that asks for the person's address (it comes after the emailed link): never filled.
+        if fields.contains(where: { $0.type == "email" && $0.disabled == true }) { return -100 }
         // A site that takes opt-outs only through its contact form: that form (name, email, a message box) is the one, and its own button does not matter.
         if contactFormRoutes.contains(where: { pageContext.lowercased().contains($0) }), fields.contains(where: { $0.type == "textarea" }),
            fields.contains(where: { $0.type == "email" || has(identity, $0.label + " " + $0.name) }) { return 6 }
+        if has(notOptOut, buttons + " " + String(heading.prefix(200)) + " " + (f.head ?? "")) && !has(strongOptOut, heading + " " + buttons + " " + (f.head ?? "")) { return -100 }
+        // A form that asks for a password is an account sign-in or sign-up (no opt-out form does); a "form" of nothing but menu toggles is the page's navigation.
+        if f.fields.contains(where: { $0.visible && has(passwordWord, $0.label + " " + $0.name) && !has(maskedData, $0.label + " " + $0.name) }) { return -100 }
+        if fields.allSatisfy({ ["checkbox", "radio"].contains($0.type) && has(navigationToggle, $0.label + " " + $0.name) }) { return -100 }
+        // Menus only, no button, and nothing about privacy in them or around them: a page's jump-to menu, not a request.
+        if f.buttons.isEmpty, fields.allSatisfy({ $0.type == "select" }), !has(optOut, fields.map { $0.label + " " + $0.name }.joined(separator: " ") + " " + heading + " " + (f.head ?? "")) { return -100 }
         // A sign-up, demo or contact form is refused outright unless its own button says opt-out ("Unsubscribe" is one); the page's privacy wording does not rescue it.
         if has(signup, buttons + " " + String(heading.prefix(200))) && !has(optOut, buttons) && !has(strongOptOut, heading) { return -100 }
         // The words around the inputs say "newsletter" or "delivered to your inbox": a subscription box, whatever its button says.
@@ -73,6 +92,9 @@ enum LiveFormPicker {
         // (A subscription box is small; a form with four or more inputs is not one, whatever sits near it.)
         // (Only the form's own button or words can rescue it: a footer's "Do Not Sell" link in the same block does not make a newsletter box an opt-out.)
         if fields.count <= 3 && has(signupContext, ctx) && !has(strongOptOut, heading + " " + buttons) { return -100 }
+        // A form for businesses (a business or work email, an industry, a job title: a footer's "Stay Updated" or a sales enquiry) is never a person's opt-out,
+        // unless its own button or words say opt out. The page's privacy wording does not rescue it.
+        if fields.contains(where: { has(businessField, $0.label + " " + $0.name) }) && !has(strongOptOut, heading + " " + buttons) && !has(optOut, buttons) { return -100 }
         // A form of one input (just an email) needs something that says it is a privacy request, not only a page that mentions privacy.
         // (A privacy-policy link beside a footer box does not count: only the button, the heading or a real opt-out phrase around it does.)
         if fields.count <= 1 && !has(optOut, buttons + " " + heading) && !has(strongOptOut, ctx) { return -100 }

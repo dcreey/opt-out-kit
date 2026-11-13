@@ -29,6 +29,61 @@ final class LiveFormPickerTests: XCTestCase {
         XCTAssertNil(LiveFormPicker.pick([box], pageContext: "/legal/do-not-sell-request Do Not Sell Request"), "a newsletter box is never filled, even on a do-not-sell page")
     }
 
+    /// Enformion's footer "Stay Updated" form: first name, last name, business email, industry and a "Submit" button, on a page about the right to opt out.
+    func testABusinessFooterFormIsNotFilledOnADoNotSellPage() {
+        func field(_ i: Int, _ type: String, _ label: String) -> LiveField { LiveField(token: "b-\(i)", name: label, type: type, label: label, required: true, visible: true) }
+        var footer = LiveForm(token: "b", action: "", method: "post", visible: true,
+                              fields: [field(0, "text", "First name*"), field(1, "text", "Last name*"), field(2, "email", "Business email*"), field(3, "select", "Industry*")],
+                              buttons: ["Submit"], text: "")
+        footer.ctx = "Stay Updated"
+        XCTAssertNil(LiveFormPicker.pick([footer], pageContext: "https://www.enformion.com/do-not-sell/ Do Not Sell My Personal Information Right to Opt-Out"))
+        let real = LiveForm(token: "r", action: "", method: "post", visible: true,
+                            fields: [field(0, "text", "First name"), field(1, "text", "Last name"), field(2, "email", "Email")], buttons: ["Submit"], text: "Do Not Sell/Right to Opt-out")
+        XCTAssertEqual(LiveFormPicker.pick([footer, real], pageContext: "Right to Opt-out")?.token, "r")
+    }
+
+    /// Peoplefinders' "Record Suppression Form": name, phone, birth date and address, with an email box the page ships switched off ("opt-out"). It comes after the emailed link.
+    func testAFormWhoseEmailBoxIsSwitchedOffIsNotFilled() {
+        func field(_ i: Int, _ type: String, _ label: String, disabled: Bool? = nil) -> LiveField { LiveField(token: "p-\(i)", name: "", type: type, label: label, required: true, visible: true, disabled: disabled) }
+        let later = LiveForm(token: "p", action: "", method: "post", visible: true,
+                             fields: [field(0, "text", "First Name"), field(1, "text", "Last Name"), field(2, "email", "Email", disabled: true), field(3, "tel", "Phone"), field(4, "text", "Street Address")],
+                             buttons: ["Submit"], text: "Record Suppression Form Please fill out the form below and then press the Submit button. we will locate your record and remove it")
+        XCTAssertNil(LiveFormPicker.pick([later], pageContext: "Opt Out - PeopleFinders Do Not Sell My Personal Information Right to Opt-out"))
+        let first = LiveForm(token: "q", action: "", method: "post", visible: true,
+                             fields: [field(0, "text", "First Name"), field(1, "text", "Last Name"), field(2, "email", "Email")], buttons: ["Submit"], text: "Right to Opt-Out")
+        XCTAssertEqual(LiveFormPicker.pick([later, first], pageContext: "Right to Opt-out")?.token, "q")
+    }
+
+    /// Forms the Chrome load check (2026-11-13) found being picked on pages about privacy: contact, quote, consultation, newsletter, sign-in and navigation "forms".
+    func testContactQuoteNewsletterLoginAndNavigationFormsAreNotOptOutForms() {
+        func f(_ token: String, _ fields: [(String, String)], buttons: [String], text: String, ctx: String? = nil) -> LiveForm {
+            var form = LiveForm(token: token, action: "", method: "post", visible: true,
+                                fields: fields.enumerated().map { LiveField(token: "\(token)-\($0.offset)", name: $0.element.1, type: $0.element.0, label: $0.element.1, required: false, visible: true) },
+                                buttons: buttons, text: text)
+            form.ctx = ctx; return form
+        }
+        let ctx = "Right to Opt-out Privacy Request"
+        let reportBox = f("a", [("text", "Name"), ("email", "Email"), ("tel", "Telephone"), ("textarea", "Your Message")], buttons: ["Submit"], text: "What to report Name Email Your Message")
+        let quote = f("b", [("text", "Name"), ("email", "Email"), ("tel", "Phone"), ("text", "Website"), ("textarea", "Question or comments")], buttons: ["GET A QUOTE"], text: "")
+        let consult = f("c", [("text", "Full Name"), ("email", "Email Address"), ("textarea", "Describe Your Research")], buttons: ["SUBMIT REQUEST"], text: "Request a Consultation")
+        let news = f("d", [("email", "Enter your email"), ("checkbox", "I agree to receive communications from us")], buttons: ["Submit"], text: "Join the newsletter to stay updated")
+        let login = f("e", [("text", "User Name"), ("password", "Password:"), ("email", "Email"), ("text", "First"), ("text", "Last")], buttons: ["Submit Your Request"], text: "Please identify yourself")
+        let nav = f("g", [("checkbox", "Open navigation menu"), ("radio", "Close submenu")], buttons: ["Open navigation menu"], text: "")
+        let human = f("h", [("checkbox", "I am human")], buttons: [], text: "Confirm you are human")
+        for form in [reportBox, quote, consult, news, login, nav, human] { XCTAssertNil(LiveFormPicker.pick([form], pageContext: ctx), form.token) }
+        var headed = f("i", [("text", "Name"), ("email", "Email"), ("tel", "Telephone"), ("textarea", "Your Message")], buttons: ["Submit"], text: "Name Email Telephone Your Message")
+        headed.head = "What to report"
+        XCTAssertNil(LiveFormPicker.pick([headed], pageContext: ctx), "the heading above the form says what it is")
+        let masked = f("m", [("text", "Name"), ("password", "Last 4 digits of Social Security Number"), ("email", "Email Address")], buttons: ["Submit Request"], text: "Non-Disclosure/Opt-Out Request")
+        XCTAssertEqual(LiveFormPicker.pick([masked], pageContext: ctx)?.token, "m", "a masked box is not an account password")
+        let jump = f("j", [("select", "DATA PRODUCTS"), ("select", "QUICK NAVIGATION")], buttons: [], text: "")
+        XCTAssertNil(LiveFormPicker.pick([jump], pageContext: "/california-privacy-rights"), "a jump-to menu is not a request")
+        var choose = f("k", [("select", "Please choose from the following options")], buttons: [], text: "Opt out Delete my information"); choose.head = "Privacy Rights Form"
+        XCTAssertEqual(LiveFormPicker.pick([choose], pageContext: "/privacy-rights")?.token, "k", "a request-type menu under a privacy heading is the first step of a request")
+        let real = f("r", [("text", "First name"), ("text", "Last name"), ("email", "Email")], buttons: ["Submit Privacy Request"], text: "Your privacy rights")
+        XCTAssertEqual(LiveFormPicker.pick([reportBox, quote, real], pageContext: ctx)?.token, "r")
+    }
+
     func testALeadOrReportButtonIsNeverAnOptOutForm() {
         for label in ["Get My FAFSA Guide", "Show My Report FREE"] {
             let box = LiveForm(token: "l", action: "", method: "post", visible: true,

@@ -19,7 +19,7 @@ final class FinishQuestion: ObservableObject {
         var needsEmail: Bool { self == .emailFollows || self == .unsure }
     }
 
-    /// `allowsNotYet`: the person tapped Mark as done, so "not yet" can take it back; after a send was confirmed there is nothing to take back.
+    /// `allowsNotYet`: whether "Not yet" is offered (every flow offers it: it keeps the person on the site and records nothing).
     struct Ask: Equatable { let site: String; let pageSaidEmail: Bool; let allowsNotYet: Bool }
     /// Set while the question is on screen.
     @Published private(set) var pending: Ask?

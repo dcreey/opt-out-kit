@@ -288,11 +288,25 @@ final class SemiAutomatedFlowTests: XCTestCase {
             let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
             let run = start(r)
             await until(r.finishQuestion.pending != nil)
-            XCTAssertEqual(r.finishQuestion.pending?.site, "a.example"); XCTAssertEqual(r.finishQuestion.pending?.allowsNotYet, false)
+            XCTAssertEqual(r.finishQuestion.pending?.site, "a.example"); XCTAssertEqual(r.finishQuestion.pending?.allowsNotYet, true)
             XCTAssertTrue(sink.results.isEmpty, "nothing is saved as done before the answer")
             r.finishQuestion.answer(answer); await finish(run, r)
             XCTAssertEqual(sink.results, [expected], "\(answer)")
         }
+    }
+
+    func testNotYetAfterASendKeepsThePersonOnTheSiteAndAsksAgainOnNext() async {
+        let page = Page(); page.texts = ["Thank you. Your request was received."]; let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink); r.asksAboutFollowUp = true
+        let run = start(r)
+        await until(r.finishQuestion.pending != nil)
+        r.finishQuestion.answer(.notYet)
+        await until(r.awaitingNext)
+        XCTAssertNil(r.finishQuestion.pending); XCTAssertEqual(r.index, 0, "still on the site")
+        r.next()
+        await until(r.finishQuestion.pending != nil)
+        r.finishQuestion.answer(.done); await finish(run, r)
+        XCTAssertEqual(sink.results.last, .submitted(awaitingEmail: false))
     }
 
     func testSkippingWhileAskedCountsAsNotSure() async {
