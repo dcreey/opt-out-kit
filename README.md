@@ -94,3 +94,7 @@ ZIP code places come from the GeoNames postal code data (geonames.org, Creative 
 [docs/DESIGN.md](docs/DESIGN.md) (design), [docs/AUTOMATION.md](docs/AUTOMATION.md) (what is automatic and why), [docs/DIRECTORY.md](docs/DIRECTORY.md) (directory format),
 [docs/VERIFICATION.md](docs/VERIFICATION.md), [docs/EXCLUDED_SITES.md](docs/EXCLUDED_SITES.md), [CLOSED_SITES.md](CLOSED_SITES.md), [docs/PERSISTENCE.md](docs/PERSISTENCE.md),
 [docs/LOCALIZATION.md](docs/LOCALIZATION.md).
+
+## License
+
+[MIT](LICENSE). The directory data (`directory/`, `brokers/`, `registries/`) is compiled from public pages and registries; each site's own name and marks belong to it.
