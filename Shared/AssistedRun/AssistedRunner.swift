@@ -163,6 +163,8 @@ final class AssistedRunner: ObservableObject {
     @Published private(set) var pageForms = (current: 1, total: 1)
     /// The address offered for this site was found on its own page, not on file: the screen says so, so the person checks it before sending.
     @Published private(set) var emailFoundOnPage = false
+    /// The site the no-form screen is about, with the address the email goes to: the offer carries an address the page gave (the directory's own entry has none).
+    var noFormEntry: DirectoryEntry? { emailOffer ?? current?.entry }
     /// Counts sites that were skipped (by the person, or because their page would not load), so the screen can show it.
     @Published private(set) var skippedCount = 0
     /// A page that would not load within 15 seconds, however many retries: skipped, and set aside for a week.
@@ -561,6 +563,8 @@ final class AssistedRunner: ObservableObject {
                 }
             }
             var final = outcome ?? .challenged("the check came back")
+            // The person emailed the site while its form was failing or waiting on them: that is the answer, not another failure to offer an email for.
+            if emailedFlag { if case .submitted = final {} else { final = .needsYou("skipped") } }
             if recordedEarly {
                 // Saved when the confirmation was noticed; the question comes now, with the confirmation still on screen, and a changed answer is saved over it.
                 if let asked = await askAboutFollowUp(items[i], final) { final = asked; correct(items[i], to: asked) }

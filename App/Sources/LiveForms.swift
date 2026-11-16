@@ -121,7 +121,7 @@ extension WebViewSession {
     func discoverFormsIn() async -> [LiveForm] {
         let js = #"""
         (function(){
-          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none';};
+          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!(r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none')) return false;if(r.right<=0||r.left>=window.innerWidth+2000) return false;for(var a=e.parentElement,n=0;a&&n<8;a=a.parentElement,n++){var as=getComputedStyle(a);if(as.overflow!=='visible'&&a.getBoundingClientRect().height<=0) return false;}return true;};
           var label=function(e){var t='';
             if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
@@ -390,7 +390,7 @@ extension WebViewSession {
         let js = #"""
         (function(token,wantE,wantP){
           var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return false;
-          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none';};
+          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!(r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none')) return false;if(r.right<=0||r.left>=window.innerWidth+2000) return false;for(var a=e.parentElement,n=0;a&&n<8;a=a.parentElement,n++){var as=getComputedStyle(a);if(as.overflow!=='visible'&&a.getBoundingClientRect().height<=0) return false;}return true;};
           function lab(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
             if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t+' '+(e.getAttribute('aria-label')||'')+' '+(e.placeholder||'')).replace(/\s+/g,' ');}
           function kind(e){var t=e.type||'text'; if(['hidden','checkbox','radio','submit','button','file','image','reset'].indexOf(t)>=0) return '';

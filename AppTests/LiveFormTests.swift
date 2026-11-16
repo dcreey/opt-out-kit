@@ -44,6 +44,31 @@ final class LiveFormTests: XCTestCase {
         XCTAssertFalse(got.contains("who=dead") || got.contains("who=agent"))
     }
 
+    /// ididata.com has a "bot trap" block (`height:0; overflow:hidden; left:-8000px`) with a confirmation menu, a date and an "I agree" box that a person never sees;
+    /// its own submit silently does nothing when any of them has a value. Guard only: the fill did not touch them in this fixture before the off-screen rule either.
+    func testBoxesInAnOffScreenBotTrapAreNeverFilled() async {
+        let html = """
+        <html><body><form id="opt" onsubmit="event.preventDefault(); var d=new FormData(this); var got=[]; d.forEach(function(v,k){got.push(k+'='+v);}); document.body.innerHTML='<p>Your request has been received. Check your email to confirm.</p><pre>'+got.join('&')+'</pre>';">
+          <h2>Do Not Sell My Personal Information</h2>
+          <label>First name *<input name="fn"></label>
+          <label>Last name *<input name="ln"></label>
+          <label>Email *<input type="email" name="em"></label>
+          <div style="height:0;position:absolute;overflow:hidden;margin:30px;padding:20px;left:-8000px;z-index:-1">
+            <label>Send confirmation to *<select name="trapMenu"><option value="">Choose</option><option value="Email">Email</option></select></label>
+            <label>Today's Date *<select name="trapMonth"><option value="">Month</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></label>
+            <label>Name *<input name="trapName"></label>
+            <label><input type="checkbox" name="trapAgree"> I have read and agree to Privacy Terms *</label>
+          </div>
+          <button type="button" onclick="this.form.requestSubmit()">OPT ME OUT</button>
+        </form></body></html>
+        """
+        let report = await FormRun.runLive(url: nil, html: html, person: pat, dryRun: false, maxWait: 6, capture: false)
+        XCTAssertEqual(report.outcome, .submitted(awaitingEmail: true), FormRun.debugLastPageText)
+        let got = FormRun.debugLastPageText
+        XCTAssertTrue(got.contains("fn=Pat") && got.contains("em=pat@example.com"), got)
+        XCTAssertFalse(got.contains("trapAgree=") || got.contains("trapMenu=Email") || got.contains("trapName=Pat") || got.contains("trapMonth=N") || got.contains("trapMonth=J"), "the trap stays empty: \(got)")
+    }
+
     /// A country-code menu beside the phone box already says +1, so the box takes the number alone; and what the person typed is not overwritten.
     func testAPhoneBoxBesideACountryCodeMenuTakesTheNumberAloneAndPersonEditsSurviveARefill() async throws {
         let html = """
@@ -450,6 +475,37 @@ final class LiveFormTests: XCTestCase {
         _ = await session.evalLive("(function(){var e=document.getElementById('cap'); e.removeAttribute('data-ook-user'); e.focus(); window.__ookUserAt=Date.now();})()")
         let ours = await session.codeBoxInUse()
         XCTAssertFalse(ours)
+    }
+
+    /// R+D and Definitive Healthcare: a person taps into the first box and the keyboard is up. A fill must still find what appeared after the first look (a box the
+    /// page's script added) and fill it, while the box they are in and anything they typed stay theirs.
+    func testFillAgainRescansThePageAndFillsNewBoxesEvenWhileThePersonIsInABox() async throws {
+        let html = "<html><body><form id=\"f\" onsubmit=\"event.preventDefault()\"><h2>Do Not Sell My Personal Information</h2><label>First name *<input name=\"fn\" id=\"fn\"></label><label>Email *<input type=\"email\" name=\"em\" id=\"em\"></label><div id=\"slot\"></div><button type=\"submit\">Submit</button></form></body></html>"
+        let session = WebViewSession.make(); defer { session.close() }
+        try await session.loadHTML(html)
+        let pageURL = URL(string: "https://example.com/opt-out")!
+        let found = await session.discoverForms(waitForFrames: false)
+        let context = await session.pageContext()
+        let live = try XCTUnwrap(LiveFormPicker.pick(found, pageContext: context))
+        let plan = FormFiller.plan(for: live.asOptOutForm(page: pageURL), signals: nil, person: pat)
+        let page = WebAssistedPage(session: session, plan: plan)
+        page.useLive(form: live.token, plan: plan, ownerMayConfirm: true)
+        page.remember(person: pat, advertisingID: nil, page: pageURL, signature: WebAssistedDriver.signature(live))
+        await page.refill()
+        // The page's script adds a last-name box later; the person taps into the first box (focus and a touch just now).
+        _ = await session.evalLive("(function(){var l=document.createElement('label'); l.innerHTML='Last name *<input name=\"ln\" id=\"ln\">'; document.getElementById('slot').appendChild(l); document.getElementById('fn').value=''; document.getElementById('fn').focus(); window.__ookUserAt=Date.now();})()")
+        let typing = await session.userIsTyping()
+        XCTAssertTrue(typing, "the setup has the person in a box")
+        await page.refill()
+        let ln = await read(session, "document.getElementById('ln').value")
+        let fn = await read(session, "document.getElementById('fn').value")
+        XCTAssertEqual(ln, "Example", "the box that appeared after the first look is filled")
+        XCTAssertEqual(fn, "Pat", "an empty box the person is in is filled when they ask for a fill")
+        // What they typed stays.
+        _ = await session.evalLive("(function(){var e=document.getElementById('ln'); e.value='Typed'; e.setAttribute('data-ook-user','1');})()")
+        await page.refill()
+        let kept = await read(session, "document.getElementById('ln').value")
+        XCTAssertEqual(kept, "Typed")
     }
 
     func testAPreviewFillsAndChoosesButSendsNothing() async {

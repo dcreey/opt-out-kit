@@ -501,6 +501,7 @@ final class EmailAndSkipFlowTests: XCTestCase {
         await wait(r.phase == .noForm)
         XCTAssertEqual(r.emailOffer?.contactEmail, "privacy@a.example", "the address came from the page")
         XCTAssertTrue(r.emailFoundOnPage, "and the screen can say so")
+        XCTAssertEqual(r.noFormEntry?.contactEmail, "privacy@a.example", "the no-form screen writes to the found address; with the directory's own entry (no address) Write the email did nothing")
         let b = EmailBatch.single(entries: [r.emailOffer!]).first!
         XCTAssertEqual(b.address, "privacy@a.example")
         h.open(b, composesInApp: false, url: URL(string: "mailto:privacy@a.example")!) { _ in }

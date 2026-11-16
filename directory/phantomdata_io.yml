@@ -21,5 +21,3 @@ live_form:
   found: true
   page: "https://app.phantomdata.io/do-not-sell"
   blockers: []
-contact_email: "privacy@phantomdata.io"
-contact_email_source: "browser"

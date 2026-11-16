@@ -171,8 +171,12 @@ final class WebAssistedPage: AssistedPage {
 
     func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
-    func adoptNewForm() async -> Bool {
-        if await session.userIsTyping() { return false }          // never fill or click while the person is typing in a box
+    func adoptNewForm() async -> Bool { await adoptNewForm(force: false) }
+
+    /// `force`: the fill itself asked for the rescan (Fill again, the first fill, each send), so being in a box does not stop it. What the person typed is kept either way:
+    /// a box they typed in carries their mark and is never overwritten.
+    func adoptNewForm(force: Bool) async -> Bool {
+        if !force, await session.userIsTyping() { return false }          // never fill or click on its own while the person is typing in a box
         guard let person, let pageURL, liveForm != nil else { return false }
         let frameBefore = session.activeFrame
         let forms = await session.discoverForms(waitForFrames: false)
@@ -198,7 +202,7 @@ final class WebAssistedPage: AssistedPage {
         _ = await session.chooseAutocomplete(state: stateName)
         _ = await session.chooseTileButtons()
         // More emails or phones than boxes: press the page's "Add another" button; the form then reads as a new one and its new boxes are filled.
-        if await session.addAnotherBoxes(form: new.token, emails: person.emails.count, phones: person.phones.count) > 0 { _ = await adoptNewForm() }
+        if await session.addAnotherBoxes(form: new.token, emails: person.emails.count, phones: person.phones.count) > 0 { _ = await adoptNewForm(force: force) }
         return true
     }
 
@@ -244,6 +248,10 @@ final class WebAssistedPage: AssistedPage {
 
     func refill() async {
         defer { Task { await notePresses() } }
+        if liveForm != nil {
+            // Every fill reads the page again first: boxes and forms that appeared after the first look (a script-built form, a step opened by a click) are found and filled too.
+            _ = await adoptNewForm(force: true)
+        }
         if let liveForm {
             textBeforeChoices = await session.visibleText()
             lastFill = await session.fillLive(plan.values)
@@ -253,7 +261,7 @@ final class WebAssistedPage: AssistedPage {
             let typedAhead = await session.chooseAutocomplete(state: stateName)          // a "State of Residence" that only counts a picked option
             _ = await session.chooseTileButtons()
             // Choosing "remove my information" (or a state) can reveal more boxes (name, birth year): read the form again and fill those too.
-            if options.chosen > 0 || typedAhead > 0 { _ = await adoptNewForm() }
+            if options.chosen > 0 || typedAhead > 0 { _ = await adoptNewForm(force: true) }
         } else { _ = await session.fillFields(plan.values) }
     }
 
@@ -524,7 +532,7 @@ struct AssistedOptOutView: View {
                     if runner.goingBack { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
                     else if let web = searchWebView { WebViewHost(webView: web).id("search\(runner.index)") }
                     else if let web = pageWebView { WebViewHost(webView: web).id(runner.index) }
-                    else if runner.phase == .noForm, let entry = runner.current?.entry { noFormCard(entry) }
+                    else if runner.phase == .noForm, let entry = runner.noFormEntry { noFormCard(entry) }
                     else { LoadingMark(title: Loc.t("Loading the form…")).frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }
                 .frame(maxHeight: .infinity)

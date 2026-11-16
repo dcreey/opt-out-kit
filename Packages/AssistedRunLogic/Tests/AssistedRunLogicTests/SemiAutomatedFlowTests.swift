@@ -157,6 +157,18 @@ final class SemiAutomatedFlowTests: XCTestCase {
         }
     }
 
+    /// Reported: "Send an email instead" on a site whose form had not gone through, "Yes, I sent it" on return, and the app said the form did not go through and offered the email again.
+    func testEmailingASiteWhoseFormDidNotGoThroughRecordsItAsEmailedAndOffersNothing() async {
+        let sink = Sink()
+        let r = make([item("a.example", email: "privacy@a.example")], Driver(["a.example": Page(sends: [.failed("no success message was shown")])]), sink)
+        let run = start(r)
+        await until({ if case .needsMore = r.phase { return true } else { return false } }())
+        r.finishByEmail()
+        await finish(run, r)
+        XCTAssertEqual(sink.results, [.emailed], "emailed, not failed")
+        XCTAssertNil(r.emailOffer, "no second offer to write the email")
+    }
+
     func testARateLimitIsNotHeldAgainstTheSite() async {
         let sink = Sink()
         let r = make([item("a.example")], Driver(["a.example": Page(sends: [.failed(AutoOptOut.rateLimited)])]), sink)
