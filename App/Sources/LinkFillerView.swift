@@ -199,7 +199,7 @@ struct LinkFillerView: View {
     /// The page, with the guide's controls above it in the same place and style as Solve and send: always at the top, so the page below can use the rest of the screen.
     private func loaded(_ web: WKWebView) -> some View {
         VStack(spacing: 0) {
-            GuideSurface(topInset: 0) {
+            GuideSurface(topInset: 0, collapsed: $guideCollapsed) {
                 HStack(spacing: 10) {
                     Menu {
                         PageMenu.items(web: web, fillTitle: "Fill in my details", idPrefix: "link", fillID: "fill", canFill: !filler.busy, details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { if case .known(let id, _, _, _)? = check { model.addFollowUpStep(id) } }) {

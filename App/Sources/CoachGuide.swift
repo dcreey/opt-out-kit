@@ -48,16 +48,21 @@ struct CoachGuideSheet: View {
     let done: () -> Void
 
     var body: some View {
-        VStack(spacing: 18) {
-            Image(systemName: guide.symbol).font(.system(size: 48)).foregroundStyle(.tint).padding(.top, 28)
-            Text(guide.title).font(.title2.bold()).multilineTextAlignment(.center)
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(guide.points, id: \.self) { Label($0, systemImage: "checkmark.circle").font(.callout).fixedSize(horizontal: false, vertical: true) }
+        // The content scrolls and the button is pinned below it, so a long guide never pushes "Got it" off the sheet.
+        ScrollView {
+            VStack(spacing: 18) {
+                Image(systemName: guide.symbol).font(.system(size: 48)).foregroundStyle(.tint).padding(.top, 28)
+                Text(guide.title).font(.title2.bold()).multilineTextAlignment(.center)
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(guide.points, id: \.self) { Label($0, systemImage: "checkmark.circle").font(.callout).fixedSize(horizontal: false, vertical: true) }
+                }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
-            Spacer()
+            .padding(.bottom, 12)
+        }
+        .safeAreaInset(edge: .bottom) {
             Button("Got it", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("coach-done")
-                .padding(.bottom, 24)
+                .padding(.vertical, 12).frame(maxWidth: .infinity).background(.regularMaterial)
         }
         .presentationDetents([.medium, .large])
         .accessibilityIdentifier("coach-guide")

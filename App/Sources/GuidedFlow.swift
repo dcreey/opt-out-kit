@@ -413,7 +413,7 @@ struct GuidedPanel: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            GuideSurface(topInset: topInset) {
+            GuideSurface(topInset: topInset, collapsed: $guideCollapsed) {
                 HStack(spacing: 10) {
                     Menu {
                         PageMenu.items(web: runner.webView, idPrefix: "guided", details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { runner.flagEmailStep(); model.addFollowUpStep(runner.siteID) }) { runner.fillAgain() }

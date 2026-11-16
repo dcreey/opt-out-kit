@@ -428,7 +428,7 @@ struct AssistedOptOutView: View {
     private var working: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
-                GuideSurface(topInset: geo.safeAreaInsets.top) {
+                GuideSurface(topInset: geo.safeAreaInsets.top, collapsed: $guideCollapsed) {
                     // The actions come first: everything about the site as a whole in the menu, the step's own buttons beside it.
                     HStack(spacing: 10) {
                         Menu {

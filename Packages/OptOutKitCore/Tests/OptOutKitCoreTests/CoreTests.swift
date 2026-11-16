@@ -3804,4 +3804,15 @@ final class SiteFilterTests: XCTestCase {
         f = SiteFilter(status: .done); f.text = "q"; f.inRegion = true; f.clear()
         XCTAssertFalse(f.narrowed); XCTAssertEqual(f.text, "q", "clearing filters keeps the search text")
     }
+
+    func testAGuideWithNoKnownFormOpensThePageTheLiveCheckFoundTheFormOn() {
+        var e = DirectoryEntry(id: "d", domain: "d.example", name: "d", bucket: "registry", tier: .A, automation: .scriptable, signals: [])
+        e.optOutURL = URL(string: "https://d.example/")
+        e.liveForm = LiveFormCheck(checked: "2026-11-13", found: true, page: "https://d.example/privacy-request")
+        guard case .openPage(let url)? = GuidedPlanner.plan(for: e).steps.first?.action else { return XCTFail("first step opens a page") }
+        XCTAssertEqual(url.absoluteString, "https://d.example/privacy-request")
+        e.liveForm = nil
+        guard case .openPage(let home)? = GuidedPlanner.plan(for: e).steps.first?.action else { return XCTFail() }
+        XCTAssertEqual(home.absoluteString, "https://d.example/", "no live form: the recorded page is used")
+    }
 }

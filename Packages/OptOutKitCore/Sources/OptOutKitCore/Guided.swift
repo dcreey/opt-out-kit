@@ -217,7 +217,9 @@ public enum GuidedPlanner {
             add(L10n.t("We send it"), L10n.t("Then we look for the site's confirmation."), .send, .formSent)
             return GuidedPlan(siteID: entry.id, siteName: entry.domain, steps: steps, addsEmailStepAfterSend: true)
         }
-        let start = entry.optOutURL ?? URL(string: "https://\(entry.domain)/")!
+        // The page the live check found the form on beats a home page the profiler guessed (draup.com and acronymix.com opened their sales pages).
+        let liveStart = entry.liveForm?.found == true ? entry.liveForm?.page.flatMap { URL(string: $0) } : nil
+        let start = liveStart ?? entry.optOutURL ?? URL(string: "https://\(entry.domain)/")!
         add(L10n.t("Open the site's opt-out page"), entry.domain, .openPage(start), .pageLoaded)
         // No known form: the app still scans the live page for one (following its opt-out links) and fills it in. If it finds none, the person does it.
         add(L10n.t("We look for the opt-out form and fill it in"), L10n.t("If we cannot find it, find the form yourself and fill it in, then tap Next step."), .autofill, .formFilled)

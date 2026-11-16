@@ -155,3 +155,5 @@ The watcher (`AssistedRunner`) refills a page when it changes, presses send when
 (`FormRun.classify`, `classifyConfirmed`, `looksFinished`). Anything the person must do (a human check, terms, a code, a menu with no choice for them)
 pauses it; the person finishes, and "Mark as done" is always the fallback. Because a refill happens while the person is typing, rule 3 above is what makes
 that safe.
+
+2026-11-13: a guide for a site with no recorded form (`GuidedPlanner.plan(for: DirectoryEntry)`) opens the page the live check found the form on (`live_form.page`) in preference to `opt_out_url`, which for `draup.com` and `acronymix.com` was a sales home page. Test: `testAGuideWithNoKnownFormOpensThePageTheLiveCheckFoundTheFormOn`.

@@ -27,9 +27,14 @@ struct GuideBoundary: View {
 /// Black ground for the guide's controls and words; it runs up behind the status bar.
 struct GuideSurface<Content: View>: View {
     let topInset: CGFloat
+    /// When set, a grabber at the bottom edge rolls the guide up with a swipe up and opens it with a swipe down (the ^ button does the same).
+    var collapsed: Binding<Bool>? = nil
     @ViewBuilder var content: Content
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) { content }
+        VStack(alignment: .leading, spacing: 8) {
+            content
+            if let collapsed { grabber(collapsed) }
+        }
             .padding(.horizontal, 14).padding(.top, topInset + 6).padding(.bottom, 6)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.black)
@@ -38,12 +43,41 @@ struct GuideSurface<Content: View>: View {
     }
 }
 
+extension GuideSurface {
+    private func grabber(_ collapsed: Binding<Bool>) -> some View {
+        Capsule().fill(Color.white.opacity(0.35)).frame(width: 40, height: 5)
+            .frame(maxWidth: .infinity).frame(height: 22).contentShape(Rectangle())
+            .gesture(DragGesture(minimumDistance: 12).onEnded { drag in
+                if drag.translation.height < -12 { withAnimation(.easeInOut(duration: 0.2)) { collapsed.wrappedValue = true } }
+                else if drag.translation.height > 12 { withAnimation(.easeInOut(duration: 0.2)) { collapsed.wrappedValue = false } }
+            })
+            .accessibilityHidden(true)
+            .accessibilityIdentifier("guide-grabber")
+    }
+}
+
 /// The ^ beside the guide's … button: rolls the guide up to its top row and one line, so the site's page gets the room. The choice is kept for every guide.
 struct GuideCollapseButton: View {
     @Binding var collapsed: Bool
+    /// The first time the guide is shown, the button pulses and a bubble says what it does; seen once, never again.
+    @AppStorage("guide.collapseHintSeen") private var hintSeen = false
+    @State private var pulse = false
     var body: some View {
-        Button { withAnimation(.easeInOut(duration: 0.2)) { collapsed.toggle() } } label: {
+        Button { hintSeen = true; withAnimation(.easeInOut(duration: 0.2)) { collapsed.toggle() } } label: {
             Image(systemName: collapsed ? "chevron.down.circle" : "chevron.up.circle").font(.title2)
+                .scaleEffect(!hintSeen && pulse ? 1.25 : 1)
+        }
+        .overlay(alignment: .bottom) {
+            if !hintSeen {
+                Text(Loc.t("Roll the guide up")).font(.caption2.bold()).foregroundStyle(.black).lineLimit(1).fixedSize()
+                    .padding(.horizontal, 8).padding(.vertical, 4).background(Color.exnayGold, in: Capsule())
+                    .offset(y: 30).allowsHitTesting(false).accessibilityHidden(true).accessibilityIdentifier("guide-collapse-hint")
+            }
+        }
+        .onAppear {
+            guard !hintSeen else { return }
+            withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) { pulse = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 8) { hintSeen = true }
         }
         .accessibilityLabel(collapsed ? Loc.t("Show the whole guide") : Loc.t("Roll the guide up")).accessibilityIdentifier("guide-collapse")
     }
