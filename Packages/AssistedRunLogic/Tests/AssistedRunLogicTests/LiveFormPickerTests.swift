@@ -20,6 +20,22 @@ final class LiveFormPickerTests: XCTestCase {
         XCTAssertNil(LiveFormPicker.pick([trial, subscribe]), "a page with only marketing forms has no opt-out form")
     }
 
+    /// peoplewhiz.com: its removal page opens on a "Search Now" form (first name, last name, city, state) under "Remove Your Personal Information From Our Search Results".
+    /// That search is the first step of the removal and is filled; the same search box at the top of its privacy policy is not.
+    func testASearchStepUnderARemoveYourInformationHeadingIsFilledButAPlainSearchBoxIsNot() {
+        func search(head: String) -> LiveForm {
+            var f = LiveForm(token: "s", action: "https://www.peoplewhiz.com/remove-my-info", method: "get", visible: true,
+                             fields: ["First Name", "Last Name", "City"].enumerated().map { LiveField(token: "s-\($0.offset)", name: $0.element, type: "text", label: $0.element, required: false, visible: true) }
+                                + [LiveField(token: "s-3", name: "state", type: "select", label: "State", required: false, visible: true)],
+                             buttons: ["Search Now"], text: "")
+            f.head = head
+            return f
+        }
+        XCTAssertEqual(LiveFormPicker.pick([search(head: "Remove Your Personal Information From Our Search Results")], pageContext: "/remove-my-info Remove My Info - PeopleWhiz")?.token, "s")
+        XCTAssertEqual(LiveFormPicker.pick([search(head: "")], pageContext: "/remove-my-info Remove My Info - PeopleWhiz")?.token, "s", "the heading may sit where the form's own lookup cannot see it; the page's address and title say it too")
+        XCTAssertNil(LiveFormPicker.pick([search(head: "Search Public Records")], pageContext: "/privacy background checks PeopleWhiz Privacy Policy"), "a search box on a policy page is not an opt-out")
+    }
+
     /// Veraset's footer box: one email input, a plain "Submit" button, and only "By subscribing, you consent to our Privacy Policy and receive updates" around it.
     func testAFooterNewsletterBoxWithAPrivacyLinkIsNotAnOptOutForm() {
         var box = LiveForm(token: "n", action: "", method: "get", visible: true,

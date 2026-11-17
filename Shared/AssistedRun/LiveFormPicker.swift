@@ -62,6 +62,8 @@ enum LiveFormPicker {
         let own = f.buttons.joined(separator: " ") + " " + f.text + " " + (f.ctx ?? "")
         return has(strongOptOut, own) || has(ownWords, f.buttons.joined(separator: " "))
     }
+    private static let removalHeading = try! NSRegularExpression(pattern: "remove[ -](your|my)[ -](personal[ -])?(info|information|data|record|listing)|opt.?out|do not sell|delete (your|my)", options: .caseInsensitive)
+    private static let searchButton = try! NSRegularExpression(pattern: "^\\s*search( now)?\\s*$", options: .caseInsensitive)
     private static let ownWords = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|unsubscribe|delete|remove|erase", options: .caseInsensitive)
 
     /// Sites whose way to opt out is their contact form (they have no request form and no email), so it is the form to fill: the request goes in its message box.
@@ -103,7 +105,10 @@ enum LiveFormPicker {
         if has(optOut, heading) { s += 2 }
         // A form for a deceased person (a suppression list for the dead) is never the opt-out of a living one.
         if has(deceasedForm, heading + " " + buttons + " " + pageContext.prefix(300)) { s -= 8 }
-        if has(marketing, buttons) { s -= 6 }
+        // A people-search site's removal starts with a search of its own records: a "Search" button under a heading that says to remove your information is that first step, not marketing.
+        let removalHead = has(removalHeading, (f.head ?? "") + " " + heading + " " + pageContext)
+        if removalHead { s += 2 }
+        if has(marketing, buttons) && !(removalHead && has(searchButton, buttons)) { s -= 6 }
         if has(marketing, heading) && !has(optOut, buttons) { s -= 3 }
         if has(optOut, pageContext) { s += 3 }
         s += min(4, fields.filter { has(identity, $0.label + " " + $0.name) }.count)

@@ -554,6 +554,8 @@ final class AppModel: ObservableObject {
     @Published var showProfileGate = false
     /// A link shared to Exnay from another app (exnay://link?u=…): the Email links tab loads it.
     @Published var incomingLink: String?
+    /// A sheet over the whole app (the last run's report, the profile gate, what's new, the walkthrough): a link shared in waits behind it and opens when it is gone, since a page or a question cannot show under a sheet.
+    var coveredByASheet: Bool { if runReport != nil || showProfileGate { return true }; if case .nothing = pending { return false }; return true }
 
     /// The web address inside an exnay://link?u=… address, https only.
     static func sharedLink(in url: URL) -> String? {
@@ -935,6 +937,8 @@ final class AppModel: ObservableObject {
     }
 
     func checkLink(_ url: URL) -> LinkCheck { LinkCheck.check(url, entries: directory, attempts: progress.optOutAttempts) }
+    /// A site the person chose for a link, with what is known of its request (finished when, waiting on an email).
+    func linkState(for entry: DirectoryEntry) -> LinkCheck { LinkCheck.state(of: entry, attempts: progress.optOutAttempts) }
 
     private static let linkTourKey = "linkfiller.toured"
     var shouldTourLinkFiller: Bool { !defaults.bool(forKey: Self.linkTourKey) }

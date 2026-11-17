@@ -277,6 +277,29 @@
     }
    }
   },
+  "%@ is already marked finished": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ est déjà marqué comme terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ ya está marcado como terminado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ ist bereits als erledigt markiert"
+     }
+    }
+   }
+  },
   "%@ is building one request that reaches every registered broker. We will add it when it opens.": {
    "extractionState": "manual",
    "localizations": {
@@ -319,6 +342,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "%@ steht nicht in Ihrer Liste, der Link stammt also vielleicht nicht von einem Opt-out, das Sie gestartet haben. Öffnen Sie ihn nur, wenn Sie sicher sind."
+     }
+    }
+   }
+  },
+  "%@ is not an address we know for any site in your list. If the link is from one of your requests, search for that site and choose it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ n'est une adresse connue d'aucun site de votre liste. Si le lien vient de l'une de vos demandes, recherchez ce site et choisissez-le."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ no es una dirección que conozcamos para ningún sitio de tu lista. Si el enlace es de una de tus solicitudes, busca ese sitio y elígelo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%@ ist keine Adresse, die wir für eine Website in Ihrer Liste kennen. Stammt der Link von einer Ihrer Anfragen, suchen Sie die Website und wählen Sie sie aus."
      }
     }
    }
@@ -2370,6 +2416,29 @@
     }
    }
   },
+  "A request to %@ was finished on %@. Does this link ask for more: a confirmation, another form or another step?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une demande à %@ a été terminée le %@. Ce lien demande-t-il autre chose : une confirmation, un autre formulaire ou une autre étape ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una solicitud a %@ se terminó el %@. ¿Este enlace pide algo más: una confirmación, otro formulario u otro paso?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Anfrage an %@ wurde am %@ abgeschlossen. Verlangt dieser Link mehr: eine Bestätigung, ein weiteres Formular oder einen weiteren Schritt?"
+     }
+    }
+   }
+  },
   "A request to %@ was finished on %@. You usually do not need this link again.": {
    "extractionState": "manual",
    "localizations": {
@@ -3493,6 +3562,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Alle Nachrichten gesendet"
+     }
+    }
+   }
+  },
+  "All sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todos los sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Websites"
      }
     }
    }
@@ -11202,6 +11294,52 @@
     }
    }
   },
+  "It is a different site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "C'est un autre site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es otro sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Es ist eine andere Website"
+     }
+    }
+   }
+  },
+  "It is none of these: open the link anyway": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun de ceux-ci : ouvrir quand même le lien"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ninguno de estos: abrir el enlace de todos modos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine davon: Link trotzdem öffnen"
+     }
+    }
+   }
+  },
   "It is not a consumer reporting agency. You agree not to use what you find for credit, insurance, employment or tenant decisions.": {
    "extractionState": "manual",
    "localizations": {
@@ -14606,6 +14744,52 @@
     }
    }
   },
+  "No site matches that. Try part of its name or its web address.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun site ne correspond. Essayez une partie de son nom ou de son adresse web."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ningún sitio coincide. Prueba con parte de su nombre o de su dirección web."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine Website passt dazu. Versuchen Sie einen Teil des Namens oder der Webadresse."
+     }
+    }
+   }
+  },
+  "No, it is finished": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non, c'est terminé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No, está terminado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nein, es ist erledigt"
+     }
+    }
+   }
+  },
   "No, stay on this page": {
    "extractionState": "manual",
    "localizations": {
@@ -15039,6 +15223,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Für %@ wurde noch nichts ausgeführt."
+     }
+    }
+   }
+  },
+  "Nothing is filled in or marked finished for a link we cannot match to a site. Only open it if you trust where it came from.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien n'est rempli ni marqué comme terminé pour un lien que nous ne pouvons pas associer à un site. Ne l'ouvrez que si vous faites confiance à sa provenance."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No se rellena ni se marca como terminado nada para un enlace que no podemos asociar con un sitio. Ábrelo solo si confías en su origen."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für einen Link, den wir keiner Website zuordnen können, wird nichts ausgefüllt oder als erledigt markiert. Öffnen Sie ihn nur, wenn Sie der Herkunft vertrauen."
      }
     }
    }
@@ -19229,6 +19436,29 @@
     }
    }
   },
+  "Search all sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rechercher dans tous les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscar en todos los sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Websites durchsuchen"
+     }
+    }
+   }
+  },
   "Search all sites by name or web address": {
    "extractionState": "manual",
    "localizations": {
@@ -20743,6 +20973,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Seiten, die Festnahme-, Fahndungsfoto- und Gerichtsakten aus öffentlichen Quellen erneut veröffentlichen. Sie verdienen mit Werbung und oft damit, Geld für das Entfernen eines Eintrags zu verlangen. Da sie Einträge kopieren, kann derselbe Eintrag auf vielen davon stehen."
+     }
+    }
+   }
+  },
+  "Sites that use %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sites qui utilisent %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sitios que usan %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Websites, die %@ verwenden"
      }
     }
    }
@@ -24956,6 +25209,29 @@
     }
    }
   },
+  "This link is from %@, an address that more than one site uses, so we cannot tell which request it belongs to. Choose the site, so the right one is filled in and marked finished.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce lien provient de %@, une adresse utilisée par plusieurs sites ; nous ne pouvons donc pas savoir à quelle demande il appartient. Choisissez le site, afin que la bonne demande soit remplie et marquée comme terminée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este enlace es de %@, una dirección que usa más de un sitio, así que no podemos saber a qué solicitud pertenece. Elige el sitio para que se rellene y se marque como terminada la correcta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Link stammt von %@, einer Adresse, die mehrere Websites nutzen. Wir können daher nicht erkennen, zu welcher Anfrage er gehört. Wählen Sie die Website, damit die richtige ausgefüllt und als erledigt markiert wird."
+     }
+    }
+   }
+  },
   "This link is not from a site in your list. Be careful what you enter.": {
    "extractionState": "manual",
    "localizations": {
@@ -26612,6 +26888,29 @@
     }
    }
   },
+  "We could not tell which site this link is for. Tap to choose it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nous n'avons pas pu savoir pour quel site est ce lien. Touchez pour le choisir."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No pudimos saber para qué sitio es este enlace. Toca para elegirlo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wir konnten nicht erkennen, für welche Website dieser Link ist. Tippen Sie, um sie zu wählen."
+     }
+    }
+   }
+  },
   "We do not have %@'s data protection rules yet. Most brokers still accept opt-out requests from anyone, and that is what this app sends.": {
    "extractionState": "manual",
    "localizations": {
@@ -28061,6 +28360,29 @@
     }
    }
   },
+  "Which site is this for?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pour quel site est-ce ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Para qué sitio es?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für welche Website ist das?"
+     }
+    }
+   }
+  },
   "Who": {
    "extractionState": "manual",
    "localizations": {
@@ -28452,6 +28774,29 @@
     }
    }
   },
+  "Yes, it needs more: open it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Oui, il faut autre chose : l'ouvrir"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sí, hace falta más: abrirlo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ja, es ist mehr nötig: öffnen"
+     }
+    }
+   }
+  },
   "Yes, it was sent": {
    "extractionState": "manual",
    "localizations": {
@@ -28793,6 +29138,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie tragen das Risiko. Die Einträge sind „wie besehen“ und können falsch sein, sie sind keine Rechtsberatung, und die Website schließt jede Gewährleistung aus und beschränkt ihre Haftung auf null."
+     }
+    }
+   }
+  },
+  "You chose %@ for this link.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez choisi %@ pour ce lien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elegiste %@ para este enlace."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben %@ für diesen Link gewählt."
+     }
+    }
+   }
+  },
+  "You chose %@, but this link's address is not one we know for that site. Check the address above before you enter anything.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez choisi %@, mais l'adresse de ce lien n'en est pas une que nous connaissons pour ce site. Vérifiez l'adresse ci-dessus avant de saisir quoi que ce soit."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elegiste %@, pero la dirección de este enlace no es una que conozcamos para ese sitio. Revisa la dirección de arriba antes de escribir nada."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben %@ gewählt, aber die Adresse dieses Links kennen wir für diese Website nicht. Prüfen Sie die Adresse oben, bevor Sie etwas eingeben."
      }
     }
    }

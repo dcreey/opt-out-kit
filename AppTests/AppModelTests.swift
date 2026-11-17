@@ -330,6 +330,19 @@ final class SharedLinkTests: XCTestCase {
         XCTAssertNil(AppModel.sharedLink(in: URL(string: "exnay://other?u=https%3A%2F%2Fexample.com")!))
         XCTAssertNil(AppModel.sharedLink(in: URL(string: "https://example.com")!))
     }
+
+    /// The first share of the day opened the app under the previous run's report sheet; the link was taken while nothing could show it and was lost.
+    func testALinkSharedUnderASheetWaitsUntilTheSheetIsGone() {
+        let model = makeModel()
+        XCTAssertTrue(model.coveredByASheet, "a first launch shows its walkthrough")
+        model.finishAnnouncements()
+        model.showProfileGate = false
+        XCTAssertFalse(model.coveredByASheet)
+        model.showProfileGate = true
+        XCTAssertTrue(model.coveredByASheet, "any sheet over the app holds a shared link back")
+        model.showProfileGate = false
+        XCTAssertFalse(model.coveredByASheet)
+    }
 }
 
 @MainActor

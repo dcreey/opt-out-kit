@@ -162,3 +162,20 @@ biggest reward ("51 sites cleared").
 2. Which of the 51 sites need a separate request anyway (the sites showing their own CAPTCHA at the search step)?
 3. Can WKWebView ever fill forms on challenge-protected sites, or is Safari View Controller plus copy chips the ceiling?
    Decided by the simulator probe (milestone 2).
+
+
+## A link shared in while a sheet is open
+
+On the first open of a day the app can show the last run's report as a sheet (and the first launch shows its walkthrough, the profile gate and What's new the same way). A link shared to Exnay from a mail app at that moment is held, not dropped: the Email links tab opens it as soon as the sheet is closed (`AppModel.coveredByASheet`, `LinkFillerView.takeIncomingLink`). Before, the link was taken while the sheet covered the tab, so its page and questions could not show and the person had to close the sheet and share again.
+
+## Which site is this link for?
+
+Many sites send people to the same address: privacy-portal providers (OneTrust alone serves about 90 sites in the list), groups of sister sites. A link from an email therefore cannot always say which request it belongs to, so the app no longer guesses (`LinkCheck.check`, `OptOutKitCore`):
+
+- **One site uses the address:** it is that site, as before.
+- **A provider's tenant address** (`blackbaud-privacy.my.onetrust.com`: a name of its own before the provider) is that one site.
+- **Anything else on a shared address** (`privacyportal.onetrust.com`, even if one site's page is recorded there) and **an address nobody uses** opens the **Which site is this for?** screen before the page loads: the sites that use the address (those waiting on an email first, the site recorded at that address next), the other sites waiting on an email, and a search box over every site in the list (names and web addresses, prefix matches first). "It is none of these: open the link anyway" loads the page with nothing filled in or marked.
+- **A chosen site** gets the same fill-and-send as a matched link when the link's address is one that site is known by (its domain, an opt-out page's host, a subdomain). For a site picked by hand at an address it is not known by, the page is only loaded and the guide says so in orange ("You chose X, but this link's address is not one we know for that site"); nothing is filled or sent for the person.
+- **A page already open with no site matched:** the guide line reads "We could not tell which site this link is for. Tap to choose it", and **Mark completed** opens the same screen, then finishes the site chosen.
+
+**A site already marked finished:** the link no longer just says so. The app asks "*Site* is already marked finished. Does this link ask for more: a confirmation, another form or another step?" with **Yes, it needs more: open it** (the site goes back on the waiting list until that step is done, and the page opens as usual), **It is a different site** (the screen above) and **No, it is finished** (nothing opens).

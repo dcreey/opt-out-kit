@@ -93,6 +93,8 @@ final class LinkFiller: ObservableObject {
     }
 
     func pageText() async -> String { await session?.viewportText() ?? "" }
+    /// The address of the page on screen.
+    var currentURL: URL? { session?.webView.url }
 
     func close() { sentQuestion.dismiss(); page = nil; session?.close(); session = nil; webView = nil; host = ""; status = "" }
 }
@@ -103,6 +105,11 @@ struct LinkFillerView: View {
     @State private var text = ""
     @State private var check: LinkCheck?
     @State private var asking: (url: URL, check: LinkCheck)?
+    /// A link that could be several sites, or none we know: the person is choosing which.
+    @State private var choosing: PendingLink?
+    /// The person named the site for this link; `pickedTrusted` is whether the link's address is one that site is known by.
+    @State private var picked = false
+    @State private var pickedTrusted = true
     @State private var showTour = false
     @State private var finished = false
     @State private var showDone = false
@@ -125,14 +132,27 @@ struct LinkFillerView: View {
         }
         .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…"), cancel: { filler.cancelLoading(); returnToChooser() }).transition(.opacity) } }
         .onChange(of: model.incomingLink) { _, _ in takeIncomingLink() }
+        // The link waits for the sheet to be gone, and a moment more: a sheet or a question asked while the last one is still sliding away is dropped.
+        .onChange(of: model.coveredByASheet) { _, covered in if !covered { Task { try? await Task.sleep(nanoseconds: 800_000_000); takeIncomingLink() } } }
         .overlay { if showDone { SentCheck().transition(.opacity) } }
         .onAppear { filler.autoSubmit = { model.autoSubmit } }
         .task(id: filler.webView == nil) { await watchForCompletion() }
         .sentQuestionAlert(filler.sentQuestion)
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
+        .sheet(item: $choosing) { pending in
+            LinkSitePicker(pending: pending, directory: model.directory, waiting: Set(model.pendingFollowUps.map(\.entry.id)),
+                           choose: { entry in pickSite(entry, for: pending) },
+                           openAnyway: pending.url.map { url in { choosing = nil; open(url, pending.check, fill: false) } },
+                           cancel: { choosing = nil; if pending.url != nil { returnToChooser() } })
+        }
+        // A site already marked finished: the link may still be right, when the email asked for more (a confirmation, another form, another step).
         .confirmationDialog(askTitle, isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }), titleVisibility: .visible, presenting: asking) { a in
-            Button(isUnknown(a.check) ? "Open it anyway" : "Open it again", role: isUnknown(a.check) ? .destructive : nil) { open(a.url, a.check) }
-            Button("Don't open", role: .cancel) {}
+            Button("Yes, it needs more: open it") {
+                if case .known(let id, _, _, _) = a.check { model.addFollowUpStep(id) }          // back on the waiting list until the extra step is done
+                open(a.url, a.check)
+            }.accessibilityIdentifier("link-needs-more")
+            Button("It is a different site") { choosing = PendingLink(url: a.url, check: .unknown(host: a.url.host ?? "")) }
+            Button("No, it is finished", role: .cancel) { returnToChooser() }
         } message: { a in Text(askMessage(a.check)) }
         .onAppear {
             if model.incomingLink != nil { takeIncomingLink() }
@@ -227,26 +247,38 @@ struct LinkFillerView: View {
         .finishQuestionAlert(finishQuestion)
     }
 
-    /// Mark completed is always there: it finishes the request for the site the link matched, or it is dimmed and the line below says why it cannot.
+    /// Mark completed is always there: it finishes the request for the site the link matched. When the link is not matched to a site, it asks which site it is.
     private var markCompletedButton: some View {
         let matched: String? = { if case .known(let id, _, _, _)? = check { return id } else { return nil } }()
-        return Button { if let matched { Task { await finish(matched) } } } label: { Text("Mark completed") }
+        return Button {
+            if let matched { Task { await finish(matched) } }
+            else { choosing = PendingLink(url: nil, check: check ?? .unknown(host: filler.host)) }
+        } label: { Text("Mark completed") }
             .buttonStyle(GuideSecondaryStyle())
-            .disabled(matched == nil || showDone).opacity(matched == nil ? 0.45 : 1).accessibilityIdentifier("link-finished")
+            .disabled(showDone).accessibilityIdentifier("link-finished")
     }
 
     @ViewBuilder private var matchLine: some View {
         if case .known(_, let name, _, _)? = check {
-            Label(Loc.f("This link matches %@, a site in your list.", name), systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(.green).accessibilityIdentifier("link-match")
+            if picked && !pickedTrusted {
+                Label(Loc.f("You chose %@, but this link's address is not one we know for that site. Check the address above before you enter anything.", name), systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-no-match")
+            } else if picked {
+                Label(Loc.f("You chose %@ for this link.", name), systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(.green).accessibilityIdentifier("link-match")
+            } else {
+                Label(Loc.f("This link matches %@, a site in your list.", name), systemImage: "checkmark.seal.fill").font(.caption).foregroundStyle(.green).accessibilityIdentifier("link-match")
+            }
         } else {
-            Label("No match: this link is not from a site in your list, so there is nothing to mark completed. Be careful what you enter.", systemImage: "exclamationmark.triangle.fill")
-                .font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("link-no-match")
+            Button { choosing = PendingLink(url: nil, check: check ?? .unknown(host: filler.host)) } label: {
+                Label("We could not tell which site this link is for. Tap to choose it.", systemImage: "questionmark.circle.fill")
+                    .font(.caption).foregroundStyle(.orange).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+            }.accessibilityIdentifier("link-no-match")
         }
     }
 
     /// A link shared to Exnay from a mail app: any page that was open is closed, and the link is checked and opened as if it had been pasted.
     private func takeIncomingLink() {
-        guard let link = model.incomingLink else { return }
+        guard let link = model.incomingLink, !model.coveredByASheet else { return }          // under a sheet it waits (see onChange below)
         model.incomingLink = nil
         returnToChooser()
         text = link
@@ -257,10 +289,24 @@ struct LinkFillerView: View {
         guard let url = LinkFiller.normalized(text) else { return }
         let c = model.checkLink(url)
         switch c {
-        case .unknown: asking = (url, c)
+        case .unknown, .shared: choosing = PendingLink(url: url, check: c)          // not guessed: the person says which site it is
         case .known(_, _, let done?, _) where done != nil: asking = (url, c)
         default: open(url, c)
         }
+    }
+
+    /// The person chose a site for the link. A link whose address that site is known by is filled in and sent as usual; any other address is only loaded.
+    private func pickSite(_ entry: DirectoryEntry, for pending: PendingLink) {
+        choosing = nil
+        let c = model.linkState(for: entry)
+        guard let url = pending.url else {          // "Mark completed" on a page that is already open
+            check = c; picked = true; pickedTrusted = filler.currentURL.map { LinkCheck.verifies($0, for: entry) } ?? false
+            Task { await finish(entry.id) }
+            return
+        }
+        let trusted = LinkCheck.verifies(url, for: entry)
+        if case .known(_, _, let done?, _) = c, done != nil, trusted { asking = (url, c); return }
+        open(url, c, fill: trusted, picked: true, trusted: trusted)
     }
 
     /// Asks "Is it completely done?" first unless the page says with confidence that it is; "not yet" leaves the person where they are.
@@ -304,13 +350,13 @@ struct LinkFillerView: View {
     }
 
     /// Closes the page and clears the pasted link so the tab is ready for the next one.
-    private func returnToChooser() { filler.close(); check = nil; finished = false; text = "" }
+    private func returnToChooser() { filler.close(); check = nil; finished = false; text = ""; picked = false; pickedTrusted = true }
 
-    private func open(_ url: URL, _ c: LinkCheck) {
-        check = c; finished = false
+    private func open(_ url: URL, _ c: LinkCheck, fill: Bool = true, picked: Bool = false, trusted: Bool = true) {
+        check = c; finished = false; self.picked = picked; pickedTrusted = trusted
         Task {
             await filler.open(url)
-            await autoFinish()
+            if fill { await autoFinish() }          // a link for a site by hand at an address it is not known by is only loaded
         }
     }
 
@@ -323,18 +369,13 @@ struct LinkFillerView: View {
         if case .submitted? = await filler.sendWhenReady(isCancelled: gone) { complete(id) }
     }
 
-    private func isUnknown(_ c: LinkCheck) -> Bool { if case .unknown = c { return true } else { return false } }
     private var askTitle: String {
-        guard let a = asking else { return "" }
-        if case .known(_, let name, _, _) = a.check { return Loc.f("You already finished %@", name) }
-        return Loc.t("We do not recognize this link")
+        guard let a = asking, case .known(_, let name, _, _) = a.check else { return "" }
+        return Loc.f("%@ is already marked finished", name)
     }
     private func askMessage(_ c: LinkCheck) -> String {
-        switch c {
-        case .unknown(let host): return Loc.f("%@ is not a site in your list, so it may not be from an opt-out you started. Only open it if you are sure.", host)
-        case .known(_, let name, let done, _):
-            return Loc.f("A request to %@ was finished on %@. You usually do not need this link again.", name, (done ?? Date()).formatted(date: .abbreviated, time: .omitted))
-        }
+        guard case .known(_, let name, let done, _) = c else { return "" }
+        return Loc.f("A request to %@ was finished on %@. Does this link ask for more: a confirmation, another form or another step?", name, (done ?? Date()).formatted(date: .abbreviated, time: .omitted))
     }
 }
 
