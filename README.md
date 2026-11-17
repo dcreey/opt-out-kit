@@ -8,6 +8,10 @@ only to the broker sites they opt out of.
 
 > The repository and code are still named `opt-out-kit` (module `OptOutKitCore`, bundle id `dev.optoutkit.app`). Only the app's name changed.
 
+## Principles
+
+Always free. Never tracks: no backend, everything on the device. Teaches people their privacy rights, with the law that applies to them. Built by AI agents, validated by people on real phones. The person stays in control and the app is honest about what it knows. The full commitments are in [docs/PRINCIPLES.md](docs/PRINCIPLES.md).
+
 ## What the app does
 
 - **A daily queue.** Each day the person picks one *kind* of broker to tackle (18 kinds, such as people search, ad tech, recruiting data, credit and

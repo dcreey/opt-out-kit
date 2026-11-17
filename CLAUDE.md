@@ -1,5 +1,9 @@
 # Exnay (opt-out-kit)
 
+## Principles
+
+Read `docs/PRINCIPLES.md`. Never add a server, account, analytics, telemetry, paywall or anything that sends a person's data anywhere but the broker; if a task seems to need one, stop and ask.
+
 ## Keep the docs current
 
 Every change to behavior updates the docs in the same piece of work, before it is committed:

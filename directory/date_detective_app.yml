@@ -17,3 +17,10 @@ live_form:
   found: false
 persistence: {"result": "unknown", "reup_months": 12}
 regions: {"list": ["US"], "evidence": "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+closed:
+  checked: "2026-11-17"
+  evidence:
+    - "try 1 https://date-detective.app: the certificate is for another name (no alternative subject name matches); resolves to 20.29.155.69"
+    - "try 1 https://www.date-detective.app: the certificate is for another name (no alternative subject name matches); resolves to 20.29.155.69"
+    - "try 2 https://date-detective.app: the certificate is for another name (no alternative subject name matches); resolves to 20.29.155.69"
+    - "try 2 https://www.date-detective.app: the certificate is for another name (no alternative subject name matches); resolves to 20.29.155.69"
