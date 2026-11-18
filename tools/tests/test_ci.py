@@ -55,6 +55,16 @@ class Balance(unittest.TestCase):
         self.assertEqual(S.timings_from_log(log), {"OptOutKitTests/PeopleTests": 2.0, "OptOutKitUITests/DryRunUITests/testRun": 40.5})
 
 
+class Failures(unittest.TestCase):
+    def test_each_failed_test_becomes_an_annotation_with_its_message(self):
+        log = ("/x/A.swift:12: error: -[OptOutKitUITests.DryRunUITests testRun] : XCTAssertTrue failed - the report shows\n"
+               "Test Case '-[OptOutKitUITests.DryRunUITests testRun]' failed (3.0 seconds).\n")
+        lines = S.failures_from_log(log)
+        self.assertEqual(lines[0], "::error title=OptOutKitUITests/DryRunUITests/testRun::XCTAssertTrue failed - the report shows")
+        self.assertTrue(lines[-1].startswith("::notice title=Failed tests::"))
+        self.assertEqual(S.failures_from_log("Test Case '-[A.B testC]' passed (1.0 seconds)."), [])
+
+
 class FileTimes(unittest.TestCase):
     def test_files_get_their_last_commits_time(self):
         with tempfile.TemporaryDirectory() as d:

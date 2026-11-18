@@ -5,6 +5,7 @@ same time.
   ci_shards.py --shards 5 --index 0          the -only-testing: arguments for shard 0, one per line
   ci_shards.py --shards 5 --list             every shard, its classes and its expected seconds
   ci_shards.py --timings-from-log LOG        the seconds each class took in an xcodebuild log, as one line of JSON (CI prints it as a notice)
+  ci_shards.py --failures-from-log LOG      each failed test and its message, as annotations (CI prints them)
   ci_shards.py --fetch-run RUN_ID            reads those notices from a finished GitHub run (public API, no login) into tools/ci_timings.json
 
 Classes are found by reading the test sources (`class Name: XCTestCase`), so a new class is picked up with no change here. A class weighs the
@@ -75,6 +76,20 @@ def timings_from_log(text):
     return {k: round(v, 1) for k, v in out.items()}          # rounded once, at the end
 
 
+FAIL = re.compile(r"error: -\[(\w+)\.(\w+) (\w+)\] : (.*)")
+
+
+def failures_from_log(text):
+    """Each failed test's assertion messages, as GitHub annotation commands. GitHub shows only 10 errors per step, so all of them also go in one
+    notice; both can be read from a public run without logging in (`--fetch-run` style)."""
+    seen = {}
+    for target, cls, test, msg in FAIL.findall(text):
+        seen.setdefault(f"{target}/{cls}/{test}", []).append(msg.strip()[:300])
+    lines = [f"::error title={k}::{' | '.join(v)}" for k, v in seen.items()]
+    if seen: lines.append("::notice title=Failed tests::" + " || ".join(f"{k}: {' | '.join(v)}" for k, v in seen.items())[:60000])
+    return lines
+
+
 def load_timings():
     return json.load(open(TIMINGS)) if os.path.exists(TIMINGS) else {}
 
@@ -97,9 +112,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shards", type=int); ap.add_argument("--index", type=int)
     ap.add_argument("--list", action="store_true"); ap.add_argument("--skip", action="append", default=[])
-    ap.add_argument("--timings-from-log"); ap.add_argument("--fetch-run")
+    ap.add_argument("--timings-from-log"); ap.add_argument("--failures-from-log"); ap.add_argument("--fetch-run")
     a = ap.parse_args()
     if a.timings_from_log: print(json.dumps(timings_from_log(open(a.timings_from_log, errors="replace").read()), sort_keys=True, separators=(",", ":"))); return
+    if a.failures_from_log: print("\n".join(failures_from_log(open(a.failures_from_log, errors="replace").read()))); return
     if a.fetch_run: fetch_run(a.fetch_run); return
     if not a.shards: sys.exit("--shards is required")
     weights = work(load_timings())

@@ -162,10 +162,12 @@ jobs:
             | grep -E "Test Case .*(passed|failed)|error:|Executed [0-9]+ tests|TEST (SUCCEEDED|FAILED)|\*\* "
           # A shard that ran nothing is a broken shard, not a pass.
           if ! grep -qE "Executed [1-9][0-9]* tests" xcodebuild.log; then echo "::error::this shard ran no tests"; exit 1; fi
-      - name: Report how long each test took (read back by `tools/ci_shards.py --fetch-run` to balance the next split)
+      - name: Report each test's time (read back by `tools/ci_shards.py --fetch-run` to balance the next split) and each failure
         if: always()
         run: |
-          [ -f xcodebuild.log ] && echo "::notice title=Shard timings::$(python3 tools/ci_shards.py --timings-from-log xcodebuild.log)" || true
+          [ -f xcodebuild.log ] || exit 0
+          echo "::notice title=Shard timings::$(python3 tools/ci_shards.py --timings-from-log xcodebuild.log)"
+          python3 tools/ci_shards.py --failures-from-log xcodebuild.log
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
