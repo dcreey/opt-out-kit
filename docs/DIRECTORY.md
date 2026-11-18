@@ -83,7 +83,7 @@ A group is a measurement from one run, not a promise.
 ## Automation
 
 `.github/workflows/profile.yml` re-profiles monthly and opens a pull request with the changes. A person reviews the
-diff; nothing merges itself. `.github/workflows/ci.yml` validates every entry against `schema/directory.schema.json`.
+diff; nothing merges itself. `.github/workflows/ci.yml` validates every entry against `schema/directory.schema.json` on every push and pull request.
 
 ## Limits
 

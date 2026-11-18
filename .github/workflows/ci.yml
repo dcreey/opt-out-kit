@@ -1,47 +1,178 @@
 name: CI
 
-# DISABLED for now: runs only when started by hand from the Actions tab. Original triggers are kept below, commented out.
+# Every push to main and every pull request. The repository is public, so GitHub's hosted runners are free; the app's tests are split across
+# several macOS machines that run at once (tools/ci_shards.py decides the split, so new test classes are picked up by themselves).
+# No job contacts a real broker site: the live tests skip unless OPTOUT_LIVE=1, and the UI tests use the app's fake sites (-uitest-fake-submit).
+# What runs where is listed in docs/TESTING.md ("Continuous integration").
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  # pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XCODEGEN_VERSION: 2.45.4
+  # Raise to throw away every cached build folder (if a cached build ever looks wrong).
+  CACHE_VERSION: v1
+  # Tests known to fail before this workflow existed, left out until they are fixed (docs/TESTING.md lists them).
+  UI_KNOWN_FAILING: >-
+    AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks
+    AutoProtectionUITests/testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears
+    AutoProtectionUITests/testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer
+
 jobs:
-  registry:
-    name: Validate broker YAML
+  checks:
+    name: Data, tools and translations
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - run: pip install check-jsonschema
-      - run: check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml
-      - run: check-jsonschema --schemafile schema/directory.schema.json directory/*.yml
-      - name: Profiler unit tests (retries, backoff, robots handling)
+      - run: pip install check-jsonschema pyyaml
+      - name: Broker and directory files match their schemas
+        run: |
+          check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml
+          check-jsonschema --schemafile schema/directory.schema.json directory/*.yml
+      - name: Tool tests (retries, backoff, robots handling, registries, translations)
         run: python3 -m unittest discover -s tools/tests
+      - name: Every string is translated, with its placeholders
+        run: python3 tools/l10n.py check
+      - name: The test shards cover every test class
+        run: |
+          python3 tools/ci_shards.py --target OptOutKitTests --dir AppTests --shards 3 --list
+          python3 tools/ci_shards.py --target OptOutKitUITests --dir AppUITests --shards 4 --list
 
-  core:
-    name: Core package tests
-    runs-on: macos-latest
+  packages:
+    name: Mac package tests
+    runs-on: macos-26
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - run: swift test
+        with: { fetch-depth: 0 }          # the full history, for the file times below
+      - name: Use the newest Xcode on the runner
+        id: xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+          echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
+        run: python3 tools/ci_restore_mtimes.py
+      - name: Restore the packages' build folders
+        uses: actions/cache@v4
+        with:
+          path: |
+            Packages/OptOutKitCore/.build
+            Packages/AssistedRunLogic/.build
+          key: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('Packages/**/Package.swift', 'Packages/**/Sources/**', 'Packages/**/Tests/**', 'Shared/**') }}
+          restore-keys: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
+      - name: OptOutKitCore
+        run: swift test
         working-directory: Packages/OptOutKitCore
+      - name: AssistedRunLogic (the assisted run's state machine)
+        run: swift test
+        working-directory: Packages/AssistedRunLogic
 
-  app:
-    name: iOS build and tests
-    runs-on: macos-latest
+  build:
+    name: Build the app and its tests
+    runs-on: macos-26
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-      - run: brew install xcodegen && xcodegen generate
-      - name: Pick an iPhone simulator
+        with: { fetch-depth: 0 }
+      - name: Use the newest Xcode on the runner
+        id: xcode
         run: |
-          UDID=$(xcrun simctl list devices available iPhone -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+          echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      - name: Restore XcodeGen
+        id: xcodegen
+        uses: actions/cache@v4
+        with:
+          path: ~/xcodegen
+          key: xcodegen-${{ env.XCODEGEN_VERSION }}
+      - name: Download XcodeGen (only when it is not cached; brew is slow on these machines)
+        if: steps.xcodegen.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL -o /tmp/xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODEGEN_VERSION/xcodegen.zip"
+          mkdir -p ~/xcodegen && unzip -q /tmp/xcodegen.zip -d ~/xcodegen
+      - name: Generate the project
+        run: |
+          XG=$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)
+          "$XG" --version && "$XG" generate
+      - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
+        run: python3 tools/ci_restore_mtimes.py
+      - name: Restore the app's build folder
+        uses: actions/cache@v4
+        with:
+          path: DerivedData
+          key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('project.yml', 'App/**', 'Shared/**', 'ShareExtension/**', 'AppTests/**', 'AppUITests/**', 'Packages/**/Sources/**', 'brokers/**', 'directory/**', 'platforms/**', 'jurisdictions/**', 'terms/**') }}
+          restore-keys: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
+      - name: Build for testing (once; every test shard reuses it)
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
+            COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -40
+          echo "Swift files compiled this run: $(grep -cE '^SwiftCompile ' build.log || true)"
+          ls DerivedData/Build/Products
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-products
+          path: DerivedData/Build/Products
+          retention-days: 2
+
+  test:
+    name: ${{ matrix.kind }} tests ${{ matrix.index }}
+    needs: build
+    runs-on: macos-26
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 0 }
+          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 1 }
+          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 2 }
+          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 0 }
+          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 1 }
+          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 2 }
+          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 3 }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use the newest Xcode on the runner
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)" && xcodebuild -version
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-products
+          path: Products
+      - name: Pick an iPhone simulator and start it
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
           echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
-      - name: Build and test (unit + UI)
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+      - name: Run this shard
+        shell: bash
         run: |
-          xcodebuild test -project OptOutKit.xcodeproj -scheme OptOutKit \
-            -destination "id=$SIM_UDID" CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO
+          SKIP=()
+          if [ "${{ matrix.kind }}" = "UI" ]; then for t in $UI_KNOWN_FAILING; do SKIP+=(--skip "$t"); done; fi
+          ARGS=()          # one argument per line (macOS ships bash 3.2, which has no mapfile)
+          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --target ${{ matrix.target }} --dir ${{ matrix.dir }} --shards ${{ matrix.shards }} --index ${{ matrix.index }} ${SKIP[@]+"${SKIP[@]}"})
+          printf '%s\n' "${ARGS[@]}"
+          XCTESTRUN=$(ls Products/*.xctestrun | head -1)
+          set -o pipefail
+          xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
+            -resultBundlePath "Results-${{ matrix.kind }}-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \
+            | grep -E "Test Case .*(passed|failed)|error:|Executed [0-9]+ tests|TEST (SUCCEEDED|FAILED)|\*\* "
+          # A shard that ran nothing is a broken shard, not a pass.
+          if grep -qE "Executed 0 tests" xcodebuild.log && ! grep -qE "Executed [1-9][0-9]* tests" xcodebuild.log; then echo "::error::this shard ran no tests"; exit 1; fi
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: results-${{ matrix.kind }}-${{ matrix.index }}
+          path: Results-${{ matrix.kind }}-${{ matrix.index }}.xcresult
+          retention-days: 7

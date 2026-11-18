@@ -4,11 +4,39 @@ Deliberately thin until the app works end to end. Layers, cheapest first:
 
 | Layer | Where | Runs |
 |---|---|---|
-| Broker YAML vs `schema/broker.schema.json` | CI `registry` job | `check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml` |
+| Broker YAML vs `schema/broker.schema.json` | CI `checks` job | `check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml` |
 | Core logic (decode, queue, progress) | `Packages/OptOutKitCore/Tests` | `swift test` in that folder |
 | Assisted run logic (runner, email handoff, page-text reading) | `Packages/AssistedRunLogic/Tests`, on the app's own sources in `Shared/AssistedRun` | `swift test --package-path Packages/AssistedRunLogic` (Mac, no simulator) |
 | App unit tests (anything that needs UIKit or a web view) | `AppTests` | `xcodebuild test` (needs a simulator) |
 | UI tests | `AppUITests` | same |
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request, on GitHub's hosted runners (free for a public repository). No job
+contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the UI tests use the app's fake sites.
+
+| Job | Machine | What it runs |
+|---|---|---|
+| `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
+| `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
+| `build` | macOS | Builds the app and both test targets once (`build-for-testing`); the shards reuse it |
+| `test` (7 at once) | macOS, one each | App unit tests in 3 shards, UI tests in 4, each on its own simulator (`test-without-building`) |
+
+`tools/ci_shards.py` splits each target's test classes by their number of tests, heaviest first into the lightest shard, reading the sources, so a new
+test class needs no change to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that every class is in exactly one shard and that the file times are set from the commits). A failing shard keeps its result bundle as an artifact for a week.
+
+Between runs it keeps three things in GitHub's cache: the app's build folder (`DerivedData`), the two packages' `.build` folders, and XcodeGen (downloaded
+from its release rather than installed with Homebrew, which is slow there). Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
+gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
+changed since the cached build is compiled (the build step prints how many Swift files it compiled). The caches are keyed by the Xcode version and the
+sources, so a new Xcode starts clean. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a
+test checks have room for slower CI machines.
+
+Left out in CI until they are fixed (they failed before CI ran them, listed in `UI_KNOWN_FAILING` in the workflow):
+`AutoProtectionUITests.testBlockedByPaymentIsAnAnswerInQuickChecks`, `testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears`,
+`testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer`.
+
+The broker pipeline (`pipeline.yml`) and the directory refresh (`profile.yml`) visit real sites, so they stay manual (Actions tab).
 
 ## User flows and where each is tested
 
@@ -121,7 +149,14 @@ Notes about how a test works live in the test file itself. This is the list of w
 | A page with no sign of life for 15 s is moved to semi-automatic; a busy one is waited for | `CoreTests.testASiteWhosePageGoesQuietIsMovedToSemiAutomaticAndABusyOneIsWaitedFor` | Mac |
 | A run cut off and brought back to the front stays pending; a site never tried is in every run, even a repeat | `AutomaticRunAppTests.testARunCutOffAndThenBroughtBackToTheFrontIsNotTakenAsFinished`, `testEverySiteNeverTriedIsInEveryRunEvenARepeat` | Sim |
 | In California DROP is step 1 and the first pass waits for it; elsewhere DROP is not in the plan and holds nothing | `AutomaticRunAppTests.testDROPComesFirstInCaliforniaAndIsLeftOutEverywhereElse` | Sim |
-| A site that never answers is given up as too slow and the run goes on; Stop ends a run part-way and keeps the rest for later | `CoreTests.testASiteThatNeverAnswersIsGivenUpAndTheRunGoesOnToTheNext`, `AutomaticRunAppTests.testStopEndsTheRunPartWayAndLeavesTheRestForLater` | Mac, Sim |
+| The engine can work on several sites at once (the app uses one): never more than asked, results in the order given, a shared page sent once, Stop starts no more sites | `CoreTests.testTheRunWorksOnThreeSitesAtOnceInOrderAndSendsASharedPageOnce`, `InterruptedRunTests` (one at a time) | Mac |
+| A site the run gives up on has its work cancelled and its hidden pages ended; pages outside a background run are never touched | `CoreTests.testASiteTheRunGivesUpOnHasItsWorkCancelled`, `GivenUpPageTests` | Mac, Sim |
+| A locked phone: a save waits for the unlock instead of stopping all saves; profiles opened while locked open at the unlock, and erasing is offered only for data that really cannot be opened | `CoreTests.testAFailureFromALockedPhoneIsToldApartFromDamagedData`, `PeopleTests.testASaveWhileThePhoneIsLockedIsWrittenAtTheUnlock`, `testProfilesThatCouldNotBeOpenedWhileLockedOpenAtTheUnlockAndAreNeverOfferedForErasing`, `testUnreadableDataIsNeverOverwritten` | Mac, Sim |
+| A run rebuilds the plan once when it ends, not after every site; rebuilding it takes under 0.2 s | `ResumeAppTests.testARunRebuildsThePlanOnceWhenItEndsNotAfterEverySite`, `ActivityPageSpeedTests` | Sim |
+| A stopped run carries on with only the sites left, never sending one twice; a stopped Re-test all carries on as a re-test | `ResumeAppTests` | Sim |
+| Stop means stop: a stopped run is not carried on or started on schedule until the person starts one; Run now then counts only the sites left | `CoreTests.testARunThePersonStoppedDoesNotStartByItself`, `AutomaticRunAppTests.testStopEndsTheRunPartWayAndLeavesTheRestForLater` | Mac, Sim |
+| The automatic opt-out page is worked out off the main thread, each form's fill once, with the same counts as the run's own rules | `ActivityPageSpeedTests.testTheActivityPageIsWorkedOutQuickly` (equal rows and Run now count, under 0.3 s after the first time) | Sim |
+| A site that never answers is given up as too slow and the run goes on; a run settles a site at least every 30 s; Stop ends a run part-way and keeps the rest for later | `CoreTests.testASiteThatNeverAnswersIsGivenUpAndTheRunGoesOnToTheNext`, `AutomaticRunAppTests.testStopEndsTheRunPartWayAndLeavesTheRestForLater` | Mac, Sim |
 | iOS ending a run's background time stops it only when the app is not on screen | `AutomaticRunAppTests.testIOSEndingTheBackgroundTimeStopsTheRunOnlyWhenThePersonIsAway` | Sim |
 | Run now leaves out the sites already sent this period; Re-test all tries them again | `CoreTests.testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod`, `BackgroundPassesAppTests` (second run and re-test) | Mac, Sim |
 | A new person gets the automatic pass first; the semi-automated queue waits for it and opens after; the report leads to it | `CoreTests.testTheSemiAutomatedQueueWaitsOnlyForTheVeryFirstAutomaticPass`, `BackgroundPassesAppTests` (`waitingForFirstPass`), `AutoProtectionUITests.testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt` | Mac, Sim |
@@ -195,7 +230,7 @@ Build locally: `brew install xcodegen && xcodegen generate`, then open `OptOutKi
 ## Broker pipeline (live, read-only)
 
 `broker-pipeline` dry-runs every `brokers/*.yml` against the live web and reports PASS, FAIL, BLOCKED or NEEDS RESEARCH
-(see `.github/workflows/pipeline.yml`, weekly and on broker changes). For each broker it loads every step page and,
+(see `.github/workflows/pipeline.yml`; started by hand from the Actions tab for now). For each broker it loads every step page and,
 when the broker has a `recheck:` block, searches a made-up name (must read as removed) and a known common name
 (must read as still listed). That pair is how it tells a working check from a silently broken one.
 
