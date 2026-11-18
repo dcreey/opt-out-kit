@@ -30,7 +30,7 @@ struct BrokerListView: View {
                         Button { showAuto = true } label: {
                             Label("Turn on automatic protection", systemImage: "bolt.shield")
                         }.accessibilityIdentifier("auto-banner")
-                    } footer: { Text("Opt-out requests, sent for you every month in the background.") }
+                    } footer: { Text("Opt-out requests, sent for you in the background: every 3 months, with a full re-test every 6.") }
                 }
                 if let problem = model.storageProblem {
                     Section {

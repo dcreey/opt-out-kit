@@ -1095,6 +1095,57 @@ final class AutoOptOutTests: XCTestCase {
     private let pat = Person(displayName: "Pat", names: [NameEntry(kind: .legal, name: "Pat Example")],
                             addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL")], emails: ["pat@example.com"])
 
+    // MARK: the background run: a full pass, then a repeat of what went through
+
+    func testABackgroundRunTriesOnlySitesWithAKnownFormAndNothingOnlyAPersonCanDo() {
+        let ok = form([("text", "first", "First name"), ("text", "last", "Last name"), ("email", "email", "Email")])
+        func attemptable(_ e: DirectoryEntry, _ progress: OptOutKitCore.Progress = OptOutKitCore.Progress()) -> Bool { AutoOptOut.backgroundAttemptable(e, person: pat, progress: progress, now: t0) }
+        var clean = entry("clean", form: ok); clean.liveCheck = LiveCheck(checked: "2026-10-22", blockers: [])
+        XCTAssertTrue(attemptable(clean), "a readable form is tried")
+        XCTAssertTrue(attemptable(entry("unmeasured", form: ok)))
+        var live = entry("live", form: nil); live.liveForm = LiveFormCheck(checked: "2026-11-01", found: true, page: "https://live.example/optout", blockers: [])
+        XCTAssertTrue(attemptable(live), "a form found on the live page is tried too")
+        var captcha = clean; captcha.liveCheck = LiveCheck(checked: "2026-10-22", blockers: ["check:recaptcha"])
+        XCTAssertTrue(attemptable(captcha), "a site that showed a human check is still tried in a full pass: the page may have changed, and the engine stops at a check without solving it")
+        var auto = clean; auto.runCheck = RunCheck(date: "2026-10-23", result: "confirmed"); XCTAssertTrue(attemptable(auto), "automatic sites are part of the pass")
+        var business = live; business.liveForm = LiveFormCheck(checked: "2026-11-01", found: true, page: "https://live.example/optout", blockers: ["business"]); XCTAssertFalse(attemptable(business))
+        var agent = live; agent.liveForm = LiveFormCheck(checked: "2026-11-01", found: true, page: "https://live.example/optout", blockers: ["agent"]); XCTAssertFalse(attemptable(agent))
+        var file = live; file.liveForm = LiveFormCheck(checked: "2026-11-01", found: true, page: "https://live.example/optout", blockers: ["file"]); XCTAssertFalse(attemptable(file))
+        var noFill = clean; noFill.noFill = true; XCTAssertFalse(attemptable(noFill), "a site that takes nothing of the person's is never filled")
+        var caution = clean; caution.caution = CautionInfo(kind: "biometric"); XCTAssertFalse(attemptable(caution))
+        XCTAssertFalse(attemptable(entry("typed", form: form([("text", "first", "First name"), ("text", "captcha", "Type the code shown")]))), "a typed code is the person's")
+        XCTAssertFalse(attemptable(entry("ssn", form: form([("text", "ssn", "Social security number *"), ("email", "email", "Email")]))), "a form that needs something only the person holds")
+        XCTAssertFalse(attemptable(entry("noform", form: nil)), "no known form: nothing to fill")
+        var failedRun = clean; failedRun.runCheck = RunCheck(date: "2026-10-23", result: "failed"); XCTAssertFalse(attemptable(failedRun))
+        var parked = OptOutKitCore.Progress(); parked.skipSite("clean", reason: .skipped, forever: true, on: t0)
+        XCTAssertFalse(attemptable(clean, parked), "a site the person set aside is left alone")
+    }
+
+    func testAFullPassTriesEverySiteAndARepeatPassOnlyTheOnesThatWentThrough() {
+        let ok = form([("text", "first", "First name"), ("email", "email", "Email")])
+        let sent = entry("sent", form: ok), lost = entry("lost", form: ok), fresh = entry("fresh", form: ok), challenged = entry("challenged", form: ok)
+        var progress = OptOutKitCore.Progress()
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed"), site: "sent")       // an old failure ...
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "sent") // ... then it went through: the latest counts
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed"), site: "lost")
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "challenged"), site: "challenged")
+        let all = [sent, lost, fresh, challenged]
+        func ids(_ kind: RunKind) -> [String] { AutoOptOut.backgroundSites(kind, entries: all, person: pat, progress: progress, now: t0 + 100 * day).map(\.id) }
+        XCTAssertEqual(ids(.full), ["sent", "lost", "fresh", "challenged"], "a full pass re-tests every site, the lost ones too")
+        XCTAssertEqual(ids(.repeatSent), ["sent"], "a repeat pass sends again only where the last send went through")
+    }
+
+    func testTheFirstRunAndThenEverySixMonthsAreFullPassesAndTheOnesBetweenAreRepeats() {
+        var s = AutoSettings()
+        XCTAssertEqual(s.nextRunKind(now: t0), .full, "the first run is the full pass")
+        s.lastFullRun = t0
+        XCTAssertEqual(s.nextRunKind(now: t0 + 92 * day), .repeatSent, "three months on: repeat what went through")
+        XCTAssertEqual(s.nextRunKind(now: t0 + 183 * day), .full, "six months on: re-test every site")
+        s.passStarted = t0 + 183 * day; s.passKind = .full
+        XCTAssertEqual(s.nextRunKind(now: t0 + 184 * day), .full, "a pass that was cut off carries on as the same kind")
+        XCTAssertEqual(AutoSettings.optOutEvery, 91 * day, "a run is due every three months"); XCTAssertEqual(AutoSettings.fullEvery, 2 * AutoSettings.optOutEvery)
+    }
+
     // MARK: field mapping
 
     func testMapsAProfileOntoACommonOptOutForm() {
@@ -1228,7 +1279,7 @@ final class AutoOptOutTests: XCTestCase {
 
     // MARK: schedule
 
-    func testOptOutIsMonthlyNothingScansAndBothStartOffUntilThePersonDecides() {
+    func testOptOutRunsEveryThreeMonthsNothingScansAndBothStartOffUntilThePersonDecides() {
         var a = AutoSettings()
         XCTAssertFalse(a.hasDecided)
         XCTAssertFalse(a.scanDue(now: t0)); XCTAssertFalse(a.optOutDue(now: t0), "nothing runs before the person says yes")
@@ -1237,9 +1288,9 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertFalse(a.scanDue(now: t0), "nothing scans yet, so turning protection on does not turn scanning on")
         XCTAssertTrue(a.optOutDue(now: t0), "first run is due straight away")
         a.lastOptOut = t0
-        XCTAssertFalse(a.optOutDue(now: t0 + 29 * day)); XCTAssertTrue(a.optOutDue(now: t0 + 30 * day))
+        XCTAssertFalse(a.optOutDue(now: t0 + 90 * day)); XCTAssertTrue(a.optOutDue(now: t0 + 91 * day))
         a.optOutEnabled = false
-        XCTAssertFalse(a.optOutDue(now: t0 + 30 * day), "switching it off stops it")
+        XCTAssertFalse(a.optOutDue(now: t0 + 91 * day), "switching it off stops it")
     }
 
     func testDecliningTurnsEverythingOffButRemembersTheAnswer() {
@@ -3384,7 +3435,7 @@ final class SkippedSitesTests: XCTestCase {
     }
 
     func testASkipWaitsAWeekThenComesBackAndIsRemindedAbout() {
-        var p = Progress(); let t0 = Date()
+        var p = OptOutKitCore.Progress(); let t0 = Date()
         p.skipSite("s1", reason: .skipped, on: t0)
         XCTAssertTrue(p.isParked("s1", now: t0.addingTimeInterval(6 * day)))
         XCTAssertEqual(p.skipReturns("s1", now: t0), t0.addingTimeInterval(7 * day))
@@ -3394,7 +3445,7 @@ final class SkippedSitesTests: XCTestCase {
     }
 
     func testSkippingAgainRestartsTheWeekAndForeverNeverComesBack() {
-        var p = Progress(); let t0 = Date()
+        var p = OptOutKitCore.Progress(); let t0 = Date()
         p.skipSite("s1", reason: .skipped, on: t0)
         p.skipSite("s1", reason: .notWorking, on: t0.addingTimeInterval(8 * day))
         XCTAssertEqual(p.skipCount("s1"), 2)
@@ -3408,7 +3459,7 @@ final class SkippedSitesTests: XCTestCase {
     }
 
     func testFinishingASkippedSiteEndsTheSkip() {
-        var p = Progress(); let t0 = Date()
+        var p = OptOutKitCore.Progress(); let t0 = Date()
         p.skipSite("s1", reason: .skipped, on: t0)
         p.recordOptOutAttempt(OptOutAttempt(date: t0.addingTimeInterval(60), outcome: "submitted"), site: "s1")
         XCTAssertFalse(p.isParked("s1", now: t0.addingTimeInterval(120)))
@@ -3431,23 +3482,23 @@ final class RunPeriodTests: XCTestCase {
 
     func testPeriodsRunBackToBackFromTheFirstRun() {
         let p0 = RunPeriod.containing(t0.addingTimeInterval(5 * day), anchor: t0)
-        XCTAssertEqual(p0.start, t0); XCTAssertEqual(p0.end, t0.addingTimeInterval(30 * day))
-        let p1 = RunPeriod.containing(t0.addingTimeInterval(31 * day), anchor: t0)
-        XCTAssertEqual(p1.start, t0.addingTimeInterval(30 * day))
+        XCTAssertEqual(p0.start, t0); XCTAssertEqual(p0.end, t0.addingTimeInterval(91 * day))
+        let p1 = RunPeriod.containing(t0.addingTimeInterval(92 * day), anchor: t0)
+        XCTAssertEqual(p1.start, t0.addingTimeInterval(91 * day))
         XCTAssertEqual(p1.previous(), p0)
     }
 
-    func testTheTallyCountsSitesSentInThePeriodAndHistoryKeepsEachMonth() {
+    func testTheTallyCountsSitesSentInThePeriodAndHistoryKeepsEachPeriod() {
         let attempts: [String: [OptOutAttempt]] = [
-            "a": [sent(t0.addingTimeInterval(2 * day)), sent(t0.addingTimeInterval(33 * day))],
+            "a": [sent(t0.addingTimeInterval(2 * day)), sent(t0.addingTimeInterval(94 * day))],
             "b": [sent(t0.addingTimeInterval(3 * day))],
             "c": [OptOutAttempt(date: t0.addingTimeInterval(4 * day), outcome: "failed", detail: "x")],
         ]
-        let now = t0.addingTimeInterval(35 * day)
+        let now = t0.addingTimeInterval(96 * day)
         let h = RunPeriods.history(anchor: t0, now: now, siteIDs: ["a", "b", "c"], attempts: attempts)
         XCTAssertEqual(h.count, 2)
-        XCTAssertEqual(h[0].handled, 1, "this month only a was sent")
-        XCTAssertEqual(h[1].handled, 2, "last month a and b were sent; a failure is not a success")
+        XCTAssertEqual(h[0].handled, 1, "this period only a was sent")
+        XCTAssertEqual(h[1].handled, 2, "last period a and b were sent; a failure is not a success")
         XCTAssertEqual(h[0].total, 3)
         XCTAssertFalse(h[1].complete)
     }
@@ -3462,17 +3513,17 @@ final class RunPeriodTests: XCTestCase {
         let inPeriod = RunPeriod.containing(t0.addingTimeInterval(10 * day), anchor: t0)
         let again = AutoOptOut.precheck(entry: e, person: person, progress: progress, now: t0.addingTimeInterval(10 * day), period: inPeriod)
         if case .tooSoon(let until)? = again.result { XCTAssertEqual(until, inPeriod.end) } else { XCTFail("handled this period: left alone") }
-        // Late in the period (29 days after the send) it is still handled; early in the next one it is due again, even though only 6 days have passed.
-        var late = progress; late.optOutAttempts["x"] = [sent(t0.addingTimeInterval(28 * day))]
-        let next = RunPeriod.containing(t0.addingTimeInterval(34 * day), anchor: t0)
-        XCTAssertNil(AutoOptOut.precheck(entry: e, person: person, progress: late, now: t0.addingTimeInterval(34 * day), period: next).result)
+        // Late in the period (6 days before it ends) it is still handled; early in the next one it is due again, even though only 6 days have passed.
+        var late = progress; late.optOutAttempts["x"] = [sent(t0.addingTimeInterval(89 * day))]
+        let next = RunPeriod.containing(t0.addingTimeInterval(95 * day), anchor: t0)
+        XCTAssertNil(AutoOptOut.precheck(entry: e, person: person, progress: late, now: t0.addingTimeInterval(95 * day), period: next).result)
     }
 
-    func testTheMonthlyRunIsDueWhenANewPeriodHasBegun() {
+    func testTheRunIsDueEveryThreeMonthsWhenANewPeriodHasBegun() {
         var s = AutoSettings(); s.optOutEnabled = true; s.periodAnchor = t0; s.lastOptOut = t0.addingTimeInterval(1 * day)
-        XCTAssertFalse(s.optOutDue(now: t0.addingTimeInterval(29 * day)))
-        XCTAssertTrue(s.optOutDue(now: t0.addingTimeInterval(30 * day)))
-        XCTAssertEqual(s.nextOptOutDate(now: t0.addingTimeInterval(10 * day)), t0.addingTimeInterval(30 * day))
+        XCTAssertFalse(s.optOutDue(now: t0.addingTimeInterval(90 * day)))
+        XCTAssertTrue(s.optOutDue(now: t0.addingTimeInterval(91 * day)))
+        XCTAssertEqual(s.nextOptOutDate(now: t0.addingTimeInterval(10 * day)), t0.addingTimeInterval(91 * day))
     }
 }
 
@@ -3493,7 +3544,7 @@ final class EmailedInsteadTests: XCTestCase {
         let now = Date()
         let attempt = AutoOptOut.attempt(for: .emailed, now: now)
         XCTAssertEqual(attempt?.wasSubmitted, true, "the dialog says we mark it done once the email is sent")
-        var p = Progress(); if let attempt { p.recordOptOutAttempt(attempt, site: "x") }
+        var p = OptOutKitCore.Progress(); if let attempt { p.recordOptOutAttempt(attempt, site: "x") }
         XCTAssertEqual(p.optOutAttempts["x"]?.count, 1)
     }
 }

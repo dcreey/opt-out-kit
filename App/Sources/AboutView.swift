@@ -93,7 +93,7 @@ extension AboutView {
     @ViewBuilder
     fileprivate var autoSection: some View {
         Section {
-            Toggle("Send opt-out requests every month", isOn: Binding(
+            Toggle("Send opt-out requests automatically", isOn: Binding(
                 get: { model.autoSettings.optOutEnabled },
                 set: { model.setAuto(scan: false, optOut: $0) }))
                 .accessibilityIdentifier("settings-optout-toggle")
@@ -101,7 +101,7 @@ extension AboutView {
         } header: {
             Text("Automatic protection")
         } footer: {
-            Text("Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.")
+            Text("Opt-out requests run every 3 months (a full re-test of every site every 6), when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.")
         }
     }
 

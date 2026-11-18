@@ -154,6 +154,25 @@ payment, ID or phone call, site blocked me, other) and leaves that site alone fo
   `tools/check_links.py` checks every hand-written broker link and every generated form page, crawls for a replacement when one
   is broken, and writes `pipeline/link-health.md`. The job fails if a hand-written broker link is lost and no new one is found.
 
+## What the background run does (2026-11-17)
+
+The run has two kinds, both sending the forms themselves, one site at a time, with nobody on screen:
+
+| Pass | When | Sites | What a site that does not go through does |
+|---|---|---|---|
+| **Full** | The first run, then every 6 months (`AutoSettings.fullEvery`, two periods; due 3 days early) | Every site that `AutoOptOut.backgroundAttemptable` accepts (about 490 of 829 today; `AppModel.fullPassSize` counts it for the explanation) | Recorded as `failed`, `rejected` or `challenged`; the site is semi-automated, with that as the reason |
+| **Repeat** | Every 3 months (`AutoSettings.optOutEvery` = 91 days) between full passes | Only the sites whose latest attempt went through (`AutoOptOut.lastAttemptWentThrough`) | The same: a repeat that does not go through moves the site to semi-automated |
+
+`backgroundAttemptable` is the safety gate and applies to both passes: the site's page mode is `form` (a form is known, read or found live; not a caution or `no_fill` site, no business,
+agent, other or file blocker, no reviewed real run that failed), no typed code, no listing for the person to pick, the form-filler's plan is ready (nothing only the person holds), and the
+person has not set the site aside. A human check, terms prompt or box to certify that a page shows is **never solved or ticked**: the engine stops there (`challenged`), so a site that
+showed one is still tried in a full pass (pages change) and goes to the person's queue if it still does. A site counts done only when the page's confirmation is seen.
+
+Bookkeeping: `AutoSettings.lastFullRun` (when a full pass last finished), `passStarted` and `passKind` (a pass that was cut off carries on with the sites it has not yet tried, whatever their
+outcome), and the period (`RunPeriod`, 91 days from the first run) so a site sent in the current period is left alone. Only the automatic group counts in the period's "handled of N", so
+a lost site from a full pass never holds the period open. Automatic protection is explained to the person at first use and in Settings (`AutoExplainer`), with the number of sites in a pass.
+Tests: `AutoOptOutTests.testABackgroundRunTriesOnlySites...`, `testAFullPassTriesEverySiteAnd...`, `testTheFirstRunAndThenEverySixMonths...`, `BackgroundPassesAppTests`, `AutomaticRunAppTests`.
+
 ## Background running (unverified)
 
 Two background tasks are registered (`dev.optoutkit.app.scan` daily, `.optout` weekly) and the app also runs anything due

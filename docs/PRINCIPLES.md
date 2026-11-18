@@ -57,8 +57,9 @@ Where a principle is enforced by a test or a build rule, the enforcement is name
 
 ## 5. The person is in control
 
-- The person does the human steps: the CAPTCHA, the confirm click, the ID or phone step, and the final send on the page's own button. The app never solves a
-  human check, never uses a service to do so, and never presses send on a page it cannot verify.
+- The person does the human steps: the CAPTCHA, the confirm click, the ID or phone step. The app never solves a human check, never uses a service to do so, and
+  never ticks a box that certifies something for them. In the guided and semi-automated flows on screen the person presses the page's own button. The background
+  run (decided 2026-11-17: a full pass over every site that can be tried, then a repeat every 3 months and a full re-test every 6) may also fill and send a form itself; it counts a site done only when it sees the confirmation, and anything that does not go through is handed back to the person's queue.
 - It never accepts terms on someone's behalf without a reviewed list, and never fills a sign-up, newsletter, demo or contact form. A test fails if one is
   set to be filled automatically.
 - It asks rather than guesses. When a link could belong to several sites (shared privacy-portal providers) the app asks which site it is. When a site is

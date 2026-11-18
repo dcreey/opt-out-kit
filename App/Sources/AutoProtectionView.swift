@@ -3,12 +3,16 @@ import OptOutKitCore
 
 /// What automatic protection does, in plain words. Shown at first use and in Settings, before anything is switched on.
 struct AutoExplainer: View {
+    @EnvironmentObject var model: AppModel
     var body: some View {
+        let n = model.fullPassSize
         VStack(alignment: .leading, spacing: 8) {
-            Label("Every month, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.", systemImage: "paperplane")
+            Label(Loc.f("First, it tries about %lld sites: every site where we found the opt-out form and it can be filled in and sent without you. It fills in only what the form asks for (like name, email and city) and sends what it can. If a recent look found you are not listed on a site, it sends nothing there.", n), systemImage: "paperplane")
+            Label("Every 3 months, it sends again to the sites that went through, because brokers add people back.", systemImage: "arrow.clockwise")
+            Label(Loc.f("Every 6 months, it re-tests all %lld sites from the start, because forms and checks change.", n), systemImage: "checklist")
+            Label("On any pass, a site that does not go through is never marked done. It moves to your semi-automated queue, with the reason, and you finish it in the app.", systemImage: "arrow.uturn.forward")
             Label("It never solves a CAPTCHA, never makes an account or pays, and leaves anything that needs a login, ID, a phone call or a certification to you. Some sites email you a link to confirm; that click is yours.", systemImage: "hand.raised")
-            Label("Most sites guard their forms with human checks, so expect many to need you. The app tells you which.", systemImage: "info.circle")
-            Label("It runs when the app is open and, when iOS allows, in the background. You can turn it off any time.", systemImage: "switch.2")
+            Label("It runs when the app is open and, when iOS allows, in the background. The first pass takes a while and carries on where it stopped. You can turn it off any time.", systemImage: "switch.2")
         }
         .font(.footnote)
     }
@@ -20,7 +24,7 @@ struct AutoToggles: View {
     @Binding var optOut: Bool
 
     var body: some View {
-        Toggle("Send opt-out requests every month", isOn: $optOut).accessibilityIdentifier("auto-optout-toggle")
+        Toggle("Send opt-out requests automatically", isOn: $optOut).accessibilityIdentifier("auto-optout-toggle")
     }
 }
 
@@ -96,10 +100,14 @@ struct AutoActivityView: View {
                         Text("Last run: \(Loc.date(last, time: true))").font(.footnote).foregroundStyle(.secondary)
                     }
                     if let next = model.autoSettings.nextOptOutDate() {
-                        Text("Next monthly run: \(Loc.date(next))").font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("auto-next-run")
+                        Group {
+                            if model.autoSettings.kindOfRun(on: next) == .full { Text(Loc.f("Next run %@: a full re-test of every site", Loc.date(next))) }
+                            else { Text(Loc.f("Next run %@: sends again to the sites that went through", Loc.date(next))) }
+                        }
+                            .font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("auto-next-run")
                     }
                 } header: { Text(person.displayName) } footer: {
-                    Text("It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.")
+                    Text("It fills in and sends each form in the background, with no website opened. A site that does not go through moves to your semi-automated queue, and you are asked about it there.")
                 }
                 periodSections(for: person)
                 if model.autoSettings.lastAttempted != nil {

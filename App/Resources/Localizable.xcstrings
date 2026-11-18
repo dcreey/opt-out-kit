@@ -8419,6 +8419,52 @@
     }
    }
   },
+  "Every 3 months, it sends again to the sites that went through, because brokers add people back.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les 3 mois, elle renvoie la demande aux sites où elle a abouti, car les courtiers réajoutent des gens."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada 3 meses vuelve a enviar a los sitios donde se completó, porque los intermediarios vuelven a añadir personas."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle 3 Monate sendet sie erneut an die Seiten, bei denen es geklappt hat, denn Datenhändler nehmen Menschen wieder auf."
+     }
+    }
+   }
+  },
+  "Every 6 months, it re-tests all %lld sites from the start, because forms and checks change.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les 6 mois, elle reteste les %lld sites depuis le début, car les formulaires et les contrôles changent."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cada 6 meses vuelve a probar los %lld sitios desde cero, porque los formularios y las verificaciones cambian."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle 6 Monate testet sie alle %lld Seiten von vorn, denn Formulare und Prüfungen ändern sich."
+     }
+    }
+   }
+  },
   "Every acceptance is logged on this phone": {
    "extractionState": "manual",
    "localizations": {
@@ -8530,29 +8576,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jeden Monat füllt es Opt-out-Formulare selbst aus und sendet sie"
-     }
-    }
-   }
-  },
-  "Every month, it sends opt-out requests. For each site where we found the opt-out form, it fills that form in with only what it asks for (like name, email and city) and sends it. If a recent look found you are not listed there, it sends nothing.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Chaque mois, il envoie des demandes de retrait. Pour chaque site où nous avons trouvé le formulaire, il le remplit avec seulement ce qui est demandé (nom, e-mail, ville) et l'envoie. Si un contrôle récent montre que vous n'y figurez pas, il n'envoie rien."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cada mes envía solicitudes de baja. En cada sitio donde encontramos el formulario, lo rellena solo con lo que pide (nombre, correo, ciudad) y lo envía. Si una revisión reciente muestra que no figura allí, no envía nada."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jeden Monat sendet es Opt-out-Anfragen. Auf jeder Seite, wo wir das Formular gefunden haben, füllt es nur aus, was verlangt wird (Name, E-Mail, Ort), und sendet es. Zeigt eine aktuelle Prüfung, dass Sie dort nicht gelistet sind, sendet es nichts."
      }
     }
    }
@@ -9542,6 +9565,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Vorname"
+     }
+    }
+   }
+  },
+  "First, it tries about %lld sites: every site where we found the opt-out form and it can be filled in and sent without you. It fills in only what the form asks for (like name, email and city) and sends what it can. If a recent look found you are not listed on a site, it sends nothing there.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pour commencer, elle essaie environ %lld sites : tous ceux où nous avons trouvé le formulaire de retrait et qu'elle peut remplir et envoyer sans vous. Elle ne remplit que ce que le formulaire demande (nom, e-mail et ville, par exemple) et envoie ce qu'elle peut. Si un examen récent a montré que vous ne figurez pas sur un site, elle n'y envoie rien."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Para empezar, prueba unos %lld sitios: todos aquellos donde encontramos el formulario de baja y puede rellenarse y enviarse sin ti. Solo rellena lo que pide el formulario (nombre, correo y ciudad, por ejemplo) y envía lo que puede. Si una revisión reciente indica que no figuras en un sitio, no envía nada allí."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zuerst versucht sie etwa %lld Seiten: alle, auf denen wir das Löschformular gefunden haben und die sich ohne Sie ausfüllen und absenden lassen. Sie füllt nur aus, was das Formular verlangt (etwa Name, E-Mail und Ort), und sendet, was sie kann. Wenn eine aktuelle Prüfung ergab, dass Sie auf einer Seite nicht geführt werden, sendet sie dort nichts."
      }
     }
    }
@@ -11271,25 +11317,25 @@
     }
    }
   },
-  "It fills in and sends each form in the background, with no website opened. You are only asked about a site if it does not go through, and that site then moves to semi-automated or guided.": {
+  "It fills in and sends each form in the background, with no website opened. A site that does not go through moves to your semi-automated queue, and you are asked about it there.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Elle remplit et envoie chaque formulaire en arrière-plan, sans ouvrir de site. On ne vous sollicite que si un site n’aboutit pas ; il passe alors en semi-automatisé ou guidé."
+      "value": "Elle remplit et envoie chaque formulaire en arrière-plan, sans ouvrir de site. Un site qui n'aboutit pas passe dans votre file semi-automatique, où elle vous demande de vous en occuper."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Rellena y envía cada formulario en segundo plano, sin abrir ningún sitio. Solo se te consulta si un sitio no se completa, y entonces pasa a semiautomático o guiado."
+      "value": "Rellena y envía cada formulario en segundo plano, sin abrir ningún sitio web. Un sitio que no se completa pasa a tu cola semiautomática, y allí se te pregunta por él."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Sie füllt jedes Formular im Hintergrund aus und sendet es, ohne eine Webseite zu öffnen. Sie werden nur gefragt, wenn eine Seite nicht durchgeht; sie wird dann halbautomatisch oder geführt."
+      "value": "Sie füllt jedes Formular im Hintergrund aus und sendet es, ohne eine Website zu öffnen. Eine Seite, die nicht durchgeht, wandert in Ihre halbautomatische Warteschlange, und dort werden Sie danach gefragt."
      }
     }
    }
@@ -11428,6 +11474,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie löst nie ein CAPTCHA, legt nie ein Konto an und zahlt nie etwas und überlässt Ihnen alles, was Login, Ausweis, einen Anruf oder eine Bestätigung verlangt. Manche Websites schicken Ihnen einen Bestätigungslink per E-Mail; dieser Klick gehört Ihnen."
+     }
+    }
+   }
+  },
+  "It runs when the app is open and, when iOS allows, in the background. The first pass takes a while and carries on where it stopped. You can turn it off any time.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle tourne quand l'app est ouverte et, quand iOS l'autorise, en arrière-plan. Le premier passage prend du temps et reprend là où il s'est arrêté. Vous pouvez la désactiver à tout moment."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Funciona con la app abierta y, cuando iOS lo permite, en segundo plano. La primera pasada tarda un rato y continúa donde se quedó. Puedes desactivarla cuando quieras."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie läuft, wenn die App geöffnet ist, und, wenn iOS es erlaubt, im Hintergrund. Der erste Durchgang dauert eine Weile und macht dort weiter, wo er aufgehört hat. Sie können sie jederzeit ausschalten."
      }
     }
    }
@@ -13640,29 +13709,6 @@
     }
    }
   },
-  "Most sites guard their forms with human checks, so expect many to need you. The app tells you which.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La plupart des sites protègent leurs formulaires par des vérifications anti-robot : attendez-vous à ce que beaucoup aient besoin de vous. L'appli vous dit lesquels."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La mayoría de los sitios protege sus formularios con verificaciones anti-bots, así que espera que muchos te necesiten. La app te dice cuáles."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die meisten Websites schützen ihre Formulare mit Bot-Prüfungen, rechnen Sie also damit, dass viele Sie brauchen. Die App sagt Ihnen, welche."
-     }
-    }
-   }
-  },
   "Most sites need the same few things.": {
    "extractionState": "manual",
    "localizations": {
@@ -14303,6 +14349,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nächste 25"
+     }
+    }
+   }
+  },
+  "Next run %@: a full re-test of every site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prochain passage le %@ : un nouveau test complet de tous les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Próxima pasada el %@: una nueva prueba completa de todos los sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nächster Durchgang am %@: ein vollständiger neuer Test aller Seiten"
+     }
+    }
+   }
+  },
+  "Next run %@: sends again to the sites that went through": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Prochain passage le %@ : renvoi aux sites où cela a abouti"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Próxima pasada el %@: vuelve a enviar a los sitios donde se completó"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nächster Durchgang am %@: erneutes Senden an die Seiten, bei denen es geklappt hat"
      }
     }
    }
@@ -15568,6 +15660,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Am Computer hat Firefox eine Einstellung dafür: Einstellungen, Datenschutz & Sicherheit, dann „Websites mitteilen, meine Daten nicht zu verkaufen oder weiterzugeben“."
+     }
+    }
+   }
+  },
+  "On any pass, a site that does not go through is never marked done. It moves to your semi-automated queue, with the reason, and you finish it in the app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À chaque passage, un site qui n'aboutit pas n'est jamais marqué comme terminé. Il passe dans votre file semi-automatique, avec la raison, et vous le terminez dans l'app."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cada pasada, un sitio que no se completa nunca se marca como terminado. Pasa a tu cola semiautomática, con el motivo, y lo terminas en la app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bei jedem Durchgang wird eine Seite, die nicht durchgeht, nie als erledigt markiert. Sie wandert mit dem Grund in Ihre halbautomatische Warteschlange, und Sie schließen sie in der App ab."
      }
     }
    }
@@ -17090,25 +17205,25 @@
     }
    }
   },
-  "Opt-out requests run monthly, when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.": {
+  "Opt-out requests run every 3 months (a full re-test of every site every 6), when the app is open and when iOS lets it run in the background. It never solves a CAPTCHA or accepts terms for you without your separate approval. When you opt yourself out, it ticks a plain box saying you are the person the request is about.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Les demandes de retrait partent chaque mois, quand l'app est ouverte et quand iOS la laisse tourner en arrière-plan. Elle ne résout jamais de CAPTCHA et n'accepte jamais de conditions sans votre accord séparé. Quand vous vous retirez vous-même, elle coche une simple case disant que vous êtes la personne concernée."
+      "value": "Les demandes de retrait partent tous les 3 mois (avec un nouveau test complet de tous les sites tous les 6 mois), quand l'app est ouverte et quand iOS la laisse tourner en arrière-plan. Elle ne résout jamais de CAPTCHA et n'accepte jamais de conditions pour vous sans votre accord distinct. Quand vous vous retirez vous-même, elle coche une case simple indiquant que vous êtes la personne concernée par la demande."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Las solicitudes de baja se envían cada mes, con la app abierta y cuando iOS la deja ejecutarse en segundo plano. Nunca resuelve un CAPTCHA ni acepta términos sin su aprobación aparte. Cuando se da de baja usted mismo, marca una casilla simple que dice que es la persona a la que se refiere la solicitud."
+      "value": "Las solicitudes de baja se envían cada 3 meses (con una nueva prueba completa de todos los sitios cada 6), con la app abierta y cuando iOS le deja funcionar en segundo plano. Nunca resuelve un CAPTCHA ni acepta condiciones por ti sin tu aprobación aparte. Cuando te das de baja a ti mismo, marca una casilla sencilla que indica que eres la persona a la que se refiere la solicitud."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Opt-out-Anfragen laufen monatlich, wenn die App geöffnet ist und iOS ihr im Hintergrund Zeit gibt. Sie löst nie ein CAPTCHA und akzeptiert nie Bedingungen ohne Ihre gesonderte Zustimmung. Wenn Sie sich selbst austragen, hakt sie ein einfaches Kästchen ab, dass Sie die betroffene Person sind."
+      "value": "Löschanträge werden alle 3 Monate gesendet (mit einem vollständigen neuen Test aller Seiten alle 6), wenn die App geöffnet ist und wenn iOS sie im Hintergrund laufen lässt. Sie löst nie ein CAPTCHA und akzeptiert nie Bedingungen für Sie ohne Ihre gesonderte Zustimmung. Wenn Sie sich selbst austragen, setzt sie ein einfaches Häkchen, dass Sie die Person sind, um die es in dem Antrag geht."
      }
     }
    }
@@ -17136,25 +17251,25 @@
     }
    }
   },
-  "Opt-out requests, sent for you every month in the background.": {
+  "Opt-out requests, sent for you in the background: every 3 months, with a full re-test every 6.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Demandes de retrait envoyées pour vous chaque mois en arrière-plan."
+      "value": "Demandes de retrait envoyées pour vous en arrière-plan : tous les 3 mois, avec un nouveau test complet tous les 6."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Solicitudes de baja enviadas por usted cada mes en segundo plano."
+      "value": "Solicitudes de baja enviadas por ti en segundo plano: cada 3 meses, con una prueba completa cada 6."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Opt-out-Anfragen, die jeden Monat im Hintergrund für Sie gesendet werden."
+      "value": "Löschanträge, die im Hintergrund für Sie gesendet werden: alle 3 Monate, mit einem vollständigen Test alle 6."
      }
     }
    }
@@ -19988,25 +20103,25 @@
     }
    }
   },
-  "Send opt-out requests every month": {
+  "Send opt-out requests automatically": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Envoyer des demandes de retrait chaque mois"
+      "value": "Envoyer les demandes de retrait automatiquement"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Enviar solicitudes de baja cada mes"
+      "value": "Enviar las solicitudes de baja automáticamente"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Opt-out-Anfragen jeden Monat senden"
+      "value": "Löschanträge automatisch senden"
      }
     }
    }

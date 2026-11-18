@@ -1,5 +1,9 @@
 import Foundation
 
+/// What a background run does. The first run, and then every six months, is a **full** pass over every site that can be tried. In between (every three months) the
+/// **repeat** pass sends again to the sites whose latest attempt went through. A site that does not go through on either is left for the person's semi-automated queue.
+public enum RunKind: String, Codable, Sendable { case full, repeatSent }
+
 public enum SubmitOutcome: Equatable, Sendable {
     case submitted(awaitingEmail: Bool)   // a success message was seen; awaitingEmail when it asks for an email confirmation
     case filledNotSubmitted               // dry run: the form was filled and left unsent
@@ -116,6 +120,33 @@ public struct AutoOptOut: Sendable {
         }
     }
 
+    /// Whether the background run may try a site with nobody watching: the app fills the form and presses send itself, and counts the site done only when it sees the
+    /// confirmation. Only a site whose form is known and has nothing only a person can do: not a caution or `no_fill` site, business, agent, other or file forms, a typed
+    /// code, a form that needs the person's own listing, or one that needs something only the person holds; and not a site the person set aside. A human check, terms
+    /// prompt or box to certify that a page shows is never solved or ticked: the engine stops there and the site goes to the person's semi-automated queue.
+    public static func backgroundAttemptable(_ entry: DirectoryEntry, person: Person, progress: Progress, now: Date = Date()) -> Bool {
+        guard entry.pageMode == .form else { return false }
+        if progress.isParked(entry.id, now: now) { return false }
+        if let form = entry.optOutForm {
+            if FormFiller.hasTypedCode(form) || FormFiller.needsListing(form) { return false }
+            if !form.fields.isEmpty, FormFiller.plan(for: form, signals: entry.signals, person: person).verdict != .ready { return false }
+        } else if entry.liveForm?.found != true { return false }
+        return true
+    }
+
+    /// Whether the site's latest attempt went through (a form was sent).
+    public static func lastAttemptWentThrough(_ entry: DirectoryEntry, progress: Progress) -> Bool {
+        progress.optOutAttempts[entry.id]?.last?.wasSubmitted ?? false
+    }
+
+    /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass only the ones whose latest attempt went through.
+    public static func backgroundSites(_ kind: RunKind, entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date()) -> [DirectoryEntry] {
+        entries.filter { e in
+            guard backgroundAttemptable(e, person: person, progress: progress, now: now) else { return false }
+            return kind == .full || lastAttemptWentThrough(e, progress: progress)
+        }
+    }
+
     /// Runs the opt-out for every site with a form, one at a time. `dryRun` fills forms but never sends them.
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
                     holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
@@ -208,9 +239,16 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     /// The sites the automatic run has taken on, per person. A site that fails moves out of the automatic group, but it stays here, so the
     /// "handled of total" and the checklist keep showing it (unchecked) in every period until it goes through.
     public var periodTargets: [String: [String]]?
+    /// When the last full pass over every site finished; nil until the first one has.
+    public var lastFullRun: Date?
+    /// A pass that was started and has not finished (the app was closed): when it began and which kind it is, so it carries on with the sites it has not yet tried.
+    public var passStarted: Date?
+    public var passKind: RunKind?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
-    public static let optOutEvery: TimeInterval = 30 * 86_400     // monthly
+    public static let optOutEvery: TimeInterval = 91 * 86_400     // every three months
+    /// A full re-test of every site comes every second period (about six months).
+    public static let fullEvery: TimeInterval = 2 * optOutEvery
 
     public init() {}
 
@@ -233,6 +271,14 @@ public struct AutoSettings: Codable, Equatable, Sendable {
         guard let periodAnchor else { return lastOptOut?.addingTimeInterval(Self.optOutEvery) }
         return RunPeriod.containing(now, anchor: periodAnchor).end
     }
+    /// The kind of the next run: a full pass the first time and then every six months, otherwise a repeat of what went through.
+    public func nextRunKind(now: Date = Date()) -> RunKind {
+        if let passKind, passStarted != nil { return passKind }
+        guard let lastFullRun else { return .full }
+        return now >= lastFullRun.addingTimeInterval(Self.fullEvery - 3 * 86_400) ? .full : .repeatSent
+    }
+    /// The kind of the run due on `date` (the next period's start), for saying what is coming.
+    public func kindOfRun(on date: Date) -> RunKind { nextRunKind(now: date) }
     public var hasDecided: Bool { decidedAt != nil }
 
     /// Turns both on at the person's first-run approval. Either can be switched off later.

@@ -219,7 +219,7 @@ final class ProfileGateAppTests: XCTestCase {
 
 @MainActor
 final class AutomaticRunAppTests: XCTestCase {
-    func testTheRunWorksThroughExactlyTheSitesTheAutomaticTaskShows() async throws {
+    func testTheFirstRunWorksThroughEverySiteThatCanBeTriedAndNothingElse() async throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
@@ -232,12 +232,13 @@ final class AutomaticRunAppTests: XCTestCase {
         let shown = m.automaticDomains(for: me)
         XCTAssertFalse(shown.isEmpty)
         let task = try XCTUnwrap(m.plan.flatMap(\.tasks).first { $0.kind == .automatic })
-        XCTAssertEqual(Set(task.domains), shown, "the count on the task is the set the run works through")
+        XCTAssertEqual(Set(task.domains), shown, "the count on the task is the set of automatic sites")
+        let pass = m.backgroundDomains(for: me, kind: .full)
         await m.runAutoOptOut(for: me, submitter: Seen())
         let ran = Set((m.optOutRun[me.id] ?? []).map(\.domain))
-        XCTAssertFalse(ran.isEmpty)
-        XCTAssertTrue(ran.isSubset(of: shown), "no semi-automated or guided site is sent in the background: \(ran.subtracting(shown).sorted().prefix(5))")
-        XCTAssertLessThan(ran.count, m.directory.filter { $0.optOutForm != nil }.count)
+        XCTAssertTrue(shown.isSubset(of: ran), "every automatic site is worked through")
+        XCTAssertTrue(ran.isSubset(of: pass), "no site outside the full pass is sent in the background: \(ran.subtracting(pass).sorted().prefix(5))")
+        XCTAssertLessThan(ran.count, m.directory.count, "sites with no form, a caution or something only a person can do are left out")
     }
 
     func testASiteThatFailedAutomaticallyMovesToAGuideAndACheckToSemiAutomated() {
@@ -263,6 +264,52 @@ final class RunReportTests: XCTestCase {
         XCTAssertEqual(mixed.attempted, 3); XCTAssertEqual(mixed.sent, 1)
         XCTAssertEqual(mixed.needYou.map(\.id), ["b", "c"])
         XCTAssertFalse(RunReport(person: "Me", rows: []).allSucceeded, "nothing tried is not a success")
+    }
+}
+
+@MainActor
+final class BackgroundPassesAppTests: XCTestCase {
+    private final class Tally: @unchecked Sendable { var pages: [String] = []; let lock = NSLock(); func add(_ p: String) { lock.lock(); pages.append(p); lock.unlock() } }
+    private struct Alternating: FormSubmitter {
+        let tally: Tally
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+            tally.add(form.page.absoluteString)
+            return tally.pages.count % 2 == 0 ? .submitted(awaitingEmail: false) : .failed("no confirmation")
+        }
+    }
+
+    func testTheFirstRunIsAFullPassAndASiteThatDoesNotGoThroughIsLeftWithThePerson() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        XCTAssertEqual(m.autoSettings.nextRunKind(), .full, "the first run is the full pass")
+        let full = m.backgroundDomains(for: me, kind: .full)
+        XCTAssertGreaterThan(full.count, 100, "the full pass takes on every site that can be tried")
+        let byDomain = Dictionary(m.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        for d in full {
+            let e = try XCTUnwrap(byDomain[d])
+            XCTAssertNil(e.caution, "\(d): a site with a caution is never filled"); XCTAssertNotEqual(e.noFill, true, d)
+            XCTAssertEqual(e.pageMode, .form, d)
+        }
+        XCTAssertTrue(m.automaticDomains(for: me).isSubset(of: full), "the automatic sites are part of the full pass")
+        XCTAssertTrue(m.backgroundDomains(for: me, kind: .repeatSent).isEmpty, "nothing has gone through yet, so there is nothing to repeat")
+        let automaticBefore = m.automaticDomains(for: me).count
+        let tally = Tally()
+        await m.runAutoOptOut(for: me, submitter: Alternating(tally: tally))
+        let rows = m.optOutRun[me.id] ?? []
+        XCTAssertTrue(Set(rows.map(\.domain)).isSubset(of: full), "nothing outside the full pass is sent")
+        let sent = Set(rows.filter { if case .submitted = $0.result { return true } else { return false } }.map(\.domain))
+        let lost = Set(rows.filter { if case .failed = $0.result { return true } else { return false } }.map(\.domain))
+        XCTAssertFalse(sent.isEmpty); XCTAssertFalse(lost.isEmpty)
+        for d in lost { XCTAssertEqual(m.method(for: try XCTUnwrap(byDomain[d]), person: me).method, .semiAutomatic, "\(d) did not go through: it is semi-automated now") }
+        for d in sent { XCTAssertTrue(byDomain[d]?.isCurrent(attempts: m.progress.optOutAttempts) ?? false, "\(d) counts as done") }
+        XCTAssertNotNil(m.autoSettings.lastFullRun, "the full pass is finished"); XCTAssertNil(m.autoSettings.passStarted)
+        XCTAssertEqual(m.autoSettings.nextRunKind(), .repeatSent, "the next run, three months on, repeats what went through")
+        XCTAssertEqual(m.backgroundDomains(for: me, kind: .repeatSent), sent.intersection(full), "the repeat pass is exactly the sites that went through")
+        XCTAssertEqual(try XCTUnwrap(m.periodHistory(for: me).first).total, automaticBefore, "only the automatic sites are counted in the period, so the full pass's lost sites never hold it open")
     }
 }
 

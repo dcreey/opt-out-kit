@@ -416,6 +416,22 @@ final class AppModel: ObservableObject {
 
     /// The sites the app opts a person out of by itself: exactly the ones in the plan's automatic task, so the count the person is
     /// shown is the number the run works through.
+    /// How many sites a full pass tries, counted for a person with every detail a form could ask for, so the number does not depend on who is using the app
+    /// (said in the explanation of automatic protection).
+    var fullPassSize: Int {
+        let sample = Person(displayName: "Sample", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                            addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")], emails: ["pat@example.com"], phones: ["555-0100"],
+                            birthdate: "1980-01-01", confirmsOwnIdentity: true)
+        return AutoOptOut.backgroundSites(.full, entries: directory.map(resolved), person: sample, progress: Progress()).count
+    }
+
+    /// The sites a background run of this kind works through for this person (see `AutoOptOut.backgroundSites`): every site that can be tried for a full pass,
+    /// the ones whose latest attempt went through for a repeat.
+    func backgroundDomains(for original: Person, kind: RunKind, person: Person? = nil, now: Date = Date()) -> Set<String> {
+        let p = person ?? formPerson(original)
+        return Set(AutoOptOut.backgroundSites(kind, entries: directory.map(resolved), person: p, progress: household.progress(for: original.id), now: now).map(\.domain))
+    }
+
     func automaticDomains(for person: Person) -> Set<String> {
         let steps = person.id == selectedID ? plan : buildPlan(for: person)
         return Set(steps.flatMap(\.tasks).filter { $0.kind == .automatic }.flatMap(\.domains))
@@ -655,7 +671,11 @@ final class AppModel: ObservableObject {
         // Periods (months) are counted from the first run; an earlier send by hand counts as the start so nothing already done is lost from the tally.
         let earliest = people.compactMap { household.progress(for: $0.id).optOutAttempts.values.flatMap { $0 }.filter(\.wasSubmitted).map(\.date).min() }.min()
         if household.autoSettings.periodAnchor == nil { household.updateAuto { $0.periodAnchor = min(earliest ?? Date(), Date()) } }
-        household.updateAuto { $0.optOutResumePending = true }; save()
+        household.updateAuto {
+            $0.optOutResumePending = true
+            if $0.passStarted == nil { $0.passStarted = Date(); $0.passKind = $0.nextRunKind(now: Date()) }
+        }
+        save()
         if #available(iOS 26.0, *), useContinued {
             let run = ContinuedRun()
             if run.start(total: max(total, 1), onExpire: { [weak self] in
@@ -668,7 +688,13 @@ final class AppModel: ObservableObject {
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
     private func endOptOutRun(interrupted: Bool) {
         autoBusy = nil; autoProgress = nil
-        if !interrupted { household.updateAuto { $0.optOutResumePending = nil } }
+        if !interrupted {
+            household.updateAuto {
+                $0.optOutResumePending = nil
+                if $0.passKind == .full { $0.lastFullRun = Date() }
+                $0.passStarted = nil; $0.passKind = nil
+            }
+        }
         if #available(iOS 26.0, *) { (continuedRun as? ContinuedRun)?.finish(success: !interrupted) }
         continuedRun = nil
         save(); endBackgroundTime()
@@ -676,7 +702,7 @@ final class AppModel: ObservableObject {
 
     // MARK: Run periods
 
-    /// The current period of the automatic run (a month when it runs monthly), once a first run has set its start.
+    /// The current period of the automatic run (three months), once a first run has set its start.
     func runPeriod(now: Date = Date()) -> RunPeriod? {
         autoSettings.periodAnchor.map { RunPeriod.containing(now, anchor: $0) }
     }
@@ -770,8 +796,11 @@ final class AppModel: ObservableObject {
     func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
         guard storageProblem == nil, isReady(original) else { return }
-        // Only the sites in the "done for you" task. Semi-automated and guided sites need the person, so they are never sent in the background.
-        var runnable = automaticOnly ? automaticDomains(for: original) : nil
+        // A full pass (the first run, then every six months) tries every site that can be tried; the pass in between repeats the sites that went through. The "done for you"
+        // sites go first. A site that does not go through is never marked done: it is left in the person's semi-automated queue, with what happened as the reason.
+        let automatic = automaticDomains(for: original)
+        let kind = household.autoSettings.nextRunKind(now: Date())
+        var runnable = automaticOnly ? backgroundDomains(for: original, kind: kind, person: person) : nil
         #if DEBUG
         // Simulator work: `-only-domains a.com,b.com` runs just those sites, whatever group they are in.
         let args = ProcessInfo.processInfo.arguments
@@ -785,13 +814,21 @@ final class AppModel: ObservableObject {
         var adID: String?
         if submitter == nil, AdvertisingID.isAsked(by: directory.filter { runnable?.contains($0.domain) ?? true }) { adID = await AdvertisingID.current() }
         // The sites this run takes on are remembered for the period, so a site that fails (and so leaves the automatic group) still counts in "of N".
+        // Only the automatic sites are counted in the period ("handled of N"): a semi-automated site that does not go through must not hold the period open.
         if !dryRun, let runnable {
-            let ids = directory.filter { runnable.contains($0.domain) }.map(\.id)
+            let ids = directory.filter { runnable.contains($0.domain) && automatic.contains($0.domain) }.map(\.id)
             household.updateAuto { $0.addPeriodTargets(ids, person: person.id.uuidString) }
         }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
-        var results = await engine.run(entries: directory.filter { runnable?.contains($0.domain) ?? true }.map(resolved), person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
+        // A pass that was cut off carries on with the sites it has not tried yet (any outcome counts as tried).
+        let passStart = household.autoSettings.passStarted
+        let triedThisPass: (DirectoryEntry) -> Bool = { e in
+            guard let passStart, !dryRun, let last = self.household.progress(for: original.id).optOutAttempts[e.id]?.last else { return false }
+            return last.date >= passStart
+        }
+        let toRun = directory.filter { (runnable?.contains($0.domain) ?? true) && !triedThisPass($0) }.map(resolved)
+        var results = await engine.run(entries: toRun.filter { automatic.contains($0.domain) } + toRun.filter { !automatic.contains($0.domain) }, person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total); if #available(iOS 26.0, *) { (self.continuedRun as? ContinuedRun)?.report(done: done, total: total) } } },
                                    evidence: { [evidence, personID = original.id] entry, shot in
                                        try? evidence.save(shot, person: personID, site: entry.id)
