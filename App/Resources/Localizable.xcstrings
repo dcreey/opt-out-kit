@@ -967,6 +967,29 @@
     }
    }
   },
+  "%lld more were not tried this time:": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld autres n'ont pas été essayés cette fois :"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld más no se probaron esta vez:"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld weitere wurden diesmal nicht versucht:"
+     }
+    }
+   }
+  },
   "%lld moved to semi-automatic. Each needs a person for one step, usually a check: we fill in the form, you clear the check and send.": {
    "extractionState": "manual",
    "localizations": {
@@ -12007,6 +12030,29 @@
     }
    }
   },
+  "Last run %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernier passage %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Última ejecución %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Letzter Lauf %@"
+     }
+    }
+   }
+  },
   "Last run %@: %lld sent, %lld need you.": {
    "extractionState": "manual",
    "localizations": {
@@ -15089,6 +15135,29 @@
     }
    }
   },
+  "No site needed sending this time": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun site n'était à envoyer cette fois"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta vez no hacía falta enviar a ningún sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diesmal musste an keine Seite gesendet werden"
+     }
+    }
+   }
+  },
   "No, it is finished": {
    "extractionState": "manual",
    "localizations": {
@@ -16400,6 +16469,29 @@
     }
    }
   },
+  "One request reaches every registered data broker in California. Do it first: the automatic opt-out then leaves those sites to it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une seule demande touche tous les courtiers de données enregistrés en Californie. Faites-la d'abord : la désinscription automatique lui laisse ensuite ces sites."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una sola solicitud llega a todos los corredores de datos registrados en California. Hazla primero: la exclusión automática le deja después esos sitios."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Eine Anfrage erreicht jeden registrierten Datenhändler in Kalifornien. Stellen Sie sie zuerst: Der automatische Widerspruch überlässt ihr dann diese Seiten."
+     }
+    }
+   }
+  },
   "One request to every broker": {
    "extractionState": "manual",
    "localizations": {
@@ -17385,6 +17477,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Öffnet sich, wenn Schritt 1 fertig ist. Dann wissen wir, welche Seiten Sie für einen Schritt brauchen, etwa eine Prüfung: Wir füllen jedes Formular aus, Sie bestehen die Prüfung und senden."
+     }
+    }
+   }
+  },
+  "Opens when step 2 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "S'ouvre quand l'étape 2 est terminée. Nous savons alors quels sites ont besoin de vous pour une étape, comme une vérification : nous remplissons chaque formulaire, vous passez la vérification et envoyez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se abre cuando termina el paso 2. Entonces sabremos qué sitios te necesitan para un paso, como una verificación: rellenamos cada formulario, tú superas la verificación y lo envías."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnet sich, wenn Schritt 2 fertig ist. Dann wissen wir, welche Seiten Sie für einen Schritt brauchen, etwa eine Prüfung: Wir füllen jedes Formular aus, Sie bestehen die Prüfung und senden."
      }
     }
    }
@@ -22725,6 +22840,29 @@
     }
    }
   },
+  "Starts when step 1 is done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Commence quand l'étape 1 est faite."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empieza cuando el paso 1 esté hecho."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Beginnt, wenn Schritt 1 erledigt ist."
+     }
+    }
+   }
+  },
   "State": {
    "extractionState": "manual",
    "localizations": {
@@ -22886,6 +23024,29 @@
     }
    }
   },
+  "Step 1: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape 1 : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso 1: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt 1: %@"
+     }
+    }
+   }
+  },
   "Step 1: automatic opt-out": {
    "extractionState": "manual",
    "localizations": {
@@ -22909,6 +23070,29 @@
     }
    }
   },
+  "Step 2: automatic opt-out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape 2 : désinscription automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso 2: exclusión automática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt 2: automatischer Widerspruch"
+     }
+    }
+   }
+  },
   "Step 2: semi-automatic": {
    "extractionState": "manual",
    "localizations": {
@@ -22928,6 +23112,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Schritt 2: halbautomatisch"
+     }
+    }
+   }
+  },
+  "Step 3: semi-automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape 3 : semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso 3: semiautomático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt 3: halbautomatisch"
      }
     }
    }
@@ -23043,6 +23250,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gestoppt: %@"
+     }
+    }
+   }
+  },
+  "Stopping…": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arrêt…"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Deteniendo…"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wird gestoppt…"
      }
     }
    }
@@ -27367,6 +27597,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Warten auf eine E-Mail"
+     }
+    }
+   }
+  },
+  "Waits for the next full re-test": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Attend le prochain retest complet"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Espera a la próxima prueba completa"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wartet auf den nächsten vollständigen Test"
      }
     }
    }

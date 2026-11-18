@@ -55,6 +55,23 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     var frames: [(info: WKFrameInfo, href: String)] = []
     var activeFrame: WKFrameInfo?
     private let reporter = FrameReporter()
+    /// Set only for a background run's site (`PageActivity.report`): told of every sign of life from the page, so a page that goes quiet is given up.
+    /// Nil for every screen a person uses (Solve and send, guides), which are left exactly as they were.
+    private let activity: (@Sendable () -> Void)? = PageActivity.report
+    private let activityReporter = ActivityReporter()
+    func touch() { activity?() }
+    /// Runs a script on the page. An answer is a sign of life (a page whose scripts never answer is the one that wedges a run).
+    func evaluate(_ js: String) async throws -> Any? {
+        let r = try await webView.evaluateJavaScript(js)
+        touch()
+        return r
+    }
+    /// The same, in one frame.
+    func evaluate(_ js: String, in frame: WKFrameInfo, contentWorld: WKContentWorld) async throws -> Any? {
+        let r = try await webView.evaluateJavaScript(js, in: frame, contentWorld: contentWorld)
+        touch()
+        return r
+    }
 
     /// The HTTP status of the last page the web view loaded.
     var httpStatus: Int { status }
@@ -83,9 +100,15 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         // The person's own touches and keys (only real ones, never the page's or the app's scripted events) are noted, so the app can leave the page alone while they type,
         // and tell a confirmation they caused (they pressed a button, a link or Enter) from one the page showed by itself.
         config.userContentController.addUserScript(WKUserScript(source: "(function(){var top=window.top===window; function tell(m){if(top){ if(m==='ookPress') window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } else try{window.top.postMessage(m,'*');}catch(x){}} ['pointerdown','touchstart','keydown','beforeinput','input'].forEach(function(n){document.addEventListener(n,function(e){ if(e.isTrusted) tell('ookUser'); },true);}); document.addEventListener('click',function(e){ if(!e.isTrusted) return; var t=e.target; if(t&&t.closest&&t.closest('button,[role=button],input[type=submit],input[type=button],input[type=image],a[href]')) tell('ookPress'); },true); document.addEventListener('keydown',function(e){ if(e.isTrusted&&e.key==='Enter'&&e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) tell('ookPress'); },true); if(top) window.addEventListener('message',function(e){ if(e.data==='ookUser') window.__ookUserAt=Date.now(); else if(e.data==='ookPress'){ window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } });})();", injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        if activity != nil {
+            // Signs of life from the page itself: the page changing, and a request it made coming back (at most one a second).
+            config.userContentController.add(activityReporter, contentWorld: .page, name: "ookActivity")
+            config.userContentController.addUserScript(WKUserScript(source: Self.activityScript, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        }
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
         reporter.session = self
+        activityReporter.session = self
         webView.navigationDelegate = self
         webView.uiDelegate = self
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
@@ -294,13 +317,17 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     // MARK: WKNavigationDelegate
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        touch()
         if navigationResponse.isForMainFrame, let http = navigationResponse.response as? HTTPURLResponse { status = http.statusCode }
         return .allow
     }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { resume(nil) }
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { resume(error) }
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { resume(error) }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { touch(); resume(nil) }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { touch(); resume(error) }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { touch(); resume(error) }
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { touch() }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) { touch() }
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) { touch() }
 
     /// A navigation that was cancelled because the page moved on to another one (a redirect) is not a failure: the next one reports.
     private func resume(_ error: Error?, force: Bool = false) {
@@ -337,6 +364,14 @@ struct WebFormSubmitter: FormSubmitter {
 
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
         await FormRun.run(url: form.page, html: nil, plan: plan, dryRun: dryRun, maxWait: maxWait, capture: false).outcome
+    }
+
+    /// It reports the page's signs of life, so the run gives up on a page that goes quiet (`AutoOptOut.idleLimit`).
+    var reportsActivity: Bool { true }
+
+    /// The same, with every web view made for this site telling `activity` of the page's signs of life.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+        await PageActivity.$report.withValue(activity) { await submitCapturing(form, plan: plan, dryRun: dryRun) }
     }
 
     /// Fills and sends the form in a hidden web view, then takes a screenshot of whatever the page showed at the end.
@@ -696,6 +731,24 @@ extension WebViewSession {
     }
 }
 
+
+/// Which background-run site the web views made now belong to, so they report the page's signs of life to that run's watchdog.
+enum PageActivity {
+    @TaskLocal static var report: (@Sendable () -> Void)?
+}
+
+extension WebViewSession {
+    /// Posts (at most once a second) when the page changes or a request it made comes back. Added only for a background run's site.
+    static let activityScript = "(function(){if(window.__ookAct)return;window.__ookAct=1;var last=0;function ping(){var n=Date.now();if(n-last<1000)return;last=n;try{webkit.messageHandlers.ookActivity.postMessage(1);}catch(e){}} try{new MutationObserver(ping).observe(document,{subtree:true,childList:true,attributes:true,characterData:true});}catch(e){} try{var f=window.fetch;if(f){window.fetch=function(){var p=f.apply(this,arguments);try{p.then(ping,ping);}catch(e){}return p;};}}catch(e){} try{var s=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(){try{this.addEventListener('loadend',ping);}catch(e){}return s.apply(this,arguments);};}catch(e){}})();"
+}
+
+/// Hands the page's signs of life to its session.
+private final class ActivityReporter: NSObject, WKScriptMessageHandler {
+    weak var session: WebViewSession?
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        Task { @MainActor in self.session?.touch() }
+    }
+}
 
 /// Receives the report each frame with inputs sends, and hands its frame handle to the session.
 private final class FrameReporter: NSObject, WKScriptMessageHandler {

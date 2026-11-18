@@ -1161,6 +1161,51 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(s.nextRunKind(now: t0 + 32 * day), .full, "a repeat pass under way becomes a full one")
     }
 
+    /// A page that wedges a step must not hold the whole run: the site is given up as too slow (so it goes to semi-automatic) and the next one is tried.
+    func testASiteThatNeverAnswersIsGivenUpAndTheRunGoesOnToTheNext() async {
+        struct Hangs: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                if form.page.host == "stuck.example" { await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in } }       // never comes back
+                return .submitted(awaitingEmail: false)
+            }
+        }
+        func site(_ host: String) -> DirectoryEntry {
+            var f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email")])
+            f.page = URL(string: "https://\(host)/optout")!
+            return DirectoryEntry(id: host, domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        }
+        let engine = AutoOptOut(submitter: Hangs(), spacing: 0, siteLimit: 0.3)
+        let results = await engine.run(entries: [site("stuck.example"), site("fine.example")], person: pat, progress: OptOutKitCore.Progress())
+        XCTAssertEqual(results.count, 2, "the run reached the second site")
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.tooSlow))
+        XCTAssertEqual(results.last?.1, .submitted(awaitingEmail: false))
+    }
+
+    /// A page that goes quiet (no load, no change, no request coming back) for the idle limit is given up and moved to semi-automatic; a page that keeps
+    /// showing signs of life is waited for, even past the idle limit in all.
+    func testASiteWhosePageGoesQuietIsMovedToSemiAutomaticAndABusyOneIsWaitedFor() async {
+        struct Watched: FormSubmitter {
+            var reportsActivity: Bool { true }
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+                if form.page.host == "quiet.example" {
+                    activity(); await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in }          // one sign of life, then nothing
+                }
+                for _ in 0..<8 { try? await Task.sleep(nanoseconds: 100_000_000); activity() }                        // busy for 0.8 s, a sign every 0.1 s
+                return SubmitEvidence(outcome: .submitted(awaitingEmail: false))
+            }
+        }
+        func site(_ host: String) -> DirectoryEntry {
+            var f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email")])
+            f.page = URL(string: "https://\(host)/optout")!
+            return DirectoryEntry(id: host, domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        }
+        let engine = AutoOptOut(submitter: Watched(), spacing: 0, siteLimit: 30, idleLimit: 0.4)
+        let results = await engine.run(entries: [site("quiet.example"), site("busy.example")], person: pat, progress: OptOutKitCore.Progress())
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.wentQuiet), "quiet for longer than the idle limit: given up")
+        XCTAssertEqual(results.last?.1, .submitted(awaitingEmail: false), "busy for twice the idle limit, with signs of life: waited for")
+    }
+
     func testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod() {
         let period = RunPeriod(start: t0, end: t0 + 91 * day)
         var p = OptOutKitCore.Progress()

@@ -7,6 +7,11 @@ struct RunReport: Identifiable, Equatable {
     let person: String
     let rows: [AppModel.AutoOptOutRow]
     var personID: UUID = UUID()
+    /// The sites the run left alone by its own rules, counted by reason (covered by a platform request, sent recently, ...): it never tried them.
+    var skipped: [String: Int] = [:]
+    var skippedCount: Int { skipped.values.reduce(0, +) }
+    /// The commonest reasons first, for the one line that says what was left alone.
+    var topSkipReasons: [(String, Int)] { skipped.sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }.prefix(3).map { ($0.key, $0.value) } }
 
     var sent: Int { rows.filter { if case .submitted = $0.result { return true } else { return false } }.count }
     /// Sites that did not go through and now wait for the person.
@@ -42,10 +47,13 @@ struct RunReportSheet: View {
         VStack(spacing: 12) {
             Image(systemName: report.allSucceeded ? "checkmark.seal.fill" : "hand.point.up.left.fill")
                 .font(.system(size: 40)).foregroundStyle(report.allSucceeded ? .green : .blue).padding(.top, 20)
-            Text(report.allSucceeded ? Loc.f("All %lld sites went through", report.sent)
-                                     : Loc.f("%lld of %lld sites went through", report.sent, report.attempted))
+            Text(report.attempted == 0 ? Loc.t("No site needed sending this time")
+                 : report.allSucceeded ? Loc.f("All %lld sites went through", report.sent)
+                 : Loc.f("%lld of %lld sites went through", report.sent, report.attempted))
                 .font(.title2.bold()).multilineTextAlignment(.center).accessibilityIdentifier("run-report-title")
-            if report.allSucceeded {
+            if report.attempted == 0 {
+                Button("Done", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-done")
+            } else if report.allSucceeded {
                 Text("Nothing more to do for these. Some sites email a link to confirm; that tap is yours.").font(.callout).multilineTextAlignment(.center)
                 Button("Done", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-done")
             } else {
@@ -55,6 +63,16 @@ struct RunReportSheet: View {
                 Button { done(); model.requestedTab = 0 } label: { Text("Start the semi-automated sites").frame(maxWidth: .infinity) }
                     .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-start-semi")
                 Button("Later", action: done).accessibilityIdentifier("run-report-done")
+            }
+            if report.skippedCount > 0 {
+                // Honest about what it never tried: how many, and why (the commonest reasons).
+                VStack(spacing: 4) {
+                    Text(Loc.f("%lld more were not tried this time:", report.skippedCount)).font(.subheadline.bold())
+                    ForEach(report.topSkipReasons, id: \.0) { why, n in
+                        Text(verbatim: "\(n) · \(why)").font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    }
+                }
+                .accessibilityElement(children: .combine).accessibilityIdentifier("run-report-skipped")
             }
             if let person = model.people.first(where: { $0.id == report.personID }) {
                 NavigationLink { RunReviewView(person: person) } label: {

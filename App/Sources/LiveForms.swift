@@ -20,13 +20,13 @@ extension WebViewSession {
               el.click(); return t;}}
           return null;})();
         """#
-        return (try? await webView.evaluateJavaScript(js)) as? String
+        return (try? await evaluate(js)) as? String
     }
 
     /// Evaluates in the frame the chosen form lives in (a page inside the page), else in the page itself.
     func evalLive(_ js: String) async -> Any? {
-        if let f = activeFrame { return try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page) }
-        return try? await webView.evaluateJavaScript(js)
+        if let f = activeFrame { return try? await evaluate(js, in: f, contentWorld: .page) }
+        return try? await evaluate(js)
     }
 
     /// The forms on the page, and when the page itself shows none that looks like an opt-out form, the forms inside its frames (privacy portals are
@@ -36,7 +36,7 @@ extension WebViewSession {
         let main = await discoverFormsIn()
         let context = await pageContext()
         if LiveFormPicker.pick(main, pageContext: context) != nil { return main }
-        if waitForFrames, frames.isEmpty, ((try? await webView.evaluateJavaScript("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
+        if waitForFrames, frames.isEmpty, ((try? await evaluate("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
             try? await Task.sleep(nanoseconds: 2_500_000_000)        // a frame reports itself only once it has loaded
         }
         for frame in frames {
@@ -51,17 +51,17 @@ extension WebViewSession {
     /// Brings the frame a form is in to the middle of the screen, so the person sees it.
     func scrollFrameIntoView(_ href: String) async {
         let js = "(function(h){var fs=[].slice.call(document.querySelectorAll('iframe')); var f=fs.filter(function(x){return x.src&&(h.indexOf(x.src)===0||x.src.indexOf(h)===0);})[0]||fs[0]; if(f) f.scrollIntoView({block:'center'});})(\(Self.liveLiteral(href)));"
-        _ = try? await webView.evaluateJavaScript(js)
+        _ = try? await evaluate(js)
     }
 
     /// A form folded inside a closed accordion (`<details>`) has no size, so it is not seen. Clicks the headings of the closed ones that hold inputs,
     /// one at a time (some sites keep only one open), and returns the forms from the first that shows an opt-out form.
     func openFoldedForms() async -> [LiveForm]? {
-        let count = (try? await webView.evaluateJavaScript("document.querySelectorAll('details:not([open])').length")) as? Int ?? 0
+        let count = (try? await evaluate("document.querySelectorAll('details:not([open])').length")) as? Int ?? 0
         guard count > 0 else { return nil }
         for i in 0..<min(count, 6) {
             let js = "(function(i){var ds=[].slice.call(document.querySelectorAll('details')).filter(function(d){return d.querySelector('input,select,textarea');}); var d=ds[i]; if(!d) return false; var s=d.querySelector('summary'); if(!s) return false; if(!d.open){s.scrollIntoView({block:'center'}); s.click();} return true;})(\(i));"
-            guard (try? await webView.evaluateJavaScript(js)) as? Bool == true else { break }
+            guard (try? await evaluate(js)) as? Bool == true else { break }
             try? await Task.sleep(nanoseconds: 900_000_000)
             let after = await discoverFormsIn()
             if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
@@ -87,7 +87,7 @@ extension WebViewSession {
           ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
           return (e.innerText||'').trim();})();
         """#
-        if let clicked = (try? await webView.evaluateJavaScript(js)) as? String, !clicked.isEmpty {
+        if let clicked = (try? await evaluate(js)) as? String, !clicked.isEmpty {
             try? await Task.sleep(nanoseconds: 2_500_000_000)
             let after = await discoverForms()
             if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
@@ -109,7 +109,7 @@ extension WebViewSession {
             try{var u=new URL(a.href,location.href); return u.hostname.replace(/^www\./,'').split('.').slice(-2).join('.')===reg||/onetrust|trustarc|datasubject|ketch|transcend|osano|securiti|zendesk|force\.com|atlassian/.test(u.hostname);}catch(e){return false;}});
           if(!as.length) return ''; as[0].scrollIntoView({block:'center'}); location.href=as[0].href; return as[0].href;})();
         """#
-        guard let went = (try? await webView.evaluateJavaScript(follow)) as? String, !went.isEmpty else { return first }
+        guard let went = (try? await evaluate(follow)) as? String, !went.isEmpty else { return first }
         try? await Task.sleep(nanoseconds: 4_000_000_000)
         await settlePage(maxWait: 6)
         let after = await discoverForms()
@@ -247,7 +247,7 @@ extension WebViewSession {
           if(cs.length!==1) return false;
           cs[0].scrollIntoView({block:'center'}); cs[0].click(); return true;})();
         """#
-        guard (try? await webView.evaluateJavaScript(js)) as? Bool == true else { return false }
+        guard (try? await evaluate(js)) as? Bool == true else { return false }
         try? await Task.sleep(nanoseconds: 2_500_000_000)
         await settlePage(maxWait: 5)
         return true
@@ -559,7 +559,7 @@ extension WebViewSession {
           if(els.some(function(e){var r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;})) return false;
           els[0].scrollIntoView({block:'center',behavior:'smooth'}); return true;})();
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
     /// A page that offers its one opt-out form as tabs ("Phone" and "Name"): opens the name tab, which is the one that takes a person's listing off.
@@ -574,7 +574,7 @@ extension WebViewSession {
           var n=names.filter(function(e){return /^(A|BUTTON)$/.test(e.tagName)||e.getAttribute('role')==='tab';})[0]||names.filter(function(e){return e.children.length===0;})[0]||names[0]; if(n.getAttribute('aria-selected')==='true'||/\bactive\b|\bselected\b/.test(n.className||'')) return false;
           n.click(); return true;})();
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
     /// A page that keeps all its privacy forms hidden until a menu outside any form is set ("Select From Available Forms": Right to Opt-out, Right to Delete, Right to Know):
@@ -594,7 +594,7 @@ extension WebViewSession {
             s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); changed=true;});
           return changed;})();
         """#
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
     /// Chooses, inside one form, the options an opt-out needs: "this request is for myself", the opt-out and deletion choices, and a
@@ -889,7 +889,7 @@ extension WebViewSession {
     func pageContext() async -> String {
         // The address, the title and the first words of the page: a portal whose only form asks "State of Residence" says what it is for in its intro
         // ("you may have rights with respect to your personal information… exercise these rights"), not in the form.
-        ((try? await webView.evaluateJavaScript("location.pathname + ' ' + document.title + ' ' + (document.body ? document.body.innerText.replace(/\\s+/g,' ').slice(0,300) : '')")) as? String) ?? ""
+        ((try? await evaluate("location.pathname + ' ' + document.title + ' ' + (document.body ? document.body.innerText.replace(/\\s+/g,' ').slice(0,300) : '')")) as? String) ?? ""
     }
 
     /// A visible, empty text box that asks for a code ("Captcha", "Security code"): the person types it, and the form is not sent until it is filled.
@@ -990,10 +990,10 @@ extension FormRun {
         #if DEBUG
         if dryRun, capture {
             // For offline analysis: the page as it stands after every click the run made, and a summary of the form it chose.
-            var snapshot = (html: ((try? await session.webView.evaluateJavaScript("document.documentElement.outerHTML")) as? String) ?? "", picked: "")
+            var snapshot = (html: ((try? await session.evaluate("document.documentElement.outerHTML")) as? String) ?? "", picked: "")
             if let token = session.chosenForm {
                 let js = "(function(t){var f=document.querySelector('[data-ook-form=\"'+t+'\"]'); if(!f) return ''; var q=function(e){return (e.innerText||e.value||'').replace(/\\s+/g,' ').trim().slice(0,60);}; var n=f; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var x=(n.innerText||'').replace(/\\s+/g,' ').trim(); if(x.length>=25&&x.length<=700) break;} return JSON.stringify({fields:[].slice.call(f.querySelectorAll('input,select,textarea')).filter(function(e){return !/hidden|submit|button|image|reset|checkbox|radio/.test(e.type)}).map(function(e){return (e.type||e.tagName)+':'+(e.name||e.id||'')}),buttons:[].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).map(q).filter(Boolean),ctx:((n&&n.innerText)||'').replace(/\\s+/g,' ').trim().slice(0,300),url:location.href});})(\(WebViewSession.liveLiteral(token)));"
-                snapshot.picked = ((try? await session.webView.evaluateJavaScript(js)) as? String) ?? ""
+                snapshot.picked = ((try? await session.evaluate(js)) as? String) ?? ""
             }
             snapshot.picked += "\n" + (url.flatMap { debugForms[$0.absoluteString] } ?? "")
             if let url { debugSnapshots[url.absoluteString] = snapshot }

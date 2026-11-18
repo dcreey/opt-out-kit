@@ -219,6 +219,138 @@ final class ProfileGateAppTests: XCTestCase {
 
 @MainActor
 final class AutomaticRunAppTests: XCTestCase {
+    /// Stop ends the run after the site in progress; what was done is kept and the pass is left to carry on later.
+    func testStopEndsTheRunPartWayAndLeavesTheRestForLater() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        struct Slow: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                try? await Task.sleep(nanoseconds: 50_000_000); return .submitted(awaitingEmail: false)
+            }
+        }
+        let total = m.backgroundDomains(for: me, kind: .full).count
+        let run = Task { await m.runAutoOptOut(for: me, submitter: Slow()) }
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < 2 && waited < 300 { try await Task.sleep(nanoseconds: 100_000_000); waited += 1 }
+        XCTAssertEqual(m.autoBusy, "optout")
+        m.stopAutoOptOut()
+        await run.value
+        let tried = (m.optOutRun[me.id] ?? []).count
+        XCTAssertGreaterThan(tried, 0); XCTAssertLessThan(tried, total, "it stopped part-way")
+        XCTAssertNil(m.autoBusy, "and is no longer working")
+        XCTAssertEqual(m.autoSettings.optOutResumePending, true, "the rest of the pass waits for the next run")
+    }
+
+    /// A site the run's own rules leave alone (here: covered by California's DROP until its request is made) is not counted as tried, is never sent,
+    /// and keeps its reason on the activity page; the report says how many were left alone and why. (A run once showed "0 of 4 went through" after
+    /// silently passing over about 300 such sites, and the page then said none were left.)
+    func testSitesTheRunLeavesAloneAreNotCountedAsTriedAndKeepTheirReason() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Los Angeles", state: "CA", zip: "90001")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        let held = Set(m.holds(for: me).keys)
+        try XCTSkipIf(held.isEmpty, "no platform request covers sites for this person in this build of the directory")
+        let full = m.backgroundDomains(for: me, kind: .full)
+        let heldDomains = Set(m.directory.filter { held.contains($0.id) }.map(\.domain)).intersection(full)
+        XCTAssertFalse(heldDomains.isEmpty, "some sites a full pass covers are held")
+        XCTAssertTrue(m.willTry(full, for: me).isDisjoint(with: heldDomains), "a held site is not one the run will try")
+        XCTAssertEqual(m.runNowCount(for: me), m.willTry(full, for: me).count, "Run now counts only what it will try")
+        let willTry = m.willTry(full, for: me)          // worked out before the run: afterwards the sites it sent count as sent recently
+        let tally = Tally()
+        await m.runAutoOptOut(for: me, submitter: Tally.Recorder(tally: tally))
+        let heldPages = Set(m.directory.filter { heldDomains.contains($0.domain) }.compactMap { AutoOptOut.standIn(m.resolved($0)).optOutForm?.page.absoluteString })
+        // A page held for one site may be the shared page of another site that is not held (a family's one portal); only a page no tried site uses counts.
+        let triedPages = Set(m.directory.filter { willTry.contains($0.domain) }.compactMap { AutoOptOut.standIn(m.resolved($0)).optOutForm?.page.absoluteString })
+        let leaked = heldPages.subtracting(triedPages).intersection(Set(tally.pages))
+        XCTAssertTrue(leaked.isEmpty, "nothing was sent to a held site: \(leaked.sorted().prefix(5))")
+        XCTAssertTrue(Set((m.optOutRun[me.id] ?? []).map(\.domain)).isDisjoint(with: heldDomains), "held sites are not in the run's results")
+        let report = try XCTUnwrap(m.runReport)
+        XCTAssertGreaterThanOrEqual(report.skippedCount, heldDomains.count, "the report says how many were left alone")
+        let rows = m.activityRows(for: me).filter { heldDomains.contains($0.domain) }
+        XCTAssertEqual(rows.count, heldDomains.count, "held sites stay on the page")
+        XCTAssertTrue(rows.allSatisfy { $0.group == .notTried && $0.line.localizedCaseInsensitiveContains("covered") }, "with their reason")
+    }
+
+    /// A run that iOS cut off (the run stopped after the site in progress) and that the person then brought back to the front (which clears that stop, so
+    /// a glance away does not end a run) is not taken as finished: a run is finished only when every site it set out to do has a result.
+    func testARunCutOffAndThenBroughtBackToTheFrontIsNotTakenAsFinished() async throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        struct Slow: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                try? await Task.sleep(nanoseconds: 50_000_000); return .submitted(awaitingEmail: false)
+            }
+        }
+        let run = Task { await m.runAutoOptOut(for: me, submitter: Slow()) }
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < 2 && waited < 300 { try await Task.sleep(nanoseconds: 100_000_000); waited += 1 }
+        m.continuedRunExpired(appActive: false)                 // iOS took the time back while the person was away
+        try await Task.sleep(nanoseconds: 200_000_000)          // the run stops after the site in progress
+        m.appDidBecomeActive()                                  // the person comes back: the stop flag is cleared again
+        await run.value
+        let tried = (m.optOutRun[me.id] ?? []).count
+        XCTAssertLessThan(tried, m.backgroundDomains(for: me, kind: .full).count, "the run did stop part-way")
+        XCTAssertEqual(m.autoSettings.optOutResumePending, true, "so it is still to carry on")
+        XCTAssertNil(m.autoSettings.lastFullRun, "and the full pass is not recorded as done")
+        XCTAssertNil(m.runReport, "and no report claims it finished")
+        XCTAssertEqual(m.autoSettings.nextRunKind(), .full, "the next run carries on with the full pass")
+    }
+
+    /// A site no run has ever tried is in every run, even a repeat, so it is never left for six months.
+    func testEverySiteNeverTriedIsInEveryRunEvenARepeat() {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        XCTAssertTrue(m.backgroundDomains(for: me, kind: .repeatSent).isEmpty, "a repeat on its own has nothing: nothing has gone through")
+        XCTAssertEqual(m.runDomains(for: me, kind: .repeatSent), m.backgroundDomains(for: me, kind: .full), "but every site never tried is in it")
+    }
+
+    /// In California, DROP's one request comes first and the first automatic pass waits for it. Anywhere else DROP is not offered and holds nothing.
+    func testDROPComesFirstInCaliforniaAndIsLeftOutEverywhereElse() {
+        func model(state: String, city: String, zip: String) -> (AppModel, Person) {
+            let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                             defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+            var me = m.people.first { $0.relationship == .me }!
+            me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+            me.addresses = [Address(street: "1 Main St", city: city, state: state, zip: zip)]
+            m.update(me); m.setContactEmail("pat@example.com"); m.setAuto(scan: false, optOut: true)
+            return (m, m.people.first { $0.relationship == .me }!)
+        }
+        let (ca, caMe) = model(state: "CA", city: "Los Angeles", zip: "90001")
+        try? XCTSkipIf(ca.holds(for: caMe).isEmpty, "DROP is not live in this build of the directory")
+        XCTAssertNotNil(ca.platformStep, "in California the DROP request is the first step")
+        XCTAssertTrue(ca.firstPassWaitsForPlatform, "and the first automatic pass waits for it")
+        let (il, ilMe) = model(state: "IL", city: "Springfield", zip: "62701")
+        XCTAssertNil(il.platformStep, "outside California there is no DROP step")
+        XCTAssertFalse(il.firstPassWaitsForPlatform, "and the first pass does not wait for one")
+        XCTAssertTrue(il.holds(for: ilMe).isEmpty, "and no site is held for it")
+        XCTAssertFalse(il.plan.flatMap(\.tasks).contains { if case .platform = $0.kind { return true } else { return false } }, "DROP is not in the plan at all")
+    }
+
+    /// iOS ending the run's background time must not stop a run the person is watching (it once did, so Run now stopped after its first site).
+    func testIOSEndingTheBackgroundTimeStopsTheRunOnlyWhenThePersonIsAway() {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        m.continuedRunExpired(appActive: true)
+        XCTAssertFalse(m.autoStopRequested, "on screen: the run carries on")
+        m.continuedRunExpired(appActive: false)
+        XCTAssertTrue(m.autoStopRequested, "away: it stops after the current site and resumes on reopen")
+    }
+
     func testTheFirstRunWorksThroughEverySiteThatCanBeTriedAndNothingElse() async throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
@@ -267,9 +399,18 @@ final class RunReportTests: XCTestCase {
     }
 }
 
+/// The pages a fake submitter was handed, in order.
+final class Tally: @unchecked Sendable {
+    var pages: [String] = []; let lock = NSLock(); func add(_ p: String) { lock.lock(); pages.append(p); lock.unlock() }
+    /// Records each page and says it went through.
+    struct Recorder: FormSubmitter {
+        let tally: Tally
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { tally.add(form.page.absoluteString); return .submitted(awaitingEmail: false) }
+    }
+}
+
 @MainActor
 final class BackgroundPassesAppTests: XCTestCase {
-    private final class Tally: @unchecked Sendable { var pages: [String] = []; let lock = NSLock(); func add(_ p: String) { lock.lock(); pages.append(p); lock.unlock() } }
     private struct Alternating: FormSubmitter {
         let tally: Tally
         func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
@@ -325,7 +466,12 @@ final class BackgroundPassesAppTests: XCTestCase {
         try await Task.sleep(nanoseconds: 300_000_000)
         var waited = 0
         while m.autoBusy != nil && waited < 600 { try await Task.sleep(nanoseconds: 100_000_000); waited += 1 }
-        XCTAssertFalse(Set((m.optOutRun[me.id] ?? []).map(\.domain)).isDisjoint(with: sent), "Re-test all tries the sites already sent again")
+        // Really sent again, not just listed: the submitter saw the pages of sites that had already gone through. (A row in the results is not proof:
+        // a site skipped as "sent recently" is a row too, and the first version of Re-test all did exactly that.)
+        let sentPages = Set(m.directory.filter { sent.contains($0.domain) }.compactMap { AutoOptOut.standIn(m.resolved($0)).optOutForm?.page.absoluteString })
+        XCTAssertFalse(sentPages.isDisjoint(with: Set(retest.pages)), "Re-test all sends again to sites that went through this period")
+        let retestRows = m.optOutRun[me.id] ?? []
+        XCTAssertFalse(retestRows.contains { if case .tooSoon = $0.result { return true } else { return false } }, "none of them is skipped as sent recently")
     }
 }
 

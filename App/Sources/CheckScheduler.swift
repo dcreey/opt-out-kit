@@ -120,6 +120,9 @@ final class ContinuedRun {
     private var done = 0, total = 0
     private var onExpire: () -> Void = {}
     private var completed = false
+    /// While one site is slow (a page load can take most of a minute), progress still moves a little, so iOS does not take it for a stalled task.
+    private var heartbeat: Timer?
+    private var lastReport = Date()
 
     /// True once iOS has accepted the run and handed us its task: only then is it safe to stay running in the background.
     var isGranted: Bool { task != nil && !completed }
@@ -148,20 +151,24 @@ final class ContinuedRun {
             Task { @MainActor in NSLog("ContinuedRun: expired"); self?.onExpire(); self?.finish(success: false) }
         }
         push()
+        heartbeat = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in Task { @MainActor in self?.push() } }
     }
 
-    func report(done: Int, total: Int) { self.done = done; self.total = total; push() }
+    func report(done: Int, total: Int) { self.done = done; self.total = total; lastReport = Date(); push() }
 
+    /// Progress in hundredths of a site: each finished site is 100 units, and the site in progress creeps up to 90 while it runs.
     private func push() {
         guard let task, !completed else { return }
-        task.progress.totalUnitCount = Int64(max(total, 1))
-        task.progress.completedUnitCount = Int64(done)
+        let creep = min(90, Int(Date().timeIntervalSince(lastReport) / 2))
+        task.progress.totalUnitCount = Int64(max(total, 1) * 100)
+        task.progress.completedUnitCount = Int64(done * 100 + creep)
         task.updateTitle("Opting you out", subtitle: "\(done) of \(total) sites")
     }
 
     func finish(success: Bool) {
         guard !completed else { return }
         completed = true
+        heartbeat?.invalidate(); heartbeat = nil
         task?.setTaskCompleted(success: success)
         if Self.current === self { Self.current = nil }
     }

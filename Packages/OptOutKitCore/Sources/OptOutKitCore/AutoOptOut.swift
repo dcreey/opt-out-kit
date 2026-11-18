@@ -17,6 +17,17 @@ public protocol FormSubmitter: Sendable {
     func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome
     /// The same, and a screenshot of what the page showed when it finished (the confirmation, or what stopped it), as JPEG data.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence
+    /// The same, calling `activity` whenever the page shows a sign of life (a load starting or finishing, the page changing, a request it made coming
+    /// back). The run gives up on a site that shows none for `AutoOptOut.idleLimit`.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence
+    /// Whether this submitter reports the page's signs of life (so the idle limit applies).
+    var reportsActivity: Bool { get }
+}
+
+/// Lets exactly one of several racing tasks go on (see `AutoOptOut.within`).
+final class FirstOnce: @unchecked Sendable {
+    private let lock = NSLock(); private var done = false
+    func claim() -> Bool { lock.lock(); defer { lock.unlock() }; if done { return false }; done = true; return true }
 }
 
 public struct SubmitEvidence: Sendable {
@@ -29,6 +40,19 @@ public extension FormSubmitter {
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence {
         SubmitEvidence(outcome: await submit(form, plan: plan, dryRun: dryRun))
     }
+    /// A submitter that has no page to watch reports nothing; it is held only to the overall limit, not the idle one.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+        await submitCapturing(form, plan: plan, dryRun: dryRun)
+    }
+    /// Whether this submitter reports the page's signs of life (so the idle limit applies).
+    var reportsActivity: Bool { false }
+}
+
+/// The last sign of life from a site's page, shared between the work and its watchdog.
+final class ActivityClock: @unchecked Sendable {
+    private let lock = NSLock(); private var last = Date()
+    func touch() { lock.lock(); last = Date(); lock.unlock() }
+    var quietFor: TimeInterval { lock.lock(); defer { lock.unlock() }; return Date().timeIntervalSince(last) }
 }
 
 /// A site already reached by a platform request the person made (California DROP): we leave it alone until `until`.
@@ -88,9 +112,62 @@ public struct AutoOptOut: Sendable {
     private let submitter: FormSubmitter
     private let minInterval: TimeInterval
     private let spacing: TimeInterval
+    /// The most one site may take, from loading its page to the screenshot. A page can wedge a step that has no limit of its own (a script that never
+    /// answers, a snapshot that never comes back); without this the whole run waited on that one site for ever.
+    private let siteLimit: TimeInterval
+    /// The most a site's page may go without any sign of life before the site is given up and moved to semi-automatic.
+    private let idleLimit: TimeInterval
 
-    public init(submitter: FormSubmitter, minInterval: TimeInterval = AutoOptOut.defaultMinInterval, spacing: TimeInterval = 2) {
-        self.submitter = submitter; self.minInterval = minInterval; self.spacing = spacing
+    public init(submitter: FormSubmitter, minInterval: TimeInterval = AutoOptOut.defaultMinInterval, spacing: TimeInterval = 2, siteLimit: TimeInterval = AutoOptOut.siteLimit,
+                idleLimit: TimeInterval = AutoOptOut.idleLimit) {
+        self.submitter = submitter; self.minInterval = minInterval; self.spacing = spacing; self.siteLimit = siteLimit; self.idleLimit = idleLimit
+    }
+
+    /// Fifteen seconds with no sign of life from the page: no load starting or finishing, no change on the page, no request of its own coming back.
+    public static let idleLimit: TimeInterval = 15
+    /// What a site whose page went quiet is recorded as. It counts as not gone through, so it moves to the semi-automated queue.
+    public static let wentQuiet = "the site stopped answering, so it moved to semi-automatic"
+
+    /// Runs one site's work, giving it up (nil) when `idle` seconds pass with no `touch`, or `cap` seconds in all. `idle` nil: only the cap applies.
+    /// The given-up work is left to end on its own; a step stuck waiting on a page cannot be cancelled, so the run must not wait for it.
+    public static func watched<T: Sendable>(idle: TimeInterval?, cap: TimeInterval,
+                                            _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool) {
+        let once = FirstOnce(), clock = ActivityClock(), start = Date()
+        return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool), Never>) in
+            Task { let value = await work({ clock.touch() }); if once.claim() { c.resume(returning: (value, false)) } }
+            Task {
+                while true {
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                    if let idle, clock.quietFor >= idle { if once.claim() { c.resume(returning: (nil, true)) }; return }
+                    if Date().timeIntervalSince(start) >= cap { if once.claim() { c.resume(returning: (nil, false)) }; return }
+                }
+            }
+        }
+    }
+
+    /// Forms read from the page, and forms found on the live page (a stand-in form carries the page; the live run decides what is filled).
+    public static func standIn(_ e: DirectoryEntry) -> DirectoryEntry {
+        guard e.optOutForm == nil, let page = e.liveForm?.page.flatMap(URL.init(string:)), e.liveForm?.found == true else { return e }
+        var copy = e; copy.optOutForm = OptOutForm(page: page, method: "post", action: nil, fields: [], hops: 1); return copy
+    }
+
+    /// How close together "Re-test all" may send to one site: no gap. The person asked for every site again and confirmed it, so a site sent earlier
+    /// the same day is sent again too (a run never sends one page twice: sites that share a page are sent once).
+    public static let retestMinInterval: TimeInterval = 0
+
+    /// Two and a half minutes: the slowest real site, with its page loads, retries and the wait for its confirmation, fits well inside it.
+    public static let siteLimit: TimeInterval = 150
+    /// What a site that ran out of time is recorded as. It counts as not gone through, so it moves to the semi-automated queue.
+    public static let tooSlow = "the site took too long to answer, so the run moved on"
+
+    /// The work's result, or nil when `seconds` pass first. The work is left to finish (or not) on its own: a step stuck waiting on a page cannot be
+    /// cancelled, so the run must not wait for it.
+    public static func within<T: Sendable>(_ seconds: TimeInterval, _ work: @escaping @Sendable () async -> T) async -> T? {
+        let once = FirstOnce()
+        return await withCheckedContinuation { (c: CheckedContinuation<T?, Never>) in
+            Task { let value = await work(); if once.claim() { c.resume(returning: value) } }
+            Task { try? await Task.sleep(nanoseconds: UInt64(max(0, seconds) * 1_000_000_000)); if once.claim() { c.resume(returning: nil) } }
+        }
     }
 
     /// Decides what to do for one site without touching the network. Nil means "go ahead and submit" with this plan.
@@ -161,12 +238,7 @@ public struct AutoOptOut: Sendable {
                     period: RunPeriod? = nil,
                     onResult: (@Sendable (DirectoryEntry, AutoOptOutResult) async -> Void)? = nil,
                     shouldStop: (@Sendable () async -> Bool)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
-        // Forms read from the page, and forms found on the live page (a stand-in form carries the page; the live run decides what is filled).
-        func standIn(_ e: DirectoryEntry) -> DirectoryEntry {
-            guard e.optOutForm == nil, let page = e.liveForm?.page.flatMap(URL.init(string:)), e.liveForm?.found == true else { return e }
-            var copy = e; copy.optOutForm = OptOutForm(page: page, method: "post", action: nil, fields: [], hops: 1); return copy
-        }
-        let targets = entries.map(standIn).filter { $0.optOutForm != nil }
+        let targets = entries.map(Self.standIn).filter { $0.optOutForm != nil }
         var out: [(DirectoryEntry, AutoOptOutResult)] = []
         // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture.
         var sent: [String: (AutoOptOutResult, Data?)] = [:]
@@ -184,7 +256,11 @@ public struct AutoOptOut: Sendable {
                     progressCallback?(i + 1, targets.count)
                     continue
                 }
-                let report = await submitter.submitCapturing(form, plan: plan, dryRun: dryRun)
+                let submitter = self.submitter
+                let watched = await Self.watched(idle: submitter.reportsActivity ? idleLimit : nil, cap: siteLimit) { touch in
+                    await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
+                }
+                let report = watched.value ?? SubmitEvidence(outcome: .failed(watched.quiet ? Self.wentQuiet : Self.tooSlow))
                 if let shot = report.screenshot, !dryRun { evidence?(entry, shot) }
                 let result = Self.result(for: report.outcome)
                 sent[key] = (result, report.screenshot)

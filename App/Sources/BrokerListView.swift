@@ -42,16 +42,31 @@ struct BrokerListView: View {
                 if waiting {
                     // A new person: the automatic pass goes first, and the semi-automated queue opens when it is done, because only then is it known
                     // which sites need a person for one step.
+                    let platform = model.platformStep
                     Section {
+                        if let platform {
+                            // In California: DROP's one request first; it reaches every registered broker, and until it is made those sites are held.
+                            NavigationLink(value: platform) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Label(Loc.f("Step 1: %@", platform.title), systemImage: "building.columns").font(.headline)
+                                    Text("One request reaches every registered data broker in California. Do it first: the automatic opt-out then leaves those sites to it.")
+                                        .font(.footnote).foregroundStyle(.secondary)
+                                }
+                            }
+                            .accessibilityIdentifier("first-pass-platform")
+                        }
                         NavigationLink { AutoActivityView() } label: {
                             VStack(alignment: .leading, spacing: 6) {
-                                Label("Step 1: automatic opt-out", systemImage: "bolt.fill").font(.headline)
+                                Label(platform == nil ? Loc.t("Step 1: automatic opt-out") : Loc.t("Step 2: automatic opt-out"), systemImage: "bolt.fill").font(.headline)
+                                    .foregroundStyle(platform == nil ? Color.primary : Color.secondary)
                                 if model.autoBusy == "optout", let p = model.autoProgress {
                                     ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
                                     Text("\(p.done) of \(p.total) sites. It sends every request it can without you, in the background. You can leave the app.")
                                         .font(.footnote).foregroundStyle(.secondary)
                                 } else if model.autoBusy == "optout" {
                                     ProgressView()
+                                } else if platform != nil {
+                                    Text("Starts when step 1 is done.").font(.footnote).foregroundStyle(.secondary)
                                 } else {
                                     Text("It sends every request it can without you, in the background, and carries on where it stopped whenever the app is open.")
                                         .font(.footnote).foregroundStyle(.secondary)
@@ -59,12 +74,13 @@ struct BrokerListView: View {
                             }
                         }
                         .accessibilityIdentifier("home-auto-working")
-                        if model.autoBusy == nil {
+                        if model.autoBusy == nil && platform == nil {
                             Button { model.runAutomaticNow() } label: { Label("Start", systemImage: "play.fill") }.accessibilityIdentifier("first-pass-start")
                         }
                         VStack(alignment: .leading, spacing: 4) {
-                            Label("Step 2: semi-automatic", systemImage: "hand.point.up.left").font(.headline).foregroundStyle(.secondary)
-                            Text("Opens when step 1 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.")
+                            Label(platform == nil ? Loc.t("Step 2: semi-automatic") : Loc.t("Step 3: semi-automatic"), systemImage: "hand.point.up.left").font(.headline).foregroundStyle(.secondary)
+                            Text(platform == nil ? Loc.t("Opens when step 1 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.")
+                                                 : Loc.t("Opens when step 2 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send."))
                                 .font(.footnote).foregroundStyle(.secondary)
                         }
                         .accessibilityElement(children: .combine)
@@ -178,7 +194,7 @@ struct BrokerListView: View {
                 }
                 if !waiting, !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
-                    if case .platform = t.kind { return !model.isDone(t) }
+                    if case .platform = t.kind { return !model.isDone(t) && !waiting }
                     return t.kind == .automatic && !model.isDone(t) && !model.autoOptOutStarted && !waiting
                 }
                 if !firstTasks.isEmpty {

@@ -71,6 +71,8 @@ struct AutoActivityView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var activity: [AppModel.ActivityRow] = []
     @State private var runNowCount: Int?
+    /// Stop was tapped: the run ends after the site in progress.
+    @State private var stopping = false
 
     private var busy: Bool { model.autoBusy == "optout" }
 
@@ -90,6 +92,7 @@ struct AutoActivityView: View {
         .navigationTitle("Automatic opt-out")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $search, prompt: Text("Find a site"))
+        .onChange(of: busy) { _, now in if !now { stopping = false } }
         .task(id: refreshKey) { if let p = model.selectedPerson { activity = model.activityRows(for: p); runNowCount = model.runNowCount(for: p) } }
         .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
             Button("Re-test every site") { model.runFullRetestNow() }
@@ -154,8 +157,15 @@ struct AutoActivityView: View {
                         .accessibilityIdentifier("period-summary")
                 }
                 if let last = model.autoSettings.lastOptOut {
-                    Text(Loc.f("Last run %@: sent %lld of %lld", Loc.date(last), model.autoSettings.lastSent ?? 0, model.autoSettings.lastAttempted ?? 0))
-                        .accessibilityIdentifier("auto-summary")
+                    // A run recorded before the counts were kept has none: just its date, not "sent 0 of 0".
+                    Group {
+                        if let tried = model.autoSettings.lastAttempted, tried > 0 {
+                            Text(Loc.f("Last run %@: sent %lld of %lld", Loc.date(last), model.autoSettings.lastSent ?? 0, tried))
+                        } else {
+                            Text(Loc.f("Last run %@", Loc.date(last)))
+                        }
+                    }
+                    .accessibilityIdentifier("auto-summary")
                 } else if !busy {
                     Text("Nothing has run yet for \(person.displayName).")
                 }
@@ -170,17 +180,26 @@ struct AutoActivityView: View {
             .font(.footnote).foregroundStyle(.secondary)
             HStack(spacing: 8) {
                 Button { model.runAutomaticNow() } label: {
-                    Label(busy ? Loc.t("Working…") : Loc.t("Run now"), systemImage: "bolt.fill").frame(maxWidth: .infinity)
+                    buttonLabel(busy ? Loc.t("Working…") : Loc.t("Run now"), icon: "bolt.fill")
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.borderedProminent).disabled(busy)
                 .accessibilityIdentifier("auto-run-now")
-                Button { confirmRetest = true } label: {
-                    Label("Re-test all", systemImage: "arrow.triangle.2.circlepath").frame(maxWidth: .infinity)
+                if busy {
+                    // While it works, the second button stops it (after the site in progress, which has a time limit).
+                    Button(role: .destructive) { stopping = true; model.stopAutoOptOut() } label: {
+                        buttonLabel(stopping ? Loc.t("Stopping…") : Loc.t("Stop"), icon: "stop.fill")
+                    }
+                    .buttonStyle(.bordered).disabled(stopping)
+                    .accessibilityIdentifier("auto-stop")
+                } else {
+                    Button { confirmRetest = true } label: {
+                        buttonLabel(Loc.t("Re-test all"), icon: "arrow.triangle.2.circlepath")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("auto-retest-all")
                 }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("auto-retest-all")
             }
-            .controlSize(.regular).disabled(busy)
+            .controlSize(.regular)
             if !busy, let n = runNowCount {
                 Text(n == 0 ? Loc.t("Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.")
                             : Loc.f("Run now tries the %lld sites still to do this period. Re-test all tries every site again.", n))
@@ -255,6 +274,15 @@ struct AutoActivityView: View {
                 }
             }
         }
+    }
+
+    /// The two buttons' labels, built the same way so their icon and text line up: centred in equal halves, one line.
+    private func buttonLabel(_ title: String, icon: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon).imageScale(.medium)
+            Text(title).lineLimit(1).minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private func activityRow(_ r: AppModel.ActivityRow) -> some View {

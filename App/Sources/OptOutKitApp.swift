@@ -64,7 +64,16 @@ final class AppModel: ObservableObject {
         didSet { UIApplication.shared.isIdleTimerDisabled = autoBusy != nil }
     }
     /// Set when the app is about to be suspended: the run stops after the site it is on, and carries on the next time the app is open.
+    /// iOS is about to suspend the app or took its background time back: stop between sites. Cleared when the app comes back in time (a glance away).
     private(set) var autoStopRequested = false
+    /// The person tapped Stop. Unlike the flag above, coming back to the app never clears it.
+    private(set) var personStopRequested = false
+    /// The last run ended before it had worked through every site it set out to do (stopped, suspended, or iOS took the time back). Only a run that
+    /// processed every site counts as finished: a stop flag that was cleared again later once made a cut-off run look complete, so the pass was
+    /// recorded as done with about 300 sites never reached.
+    private var runCutOff = false
+    /// What the engine asks between sites.
+    var shouldStopRun: Bool { autoStopRequested || personStopRequested }
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     /// iOS 26+: the system-sanctioned background run for the current opt-out run (a `ContinuedRun`), when iOS accepted it.
     private var continuedRun: Any?
@@ -669,7 +678,7 @@ final class AppModel: ObservableObject {
     /// A real opt-out run begins: written down as in progress (so a cut-off run is carried on at the next launch), the screen kept awake, and on iOS 26 the
     /// system asked to keep it going while the person uses another app.
     private func beginOptOutRun(total: Int, useContinued: Bool) {
-        autoBusy = "optout"; autoStopRequested = false
+        autoBusy = "optout"; autoStopRequested = false; personStopRequested = false; runCutOff = false
         // Periods (months) are counted from the first run; an earlier send by hand counts as the start so nothing already done is lost from the tally.
         let earliest = people.compactMap { household.progress(for: $0.id).optOutAttempts.values.flatMap { $0 }.filter(\.wasSubmitted).map(\.date).min() }.min()
         if household.autoSettings.periodAnchor == nil { household.updateAuto { $0.periodAnchor = min(earliest ?? Date(), Date()) } }
@@ -681,10 +690,29 @@ final class AppModel: ObservableObject {
         if #available(iOS 26.0, *), useContinued {
             let run = ContinuedRun()
             if run.start(total: max(total, 1), onExpire: { [weak self] in
-                // iOS ended the background run: stop after this site (it resumes on reopen), and say so.
-                self?.autoStopRequested = true; CheckScheduler.notifyPaused()
+                self?.continuedRunExpired(appActive: UIApplication.shared.applicationState == .active)
             }) { continuedRun = run }
         }
+    }
+
+    /// The person stopped the run: it ends after the site in progress (at most `AutoOptOut.siteLimit`), keeping everything done so far. The pass is
+    /// written down as unfinished, so the next run carries on with the sites it had not reached.
+    func stopAutoOptOut() {
+        guard autoBusy == "optout" else { return }
+        personStopRequested = true
+        NSLog("OptOutRun: stopped by the person")
+    }
+
+    /// iOS took back the background time it gave the run. With the app on screen the run needs no background time, so it carries on (and if the person
+    /// later leaves, `appDidEnterBackground` stops it after that site as on older iOS). Only when the person is away does it stop and say it is paused.
+    /// It once stopped either way, so a run started with "Run now" could end after its first site while the person watched.
+    func continuedRunExpired(appActive: Bool) {
+        if #available(iOS 26.0, *) { (continuedRun as? ContinuedRun)?.finish(success: false) }
+        continuedRun = nil
+        NSLog("OptOutRun: iOS ended the background time (app active=%d)", appActive ? 1 : 0)
+        guard !appActive else { return }
+        autoStopRequested = true
+        CheckScheduler.notifyPaused()
     }
 
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
@@ -765,7 +793,10 @@ final class AppModel: ObservableObject {
         let period = runPeriod(now: now)
         let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && (period?.contains($0.date) ?? true) }
         var ids = Set(automaticSites(for: person, now: now).map(\.id))
-        let pass = backgroundDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now)
+        // Every site a full pass covers, whatever kind the next run is: a repeat period must not make the others vanish from the page.
+        let pass = backgroundDomains(for: person, kind: .full, now: now)
+        let nextPass = runDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now)
+        let held = holds(for: person, now: now)
         for e in directory where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
         let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let lastRun = Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b })
@@ -776,8 +807,11 @@ final class AppModel: ObservableObject {
             case .sent: line = Loc.f("Sent %@", Loc.date(s.date ?? now))
             case .needsYou: line = ReviewItem(id: e.id, domain: e.domain, outcome: s.outcome ?? "failed", detail: s.detail, date: s.date ?? now, hasScreenshot: false).label
             case .notTried:
-                if let r = lastRun[e.id] { line = r.label }
-                else if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
+                // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
+                if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
+                else if let why = skipReason(e, for: person, holds: held, now: now) { line = why }
+                else if !nextPass.contains(e.domain) { line = Loc.t("Waits for the next full re-test") }
+                else if let r = lastRun[e.id] { line = r.label }
                 else { line = Loc.t("Not tried yet this period") }
             }
             return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
@@ -838,8 +872,19 @@ final class AppModel: ObservableObject {
         // sites go first. A site that does not go through is never marked done: it is left in the person's semi-automated queue, with what happened as the reason.
         let automatic = automaticDomains(for: original)
         let kind = household.autoSettings.nextRunKind(now: Date())
-        var runnable = automaticOnly ? backgroundDomains(for: original, kind: kind, person: person) : nil
+        var runnable = automaticOnly ? runDomains(for: original, kind: kind) : nil
         if !everySite, !dryRun, let r = runnable { runnable = remainingDomains(of: r, for: original) }
+        // Only the sites it will really try: a site its own rules leave alone (covered by a platform request, marked not working, not listed there, sent
+        // recently) is not counted in the run, so "N of M" and the report are honest. Those sites stay on the activity page with their reason.
+        var skippedReasons: [String: Int] = [:]
+        if !dryRun, let r = runnable {
+            let tryNow = willTry(r, for: original, everySite: everySite)
+            let held = holds(for: original)
+            for e in directory where r.contains(e.domain) && !tryNow.contains(e.domain) {
+                if let why = skipReason(e, for: original, everySite: everySite, holds: held) { skippedReasons[why, default: 0] += 1 }
+            }
+            runnable = tryNow
+        }
         #if DEBUG
         // Simulator work: `-only-domains a.com,b.com` runs just those sites, whatever group they are in.
         let args = ProcessInfo.processInfo.arguments
@@ -858,7 +903,9 @@ final class AppModel: ObservableObject {
             let ids = directory.filter { runnable.contains($0.domain) && automatic.contains($0.domain) }.map(\.id)
             household.updateAuto { $0.addPeriodTargets(ids, person: person.id.uuidString) }
         }
-        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID), spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
+        let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID),
+                                minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
+                                spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
         let now = Date()
         // A pass that was cut off carries on with the sites it has not tried yet (any outcome counts as tried).
         let passStart = household.autoSettings.passStarted
@@ -873,10 +920,14 @@ final class AppModel: ObservableObject {
                                        try? evidence.save(shot, person: personID, site: entry.id)
                                        Self.exportForReview(entry.domain, shot)
                                    },
-                                   period: runPeriod(now: now),
+                                   period: everySite ? nil : runPeriod(now: now),
                                    onResult: { [weak self] entry, result in await self?.recordAutoResult(entry, result, for: person.id, dryRun: dryRun) },
-                                   shouldStop: { [weak self] in await self?.autoStopRequested ?? true })
-        interrupted = autoStopRequested && !dryRun
+                                   shouldStop: { [weak self] in await self?.shouldStopRun ?? true })
+        // Finished only if every site it set out to do has a result. A stop flag is not proof either way: it can be cleared again after the loop has already stopped.
+        let expected = toRun.filter { AutoOptOut.standIn($0).optOutForm != nil }.count
+        interrupted = !dryRun && results.count < expected
+        if interrupted { runCutOff = true }
+        NSLog("OptOutRun: %d of %d sites have a result%@", results.count, expected, interrupted ? " (cut off; the rest waits)" : "")
         // A page that has gone is usually a moved link: look for the new one and try that site again, once.
         if !dryRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
@@ -894,12 +945,20 @@ final class AppModel: ObservableObject {
         optOutRun[person.id] = results.map { AutoOptOutRow(id: $0.0.id, domain: $0.0.domain, result: $0.1) }
         Self.exportResults(results.map { ($0.0.domain, $0.1.label) })
         if !dryRun, !interrupted {
-            let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [], personID: original.id)
+            // Every site that produced no try is in the report with its real reason: the ones left out before the run, and the ones the engine passed over
+            // during it (sent recently, not listed there, covered by a platform request, ...). Nothing is silently dropped from the count.
+            for (_, result) in results {
+                switch result {
+                case .submitted, .challenged, .needsYou, .needsData, .rejected, .failed, .emailed: break
+                default: skippedReasons[result.label, default: 0] += 1
+                }
+            }
+            let report = RunReport(person: original.displayName, rows: optOutRun[person.id] ?? [], personID: original.id, skipped: skippedReasons)
             household.updateAuto {
                 $0.lastOptOut = now
                 $0.lastAttempted = report.attempted; $0.lastSent = report.sent; $0.lastNeedYou = report.needYou.count
             }
-            if report.attempted > 0 { runReport = report }
+            if report.attempted > 0 || report.skippedCount > 0 { runReport = report }
         }
         save()
         refreshReminders()
@@ -1230,14 +1289,49 @@ final class AppModel: ObservableObject {
         return Set(AutoOptOut.notSent(in: runPeriod(now: now), entries, progress: household.progress(for: person.id)).map(\.domain))
     }
 
-    /// How many sites "Run now" would try for this person now: the next pass's sites not yet sent this period.
+    /// The sites a run of this kind sets out to do: the pass's own sites, and every site a full pass covers that no run has ever tried. A site never
+    /// reached is never left for six months just because the next run is a repeat (a pass that was cut off and wrongly counted as finished once left
+    /// about 300 sites that way); new sites in the directory are picked up the same way.
+    func runDomains(for original: Person, kind: RunKind, now: Date = Date()) -> Set<String> {
+        let progress = household.progress(for: original.id)
+        let neverTried = Set(directory.filter { (progress.optOutAttempts[$0.id] ?? []).isEmpty }.map(\.domain))
+        return backgroundDomains(for: original, kind: kind, now: now).union(backgroundDomains(for: original, kind: .full, now: now).intersection(neverTried))
+    }
+
+    /// How many sites "Run now" would really try for this person now: the run's sites not yet sent this period that its own rules do not leave alone.
     func runNowCount(for person: Person, now: Date = Date()) -> Int {
-        remainingDomains(of: backgroundDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now), for: person, now: now).count
+        willTry(remainingDomains(of: runDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now), for: person, now: now), for: person, now: now).count
+    }
+
+    /// Why a run leaves this site alone right now (covered by a platform request, marked not working, not listed there, sent recently, a detail missing),
+    /// or nil when it would try it. The same check the run makes before each site (`AutoOptOut.precheck`).
+    func skipReason(_ entry: DirectoryEntry, for original: Person, everySite: Bool = false, holds: [String: PlatformHold]? = nil, now: Date = Date()) -> String? {
+        let e = AutoOptOut.standIn(resolved(entry))
+        let pre = AutoOptOut.precheck(entry: e, person: formPerson(original), progress: household.progress(for: original.id), now: now,
+                                      minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
+                                      hold: (holds ?? self.holds(for: original, now: now))[entry.id], period: everySite ? nil : runPeriod(now: now))
+        return pre.result?.label
+    }
+
+    /// Of these sites, the ones a run would really try now.
+    func willTry(_ domains: Set<String>, for original: Person, everySite: Bool = false, now: Date = Date()) -> Set<String> {
+        let held = holds(for: original, now: now)
+        return Set(directory.filter { domains.contains($0.domain) && skipReason($0, for: original, everySite: everySite, holds: held, now: now) == nil }.map(\.domain))
     }
 
     /// The selected person's first automatic pass is still to finish, so the semi-automated queue waits (see `AutoSettings.firstPassPending`).
     /// Not while the profile is incomplete: the run cannot start then, and the profile gate asks for what is missing.
     var waitingForFirstPass: Bool { autoSettings.firstPassPending && (selectedPerson.map(isReady) ?? false) }
+
+    /// The official one-request service the selected person can use and has not made yet (California's DROP, for someone in California). It comes
+    /// before the automatic pass: until it is made, every site it reaches is held, so the pass would leave them all alone. Nil for everyone it does
+    /// not apply to: outside California DROP is not offered at all and holds nothing.
+    var platformStep: PlanTask? {
+        plan.flatMap(\.tasks).first { t in if case .platform = t.kind { return !isDone(t) } else { return false } }
+    }
+
+    /// The first automatic pass waits for the platform request (see `platformStep`).
+    var firstPassWaitsForPlatform: Bool { autoSettings.firstPassPending && platformStep != nil }
 
     /// Re-tests every site that can be tried, now, whatever the schedule says. The usual schedule carries on from it (the next full re-test is counted from when this one finishes).
     func runFullRetestNow(submitter: FormSubmitter? = nil) {
@@ -1510,11 +1604,13 @@ final class AppModel: ObservableObject {
             autoBusy = nil
         }
         // Due on schedule, or a run that was cut off (the app was closed or suspended) and still has sites left.
-        if household.autoSettings.optOutDue(now: now) || household.autoSettings.optOutResumePending == true {
+        // A new person in California makes their DROP request first; the first pass starts once it is made (it would hold back every site DROP reaches).
+        if firstPassWaitsForPlatform { NSLog("OptOutRun: the first pass waits for the platform request") }
+        else if household.autoSettings.optOutDue(now: now) || household.autoSettings.optOutResumePending == true {
             NSLog("OptOutRun: resuming a run that was cut off (pending=%d)", household.autoSettings.optOutResumePending == true ? 1 : 0)
             beginOptOutRun(total: directory.count, useContinued: true)
             for person in people where isReady(person) { await runAutoOptOut(for: person) }
-            endOptOutRun(interrupted: autoStopRequested)
+            endOptOutRun(interrupted: runCutOff)
         }
         CheckScheduler.scheduleAutomation(autoSettings)
     }
