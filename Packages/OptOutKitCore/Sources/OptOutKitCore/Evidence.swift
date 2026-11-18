@@ -18,7 +18,7 @@ public struct EvidenceStore: Sendable {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let sealed = try SealedStore.seal(jpeg, key: keys.key())
         #if os(iOS)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])
+        try sealed.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])   // written by runs while the phone is locked
         #else
         try sealed.write(to: url, options: [.atomic])
         #endif

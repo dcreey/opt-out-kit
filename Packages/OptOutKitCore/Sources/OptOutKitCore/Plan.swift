@@ -154,8 +154,9 @@ public enum OptOutPlan {
             }
             // Forms that ask the person to type a code take the most effort, so they come last in the semi-automated step.
             func typed(_ t: PlanTask) -> Bool { m == .semiAutomatic && ((byDomain[t.domains.first ?? ""]?.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (byDomain[t.domains.first ?? ""]?.liveForm?.blockers.contains("code") ?? false)) }
-            steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation,
-                                  tasks: tasks.sorted { (typed($0) ? 1 : 0, $0.title.lowercased()) < (typed($1) ? 1 : 0, $1.title.lowercased()) }))
+            // Each task's sort key is worked out once: checking a form for a typed code inside the comparison did it some 16,000 times a build.
+            let sorted = tasks.map { ((typed($0) ? 1 : 0, $0.title.lowercased()), $0) }.sorted { $0.0 < $1.0 }.map(\.1)
+            steps.append(PlanStep(kind: .method(m), title: m.title, explanation: m.explanation, tasks: sorted))
         }
         // Each task carries the highest priority among the sites it handles, so the queue can put the brokers that matter most first.
         for i in steps.indices { for j in steps[i].tasks.indices {

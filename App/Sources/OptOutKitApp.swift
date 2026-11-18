@@ -47,13 +47,25 @@ final class AppModel: ObservableObject {
     @Published private(set) var household = Household() {
         // Only a change to the people or their progress changes the plan; the email address and settings do not, and rebuilding the plan for
         // every site is what made typing in the email box slow.
-        didSet { if oldValue.people != household.people || oldValue.progress != household.progress { planCache = nil } }
+        // While a run works, its own results do not rebuild the plan after every site (that took about a second each time, on the main thread, and made
+        // the app slow during a run): the plan is rebuilt once when the run ends. A change the person makes (their profile) still rebuilds it at once.
+        didSet {
+            if oldValue.people != household.people { planCache = nil }
+            else if oldValue.progress != household.progress, autoBusy != "optout" { planCache = nil }
+        }
     }
     @Published private(set) var selectedID: UUID { didSet { planCache = nil } }
     @Published private var regionTick = 0 { didSet { planCache = nil } }
     @Published var loadError: String?
     /// Set when saved data exists but cannot be opened. Saving is paused so it is never overwritten by accident.
     @Published private(set) var storageProblem: String?
+    /// Only when the saved data really could not be opened (not when the phone was just locked, nor when a save failed) is starting over offered.
+    @Published private(set) var storageCanErase = false
+    /// The saved profiles could not be opened yet because the phone has not been unlocked since it started; they open at the unlock.
+    private var loadWaitsForUnlock = false
+    /// A save came while the phone kept its files closed; it is written at the unlock. It once paused every later save until the app was restarted.
+    private var saveWaitsForUnlock = false
+    private var unlockObserver: NSObjectProtocol?
 
     @Published private(set) var pending: Pending = .nothing
     @Published private(set) var isChecking = false
@@ -161,13 +173,20 @@ final class AppModel: ObservableObject {
         var problem: String?
         do {
             if let saved = try store.load() { loaded = saved }
+        } catch where StorageError.isLocked(error) {
+            problem = Loc.t("Unlock your phone to open your saved profiles.")
+            loadWaitsForUnlock = true
         } catch {
             problem = Loc.f("Your saved profiles could not be opened on this device (%@). They are untouched.", error)
+            storageCanErase = true
         }
         if loaded.people.isEmpty { loaded.add(Person(displayName: "Me", relationship: .me)) }
         household = loaded
         selectedID = loaded.people[0].id
         storageProblem = problem
+        unlockObserver = NotificationCenter.default.addObserver(forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.protectedDataAvailable() }
+        }
         if let directoryURL { directory = ((try? Registry.loadDirectory(directoryURL)) ?? []).filter { $0.excluded == nil } }       // excluded sites are never shown
         if let jurisdictionsURL { jurisdictions = (try? JurisdictionLoader.load(directory: jurisdictionsURL)) ?? [] }
         if let registrySummaryURL { registrySummary = JurisdictionLoader.loadSummary(registrySummaryURL) }
@@ -387,9 +406,16 @@ final class AppModel: ObservableObject {
     /// The plan and its ranked queue are built from every site, so they are kept until something they depend on changes (the profile,
     /// progress, language or data). Rebuilding them on every redraw made typing in the search box lag.
     private var planCache: (plan: [PlanStep], queue: [QueueBand])?
+    #if DEBUG
+    /// Tests: how many times the plan was built.
+    private(set) var planBuilds = 0
+    #endif
 
     private func builtPlan() -> (plan: [PlanStep], queue: [QueueBand]) {
         if let planCache { return planCache }
+        #if DEBUG
+        planBuilds += 1
+        #endif
         let plan = buildPlan(for: selectedPerson)
         let built = (plan, OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries))
         planCache = built
@@ -421,8 +447,18 @@ final class AppModel: ObservableObject {
     /// The plan for any one person (the selected one is cached by `plan`).
     func buildPlan(for person: Person?) -> [PlanStep] {
         let eligible: [Platform] = person.map { p in platforms.filter { $0.live && $0.eligible(p, ownerState: household.ownerState) } } ?? []
+        // Each site's method is worked out once per build (the plan asks for some sites more than once), with the person's progress read once.
+        let attempts = person.map { household.progress(for: $0.id).optOutAttempts } ?? [:]
+        let confirming = person?.mayConfirmOwnIdentity() ?? false
+        var verdicts: [String: MethodVerdict] = [:]
         return OptOutPlan.build(entries: scopedDirectory(for: person).filter { $0.closed == nil }, brokers: brokers, platforms: eligible,
-                                classifyEntry: { method(for: $0, person: person) }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
+                                classifyEntry: { e in
+                                    if let v = verdicts[e.id] { return v }
+                                    let last = attempts[e.id]?.last?.outcome
+                                    let v = OptOutMethods.classify(resolved(e), confirmingIdentity: confirming, challengedBefore: last == "challenged",
+                                                                   failedBefore: last == "failed" || last == "rejected")
+                                    verdicts[e.id] = v; return v
+                                }, classifyBroker: { OptOutMethods.classify($0, in: directory) })
     }
 
     /// The sites the app opts a person out of by itself: exactly the ones in the plan's automatic task, so the count the person is
@@ -440,7 +476,16 @@ final class AppModel: ObservableObject {
     /// the ones whose latest attempt went through for a repeat.
     func backgroundDomains(for original: Person, kind: RunKind, person: Person? = nil, now: Date = Date()) -> Set<String> {
         let p = person ?? formPerson(original)
-        return Set(AutoOptOut.backgroundSites(kind, entries: directory.map(resolved), person: p, progress: household.progress(for: original.id), now: now).map(\.domain))
+        let plans = person == nil ? fillPlans(for: original) : nil
+        return Set(AutoOptOut.backgroundSites(kind, entries: directory.map(resolved), person: p, progress: household.progress(for: original.id), now: now, plans: plans).map(\.domain))
+    }
+
+    /// How each site's form is filled for this person, kept until their details change (see `FillPlans`).
+    private var plansMemo: FillPlans?
+    func fillPlans(for original: Person) -> FillPlans {
+        let p = formPerson(original)
+        if let m = plansMemo, m.person == p { return m }
+        let m = FillPlans(person: p); plansMemo = m; return m
     }
 
     func automaticDomains(for person: Person) -> Set<String> {
@@ -653,6 +698,7 @@ final class AppModel: ObservableObject {
             if scan || optOut { a.turnOnBoth(now: a.decidedAt ?? Date()) }
             else { a.declineForNow(now: a.decidedAt ?? Date()) }
             a.scanEnabled = scan; a.optOutEnabled = optOut
+            if optOut { a.stoppedByPerson = nil }          // turning it on again means it may run
         }
         save()
         if scan || optOut, !ProcessInfo.processInfo.arguments.contains("-uitest-reset") { CheckScheduler.requestNotificationPermission() }
@@ -695,11 +741,15 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// The person stopped the run: it ends after the site in progress (at most `AutoOptOut.siteLimit`), keeping everything done so far. The pass is
+    /// The person stopped the run: it starts no more sites and ends when the ones in progress finish (at most `AutoOptOut.siteLimit`), keeping everything done so far. The pass is
     /// written down as unfinished, so the next run carries on with the sites it had not reached.
     func stopAutoOptOut() {
         guard autoBusy == "optout" else { return }
         personStopRequested = true
+        // Written down, so the run does not start again when the person goes back, reopens the app, or the schedule comes round: only Run now or
+        // Re-test all starts it again.
+        household.updateAuto { $0.stoppedByPerson = true }
+        save()
         NSLog("OptOutRun: stopped by the person")
     }
 
@@ -718,11 +768,12 @@ final class AppModel: ObservableObject {
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
     private func endOptOutRun(interrupted: Bool) {
         autoBusy = nil; autoProgress = nil
+        planCache = nil          // the run's results are in the plan now, once
         if !interrupted {
             household.updateAuto {
                 $0.optOutResumePending = nil
                 if $0.passKind == .full { $0.lastFullRun = Date() }
-                $0.passStarted = nil; $0.passKind = nil
+                $0.passStarted = nil; $0.passKind = nil; $0.passEverySite = nil
             }
         }
         if #available(iOS 26.0, *) { (continuedRun as? ContinuedRun)?.finish(success: !interrupted) }
@@ -788,19 +839,48 @@ final class AppModel: ObservableObject {
 
     /// Every site the automatic run deals with this period, sorted into needs you, sent and not tried: the "done for you" sites, the sites the next pass
     /// would try, and any site the run tried this period that did not go through (it has moved to the semi-automated queue, so it is in neither of the others).
-    func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] {
-        let progress = household.progress(for: person.id)
-        let period = runPeriod(now: now)
+    func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] { Self.activityPage(activityInputs(for: person, now: now)).rows }
+
+    /// Everything the automatic opt-out page shows, as plain values taken on the main thread (quick); `activityPage` does the slow part anywhere.
+    struct ActivityInputs: @unchecked Sendable {
+        let entries: [DirectoryEntry]          // resolved (healed links, regional pages)
+        let plans: FillPlans
+        let progress: OptOutKitCore.Progress
+        let holds: [String: PlatformHold]
+        let period: RunPeriod?
+        let nextKind: RunKind
+        let automaticIDs: Set<String>
+        let lastRun: [String: AutoOptOutResult]
+        let now: Date
+    }
+
+    func activityInputs(for person: Person, now: Date = Date()) -> ActivityInputs {
+        ActivityInputs(entries: directory.map(resolved), plans: fillPlans(for: person), progress: household.progress(for: person.id), holds: holds(for: person, now: now),
+                       period: runPeriod(now: now), nextKind: autoSettings.nextRunKind(now: now), automaticIDs: Set(automaticSites(for: person, now: now).map(\.id)),
+                       lastRun: Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b }), now: now)
+    }
+
+    /// The page's groups and the number "Run now" would try, each site's form checked once. The same rules as `runDomains`, `remainingDomains`,
+    /// `willTry` and `skipReason` (a test holds them equal); build 47 worked the page out on the main thread in seconds, after every site of a run.
+    nonisolated static func activityPage(_ i: ActivityInputs) -> (rows: [ActivityRow], runNow: Int) {
+        let now = i.now, progress = i.progress, period = i.period
         let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && (period?.contains($0.date) ?? true) }
-        var ids = Set(automaticSites(for: person, now: now).map(\.id))
         // Every site a full pass covers, whatever kind the next run is: a repeat period must not make the others vanish from the page.
-        let pass = backgroundDomains(for: person, kind: .full, now: now)
-        let nextPass = runDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now)
-        let held = holds(for: person, now: now)
-        for e in directory where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let lastRun = Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b })
-        return RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period).compactMap { s in
+        let fullSites = AutoOptOut.backgroundSites(.full, entries: i.entries, person: i.plans.person, progress: progress, now: now, plans: i.plans)
+        let pass = Set(fullSites.map(\.domain))
+        let neverTried = Set(i.entries.filter { (progress.optOutAttempts[$0.id] ?? []).isEmpty }.map(\.domain))
+        let nextPass = i.nextKind == .full ? pass
+            : Set(fullSites.filter { AutoOptOut.lastAttemptWentThrough($0, progress: progress) }.map(\.domain)).union(pass.intersection(neverTried))
+        var reasons: [String: String?] = [:]
+        func reason(_ e: DirectoryEntry) -> String? {
+            if let r = reasons[e.id] { return r }
+            let r = skipReason(AutoOptOut.standIn(e), plans: i.plans, progress: progress, everySite: false, hold: i.holds[e.id], period: period, now: now)
+            reasons[e.id] = r; return r
+        }
+        var ids = i.automaticIDs
+        for e in i.entries where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
+        let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period).compactMap { s -> ActivityRow? in
             guard let e = byID[s.id] else { return nil }
             let line: String
             switch s.group {
@@ -809,13 +889,16 @@ final class AppModel: ObservableObject {
             case .notTried:
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
                 if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
-                else if let why = skipReason(e, for: person, holds: held, now: now) { line = why }
+                else if let why = reason(e) { line = why }
                 else if !nextPass.contains(e.domain) { line = Loc.t("Waits for the next full re-test") }
-                else if let r = lastRun[e.id] { line = r.label }
+                else if let r = i.lastRun[e.id] { line = r.label }
                 else { line = Loc.t("Not tried yet this period") }
             }
             return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
         }.sorted { $0.domain < $1.domain }
+        let remaining = AutoOptOut.notSent(in: period, i.entries.filter { nextPass.contains($0.domain) }, progress: progress)
+        let runNow = Set(remaining.filter { reason($0) == nil }.map(\.domain)).count
+        return (rows, runNow)
     }
 
     /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
@@ -851,6 +934,9 @@ final class AppModel: ObservableObject {
 
     /// Back in front: if the run was asked to stop, the next due-check (below) carries on with the sites left.
     func appDidBecomeActive() {
+        protectedDataAvailable()
+        // Each site's form is checked against the person once, away from the main thread, so the automatic opt-out page and the start of a run are quick.
+        if let p = selectedPerson, storageProblem == nil { let inputs = activityInputs(for: p); Task.detached(priority: .utility) { _ = AppModel.activityPage(inputs) } }
         endBackgroundTime()
         refreshReminders()
         // A quick glance away: the run was only asked to stop, so let it go on.
@@ -865,9 +951,13 @@ final class AppModel: ObservableObject {
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
     /// `everySite`: "Re-test all", which tries every site of the pass again. Otherwise a run leaves out the sites already sent this period (`AutoOptOut.notSent`),
     /// so "Run now" does only what is left: sites due again, sites not reached, and sites that did not go through.
-    func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, everySite: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
+    func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, everySite asked: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
+        // A "Re-test all" that was stopped or cut off is carried on as one, by Run now or by itself: what it had not reached is still sent again.
+        let everySite = asked || (!dryRun && household.autoSettings.passStarted != nil && household.autoSettings.passEverySite == true)
         guard storageProblem == nil, isReady(original) else { return }
+        // A run only starts by itself when the person has not stopped it (`AutoSettings.startsByItself`), so a run starting means it may go on.
+        if !dryRun, household.autoSettings.stoppedByPerson == true { household.updateAuto { $0.stoppedByPerson = nil } }
         // A full pass (the first run, then every six months) tries every site that can be tried; the pass in between repeats the sites that went through. The "done for you"
         // sites go first. A site that does not go through is never marked done: it is left in the person's semi-automated queue, with what happened as the reason.
         let automatic = automaticDomains(for: original)
@@ -905,7 +995,8 @@ final class AppModel: ObservableObject {
         }
         let engine = AutoOptOut(submitter: submitter ?? makeSubmitter(for: person, advertisingID: adID),
                                 minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
-                                spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0)
+                                spacing: submitter == nil && !Self.usesFakeSubmitter ? 2 : 0,
+                                parallel: submitter == nil ? AutoOptOut.appParallel : 1)
         let now = Date()
         // A pass that was cut off carries on with the sites it has not tried yet (any outcome counts as tried).
         let passStart = household.autoSettings.passStarted
@@ -914,8 +1005,18 @@ final class AppModel: ObservableObject {
             return last.date >= passStart
         }
         let toRun = directory.filter { (runnable?.contains($0.domain) ?? true) && !triedThisPass($0) }.map(resolved)
+        // The count shown is what this run really has left, from the start: a run carried on after it was cut off showed "0 of" every site in the
+        // directory until its first site was done, and looked as if it had started again from scratch.
+        if !dryRun, autoBusy == "optout" {
+            let total = toRun.filter { AutoOptOut.standIn($0).optOutForm != nil }.count
+            autoProgress = (0, total)
+            if #available(iOS 26.0, *) { (continuedRun as? ContinuedRun)?.report(done: 0, total: total) }
+        }
         var results = await engine.run(entries: toRun.filter { automatic.contains($0.domain) } + toRun.filter { !automatic.contains($0.domain) }, person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
-                                   progressCallback: { done, total in Task { @MainActor in self.autoProgress = (done, total); if #available(iOS 26.0, *) { (self.continuedRun as? ContinuedRun)?.report(done: done, total: total) } } },
+                                   progressCallback: { done, total in Task { @MainActor in
+                                       // A count that arrives after the run ended must not bring back a progress bar that then never moves.
+                                       guard self.autoBusy != nil else { return }
+                                       self.autoProgress = (done, total); if #available(iOS 26.0, *) { (self.continuedRun as? ContinuedRun)?.report(done: done, total: total) } } },
                                    evidence: { [evidence, personID = original.id] entry, shot in
                                        try? evidence.save(shot, person: personID, site: entry.id)
                                        Self.exportForReview(entry.domain, shot)
@@ -1303,20 +1404,29 @@ final class AppModel: ObservableObject {
         willTry(remainingDomains(of: runDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now), for: person, now: now), for: person, now: now).count
     }
 
+    /// Whether the person stopped the run; nothing starts by itself until they press Run now or Re-test all.
+    var runStoppedByPerson: Bool { autoSettings.stoppedByPerson == true }
+
     /// Why a run leaves this site alone right now (covered by a platform request, marked not working, not listed there, sent recently, a detail missing),
     /// or nil when it would try it. The same check the run makes before each site (`AutoOptOut.precheck`).
     func skipReason(_ entry: DirectoryEntry, for original: Person, everySite: Bool = false, holds: [String: PlatformHold]? = nil, now: Date = Date()) -> String? {
-        let e = AutoOptOut.standIn(resolved(entry))
-        let pre = AutoOptOut.precheck(entry: e, person: formPerson(original), progress: household.progress(for: original.id), now: now,
-                                      minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
-                                      hold: (holds ?? self.holds(for: original, now: now))[entry.id], period: everySite ? nil : runPeriod(now: now))
-        return pre.result?.label
+        Self.skipReason(AutoOptOut.standIn(resolved(entry)), plans: fillPlans(for: original), progress: household.progress(for: original.id), everySite: everySite,
+                        hold: (holds ?? self.holds(for: original, now: now))[entry.id], period: runPeriod(now: now), now: now)
+    }
+
+    /// The same, from values only, so the automatic opt-out page can work it out away from the main thread.
+    nonisolated static func skipReason(_ e: DirectoryEntry, plans: FillPlans, progress: OptOutKitCore.Progress, everySite: Bool, hold: PlatformHold?, period: RunPeriod?, now: Date) -> String? {
+        AutoOptOut.precheck(entry: e, person: plans.person, progress: progress, now: now,
+                            minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
+                            hold: hold, period: everySite ? nil : period, plans: plans).result?.label
     }
 
     /// Of these sites, the ones a run would really try now.
     func willTry(_ domains: Set<String>, for original: Person, everySite: Bool = false, now: Date = Date()) -> Set<String> {
-        let held = holds(for: original, now: now)
-        return Set(directory.filter { domains.contains($0.domain) && skipReason($0, for: original, everySite: everySite, holds: held, now: now) == nil }.map(\.domain))
+        let held = holds(for: original, now: now), plans = fillPlans(for: original), progress = household.progress(for: original.id), period = runPeriod(now: now)
+        return Set(directory.filter { domains.contains($0.domain) }.filter {
+            Self.skipReason(AutoOptOut.standIn(resolved($0)), plans: plans, progress: progress, everySite: everySite, hold: held[$0.id], period: period, now: now) == nil
+        }.map(\.domain))
     }
 
     /// The selected person's first automatic pass is still to finish, so the semi-automated queue waits (see `AutoSettings.firstPassPending`).
@@ -1606,9 +1716,9 @@ final class AppModel: ObservableObject {
         // Due on schedule, or a run that was cut off (the app was closed or suspended) and still has sites left.
         // A new person in California makes their DROP request first; the first pass starts once it is made (it would hold back every site DROP reaches).
         if firstPassWaitsForPlatform { NSLog("OptOutRun: the first pass waits for the platform request") }
-        else if household.autoSettings.optOutDue(now: now) || household.autoSettings.optOutResumePending == true {
+        else if household.autoSettings.startsByItself(now: now) {
             NSLog("OptOutRun: resuming a run that was cut off (pending=%d)", household.autoSettings.optOutResumePending == true ? 1 : 0)
-            beginOptOutRun(total: directory.count, useContinued: true)
+            beginOptOutRun(total: 0, useContinued: true)
             for person in people where isReady(person) { await runAutoOptOut(for: person) }
             endOptOutRun(interrupted: runCutOff)
         }
@@ -1752,9 +1862,39 @@ final class AppModel: ObservableObject {
         household = Household()
         household.add(Person(displayName: "Me", relationship: .me))
         selectedID = household.people[0].id
-        storageProblem = nil
+        storageProblem = nil; storageCanErase = false; loadWaitsForUnlock = false
         save()
     }
+
+    /// The phone was unlocked (or the app came to the front, which means it is): profiles that could not be opened while it was locked are opened
+    /// now, and a save that had to wait is written.
+    func protectedDataAvailable() {
+        if loadWaitsForUnlock {
+            do {
+                let saved = try store.load()
+                loadWaitsForUnlock = false
+                var loaded = saved ?? Household()
+                if loaded.people.isEmpty { loaded.add(Person(displayName: "Me", relationship: .me)) }
+                household = loaded
+                selectedID = loaded.people[0].id
+                storageProblem = nil
+                NSLog("Storage: opened after the unlock")
+            } catch where StorageError.isLocked(error) {
+                return
+            } catch {
+                loadWaitsForUnlock = false
+                storageProblem = Loc.f("Your saved profiles could not be opened on this device (%@). They are untouched.", error)
+                storageCanErase = true
+                return
+            }
+        }
+        if saveWaitsForUnlock { saveWaitsForUnlock = false; save() }
+    }
+
+    #if DEBUG
+    /// Tests: a save is waiting for the unlock.
+    var savePendingUnlock: Bool { saveWaitsForUnlock }
+    #endif
 
     /// Encrypting and writing the household takes a moment, so it runs off the main thread, one write at a time and in order. A failure is shown when it comes back.
     private let saveQueue = DispatchQueue(label: "dev.optoutkit.save", qos: .utility)
@@ -1770,7 +1910,11 @@ final class AppModel: ObservableObject {
             UIApplication.shared.endBackgroundTask(background); background = .invalid
         }
         saveQueue.async { [weak self] in
-            do { try store.save(snapshot) } catch {
+            do { try store.save(snapshot) } catch where StorageError.isLocked(error) {
+                // The phone is locked and its files closed: not a fault. Written again at the unlock, with everything that changed in between.
+                NSLog("Storage: save waits for the unlock")
+                DispatchQueue.main.async { self?.saveWaitsForUnlock = true }
+            } catch {
                 DispatchQueue.main.async { self?.storageProblem = Loc.f("Could not save: %@", error) }
             }
             DispatchQueue.main.async { if background != .invalid { UIApplication.shared.endBackgroundTask(background); background = .invalid } }

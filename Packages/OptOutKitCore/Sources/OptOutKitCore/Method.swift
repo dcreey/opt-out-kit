@@ -37,6 +37,18 @@ public enum OptOutMethods {
                                          emails: ["pat@example.com"], phones: ["555-0100"], birthdate: "1980-01-01", confirmsOwnIdentity: confirmingIdentity) }
 
     /// `confirmingIdentity` is true for the account owner when they have allowed "I am this person" boxes to be ticked for them.
+    /// How a site's form fills for a complete profile. It depends only on the form (and the language its reasons are in), never on what was sent, so it is
+    /// worked out once per site and kept: working it out for every site each time the plan was rebuilt took about a second, and the plan is rebuilt often.
+    private static func samplePlan(_ e: DirectoryEntry, _ form: OptOutForm, signals: [String], confirmingIdentity: Bool, listing: URL?) -> FillPlan {
+        let key = [e.id, form.page.absoluteString, form.action?.absoluteString ?? "", "\(form.fields.count)", signals.joined(separator: ","),
+                   confirmingIdentity ? "1" : "0", listing == nil ? "" : "L", L10n.language].joined(separator: "|")
+        if let p = sampleCache.get(key) { return p }
+        let p = FormFiller.plan(for: form, signals: signals, person: complete(confirmingIdentity: confirmingIdentity), listingURL: listing)
+        sampleCache.set(key, p)
+        return p
+    }
+    private static let sampleCache = PlanCache()
+
     public static func classify(_ e: DirectoryEntry, confirmingIdentity: Bool = false, challengedBefore: Bool = false, failedBefore: Bool = false) -> MethodVerdict {
         let signals = e.signals ?? []
         // What a real page load showed that only the person can answer (a business field, an agent, a file, a state menu without their state,
@@ -84,7 +96,7 @@ public enum OptOutMethods {
         // A form that wants the address of the person's own listing is workable when the site can be searched by name: the app
         // searches, the person taps their listing, the app fills the rest.
         let listing: URL? = FormFiller.needsListing(form) && e.hasListingSearch ? URL(string: "https://example.com/listing") : nil
-        let plan = FormFiller.plan(for: form, signals: signals, person: complete(confirmingIdentity: confirmingIdentity), listingURL: listing)
+        let plan = samplePlan(e, form, signals: signals, confirmingIdentity: confirmingIdentity, listing: listing)
         switch plan.verdict {
         case .needsYou(let why): return MethodVerdict(method: .semiAutomatic, reason: why)
         case .needsData(let what): return MethodVerdict(method: .semiAutomatic, reason: L10n.f("The form asks for %@, which we do not hold.", what.joined(separator: ", ")))
@@ -157,4 +169,11 @@ public enum OptOutMethods {
         }
         return out
     }
+}
+
+/// The sample plans worked out so far (see `OptOutMethods.samplePlan`).
+final class PlanCache: @unchecked Sendable {
+    private let lock = NSLock(); private var plans: [String: FillPlan] = [:]
+    func get(_ k: String) -> FillPlan? { lock.lock(); defer { lock.unlock() }; return plans[k] }
+    func set(_ k: String, _ p: FillPlan) { lock.lock(); plans[k] = p; lock.unlock() }
 }

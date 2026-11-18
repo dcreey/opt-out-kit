@@ -7,7 +7,7 @@ Last updated 2026-11-17.
 ## What the app holds
 
 What you type into a profile (names, addresses, emails, phone numbers, birthdate, an optional LinkedIn address) is stored encrypted on your phone, in the
-app's own storage. It is not sent to us, because we have nowhere to receive it. If you delete a profile or the app, it is gone; we cannot recover it.
+app's own storage, with the key in the iOS Keychain. It can be read once the phone has been unlocked after it starts, so the automatic run can work while the phone is locked. It is not sent to us, because we have nowhere to receive it. If you delete a profile or the app, it is gone; we cannot recover it.
 
 ## Where your information goes
 

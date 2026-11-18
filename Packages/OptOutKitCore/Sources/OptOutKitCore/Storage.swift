@@ -3,6 +3,21 @@ import CryptoKit
 
 public enum StorageError: Error, Equatable {
     case badHeader
+    /// The phone has not been unlocked since it was turned on, so iOS keeps the key (and the files) closed. Not a fault: it passes at the next unlock.
+    case locked
+
+    /// Whether a load or save failed only because the phone is locked: the key could not be read yet (`locked`), or iOS refused to open the file
+    /// for its data protection. Such a failure is put off until the phone is unlocked, never shown as damage and never a reason to erase.
+    public static func isLocked(_ error: Error) -> Bool {
+        if let e = error as? StorageError { return e == .locked }
+        let ns = error as NSError
+        if ns.domain == NSOSStatusErrorDomain, ns.code == -25308 { return true }          // errSecInteractionNotAllowed
+        if ns.domain == NSCocoaErrorDomain, ns.code == NSFileReadNoPermissionError || ns.code == NSFileWriteNoPermissionError {
+            let posix = (ns.userInfo[NSUnderlyingErrorKey] as? NSError).map { $0.domain == NSPOSIXErrorDomain ? $0.code : 0 } ?? 0
+            return posix == Int(EPERM) || posix == 0
+        }
+        return false
+    }
 }
 
 /// AES-256-GCM sealing for local data. Format: "OOK1" header (authenticated) + nonce + ciphertext + tag.
@@ -59,7 +74,9 @@ public struct HouseholdStore {
         let sealed = try SealedStore.seal(JSONEncoder().encode(household), key: keys.key())
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         #if os(iOS)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])   // iOS data protection: unreadable while locked
+        // iOS data protection: unreadable until the phone is first unlocked after it starts. Not "complete" (unreadable whenever locked): the
+        // automatic run works while the phone is locked in a pocket or charging overnight, and must be able to keep what it did.
+        try sealed.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         #else
         try sealed.write(to: url, options: [.atomic])   // macOS (tests, tools) has no per-file data protection
         #endif

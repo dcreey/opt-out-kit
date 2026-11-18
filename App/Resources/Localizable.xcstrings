@@ -23208,6 +23208,29 @@
     }
    }
   },
+  "Stopped. Nothing runs by itself until you press Run now, which carries on with the sites left.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Arrêté. Rien ne se lance tout seul tant que vous n'appuyez pas sur Lancer maintenant, qui reprend avec les sites restants."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Detenido. Nada se inicia solo hasta que pulses Ejecutar ahora, que continúa con los sitios que faltan."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gestoppt. Nichts startet von selbst, bis Sie auf „Jetzt starten“ tippen; das macht mit den übrigen Websites weiter."
+     }
+    }
+   }
+  },
   "Stopped by a human check or terms prompt": {
    "extractionState": "manual",
    "localizations": {
@@ -27229,6 +27252,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Später freischalten"
+     }
+    }
+   }
+  },
+  "Unlock your phone to open your saved profiles.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Déverrouillez votre téléphone pour ouvrir vos profils enregistrés."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Desbloquea tu teléfono para abrir tus perfiles guardados."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Entsperren Sie Ihr Telefon, um Ihre gespeicherten Profile zu öffnen."
      }
     }
    }

@@ -243,6 +243,18 @@ final class AutomaticRunAppTests: XCTestCase {
         XCTAssertGreaterThan(tried, 0); XCTAssertLessThan(tried, total, "it stopped part-way")
         XCTAssertNil(m.autoBusy, "and is no longer working")
         XCTAssertEqual(m.autoSettings.optOutResumePending, true, "the rest of the pass waits for the next run")
+        // Stop means stop: not carried on by reopening the app or going back, nor by the schedule, until the person starts a run.
+        XCTAssertEqual(m.autoSettings.stoppedByPerson, true)
+        var on = m.autoSettings; on.optOutEnabled = true
+        XCTAssertFalse(on.startsByItself(now: Date()), "a stopped run does not start again by itself, even with automatic opt-out on")
+        XCTAssertTrue(m.runStoppedByPerson, "the page says it is stopped")
+        // Run now carries on with only the sites left, and counts only those from the start.
+        let left = Task { await m.runAutoOptOut(for: me, submitter: Slow()) }
+        waited = 0
+        while m.autoProgress == nil && waited < 100 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        XCTAssertEqual(m.autoProgress?.total, total - tried, "the count is the sites left, not every site")
+        XCTAssertNil(m.autoSettings.stoppedByPerson, "starting a run clears Stop")
+        m.stopAutoOptOut(); await left.value
     }
 
     /// A site the run's own rules leave alone (here: covered by California's DROP until its request is made) is not counted as tried, is never sent,
@@ -650,5 +662,118 @@ final class EvidenceImageTests: XCTestCase {
         XCTAssertGreaterThan(EvidenceImage.mean(of: fixed), 0.3, "the page shows again")
         let normal = try XCTUnwrap(EvidenceImage.image(from: jpeg(gray: 1)))
         XCTAssertGreaterThan(EvidenceImage.mean(of: normal), 0.8)
+    }
+}
+
+/// The automatic opt-out page must open at once, with the real directory of about 800 sites.
+@MainActor
+final class ActivityPageSpeedTests: XCTestCase {
+    func testTheActivityPageIsWorkedOutQuickly() {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        let p = m.selectedPerson!
+        var t = Date(); _ = m.activityRows(for: p); let rows = Date().timeIntervalSince(t)
+        t = Date(); _ = m.runNowCount(for: p); let count = Date().timeIntervalSince(t)
+        t = Date(); _ = m.automaticDomains(for: p); let plan = Date().timeIntervalSince(t)
+        t = Date(); _ = m.backgroundDomains(for: p, kind: .full); let bg = Date().timeIntervalSince(t)
+        t = Date(); _ = m.holds(for: p); let holds = Date().timeIntervalSince(t)
+        NSLog("SPEED rows=%.3f count=%.3f plan=%.3f background=%.3f holds=%.3f", rows, count, plan, bg, holds)
+        _ = holds; _ = bg; _ = plan
+        let inputs = m.activityInputs(for: p)
+        t = Date(); let page = AppModel.activityPage(inputs); let again = Date().timeIntervalSince(t)
+        NSLog("SPEED page again=%.3f", again)
+        XCTAssertEqual(page.runNow, m.runNowCount(for: p), "the page counts what Run now really tries")
+        XCTAssertEqual(page.rows, m.activityRows(for: p))
+        XCTAssertLessThan(again, 0.5, "with each form's fill worked out once, the page takes \(again) s")
+        XCTAssertLessThan(rows, 6, "even the first time (build 47 took about 5 s every time)")
+        // A change to the progress rebuilds the plan (once a run is over): it must be quick. It took about a second in build 47.
+        _ = m.plan
+        m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: "submitted"), site: m.directory[0].id)
+        t = Date(); _ = m.plan; let replan = Date().timeIntervalSince(t)
+        NSLog("SPEED replan=%.3f", replan)
+        XCTAssertLessThan(replan, 0.5, "rebuilding the plan takes \(replan) s")
+    }
+}
+
+/// A run that was stopped or cut off carries on where it left off: the sites done are not sent again, and the ones left are all sent.
+@MainActor
+final class ResumeAppTests: XCTestCase {
+    private struct SlowRecorder: FormSubmitter {
+        let tally: Tally
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+            try? await Task.sleep(nanoseconds: 30_000_000); tally.add(form.page.absoluteString); return .submitted(awaitingEmail: false)
+        }
+    }
+
+    private func readyModel() -> (AppModel, Person) {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        return (m, m.people.first { $0.id == me.id }!)
+    }
+
+    /// Runs until `n` sites are done, then presses Stop.
+    private func runAndStop(_ m: AppModel, _ me: Person, after n: Int, tally: Tally, everySite: Bool = false) async throws {
+        let run = Task { await m.runAutoOptOut(for: me, everySite: everySite, submitter: SlowRecorder(tally: tally)) }
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < n && waited < 500 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        m.stopAutoOptOut(); await run.value
+    }
+
+    func testAStoppedRunCarriesOnWithOnlyTheSitesLeft() async throws {
+        let (m, me) = readyModel()
+        let first = Tally(), second = Tally()
+        try await runAndStop(m, me, after: 3, tally: first)
+        XCTAssertFalse(first.pages.isEmpty)
+        await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: second))       // Run now
+        XCTAssertTrue(Set(first.pages).isDisjoint(with: second.pages), "nothing done before the stop is sent again")
+        XCTAssertNil(m.autoSettings.optOutResumePending, "every site left was done: the pass is finished")
+        let third = Tally()
+        await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: third))
+        XCTAssertTrue(third.pages.isEmpty, "with everything sent this period, Run now has nothing left")
+        XCTAssertEqual(Set(first.pages + second.pages).count, first.pages.count + second.pages.count, "no page sent twice")
+    }
+
+    /// A Re-test all that is stopped carries on as a re-test: the sites it had not reached are sent again, even though they were sent earlier in the period.
+    /// A run's own results do not rebuild the plan after every site (that froze the app for about a second a site); it is rebuilt once when the run ends.
+    func testARunRebuildsThePlanOnceWhenItEndsNotAfterEverySite() async throws {
+        let (m, me) = readyModel()
+        _ = m.plan
+        let before = m.planBuilds
+        let run = Task { await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: Tally())) }
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < 5 && waited < 500 { _ = m.plan; try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        XCTAssertGreaterThanOrEqual(m.autoProgress?.done ?? 0, 5)
+        XCTAssertEqual(m.planBuilds, before, "five sites done, the screens redrawn many times: the plan was not rebuilt")
+        m.stopAutoOptOut(); await run.value
+        _ = m.plan
+        XCTAssertEqual(m.planBuilds, before + 1, "rebuilt once, when the run ended")
+    }
+
+    func testAStoppedReTestCarriesOnAsAReTest() async throws {
+        let (m, me) = readyModel()
+        let firstPass = Tally()
+        await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: firstPass))     // everything sent this period
+        let total = Set(firstPass.pages)
+        XCTAssertFalse(total.isEmpty)
+        m.runFullRetestNow(submitter: SlowRecorder(tally: Tally()))
+        // runFullRetestNow starts its own task; stop it part-way.
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < 3 && waited < 500 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        m.stopAutoOptOut()
+        while m.autoBusy != nil && waited < 1000 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        XCTAssertEqual(m.autoSettings.passEverySite, true)
+        let rest = Tally()
+        await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: rest))          // Run now
+        XCTAssertFalse(rest.pages.isEmpty, "the re-test goes on with the sites it had not reached, though they were sent earlier this period")
+        XCTAssertLessThan(Set(rest.pages).count, total.count, "and not the ones it already re-tested")
+        XCTAssertNil(m.autoSettings.passEverySite, "finished: the next Run now is an ordinary one")
     }
 }

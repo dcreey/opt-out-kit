@@ -1,5 +1,6 @@
 import XCTest
 import OptOutKitCore
+import WebKit
 @testable import OptOutKit
 
 /// The form filler, run against LOCAL test pages that imitate opt-out forms. No real site is contacted and no real
@@ -163,5 +164,40 @@ private struct WebFormEchoProbe {
         let probe = html.replacingOccurrences(of: "document.body.innerHTML =", with: "document.title = [first.value, last.value, email.value, state.value, city.value, ack.checked].join('|'); document.body.innerHTML =")
         let result = await WebFormSubmitter(maxWait: 8).submitReturningTitle(html: probe, plan: plan)
         return result
+    }
+}
+
+/// A background-run site the run gives up on (quiet, or out of time) has its web pages ended, so they do not pile up in memory for the rest of the run.
+@MainActor
+final class GivenUpPageTests: XCTestCase {
+    func testThePagesOfASiteTheRunGaveUpOnAreEnded() async throws {
+        let bin = SessionBin()
+        let session = PageActivity.$bin.withValue(bin) { WebViewSession.make() }
+        try await session.loadHTML("<html><body><p>slow page</p></body></html>")
+        XCTAssertNotNil(session.webView.superview, "parked in the window while it works")
+        bin.abandonAll()
+        XCTAssertTrue(session.abandoned)
+        XCTAssertNil(session.webView.superview, "taken out of the window")
+        do { _ = try await session.evaluate("1"); XCTFail("an ended page runs nothing more") } catch {}
+        let late = PageActivity.$bin.withValue(bin) { WebViewSession.make() }
+        XCTAssertTrue(late.abandoned, "a page the given-up work opens afterwards is ended at once")
+        XCTAssertFalse(WebViewSession.make().abandoned, "a page outside a background run (Solve and send, guides) is never touched")
+    }
+
+    /// The whole path: the run's watchdog gives up, the submitter's work is cancelled, and its hidden page leaves the window.
+    func testGivingUpASiteEndsItsPagesThroughTheSubmitter() async throws {
+        func parked() -> Int { UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).flatMap(\.subviews).filter { $0 is WKWebView }.count }
+        let before = parked()
+        // An address that never answers, so the page is still loading when the run gives up.
+        let form = OptOutForm(page: URL(string: "https://10.255.255.1/optout")!, method: "post", action: nil, fields: [FormField(type: "email", name: "email", label: "Email")], hops: 1)
+        let run = Task { await AutoOptOut.watched(idle: nil, cap: 1.5) { touch in await WebFormSubmitter().submitCapturing(form, plan: FillPlan(values: [], verdict: .ready), dryRun: true, activity: touch) } }
+        try await Task.sleep(nanoseconds: 700_000_000)
+        // Some networks (CI machines) refuse the address at once instead of letting it hang; then there is no page left to end.
+        try XCTSkipIf(parked() == before, "this network refused the address at once, so the page had already ended")
+        XCTAssertEqual(parked(), before + 1, "its hidden page is parked in the window while it works")
+        let watched = await run.value
+        XCTAssertNil(watched.value, "given up")
+        try await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertEqual(parked(), before, "its hidden page left the window")
     }
 }

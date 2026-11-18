@@ -1153,6 +1153,7 @@ final class AutoOptOutTests: XCTestCase {
         s.startFullRetest(now: t0 + 30 * day)
         XCTAssertEqual(s.nextRunKind(now: t0 + 30 * day), .full, "asked for by hand, a month after the last full pass")
         XCTAssertEqual(s.optOutResumePending, true, "a cut-off re-test carries on")
+        XCTAssertEqual(s.passEverySite, true, "and carries on as a re-test of every site")
         XCTAssertEqual(s.passStarted, t0 + 30 * day)
         s.startFullRetest(now: t0 + 31 * day)
         XCTAssertEqual(s.passStarted, t0 + 30 * day, "a full pass already under way is not restarted")
@@ -1179,6 +1180,8 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(results.count, 2, "the run reached the second site")
         XCTAssertEqual(results.first?.1, .failed(AutoOptOut.tooSlow))
         XCTAssertEqual(results.last?.1, .submitted(awaitingEmail: false))
+        XCTAssertLessThanOrEqual(AutoOptOut.siteLimit + 2, AutoOptOut.progressEvery, "with the pause between sites, a run settles a site at least every 30 s")
+        XCTAssertLessThanOrEqual(AutoOptOut.idleLimit, AutoOptOut.siteLimit)
     }
 
     /// A page that goes quiet (no load, no change, no request coming back) for the idle limit is given up and moved to semi-automatic; a page that keeps
@@ -1204,6 +1207,97 @@ final class AutoOptOutTests: XCTestCase {
         let results = await engine.run(entries: [site("quiet.example"), site("busy.example")], person: pat, progress: OptOutKitCore.Progress())
         XCTAssertEqual(results.first?.1, .failed(AutoOptOut.wentQuiet), "quiet for longer than the idle limit: given up")
         XCTAssertEqual(results.last?.1, .submitted(awaitingEmail: false), "busy for twice the idle limit, with signs of life: waited for")
+    }
+
+    /// A site the run gives up on has its work cancelled, so the app can end its pages: left running, given-up pages piled up until iOS closed the app.
+    func testASiteTheRunGivesUpOnHasItsWorkCancelled() async {
+        final class Seen: @unchecked Sendable { private let l = NSLock(); private var v = false; func set() { l.lock(); v = true; l.unlock() }; var value: Bool { l.lock(); defer { l.unlock() }; return v } }
+        let seen = Seen()
+        let r = await AutoOptOut.watched(idle: 0.2, cap: 30) { _ -> Int in
+            await withTaskCancellationHandler { while !Task.isCancelled { try? await Task.sleep(nanoseconds: 20_000_000) } } onCancel: { seen.set() }
+            return 1
+        }
+        XCTAssertNil(r.value); XCTAssertTrue(r.quiet)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertTrue(seen.value, "the given-up work was told to stop")
+        let late = Seen()
+        _ = await AutoOptOut.within(0.1) { () -> Int in
+            await withTaskCancellationHandler { while !Task.isCancelled { try? await Task.sleep(nanoseconds: 20_000_000) } } onCancel: { late.set() }
+            return 1
+        }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertTrue(late.value, "the same for work that ran out of time")
+    }
+
+    /// Three sites at once, never more; the results come back in the order the sites were given; sites sharing one page are sent once even when they
+    /// come up together; and Stop starts no new site (the ones in progress finish).
+    func testTheRunWorksOnThreeSitesAtOnceInOrderAndSendsASharedPageOnce() async {
+        final class Gauge: @unchecked Sendable {
+            private let l = NSLock(); private var now = 0; private(set) var peak = 0; private(set) var pages: [String] = []
+            func enter(_ p: String) { l.lock(); now += 1; peak = max(peak, now); pages.append(p); l.unlock() }
+            func leave() { l.lock(); now -= 1; l.unlock() }
+            var sentPages: [String] { l.lock(); defer { l.unlock() }; return pages }
+            var highest: Int { l.lock(); defer { l.unlock() }; return peak }
+        }
+        struct Slow: FormSubmitter {
+            let gauge: Gauge
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                gauge.enter(form.page.absoluteString); defer { gauge.leave() }
+                // Later sites finish first, so the order of the results is not the order they finished in.
+                let n = Int(form.page.host?.filter(\.isNumber) ?? "") ?? 0
+                try? await Task.sleep(nanoseconds: UInt64(200_000_000 - n * 10_000_000))
+                return .submitted(awaitingEmail: false)
+            }
+        }
+        func site(_ id: String, page: String) -> DirectoryEntry {
+            var f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email")])
+            f.page = URL(string: "https://\(page)/optout")!
+            return DirectoryEntry(id: id, domain: id, name: id, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        }
+        let gauge = Gauge()
+        let entries = (1...8).map { site("s\($0).example", page: "s\($0).example") } + [site("twin.example", page: "s1.example")]
+        let start = Date()
+        let results = await AutoOptOut(submitter: Slow(gauge: gauge), spacing: 0, parallel: 3).run(entries: entries, person: pat, progress: OptOutKitCore.Progress())
+        XCTAssertEqual(results.map(\.0.id), entries.map(\.id), "in the order given")
+        XCTAssertTrue(results.allSatisfy { $0.1 == .submitted(awaitingEmail: false) })
+        XCTAssertEqual(gauge.highest, 3, "three at once, never more")
+        XCTAssertEqual(gauge.sentPages.filter { $0.contains("s1.example") }.count, 1, "a page two sites share is sent once")
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1.2, "eight sites of about 0.2 s each, three at a time")
+
+        let stopGauge = Gauge()
+        actor Done { var n = 0; func add() { n += 1 }; func atLeast(_ k: Int) -> Bool { n >= k } }
+        let done = Done()
+        let stopped = await AutoOptOut(submitter: Slow(gauge: stopGauge), spacing: 0, parallel: 3)
+            .run(entries: entries, person: pat, progress: OptOutKitCore.Progress(), onResult: { _, _ in await done.add() }, shouldStop: { await done.atLeast(2) })
+        // Three start; one finishes and a fourth starts; a second finishes and Stop is seen. The two still running finish; none is started after.
+        XCTAssertEqual(stopped.count, 4, "the sites already started finish; none is started after Stop")
+        XCTAssertEqual(stopGauge.sentPages.count, 4)
+    }
+
+    /// A load or save that failed only because the phone is locked is recognized, so it waits for the unlock and is never shown as damaged data.
+    func testAFailureFromALockedPhoneIsToldApartFromDamagedData() {
+        XCTAssertTrue(StorageError.isLocked(StorageError.locked))
+        XCTAssertTrue(StorageError.isLocked(NSError(domain: NSOSStatusErrorDomain, code: -25308)), "the Keychain's 'interaction not allowed'")
+        XCTAssertTrue(StorageError.isLocked(NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoPermissionError,
+                                                    userInfo: [NSUnderlyingErrorKey: NSError(domain: NSPOSIXErrorDomain, code: Int(EPERM))])), "a file iOS keeps closed")
+        XCTAssertFalse(StorageError.isLocked(StorageError.badHeader), "damaged data is not a locked phone")
+        XCTAssertFalse(StorageError.isLocked(NSError(domain: NSCocoaErrorDomain, code: NSFileReadCorruptFileError)))
+        XCTAssertFalse(StorageError.isLocked(NSError(domain: NSOSStatusErrorDomain, code: -25300)), "a missing key is not a locked phone")
+    }
+
+    /// Stop means stop: a stopped run is not carried on, and a due one is not started, until the person starts a run.
+    func testARunThePersonStoppedDoesNotStartByItself() {
+        var s = AutoSettings(); s.optOutEnabled = true
+        XCTAssertTrue(s.startsByItself(now: t0), "never run: due")
+        s.lastOptOut = t0; s.periodAnchor = t0
+        XCTAssertFalse(s.startsByItself(now: t0 + day))
+        s.optOutResumePending = true
+        XCTAssertTrue(s.startsByItself(now: t0 + day), "cut off by iOS: carried on")
+        s.stoppedByPerson = true
+        XCTAssertFalse(s.startsByItself(now: t0 + day), "stopped by the person: not carried on")
+        XCTAssertFalse(s.startsByItself(now: t0 + 200 * day), "nor started when due")
+        s.stoppedByPerson = nil; s.optOutEnabled = false
+        XCTAssertFalse(s.startsByItself(now: t0 + day), "off: nothing starts")
     }
 
     func testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod() {

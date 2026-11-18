@@ -1,4 +1,5 @@
 import XCTest
+import CryptoKit
 import OptOutKitCore
 @testable import OptOutKit
 
@@ -59,9 +60,56 @@ final class PeopleTests: XCTestCase {
 
         let locked = makeModel(url: url, keys: FixedKey())   // different key: cannot decrypt
         XCTAssertNotNil(locked.storageProblem)
+        XCTAssertTrue(locked.storageCanErase, "data that really cannot be opened: starting over is offered")
         locked.addPerson(named: "Dad")                       // must not write over the original
         locked.flushSaves()
         XCTAssertEqual(try Data(contentsOf: url), before)
+    }
+
+    /// A key that cannot be read while the "phone" is locked, as the Keychain answers before the first unlock.
+    private final class LockableKey: KeyProviding {
+        let inner = FixedKey(); var locked = false
+        func key() throws -> SymmetricKey { if locked { throw StorageError.locked }; return try inner.key() }
+    }
+
+    /// Opened while the phone is locked (a background run that starts before the first unlock): no "damaged data", no offer to erase, nothing written;
+    /// at the unlock the saved profiles open as they were.
+    func testProfilesThatCouldNotBeOpenedWhileLockedOpenAtTheUnlockAndAreNeverOfferedForErasing() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
+        let keys = LockableKey()
+        let first = makeModel(url: url, keys: keys)
+        first.addPerson(named: "Mum"); first.flushSaves()
+        let before = try Data(contentsOf: url)
+
+        keys.locked = true
+        let model = makeModel(url: url, keys: keys)
+        XCTAssertNotNil(model.storageProblem, "it says to unlock the phone")
+        XCTAssertFalse(model.storageCanErase, "a locked phone is not damaged data: starting over is not offered")
+        model.addPerson(named: "Dad"); model.flushSaves()
+        XCTAssertEqual(try Data(contentsOf: url), before, "nothing is written over the profiles it could not open")
+
+        keys.locked = false
+        model.protectedDataAvailable()
+        XCTAssertNil(model.storageProblem)
+        XCTAssertTrue(model.people.contains { $0.displayName == "Mum" }, "the saved profiles opened at the unlock")
+    }
+
+    /// A save while the phone is locked waits for the unlock instead of stopping every later save ("Could not save: status(-25308)").
+    func testASaveWhileThePhoneIsLockedIsWrittenAtTheUnlock() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed")
+        let keys = LockableKey()
+        let model = makeModel(url: url, keys: keys)
+        model.addPerson(named: "Mum"); model.flushSaves()
+        keys.locked = true
+        model.addPerson(named: "Dad"); model.flushSaves()
+        let flagged = expectation(description: "the failed save is noted"); DispatchQueue.main.async { flagged.fulfill() }; wait(for: [flagged], timeout: 2)
+        XCTAssertNil(model.storageProblem, "not shown as a problem, and saving is not paused")
+        XCTAssertTrue(model.savePendingUnlock)
+
+        keys.locked = false
+        model.protectedDataAvailable(); model.flushSaves()
+        XCTAssertFalse(model.savePendingUnlock)
+        XCTAssertTrue(makeModel(url: url, keys: keys).people.contains { $0.displayName == "Dad" }, "written at the unlock")
     }
 
     func testAddedRelativeIsAPersonWithARelationship() throws {
@@ -216,6 +264,7 @@ final class InterruptedRunAppTests: XCTestCase {
         let me = try XCTUnwrap(model.selectedPerson)
         let entry = try XCTUnwrap(model.directory.first)
         model.recordAutoResult(entry, .submitted(awaitingEmail: false), for: me.id, dryRun: false)
+        model.flushSaves()          // saves are written in the background, one after another
         // A fresh launch (the app was closed right after) still knows it was sent.
         let again = makeModel(url: url, keys: keys)
         XCTAssertTrue(again.progress.optOutAttempts[entry.id]?.contains { $0.wasSubmitted } ?? false, "the request is not lost when the app closes")

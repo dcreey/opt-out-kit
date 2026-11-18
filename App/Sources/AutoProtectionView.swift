@@ -71,7 +71,9 @@ struct AutoActivityView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var activity: [AppModel.ActivityRow] = []
     @State private var runNowCount: Int?
-    /// Stop was tapped: the run ends after the site in progress.
+    /// The groups have been worked out once (the counts show a placeholder until then, a moment after the page opens).
+    @State private var loaded = false
+    /// Stop was tapped: the run starts no more sites and ends when the ones in progress finish.
     @State private var stopping = false
 
     private var busy: Bool { model.autoBusy == "optout" }
@@ -93,7 +95,14 @@ struct AutoActivityView: View {
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $search, prompt: Text("Find a site"))
         .onChange(of: busy) { _, now in if !now { stopping = false } }
-        .task(id: refreshKey) { if let p = model.selectedPerson { activity = model.activityRows(for: p); runNowCount = model.runNowCount(for: p) } }
+        .task(id: refreshKey) {
+            // Worked out away from the main thread, so the page opens at once and the app stays quick while a run moves on.
+            guard let p = model.selectedPerson else { return }
+            let inputs = model.activityInputs(for: p)
+            let page = await Task.detached(priority: .userInitiated) { AppModel.activityPage(inputs) }.value
+            guard !Task.isCancelled else { return }
+            activity = page.rows; runNowCount = page.runNow; loaded = true
+        }
         .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
             Button("Re-test every site") { model.runFullRetestNow() }
                 .accessibilityIdentifier("auto-retest-confirm")
@@ -133,7 +142,7 @@ struct AutoActivityView: View {
                     let n = activity.filter { $0.group == g }.count
                     Button { toggle(g) } label: {
                         VStack(spacing: 2) {
-                            Text(verbatim: "\(n)").font(.title2.bold()).foregroundStyle(color(g))
+                            Text(verbatim: loaded ? "\(n)" : "–").font(.title2.bold()).foregroundStyle(color(g))
                             Text(g == .notTried ? Loc.t("Not tried") : g == .needsYou ? Loc.t("Semi-automatic") : title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 8)
@@ -185,7 +194,7 @@ struct AutoActivityView: View {
                 .buttonStyle(.borderedProminent).disabled(busy)
                 .accessibilityIdentifier("auto-run-now")
                 if busy {
-                    // While it works, the second button stops it (after the site in progress, which has a time limit).
+                    // While it works, the second button stops it (after the sites in progress, which have a time limit).
                     Button(role: .destructive) { stopping = true; model.stopAutoOptOut() } label: {
                         buttonLabel(stopping ? Loc.t("Stopping…") : Loc.t("Stop"), icon: "stop.fill")
                     }
@@ -200,6 +209,10 @@ struct AutoActivityView: View {
                 }
             }
             .controlSize(.regular)
+            if !busy, model.runStoppedByPerson {
+                Text(Loc.t("Stopped. Nothing runs by itself until you press Run now, which carries on with the sites left."))
+                    .font(.caption.bold()).foregroundStyle(.orange).accessibilityIdentifier("auto-stopped")
+            }
             if !busy, let n = runNowCount {
                 Text(n == 0 ? Loc.t("Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.")
                             : Loc.f("Run now tries the %lld sites still to do this period. Re-test all tries every site again.", n))

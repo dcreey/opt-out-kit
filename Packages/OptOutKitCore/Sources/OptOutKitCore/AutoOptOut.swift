@@ -24,6 +24,22 @@ public protocol FormSubmitter: Sendable {
     var reportsActivity: Bool { get }
 }
 
+/// How each site's form is filled for one person, worked out once and kept. Working it out is the slow part of deciding which sites a run tries (about a
+/// millisecond a form, for some 800 sites, several times over), and it depends only on the form and the person, not on what was sent. Build 47 worked it
+/// out again for every site each time the automatic opt-out page refreshed, which took seconds and made the app slow during a run.
+public final class FillPlans: @unchecked Sendable {
+    public let person: Person
+    private let lock = NSLock(); private var plans: [String: FillPlan] = [:]
+    public init(person: Person) { self.person = person }
+    public func plan(_ entry: DirectoryEntry, _ form: OptOutForm) -> FillPlan {
+        let key = entry.id + "|" + form.page.absoluteString + "|" + (form.action?.absoluteString ?? "") + "|\(form.fields.count)"
+        lock.lock(); if let p = plans[key] { lock.unlock(); return p }; lock.unlock()
+        let p = FormFiller.plan(for: form, signals: entry.signals, person: person)
+        lock.lock(); plans[key] = p; lock.unlock()
+        return p
+    }
+}
+
 /// Lets exactly one of several racing tasks go on (see `AutoOptOut.within`).
 final class FirstOnce: @unchecked Sendable {
     private let lock = NSLock(); private var done = false
@@ -117,11 +133,19 @@ public struct AutoOptOut: Sendable {
     private let siteLimit: TimeInterval
     /// The most a site's page may go without any sign of life before the site is given up and moved to semi-automatic.
     private let idleLimit: TimeInterval
+    /// How many sites are worked on at once. Each is a different site, so no site sees more than one request at a time; the time a run takes is
+    /// mostly waiting on pages, so three at once take about a third of the time.
+    private let parallel: Int
 
     public init(submitter: FormSubmitter, minInterval: TimeInterval = AutoOptOut.defaultMinInterval, spacing: TimeInterval = 2, siteLimit: TimeInterval = AutoOptOut.siteLimit,
-                idleLimit: TimeInterval = AutoOptOut.idleLimit) {
+                idleLimit: TimeInterval = AutoOptOut.idleLimit, parallel: Int = 1) {
         self.submitter = submitter; self.minInterval = minInterval; self.spacing = spacing; self.siteLimit = siteLimit; self.idleLimit = idleLimit
+        self.parallel = max(1, parallel)
     }
+
+    /// How many sites the app's run works on at once: one. The app staying quick matters more than how long a run takes, and every page a run has open
+    /// shares the main thread and the processor with the screens the person is using.
+    public static let appParallel = 1
 
     /// Fifteen seconds with no sign of life from the page: no load starting or finishing, no change on the page, no request of its own coming back.
     public static let idleLimit: TimeInterval = 15
@@ -129,17 +153,18 @@ public struct AutoOptOut: Sendable {
     public static let wentQuiet = "the site stopped answering, so it moved to semi-automatic"
 
     /// Runs one site's work, giving it up (nil) when `idle` seconds pass with no `touch`, or `cap` seconds in all. `idle` nil: only the cap applies.
-    /// The given-up work is left to end on its own; a step stuck waiting on a page cannot be cancelled, so the run must not wait for it.
+    /// The given-up work is cancelled (the app closes that site's web pages when it sees the cancel) but not waited for: a step stuck waiting on a page
+    /// may not notice, so the run must not wait for it. Left running, given-up pages piled up in memory until iOS closed the app.
     public static func watched<T: Sendable>(idle: TimeInterval?, cap: TimeInterval,
                                             _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool) {
         let once = FirstOnce(), clock = ActivityClock(), start = Date()
         return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool), Never>) in
-            Task { let value = await work({ clock.touch() }); if once.claim() { c.resume(returning: (value, false)) } }
+            let worker = Task { let value = await work({ clock.touch() }); if once.claim() { c.resume(returning: (value, false)) } }
             Task {
                 while true {
                     try? await Task.sleep(nanoseconds: 250_000_000)
-                    if let idle, clock.quietFor >= idle { if once.claim() { c.resume(returning: (nil, true)) }; return }
-                    if Date().timeIntervalSince(start) >= cap { if once.claim() { c.resume(returning: (nil, false)) }; return }
+                    if let idle, clock.quietFor >= idle { if once.claim() { worker.cancel(); c.resume(returning: (nil, true)) }; return }
+                    if Date().timeIntervalSince(start) >= cap { if once.claim() { worker.cancel(); c.resume(returning: (nil, false)) }; return }
                 }
             }
         }
@@ -155,8 +180,11 @@ public struct AutoOptOut: Sendable {
     /// the same day is sent again too (a run never sends one page twice: sites that share a page are sent once).
     public static let retestMinInterval: TimeInterval = 0
 
-    /// Two and a half minutes: the slowest real site, with its page loads, retries and the wait for its confirmation, fits well inside it.
-    public static let siteLimit: TimeInterval = 150
+    /// 28 seconds, so with the 2-second pause between sites a run settles at least one site every 30 seconds (`progressEvery`): it always moves. A site
+    /// that needs longer is given up and moves to semi-automatic. It was two and a half minutes; it can be raised again once runs are reliable.
+    public static let siteLimit: TimeInterval = 28
+    /// The longest a run goes without settling a site: the site limit and the pause after it.
+    public static let progressEvery: TimeInterval = 30
     /// What a site that ran out of time is recorded as. It counts as not gone through, so it moves to the semi-automated queue.
     public static let tooSlow = "the site took too long to answer, so the run moved on"
 
@@ -165,15 +193,15 @@ public struct AutoOptOut: Sendable {
     public static func within<T: Sendable>(_ seconds: TimeInterval, _ work: @escaping @Sendable () async -> T) async -> T? {
         let once = FirstOnce()
         return await withCheckedContinuation { (c: CheckedContinuation<T?, Never>) in
-            Task { let value = await work(); if once.claim() { c.resume(returning: value) } }
-            Task { try? await Task.sleep(nanoseconds: UInt64(max(0, seconds) * 1_000_000_000)); if once.claim() { c.resume(returning: nil) } }
+            let worker = Task { let value = await work(); if once.claim() { c.resume(returning: value) } }
+            Task { try? await Task.sleep(nanoseconds: UInt64(max(0, seconds) * 1_000_000_000)); if once.claim() { worker.cancel(); c.resume(returning: nil) } }
         }
     }
 
     /// Decides what to do for one site without touching the network. Nil means "go ahead and submit" with this plan.
     public static func precheck(entry: DirectoryEntry, person: Person, progress: Progress, now: Date,
                                 minInterval: TimeInterval = defaultMinInterval, hold: PlatformHold? = nil,
-                                period: RunPeriod? = nil) -> (result: AutoOptOutResult?, plan: FillPlan?) {
+                                period: RunPeriod? = nil, plans: FillPlans? = nil) -> (result: AutoOptOutResult?, plan: FillPlan?) {
         guard let form = entry.optOutForm else { return (.needsYou(L10n.t("No opt-out form found for this site yet.")), nil) }
         if let hold, now < hold.until { return (.coveredByPlatform(name: hold.name, until: hold.until), nil) }
         if let issue = progress.activeIssue(for: entry.id, now: now) {
@@ -189,7 +217,7 @@ public struct AutoOptOut: Sendable {
             return (.skippedNotListed, nil)
         }
         if form.fields.isEmpty, entry.liveForm?.found == true { return (nil, FillPlan(values: [], verdict: .ready)) }        // the live page decides what is filled
-        let plan = FormFiller.plan(for: form, signals: entry.signals, person: person)
+        let plan = plans?.plan(entry, form) ?? FormFiller.plan(for: form, signals: entry.signals, person: person)
         switch plan.verdict {
         case .ready: return (nil, plan)
         case .needsData(let what): return (.needsData(what), plan)
@@ -201,12 +229,12 @@ public struct AutoOptOut: Sendable {
     /// confirmation. Only a site whose form is known and has nothing only a person can do: not a caution or `no_fill` site, business, agent, other or file forms, a typed
     /// code, a form that needs the person's own listing, or one that needs something only the person holds; and not a site the person set aside. A human check, terms
     /// prompt or box to certify that a page shows is never solved or ticked: the engine stops there and the site goes to the person's semi-automated queue.
-    public static func backgroundAttemptable(_ entry: DirectoryEntry, person: Person, progress: Progress, now: Date = Date()) -> Bool {
+    public static func backgroundAttemptable(_ entry: DirectoryEntry, person: Person, progress: Progress, now: Date = Date(), plans: FillPlans? = nil) -> Bool {
         guard entry.pageMode == .form else { return false }
         if progress.isParked(entry.id, now: now) { return false }
         if let form = entry.optOutForm {
             if FormFiller.hasTypedCode(form) || FormFiller.needsListing(form) { return false }
-            if !form.fields.isEmpty, FormFiller.plan(for: form, signals: entry.signals, person: person).verdict != .ready { return false }
+            if !form.fields.isEmpty, (plans?.plan(entry, form) ?? FormFiller.plan(for: form, signals: entry.signals, person: person)).verdict != .ready { return false }
         } else if entry.liveForm?.found != true { return false }
         return true
     }
@@ -217,9 +245,9 @@ public struct AutoOptOut: Sendable {
     }
 
     /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass only the ones whose latest attempt went through.
-    public static func backgroundSites(_ kind: RunKind, entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date()) -> [DirectoryEntry] {
+    public static func backgroundSites(_ kind: RunKind, entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), plans: FillPlans? = nil) -> [DirectoryEntry] {
         entries.filter { e in
-            guard backgroundAttemptable(e, person: person, progress: progress, now: now) else { return false }
+            guard backgroundAttemptable(e, person: person, progress: progress, now: now, plans: plans) else { return false }
             return kind == .full || lastAttemptWentThrough(e, progress: progress)
         }
     }
@@ -239,38 +267,59 @@ public struct AutoOptOut: Sendable {
                     onResult: (@Sendable (DirectoryEntry, AutoOptOutResult) async -> Void)? = nil,
                     shouldStop: (@Sendable () async -> Bool)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         let targets = entries.map(Self.standIn).filter { $0.optOutForm != nil }
-        var out: [(DirectoryEntry, AutoOptOutResult)] = []
-        // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture.
+        var out: [(index: Int, entry: DirectoryEntry, result: AutoOptOutResult)] = []
+        // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture. One whose page is being sent
+        // right now waits for that send's result.
         var sent: [String: (AutoOptOutResult, Data?)] = [:]
-        for (i, entry) in targets.enumerated() {
-            // The app is about to be suspended or closed: stop between sites, so what is done is kept and the rest waits for the next run.
-            if await shouldStop?() == true { break }
-            let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id], period: period)
-            if let result = pre.result { out.append((entry, result)); await onResult?(entry, result) }
-            else if let plan = pre.plan, let form = entry.optOutForm {
-                let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
-                if let again = sent[key] {
-                    out.append((entry, again.0))
-                    if let shot = again.1, !dryRun { evidence?(entry, shot) }
-                    await onResult?(entry, again.0)
-                    progressCallback?(i + 1, targets.count)
-                    continue
-                }
-                let submitter = self.submitter
-                let watched = await Self.watched(idle: submitter.reportsActivity ? idleLimit : nil, cap: siteLimit) { touch in
-                    await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
-                }
-                let report = watched.value ?? SubmitEvidence(outcome: .failed(watched.quiet ? Self.wentQuiet : Self.tooSlow))
-                if let shot = report.screenshot, !dryRun { evidence?(entry, shot) }
+        var waiting: [String: [Int]] = [:]
+        var done = 0
+        let submitter = self.submitter, idle = submitter.reportsActivity ? idleLimit : nil, cap = siteLimit, spacing = self.spacing
+        func record(_ i: Int, _ result: AutoOptOutResult, shot: Data?) async {
+            let entry = targets[i]
+            out.append((i, entry, result))
+            if let shot, !dryRun { evidence?(entry, shot) }
+            await onResult?(entry, result)          // kept right away: closing the app now must not lose a request that was already sent
+            done += 1
+            progressCallback?(done, targets.count)
+        }
+        await withTaskGroup(of: (Int, String, SubmitEvidence).self) { group in
+            var inFlight = 0, launched = 0
+            func collect() async {
+                guard let (i, key, report) = await group.next() else { return }
+                inFlight -= 1
                 let result = Self.result(for: report.outcome)
                 sent[key] = (result, report.screenshot)
-                out.append((entry, result))
-                await onResult?(entry, result)          // kept right away: closing the app now must not lose a request that was already sent
-                if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
+                await record(i, result, shot: report.screenshot)
+                for j in waiting.removeValue(forKey: key) ?? [] { await record(j, result, shot: report.screenshot) }
             }
-            progressCallback?(i + 1, targets.count)
+            for (i, entry) in targets.enumerated() {
+                // The app is about to be suspended or closed, or the person pressed Stop: start no more sites. The ones in progress finish, so what
+                // is done is kept and the rest waits for the next run.
+                if await shouldStop?() == true { break }
+                let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id], period: period)
+                if let result = pre.result { await record(i, result, shot: nil); continue }
+                guard let plan = pre.plan, let form = entry.optOutForm else { done += 1; progressCallback?(done, targets.count); continue }
+                let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
+                if let again = sent[key] { await record(i, again.0, shot: again.1); continue }
+                if waiting[key] != nil { waiting[key]!.append(i); continue }
+                while inFlight >= parallel { await collect() }
+                // Waiting for a free lane took time: Stop may have been pressed meanwhile.
+                if await shouldStop?() == true { break }
+                // Requests are spaced out a little: each lane waits before its next site.
+                let wait = launched >= parallel ? spacing : 0
+                waiting[key] = []; inFlight += 1; launched += 1
+                group.addTask {
+                    if wait > 0 { try? await Task.sleep(nanoseconds: UInt64(wait * 1_000_000_000)) }
+                    let watched = await Self.watched(idle: idle, cap: cap) { touch in
+                        await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
+                    }
+                    return (i, key, watched.value ?? SubmitEvidence(outcome: .failed(watched.quiet ? Self.wentQuiet : Self.tooSlow)))
+                }
+            }
+            while inFlight > 0 { await collect() }
         }
-        return out
+        // In the order the sites were given, whatever order they finished in.
+        return out.sorted { $0.index < $1.index }.map { ($0.entry, $0.result) }
     }
 
     /// What a site that answers "Too many requests" is reported as: not a failure of the form, so nothing is recorded against the site and it stays to try again.
@@ -317,6 +366,9 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var lastNeedYou: Int?
     /// An opt-out run was started and has not finished (the app was closed or suspended): the next time the app is open it carries on with the sites left.
     public var optOutResumePending: Bool?
+    /// The person pressed Stop. Nothing starts by itself again (not on opening the app, not on schedule) until they press Run now or Re-test all.
+    /// Build 47 carried a stopped run on at the next opening, so Stop seemed to do nothing.
+    public var stoppedByPerson: Bool?
     /// When the first opt-out run started: periods (months) are counted from here, so each month's tally is comparable.
     public var periodAnchor: Date?
     /// The sites the automatic run has taken on, per person. A site that fails moves out of the automatic group, but it stays here, so the
@@ -327,6 +379,9 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     /// A pass that was started and has not finished (the app was closed): when it began and which kind it is, so it carries on with the sites it has not yet tried.
     public var passStarted: Date?
     public var passKind: RunKind?
+    /// The pass under way is a "Re-test all": carried on after a Stop or a cut-off, it still sends again to the sites sent earlier in the period,
+    /// not only to the ones never sent.
+    public var passEverySite: Bool?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
     public static let optOutEvery: TimeInterval = 91 * 86_400     // every three months
@@ -336,6 +391,13 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public init() {}
 
     public func scanDue(now: Date) -> Bool { scanEnabled && (lastScan.map { now.timeIntervalSince($0) >= Self.scanEvery } ?? true) }
+    /// Whether a run starts by itself now: one is due on schedule, or a run was cut off (the app closed or suspended) and has sites left. Never after the
+    /// person stopped it.
+    public func startsByItself(now: Date) -> Bool {
+        guard optOutEnabled, stoppedByPerson != true else { return false }
+        return optOutDue(now: now) || optOutResumePending == true
+    }
+
     public func optOutDue(now: Date) -> Bool {
         guard optOutEnabled else { return false }
         guard let last = lastOptOut else { return true }
@@ -366,8 +428,8 @@ public struct AutoSettings: Codable, Equatable, Sendable {
 
     /// The person asked to re-test every site now. A full pass already under way just carries on; anything else (nothing running, or a repeat pass) becomes a fresh full pass.
     public mutating func startFullRetest(now: Date = Date()) {
-        if passStarted != nil, passKind == .full { return }
-        passStarted = now; passKind = .full; optOutResumePending = true
+        if passStarted != nil, passKind == .full { passEverySite = true; return }
+        passStarted = now; passKind = .full; optOutResumePending = true; passEverySite = true
     }
     /// The kind of the run due on `date` (the next period's start), for saying what is coming.
     public func kindOfRun(on date: Date) -> RunKind { nextRunKind(now: date) }

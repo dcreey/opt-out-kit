@@ -60,17 +60,31 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     private let activity: (@Sendable () -> Void)? = PageActivity.report
     private let activityReporter = ActivityReporter()
     func touch() { activity?() }
+    /// The run gave this site up (it went quiet or ran out of time): the page was stopped and taken out of the window, and every later step fails at once.
+    private(set) var abandoned = false
     /// Runs a script on the page. An answer is a sign of life (a page whose scripts never answer is the one that wedges a run).
     func evaluate(_ js: String) async throws -> Any? {
+        if abandoned { throw CancellationError() }
         let r = try await webView.evaluateJavaScript(js)
         touch()
         return r
     }
     /// The same, in one frame.
     func evaluate(_ js: String, in frame: WKFrameInfo, contentWorld: WKContentWorld) async throws -> Any? {
+        if abandoned { throw CancellationError() }
         let r = try await webView.evaluateJavaScript(js, in: frame, contentWorld: contentWorld)
         touch()
         return r
+    }
+
+    /// Ends a background run's page that the run gave up on: it stops loading, leaves the window, and a load still waiting is ended, so the work
+    /// behind it winds down instead of keeping a hidden page alive for the rest of the run.
+    func abandon() {
+        guard !abandoned else { return }
+        abandoned = true
+        close()
+        webView.configuration.userContentController.removeAllScriptMessageHandlers()
+        resume(CancellationError(), force: true)
     }
 
     /// The HTTP status of the last page the web view loaded.
@@ -89,6 +103,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     }
 
     private override init() {
+        let bin = PageActivity.bin
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
         // Global Privacy Control: every page the app opens is told, in script too, that this person opts out of sale and sharing.
@@ -111,6 +126,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         activityReporter.session = self
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        bin?.add(self)
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
         webView.alpha = 0.01
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
@@ -277,6 +293,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     }
 
     private func wait(limit: TimeInterval = 50, _ start: () -> Void) async throws {
+        if abandoned { throw CancellationError() }
         try await withCheckedThrowingContinuation { (c: CheckedContinuation<Void, Error>) in
             loadContinuation = c
             waitSerial += 1
@@ -294,7 +311,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     private func settle(maxWait: TimeInterval) async {
         let deadline = Date().addingTimeInterval(maxWait)
         var last = -1, stable = 0
-        while Date() < deadline {
+        while Date() < deadline, !abandoned, !Task.isCancelled {
             try? await Task.sleep(nanoseconds: 500_000_000)
             let probe = (try? await webView.evaluateJavaScript("(document.readyState||'') + '|' + (document.body ? document.body.innerText : '')")) as? String ?? ""
             let ready = probe.hasPrefix("complete|")
@@ -370,8 +387,16 @@ struct WebFormSubmitter: FormSubmitter {
     var reportsActivity: Bool { true }
 
     /// The same, with every web view made for this site telling `activity` of the page's signs of life.
+    /// When the run gives the site up, its work is cancelled and every web view it made is ended at once.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
-        await PageActivity.$report.withValue(activity) { await submitCapturing(form, plan: plan, dryRun: dryRun) }
+        let bin = await MainActor.run { SessionBin() }
+        return await withTaskCancellationHandler {
+            await PageActivity.$bin.withValue(bin) {
+                await PageActivity.$report.withValue(activity) { await submitCapturing(form, plan: plan, dryRun: dryRun) }
+            }
+        } onCancel: {
+            Task { @MainActor in bin.abandonAll(); NSLog("OptOutRun: gave up a site, its pages were ended") }
+        }
     }
 
     /// Fills and sends the form in a hidden web view, then takes a screenshot of whatever the page showed at the end.
@@ -735,6 +760,25 @@ extension WebViewSession {
 /// Which background-run site the web views made now belong to, so they report the page's signs of life to that run's watchdog.
 enum PageActivity {
     @TaskLocal static var report: (@Sendable () -> Void)?
+    /// The web views made for that site, so they can be ended when the run gives the site up.
+    @TaskLocal static var bin: SessionBin?
+}
+
+/// The web views one background-run site made. When the run gives the site up (its work is cancelled), they are all ended (`WebViewSession.abandon`).
+@MainActor
+final class SessionBin {
+    private var sessions: [WeakSession] = []
+    private(set) var ended = false
+    func add(_ s: WebViewSession) {
+        if ended { s.abandon(); return }
+        sessions.append(WeakSession(s))
+    }
+    func abandonAll() {
+        ended = true
+        for s in sessions { s.value?.abandon() }
+        sessions = []
+    }
+    private struct WeakSession { weak var value: WebViewSession?; init(_ v: WebViewSession) { value = v } }
 }
 
 extension WebViewSession {

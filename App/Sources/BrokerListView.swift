@@ -35,7 +35,10 @@ struct BrokerListView: View {
                 if let problem = model.storageProblem {
                     Section {
                         Text(problem).font(.footnote).foregroundStyle(.red)
-                        Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
+                        // Only for data that really could not be opened: never for a locked phone or a failed save, where the data is fine.
+                        if model.storageCanErase {
+                            Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
+                        }
                     }
                 }
                 let waiting = model.waitingForFirstPass
