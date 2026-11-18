@@ -19,10 +19,12 @@ env:
   # Raise to throw away every cached build folder (if a cached build ever looks wrong).
   CACHE_VERSION: v1
   # Tests known to fail before this workflow existed, left out until they are fixed (docs/TESTING.md lists them).
-  UI_KNOWN_FAILING: >-
-    AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks
-    AutoProtectionUITests/testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears
-    AutoProtectionUITests/testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer
+  KNOWN_FAILING: >-
+    OptOutKitUITests/AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks
+    OptOutKitUITests/AutoProtectionUITests/testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears
+    OptOutKitUITests/AutoProtectionUITests/testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer
+  # GitHub's free plan runs at most 5 macOS jobs at once: the test shards are 5, each a mix of unit and UI tests balanced by measured time.
+  SHARDS: 5
 
 jobs:
   checks:
@@ -40,10 +42,8 @@ jobs:
         run: python3 -m unittest discover -s tools/tests
       - name: Every string is translated, with its placeholders
         run: python3 tools/l10n.py check
-      - name: The test shards cover every test class
-        run: |
-          python3 tools/ci_shards.py --target OptOutKitTests --dir AppTests --shards 3 --list
-          python3 tools/ci_shards.py --target OptOutKitUITests --dir AppUITests --shards 4 --list
+      - name: The test shards (by measured time, tools/ci_timings.json)
+        run: python3 tools/ci_shards.py --shards $SHARDS --list
 
   packages:
     name: Mac package tests
@@ -126,21 +126,14 @@ jobs:
           retention-days: 2
 
   test:
-    name: ${{ matrix.kind }} tests ${{ matrix.index }}
+    name: Tests ${{ matrix.index }}
     needs: build
     runs-on: macos-26
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 0 }
-          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 1 }
-          - { kind: Unit, target: OptOutKitTests, dir: AppTests, shards: 3, index: 2 }
-          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 0 }
-          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 1 }
-          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 2 }
-          - { kind: UI, target: OptOutKitUITests, dir: AppUITests, shards: 4, index: 3 }
+        index: [0, 1, 2, 3, 4]          # keep in step with SHARDS
     steps:
       - uses: actions/checkout@v4
       - name: Use the newest Xcode on the runner
@@ -158,21 +151,24 @@ jobs:
       - name: Run this shard
         shell: bash
         run: |
-          SKIP=()
-          if [ "${{ matrix.kind }}" = "UI" ]; then for t in $UI_KNOWN_FAILING; do SKIP+=(--skip "$t"); done; fi
+          SKIP=(); for t in $KNOWN_FAILING; do SKIP+=(--skip "$t"); done
           ARGS=()          # one argument per line (macOS ships bash 3.2, which has no mapfile)
-          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --target ${{ matrix.target }} --dir ${{ matrix.dir }} --shards ${{ matrix.shards }} --index ${{ matrix.index }} ${SKIP[@]+"${SKIP[@]}"})
+          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --shards $SHARDS --index ${{ matrix.index }} "${SKIP[@]}")
           printf '%s\n' "${ARGS[@]}"
           XCTESTRUN=$(ls Products/*.xctestrun | head -1)
           set -o pipefail
           xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
-            -resultBundlePath "Results-${{ matrix.kind }}-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \
+            -resultBundlePath "Results-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \
             | grep -E "Test Case .*(passed|failed)|error:|Executed [0-9]+ tests|TEST (SUCCEEDED|FAILED)|\*\* "
           # A shard that ran nothing is a broken shard, not a pass.
-          if grep -qE "Executed 0 tests" xcodebuild.log && ! grep -qE "Executed [1-9][0-9]* tests" xcodebuild.log; then echo "::error::this shard ran no tests"; exit 1; fi
+          if ! grep -qE "Executed [1-9][0-9]* tests" xcodebuild.log; then echo "::error::this shard ran no tests"; exit 1; fi
+      - name: Report how long each test took (read back by `tools/ci_shards.py --fetch-run` to balance the next split)
+        if: always()
+        run: |
+          [ -f xcodebuild.log ] && echo "::notice title=Shard timings::$(python3 tools/ci_shards.py --timings-from-log xcodebuild.log)" || true
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: results-${{ matrix.kind }}-${{ matrix.index }}
-          path: Results-${{ matrix.kind }}-${{ matrix.index }}.xcresult
+          name: results-${{ matrix.index }}
+          path: Results-${{ matrix.index }}.xcresult
           retention-days: 7

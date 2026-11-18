@@ -20,10 +20,14 @@ contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
 | `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
 | `build` | macOS | Builds the app and both test targets once (`build-for-testing`); the shards reuse it |
-| `test` (7 at once) | macOS, one each | App unit tests in 3 shards, UI tests in 4, each on its own simulator (`test-without-building`) |
+| `test` (5 at once) | macOS, one each | The app's unit and UI tests in 5 shards, each a mix balanced by measured time, each on its own simulator (`test-without-building`) |
 
-`tools/ci_shards.py` splits each target's test classes by their number of tests, heaviest first into the lightest shard, reading the sources, so a new
-test class needs no change to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that every class is in exactly one shard and that the file times are set from the commits). A failing shard keeps its result bundle as an artifact for a week.
+`tools/ci_shards.py` shares the tests out so the 5 shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
+class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
+from its number of tests. Every shard prints its timings as a notice, and `python3 tools/ci_shards.py --fetch-run RUN_ID` reads them back from a finished
+run (public API, no login) into that file, so the split stays balanced as tests change. Tests are read from the sources, so a new class needs no change
+to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that everything runs exactly once, a known-failing test is left out wherever it
+lands, and the file times are set from the commits). The free plan runs at most 5 macOS jobs at once, which is why there are 5 shards. A failing shard keeps its result bundle as an artifact for a week.
 
 Between runs it keeps three things in GitHub's cache: the app's build folder (`DerivedData`), the two packages' `.build` folders, and XcodeGen (downloaded
 from its release rather than installed with Homebrew, which is slow there). Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
@@ -32,7 +36,7 @@ changed since the cached build is compiled (the build step prints how many Swift
 sources, so a new Xcode starts clean. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a
 test checks have room for slower CI machines.
 
-Left out in CI until they are fixed (they failed before CI ran them, listed in `UI_KNOWN_FAILING` in the workflow):
+Left out in CI until they are fixed (they failed before CI ran them, listed in `KNOWN_FAILING` in the workflow):
 `AutoProtectionUITests.testBlockedByPaymentIsAnAnswerInQuickChecks`, `testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears`,
 `testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer`.
 

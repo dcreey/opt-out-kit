@@ -23,6 +23,38 @@ class Shards(unittest.TestCase):
             self.assertEqual(S.classes(d), {"OneTests": 2})
 
 
+class Balance(unittest.TestCase):
+    def test_everything_runs_exactly_once_and_ui_tests_are_handed_out_one_at_a_time(self):
+        weights = S.work({})
+        units = {k for k in weights if k.startswith("OptOutKitTests/")}
+        ui = {k for k in weights if k.startswith("OptOutKitUITests/")}
+        self.assertTrue(all(k.count("/") == 1 for k in units), "unit tests by class")
+        self.assertTrue(all(k.count("/") == 2 for k in ui), "UI tests one by one")
+        bins, load = S.split(weights, 5)
+        flat = [k for b in bins for k in b]
+        self.assertEqual(sorted(flat), sorted(weights))
+        self.assertLessEqual(max(load) - min(load), max(weights.values()))
+
+    def test_measured_seconds_beat_the_guess(self):
+        key = next(k for k in S.work({}) if k.startswith("OptOutKitUITests/"))
+        self.assertEqual(S.work({key: 123.0})[key], 123.0)
+
+    def test_a_known_failing_test_is_left_out_wherever_it_lands(self):
+        skip = "OptOutKitUITests/AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks"
+        out = []
+        for i in range(5):
+            out += subprocess.run([sys.executable, os.path.join(ROOT, "tools", "ci_shards.py"), "--shards", "5", "--index", str(i), "--skip", skip],
+                                  capture_output=True, text=True, check=True).stdout.split()
+        self.assertNotIn("-only-testing:" + skip, out)
+        self.assertTrue(any("AutoProtectionUITests/" in x for x in out), "the rest of that class still runs")
+
+    def test_seconds_are_read_from_an_xcodebuild_log(self):
+        log = ("Test Case '-[OptOutKitTests.PeopleTests testA]' passed (1.25 seconds).\n"
+               "Test Case '-[OptOutKitTests.PeopleTests testB]' failed (0.75 seconds).\n"
+               "Test Case '-[OptOutKitUITests.DryRunUITests testRun]' passed (40.5 seconds).\n")
+        self.assertEqual(S.timings_from_log(log), {"OptOutKitTests/PeopleTests": 2.0, "OptOutKitUITests/DryRunUITests/testRun": 40.5})
+
+
 class FileTimes(unittest.TestCase):
     def test_files_get_their_last_commits_time(self):
         with tempfile.TemporaryDirectory() as d:
