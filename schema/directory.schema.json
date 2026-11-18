@@ -6,6 +6,31 @@
   "additionalProperties": false,
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "languages": {
+      "description": "The languages the site is offered in, and its opt-out page in each (tools/regional_sites.py)",
+      "type": "object", "additionalProperties": false, "required": ["list", "pages"],
+      "properties": {
+        "list": { "type": "array", "items": { "type": "string" } },
+        "pages": { "type": "object", "additionalProperties": { "type": "string" } },
+        "checked": { "type": ["string", "null"] }
+      }
+    },
+    "regional_sites": {
+      "description": "The site's own sites for other countries (tools/regional_sites.py)",
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["region", "url", "how"],
+        "properties": {
+          "region": { "type": "string" },
+          "url": { "type": "string" },
+          "how": { "type": "string" },
+          "privacy_page": { "type": ["string", "null"] },
+          "has_form": { "type": ["boolean", "null"] }
+        }
+      }
+    },
+    "no_fill": { "description": "Nothing of the person's is filled in: the app shows the page only", "type": "boolean" },
+    "find_later": { "description": "No page or email found yet: to be found by hand", "type": "boolean" },
     "domain": { "type": "string", "minLength": 3 },
     "name": { "type": "string" },
     "bucket": { "enum": ["direct", "indirect", "registry"] },
