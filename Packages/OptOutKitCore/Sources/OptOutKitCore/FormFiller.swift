@@ -183,6 +183,12 @@ public enum FormFiller {
                 continue
             default: break
             }
+            // A LinkedIn address: the person's optional profile link goes only in a box that says LinkedIn. Without one a required box is left to the person.
+            if has("linkedin"), !has("facebook|twitter|instagram|tiktok|snapchat"), field.type == "text" || field.type == "url" || field.type == "textarea" {
+                if let url = person.linkedInURL { put([url], L10n.noun("LinkedIn profile")) }
+                else if required { needsYou = needsYou ?? L10n.f("This form asks for your LinkedIn profile (\"%@\"). Add it to your profile, or paste it on the page.", field.display) }
+                continue
+            }
             // Numbers and identifiers only the person holds (SSN, last four digits, licence, passport, order or account numbers): never guessed, never another field's value.
             if has("\\bssn\\b|social.?security|last.?(4|four)\\b|licen[sc]e|passport|\\bstate.?id\\b|national.?id|\\btax.?id\\b|\\bitin\\b|\\bid.?(number|no\\b|#)|identification.?number|member.?(id|number)|order.?(number|id|no\\b)|reference.?(number|id)|case.?(number|id)|account.?(id|number|no\\b)|claim.?number|policy.?number|\\bhash(ed)?\\b|\\bsha-?(1|256)\\b|\\bmd5\\b|\\bhex\\b|[0-9]+.?character") {
                 if required { needsYou = needsYou ?? L10n.f("This form asks for something only you can supply (\"%@\").", field.display) }

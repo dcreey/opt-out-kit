@@ -21,7 +21,7 @@ struct RunReviewView: View {
                 Section {
                     ForEach(done) { row($0) }
                 } header: { Text("Went through (\(done.count))") } footer: {
-                    Text("Open any site to see the page it showed after your request was sent. If it does not look finished, say so and the site moves to a guide.")
+                    Text("Open any site to see its page and the screenshot of what it showed after your request was sent.")
                 }
             }
         }
@@ -31,7 +31,7 @@ struct RunReviewView: View {
 
     private func row(_ item: AppModel.ReviewItem) -> some View {
         NavigationLink {
-            EvidenceDetailView(item: item, person: person)
+            if let entry = model.directory.first(where: { $0.id == item.id }) { DirectoryInfoView(entry: entry) }
         } label: {
             HStack(spacing: 12) {
                 Thumbnail(item: item, person: person).frame(width: 44, height: 78)
@@ -61,51 +61,6 @@ private struct Thumbnail: View {
         .task { if item.hasScreenshot, let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
     }
 }
-
-/// One site's screenshot, full size, with what it was and a way to say it does not look right.
-struct EvidenceDetailView: View {
-    @EnvironmentObject var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-    let item: AppModel.ReviewItem
-    let person: Person
-    @State private var image: UIImage?
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Label(item.label, systemImage: item.worked ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                    .font(.headline).foregroundStyle(item.worked ? Color.green : Color.orange).fixedSize(horizontal: false, vertical: true)
-                Text("\(item.domain) · \(Loc.date(item.date, time: true))").font(.footnote).foregroundStyle(.secondary)
-                if let entry = model.directory.first(where: { $0.id == item.id }) {
-                    NavigationLink { DirectoryInfoView(entry: entry) } label: { Label("Open the site page", systemImage: "globe") }.accessibilityIdentifier("evidence-site-page")
-                }
-                if let image {
-                    Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.4)))
-                        .accessibilityIdentifier("evidence-image")
-                    Text("This is the page the site showed when we finished.").font(.caption).foregroundStyle(.secondary)
-                } else {
-                    Text("There is no screenshot for this site.").font(.callout).foregroundStyle(.secondary)
-                }
-                if item.worked {
-                    Button { dismiss() } label: { Label("Looks right", systemImage: "hand.thumbsup").frame(maxWidth: .infinity) }
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("evidence-looks-right")
-                    Button(role: .destructive) { model.markLooksWrong(item, for: person); dismiss() } label: {
-                        Label("This does not look finished", systemImage: "hand.thumbsdown").frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered).accessibilityIdentifier("evidence-looks-wrong")
-                    Text("If you say it does not look finished, this site is no longer counted as done and moves to your queue as a guided task.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .padding()
-        }
-        .navigationTitle(item.domain)
-        .navigationBarTitleDisplayMode(.inline)
-        .task { if let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
-    }
-}
-
 
 /// A small preview of the screenshot saved for a site; tap it to see it full size.
 struct SiteScreenshot: View {

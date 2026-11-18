@@ -89,19 +89,23 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
     /// Kept so older saved profiles still load. The owner's plain "I am this person" box is now always ticked for them (see
     /// `mayConfirmOwnIdentity`), so this value no longer changes anything.
     public var confirmsOwnIdentity: Bool
+    /// Optional. The address of the person's own LinkedIn profile, typed by them. Filled only into a box that says LinkedIn (recruiting and workforce
+    /// sites that need it to find a record); never sent anywhere else.
+    public var linkedIn: String?
 
     public init(id: UUID = UUID(), displayName: String, relationship: Relationship = .otherFamily,
                 names: [NameEntry] = [NameEntry(kind: .legal)], addresses: [Address] = [],
                 emails: [String] = [], phones: [String] = [], birthdate: String? = nil,
-                isMinor: Bool = false, isPublicFigure: Bool = false, confirmsOwnIdentity: Bool = false) {
+                isMinor: Bool = false, isPublicFigure: Bool = false, confirmsOwnIdentity: Bool = false, linkedIn: String? = nil) {
         self.id = id; self.displayName = displayName; self.relationship = relationship
         self.names = names; self.addresses = addresses; self.emails = emails
         self.phones = phones; self.birthdate = birthdate
         self.isMinor = isMinor; self.isPublicFigure = isPublicFigure; self.confirmsOwnIdentity = confirmsOwnIdentity
+        self.linkedIn = linkedIn
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, displayName, relationship, names, addresses, emails, phones, birthdate, isMinor, isPublicFigure, confirmsOwnIdentity
+        case id, displayName, relationship, names, addresses, emails, phones, birthdate, isMinor, isPublicFigure, confirmsOwnIdentity, linkedIn
     }
 
     /// Profiles saved before the safety flags existed load with both off.
@@ -118,6 +122,16 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
         isMinor = try c.decodeIfPresent(Bool.self, forKey: .isMinor) ?? false
         isPublicFigure = try c.decodeIfPresent(Bool.self, forKey: .isPublicFigure) ?? false
         confirmsOwnIdentity = try c.decodeIfPresent(Bool.self, forKey: .confirmsOwnIdentity) ?? false
+        linkedIn = try c.decodeIfPresent(String.self, forKey: .linkedIn)
+    }
+
+    /// The LinkedIn address as a full link, or nil when none was entered. "linkedin.com/in/pat" gets https://; anything that is not a LinkedIn address is not used.
+    public var linkedInURL: String? {
+        var s = (linkedIn ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.isEmpty { return nil }
+        if !s.lowercased().hasPrefix("http") { s = "https://" + s }
+        guard let host = URL(string: s)?.host?.lowercased(), host == "linkedin.com" || host.hasSuffix(".linkedin.com") else { return nil }
+        return s
     }
 
     /// Whether the app may tick "I am this person" for this profile: only the account owner, only after they allowed it, never a minor.

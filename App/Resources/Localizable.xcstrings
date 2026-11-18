@@ -12306,6 +12306,29 @@
     }
    }
   },
+  "LinkedIn profile": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Profil LinkedIn"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Perfil de LinkedIn"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "LinkedIn-Profil"
+     }
+    }
+   }
+  },
   "Listed again": {
    "extractionState": "manual",
    "localizations": {
@@ -17201,6 +17224,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Austragung im Hintergrund"
+     }
+    }
+   }
+  },
+  "Optional. Some recruiting and workforce sites cannot find your record without it. It is filled only into a box that asks for LinkedIn, and goes only to that site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Facultatif. Certains sites de recrutement et de données sur l'emploi ne retrouvent pas votre fiche sans lui. Il n'est saisi que dans une case qui demande LinkedIn, et n'est envoyé qu'à ce site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Opcional. Algunos sitios de reclutamiento y datos laborales no pueden encontrar tu registro sin él. Solo se rellena en una casilla que pide LinkedIn y solo se envía a ese sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Optional. Manche Recruiting- und Beschäftigungsdaten-Seiten finden Ihren Eintrag ohne es nicht. Es wird nur in ein Feld eingetragen, das nach LinkedIn fragt, und geht nur an diese Seite."
      }
     }
    }

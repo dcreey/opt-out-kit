@@ -3108,6 +3108,27 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertNil(v(plan([("email", "e1", "Email"), ("email", "e3", "Alternate email")], person: wide), "e3"), "one email: the alternate stays empty")
     }
 
+    func testALinkedInBoxTakesTheProfilesLinkedInAddressOnlyWhenOneWasEntered() {
+        let boxes: [(String, String, String)] = [("text", "li", "LinkedIn profile URL *"), ("text", "fb", "Facebook profile *"), ("text", "email", "Email *")]
+        var p = wide
+        let none = plan(boxes, person: p)
+        XCTAssertNil(v(none, "li"), "no address entered: nothing is invented")
+        guard case .needsYou(let why) = none.verdict else { return XCTFail("a required LinkedIn box with no address is left to the person, got \(none.verdict)") }
+        XCTAssertTrue(why.contains("LinkedIn"))
+        p.linkedIn = "linkedin.com/in/pat-example"
+        let filled = plan(boxes, person: p)
+        XCTAssertEqual(v(filled, "li"), ["https://linkedin.com/in/pat-example"], "a bare address gets https://")
+        XCTAssertNil(v(filled, "fb"), "other social profiles are never filled")
+        XCTAssertNil(v(plan([("text", "w", "Website")], person: p), "w"), "the address goes only in a box that says LinkedIn")
+        p.linkedIn = "https://evil.example/in/pat"
+        XCTAssertNil(v(plan(boxes, person: p), "li"), "an address that is not LinkedIn's is not used")
+        XCTAssertNil(wide.linkedIn, "optional: a profile has none by default")
+        let old = try? JSONDecoder().decode(Person.self, from: JSONEncoder().encode(wide))
+        XCTAssertNotNil(old); XCTAssertNil(old?.linkedIn)
+        var q = wide; q.linkedIn = "https://www.linkedin.com/in/pat"
+        XCTAssertEqual(try? JSONDecoder().decode(Person.self, from: JSONEncoder().encode(q)).linkedIn, "https://www.linkedin.com/in/pat")
+    }
+
     /// A box added by an "Add another email / phone" button repeats the label of the one before it; it takes the next value, and with none left it repeats the first as before.
     func testABoxClonedByAddAnotherTakesTheNextValue() {
         let p = plan([("email", "e1", "Email *"), ("email", "e2", "Email"), ("email", "e3", "Email"), ("email", "e4", "Email"),

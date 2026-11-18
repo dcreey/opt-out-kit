@@ -25,6 +25,7 @@ Ask once, store only on the phone. Collect what brokers match on, because a miss
 |---|---|---|
 | Names | Matching; brokers list "Bob" and "Robert" separately | An unlimited list, each tagged legal, previous legal, maiden, nickname or other |
 | Relationship | Links the person to the owner | Dropdown of family relationships (parent, child, sibling, spouse, cousin, other family and so on); no friends; not shown for the owner |
+| LinkedIn profile (optional) | Recruiting and workforce sites that ask for it to find a record | A single optional address on the profile editor, below Phones; filled only into a box that says LinkedIn, sent only to that site, never anywhere else |
 | Current and previous addresses | Matching; most brokers key on address | City, state and years lived; full street only if the user adds it. A US state is chosen from a menu of the fifty states and DC (two-letter code stored); another country keeps a free-text region |
 | Emails | Confirmation links | The household email (owner's profile) plus an "Other email addresses" list on every profile ("Add email"): forms with more than one email box take them in order, the rest go in the message box. Offer alias addresses for brokers that allow one opt-out per email |
 | Phones | Some matching, phone-code steps | Optional; shown as (773) 633-1564 while typed (`PhoneFormat.display`), forms still get plain digits |

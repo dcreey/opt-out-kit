@@ -47,6 +47,10 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 7. **A box is never given another box's value.** `FormFiller.plan` decides by the words of the label, so the order and the exceptions matter:
    - *Identifiers only the person holds* (SSN, "last 4 digits", licence, passport, state or national ID, tax ID, account, order, reference, case, policy numbers) are
      left empty; when required they make the form "needs you". They used to match "last" (last name) or "state" (the state code).
+   - *A LinkedIn box* (some recruiting and workforce sites need the person's profile to find a record): filled with the profile's optional **LinkedIn profile** address
+     (`Person.linkedInURL`; "linkedin.com/in/…" gets `https://`, an address that is not on linkedin.com is not used), only in a text or URL box whose label or name says LinkedIn. With no address a
+     required box makes the form `needsYou` ("This form asks for your LinkedIn profile…": add it to the profile or paste it on the page); an optional one is left empty. Facebook, X, Instagram
+     and the other social boxes below are never filled.
    - *Someone else's or unknown details* (maiden name, mother, father, parent or guardian, spouse, emergency contact, alias, nickname, other or former names, a social
      profile or handle, gender, race, marital status, employer, occupation, income, birthplace) are left empty; when required, "needs you".
    - *A further email or phone* ("Alternate email", "Additional email", "Secondary phone", "Other phone", "Email 2") takes the next one in the profile, in order
@@ -139,6 +143,7 @@ misspells its own domain (now `info@usdatacorporation.com`). `generitech.com` (s
 | An error on a phone box is retried in other shapes | `LiveFormTests.testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes` |
 | A phone split over three boxes (3, 3, 4 characters) gets one part per box | `LiveFormTests.testAPhoneSplitOverThreeBoxesGetsOnePartInEach` |
 | A date box follows its placeholder and is retried in other shapes (day first) | `LiveFormTests.testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes` |
+| A LinkedIn box gets the profile's optional LinkedIn address only when one was entered; nothing is invented, and other social boxes stay empty | `CoreTests.testALinkedInBoxTakesTheProfilesLinkedInAddressOnlyWhenOneWasEntered` |
 | An identifier, someone else's name or a social profile is never filled with the person's own details | `CoreTests.testIdentifiersAndSomeoneElsesNamesAreNeverFilledWithThePersonsOwnDetails` |
 | A phone box that mentions a country code, or says "cell", is the phone | `CoreTests.testAPhoneBoxThatMentionsACountryCodeIsThePhoneAndACellBoxIsAPhoneToo` |
 | "First and last name" is the full name; a previous address is the second one | `CoreTests.testFirstAndLastTogetherIsTheFullNameAndAPreviousAddressIsTheSecondOne` |

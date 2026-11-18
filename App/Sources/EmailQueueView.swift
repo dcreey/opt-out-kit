@@ -113,8 +113,8 @@ struct VerifyQueueView: View {
     let domains: [String]
     @State private var runner: AssistedRunner?
 
-    /// The sites of this list: the ones still to do first, finished ones (with a check mark) after. A site to do opens its page; a finished one
-    /// opens what happened, with the screenshot when there is one.
+    /// The sites of this list: the ones still to do first, finished ones (with a check mark) after. Every site opens its page, which shows the
+    /// screenshot of what happened for a finished one.
     @ViewBuilder private var siteRows: some View {
         let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         let attempts = model.progress.optOutAttempts
@@ -125,8 +125,7 @@ struct VerifyQueueView: View {
             ForEach(ordered, id: \.id) { entry in
                 let done = finished.contains(entry.id)
                 NavigationLink {
-                    if done, let person = model.selectedPerson, let item = model.reviewItem(entryID: entry.id, for: person) { EvidenceDetailView(item: item, person: person) }
-                    else { DirectoryInfoView(entry: entry) }
+                    DirectoryInfoView(entry: entry)
                 } label: {
                     HStack {
                         Image(systemName: done ? "checkmark.circle.fill" : "circle").foregroundStyle(done ? Color.green : Color.secondary)

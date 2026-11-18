@@ -39,6 +39,7 @@ struct PersonEditorView: View {
         p.names.removeAll { $0.kind != .legal && blank($0.name) }
         p.phones.removeAll { blank($0) }
         p.emails.removeAll { blank($0) }
+        if blank(p.linkedIn) { p.linkedIn = nil }
         if p.addresses.count > 1 {
             p.addresses = [p.addresses[0]] + p.addresses.dropFirst().filter { !(blank($0.street) && blank($0.city) && blank($0.state) && blank($0.zip)) }
         }
@@ -111,6 +112,13 @@ struct PersonEditorView: View {
                               addLabel: Loc.t("Add email"), items: $person.emails, keyboard: .emailAddress, identifier: "other-email")
             StringListSection(title: "Phones", hint: "Optional. Shown as (773) 633-1564 while you type; forms get plain digits.", addLabel: Loc.t("Add phone"),
                               items: $person.phones, keyboard: .phonePad, format: PhoneFormat.display, identifier: "phone")
+            Section {
+                TextField("linkedin.com/in/your-name", text: Binding(get: { person.linkedIn ?? "" }, set: { person.linkedIn = $0 }))
+                    .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                    .accessibilityIdentifier("field-linkedin")
+            } header: { Text("LinkedIn profile") } footer: {
+                Text("Optional. Some recruiting and workforce sites cannot find your record without it. It is filled only into a box that asks for LinkedIn, and goes only to that site.")
+            }
             if model.people.count > 1 {
                 Section {
                     Button("Delete this person", role: .destructive) { confirmDelete = true }
