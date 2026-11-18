@@ -297,8 +297,12 @@ final class BackgroundPassesAppTests: XCTestCase {
         XCTAssertTrue(m.automaticDomains(for: me).isSubset(of: full), "the automatic sites are part of the full pass")
         XCTAssertTrue(m.backgroundDomains(for: me, kind: .repeatSent).isEmpty, "nothing has gone through yet, so there is nothing to repeat")
         let automaticBefore = m.automaticDomains(for: me).count
+        XCTAssertFalse(m.waitingForFirstPass, "automatic protection is off: the semi-automated queue does not wait")
+        m.setAuto(scan: false, optOut: true)
+        XCTAssertTrue(m.waitingForFirstPass, "a new person with automatic protection on: the semi-automated queue waits for the first pass")
         let tally = Tally()
         await m.runAutoOptOut(for: me, submitter: Alternating(tally: tally))
+        XCTAssertFalse(m.waitingForFirstPass, "the first pass finished: the semi-automated queue opens, with the sites that did not go through in it")
         let rows = m.optOutRun[me.id] ?? []
         XCTAssertTrue(Set(rows.map(\.domain)).isSubset(of: full), "nothing outside the full pass is sent")
         let sent = Set(rows.filter { if case .submitted = $0.result { return true } else { return false } }.map(\.domain))
@@ -310,6 +314,18 @@ final class BackgroundPassesAppTests: XCTestCase {
         XCTAssertEqual(m.autoSettings.nextRunKind(), .repeatSent, "the next run, three months on, repeats what went through")
         XCTAssertEqual(m.backgroundDomains(for: me, kind: .repeatSent), sent.intersection(full), "the repeat pass is exactly the sites that went through")
         XCTAssertEqual(try XCTUnwrap(m.periodHistory(for: me).first).total, automaticBefore, "only the automatic sites are counted in the period, so the full pass's lost sites never hold it open")
+        // Run now again in the same period: nothing left. The sites that went through are not sent twice and the ones that did not are in the semi-automated
+        // queue; Re-test all is the way to try every site again.
+        XCTAssertEqual(m.runNowCount(for: me), 0)
+        let again = Tally()
+        await m.runAutoOptOut(for: me, submitter: Alternating(tally: again))
+        XCTAssertTrue(again.pages.isEmpty, "Run now sent nothing twice in the same period")
+        let retest = Tally()
+        m.runFullRetestNow(submitter: Alternating(tally: retest))
+        try await Task.sleep(nanoseconds: 300_000_000)
+        var waited = 0
+        while m.autoBusy != nil && waited < 600 { try await Task.sleep(nanoseconds: 100_000_000); waited += 1 }
+        XCTAssertFalse(Set((m.optOutRun[me.id] ?? []).map(\.domain)).isDisjoint(with: sent), "Re-test all tries the sites already sent again")
     }
 }
 

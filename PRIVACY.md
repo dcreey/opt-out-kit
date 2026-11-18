@@ -18,8 +18,9 @@ Each broker's own privacy policy governs what it does with a request.
 ## Advertising ID
 
 Some brokers opt a phone out by its advertising ID. If a form asks for it, Exnay asks iOS for your permission (the system "Allow tracking" prompt) and, if you
-agree, gives the ID to that broker's form so it can remove your phone. Exnay does not store it and does not use it to track you. If you refuse, those forms
-are filled without it.
+agree, gives the ID to that broker's form so it can remove your phone. Exnay does not store it, never sends it to us, and does not use it to track you. If you
+refuse, those forms are filled without it. Because the ID does leave your phone for that broker, the App Store privacy details list it as a Device ID used for
+app functionality. Full details, with the code that handles it: [docs/ADVERTISING-ID.md](docs/ADVERTISING-ID.md).
 
 ## What the app does not do
 

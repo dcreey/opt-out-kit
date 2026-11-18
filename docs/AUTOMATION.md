@@ -163,6 +163,12 @@ The run has two kinds, both sending the forms themselves, one site at a time, wi
 | **Full** | The first run, then every 6 months (`AutoSettings.fullEvery`, two periods; due 3 days early) | Every site that `AutoOptOut.backgroundAttemptable` accepts (about 490 of 829 today; `AppModel.fullPassSize` counts it for the explanation) | Recorded as `failed`, `rejected` or `challenged`; the site is semi-automated, with that as the reason |
 | **Repeat** | Every 3 months (`AutoSettings.optOutEvery` = 91 days) between full passes | Only the sites whose latest attempt went through (`AutoOptOut.lastAttemptWentThrough`) | The same: a repeat that does not go through moves the site to semi-automated |
 
+For a new person the first full pass comes before anything else: the Queue shows it as step 1 and holds back the semi-automated queue until it has finished (`AutoSettings.firstPassPending`), so the queue starts with exactly the sites that need a person. See [UX.md](UX.md).
+
+"Run now" (and every run, scheduled or resumed) leaves out the sites already sent in the current period (`AutoOptOut.notSent`), so it only does what is left; only "Re-test all" (`runAutoOptOut(everySite:)`) tries a site sent this period again.
+
+The person can also start a **full** pass by hand at any time (Activity, "Re-test every site now", after a confirmation): `AutoSettings.startFullRetest` marks a full pass as started, so the run is the same as a scheduled one and a cut-off one carries on. When it finishes `lastFullRun` is set, so the next scheduled full re-test is counted from then.
+
 `backgroundAttemptable` is the safety gate and applies to both passes: the site's page mode is `form` (a form is known, read or found live; not a caution or `no_fill` site, no business,
 agent, other or file blocker, no reviewed real run that failed), no typed code, no listing for the person to pick, the form-filler's plan is ready (nothing only the person holds), and the
 person has not set the site aside. A human check, terms prompt or box to certify that a page shows is **never solved or ticked**: the engine stops there (`challenged`), so a site that

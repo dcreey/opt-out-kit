@@ -61,14 +61,23 @@ final class AutoProtectionUITests: XCTestCase {
         // Give the owner a name and email so forms can be filled.
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
-        app.buttons["Done"].tap()
+        app.buttons["editor-done"].tap()
         app.tabBars.buttons["Settings"].tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
         XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 5), "one button runs everything")
         app.buttons["auto-run-now"].tap()
-        XCTAssertTrue(app.staticTexts["auto-summary"].waitForExistence(timeout: 60))
+        // A form in the pass asks for the advertising ID, so Apple's prompt comes up once; the run waits for the answer.
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.buttons["Ask App Not to Track"].waitForExistence(timeout: 10) { springboard.buttons["Ask App Not to Track"].tap() }
+        // A full pass is about 490 sites, so the test checks that it is running and counting, not that it finished.
+        XCTAssertTrue(app.descendants(matching: .any)["auto-working"].waitForExistence(timeout: 30), "the run is under way")
+        let sent = app.buttons["activity-count-sent"]
+        XCTAssertTrue(sent.waitForExistence(timeout: 5))
+        let start = Date()
+        while sent.label.hasPrefix("0") && Date().timeIntervalSince(start) < 60 { Thread.sleep(forTimeInterval: 2) }
+        XCTAssertFalse(sent.label.hasPrefix("0"), "the counts move as sites are sent")
         shot(app, "3-activity-after-preview")
     }
 
@@ -96,11 +105,17 @@ final class AutoProtectionUITests: XCTestCase {
         app.launch()
         let done = app.buttons["run-report-done"]
         if done.waitForExistence(timeout: 120) { done.tap() }          // the run's result sheet comes up when it finishes
-        let status = app.buttons["home-auto-status"]
-        XCTAssertTrue(status.waitForExistence(timeout: 30), "the home page shows the period standing")
+        app.tabBars.buttons["Settings"].tap()
+        let status = app.buttons["auto-activity"]
+        XCTAssertTrue(app.scrollUntilExists(status), "Settings opens the automatic opt-out page")
         status.tap()
+        XCTAssertTrue(app.buttons["activity-count-sent"].waitForExistence(timeout: 10), "the page opens with the three counts")
+        shot(app, "5a-activity-page-folded")
+        // The groups are folded except "Need you"; tapping a count opens its list.
+        app.buttons["activity-count-sent"].tap()
         let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'period-site-'")).firstMatch
-        XCTAssertTrue(app.scrollUntilExists(row), "the status page lists every site")
+        XCTAssertTrue(app.scrollUntilExists(row), "the opened group lists its sites")
+        shot(app, "5b-activity-page-sent-open")
         row.tap()
         let state = app.descendants(matching: .any)["site-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5), "the site's page opened")
@@ -121,5 +136,26 @@ final class AutoProtectionUITests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any)["birth-month"].isEnabled, "month waits for the year")
         XCTAssertFalse(app.descendants(matching: .any)["birth-day"].isEnabled, "day waits for the month")
         XCTAssertTrue(app.staticTexts["missing-details"].exists || app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'birthdate'")).count > 0, "and says it is still needed")
+    }
+
+    /// A new person: the automatic pass goes first and the semi-automated queue waits for it, then opens with the sites that need a person.
+    func testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on", "-uitest-fake-submit", "-only-domains", "abovedata.io,acronymix.com"]
+        app.launch()
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 15), "step 2 is shown as waiting for step 1")
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.exists, "the semi-automated queue is not offered yet")
+        shot(app, "6a-new-person-step-1")
+        // UI tests do not start runs by themselves (`-uitest-reset`), so the test starts it the way a person can.
+        app.buttons["first-pass-start"].tap()
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if springboard.buttons["Ask App Not to Track"].waitForExistence(timeout: 3) { springboard.buttons["Ask App Not to Track"].tap() }
+        let later = app.buttons["run-report-done"]
+        XCTAssertTrue(later.waitForExistence(timeout: 120), "the first pass finishes and says what it did")
+        shot(app, "6b-first-pass-report")
+        later.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.waitForExistence(timeout: 10), "then the semi-automated queue opens")
+        XCTAssertFalse(app.descendants(matching: .any)["first-pass-step2"].exists)
+        shot(app, "6c-queue-after-first-pass")
     }
 }

@@ -19,6 +19,8 @@ Where a principle is enforced by a test or a build rule, the enforcement is name
   Nothing is reported anywhere, and no screen, setting or wording says or implies otherwise.
 - What a person enters is stored encrypted on their phone and goes only to the broker site they are opting out of, only the fields that site needs, and only
   when the person has confirmed. It is never sent to us, to a third party, to an AI service or to a CAPTCHA-solving service.
+  The phone's advertising ID is the one device identifier that may go to a broker, only when that broker's form asks for it and only after the person allows it
+  in Apple's prompt; it is not stored (see [ADVERTISING-ID.md](ADVERTISING-ID.md)).
 - The only network traffic is to broker pages and email links the person opened, and (for the live form) pages the directory points at.
   No SDK that phones home goes into the build, including "privacy-friendly" ones. Adding any dependency means checking what it contacts.
 - Because there is no server there is nothing to breach, subpoena or monetize. The accepted trade-off is that nothing can be recovered from us:

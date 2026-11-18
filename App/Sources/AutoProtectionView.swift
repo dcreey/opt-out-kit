@@ -64,78 +64,22 @@ struct AutoActivityView: View {
     @EnvironmentObject var model: AppModel
     /// The sites a plan task says this run handles, listed at the bottom when it is opened from the plan.
     var handles: [String] = []
+    @State private var confirmRetest = false
+    @State private var search = ""
+    /// Which groups are unfolded: none to begin with, the counts say enough.
+    @State private var open: Set<ActivityGroup> = []
+    @Environment(\.dismiss) private var dismiss
+    @State private var activity: [AppModel.ActivityRow] = []
+    @State private var runNowCount: Int?
 
-    private var rows: [AppModel.AutoOptOutRow] { model.selectedPerson.flatMap { model.optOutRun[$0.id] } ?? [] }
     private var busy: Bool { model.autoBusy == "optout" }
-
-    private func isSent(_ r: AppModel.AutoOptOutRow) -> Bool { if case .submitted = r.result { return true } else { return false } }
-    /// The ones the person has to do something about.
-    private func needsPerson(_ r: AppModel.AutoOptOutRow) -> Bool {
-        switch r.result { case .challenged, .needsYou, .needsData, .rejected, .failed: return true; default: return false }
-    }
 
     var body: some View {
         List {
             if let person = model.selectedPerson {
-                Section {
-                    if busy {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label("Working in the background", systemImage: "hourglass").font(.headline)
-                            if let p = model.autoProgress {
-                                ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
-                                Text("\(p.done) of \(p.total) sites. You can leave this screen.").font(.footnote).foregroundStyle(.secondary)
-                            } else {
-                                ProgressView()
-                            }
-                        }
-                        .accessibilityIdentifier("auto-working")
-                    }
-                    Button { model.runAutomaticNow() } label: {
-                        Label(busy ? Loc.t("Working…") : Loc.t("Run now"), systemImage: "bolt.fill").frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent).controlSize(.large)
-                    .disabled(busy)
-                    .accessibilityIdentifier("auto-run-now")
-                    if let last = model.autoSettings.lastOptOut {
-                        Text("Last run: \(Loc.date(last, time: true))").font(.footnote).foregroundStyle(.secondary)
-                    }
-                    if let next = model.autoSettings.nextOptOutDate() {
-                        Group {
-                            if model.autoSettings.kindOfRun(on: next) == .full { Text(Loc.f("Next run %@: a full re-test of every site", Loc.date(next))) }
-                            else { Text(Loc.f("Next run %@: sends again to the sites that went through", Loc.date(next))) }
-                        }
-                            .font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("auto-next-run")
-                    }
-                } header: { Text(person.displayName) } footer: {
-                    Text("It fills in and sends each form in the background, with no website opened. A site that does not go through moves to your semi-automated queue, and you are asked about it there.")
-                }
-                periodSections(for: person)
-                if model.autoSettings.lastAttempted != nil {
-                    Section {
-                        NavigationLink { RunReviewView(person: person) } label: {
-                            Label("Review the last run and its screenshots", systemImage: "photo.on.rectangle.angled")
-                        }
-                        .accessibilityIdentifier("review-last-run")
-                    } footer: { Text("After each site is sent we keep a screenshot of the page it showed, so you can confirm what happened.") }
-                }
-                if !rows.isEmpty {
-                    let sent = rows.filter(isSent).count
-                    let attention = rows.filter(needsPerson)
-                    Section {
-                        Text("Sent \(sent) of \(rows.count) sites. \(attention.count) need you.").font(.headline).accessibilityIdentifier("auto-summary")
-                    }
-                    if !attention.isEmpty {
-                        Section("Needs you (\(attention.count))") {
-                            ForEach(attention) { r in
-                                if let entry = model.directory.first(where: { $0.id == r.id }) {
-                                    NavigationLink { DirectoryInfoView(entry: entry) } label: { attentionRow(r) }
-                                } else { attentionRow(r) }
-                            }
-                        }
-                    }
-                } else if !busy {
-                    Section { Text("Nothing has run yet for \(person.displayName).").font(.footnote).foregroundStyle(.secondary) }
-                }
+                statusSection(for: person)
+                groupSections
+                moreSection(for: person)
             }
             if !handles.isEmpty {
                 Section("Sites in this run (\(handles.count))") {
@@ -144,38 +88,168 @@ struct AutoActivityView: View {
             }
         }
         .navigationTitle("Automatic opt-out")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $search, prompt: Text("Find a site"))
+        .task(id: refreshKey) { if let p = model.selectedPerson { activity = model.activityRows(for: p); runNowCount = model.runNowCount(for: p) } }
+        .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
+            Button("Re-test every site") { model.runFullRetestNow() }
+                .accessibilityIdentifier("auto-retest-confirm")
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This tries every site that can be tried, one after another in the background, and sends a request wherever a form goes through. It can take a long while. Anything that does not go through moves to your semi-automated queue.")
+        }
         // Links on this page carry their own destination. A page opened by a closure-style link must not declare a `navigationDestination` of its own:
         // SwiftUI builds the page a second time when a value is pushed, finds the route "declared earlier on the stack", and the push bounces straight back.
     }
 
-    /// This period's tally, the checklist of every automatic site (what ran and what did not), and the earlier periods.
-    @ViewBuilder private func periodSections(for person: Person) -> some View {
-        let history = model.periodHistory(for: person)
-        if let now = history.first {
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(Loc.f("%lld of %lld sites handled this period", now.handled, now.total)).font(.headline).accessibilityIdentifier("period-summary")
-                    ProgressView(value: Double(now.handled), total: Double(max(now.total, 1))).tint(now.complete ? .green : .accentColor)
-                    Text("\(Loc.date(now.period.start)) to \(Loc.date(now.period.end.addingTimeInterval(-1)))").font(.caption).foregroundStyle(.secondary)
-                    if now.complete { Label("Every site went through this period.", systemImage: "checkmark.seal.fill").font(.footnote).foregroundStyle(.green) }
-                    else { Text(Loc.f("%lld left. A run only does the sites not handled yet in this period.", now.total - now.handled)).font(.footnote).foregroundStyle(.secondary) }
+    /// The groups are worked out again when a run moves on a site, finishes, or the person changes.
+    private var refreshKey: String { "\(model.selectedID.uuidString)-\(model.autoBusy ?? "")-\(model.autoProgress?.done ?? -1)-\(model.autoSettings.lastOptOut?.timeIntervalSince1970 ?? 0)" }
+
+    private var filtered: [AppModel.ActivityRow] {
+        let q = search.trimmingCharacters(in: .whitespaces)
+        return q.isEmpty ? activity : activity.filter { $0.domain.localizedCaseInsensitiveContains(q) }
+    }
+
+    private func title(_ g: ActivityGroup) -> String {
+        switch g { case .needsYou: return Loc.t("Moved to semi-automatic"); case .sent: return Loc.t("Sent"); case .notTried: return Loc.t("Not tried or skipped") }
+    }
+    private func color(_ g: ActivityGroup) -> Color {
+        switch g { case .needsYou: return .blue; case .sent: return .green; case .notTried: return .secondary }
+    }
+    private func icon(_ g: ActivityGroup) -> String {
+        switch g { case .needsYou: return "hand.point.up.left.fill"; case .sent: return "checkmark.circle.fill"; case .notTried: return "circle.dashed" }
+    }
+    private func isOpen(_ g: ActivityGroup) -> Bool { !search.isEmpty || open.contains(g) }
+    private func toggle(_ g: ActivityGroup) { withAnimation { if open.contains(g) { open.remove(g) } else { open.insert(g) } } }
+
+    /// Everything at a glance: the three counts (each opens its list), the period, the last and next run, and the two buttons.
+    @ViewBuilder private func statusSection(for person: Person) -> some View {
+        Section {
+            HStack(spacing: 8) {
+                ForEach(ActivityGroup.allCases, id: \.self) { g in
+                    let n = activity.filter { $0.group == g }.count
+                    Button { toggle(g) } label: {
+                        VStack(spacing: 2) {
+                            Text(verbatim: "\(n)").font(.title2.bold()).foregroundStyle(color(g))
+                            Text(g == .notTried ? Loc.t("Not tried") : g == .needsYou ? Loc.t("Semi-automatic") : title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
+                        }
+                        .frame(maxWidth: .infinity).padding(.vertical, 8)
+                        .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("activity-count-\(g.rawValue)")
                 }
-            } header: { Text("This period") }
-            let rows = model.periodRows(for: person)
-            let todo = rows.filter { !$0.handled }, done = rows.filter(\.handled)
-            Section {
-                ForEach(todo + done) { r in
-                    if let entry = model.directory.first(where: { $0.id == r.id }) { NavigationLink { DirectoryInfoView(entry: entry) } label: { periodRow(r) }.accessibilityIdentifier("period-site-\(r.domain)") } else { periodRow(r) }
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                if busy {
+                    if let p = model.autoProgress {
+                        ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                        Text("Working in the background: \(p.done) of \(p.total) sites. You can leave this screen.").font(.caption).accessibilityIdentifier("auto-working")
+                    } else {
+                        ProgressView().accessibilityIdentifier("auto-working")
+                    }
                 }
-            } header: { Text("Each site") } footer: { Text("A check mark means the request went through this period.") }
-            if history.count > 1 {
-                Section("Earlier periods") {
-                    ForEach(Array(history.dropFirst().enumerated()), id: \.offset) { _, t in
+                if let period = model.runPeriod() {
+                    Text(Loc.f("This period: %@ to %@", Loc.date(period.start), Loc.date(period.end.addingTimeInterval(-1))))
+                        .accessibilityIdentifier("period-summary")
+                }
+                if let last = model.autoSettings.lastOptOut {
+                    Text(Loc.f("Last run %@: sent %lld of %lld", Loc.date(last), model.autoSettings.lastSent ?? 0, model.autoSettings.lastAttempted ?? 0))
+                        .accessibilityIdentifier("auto-summary")
+                } else if !busy {
+                    Text("Nothing has run yet for \(person.displayName).")
+                }
+                if let next = model.autoSettings.nextOptOutDate() {
+                    Group {
+                        if model.autoSettings.kindOfRun(on: next) == .full { Text(Loc.f("Next run %@: a full re-test of every site", Loc.date(next))) }
+                        else { Text(Loc.f("Next run %@: sends again to the sites that went through", Loc.date(next))) }
+                    }
+                    .accessibilityIdentifier("auto-next-run")
+                }
+            }
+            .font(.footnote).foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                Button { model.runAutomaticNow() } label: {
+                    Label(busy ? Loc.t("Working…") : Loc.t("Run now"), systemImage: "bolt.fill").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("auto-run-now")
+                Button { confirmRetest = true } label: {
+                    Label("Re-test all", systemImage: "arrow.triangle.2.circlepath").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("auto-retest-all")
+            }
+            .controlSize(.regular).disabled(busy)
+            if !busy, let n = runNowCount {
+                Text(n == 0 ? Loc.t("Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.")
+                            : Loc.f("Run now tries the %lld sites still to do this period. Re-test all tries every site again.", n))
+                    .font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-run-now-scope")
+            }
+        } header: { Text(person.displayName) }
+    }
+
+    /// One section per group, folded until its header or count is tapped (all open while searching). A site that needs you is in the semi-automated queue.
+    @ViewBuilder private var groupSections: some View {
+        ForEach(ActivityGroup.allCases, id: \.self) { g in
+            let items = filtered.filter { $0.group == g }
+            if !items.isEmpty {
+                Section {
+                    if isOpen(g) {
+                        ForEach(items) { r in
+                            if let entry = model.directory.first(where: { $0.id == r.id }) {
+                                NavigationLink { DirectoryInfoView(entry: entry) } label: { activityRow(r) }.accessibilityIdentifier("period-site-\(r.domain)")
+                            } else { activityRow(r) }
+                        }
+                    }
+                } header: {
+                    Button { toggle(g) } label: {
                         HStack {
-                            Image(systemName: t.complete ? "checkmark.circle.fill" : "circle.lefthalf.filled").foregroundStyle(t.complete ? .green : .orange)
-                            Text("\(Loc.date(t.period.start)) to \(Loc.date(t.period.end.addingTimeInterval(-1)))").font(.footnote)
+                            Label(title(g), systemImage: icon(g)).foregroundStyle(color(g))
+                            Text(verbatim: "\(items.count)").foregroundStyle(.secondary)
                             Spacer()
-                            Text(Loc.f("%lld of %lld", t.handled, t.total)).font(.footnote.bold())
+                            Image(systemName: isOpen(g) ? "chevron.down" : "chevron.right").foregroundStyle(.secondary)
+                        }
+                        .font(.subheadline.bold()).textCase(nil)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("activity-group-\(g.rawValue)")
+                } footer: {
+                    if g == .needsYou {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Nothing to do on this page. These sites need a person for one step, usually a check, so they are in your semi-automated queue: we fill in each form, you clear the check and send.")
+                            Button { dismiss(); model.requestedTab = 0 } label: { Label("Go to the semi-automated queue", systemImage: "arrow.right.circle") }
+                                .font(.footnote.bold()).accessibilityIdentifier("activity-open-semi")
+                        }
+                    }
+                }
+            }
+        }
+        if !search.isEmpty && filtered.isEmpty {
+            Section { Text("No site matches.").font(.footnote).foregroundStyle(.secondary) }
+        }
+    }
+
+    /// The screenshots of the last run and the earlier periods, folded away.
+    @ViewBuilder private func moreSection(for person: Person) -> some View {
+        let history = model.periodHistory(for: person)
+        if model.autoSettings.lastAttempted != nil || history.count > 1 {
+            Section {
+                if model.autoSettings.lastAttempted != nil {
+                    NavigationLink { RunReviewView(person: person) } label: {
+                        Label("Screenshots of the last run", systemImage: "photo.on.rectangle.angled")
+                    }
+                    .accessibilityIdentifier("review-last-run")
+                }
+                if history.count > 1 {
+                    DisclosureGroup("Earlier periods") {
+                        ForEach(Array(history.dropFirst().enumerated()), id: \.offset) { _, t in
+                            HStack {
+                                Image(systemName: t.complete ? "checkmark.circle.fill" : "circle.lefthalf.filled").foregroundStyle(t.complete ? .green : .orange)
+                                Text("\(Loc.date(t.period.start)) to \(Loc.date(t.period.end.addingTimeInterval(-1)))").font(.footnote)
+                                Spacer()
+                                Text(Loc.f("%lld of %lld", t.handled, t.total)).font(.footnote.bold())
+                            }
                         }
                     }
                 }
@@ -183,23 +257,14 @@ struct AutoActivityView: View {
         }
     }
 
-    private func periodRow(_ r: AppModel.PeriodSiteRow) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: r.handled ? "checkmark.circle.fill" : (r.note != nil ? "exclamationmark.circle.fill" : "circle"))
-                .foregroundStyle(r.handled ? Color.green : (r.note != nil ? Color.orange : Color.secondary))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(r.domain).font(.footnote).foregroundStyle(r.handled ? Color.secondary : Color.primary)
-                if let on = r.handledOn { Text(Loc.f("Sent %@", Loc.date(on))).font(.caption2).foregroundStyle(.secondary) }
-                else if let note = r.note { Text(note).font(.caption2).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true) }
-                else { Text("Not sent yet").font(.caption2).foregroundStyle(.secondary) }
+    private func activityRow(_ r: AppModel.ActivityRow) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon(r.group)).foregroundStyle(color(r.group))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(verbatim: r.domain).font(.footnote)
+                Text(r.line).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
             }
         }
     }
 
-    private func attentionRow(_ r: AppModel.AutoOptOutRow) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(r.domain)
-            Text(r.result.label).font(.caption).foregroundStyle(.orange).fixedSize(horizontal: false, vertical: true)
-        }
-    }
 }

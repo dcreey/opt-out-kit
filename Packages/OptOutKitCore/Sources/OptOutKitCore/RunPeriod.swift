@@ -54,3 +54,35 @@ public enum RunPeriods {
         return out
     }
 }
+
+/// Where one site of the automatic run stands this period, for the activity page's three groups.
+public enum ActivityGroup: String, CaseIterable, Sendable {
+    case needsYou      // the latest attempt this period did not go through (a check, a refusal, an error): it is in the semi-automated queue
+    case sent          // a request went through this period
+    case notTried      // nothing this period yet: not reached, held back by the run's own rules, or set aside by the person
+}
+
+public struct ActivitySite: Equatable, Sendable {
+    public var id: String
+    public var group: ActivityGroup
+    /// When it went through (sent) or when the attempt that did not go through was made (needs you).
+    public var date: Date?
+    /// The outcome and detail of the attempt that did not go through.
+    public var outcome: String?
+    public var detail: String?
+}
+
+public extension RunPeriods {
+    /// Sorts the run's sites into the three groups by their attempts in `period` (every attempt when there is no period yet). A site sent this period is
+    /// "sent" even if a later try failed, because the request stands; an emailed request is the person's and does not count either way.
+    static func activity(siteIDs: [String], attempts: [String: [OptOutAttempt]], period: RunPeriod?) -> [ActivitySite] {
+        siteIDs.map { id in
+            let list = (attempts[id] ?? []).filter { period?.contains($0.date) ?? true }
+            if let sent = list.filter(\.wasSubmitted).map(\.date).max() { return ActivitySite(id: id, group: .sent, date: sent) }
+            if let last = list.filter({ !$0.wasEmailed }).max(by: { $0.date < $1.date }) {
+                return ActivitySite(id: id, group: .needsYou, date: last.date, outcome: last.outcome, detail: last.detail)
+            }
+            return ActivitySite(id: id, group: .notTried)
+        }
+    }
+}

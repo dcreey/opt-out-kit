@@ -43,6 +43,9 @@ PRIVATE BY DESIGN
 • Always free. No ads, no subscription.
 • Open source: github.com/dcreey/opt-out-kit
 
+YOUR PHONE'S ADVERTISING ID
+Some brokers keep an advertising profile of your phone and remove it only when given your advertising ID. If a broker's form asks for it, Exnay asks for your permission using Apple's "Allow tracking" prompt, and only then puts the ID into that one form. It is used only to remove your phone from that broker's profile. Exnay does not store it, never sends it to us (there is no "us" to send it to), and never uses it to track you or show you ads. If you say no, the form is filled without it. Because the ID does go to that broker, the App Privacy details list it as a Device ID. The details, and the code that handles it, are public: github.com/dcreey/opt-out-kit/blob/main/docs/ADVERTISING-ID.md and the privacy policy at github.com/dcreey/opt-out-kit/blob/main/PRIVACY.md
+
 IN YOUR LANGUAGE
 English, French, Spanish and German.
 
@@ -52,4 +55,4 @@ Exnay does not give legal advice. Broker pages change often; the app records whe
 First release.
 
 **App Review notes**
-Exnay has no account or login. Open the app, add a profile (any name and a US address work), then open the Queue tab, pick a kind of broker and tap a site to see the page filled in. Automatic protection is off until the person turns it on at first use; once on, it fills and sends opt-out forms to broker sites itself (a full pass first, a repeat every 3 months and a full re-test every 6) and leaves anything with a human check to the person. The app contacts only the data-broker websites the person opens. The advertising ID is requested (App Tracking Transparency prompt) only when a broker's form asks for it, and is passed only to that form.
+Exnay has no account or login. Open the app, add a profile (any name and a US address work), then open the Queue tab, pick a kind of broker and tap a site to see the page filled in. Automatic protection is off until the person turns it on at first use; once on, it fills and sends opt-out forms to broker sites itself (a full pass first, a repeat every 3 months and a full re-test every 6) and leaves anything with a human check to the person. The app contacts only the data-broker websites the person opens. The advertising ID is requested (App Tracking Transparency prompt) only when a broker's form asks for it, and is passed only to that form, solely to remove the person's phone from that broker's advertising profile (an advertising-related use). It is never stored, never sent to us (there is no server) and never used to track the person or show ads. Declared as Device ID, app functionality. Details: docs/ADVERTISING-ID.md in the public repository.

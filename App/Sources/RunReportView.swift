@@ -39,35 +39,30 @@ struct RunReportSheet: View {
     }
 
     private var content: some View {
-        VStack(spacing: 16) {
-            Image(systemName: report.allSucceeded ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-                .font(.system(size: 52)).foregroundStyle(report.allSucceeded ? .green : .orange).padding(.top, 24)
+        VStack(spacing: 12) {
+            Image(systemName: report.allSucceeded ? "checkmark.seal.fill" : "hand.point.up.left.fill")
+                .font(.system(size: 40)).foregroundStyle(report.allSucceeded ? .green : .blue).padding(.top, 20)
             Text(report.allSucceeded ? Loc.f("All %lld sites went through", report.sent)
                                      : Loc.f("%lld of %lld sites went through", report.sent, report.attempted))
                 .font(.title2.bold()).multilineTextAlignment(.center).accessibilityIdentifier("run-report-title")
-            if let now = model.periodHistory(for: model.people.first(where: { $0.id == report.personID }) ?? Person(displayName: "")).first {
-                Text(Loc.f("%lld of %lld sites handled this period", now.handled, now.total)).font(.subheadline.bold()).foregroundStyle(.secondary).accessibilityIdentifier("run-report-period")
-            }
             if report.allSucceeded {
                 Text("Nothing more to do for these. Some sites email a link to confirm; that tap is yours.").font(.callout).multilineTextAlignment(.center)
+                Button("Done", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-done")
             } else {
-                Text("\(report.needYou.count) need you. They moved to your queue as semi-automated or guided tasks.").font(.callout).multilineTextAlignment(.center)
-                List(report.needYou) { r in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(r.domain).font(.headline)
-                        Text(r.result.label).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                .listStyle(.plain)
+                Text(Loc.f("%lld moved to semi-automatic. Each needs a person for one step, usually a check: we fill in the form, you clear the check and send.", report.needYou.count))
+                    .font(.callout).multilineTextAlignment(.center).accessibilityIdentifier("run-report-moved")
+                // The next step comes first, where the half-height sheet shows it.
+                Button { done(); model.requestedTab = 0 } label: { Text("Start the semi-automated sites").frame(maxWidth: .infinity) }
+                    .buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-start-semi")
+                Button("Later", action: done).accessibilityIdentifier("run-report-done")
             }
             if let person = model.people.first(where: { $0.id == report.personID }) {
                 NavigationLink { RunReviewView(person: person) } label: {
-                    Label("Review every site and its screenshot", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity)
+                    Label("Review every site and its screenshot", systemImage: "photo.on.rectangle.angled")
                 }
-                .buttonStyle(.bordered).accessibilityIdentifier("run-report-review")
+                .font(.footnote).accessibilityIdentifier("run-report-review")
             }
             Spacer(minLength: 0)
-            Button("Done", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("run-report-done").padding(.bottom, 20)
         }
         .padding(.horizontal, 20)
     }
@@ -83,9 +78,9 @@ struct LastRunRow: View {
             let needYou = s.lastNeedYou ?? 0
             NavigationLink(value: "auto-activity") {
                 HStack(spacing: 10) {
-                    Image(systemName: needYou == 0 ? "checkmark.circle.fill" : "exclamationmark.circle.fill").foregroundStyle(needYou == 0 ? .green : .orange)
+                    Image(systemName: needYou == 0 ? "checkmark.circle.fill" : "hand.point.up.left.fill").foregroundStyle(needYou == 0 ? .green : .blue)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(needYou == 0 ? Loc.f("Last run: all %lld sites went through", sent) : Loc.f("Last run: %lld of %lld went through, %lld need you", sent, attempted, needYou))
+                        Text(needYou == 0 ? Loc.f("Last run: all %lld sites went through", sent) : Loc.f("Last run: %lld of %lld went through, %lld moved to semi-automatic", sent, attempted, needYou))
                             .font(.subheadline.bold()).fixedSize(horizontal: false, vertical: true)
                         Text(Loc.date(date, time: true)).font(.caption).foregroundStyle(.secondary)
                         if let person = model.selectedPerson, let now = model.periodHistory(for: person).first {

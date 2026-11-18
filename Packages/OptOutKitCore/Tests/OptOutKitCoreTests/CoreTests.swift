@@ -1146,6 +1146,64 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(AutoSettings.optOutEvery, 91 * day, "a run is due every three months"); XCTAssertEqual(AutoSettings.fullEvery, 2 * AutoSettings.optOutEvery)
     }
 
+    func testReTestingEverySiteNowStartsAFullPassWhateverTheScheduleSaysAndKeepsOneAlreadyUnderWay() {
+        var s = AutoSettings()
+        s.lastFullRun = t0
+        XCTAssertEqual(s.nextRunKind(now: t0 + 30 * day), .repeatSent)
+        s.startFullRetest(now: t0 + 30 * day)
+        XCTAssertEqual(s.nextRunKind(now: t0 + 30 * day), .full, "asked for by hand, a month after the last full pass")
+        XCTAssertEqual(s.optOutResumePending, true, "a cut-off re-test carries on")
+        XCTAssertEqual(s.passStarted, t0 + 30 * day)
+        s.startFullRetest(now: t0 + 31 * day)
+        XCTAssertEqual(s.passStarted, t0 + 30 * day, "a full pass already under way is not restarted")
+        s.passKind = .repeatSent
+        s.startFullRetest(now: t0 + 32 * day)
+        XCTAssertEqual(s.nextRunKind(now: t0 + 32 * day), .full, "a repeat pass under way becomes a full one")
+    }
+
+    func testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod() {
+        let period = RunPeriod(start: t0, end: t0 + 91 * day)
+        var p = OptOutKitCore.Progress()
+        p.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "sent-now")
+        p.recordOptOutAttempt(OptOutAttempt(date: t0 - 10 * day, outcome: "submitted"), site: "due-again")
+        p.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "challenged"), site: "stopped")
+        let entries = ["sent-now", "due-again", "stopped", "never"].map { DirectoryEntry(id: $0, domain: "\($0).com", name: $0, bucket: "direct", tier: .B, automation: .guided) }
+        XCTAssertEqual(AutoOptOut.notSent(in: period, entries, progress: p).map(\.id), ["due-again", "stopped", "never"],
+                       "sent this period: left alone; sent last period, stopped, or never tried: tried again")
+        XCTAssertEqual(AutoOptOut.notSent(in: nil, entries, progress: p).count, 4, "before the first period every site is still to do")
+    }
+
+    func testTheSemiAutomatedQueueWaitsOnlyForTheVeryFirstAutomaticPass() {
+        var s = AutoSettings()
+        XCTAssertFalse(s.firstPassPending, "nothing to wait for while automatic protection is off")
+        s.turnOnBoth(now: t0)
+        XCTAssertTrue(s.firstPassPending, "turned on, nothing run yet: the queue waits for the first pass")
+        s.passStarted = t0; s.passKind = .full
+        XCTAssertTrue(s.firstPassPending, "still waiting while the first pass works or is cut off")
+        s.lastOptOut = t0 + day; s.passStarted = nil; s.passKind = nil
+        XCTAssertFalse(s.firstPassPending, "the first pass finished: the semi-automated queue opens")
+        s.startFullRetest(now: t0 + 30 * day)
+        XCTAssertFalse(s.firstPassPending, "a later re-test never hides the queue")
+    }
+
+    func testTheActivityPageSortsEachSiteIntoSentNeedsYouOrNotTriedByThisPeriodsAttempts() {
+        let period = RunPeriod(start: t0, end: t0 + 91 * day)
+        let attempts: [String: [OptOutAttempt]] = [
+            "a": [OptOutAttempt(date: t0 + day, outcome: "submitted")],
+            "b": [OptOutAttempt(date: t0 + day, outcome: "challenged", detail: "a CAPTCHA")],
+            "c": [OptOutAttempt(date: t0 - day, outcome: "submitted")],
+            "d": [OptOutAttempt(date: t0 + day, outcome: "submitted"), OptOutAttempt(date: t0 + 2 * day, outcome: "failed")],
+            "e": [OptOutAttempt(date: t0 + day, outcome: "emailed")],
+        ]
+        let rows = Dictionary(uniqueKeysWithValues: RunPeriods.activity(siteIDs: ["a", "b", "c", "d", "e", "f"], attempts: attempts, period: period).map { ($0.id, $0) })
+        XCTAssertEqual(rows["a"]?.group, .sent); XCTAssertEqual(rows["a"]?.date, t0 + day)
+        XCTAssertEqual(rows["b"]?.group, .needsYou); XCTAssertEqual(rows["b"]?.detail, "a CAPTCHA")
+        XCTAssertEqual(rows["c"]?.group, .notTried, "a send in an earlier period does not count for this one")
+        XCTAssertEqual(rows["d"]?.group, .sent, "a request that went through this period stands even if a later try failed")
+        XCTAssertEqual(rows["e"]?.group, .notTried, "an email the person sent is not the run's")
+        XCTAssertEqual(rows["f"]?.group, .notTried)
+    }
+
     // MARK: field mapping
 
     func testMapsAProfileOntoACommonOptOutForm() {

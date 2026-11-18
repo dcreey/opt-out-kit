@@ -182,6 +182,8 @@ final class AppModel: ObservableObject {
             household.setContactEmail("pat@example.com")
             household.updateAuto { $0.decidedAt = Date() }
         }
+        // UI tests: automatic protection on, as a new person who said yes at first use (the first pass then starts when the app is open).
+        if args.contains("-uitest-auto-on") { household.updateAuto { $0.turnOnBoth(now: Date()) } }
         #endif
     }
 
@@ -748,6 +750,40 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// One site on the activity page: which group it is in and the one line that says why.
+    struct ActivityRow: Identifiable, Equatable {
+        let id: String
+        let domain: String
+        let group: ActivityGroup
+        let line: String
+    }
+
+    /// Every site the automatic run deals with this period, sorted into needs you, sent and not tried: the "done for you" sites, the sites the next pass
+    /// would try, and any site the run tried this period that did not go through (it has moved to the semi-automated queue, so it is in neither of the others).
+    func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] {
+        let progress = household.progress(for: person.id)
+        let period = runPeriod(now: now)
+        let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && (period?.contains($0.date) ?? true) }
+        var ids = Set(automaticSites(for: person, now: now).map(\.id))
+        let pass = backgroundDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now)
+        for e in directory where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
+        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let lastRun = Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b })
+        return RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period).compactMap { s in
+            guard let e = byID[s.id] else { return nil }
+            let line: String
+            switch s.group {
+            case .sent: line = Loc.f("Sent %@", Loc.date(s.date ?? now))
+            case .needsYou: line = ReviewItem(id: e.id, domain: e.domain, outcome: s.outcome ?? "failed", detail: s.detail, date: s.date ?? now, hasScreenshot: false).label
+            case .notTried:
+                if let r = lastRun[e.id] { line = r.label }
+                else if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
+                else { line = Loc.t("Not tried yet this period") }
+            }
+            return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
+        }.sorted { $0.domain < $1.domain }
+    }
+
     /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
     func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, for personID: UUID, dryRun: Bool) {
         guard !dryRun else { return }
@@ -793,7 +829,9 @@ final class AppModel: ObservableObject {
     }
 
     /// Sends opt-out requests for one person to every site whose form we found. `dryRun` fills forms but never sends them.
-    func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
+    /// `everySite`: "Re-test all", which tries every site of the pass again. Otherwise a run leaves out the sites already sent this period (`AutoOptOut.notSent`),
+    /// so "Run now" does only what is left: sites due again, sites not reached, and sites that did not go through.
+    func runAutoOptOut(for original: Person, dryRun: Bool = false, automaticOnly: Bool = true, everySite: Bool = false, submitter: FormSubmitter? = nil, inspector: PageInspector? = nil) async {
         let person = formPerson(original)
         guard storageProblem == nil, isReady(original) else { return }
         // A full pass (the first run, then every six months) tries every site that can be tried; the pass in between repeats the sites that went through. The "done for you"
@@ -801,6 +839,7 @@ final class AppModel: ObservableObject {
         let automatic = automaticDomains(for: original)
         let kind = household.autoSettings.nextRunKind(now: Date())
         var runnable = automaticOnly ? backgroundDomains(for: original, kind: kind, person: person) : nil
+        if !everySite, !dryRun, let r = runnable { runnable = remainingDomains(of: r, for: original) }
         #if DEBUG
         // Simulator work: `-only-domains a.com,b.com` runs just those sites, whatever group they are in.
         let args = ProcessInfo.processInfo.arguments
@@ -1182,6 +1221,31 @@ final class AppModel: ObservableObject {
         requireProfile { [self] in
             guard autoBusy == nil, let person = selectedPerson else { return }
             Task { await runAutoOptOut(for: person) }
+        }
+    }
+
+    /// Of these sites, the ones with no request sent this period.
+    func remainingDomains(of domains: Set<String>, for person: Person, now: Date = Date()) -> Set<String> {
+        let entries = directory.filter { domains.contains($0.domain) }
+        return Set(AutoOptOut.notSent(in: runPeriod(now: now), entries, progress: household.progress(for: person.id)).map(\.domain))
+    }
+
+    /// How many sites "Run now" would try for this person now: the next pass's sites not yet sent this period.
+    func runNowCount(for person: Person, now: Date = Date()) -> Int {
+        remainingDomains(of: backgroundDomains(for: person, kind: autoSettings.nextRunKind(now: now), now: now), for: person, now: now).count
+    }
+
+    /// The selected person's first automatic pass is still to finish, so the semi-automated queue waits (see `AutoSettings.firstPassPending`).
+    /// Not while the profile is incomplete: the run cannot start then, and the profile gate asks for what is missing.
+    var waitingForFirstPass: Bool { autoSettings.firstPassPending && (selectedPerson.map(isReady) ?? false) }
+
+    /// Re-tests every site that can be tried, now, whatever the schedule says. The usual schedule carries on from it (the next full re-test is counted from when this one finishes).
+    func runFullRetestNow(submitter: FormSubmitter? = nil) {
+        requireProfile { [self] in
+            guard autoBusy == nil, let person = selectedPerson else { return }
+            household.updateAuto { $0.startFullRetest() }
+            save()
+            Task { await runAutoOptOut(for: person, everySite: true, submitter: submitter) }
         }
     }
 

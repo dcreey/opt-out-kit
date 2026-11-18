@@ -147,6 +147,13 @@ public struct AutoOptOut: Sendable {
         }
     }
 
+    /// The sites still to do this period: those with no request sent in `period` (all of them before the first period has started). "Run now" works through
+    /// these, so a site already sent this period is not sent again; one that is due again, or did not go through, is tried.
+    public static func notSent(in period: RunPeriod?, _ entries: [DirectoryEntry], progress: Progress) -> [DirectoryEntry] {
+        guard let period else { return entries }
+        return entries.filter { e in !(progress.optOutAttempts[e.id]?.contains { $0.wasSubmitted && period.contains($0.date) } ?? false) }
+    }
+
     /// Runs the opt-out for every site with a form, one at a time. `dryRun` fills forms but never sends them.
     public func run(entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), dryRun: Bool = false,
                     holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
@@ -276,6 +283,15 @@ public struct AutoSettings: Codable, Equatable, Sendable {
         if let passKind, passStarted != nil { return passKind }
         guard let lastFullRun else { return .full }
         return now >= lastFullRun.addingTimeInterval(Self.fullEvery - 3 * 86_400) ? .full : .repeatSent
+    }
+    /// A new person's first automatic pass has not finished yet. Until it has, the app does not know which sites need a person, so the semi-automated
+    /// queue waits for it. Only the very first pass: a later run (or a re-test by hand) never hides the queue.
+    public var firstPassPending: Bool { optOutEnabled && lastOptOut == nil }
+
+    /// The person asked to re-test every site now. A full pass already under way just carries on; anything else (nothing running, or a repeat pass) becomes a fresh full pass.
+    public mutating func startFullRetest(now: Date = Date()) {
+        if passStarted != nil, passKind == .full { return }
+        passStarted = now; passKind = .full; optOutResumePending = true
     }
     /// The kind of the run due on `date` (the next period's start), for saying what is coming.
     public func kindOfRun(on date: Date) -> RunKind { nextRunKind(now: date) }

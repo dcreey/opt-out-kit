@@ -967,25 +967,25 @@
     }
    }
   },
-  "%lld need you. They moved to your queue as semi-automated or guided tasks.": {
+  "%lld moved to semi-automatic. Each needs a person for one step, usually a check: we fill in the form, you clear the check and send.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "%lld ont besoin de vous. Ils sont passés dans votre file en tâches semi-automatisées ou guidées."
+      "value": "%lld sont passés en semi-automatique. Chacun demande une personne pour une étape, souvent une vérification : nous remplissons le formulaire, vous passez la vérification et envoyez."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "%lld te necesitan. Pasaron a tu cola como tareas semiautomáticas o guiadas."
+      "value": "%lld pasaron a semiautomático. Cada uno necesita a una persona para un paso, normalmente una verificación: rellenamos el formulario, tú superas la verificación y lo envías."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "%lld brauchen Sie. Sie sind in Ihrer Warteschlange jetzt halbautomatische oder geführte Aufgaben."
+      "value": "%lld wurden in halbautomatisch verschoben. Jede braucht für einen Schritt einen Menschen, meist eine Prüfung: Wir füllen das Formular aus, Sie bestehen die Prüfung und senden."
      }
     }
    }
@@ -1055,6 +1055,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld von %lld Seiten sind durchgegangen"
+     }
+    }
+   }
+  },
+  "%lld of %lld sites. It sends every request it can without you, in the background. You can leave the app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sites sur %lld. Elle envoie en arrière-plan toutes les demandes possibles sans vous. Vous pouvez quitter l'app."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld de %lld sitios. Envía en segundo plano todas las solicitudes que puede sin ti. Puedes salir de la app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld von %lld Seiten. Sie sendet im Hintergrund jede Anfrage, die ohne Sie geht. Sie können die App verlassen."
      }
     }
    }
@@ -9339,6 +9362,29 @@
     }
    }
   },
+  "Find a site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trouver un site"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Buscar un sitio"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Seite suchen"
+     }
+    }
+   }
+  },
   "Find the current opt-out page": {
    "extractionState": "manual",
    "localizations": {
@@ -10006,6 +10052,29 @@
     }
    }
   },
+  "Getting started": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pour commencer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Para empezar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Erste Schritte"
+     }
+    }
+   }
+  },
   "Ghost": {
    "extractionState": "manual",
    "localizations": {
@@ -10117,6 +10186,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Zurück zum gespeicherten Link"
+     }
+    }
+   }
+  },
+  "Go to the semi-automated queue": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aller à la file semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ir a la cola semiautomática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zur halbautomatischen Warteschlange"
      }
     }
    }
@@ -11570,6 +11662,29 @@
     }
    }
   },
+  "It sends every request it can without you, in the background, and carries on where it stopped whenever the app is open.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Elle envoie en arrière-plan toutes les demandes possibles sans vous, et reprend là où elle s'est arrêtée dès que l'app est ouverte."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envía en segundo plano todas las solicitudes que puede sin ti y continúa donde se detuvo cada vez que la app está abierta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie sendet im Hintergrund jede Anfrage, die ohne Sie geht, und macht dort weiter, wo sie aufgehört hat, sobald die App offen ist."
+     }
+    }
+   }
+  },
   "It shows one step at a time. Tap Copy to copy your details, paste them into the site, then tap Next step.": {
    "extractionState": "manual",
    "localizations": {
@@ -11915,6 +12030,29 @@
     }
    }
   },
+  "Last run %@: sent %lld of %lld": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernier passage %@ : %lld envoyés sur %lld"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Última ejecución %@: %lld enviados de %lld"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Letzter Lauf %@: %lld von %lld gesendet"
+     }
+    }
+   }
+  },
   "Last run: %@": {
    "extractionState": "manual",
    "localizations": {
@@ -11938,25 +12076,25 @@
     }
    }
   },
-  "Last run: %lld of %lld went through, %lld need you": {
+  "Last run: %lld of %lld went through, %lld moved to semi-automatic": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Dernière exécution : %lld sur %lld ont abouti, %lld ont besoin de vous"
+      "value": "Dernier passage : %lld sur %lld ont abouti, %lld passés en semi-automatique"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Última ejecución: %lld de %lld se completaron, %lld te necesitan"
+      "value": "Última ejecución: %lld de %lld se enviaron, %lld pasaron a semiautomático"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Letzter Durchlauf: %lld von %lld durchgegangen, %lld brauchen Sie"
+      "value": "Letzter Lauf: %lld von %lld gingen durch, %lld in halbautomatisch verschoben"
      }
     }
    }
@@ -12049,6 +12187,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Zuletzt gesendet am %@. Zu wiederholen etwa am %@."
+     }
+    }
+   }
+  },
+  "Later": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Plus tard"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Más tarde"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Später"
      }
     }
    }
@@ -13801,6 +13962,29 @@
     }
    }
   },
+  "Moved to semi-automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Passés en semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pasados a semiautomático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In halbautomatisch verschoben"
+     }
+    }
+   }
+  },
   "Moving through the legislature, not law yet: %@. %@": {
    "extractionState": "manual",
    "localizations": {
@@ -14882,6 +15066,29 @@
     }
    }
   },
+  "No site matches.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun site ne correspond."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ningún sitio coincide."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Keine Seite passt."
+     }
+    }
+   }
+  },
   "No, it is finished": {
    "extractionState": "manual",
    "localizations": {
@@ -15181,6 +15388,75 @@
     }
    }
   },
+  "Not tried": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas essayés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin probar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht versucht"
+     }
+    }
+   }
+  },
+  "Not tried or skipped": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas essayés ou ignorés"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sin probar u omitidos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht versucht oder übersprungen"
+     }
+    }
+   }
+  },
+  "Not tried yet this period": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas encore essayé cette période"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún sin probar en este periodo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In diesem Zeitraum noch nicht versucht"
+     }
+    }
+   }
+  },
   "Not working": {
    "extractionState": "manual",
    "localizations": {
@@ -15365,6 +15641,29 @@
     }
    }
   },
+  "Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Plus rien pour Lancer maintenant cette période : ce qui a abouti est fait, et le reste est dans votre file semi-automatique. Tout retester essaie de nouveau chaque site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No queda nada para Ejecutar ahora en este periodo: lo que se envió está hecho y lo que no está en tu cola semiautomática. Volver a probar todo prueba de nuevo cada sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für Jetzt starten bleibt in diesem Zeitraum nichts: Was durchging, ist erledigt, der Rest ist in Ihrer halbautomatischen Warteschlange. Alle erneut testen probiert jede Seite noch einmal."
+     }
+    }
+   }
+  },
   "Nothing left to verify": {
    "extractionState": "manual",
    "localizations": {
@@ -15453,6 +15752,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nichts übersprungen. Seiten, die du zurückstellst, erscheinen hier."
+     }
+    }
+   }
+  },
+  "Nothing to do on this page. These sites need a person for one step, usually a check, so they are in your semi-automated queue: we fill in each form, you clear the check and send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien à faire sur cette page. Ces sites demandent une personne pour une étape, souvent une vérification : ils sont donc dans votre file semi-automatique. Nous remplissons chaque formulaire, vous passez la vérification et envoyez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nada que hacer en esta página. Estos sitios necesitan a una persona para un paso, normalmente una verificación, así que están en tu cola semiautomática: rellenamos cada formulario, tú superas la verificación y lo envías."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Auf dieser Seite ist nichts zu tun. Diese Seiten brauchen für einen Schritt einen Menschen, meist eine Prüfung, deshalb sind sie in Ihrer halbautomatischen Warteschlange: Wir füllen jedes Formular aus, Sie bestehen die Prüfung und senden."
      }
     }
    }
@@ -17044,6 +17366,29 @@
     }
    }
   },
+  "Opens when step 1 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "S'ouvre quand l'étape 1 est terminée. Nous savons alors quels sites ont besoin de vous pour une étape, comme une vérification : nous remplissons chaque formulaire, vous passez la vérification et envoyez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se abre cuando termina el paso 1. Entonces sabremos qué sitios te necesitan para un paso, como una verificación: rellenamos cada formulario, tú superas la verificación y lo envías."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Öffnet sich, wenn Schritt 1 fertig ist. Dann wissen wir, welche Seiten Sie für einen Schritt brauchen, etwa eine Prüfung: Wir füllen jedes Formular aus, Sie bestehen die Prüfung und senden."
+     }
+    }
+   }
+  },
   "Opt out": {
    "extractionState": "manual",
    "localizations": {
@@ -18470,6 +18815,98 @@
     }
    }
   },
+  "Re-test all": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tout retester"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Volver a probar todo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle erneut testen"
+     }
+    }
+   }
+  },
+  "Re-test every site": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retester tous les sites"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Volver a probar todos los sitios"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten erneut testen"
+     }
+    }
+   }
+  },
+  "Re-test every site now": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retester tous les sites maintenant"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Volver a probar todos los sitios ahora"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten jetzt erneut testen"
+     }
+    }
+   }
+  },
+  "Re-test every site now?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Retester tous les sites maintenant ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Volver a probar todos los sitios ahora?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten jetzt erneut testen?"
+     }
+    }
+   }
+  },
   "Reaches %lld registered brokers, %lld of the sites in this app": {
    "extractionState": "manual",
    "localizations": {
@@ -19436,6 +19873,29 @@
     }
    }
   },
+  "Run now tries the %lld sites still to do this period. Re-test all tries every site again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lancer maintenant essaie les %lld sites qui restent à faire cette période. Tout retester essaie de nouveau chaque site."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ejecutar ahora prueba los %lld sitios que quedan por hacer en este periodo. Volver a probar todo prueba de nuevo cada sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jetzt starten probiert die %lld Seiten, die in diesem Zeitraum noch offen sind. Alle erneut testen probiert jede Seite noch einmal."
+     }
+    }
+   }
+  },
   "Safari has no built-in switch, so use one of those browsers for everyday browsing.": {
    "extractionState": "manual",
    "localizations": {
@@ -19570,6 +20030,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Suchläufe laufen täglich, Anfragen wöchentlich, bei geöffneter App oder wenn iOS es im Hintergrund erlaubt. Sie löst nie ein CAPTCHA und akzeptiert nie Bedingungen ohne Ihre gesonderte Zustimmung. Tragen Sie sich selbst aus, setzt sie ein einfaches Häkchen, dass Sie die betroffene Person sind. Familienprofile fragen immer die Person selbst."
+     }
+    }
+   }
+  },
+  "Screenshots of the last run": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Captures du dernier passage"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Capturas de la última ejecución"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bildschirmfotos des letzten Laufs"
      }
     }
    }
@@ -22219,6 +22702,29 @@
     }
    }
   },
+  "Start the semi-automated sites": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Commencer les sites semi-automatiques"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Empezar los sitios semiautomáticos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Halbautomatische Seiten starten"
+     }
+    }
+   }
+  },
   "State": {
    "extractionState": "manual",
    "localizations": {
@@ -22376,6 +22882,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Schritt %lld: %@"
+     }
+    }
+   }
+  },
+  "Step 1: automatic opt-out": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape 1 : désinscription automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso 1: exclusión automática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt 1: automatischer Widerspruch"
+     }
+    }
+   }
+  },
+  "Step 2: semi-automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Étape 2 : semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Paso 2: semiautomático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Schritt 2: halbautomatisch"
      }
     }
    }
@@ -25600,6 +26152,29 @@
     }
    }
   },
+  "This period: %@ to %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette période : du %@ au %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este periodo: del %@ al %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Zeitraum: %@ bis %@"
+     }
+    }
+   }
+  },
   "This searches each site for %@ the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.": {
    "extractionState": "manual",
    "localizations": {
@@ -25757,6 +26332,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Opt-out-Seite dieser Website war umgezogen. Wir haben die neue am %@ gefunden."
+     }
+    }
+   }
+  },
+  "This tries every site that can be tried, one after another in the background, and sends a request wherever a form goes through. It can take a long while. Anything that does not go through moves to your semi-automated queue.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cela essaie tous les sites qui peuvent l'être, l'un après l'autre en arrière-plan, et envoie une demande partout où le formulaire aboutit. Cela peut prendre beaucoup de temps. Tout ce qui n'aboutit pas passe dans votre file semi-automatique."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esto prueba todos los sitios que se pueden probar, uno tras otro en segundo plano, y envía una solicitud donde el formulario se envía correctamente. Puede tardar mucho. Lo que no se complete pasa a tu cola semiautomática."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dabei wird jede Seite, die sich versuchen lässt, nacheinander im Hintergrund probiert, und überall, wo das Formular durchgeht, wird eine Anfrage gesendet. Das kann lange dauern. Was nicht durchgeht, kommt in Ihre halbautomatische Warteschlange."
      }
     }
    }
@@ -28728,6 +29326,29 @@
     }
    }
   },
+  "Working in the background: %lld of %lld sites. You can leave this screen.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "En cours en arrière-plan : %lld sites sur %lld. Vous pouvez quitter cet écran."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Trabajando en segundo plano: %lld de %lld sitios. Puedes salir de esta pantalla."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Läuft im Hintergrund: %lld von %lld Seiten. Sie können diesen Bildschirm verlassen."
+     }
+    }
+   }
+  },
   "Working…": {
    "extractionState": "manual",
    "localizations": {
@@ -29782,6 +30403,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie versprechen, die Kosten der Website zu tragen. Eine weit gefasste „Freistellungs“-Klausel besagt, dass Sie die Website, ihre Werbepartner und Partner von jeder Forderung freistellen, die aus Ihrer Nutzung der Website oder einem Verstoß gegen diese Bedingungen entsteht."
+     }
+    }
+   }
+  },
+  "You set it aside": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous l'avez mis de côté"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Lo dejaste a un lado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Von Ihnen zurückgestellt"
      }
     }
    }

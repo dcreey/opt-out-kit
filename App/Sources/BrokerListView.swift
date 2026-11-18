@@ -38,7 +38,40 @@ struct BrokerListView: View {
                         Button("Erase saved data and start over", role: .destructive) { model.eraseAndStartOver() }
                     }
                 }
-                if model.autoBusy == "optout" {
+                let waiting = model.waitingForFirstPass
+                if waiting {
+                    // A new person: the automatic pass goes first, and the semi-automated queue opens when it is done, because only then is it known
+                    // which sites need a person for one step.
+                    Section {
+                        NavigationLink { AutoActivityView() } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Label("Step 1: automatic opt-out", systemImage: "bolt.fill").font(.headline)
+                                if model.autoBusy == "optout", let p = model.autoProgress {
+                                    ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                                    Text("\(p.done) of \(p.total) sites. It sends every request it can without you, in the background. You can leave the app.")
+                                        .font(.footnote).foregroundStyle(.secondary)
+                                } else if model.autoBusy == "optout" {
+                                    ProgressView()
+                                } else {
+                                    Text("It sends every request it can without you, in the background, and carries on where it stopped whenever the app is open.")
+                                        .font(.footnote).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .accessibilityIdentifier("home-auto-working")
+                        if model.autoBusy == nil {
+                            Button { model.runAutomaticNow() } label: { Label("Start", systemImage: "play.fill") }.accessibilityIdentifier("first-pass-start")
+                        }
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label("Step 2: semi-automatic", systemImage: "hand.point.up.left").font(.headline).foregroundStyle(.secondary)
+                            Text("Opens when step 1 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("first-pass-step2")
+                    } header: { Text("Getting started") }
+                }
+                if model.autoBusy == "optout" && !waiting {
                     Section {
                         // Tapping it opens the status of the run: what is done and what needs you.
                         NavigationLink { AutoActivityView() } label: {
@@ -113,7 +146,9 @@ struct BrokerListView: View {
                     } header: { Text("One-time setting") }
                 }
                 let goals = model.dailyGoals
-                if model.needsKindChoice {
+                if waiting {
+                    EmptyView()          // the semi-automated queue opens when the first pass has finished
+                } else if model.needsKindChoice {
                     // Every day opens on one question: which kind of broker to tackle.
                     Section {
                         ForEach(Array(model.remainingKinds.enumerated()), id: \.element.kind) { index, item in
@@ -141,10 +176,10 @@ struct BrokerListView: View {
                         }.accessibilityIdentifier("skipped-reminder")
                     }
                 }
-                if !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
+                if !waiting, !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
                     if case .platform = t.kind { return !model.isDone(t) }
-                    return t.kind == .automatic && !model.isDone(t) && !model.autoOptOutStarted
+                    return t.kind == .automatic && !model.isDone(t) && !model.autoOptOutStarted && !waiting
                 }
                 if !firstTasks.isEmpty {
                     Section {
