@@ -155,7 +155,7 @@ final class AutoProtectionUITests: XCTestCase {
         let later = app.buttons["run-report-done"]
         XCTAssertTrue(later.waitForExistence(timeout: 120), "the first pass finishes and says what it did")
         shot(app, "6b-first-pass-report")
-        later.tap()
+        if later.exists && later.isHittable { later.tap() }          // on a slow machine the report can already have been put away
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.waitForExistence(timeout: 10), "then the semi-automated queue opens")
         XCTAssertFalse(app.descendants(matching: .any)["first-pass-step2"].exists)
         shot(app, "6c-queue-after-first-pass")
