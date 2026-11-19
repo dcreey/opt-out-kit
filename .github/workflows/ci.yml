@@ -205,29 +205,6 @@ jobs:
         with:
           name: test-products
           path: DerivedData/Build/Products
-      - name: Boot shard 0's simulator now that the build is handed over
-        if: matrix.index == 0
-        run: nohup sh -c "xcrun simctl boot $SIM_UDID; xcrun simctl bootstatus $SIM_UDID -b; date +%s > $RUNNER_TEMP/simready" > $RUNNER_TEMP/simboot.log 2>&1 &
-      - name: Wait for shard 0's build (the simulator boots meanwhile; this shard compiles nothing)
-        if: matrix.index != 0
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          API="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          for i in $(seq 1 180); do
-            n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/artifacts?name=test-products" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))' || echo 0)
-            [ "$n" -gt 0 ] && { echo "the build arrived after $(( $(date +%s) - JOB_START )) s"; exit 0; }
-            gone=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/jobs?per_page=30" | python3 -c 'import json,sys; print(any(j["name"] == "Unit tests 0" and j["status"] == "completed" for j in json.load(sys.stdin)["jobs"]))' || echo False)
-            [ "$gone" = True ] && { echo "::error::shard 0 ended without handing over its build"; exit 1; }
-            sleep 5
-          done
-          echo "::error::no build from shard 0 after 15 minutes"; exit 1
-      - name: Download the build
-        if: matrix.index != 0
-        uses: actions/download-artifact@v4
-        with:
-          name: test-products
-          path: DerivedData/Build/Products
       - name: Leave the logs out of the build folder the post step saves (so the cache does not grow)
         if: always() && matrix.index == 0
         run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData
