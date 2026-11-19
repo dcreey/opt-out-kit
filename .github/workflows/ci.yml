@@ -102,6 +102,10 @@ jobs:
           echo "${{ steps.files.outputs.list }}" > OptOutKit.xcodeproj/.files
       - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
         run: python3 tools/ci_restore_mtimes.py
+      - name: Pin the packages for Xcode (the committed lockfile; the build then resolves nothing over the network)
+        run: |
+          mkdir -p OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          cp Packages/OptOutKitCore/Package.resolved OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
       - name: Restore the app's build folder
         id: dd
         uses: actions/cache/restore@v4
@@ -115,6 +119,7 @@ jobs:
           # At lower priority, so the simulator still booting gets the processor first (these machines have three cores).
           nice -n 10 xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
+            -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
           echo "::notice title=Build::$(grep -cE '^SwiftCompile ' build.log || true) Swift files compiled (cache: ${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }})"
       - name: Keep the build folder for the next run (one shard saves it, without logs, so it does not grow)
@@ -163,8 +168,8 @@ jobs:
       - name: Package tests (OptOutKitCore, and AssistedRunLogic, the assisted run's state machine)
         if: matrix.index == 0 && !cancelled()
         run: |
-          (cd Packages/OptOutKitCore && swift test)
-          (cd Packages/AssistedRunLogic && swift test)
+          (cd Packages/OptOutKitCore && swift test --disable-automatic-resolution)
+          (cd Packages/AssistedRunLogic && swift test --disable-automatic-resolution)
       - name: Keep the packages' build folders for the next run
         if: matrix.index == 0 && !cancelled() && steps.spm.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4

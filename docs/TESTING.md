@@ -33,7 +33,10 @@ bundle as an artifact for a week.
 Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved without its logs so it does not grow), the two packages'
 `.build` folders, the generated Xcode project (XcodeGen runs only when `project.yml` or the list of files changed: the project carries a hash of the file
 list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). The checkout fetches the last 100
-commits, which is enough for the file times. Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
+commits, which is enough for the file times. The packages' `Package.resolved` files are committed: they pin Yams, and the CI build copies the core package's into the
+generated project and builds with `-disableAutomaticPackageResolution` (no package resolution over the network), `-skipPackagePluginValidation` and
+`-skipMacroValidation`; `swift test` runs with `--disable-automatic-resolution`. Code signing stays on (ad hoc): the app's encryption key lives in the
+Keychain, which needs a signed app on the simulator. Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
 gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
 changed since the cached build is compiled (a notice says how many Swift files were). The caches are keyed by the Xcode version and the sources, so a new
 Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have

@@ -4,7 +4,7 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 *.xcodeproj
-Package.resolved
+# Package.resolved is committed (Packages/*/Package.resolved): it pins Yams, and CI builds from it without resolving packages over the network.
 App/Info.plist
 .profile-cache/
 .search-cache/
