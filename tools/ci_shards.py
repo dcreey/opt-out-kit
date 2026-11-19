@@ -92,6 +92,22 @@ def failures_from_log(text):
     return lines
 
 
+STEP = re.compile(r"^(.+?) \((\d+) tasks?\) \| (\d+(?:\.\d+)?) seconds$", re.M)
+
+
+def build_summary(text, cache="", folder=None):
+    """One notice from an xcodebuild log built with -showBuildTimingSummary: the slowest kinds of step, the Swift files compiled, the cache used and the
+    build folder's size, so a run shows where its build time went."""
+    steps = sorted(((float(sec), name, int(n)) for name, n, sec in STEP.findall(text)), reverse=True)
+    compiled = len(re.findall(r"^SwiftCompile normal ", text, re.M))          # not the summary's own "SwiftCompile (n tasks)" line
+    top = ", ".join(f"{name} {sec:.0f} s ({n})" for sec, name, n in steps[:6]) or "no timing summary"
+    size = ""
+    if folder and os.path.isdir(folder):
+        total = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(folder) for f in fs if not os.path.islink(os.path.join(r, f)))
+        size = f"; build folder {total / 1e6:.0f} MB"
+    return f"::notice title=Build::{compiled} Swift files compiled (cache: {cache or '?'}){size}. Slowest: {top}"
+
+
 def load_timings():
     return json.load(open(TIMINGS)) if os.path.exists(TIMINGS) else {}
 
@@ -115,9 +131,11 @@ def main():
     ap.add_argument("--shards", type=int); ap.add_argument("--index", type=int)
     ap.add_argument("--list", action="store_true"); ap.add_argument("--skip", action="append", default=[])
     ap.add_argument("--reserve", action="append", default=[], help="SHARD:SECONDS of other work on that shard")
+    ap.add_argument("--build-summary"); ap.add_argument("--cache", default=""); ap.add_argument("--folder")
     ap.add_argument("--timings-from-log"); ap.add_argument("--failures-from-log"); ap.add_argument("--fetch-run")
     a = ap.parse_args()
     if a.timings_from_log: print(json.dumps(timings_from_log(open(a.timings_from_log, errors="replace").read()), sort_keys=True, separators=(",", ":"))); return
+    if a.build_summary: print(build_summary(open(a.build_summary, errors="replace").read(), a.cache, a.folder)); return
     if a.failures_from_log: print("\n".join(failures_from_log(open(a.failures_from_log, errors="replace").read()))); return
     if a.fetch_run: fetch_run(a.fetch_run); return
     if not a.shards: sys.exit("--shards is required")

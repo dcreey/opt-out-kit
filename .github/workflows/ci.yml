@@ -59,6 +59,7 @@ jobs:
           sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
           xcodebuild -version
           echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+          echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"          # the build-folder cache starts afresh each week, so it never grows
           UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
           echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
           echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
@@ -111,17 +112,18 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: DerivedData
-          key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('project.yml', 'App/**', 'Shared/**', 'ShareExtension/**', 'AppTests/**', 'AppUITests/**', 'Packages/**/Sources/**', 'brokers/**', 'directory/**', 'platforms/**', 'jurisdictions/**', 'terms/**') }}
-          restore-keys: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
+          key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-${{ hashFiles('project.yml', 'App/**', 'Shared/**', 'ShareExtension/**', 'AppTests/**', 'AppUITests/**', 'Packages/**/Sources/**', 'brokers/**', 'directory/**', 'platforms/**', 'jurisdictions/**', 'terms/**') }}
+          restore-keys: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-
       - name: Build the app and its tests (while the simulator boots)
         run: |
           set -o pipefail
           # At lower priority, so the simulator still booting gets the processor first (these machines have three cores).
           nice -n 10 xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
-            -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation \
+            -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation -showBuildTimingSummary \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
-          echo "::notice title=Build::$(grep -cE '^SwiftCompile ' build.log || true) Swift files compiled (cache: ${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }})"
+          # Where the build's time went (the slowest kinds of step), how much it compiled, and how big the build folder is.
+          python3 tools/ci_shards.py --build-summary build.log --cache "${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }}" --folder DerivedData
       - name: Keep the build folder for the next run (one shard saves it, without logs, so it does not grow)
         if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
         run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData

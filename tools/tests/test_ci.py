@@ -71,6 +71,15 @@ class Failures(unittest.TestCase):
         self.assertEqual(S.failures_from_log("Test Case '-[A.B testC]' passed (1.0 seconds)."), [])
 
 
+class BuildSummary(unittest.TestCase):
+    def test_the_slowest_steps_and_the_files_compiled_are_reported(self):
+        log = ("SwiftCompile normal arm64 /x/A.swift\nSwiftCompile normal arm64 /x/B.swift\nBuild Timing Summary\n\n"
+               "SwiftCompile (2 tasks) | 2.387 seconds\n\nCodeSign (3 tasks) | 0.264 seconds\n\nLd (1 task) | 9.5 seconds\n")
+        line = S.build_summary(log, "exact")
+        self.assertTrue(line.startswith("::notice title=Build::2 Swift files compiled (cache: exact)"))
+        self.assertIn("Slowest: Ld 10 s (1), SwiftCompile 2 s (2), CodeSign 0 s (3)", line)
+
+
 class FileTimes(unittest.TestCase):
     def test_files_get_their_last_commits_time(self):
         with tempfile.TemporaryDirectory() as d:
