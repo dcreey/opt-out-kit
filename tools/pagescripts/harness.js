@@ -4,7 +4,7 @@
 // jsdom has no layout, so the few things the scripts read from layout are stood in for here, from the page's own markup:
 //   - getBoundingClientRect / offsetParent: zero size for an element (or an ancestor) that is display:none, visibility:hidden, [hidden], or has an
 //     inline width or height of 0; an element placed off screen (an inline left or top below -1000, as bot traps are) gets that position.
-//     Everything else is 200 x 30 at the top left.
+//     A frame is 300 x 150 (or its width and height attributes); everything else is 200 x 30 at the top left.
 //   - innerText: the text of what is shown (hidden elements, <script> and <style> left out), with blocks on their own lines.
 //   - scrollIntoView, scrollTo, scrollBy: recorded, nothing moves.
 //   - webkit.messageHandlers.<name>.postMessage: recorded.
@@ -53,7 +53,11 @@ function install(window) {
   window.Element.prototype.getBoundingClientRect = function () {
     if (hidden(this)) return { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
     const o = offset(this);
-    return { x: o.x, y: o.y, top: o.y, left: o.x, right: o.x + 200, bottom: o.y + 30, width: 200, height: 30 };
+    // A frame is 300 x 150 unless told otherwise, as in a browser (the scripts ignore frames under 40 pixels: tracking pixels, the badge).
+    const st = this.style || {};
+    const w = this.tagName === 'IFRAME' ? (parseFloat(st.width) || +this.getAttribute('width') || 300) : 200;
+    const h = this.tagName === 'IFRAME' ? (parseFloat(st.height) || +this.getAttribute('height') || 150) : 30;
+    return { x: o.x, y: o.y, top: o.y, left: o.x, right: o.x + w, bottom: o.y + h, width: w, height: h };
   };
   Object.defineProperty(window.HTMLElement.prototype, 'offsetParent', { configurable: true, get() { return hidden(this) ? null : (this.parentElement || doc.body); } });
   Object.defineProperty(window.HTMLElement.prototype, 'offsetWidth', { configurable: true, get() { return hidden(this) ? 0 : 200; } });
