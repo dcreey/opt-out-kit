@@ -53,9 +53,7 @@ jobs:
       matrix:
         index: [0, 1, 2, 3, 4]          # keep in step with SHARDS
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }          # the full history, for the file times below
-      - name: Use the newest Xcode, and start booting a simulator now (it takes about 2 minutes; the build runs meanwhile)
+      - name: Start booting a simulator first (the steps after it mostly wait on the network, so the boot gets the processor)
         id: xcode
         run: |
           sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
@@ -63,22 +61,45 @@ jobs:
           echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
           UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
           echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
-          nohup xcrun simctl boot "$UDID" > simboot.log 2>&1 &
+          echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+          # Boots in the background and notes when it is ready (reported in a notice below).
+          nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > $RUNNER_TEMP/simboot.log 2>&1 &
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 100 }          # recent history is enough for the file times below
+      - name: Restore the generated project (XcodeGen runs only when project.yml or the list of files changed)
+        id: xcproj
+        uses: actions/cache@v4
+        with:
+          path: |
+            OptOutKit.xcodeproj
+            App/Info.plist
+            ShareExtension/Info.plist
+          key: xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles('project.yml') }}-${{ hashFiles('.github/workflows/ci.yml') }}-${{ github.sha }}
+          restore-keys: xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles('project.yml') }}-
+      - name: Check the restored project matches this commit's files
+        id: files
+        run: |
+          LIST=$(git ls-files | shasum | cut -c1-16)
+          if [ -f OptOutKit.xcodeproj/.files ] && [ "$(cat OptOutKit.xcodeproj/.files)" = "$LIST" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; else echo "same=false" >> "$GITHUB_OUTPUT"; fi
+          echo "list=$LIST" >> "$GITHUB_OUTPUT"
       - name: Restore XcodeGen
+        if: steps.files.outputs.same != 'true'
         id: xcodegen
         uses: actions/cache@v4
         with:
           path: ~/xcodegen
           key: xcodegen-${{ env.XCODEGEN_VERSION }}
       - name: Download XcodeGen (only when it is not cached; brew is slow on these machines)
-        if: steps.xcodegen.outputs.cache-hit != 'true'
+        if: steps.files.outputs.same != 'true' && steps.xcodegen.outputs.cache-hit != 'true'
         run: |
           curl -fsSL -o /tmp/xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODEGEN_VERSION/xcodegen.zip"
           mkdir -p ~/xcodegen && unzip -q /tmp/xcodegen.zip -d ~/xcodegen
       - name: Generate the project
+        if: steps.files.outputs.same != 'true'
         run: |
           XG=$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)
           "$XG" --version && "$XG" generate
+          echo "${{ steps.files.outputs.list }}" > OptOutKit.xcodeproj/.files
       - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
         run: python3 tools/ci_restore_mtimes.py
       - name: Restore the app's build folder
@@ -91,18 +112,24 @@ jobs:
       - name: Build the app and its tests (while the simulator boots)
         run: |
           set -o pipefail
-          xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
+          # At lower priority, so the simulator still booting gets the processor first (these machines have three cores).
+          nice -n 10 xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
           echo "::notice title=Build::$(grep -cE '^SwiftCompile ' build.log || true) Swift files compiled (cache: ${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }})"
-      - name: Keep the build folder for the next run (one shard saves it)
+      - name: Keep the build folder for the next run (one shard saves it, without logs, so it does not grow)
         if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
+        run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData
+      - if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: DerivedData
           key: ${{ steps.dd.outputs.cache-primary-key }}
       - name: Wait for the simulator
-        run: xcrun simctl bootstatus "$SIM_UDID" -b || { cat simboot.log; exit 1; }
+        run: |
+          xcrun simctl bootstatus "$SIM_UDID" -b || { cat $RUNNER_TEMP/simboot.log; exit 1; }
+          while [ ! -f $RUNNER_TEMP/simready ]; do sleep 1; done
+          echo "::notice title=Simulator::ready $(( $(cat $RUNNER_TEMP/simready) - JOB_START )) s after the job started; tests start $(( $(date +%s) - JOB_START )) s in"
       - name: Run this shard
         shell: bash
         run: |

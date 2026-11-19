@@ -3,7 +3,8 @@
 
 A fresh checkout gives every file the time of the checkout, so Xcode and SwiftPM, which decide what to rebuild by file times, would rebuild
 everything even with last run's build folder restored from the cache. With the commit times, only files changed since that build are rebuilt.
-Needs the full history (actions/checkout with fetch-depth: 0). Files with changes not yet committed keep their own time.
+Works on a shallow checkout (CI fetches the last 100 commits): a file not changed in that window gets the oldest commit's time, which is older than any
+build made from those commits. Files with changes not yet committed keep their own time.
 
   ci_restore_mtimes.py            every tracked file
   ci_restore_mtimes.py --check    print how many files it would set, change nothing
@@ -21,6 +22,10 @@ def main():
     for line in log.splitlines():
         if line.startswith("@"): when = int(line[1:])
         elif line and line in tracked and line not in seen: seen[line] = when
+    # Not changed in the commits fetched: older than all of them.
+    oldest = min(seen.values()) if seen else None
+    for path in tracked:
+        if path not in seen and oldest is not None: seen[path] = oldest
     done = 0
     for path, t in seen.items():
         if path in dirty or not os.path.isfile(path): continue

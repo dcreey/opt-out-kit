@@ -86,6 +86,23 @@ class FileTimes(unittest.TestCase):
             self.assertEqual(int(os.path.getmtime(os.path.join(d, "a.txt"))), 978307200, "set to its commit's time")
             self.assertGreater(os.path.getmtime(os.path.join(d, "b.txt")), 978307200)
 
+    def test_a_shallow_checkout_gives_files_not_changed_in_it_the_oldest_time(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, dst = os.path.join(d, "src"), os.path.join(d, "dst")
+            os.mkdir(src)
+            git = lambda where, *a, **k: subprocess.run(["git", "-C", where, *a], check=True, capture_output=True, **k)
+            git(src, "init", "-q"); git(src, "config", "user.email", "t@example.com"); git(src, "config", "user.name", "t")
+            for i, name in enumerate(["old.txt", "mid.txt", "new.txt"]):
+                open(os.path.join(src, name), "w").write(name)
+                when = f"200{i + 1}-01-01T00:00:00Z"
+                git(src, "add", "."); git(src, "commit", "-qm", name, env=dict(os.environ, GIT_COMMITTER_DATE=when, GIT_AUTHOR_DATE=when))
+            subprocess.run(["git", "clone", "-q", "--depth", "2", "file://" + src, dst], check=True, capture_output=True)
+            script = os.path.abspath(os.path.join(ROOT, "tools", "ci_restore_mtimes.py"))
+            subprocess.run([sys.executable, script], cwd=dst, check=True, capture_output=True)
+            t = lambda n: int(os.path.getmtime(os.path.join(dst, n)))
+            self.assertLess(t("old.txt"), t("new.txt"), "a file older than the fetched commits is not taken as new")
+            self.assertLessEqual(t("old.txt"), t("mid.txt"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,7 +18,7 @@ contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the
 | Job | Machine | What it runs |
 |---|---|---|
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
-| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator at once, builds the app and both test targets from the cached build folder while it boots, then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
+| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator before anything else (checkout and cache downloads mostly wait on the network, so the boot gets the processor), builds the app and both test targets from the cached build folder at lower priority (`nice`) while it boots, then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic`. A notice says when the simulator was ready and when the tests started |
 
 `tools/ci_shards.py` shares the tests out so the 5 shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
 class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
@@ -30,8 +30,10 @@ wherever it lands, a shard with other work gets less, failures become annotation
 most 5 macOS jobs at once, which is why there are 5 shards and no separate build job: nothing waits for a free machine. A failing shard keeps its result
 bundle as an artifact for a week.
 
-Between runs it keeps three things in GitHub's cache: the app's build folder (`DerivedData`), the two packages' `.build` folders, and XcodeGen (downloaded
-from its release rather than installed with Homebrew, which is slow there). Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
+Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved without its logs so it does not grow), the two packages'
+`.build` folders, the generated Xcode project (XcodeGen runs only when `project.yml` or the list of files changed: the project carries a hash of the file
+list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). The checkout fetches the last 100
+commits, which is enough for the file times. Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
 gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
 changed since the cached build is compiled (a notice says how many Swift files were). The caches are keyed by the Xcode version and the sources, so a new
 Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have
