@@ -22,8 +22,9 @@ env:
   KNOWN_FAILING: ""
   # GitHub's free plan runs at most 5 macOS jobs at once: the test shards are 5, each a mix of unit and UI tests balanced by measured time.
   SHARDS: 5
-  # Shard 0 also runs the two Swift packages' tests (about this long on these machines), so it is given that much less of the app's tests.
-  PACKAGES_SECONDS: 120
+  # Shard 0 builds the app for every shard (the others wait for it meanwhile, booting their simulators) and also runs the two Swift packages' tests
+  # (about this long on these machines), so it is given that much less of the app's tests.
+  PACKAGES_SECONDS: 170
 
 jobs:
   checks:
@@ -48,6 +49,9 @@ jobs:
     name: Tests ${{ matrix.index }}
     runs-on: macos-26
     timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read          # shards 1 to 4 look up shard 0's build in this run
     strategy:
       fail-fast: false
       matrix:
@@ -66,8 +70,10 @@ jobs:
           # Boots in the background and notes when it is ready (reported in a notice below).
           nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > $RUNNER_TEMP/simboot.log 2>&1 &
       - uses: actions/checkout@v4
-        with: { fetch-depth: 100 }          # recent history is enough for the file times below
+        with:
+          fetch-depth: ${{ matrix.index == 0 && 100 || 1 }}          # shard 0 builds and needs recent history for the file times; the others only test
       - name: Restore the generated project (XcodeGen runs only when project.yml or the list of files changed)
+        if: matrix.index == 0
         id: xcproj
         uses: actions/cache@v4
         with:
@@ -78,52 +84,89 @@ jobs:
           key: xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles('project.yml') }}-${{ hashFiles('.github/workflows/ci.yml') }}-${{ github.sha }}
           restore-keys: xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles('project.yml') }}-
       - name: Check the restored project matches this commit's files
+        if: matrix.index == 0
         id: files
         run: |
           LIST=$(git ls-files | shasum | cut -c1-16)
           if [ -f OptOutKit.xcodeproj/.files ] && [ "$(cat OptOutKit.xcodeproj/.files)" = "$LIST" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; else echo "same=false" >> "$GITHUB_OUTPUT"; fi
           echo "list=$LIST" >> "$GITHUB_OUTPUT"
       - name: Restore XcodeGen
-        if: steps.files.outputs.same != 'true'
+        if: matrix.index == 0 && steps.files.outputs.same != 'true'
         id: xcodegen
         uses: actions/cache@v4
         with:
           path: ~/xcodegen
           key: xcodegen-${{ env.XCODEGEN_VERSION }}
       - name: Download XcodeGen (only when it is not cached; brew is slow on these machines)
-        if: steps.files.outputs.same != 'true' && steps.xcodegen.outputs.cache-hit != 'true'
+        if: matrix.index == 0 && steps.files.outputs.same != 'true' && steps.xcodegen.outputs.cache-hit != 'true'
         run: |
           curl -fsSL -o /tmp/xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODEGEN_VERSION/xcodegen.zip"
           mkdir -p ~/xcodegen && unzip -q /tmp/xcodegen.zip -d ~/xcodegen
       - name: Generate the project
-        if: steps.files.outputs.same != 'true'
+        if: matrix.index == 0 && steps.files.outputs.same != 'true'
         run: |
           XG=$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)
           "$XG" --version && "$XG" generate
           echo "${{ steps.files.outputs.list }}" > OptOutKit.xcodeproj/.files
       - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
+        if: matrix.index == 0
         run: python3 tools/ci_restore_mtimes.py
       - name: Pin the packages for Xcode (the committed lockfile; the build then resolves nothing over the network)
+        if: matrix.index == 0
         run: |
           mkdir -p OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
           cp Packages/OptOutKitCore/Package.resolved OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+      - name: "Fingerprint the sources from git's own tree hashes (hashing every file took over two minutes and timed out)"
+        if: matrix.index == 0
+        id: src
+        run: echo "hash=$(git ls-tree HEAD project.yml App Shared ShareExtension AppTests AppUITests Packages brokers directory platforms jurisdictions terms | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"
       - name: Restore the app's build folder
+        if: matrix.index == 0
         id: dd
         uses: actions/cache/restore@v4
         with:
           path: DerivedData
-          key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-${{ hashFiles('project.yml', 'App/**', 'Shared/**', 'ShareExtension/**', 'AppTests/**', 'AppUITests/**', 'Packages/**/Sources/**', 'brokers/**', 'directory/**', 'platforms/**', 'jurisdictions/**', 'terms/**') }}
+          key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-${{ steps.src.outputs.hash }}
           restore-keys: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-
-      - name: Build the app and its tests (while the simulator boots)
+      - name: Build the app and its tests once, for every shard
+        if: matrix.index == 0
         run: |
           set -o pipefail
-          # At lower priority, so the simulator still booting gets the processor first (these machines have three cores).
-          nice -n 10 xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
+          xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
             -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation -showBuildTimingSummary \
+            ASSETCATALOG_COMPILER_APPICON_NAME= \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
+          # No app icon in the test build: rendering its variants took over three minutes on these machines (CI only; release builds keep it).
           # Where the build's time went (the slowest kinds of step), how much it compiled, and how big the build folder is.
           python3 tools/ci_shards.py --build-summary build.log --cache "${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }}" --folder DerivedData
+      - name: Hand the build to the other shards
+        if: matrix.index == 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-products
+          path: DerivedData/Build/Products
+          retention-days: 1
+      - name: Wait for shard 0's build (the simulator boots meanwhile; this shard compiles nothing)
+        if: matrix.index != 0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          API="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          for i in $(seq 1 180); do
+            n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/artifacts?name=test-products" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))' || echo 0)
+            [ "$n" -gt 0 ] && { echo "the build arrived after $(( $(date +%s) - JOB_START )) s"; exit 0; }
+            gone=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/jobs?per_page=30" | python3 -c 'import json,sys; print(any(j["name"] == "Tests 0" and j["status"] == "completed" for j in json.load(sys.stdin)["jobs"]))' || echo False)
+            [ "$gone" = True ] && { echo "::error::shard 0 ended without handing over its build"; exit 1; }
+            sleep 5
+          done
+          echo "::error::no build from shard 0 after 15 minutes"; exit 1
+      - name: Download the build
+        if: matrix.index != 0
+        uses: actions/download-artifact@v4
+        with:
+          name: test-products
+          path: DerivedData/Build/Products
       - name: Keep the build folder for the next run (one shard saves it, without logs, so it does not grow)
         if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
         run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData

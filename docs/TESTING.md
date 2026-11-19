@@ -18,7 +18,7 @@ contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the
 | Job | Machine | What it runs |
 |---|---|---|
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
-| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator before anything else (checkout and cache downloads mostly wait on the network, so the boot gets the processor), builds the app and both test targets from the cached build folder at lower priority (`nice`) while it boots, then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic`. A notice says when the simulator was ready and when the tests started |
+| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator before anything else. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 4 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic`. A notice says when the simulator was ready and when the tests started |
 
 `tools/ci_shards.py` shares the tests out so the 5 shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
 class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
@@ -27,7 +27,9 @@ from its number of tests, and shard 0 is given less to make room for the package
 tests change. Every failed test and its message is an annotation too, readable without logging in. Tests are read from the sources, so a new class needs
 no change to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that everything runs exactly once, a known-failing test is left out
 wherever it lands, a shard with other work gets less, failures become annotations, and the file times are set from the commits). The free plan runs at
-most 5 macOS jobs at once, which is why there are 5 shards and no separate build job: nothing waits for a free machine. A failing shard keeps its result
+most 5 macOS jobs at once, which is why there are 5 shards and the build is done by one of them rather than a sixth job: nothing waits for a free machine.
+Building once instead of in every shard was measured to matter: these machines have three cores, and five shards each compiling while their simulator
+booted slowed both (the tests started 8 to 9 minutes in). A failing shard keeps its result
 bundle as an artifact for a week.
 
 Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved without its logs, and started afresh each week so stale build products never pile up in it), the two packages'
@@ -35,7 +37,9 @@ Between runs it keeps four things in GitHub's cache: the app's build folder (`De
 list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). The checkout fetches the last 100
 commits, which is enough for the file times. The packages' `Package.resolved` files are committed: they pin Yams, and the CI build copies the core package's into the
 generated project and builds with `-disableAutomaticPackageResolution` (no package resolution over the network), `-skipPackagePluginValidation` and
-`-skipMacroValidation`; `swift test` runs with `--disable-automatic-resolution`. Code signing stays on (ad hoc): the app's encryption key lives in the
+`-skipMacroValidation`; `swift test` runs with `--disable-automatic-resolution`. The CI test build leaves out the app icon
+(`ASSETCATALOG_COMPILER_APPICON_NAME=`): rendering its appearance variants took over three minutes on those machines, and no test looks at it. The build
+cache's key comes from git's tree hashes of the source folders (hashing every file with `hashFiles` took over two minutes and timed out). Code signing stays on (ad hoc): the app's encryption key lives in the
 Keychain, which needs a signed app on the simulator. Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
 gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
 changed since the cached build is compiled. Each shard's build posts a notice with the Swift files it compiled, the cache it started from, the build
