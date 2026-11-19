@@ -45,6 +45,14 @@ class ReleaseGate(unittest.TestCase):
     def test_failed_unit_tests_stop_it_too(self):
         self.assertIn("ci.yml did not pass", G.check(SHA, False, True, api({"ci.yml": [run("failure")], "integration.yml": [run()]}))[0])
 
+    def test_testflight_needs_only_the_unit_tests(self):
+        """A GitHub release and Integration are for the App Store; TestFlight (the owner trying a build on a phone) needs only CI."""
+        self.assertEqual(G.check(SHA, False, True, api({"ci.yml": [run()]}), target="testflight"), [], "no Integration run: fine for TestFlight")
+        self.assertEqual(G.check(SHA, False, True, api({"ci.yml": [run()], "integration.yml": [run("failure")]}), target="testflight"), [])
+        self.assertIn("ci.yml did not pass", G.check(SHA, False, True, api({"ci.yml": [run("failure")]}), target="testflight")[0])
+        self.assertIn("uncommitted", G.check(SHA, True, True, api({"ci.yml": [run()]}), target="testflight")[0])
+        self.assertIn("integration.yml has not run", G.check(SHA, False, True, api({"ci.yml": [run()]}))[0], "the App Store is the default, and needs Integration")
+
 
 if __name__ == "__main__":
     unittest.main()

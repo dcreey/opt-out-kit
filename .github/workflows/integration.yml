@@ -1,8 +1,8 @@
 name: Integration
 
 # The integration tests: the app's UI tests, driving the real app on a simulator (unit tests run on every push: ci.yml). They run when a GitHub release
-# is published (the release is the build going to TestFlight or the App Store), when started by hand from the Actions tab, and the run over every
-# site also weekly. Sending is faked (-uitest-fake-submit): no broker site is contacted. docs/TESTING.md, "Unit and integration tests".
+# is published (a release is the app going to the App Store; TestFlight needs only ci.yml), when started by hand from the Actions tab, and the run over
+# every site also weekly. Sending is faked (-uitest-fake-submit): no broker site is contacted. docs/TESTING.md, "Unit and integration tests".
 on:
   release:
     types: [published]

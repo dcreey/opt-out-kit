@@ -9,8 +9,8 @@ Layers, cheapest first:
 | Assisted run logic (runner, email handoff, page-text reading) | **unit** | `Packages/AssistedRunLogic/Tests`, on the app's own sources in `Shared/AssistedRun` | `swift test --package-path Packages/AssistedRunLogic`; every push |
 | App unit tests (the app model, web views on local pages, storage) | **unit** | `AppTests` (target `OptOutKitTests`) | `xcodebuild test` on a simulator; every push |
 | Page scripts (the JavaScript the app runs in web pages) | **unit** | `tools/pagescripts` (headless DOM) | `npm test` in that folder; every push |
-| UI tests (the real app driven on a simulator) | **integration** | `AppUITests` (target `OptOutKitUITests`) | for a release (`.github/workflows/integration.yml`) |
-| The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for a release, and weekly |
+| UI tests (the real app driven on a simulator) | **integration** | `AppUITests` (target `OptOutKitUITests`) | for an App Store release (`.github/workflows/integration.yml`); not needed for TestFlight |
+| The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for an App Store release, and weekly |
 | Live sites (read-only) | live | `AppTests/Live*` with `OPTOUT_LIVE=1`; `pipeline.yml` | by hand only |
 
 ## Page scripts
@@ -59,7 +59,7 @@ layout, input masks and real taps stays covered by the WebKit tests (`LiveFormTe
 
 ## Unit and integration tests
 
-**Unit tests run on every push; integration tests run for a release.** Unit tests are everything in the two Swift packages and the app's
+**Unit tests run on every push (and gate TestFlight); integration tests run for an App Store release.** Unit tests are everything in the two Swift packages and the app's
 `OptOutKitTests`: they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
 they run in `.github/workflows/ci.yml` on every push and pull request. Integration tests are the UI tests in `OptOutKitUITests`: they drive the real app
 on a simulator, tap through its screens and check what a person sees. They take far longer (a UI test walks every screen in its way), so they run in
@@ -71,12 +71,20 @@ proved by a unit test, so a push that breaks a rule fails at once, not at the ne
 screen, that a sheet stays open, that a keyboard has a Done button) has no rule behind it and is integration only. When a UI test is added, the unit test
 for its rule is added with it, and both go in the table below.
 
-**Releasing (the gate):** a build goes to TestFlight or the App Store only from a commit whose unit tests and integration tests passed.
-`tools/release_testflight.sh` runs `tools/release_gate.py` first and stops unless the working copy is clean, the commit is on GitHub's `main`, and both the
-CI workflow and the Integration workflow succeeded for exactly that commit (read from GitHub's public API; `tools/tests/test_release_gate.py`). To release:
-push the commit; publish a GitHub release for it (Releases, Draft a new release, a tag such as `v1.0-49`), which starts Integration on it, or start
-Integration by hand (Actions, Integration, Run workflow, on `main`); when both pass, run `tools/release_testflight.sh`. A failing integration test is fixed
-(or the release is held) before the build goes to review. Integration takes the UI tests about 15 minutes and the run over every site up to two hours.
+**Releasing (the gate). The release workflow is for releasing the app on the App Store (iOS), not for TestFlight.** A GitHub release, and the
+Integration workflow it starts, is the step before a build is submitted for App Store review. TestFlight is the owner's own test channel, used to try a
+fix on a phone within minutes, so a TestFlight upload needs only the unit tests: Integration takes up to two hours.
+
+- **TestFlight:** `tools/release_testflight.sh` runs `tools/release_gate.py --for testflight` first and stops unless the working copy is clean, the
+  commit is on GitHub's `main` and the CI workflow (unit tests) succeeded for exactly that commit. Push, wait for CI, run the script.
+- **App Store:** a build is submitted for review only after `tools/release_gate.py --sha <the build's commit>` passes (without `--for testflight`): the same
+  checks, and the Integration workflow (the UI tests and the run over every site) also succeeded for exactly that commit. To get there, publish a GitHub
+  release for the commit (Releases, Draft a new release, a tag such as `v1.0-49`), which starts Integration on it, or start Integration by hand
+  (Actions, Integration, Run workflow, on `main`). A failing integration test is fixed, or the release held, before the build goes to review.
+
+The gate reads GitHub's public API (no login); its rules are tested in `tools/tests/test_release_gate.py`. Only the repository's admin can create, move
+or delete tags (a tag ruleset), so only they can publish a release. Integration takes the UI tests about 15 minutes and the run over every site up to two
+hours.
 
 | Integration test (`OptOutKitUITests`) | The rules it checks, and their unit tests |
 |---|---|
