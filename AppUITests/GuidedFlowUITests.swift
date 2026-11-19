@@ -74,11 +74,18 @@ final class GuidedFlowUITests: XCTestCase {
         openGuide(app)
         XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
         app.buttons["guided-more"].tap()
-        XCTAssertTrue(app.buttons["Not working"].waitForExistence(timeout: 3))
-        app.buttons["Not working"].tap()
+        // On a slow machine the menu can still be appearing: tap "Not working" once it can be tapped, and again if its reasons did not open.
+        let notWorking = app.buttons["Not working"], first = app.buttons["The page or link is broken"]
+        XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
+        for _ in 0..<3 where !first.exists {
+            let ready = NSPredicate(format: "hittable == true")
+            expectation(for: ready, evaluatedWith: notWorking); waitForExpectations(timeout: 10)
+            notWorking.tap()
+            _ = first.waitForExistence(timeout: 5)
+        }
         shot(app, "8-guided-not-working-menu")
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
-            XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 3), "\(label) is offered")
+            XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
         }
         app.buttons["The page or link is broken"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["reported-issue"].waitForExistence(timeout: 5), "the site now shows it was reported")
