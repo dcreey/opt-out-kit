@@ -166,6 +166,9 @@ final class AppModel: ObservableObject {
         if args.contains("-uitest-reset") {
             defaults.removeObject(forKey: Self.languageKey)
             for id in CoachGuide.allIDs { defaults.set(!args.contains("-uitest-coach"), forKey: "coach.\(id)") }
+            // The once-only explainers count as seen too (unless a test asks for them), so a fresh simulator (as in CI) behaves like one that has
+            // seen them: on CI the email-links explainer covered the run report and the tests could not reach it.
+            for k in ["emaillinks.explained", "followup.explained"] { defaults.set(!args.contains("-uitest-explainers"), forKey: k) }
         }
         let initial = Self.initialLanguage(defaults)
         language = initial; L10n.language = initial; Loc.language = initial

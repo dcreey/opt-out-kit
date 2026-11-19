@@ -42,7 +42,9 @@ run uses `-uitest-sites 25` (`XCUIApplication.fewSites`): the first 25 sites wit
 finished run and its report. Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
 profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
 `-uitest` flag a run never asks iOS for the advertising ID: on a fresh simulator (as in CI) the tracking prompt came up at an unpredictable moment and the
-run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`).
+run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`). `-uitest-reset` also marks the first-visit guide cards and the once-only explainers (email links, follow-ups) as seen unless a test asks for them
+(`-uitest-coach`, `-uitest-explainers`), so a fresh simulator, as in CI, behaves like a used one: on CI the email-links explainer covered the run report.
+A UI test that only needs a complete profile starts with `-uitest-seed-profile` instead of typing one (typing is tested in `ProfileEditorUITests`).
 
 **Weekly end-to-end** (`.github/workflows/e2e.yml`, Mondays and by hand): the same automatic-run UI tests over every site (`TEST_RUNNER_OPTOUT_ALL_SITES=1`
 lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
