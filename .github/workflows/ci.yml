@@ -63,9 +63,9 @@ jobs:
       - name: "Fingerprint the packages from git's tree hashes"
         id: pkgsrc
         run: echo "hash=$(git ls-tree HEAD Packages Shared | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"
-      - name: Restore the packages' build folders
+      - name: Restore the packages' build folders (saved again by the post step, at the end of the job)
         id: spm
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: |
             Packages/OptOutKitCore/.build
@@ -76,14 +76,6 @@ jobs:
         run: |
           (cd Packages/OptOutKitCore && swift test --disable-automatic-resolution)
           (cd Packages/AssistedRunLogic && swift test --disable-automatic-resolution)
-      - name: Keep the packages' build folders for the next run
-        if: steps.spm.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            Packages/OptOutKitCore/.build
-            Packages/AssistedRunLogic/.build
-          key: ${{ steps.spm.outputs.cache-primary-key }}
 
   test:
     name: Unit tests ${{ matrix.index }}
@@ -163,10 +155,10 @@ jobs:
         if: matrix.index == 0
         id: src
         run: echo "hash=$(git ls-tree HEAD project.yml App Shared ShareExtension AppTests AppUITests Packages brokers directory platforms jurisdictions terms | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"
-      - name: Restore the app's build folder
+      - name: Restore the app's build folder (saved again by this step's post step, at the end of the job, so nothing waits for it)
         if: matrix.index == 0
         id: dd
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: DerivedData
           key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-${{ steps.src.outputs.hash }}
@@ -236,14 +228,9 @@ jobs:
         with:
           name: test-products
           path: DerivedData/Build/Products
-      - name: Keep the build folder for the next run (one shard saves it, without logs, so it does not grow)
-        if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
+      - name: Leave the logs out of the build folder the post step saves (so the cache does not grow)
+        if: always() && matrix.index == 0
         run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData
-      - if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: DerivedData
-          key: ${{ steps.dd.outputs.cache-primary-key }}
       - name: Wait for the simulator
         run: |
           xcrun simctl bootstatus "$SIM_UDID" -b || { cat $RUNNER_TEMP/simboot.log; exit 1; }

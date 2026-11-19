@@ -67,8 +67,8 @@ and the UI tests use the app's fake sites.
 **`.github/workflows/integration.yml`: the integration tests, for a release.** On a published GitHub release and by hand: the UI tests (`OptOutKitUITests`)
 in 5 shards, built and handed over the same way. On a release, by hand and weekly (Mondays): the automatic run over every site (see below).
 
-`tools/ci_shards.py` shares the tests out (`--suite` picks the unit or the UI tests) so the shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
-class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
+`tools/ci_shards.py` shares the tests out (`--suite` picks the unit or the UI tests) so the shards end at about the same time: unit tests a class at a time (a class measured over 45 seconds, such as the
+web-view classes, one test at a time), UI tests one test at a time (one UI class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
 from its number of tests, and shard 0 is given less to make room for the package tests (`--reserve`). Every shard prints its timings as a notice, and
 `python3 tools/ci_shards.py --fetch-run RUN_ID` reads them back from a finished run (public API, no login) into that file, so the split stays balanced as
 tests change. Every failed test and its message is an annotation too, readable without logging in. Tests are read from the sources, so a new class needs
@@ -80,7 +80,7 @@ Building once instead of in every shard was measured to matter: these machines h
 booted slowed both (the tests started 8 to 9 minutes in). A failing shard keeps its result
 bundle as an artifact for a week.
 
-Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved without its logs, and started afresh each week so stale build products never pile up in it), the two packages'
+Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved by `actions/cache`'s post step at the end of shard 0's job, after its tests, because saving it takes minutes; without its logs; started afresh each week so stale build products never pile up in it), the two packages'
 `.build` folders, the generated Xcode project (XcodeGen runs only when `project.yml` or the list of files changed: the project carries a hash of the file
 list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). The checkout fetches the last 100
 commits, which is enough for the file times. The packages' `Package.resolved` files are committed: they pin Yams, and the CI build copies the core package's into the
