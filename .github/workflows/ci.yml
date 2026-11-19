@@ -43,6 +43,14 @@ jobs:
         run: python3 -m unittest discover -s tools/tests
       - name: Every string is translated, with its placeholders
         run: python3 tools/l10n.py check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/pagescripts/package-lock.json
+      - name: Page scripts (the app's JavaScript for web pages, run in a headless DOM)
+        working-directory: tools/pagescripts
+        run: npm ci --no-audit --no-fund && npm test
       - name: The test shards (by measured time, tools/ci_timings.json)
         run: python3 tools/ci_shards.py --suite $SUITE --shards $SHARDS --reserve 0:$PACKAGES_SECONDS --list
 

@@ -1,0 +1,7 @@
+{
+  "name": "exnay-pagescripts-tests",
+  "private": true,
+  "description": "Unit tests for the app's page scripts (App/PageScripts/*.js), run in a headless DOM. docs/TESTING.md, \"Page scripts\".",
+  "scripts": { "test": "node --test" },
+  "devDependencies": { "jsdom": "^26.1.0" }
+}

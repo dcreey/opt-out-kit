@@ -29,3 +29,4 @@ pipeline/region-pages/
 .live-guess/
 .live-*/
 .dir-proposed/
+node_modules/
