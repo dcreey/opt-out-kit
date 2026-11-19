@@ -61,8 +61,10 @@ def work(timings, root=ROOT):
     return out
 
 
-def split(weights, shards):
+def split(weights, shards, reserve=None):
+    """`reserve`: seconds a shard already spends on other work (shard 0 runs the Swift packages' tests), so it gets that much less."""
     bins = [[] for _ in range(shards)]; load = [0.0] * shards
+    for i, secs in (reserve or {}).items(): load[i] += secs
     for name, w in sorted(weights.items(), key=lambda kv: (-kv[1], kv[0])):
         i = load.index(min(load)); bins[i].append(name); load[i] += w
     return bins, load
@@ -112,6 +114,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shards", type=int); ap.add_argument("--index", type=int)
     ap.add_argument("--list", action="store_true"); ap.add_argument("--skip", action="append", default=[])
+    ap.add_argument("--reserve", action="append", default=[], help="SHARD:SECONDS of other work on that shard")
     ap.add_argument("--timings-from-log"); ap.add_argument("--failures-from-log"); ap.add_argument("--fetch-run")
     a = ap.parse_args()
     if a.timings_from_log: print(json.dumps(timings_from_log(open(a.timings_from_log, errors="replace").read()), sort_keys=True, separators=(",", ":"))); return
@@ -120,7 +123,8 @@ def main():
     if not a.shards: sys.exit("--shards is required")
     weights = work(load_timings())
     if not weights: sys.exit("no XCTestCase classes found")
-    bins, load = split(weights, a.shards)
+    reserve = {int(r.split(":")[0]): float(r.split(":")[1]) for r in a.reserve}
+    bins, load = split(weights, a.shards, reserve)
     if a.list:
         for i, (b, w) in enumerate(zip(bins, load)): print(f"shard {i}: about {w / 60:.1f} min, {len(b)} classes: {', '.join(sorted(b))}")
         return

@@ -9,7 +9,9 @@ final class OnboardingAndSitesUITests: XCTestCase {
         for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         app.enterOnboardingEmail()
         app.finishOnboarding()
-        XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 5), "the ranked queue is visible after the walkthrough")
+        app.completeProfileGate()
+        // A new person: the first automatic pass is the first step (it starts by itself once the profile is in), and the semi-automated queue waits for it.
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 10), "the queue starts with the automatic pass")
     }
 
     func testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt() {
@@ -39,21 +41,24 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let rules = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'requires data brokers to register themselves'")).firstMatch
         XCTAssertTrue(rules.waitForExistence(timeout: 5), "the page explains California's registry")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'automatic opt-out for all of these registries'")).firstMatch.exists)
-        // Reading it is required: Next stays off until the person has scrolled to the bottom.
-        XCTAssertFalse(app.buttons["onboarding-next"].isEnabled, "cannot continue before reading the state's rules")
-        XCTAssertTrue(app.staticTexts["onboarding-state-scroll-hint"].exists)
-        var swipes = 0
-        while !app.buttons["onboarding-next"].isEnabled && swipes < 12 { app.swipeUp(); swipes += 1 }
-        XCTAssertTrue(app.buttons["onboarding-next"].isEnabled, "scrolling to the end unlocks Next")
+        // Reading it is required: Next stays off until the last line (the review date) has been on screen.
+        app.assertNextWaitsForTheEnd(of: app.staticTexts["state-rules-reviewed"], "California's rules")
         XCTAssertTrue(app.staticTexts["state-rules-reviewed"].exists, "the review date is the last line")
         app.buttons["onboarding-next"].tap()
         XCTAssertTrue(app.staticTexts["Accept site terms for you?"].waitForExistence(timeout: 5), "the walkthrough asks about accepting terms")
-        XCTAssertTrue(app.staticTexts["onboarding-terms-status"].waitForExistence(timeout: 5), "and says whether that is available")
+        // Either it is not available yet (and says so), or reviewed terms exist and it can be allowed.
+        XCTAssertTrue(app.descendants(matching: .any)["onboarding-terms-status"].waitForExistence(timeout: 5) || app.buttons["onboarding-terms-allow"].exists,
+                      "and says whether that is available")
         app.buttons["onboarding-next"].tap()
+        // The advertising ID page, passed without sharing it; then the automatic-protection page and the last one.
+        XCTAssertTrue(app.buttons["adid-allow"].waitForExistence(timeout: 5) || app.staticTexts["adid-allowed"].exists)
+        app.tapNextOnboarding()
         app.finishOnboarding()
+        app.completeProfileGate(city: "Los Angeles", state: "CA", zip: "90001")          // an address in California too
 
-        XCTAssertTrue(app.buttons["next-platform-ca-drop"].waitForExistence(timeout: 5), "the queue leads with California DROP")
-        XCTAssertTrue(app.scrollUntilExists(app.buttons["band-1"], maxSwipes: 6), "and its band is the first")
+        // In California the first step is the DROP request, then the automatic pass.
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-platform"].waitForExistence(timeout: 10), "the queue leads with California DROP")
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].exists, "then the automatic pass")
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Up next'")).firstMatch.waitForExistence(timeout: 5), "the Sites page lists the sites up next, not every task")
         app.searchSites("spokeo")
@@ -78,7 +83,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["We find and remove your data for you"].waitForExistence(timeout: 10), "the first page is automatic scanning and removal")
+        XCTAssertTrue(app.staticTexts["We remove your data for you"].waitForExistence(timeout: 10), "the first page is automatic removal")
         XCTAssertFalse(app.staticTexts["Work through a site"].exists)
         XCTAssertFalse(app.staticTexts["Track every site"].exists)
     }
@@ -161,14 +166,14 @@ final class OnboardingAndSitesUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding", "-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["Reprenez vos données"].waitForExistence(timeout: 10), "French from the device language")
+        XCTAssertTrue(app.staticTexts["Nous retirons vos données pour vous"].waitForExistence(timeout: 10), "French from the device language")
         // The picker on the first page switches the whole app at once.
         app.buttons["onboarding-language"].tap()
         app.buttons["Español"].tap()
-        XCTAssertTrue(app.staticTexts["Recupera tus datos"].waitForExistence(timeout: 5), "now Spanish")
+        XCTAssertTrue(app.staticTexts["Eliminamos sus datos por usted"].waitForExistence(timeout: 5), "now Spanish")
         app.buttons["onboarding-language"].tap()
         app.buttons["Deutsch"].tap()
-        XCTAssertTrue(app.staticTexts["Holen Sie sich Ihre Daten zurück"].waitForExistence(timeout: 5), "now German")
+        XCTAssertTrue(app.staticTexts["Wir entfernen Ihre Daten für Sie"].waitForExistence(timeout: 5), "now German")
     }
 
     func testChoosingAnotherCountryShowsItsLawsAndRegulatorAndNeedsReadingToo() {
@@ -188,19 +193,17 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertFalse(app.buttons["onboarding-state"].exists, "only the US has states")
         let law = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Uruguay has a data protection law'")).firstMatch
         XCTAssertTrue(law.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["onboarding-next"].isEnabled, "the rules have to be read")
-        var swipes = 0
-        while !app.buttons["onboarding-next"].isEnabled && swipes < 12 { app.swipeUp(); swipes += 1 }
-        XCTAssertTrue(app.buttons["onboarding-next"].isEnabled)
+        let regulator = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'gub.uy'")).firstMatch
+        app.assertNextWaitsForTheEnd(of: regulator, "Uruguay's rules")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'gub.uy'")).firstMatch.exists, "the regulator is named")
     }
 
     func testNotLivingInCaliforniaHidesIt() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on"]          // the made-up profile lives in Illinois
         app.launch()
-        XCTAssertTrue(app.buttons["next-automatic"].waitForExistence(timeout: 10), "the app's own run leads when there is no official service")
-        XCTAssertFalse(app.buttons["next-platform-ca-drop"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-start"].waitForExistence(timeout: 10), "the app's own run comes first when there is no official service")
+        XCTAssertFalse(app.descendants(matching: .any)["first-pass-platform"].exists, "and California's DROP is not offered")
     }
 
     func testWalkthroughDoesNotReappearOnNextLaunch() {
@@ -210,11 +213,12 @@ final class OnboardingAndSitesUITests: XCTestCase {
         for _ in 0..<3 { first.tapNextOnboarding() }          // there is no Skip: each page is scrolled to its end, then Next
         first.enterOnboardingEmail()
         first.finishOnboarding()
+        first.completeProfileGate()
         first.terminate()
 
         let again = XCUIApplication()
         again.launch()
-        XCTAssertTrue(again.buttons["next-automatic"].waitForExistence(timeout: 10))
+        XCTAssertTrue(again.buttons["profile-button"].waitForExistence(timeout: 10), "the app opens on the queue")
         XCTAssertFalse(again.buttons["onboarding-next"].exists)
     }
 
@@ -245,16 +249,14 @@ final class OnboardingAndSitesUITests: XCTestCase {
 }
 
 final class DirectoryUITests: XCTestCase {
-    func testSitesAreGroupedByWhoDoesTheWorkAndShowNoTiers() {
+    /// The Sites tab never shows a site's tier (an internal measure). Its groups (Done, Skipped, Up next) have their own test,
+    /// `testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`.
+    func testTheSitesTabShowsNoTiers() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
         app.tabBars.buttons["Sites"].tap()
-        let list = app.collectionViews["sites-list"]
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
-        let auto = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Automatic opt-out ('")).firstMatch
-        XCTAssertTrue(auto.waitForExistence(timeout: 5), "an automatic section with its site count")
-        XCTAssertTrue(auto.label.hasSuffix("sites)"))
+        XCTAssertTrue(app.collectionViews["sites-list"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'tier'")).count, 0, "tiers are not shown")
     }
 
@@ -264,9 +266,14 @@ final class DirectoryUITests: XCTestCase {
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("texascourtrecords")
-        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-'")).firstMatch
-        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        // A site that leads a group sharing one opt-out is listed as its task, any other by its domain.
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-' OR identifier BEGINSWITH 'site-texascourtrecords'")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "the search finds the site")
         row.tap()
+        // How the site is opted out is folded under "More details" on its page.
+        let more = app.buttons["More details"]
+        XCTAssertTrue(app.scrollUntilExists(more), "the site page has its details")
+        more.tap()
         let shared = app.staticTexts["Shared opt-out"]
         for _ in 0..<4 where !shared.exists { app.swipeUp() }
         XCTAssertTrue(shared.waitForExistence(timeout: 5))
@@ -285,9 +292,10 @@ final class ExposureScanUITests: XCTestCase {
         // Give the default person a name so the check has something to search for.
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
-        app.buttons["Done"].tap()
+        app.buttons["editor-done"].tap()          // the editor's own Done (the keyboard has one too)
 
         app.tabBars.buttons["Sites"].tap()
+        XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]), "the scan is low on the Sites tab")
         app.buttons["scan-exposure"].tap()
         app.buttons["start-scan"].tap()
         XCTAssertTrue(app.staticTexts["scan-summary"].waitForExistence(timeout: 30))
@@ -299,8 +307,11 @@ final class QuickCheckUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
+        app.buttons["profile-button"].tap()
+        app.fillRequiredProfile()                     // looking a site up needs the legal name, address and the household email
+        app.buttons["editor-done"].tap()
         app.tabBars.buttons["Sites"].tap()
-        XCTAssertTrue(app.staticTexts["Exposed"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-clean"].waitForExistence(timeout: 5))
         app.buttons["answer-clean"].tap()

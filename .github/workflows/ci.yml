@@ -18,13 +18,12 @@ env:
   XCODEGEN_VERSION: 2.45.4
   # Raise to throw away every cached build folder (if a cached build ever looks wrong).
   CACHE_VERSION: v1
-  # Tests known to fail before this workflow existed, left out until they are fixed (docs/TESTING.md lists them).
-  KNOWN_FAILING: >-
-    OptOutKitUITests/AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks
-    OptOutKitUITests/AutoProtectionUITests/testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears
-    OptOutKitUITests/AutoProtectionUITests/testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer
+  # Tests known to fail, left out until they are fixed (docs/TESTING.md lists them). Empty: every test runs.
+  KNOWN_FAILING: ""
   # GitHub's free plan runs at most 5 macOS jobs at once: the test shards are 5, each a mix of unit and UI tests balanced by measured time.
   SHARDS: 5
+  # Shard 0 also runs the two Swift packages' tests (about this long on these machines), so it is given that much less of the app's tests.
+  PACKAGES_SECONDS: 120
 
 jobs:
   checks:
@@ -43,51 +42,28 @@ jobs:
       - name: Every string is translated, with its placeholders
         run: python3 tools/l10n.py check
       - name: The test shards (by measured time, tools/ci_timings.json)
-        run: python3 tools/ci_shards.py --shards $SHARDS --list
+        run: python3 tools/ci_shards.py --shards $SHARDS --reserve 0:$PACKAGES_SECONDS --list
 
-  packages:
-    name: Mac package tests
+  test:
+    name: Tests ${{ matrix.index }}
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        index: [0, 1, 2, 3, 4]          # keep in step with SHARDS
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }          # the full history, for the file times below
-      - name: Use the newest Xcode on the runner
+      - name: Use the newest Xcode, and start booting a simulator now (it takes about 2 minutes; the build runs meanwhile)
         id: xcode
         run: |
           sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
           xcodebuild -version
           echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
-      - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
-        run: python3 tools/ci_restore_mtimes.py
-      - name: Restore the packages' build folders
-        uses: actions/cache@v4
-        with:
-          path: |
-            Packages/OptOutKitCore/.build
-            Packages/AssistedRunLogic/.build
-          key: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('Packages/**/Package.swift', 'Packages/**/Sources/**', 'Packages/**/Tests/**', 'Shared/**') }}
-          restore-keys: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
-      - name: OptOutKitCore
-        run: swift test
-        working-directory: Packages/OptOutKitCore
-      - name: AssistedRunLogic (the assisted run's state machine)
-        run: swift test
-        working-directory: Packages/AssistedRunLogic
-
-  build:
-    name: Build the app and its tests
-    runs-on: macos-26
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: Use the newest Xcode on the runner
-        id: xcode
-        run: |
-          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
-          xcodebuild -version
-          echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+          nohup xcrun simctl boot "$UDID" > simboot.log 2>&1 &
       - name: Restore XcodeGen
         id: xcodegen
         uses: actions/cache@v4
@@ -106,56 +82,35 @@ jobs:
       - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
         run: python3 tools/ci_restore_mtimes.py
       - name: Restore the app's build folder
-        uses: actions/cache@v4
+        id: dd
+        uses: actions/cache/restore@v4
         with:
           path: DerivedData
           key: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('project.yml', 'App/**', 'Shared/**', 'ShareExtension/**', 'AppTests/**', 'AppUITests/**', 'Packages/**/Sources/**', 'brokers/**', 'directory/**', 'platforms/**', 'jurisdictions/**', 'terms/**') }}
           restore-keys: dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
-      - name: Build for testing (once; every test shard reuses it)
+      - name: Build the app and its tests (while the simulator boots)
         run: |
           set -o pipefail
           xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
-            COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -40
-          echo "Swift files compiled this run: $(grep -cE '^SwiftCompile ' build.log || true)"
-          ls DerivedData/Build/Products
-      - uses: actions/upload-artifact@v4
+            COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
+          echo "::notice title=Build::$(grep -cE '^SwiftCompile ' build.log || true) Swift files compiled (cache: ${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }})"
+      - name: Keep the build folder for the next run (one shard saves it)
+        if: matrix.index == 0 && steps.dd.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
         with:
-          name: test-products
-          path: DerivedData/Build/Products
-          retention-days: 2
-
-  test:
-    name: Tests ${{ matrix.index }}
-    needs: build
-    runs-on: macos-26
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        index: [0, 1, 2, 3, 4]          # keep in step with SHARDS
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use the newest Xcode on the runner
-        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)" && xcodebuild -version
-      - uses: actions/download-artifact@v4
-        with:
-          name: test-products
-          path: Products
-      - name: Pick an iPhone simulator and start it
-        run: |
-          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
-          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
-          xcrun simctl boot "$UDID" || true
-          xcrun simctl bootstatus "$UDID" -b
+          path: DerivedData
+          key: ${{ steps.dd.outputs.cache-primary-key }}
+      - name: Wait for the simulator
+        run: xcrun simctl bootstatus "$SIM_UDID" -b || { cat simboot.log; exit 1; }
       - name: Run this shard
         shell: bash
         run: |
           SKIP=(); for t in $KNOWN_FAILING; do SKIP+=(--skip "$t"); done
           ARGS=()          # one argument per line (macOS ships bash 3.2, which has no mapfile)
-          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --shards $SHARDS --index ${{ matrix.index }} "${SKIP[@]}")
+          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --shards $SHARDS --reserve 0:$PACKAGES_SECONDS --index ${{ matrix.index }} ${SKIP[@]+"${SKIP[@]}"})
           printf '%s\n' "${ARGS[@]}"
-          XCTESTRUN=$(ls Products/*.xctestrun | head -1)
+          XCTESTRUN=$(ls DerivedData/Build/Products/*.xctestrun | head -1)
           set -o pipefail
           xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
             -resultBundlePath "Results-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \
@@ -168,6 +123,29 @@ jobs:
           [ -f xcodebuild.log ] || exit 0
           echo "::notice title=Shard timings::$(python3 tools/ci_shards.py --timings-from-log xcodebuild.log)"
           python3 tools/ci_shards.py --failures-from-log xcodebuild.log
+      - name: Restore the packages' build folders
+        if: matrix.index == 0 && !cancelled()
+        id: spm
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            Packages/OptOutKitCore/.build
+            Packages/AssistedRunLogic/.build
+          key: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ hashFiles('Packages/**/Package.swift', 'Packages/**/Sources/**', 'Packages/**/Tests/**', 'Shared/**') }}
+          restore-keys: spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-
+      - name: Package tests (OptOutKitCore, and AssistedRunLogic, the assisted run's state machine)
+        if: matrix.index == 0 && !cancelled()
+        run: |
+          (cd Packages/OptOutKitCore && swift test)
+          (cd Packages/AssistedRunLogic && swift test)
+      - name: Keep the packages' build folders for the next run
+        if: matrix.index == 0 && !cancelled() && steps.spm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            Packages/OptOutKitCore/.build
+            Packages/AssistedRunLogic/.build
+          key: ${{ steps.spm.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

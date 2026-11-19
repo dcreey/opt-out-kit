@@ -42,6 +42,10 @@ extension XCUIApplication {
         if (menu.value as? String)?.contains(code) == true || menu.label.contains(code) { return }
         menu.tap()
         let item = descendants(matching: .any).matching(NSPredicate(format: "label ENDSWITH %@", "(\(code))")).firstMatch
+        // A short menu (the keyboard is up) shows only the first states: scroll within it until the state is there.
+        let first = descendants(matching: .any).matching(NSPredicate(format: "label ENDSWITH %@", "(AL)")).firstMatch
+        var swipes = 0
+        while !item.waitForExistence(timeout: 1) && swipes < 8 { (first.exists ? first : item).swipeUp(); swipes += 1 }
         XCTAssertTrue(item.waitForExistence(timeout: 5), "state \(code) in the menu")
         item.tap()          // the menu scrolls to it
     }
@@ -65,10 +69,10 @@ extension XCUIApplication {
         tapNextOnboarding()
     }
 
-    /// From the automatic-protection page: on to the last page, which points to About, and Start.
+    /// From the automatic-protection page: on to the last page, which points to the Settings tab, and Start.
     func finishOnboarding() {
         tapNextOnboarding()
-        XCTAssertTrue(staticTexts["Your settings are in About"].waitForExistence(timeout: 5), "the last page points to About")
+        XCTAssertTrue(staticTexts["Your settings are in Settings"].waitForExistence(timeout: 5), "the last page points to the Settings tab")
         buttons["onboarding-done"].tap()
     }
 }
@@ -77,8 +81,9 @@ extension XCUIApplication {
     /// Scrolls a long list (the lazy SwiftUI List renders rows only near the screen) until the element exists.
     @discardableResult
     func scrollUntilExists(_ element: XCUIElement, maxSwipes: Int = 12) -> Bool {
+        if element.waitForExistence(timeout: 2) { return true }          // the screen may still be appearing
         var n = 0
-        while !element.exists && n < maxSwipes { swipeUp(); n += 1 }
+        while !element.waitForExistence(timeout: 0.5) && n < maxSwipes { swipeUp(); n += 1 }
         return element.exists
     }
 }
@@ -109,4 +114,31 @@ extension XCUIApplication {
         while !buttons["onboarding-next"].isEnabled && swipes < 12 { swipeUp(); swipes += 1 }
         buttons["onboarding-next"].tap()
     }
+}
+
+extension XCUIApplication {
+    /// After the walkthrough with automatic protection on: the profile gate asks for the legal name and current address (the email was given in
+    /// the walkthrough). Fills them in, continues, and passes the question about earlier addresses.
+    func completeProfileGate(city: String = "Springfield", state: String = "IL", zip: String = "62701") {
+        XCTAssertTrue(buttons["profile-gate-continue"].waitForExistence(timeout: 10), "the profile is asked for next")
+        fillRequiredProfile(city: city, state: state, zip: zip, email: nil)
+        buttons["profile-gate-continue"].tap()
+        let skip = buttons.matching(identifier: "profile-gate-skip-previous").firstMatch          // its alert lists the button twice
+        if skip.waitForExistence(timeout: 3) { skip.tap() }
+    }
+
+    /// A page whose reading is required: Next stays off until its last line has been on screen. On a tall screen a short page is read at once.
+    func assertNextWaitsForTheEnd(of lastLine: XCUIElement, _ what: String, file: StaticString = #filePath, line: UInt = #line) {
+        let next = buttons["onboarding-next"]
+        XCTAssertTrue(!next.isEnabled || lastLine.exists, "\(what): Next is on only once the end has been seen", file: file, line: line)
+        var swipes = 0
+        while !next.isEnabled && swipes < 12 { swipeUp(); swipes += 1 }
+        XCTAssertTrue(next.isEnabled, "\(what): scrolling to the end unlocks Next", file: file, line: line)
+    }
+}
+
+extension XCUIApplication {
+    /// Launch arguments that keep a whole automatic run small in CI: the first 25 sites with a known form. The weekly end-to-end job sets
+    /// OPTOUT_ALL_SITES=1 (TEST_RUNNER_OPTOUT_ALL_SITES for xcodebuild) to run the same tests over every site.
+    static var fewSites: [String] { ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1" ? [] : ["-uitest-sites", "25"] }
 }

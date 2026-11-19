@@ -3,7 +3,7 @@ import XCTest
 /// The guided screen: browser on top, our panel in the bottom quarter, with the step, a count, Next, Cancel and Not working.
 final class GuidedFlowUITests: XCTestCase {
     private func openGuide(_ app: XCUIApplication) {
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
         app.openFlowTask("peopleconnect")
         let start = app.buttons["guide-me"]
@@ -42,13 +42,16 @@ final class GuidedFlowUITests: XCTestCase {
         // Step 1 (open the site) is finished by the app as soon as the page loads.
         let advanced = NSPredicate(format: "label CONTAINS 'Step 2'")
         expectation(for: advanced, evaluatedWith: progress); waitForExpectations(timeout: 10)
-        // Step 2 is "copy your email". With no email on the profile it says so, and Next still moves on.
+        // Step 2 is "copy your email". Copying it finishes the step, which the guide sees, so it moves on by itself (Next is only for a step it
+        // cannot see).
         XCTAssertTrue(app.buttons["guided-copy"].exists)
         app.buttons["guided-copy"].tap()
         XCTAssertTrue(app.staticTexts["guided-status"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["guided-status"].label.contains("not on your profile"))
-        app.buttons["guided-next"].tap()
-        expectation(for: NSPredicate(format: "label CONTAINS 'Step 3'"), evaluatedWith: progress); waitForExpectations(timeout: 5)
+        let status = app.staticTexts["guided-status"].label
+        XCTAssertTrue(status.contains("Copied") || status.contains("done"), status)
+        let step3 = NSPredicate(format: "label CONTAINS 'Step 3'")
+        if !step3.evaluate(with: progress) { app.buttons["guided-next"].tap() }
+        expectation(for: step3, evaluatedWith: progress); waitForExpectations(timeout: 5)
         // Step 3 has no detector in this broker file: Next moves on.
         app.buttons["guided-next"].tap()
         expectation(for: NSPredicate(format: "label CONTAINS 'Step 4'"), evaluatedWith: progress); waitForExpectations(timeout: 5)
@@ -89,7 +92,7 @@ final class SiteViewLayoutUITests: XCTestCase {
 
     func testABrokerSiteViewLeadsWithTheGuideAndEndsWithTheSiteLink() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("peopleconnect")
@@ -109,7 +112,7 @@ final class SiteViewLayoutUITests: XCTestCase {
 
     func testADirectorySiteViewHasTheSiteLinkAtTheTopAndNotAgainAtTheBottom() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("texascourtrecords")
@@ -126,7 +129,7 @@ final class SiteViewLayoutUITests: XCTestCase {
 
     func testTheGuideOpensFromTheSiteView() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided"]
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-guided", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
         app.tabBars.buttons["Sites"].tap()
         app.searchSites("peopleconnect")

@@ -1,5 +1,6 @@
 import XCTest
 
+/// The profile editor. (Adding family profiles is switched off, `Features.otherProfiles`, so it has no UI test; its rules are Mac tests.)
 final class ProfileEditorUITests: XCTestCase {
     private func launch(reset: Bool) -> XCUIApplication {
         let app = XCUIApplication()
@@ -22,48 +23,27 @@ final class ProfileEditorUITests: XCTestCase {
         var scrolls = 0
         while !app.buttons["add-address"].isHittable && scrolls < 10 { app.swipeUp(); scrolls += 1 }   // the editor is taller now
         app.buttons["add-address"].tap()
-        XCTAssertTrue(app.textFields["Street (optional)"].waitForExistence(timeout: 3), "previous addresses are added separately")
+        // A previous address is a city, state and ZIP code (no street: those are enough to find a record).
+        XCTAssertTrue(app.scrollUntilExists(app.descendants(matching: .any)["previous-state-1"]), "previous addresses are added separately")
+        XCTAssertFalse(app.textFields["Street (optional)"].exists, "with no street")
     }
 
     func testALegalNameAndCurrentAddressAreRequiredBeforeTheEditorCanClose() {
         let app = launch(reset: true)
         app.buttons["profile-button"].tap()
-        XCTAssertTrue(app.staticTexts["missing-details"].waitForExistence(timeout: 5), "says what is still needed")
-        XCTAssertFalse(app.buttons["editor-done"].isEnabled, "cannot close an incomplete profile")
+        // The top of the editor first: scrolling down to the note takes these off the screen (and out of the list).
+        XCTAssertTrue(app.textFields["legal-middle"].waitForExistence(timeout: 5), "a middle name can be given")
         XCTAssertFalse(app.pickers.firstMatch.exists, "the legal name and current address have no type to choose")
-        XCTAssertTrue(app.textFields["legal-middle"].exists, "a middle name can be given")
-        XCTAssertTrue(app.textFields["contact-email"].exists, "the owner's email is required too")
+        let missing = app.descendants(matching: .any)["missing-details"]
+        XCTAssertTrue(app.scrollUntilExists(missing), "says what is still needed")          // under the birthdate, below the first screen
+        XCTAssertFalse(app.buttons["editor-done"].isEnabled, "cannot close an incomplete profile")
+        XCTAssertTrue(app.scrollUntilExists(app.textFields["contact-email"]), "the owner's email is required too")
         app.fillRequiredProfile()
-        XCTAssertFalse(app.staticTexts["missing-details"].exists)
+        XCTAssertTrue(missing.waitForNonExistence(timeout: 5), "nothing is missing any more")
         XCTAssertTrue(app.buttons["editor-done"].isEnabled)
         app.buttons["editor-done"].tap()
-        XCTAssertTrue(app.buttons["profile-button"].waitForExistence(timeout: 5))
-    }
-
-    func testAddRelativeAsAnotherPersonAndSwitchAccounts() {
-        let app = launch(reset: true)
-        app.buttons["account-switcher"].tap()
-        app.buttons["Add person…"].tap()
-        let field = app.alerts.textFields["Name"]
-        XCTAssertTrue(field.waitForExistence(timeout: 3))
-        field.typeText("Mum")
-        app.alerts.buttons["Add"].tap()
-
-        // Editor opens for the new person, with a relationship dropdown.
-        let dropdown = app.buttons["field-relationship"]
-        XCTAssertTrue(dropdown.waitForExistence(timeout: 5))
-        dropdown.tap()
-        for option in ["Parent", "Child", "Sibling", "Cousin", "Other family"] {
-            XCTAssertTrue(app.buttons[option].waitForExistence(timeout: 3), "\(option) missing from relationship list")
-        }
-        XCTAssertFalse(app.buttons["Friend"].exists, "family only: there is no Friend option")
-        app.buttons["Parent"].tap()
-        XCTAssertTrue(app.buttons["field-relationship"].label.contains("Parent"))
-        app.fillRequiredProfile(first: "Mum", email: nil)
-        app.buttons["Done"].tap()
-
-        app.buttons["account-switcher"].tap()
-        XCTAssertTrue(app.buttons["Mum"].exists && app.buttons["Me"].exists)
+        // The editor closes. (What comes next can be a sheet of its own, which hides the screen below from the test, so the test checks the editor.)
+        XCTAssertTrue(app.buttons["editor-done"].waitForNonExistence(timeout: 5), "a complete profile closes the editor")
     }
 
     /// Real Keychain + encrypted file: a profile typed in one launch is still there in the next.

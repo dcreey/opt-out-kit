@@ -60,12 +60,13 @@ struct CoachGuideSheet: View {
             }
             .padding(.bottom, 12)
         }
+        // On the scroll view only: set on the whole sheet it was passed down to the button below and replaced its own identifier.
+        .accessibilityIdentifier("coach-guide")
         .safeAreaInset(edge: .bottom) {
             Button("Got it", action: done).buttonStyle(.borderedProminent).controlSize(.large).accessibilityIdentifier("coach-done")
                 .padding(.vertical, 12).frame(maxWidth: .infinity).background(.regularMaterial)
         }
         .presentationDetents([.medium, .large])
-        .accessibilityIdentifier("coach-guide")
     }
 }
 

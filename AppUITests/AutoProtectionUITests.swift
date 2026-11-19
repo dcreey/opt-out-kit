@@ -5,43 +5,46 @@ final class AutoProtectionUITests: XCTestCase {
         let a = XCTAttachment(screenshot: app.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
-    func testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer() {
+    /// The first-run page has one switch, automatic opt-out requests, on by default; the answer is saved and shown in Settings. (There was a daily
+    /// scan switch too; the scan is no longer automatic.)
+    func testFirstRunPageTurnsAutomaticOptOutOnByDefaultAndSavesTheAnswer() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.tapNextOnboarding() }
         app.enterOnboardingEmail()
-        let scan = app.switches["auto-scan-toggle"], opt = app.switches["auto-optout-toggle"]
-        XCTAssertTrue(scan.waitForExistence(timeout: 5))
-        XCTAssertEqual(scan.value as? String, "1", "daily scan starts on")
-        XCTAssertEqual(opt.value as? String, "1", "weekly opt-out starts on")
+        let opt = app.switches["auto-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(opt), "the automatic protection page")
+        XCTAssertEqual(opt.value as? String, "1", "automatic opt-out starts on")
+        XCTAssertFalse(app.switches["auto-scan-toggle"].exists, "there is no automatic scan to turn on")
         shot(app, "1-first-run-automatic-protection")
         app.finishOnboarding()
+        // Turned on, it needs the legal name and current address before it can start: the profile gate asks for them next.
+        app.completeProfileGate()
 
         app.tabBars.buttons["Settings"].tap()
-        let s2 = app.switches["settings-scan-toggle"]
-        XCTAssertTrue(app.scrollUntilExists(s2))
-        XCTAssertEqual(s2.value as? String, "1")
-        XCTAssertEqual(app.switches["settings-optout-toggle"].value as? String, "1")
-        shot(app, "2-settings-both-on")
+        let setting = app.switches["settings-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(setting))
+        XCTAssertEqual(setting.value as? String, "1", "Settings shows it on")
+        shot(app, "2-settings-on")
     }
 
-    func testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears() {
+    func testDecliningAtFirstRunTurnsItOffAndTheQueueBannerDisappears() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
+        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.tapNextOnboarding() }
         app.enterOnboardingEmail()
-        for id in ["auto-scan-toggle", "auto-optout-toggle"] {
-            let t = app.switches[id]; XCTAssertTrue(t.waitForExistence(timeout: 5))
-            t.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
-            XCTAssertEqual(t.value as? String, "0")
-        }
+        let opt = app.switches["auto-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(opt))
+        opt.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        XCTAssertEqual(opt.value as? String, "0")
         app.finishOnboarding()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
         app.tabBars.buttons["Settings"].tap()
-        XCTAssertTrue(app.scrollUntilExists(app.switches["settings-scan-toggle"]))
-        XCTAssertEqual(app.switches["settings-scan-toggle"].value as? String, "0")
+        let setting = app.switches["settings-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(setting))
+        XCTAssertEqual(setting.value as? String, "0", "Settings shows it off")
     }
 
     func testSkippingTheWalkthroughLeavesAQueueBannerThatOffersToTurnItOn() {
@@ -56,7 +59,7 @@ final class AutoProtectionUITests: XCTestCase {
 
     func testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-submit", "-uitest-fake-scan"]
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-submit", "-uitest-fake-scan"] + XCUIApplication.fewSites
         app.launch()
         // Give the owner a name and email so forms can be filled.
         app.buttons["profile-button"].tap()
@@ -71,13 +74,17 @@ final class AutoProtectionUITests: XCTestCase {
         // A form in the pass asks for the advertising ID, so Apple's prompt comes up once; the run waits for the answer.
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         if springboard.buttons["Ask App Not to Track"].waitForExistence(timeout: 10) { springboard.buttons["Ask App Not to Track"].tap() }
-        // A full pass is about 490 sites, so the test checks that it is running and counting, not that it finished.
-        XCTAssertTrue(app.descendants(matching: .any)["auto-working"].waitForExistence(timeout: 30), "the run is under way")
+        // The run finishes and reports: 25 sites in CI (`fewSites`), every site in the weekly end-to-end job.
+        let everySite = ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1"
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: everySite ? 5400 : 120), "the run finished and reported")
+        shot(app, "3a-run-report")
+        done.tap()
         let sent = app.buttons["activity-count-sent"]
         XCTAssertTrue(sent.waitForExistence(timeout: 5))
         let start = Date()
-        while sent.label.hasPrefix("0") && Date().timeIntervalSince(start) < 60 { Thread.sleep(forTimeInterval: 2) }
-        XCTAssertFalse(sent.label.hasPrefix("0"), "the counts move as sites are sent")
+        while sent.label.hasPrefix("0") && Date().timeIntervalSince(start) < 10 { Thread.sleep(forTimeInterval: 1) }
+        XCTAssertFalse(sent.label.hasPrefix("0"), "the page counts the sites that were sent")
         shot(app, "3-activity-after-preview")
     }
 
@@ -89,6 +96,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.fillRequiredProfile()                     // searching needs the profile's legal name, address and the household email
         app.buttons["editor-done"].tap()
         app.tabBars.buttons["Sites"].tap()
+        XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-paywalled"].waitForExistence(timeout: 5))
         shot(app, "4-quick-check-blocked-by-payment")
@@ -101,10 +109,13 @@ final class AutoProtectionUITests: XCTestCase {
     /// its own while opened by a closure-style link, so SwiftUI built it twice and rejected the push.)
     func testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-demo-run"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-demo-run"] + XCUIApplication.fewSites
         app.launch()
+        // The whole run, then its result sheet: 25 sites in CI, every site in the weekly end-to-end job.
         let done = app.buttons["run-report-done"]
-        if done.waitForExistence(timeout: 120) { done.tap() }          // the run's result sheet comes up when it finishes
+        let everySite = ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1"
+        XCTAssertTrue(done.waitForExistence(timeout: everySite ? 5400 : 120), "the run finished and reported")
+        done.tap()
         app.tabBars.buttons["Settings"].tap()
         let status = app.buttons["auto-activity"]
         XCTAssertTrue(app.scrollUntilExists(status), "Settings opens the automatic opt-out page")
@@ -141,7 +152,7 @@ final class AutoProtectionUITests: XCTestCase {
     /// A new person: the automatic pass goes first and the semi-automated queue waits for it, then opens with the sites that need a person.
     func testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on", "-uitest-fake-submit", "-only-domains", "abovedata.io,acronymix.com"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on", "-uitest-fake-submit", "-only-domains", "abovedata.io,acronymix.com"] + XCUIApplication.fewSites
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 15), "step 2 is shown as waiting for step 1")
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.exists, "the semi-automated queue is not offered yet")

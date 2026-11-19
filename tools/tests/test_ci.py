@@ -35,6 +35,12 @@ class Balance(unittest.TestCase):
         self.assertEqual(sorted(flat), sorted(weights))
         self.assertLessEqual(max(load) - min(load), max(weights.values()))
 
+    def test_a_shard_with_other_work_gets_less(self):
+        weights = {f"T/C{i}": 10.0 for i in range(10)}
+        bins, load = S.split(weights, 2, {0: 30.0})
+        self.assertLess(len(bins[0]), len(bins[1]), "the shard with other work gets fewer tests")
+        self.assertLessEqual(abs(load[0] - load[1]), 10.0, "and the totals, its other work included, stay within one test")
+
     def test_measured_seconds_beat_the_guess(self):
         key = next(k for k in S.work({}) if k.startswith("OptOutKitUITests/"))
         self.assertEqual(S.work({key: 123.0})[key], 123.0)

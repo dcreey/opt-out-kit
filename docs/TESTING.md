@@ -18,27 +18,35 @@ contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the
 | Job | Machine | What it runs |
 |---|---|---|
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
-| `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
-| `build` | macOS | Builds the app and both test targets once (`build-for-testing`); the shards reuse it |
-| `test` (5 at once) | macOS, one each | The app's unit and UI tests in 5 shards, each a mix balanced by measured time, each on its own simulator (`test-without-building`) |
+| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator at once, builds the app and both test targets from the cached build folder while it boots, then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
 
 `tools/ci_shards.py` shares the tests out so the 5 shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
 class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
-from its number of tests. Every shard prints its timings as a notice, and `python3 tools/ci_shards.py --fetch-run RUN_ID` reads them back from a finished
-run (public API, no login) into that file, so the split stays balanced as tests change. Tests are read from the sources, so a new class needs no change
-to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that everything runs exactly once, a known-failing test is left out wherever it
-lands, and the file times are set from the commits). The free plan runs at most 5 macOS jobs at once, which is why there are 5 shards. A failing shard keeps its result bundle as an artifact for a week.
+from its number of tests, and shard 0 is given less to make room for the package tests (`--reserve`). Every shard prints its timings as a notice, and
+`python3 tools/ci_shards.py --fetch-run RUN_ID` reads them back from a finished run (public API, no login) into that file, so the split stays balanced as
+tests change. Every failed test and its message is an annotation too, readable without logging in. Tests are read from the sources, so a new class needs
+no change to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that everything runs exactly once, a known-failing test is left out
+wherever it lands, a shard with other work gets less, failures become annotations, and the file times are set from the commits). The free plan runs at
+most 5 macOS jobs at once, which is why there are 5 shards and no separate build job: nothing waits for a free machine. A failing shard keeps its result
+bundle as an artifact for a week.
 
 Between runs it keeps three things in GitHub's cache: the app's build folder (`DerivedData`), the two packages' `.build` folders, and XcodeGen (downloaded
 from its release rather than installed with Homebrew, which is slow there). Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
 gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
-changed since the cached build is compiled (the build step prints how many Swift files it compiled). The caches are keyed by the Xcode version and the
-sources, so a new Xcode starts clean. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a
-test checks have room for slower CI machines.
+changed since the cached build is compiled (a notice says how many Swift files were). The caches are keyed by the Xcode version and the sources, so a new
+Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have
+room for slower CI machines.
 
-Left out in CI until they are fixed (they failed before CI ran them, listed in `KNOWN_FAILING` in the workflow):
-`AutoProtectionUITests.testBlockedByPaymentIsAnAnswerInQuickChecks`, `testDecliningAtFirstRunTurnsBothOffAndTheQueueBannerDisappears`,
-`testFirstRunPageTurnsOnBothSwitchesByDefaultAndSavesTheAnswer`.
+**UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). A UI test of a whole automatic
+run uses `-uitest-sites 25` (`XCUIApplication.fewSites`): the first 25 sites with a known form, so the run finishes in seconds and the test checks the
+finished run and its report. Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
+profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`.
+
+**Weekly end-to-end** (`.github/workflows/e2e.yml`, Mondays and by hand): the same automatic-run UI tests over every site (`TEST_RUNNER_OPTOUT_ALL_SITES=1`
+lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
+
+Family profiles are switched off (`Features.otherProfiles`), so they have no UI test (the tests that added relatives were removed on 2026-11-18); their
+rules (relationships, minors and public figures are never searched) are Mac tests in `CoreTests`. No test is left out of CI (`KNOWN_FAILING` is empty).
 
 The broker pipeline (`pipeline.yml`) and the directory refresh (`profile.yml`) visit real sites, so they stay manual (Actions tab).
 

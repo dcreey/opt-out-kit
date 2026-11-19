@@ -1,0 +1,57 @@
+name: Weekly end-to-end
+
+# The automatic run over every site in the directory, once a week. CI runs the same tests on 25 sites (`-uitest-sites 25`), which proves the run
+# works; this proves it works at full size (about 490 sites take most of an hour). Sending is faked (-uitest-fake-submit): no broker site is
+# contacted. Start it by hand from the Actions tab at any time. See docs/TESTING.md ("Continuous integration").
+on:
+  schedule:
+    - cron: "0 9 * * 1"          # Mondays, 09:00 UTC
+  workflow_dispatch:
+
+env:
+  XCODEGEN_VERSION: 2.45.4
+
+jobs:
+  all-sites:
+    name: Automatic run over every site
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use the newest Xcode, and start booting a simulator
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+          nohup xcrun simctl boot "$UDID" > simboot.log 2>&1 &
+      - name: XcodeGen and the project
+        run: |
+          curl -fsSL -o /tmp/xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODEGEN_VERSION/xcodegen.zip"
+          mkdir -p ~/xcodegen && unzip -q /tmp/xcodegen.zip -d ~/xcodegen
+          "$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)" generate
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
+            COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tail -20
+      - run: xcrun simctl bootstatus "$SIM_UDID" -b
+      - name: Every site (TEST_RUNNER_OPTOUT_ALL_SITES=1 lifts the 25-site limit)
+        env:
+          TEST_RUNNER_OPTOUT_ALL_SITES: "1"
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building -xctestrun "$(ls DerivedData/Build/Products/*.xctestrun | head -1)" -destination "id=$SIM_UDID" \
+            -resultBundlePath Results.xcresult \
+            -only-testing:OptOutKitUITests/AutoProtectionUITests/testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere \
+            -only-testing:OptOutKitUITests/AutoProtectionUITests/testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet \
+            2>&1 | tee xcodebuild.log | grep -E "Test Case .*(passed|failed)|error:|Executed [0-9]+ tests|\*\* "
+      - name: Report failures
+        if: always()
+        run: '[ -f xcodebuild.log ] && python3 tools/ci_shards.py --failures-from-log xcodebuild.log || true'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-results
+          path: Results.xcresult
+          retention-days: 14
