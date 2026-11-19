@@ -718,6 +718,16 @@ final class AppModel: ObservableObject {
         CheckScheduler.scheduleAutomation(autoSettings)
     }
 
+    /// UI tests never wait on iOS's tracking prompt: on a fresh simulator (as in CI) it comes up at an unpredictable moment and a run waited for it for
+    /// ever. The walkthrough's advertising-ID page has its own test.
+    private static var skipsTrackingPromptForTests: Bool {
+        #if DEBUG
+        ProcessInfo.processInfo.arguments.contains(where: { $0.hasPrefix("-uitest") })
+        #else
+        false
+        #endif
+    }
+
     /// UI tests that fake sending have no site to be polite to, so the pause between sites is skipped.
     private static var usesFakeSubmitter: Bool {
         #if DEBUG
@@ -999,7 +1009,7 @@ final class AppModel: ObservableObject {
         defer { if ownsBusy { endOptOutRun(interrupted: interrupted) } }
         // Only when a form in this run asks for the phone's advertising ID is the person asked (once) for permission to read it.
         var adID: String?
-        if submitter == nil, AdvertisingID.isAsked(by: directory.filter { runnable?.contains($0.domain) ?? true }) { adID = await AdvertisingID.current() }
+        if submitter == nil, !Self.skipsTrackingPromptForTests, AdvertisingID.isAsked(by: directory.filter { runnable?.contains($0.domain) ?? true }) { adID = await AdvertisingID.current() }
         // The sites this run takes on are remembered for the period, so a site that fails (and so leaves the automatic group) still counts in "of N".
         // Only the automatic sites are counted in the period ("handled of N"): a semi-automated site that does not go through must not hold the period open.
         if !dryRun, let runnable {

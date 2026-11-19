@@ -19,7 +19,7 @@ final class SafetyFlagsUITests: XCTestCase {
     /// A SwiftUI toggle row only flips when its switch (the right-hand end of the row) is tapped.
     private func flip(_ app: XCUIApplication, _ toggle: XCUIElement) {
         reveal(app, toggle)
-        toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        app.setSwitch(toggle, on: (toggle.value as? String) != "1")
     }
 
     private func screenshot(_ app: XCUIApplication, _ name: String) {

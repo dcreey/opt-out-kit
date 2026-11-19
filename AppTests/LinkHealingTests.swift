@@ -64,6 +64,7 @@ final class LinkHealingTests: XCTestCase {
         let keys = FixedKey()
         let a = AppModel(store: HouseholdStore(url: url, keys: keys), defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         _ = await a.healLink(for: entry("moved.example"), inspector: movedSite(host: "moved.example"))
+        a.flushSaves()          // saves are written in the background, one after another
         let b = AppModel(store: HouseholdStore(url: url, keys: keys), defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         XCTAssertEqual(b.healedLink(for: "moved_example")?.form.page.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")), "request-portal")
     }

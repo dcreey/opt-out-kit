@@ -37,8 +37,7 @@ final class AutoProtectionUITests: XCTestCase {
         app.enterOnboardingEmail()
         let opt = app.switches["auto-optout-toggle"]
         XCTAssertTrue(app.scrollUntilExists(opt))
-        opt.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
-        XCTAssertEqual(opt.value as? String, "0")
+        app.setSwitch(opt, on: false)
         app.finishOnboarding()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
         app.tabBars.buttons["Settings"].tap()
@@ -71,9 +70,6 @@ final class AutoProtectionUITests: XCTestCase {
         app.buttons["auto-activity"].tap()
         XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 5), "one button runs everything")
         app.buttons["auto-run-now"].tap()
-        // A form in the pass asks for the advertising ID, so Apple's prompt comes up once; the run waits for the answer.
-        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-        if springboard.buttons["Ask App Not to Track"].waitForExistence(timeout: 10) { springboard.buttons["Ask App Not to Track"].tap() }
         // The run finishes and reports: 25 sites in CI (`fewSites`), every site in the weekly end-to-end job.
         let everySite = ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1"
         let done = app.buttons["run-report-done"]
@@ -159,8 +155,6 @@ final class AutoProtectionUITests: XCTestCase {
         shot(app, "6a-new-person-step-1")
         // UI tests do not start runs by themselves (`-uitest-reset`), so the test starts it the way a person can.
         app.buttons["first-pass-start"].tap()
-        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
-        if springboard.buttons["Ask App Not to Track"].waitForExistence(timeout: 3) { springboard.buttons["Ask App Not to Track"].tap() }
         let later = app.buttons["run-report-done"]
         XCTAssertTrue(later.waitForExistence(timeout: 120), "the first pass finishes and says what it did")
         shot(app, "6b-first-pass-report")

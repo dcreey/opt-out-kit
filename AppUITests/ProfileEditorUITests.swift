@@ -55,13 +55,14 @@ final class ProfileEditorUITests: XCTestCase {
         name.tap()
         name.typeText("Pat")
         XCUIDevice.shared.press(.home)          // leaving the app saves what is typed (nothing is written while typing)
-        sleep(2)
+        sleep(5)                                // the save is written in the background; CI machines are slow
         app.terminate()
 
         let again = launch(reset: false)
+        XCTAssertTrue(again.buttons["profile-button"].waitForExistence(timeout: 15), "the app opened")
         again.buttons["profile-button"].tap()
         let restored = again.textFields["legal-first"]
-        XCTAssertTrue(restored.waitForExistence(timeout: 5))
+        XCTAssertTrue(restored.waitForExistence(timeout: 10), "the profile editor opened")
         XCTAssertEqual(restored.value as? String, "Pat")
     }
 }

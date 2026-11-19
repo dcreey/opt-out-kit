@@ -138,6 +138,19 @@ extension XCUIApplication {
 }
 
 extension XCUIApplication {
+    /// Sets a SwiftUI toggle row. The row flips only when its switch is tapped, and where the switch sits depends on the phone's width, so it taps the
+    /// switch itself and, if that did not take, the right-hand end of the row.
+    func setSwitch(_ toggle: XCUIElement, on: Bool, file: StaticString = #filePath, line: UInt = #line) {
+        let want = on ? "1" : "0"
+        if (toggle.value as? String) == want { return }
+        let inner = toggle.switches.firstMatch
+        (inner.exists ? inner : toggle).tap()
+        if (toggle.value as? String) != want { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap() }
+        XCTAssertEqual(toggle.value as? String, want, file: file, line: line)
+    }
+}
+
+extension XCUIApplication {
     /// Launch arguments that keep a whole automatic run small in CI: the first 25 sites with a known form. The weekly end-to-end job sets
     /// OPTOUT_ALL_SITES=1 (TEST_RUNNER_OPTOUT_ALL_SITES for xcodebuild) to run the same tests over every site.
     static var fewSites: [String] { ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1" ? [] : ["-uitest-sites", "25"] }

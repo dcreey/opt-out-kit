@@ -40,7 +40,9 @@ room for slower CI machines.
 **UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). A UI test of a whole automatic
 run uses `-uitest-sites 25` (`XCUIApplication.fewSites`): the first 25 sites with a known form, so the run finishes in seconds and the test checks the
 finished run and its report. Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
-profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`.
+profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
+`-uitest` flag a run never asks iOS for the advertising ID: on a fresh simulator (as in CI) the tracking prompt came up at an unpredictable moment and the
+run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`).
 
 **Weekly end-to-end** (`.github/workflows/e2e.yml`, Mondays and by hand): the same automatic-run UI tests over every site (`TEST_RUNNER_OPTOUT_ALL_SITES=1`
 lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
