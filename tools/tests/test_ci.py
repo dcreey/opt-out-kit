@@ -66,7 +66,7 @@ class Failures(unittest.TestCase):
         log = ("/x/A.swift:12: error: -[OptOutKitUITests.DryRunUITests testRun] : XCTAssertTrue failed - the report shows\n"
                "Test Case '-[OptOutKitUITests.DryRunUITests testRun]' failed (3.0 seconds).\n")
         lines = S.failures_from_log(log)
-        self.assertEqual(lines[0], "::error title=OptOutKitUITests/DryRunUITests/testRun::XCTAssertTrue failed - the report shows")
+        self.assertEqual(lines[0], "::error title=OptOutKitUITests/DryRunUITests/testRun::A.swift:12: XCTAssertTrue failed - the report shows")
         self.assertTrue(lines[-1].startswith("::notice title=Failed tests::"))
         self.assertEqual(S.failures_from_log("Test Case '-[A.B testC]' passed (1.0 seconds)."), [])
 

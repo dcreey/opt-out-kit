@@ -78,15 +78,16 @@ def timings_from_log(text):
     return {k: round(v, 1) for k, v in out.items()}          # rounded once, at the end
 
 
-FAIL = re.compile(r"error: -\[(\w+)\.(\w+) (\w+)\] : (.*)")
+FAIL = re.compile(r"(?:([\w./-]+\.swift):(\d+): )?error: -\[(\w+)\.(\w+) (\w+)\] : (.*)")
 
 
 def failures_from_log(text):
     """Each failed test's assertion messages, as GitHub annotation commands. GitHub shows only 10 errors per step, so all of them also go in one
     notice; both can be read from a public run without logging in (`--fetch-run` style)."""
     seen = {}
-    for target, cls, test, msg in FAIL.findall(text):
-        seen.setdefault(f"{target}/{cls}/{test}", []).append(msg.strip()[:300])
+    for path, line, target, cls, test, msg in FAIL.findall(text):
+        where = f"{os.path.basename(path)}:{line}: " if path else ""          # which assertion, so a failure can be found without the log
+        seen.setdefault(f"{target}/{cls}/{test}", []).append(where + msg.strip()[:300])
     lines = [f"::error title={k}::{' | '.join(v)}" for k, v in seen.items()]
     if seen: lines.append("::notice title=Failed tests::" + " || ".join(f"{k}: {' | '.join(v)}" for k, v in seen.items())[:60000])
     return lines
