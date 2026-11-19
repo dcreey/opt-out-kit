@@ -41,22 +41,21 @@ layout, input masks and real taps stays covered by the WebKit tests (`LiveFormTe
 | `page-reading-and-person.test.js` | `describe-page`, `describe-form`, `form-state`, `form-top`, `page-emails`, `visible-fields`, `viewport-text`, `page-changed`, `user-is-typing`, `code-box-in-use`, `empty-code-field`, `empty-verification-code-box`, `global-privacy-control`, `frame-reporter`, `touch-tracker`, `activity`, the scroll helpers |
 | `coverage.test.js` | every script has a test; `ownership` (the fragment) on its own |
 
-**Audit findings (2026-11-19).** Writing these tests turned up the following. Fixed: (3). The rest are recorded and pinned by tests where they are
-behaviour, to be fixed one at a time (each changes what a form gets):
+**Audit findings (2026-11-19), all fixed**, each with a test that pins the corrected behaviour:
 
-1. `discover-forms`: a box with no label of its own borrows the label of the box before it (its fallback reads the previous element, which can be another
-   box's `<label>`); it is then taken for that box's kind, and as required when that label has a star.
-2. `fill-live`: `hasCountryCode` is defined and never called. Harmless: the plain number is typed anyway, so a box beside a country-code menu already gets
-   the number alone.
-3. Fixed: `choose-tile-buttons` could tap the same tile twice when a heading and the block around it both read "I am a ..." (two groups); on a tile that
-   toggles, the second tap undid the app's choice. A group whose tile the app already tapped is now skipped.
-4. `empty-required-choice`: the name of a box inside a wrapping `<label>` includes a menu's options ("State Choose IL"), shown in the "still needed" line.
-5. `decline-consent-banner` clicks the first element anywhere whose text is exactly "Reject" or "Decline" without checking that it is shown (`deny-cookies`
-   checks).
-6. `press-submit`, `fill-fields`: a field name is "escaped" with `replace(/"/g,'\"')`, which in JavaScript leaves it unchanged; a name holding a quote would
-   break the selector. Field names with quotes are rare.
-7. `touch-tracker`: in the page itself, any `postMessage('ookPress')` counts as the person pressing a button; the message is not checked to come from one of
-   the page's own frames, so a page's script could make a confirmation look like the person's press.
+1. `discover-forms`: a box with no label of its own borrowed the label of the box before it (and so its kind, and "required" from its star). The element
+   before a box is now its label only when it belongs to no other box (not a `<label>` holding a box or pointing at another box on the page; one pointing
+   at an id that does not exist is still taken, as the page's own mistake), and a parent's text only when the parent holds no other box.
+2. `fill-live`: `hasCountryCode`, defined and never called, is gone (the number alone was typed anyway).
+3. `choose-tile-buttons` could tap a tile twice when a heading and the block around it both read "I am a ..."; on a toggling tile that undid the app's
+   choice. A group whose tile the app already tapped is skipped.
+4. `empty-required-choice`: the name of a box inside a wrapping `<label>` carried a menu's options ("State Choose IL"); it is now the label's shown words
+   without them. (Shown words: a first fix used the label's full text, which read a bot trap's hidden "Send confirmation to *" as a required menu; the
+   WebKit test `testBoxesInAnOffScreenBotTrapAreNeverFilled` caught it.)
+5. `decline-consent-banner` presses only a shown element (a hidden "Decline" in a closed menu is not the prompt's).
+6. `press-submit`, `fill-fields`: a field name is escaped for its selector (`CSS.escape`), so a name holding a quote or backslash is found.
+7. `touch-tracker`: a press reported by message counts only when it comes from one of the page's own frames; a page's script posting `ookPress` itself
+   no longer looks like the person's press.
 
 ## Unit and integration tests
 
@@ -72,9 +71,12 @@ proved by a unit test, so a push that breaks a rule fails at once, not at the ne
 screen, that a sheet stays open, that a keyboard has a Done button) has no rule behind it and is integration only. When a UI test is added, the unit test
 for its rule is added with it, and both go in the table below.
 
-**Releasing:** publish a GitHub release (Releases, Draft a new release, a tag such as `v1.0-48`) for the commit being shipped to TestFlight or the App
-Store. The Integration workflow runs on it; ship once it passes. A failing integration test is fixed (or the release is held) before the build goes to
-review.
+**Releasing (the gate):** a build goes to TestFlight or the App Store only from a commit whose unit tests and integration tests passed.
+`tools/release_testflight.sh` runs `tools/release_gate.py` first and stops unless the working copy is clean, the commit is on GitHub's `main`, and both the
+CI workflow and the Integration workflow succeeded for exactly that commit (read from GitHub's public API; `tools/tests/test_release_gate.py`). To release:
+push the commit; publish a GitHub release for it (Releases, Draft a new release, a tag such as `v1.0-49`), which starts Integration on it, or start
+Integration by hand (Actions, Integration, Run workflow, on `main`); when both pass, run `tools/release_testflight.sh`. A failing integration test is fixed
+(or the release is held) before the build goes to review. Integration takes the UI tests about 15 minutes and the run over every site up to two hours.
 
 | Integration test (`OptOutKitUITests`) | The rules it checks, and their unit tests |
 |---|---|

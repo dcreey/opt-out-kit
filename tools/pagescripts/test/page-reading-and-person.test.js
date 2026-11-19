@@ -124,12 +124,14 @@ test('only the person\'s real touches count: the app\'s own scripted clicks and 
   assert.equal(w.__ookUserAt, undefined);
 });
 
-test('a press reported by a frame counts as the person\'s; so does one any script on the page posts (an audit finding)', async () => {
-  const w = page('<p>x</p>');
+test('a press reported by one of the page\'s own frames counts as the person\'s; one the page\'s own script posts does not', async () => {
+  const w = page('<iframe id=f></iframe>');
   run(w, 'touch-tracker');
   w.postMessage('ookPress', '*');
   await sleep(10);
-  assert.equal(w.__ookPress, 1, 'the message is not checked to come from a frame of the page (docs/TESTING.md, audit findings)');
+  assert.equal(w.__ookPress, undefined, 'the page itself cannot make a press look like the person\'s');
+  w.dispatchEvent(new w.MessageEvent('message', { data: 'ookPress', source: w.document.getElementById('f').contentWindow }));
+  assert.equal(w.__ookPress, 1, 'a frame of the page reports the person\'s press there');
 });
 
 test('the activity signal tells the app (at most once a second) when the page changes, and does not start twice', async () => {

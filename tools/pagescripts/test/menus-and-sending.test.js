@@ -88,6 +88,14 @@ test('fill-fields types by name or id, and sets a menu by value or text', () => 
   assert.equal(w.document.querySelector('[name=st]').value, 'IL');
 });
 
+test('a field name holding a quote or backslash is found, not a broken selector', () => {
+  const w = page('<form><input name=\'a"b\'><input name="c\\d"><button id=go>Send</button></form>');
+  assert.equal(callJSON(w, 'fill-fields', JSON.stringify([{ name: 'a"b', candidates: ['x'] }, { name: 'c\\d', candidates: ['y'] }])), 2);
+  assert.equal(w.document.querySelector('form').elements[0].value, 'x');
+  assert.equal(w.document.querySelector('form').elements[1].value, 'y');
+  assert.equal(call(w, 'press-submit', 'a"b'), true);
+});
+
 test('press-submit presses the form\'s submit button, skipping an "I agree" one, and finds the form by a field\'s name', () => {
   const w = page('<form><input name=email><input type=submit id=ag value="I agree"><button id=go>Send</button></form>');
   const seen = clicks(w, ['ag', 'go']);

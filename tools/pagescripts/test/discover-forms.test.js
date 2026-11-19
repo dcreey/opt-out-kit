@@ -36,6 +36,18 @@ test('a label is read from label[for], a wrapping label, aria-labelledby, aria-l
   assert.equal(field(f, 'l8').label, 'State of residence', "its parent's text");
 });
 
+test('a box with no label of its own does not borrow the label of the box before it', () => {
+  const { out } = forms('<form><label>Email *<input name=email></label><input name=nick><span>Street</span><input name=street></form>');
+  const f = out[0];
+  assert.notEqual(field(f, 'nick').label, 'Email *', 'the label before it belongs to the email box');
+  assert.equal(field(f, 'nick').required, false, "so it is not taken as required either");
+  assert.equal(field(f, 'street').label, 'Street', 'a plain caption before a box is still its label');
+  const forOther = forms('<form><div><label for=a>First name</label><input id=a name=a></div><div><label for=a>First name</label><input id=b name=b><input name=c></div></form>').out[0];
+  assert.notEqual(field(forOther, 'b').label, 'First name', 'a label for another box on the page is not this box\'s');
+  const missing = forms('<form><label for=nope>Last name</label><input id=b name=b></form>').out[0];
+  assert.equal(field(missing, 'b').label, 'Last name', 'a label for an id that does not exist is taken as this box\'s (the page\'s own mistake)');
+});
+
 test('buttons and hidden inputs are not boxes; a box is required when marked so or its label has a star', () => {
   const { out } = forms(`<form><input type=hidden name=h><input type=submit name=s value=Go><input type=button name=b><input type=image name=im>
     <input type=reset name=r><input name=req required><label>Email *<input name=star></label><input name=opt aria-label="Nickname"><input name=off disabled aria-label="Code"></form>`);

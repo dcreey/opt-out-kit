@@ -112,8 +112,10 @@ test('with no retried date box nothing is changed', () => {
 test('the first required box still empty is named; filled ones, optional ones and check-code boxes are not', () => {
   const w = page(`<form data-ook-form="f0"><label>First name * <input value="Pat"></label><label>Nickname <input></label>
     <label>Verification code * <input></label><label>State * <select><option value="">Choose</option><option>IL</option></select></label></form>`);
-  // The label of a box inside a <label> also carries the menu's options (see the audit findings in docs/TESTING.md).
-  assert.match(call(w, 'empty-required-choice', 'f0'), /^State\b/);
+  assert.equal(call(w, 'empty-required-choice', 'f0'), 'State', "the label's own words, without the menu's options")
+  // A required menu inside a hidden bot trap has no shown label, so it is not something the person must fill (WebKit's LiveFormTests have the real trap).
+  const trap = page('<form data-ook-form="f0"><div style="height:0;overflow:hidden;position:absolute;left:-8000px"><label>Send confirmation to *<select><option value="">Choose</option><option>Email</option></select></label></div></form>');
+  assert.equal(call(trap, 'empty-required-choice', 'f0'), '');
   const done = page('<form data-ook-form="f0"><input required aria-label="Email" value="pat@example.com"></form>');
   assert.equal(call(done, 'empty-required-choice', 'f0'), '');
 });

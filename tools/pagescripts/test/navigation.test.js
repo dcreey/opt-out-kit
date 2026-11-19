@@ -41,6 +41,13 @@ test('decline-consent-banner presses Reject / Decline / Ablehnen and never Accep
   assert.equal(run(page('<button>Accept</button>'), 'decline-consent-banner'), false);
 });
 
+test('decline-consent-banner never presses a hidden "Decline" (one in a closed menu)', () => {
+  const w = page('<div style="display:none"><button id=hid>Decline</button></div><button id=acc>Accept</button>');
+  const seen = clicks(w, ['hid', 'acc']);
+  assert.equal(run(w, 'decline-consent-banner'), false);
+  assert.deepEqual(seen, []);
+});
+
 // ---- hide-consent-overlays.js: a cookie overlay that would not go away stops covering the page (it consents to nothing)
 
 test('a fixed cookie overlay is hidden, but not one holding a form, and the page can scroll again', () => {

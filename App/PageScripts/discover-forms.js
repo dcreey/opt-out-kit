@@ -6,8 +6,12 @@
     // Form builders (Tally, Typeform) put the question in a heading and point the box at it: aria-labelledby="label_<id>".
     if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
     if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.getAttribute('title')||'';
-    if(!t&&e.previousElementSibling) t=e.previousElementSibling.innerText||'';
-    if(!t&&e.parentElement) t=(e.parentElement.innerText||'').slice(0,60);
+    // The element just before the box (<span>Street</span><input>), unless it belongs to another box: a <label> holding a box of its own, or one for another
+    // box on the page (a label pointing at an id that does not exist is usually this box's, with the page's own mistake in it).
+    var pv=e.previousElementSibling;
+    if(!t&&pv&&!/^(INPUT|SELECT|TEXTAREA)$/.test(pv.tagName)&&!(pv.tagName==='LABEL'&&(pv.querySelector('input,select,textarea')||(pv.htmlFor&&pv.htmlFor!==e.id&&document.getElementById(pv.htmlFor))))) t=pv.innerText||'';
+    // Its parent's text, unless the parent holds other boxes too (then that text is theirs as much as this one's).
+    if(!t&&e.parentElement&&e.parentElement.querySelectorAll('input:not([type=hidden]),select,textarea').length<=1) t=(e.parentElement.innerText||'').slice(0,60);
     return t.replace(/\s+/g,' ').trim().slice(0,90);};
   var ctxEl=function(e){var n=e; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var t=(n.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>=25&&t.length<=700) return n;} return e.parentElement||e;};
   // A rich-text message box (Quill, Draft, a plain contenteditable div) is a box too; it counts as a textarea.

@@ -15,12 +15,8 @@
     var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
     var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
     el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
-  // A phone number is typed as plain digits, with no spaces or punctuation. Only a box that shows an error gets other shapes (see tryPhoneFormats).
-  // A menu of country codes ("United States (+1)") beside the box already supplies the code, so then the box takes the number alone.
-  function hasCountryCode(el){var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){
-      var ss=n.querySelectorAll('select'); for(var i=0;i<ss.length;i++){var o=ss[i].options[ss[i].selectedIndex]; if(o&&/\+\d{1,3}\b/.test(o.text+' '+o.value)) return true;}
-      if(n.tagName==='FORM') break;}
-    return false;}
+  // A phone number is typed as plain digits, with no spaces or punctuation (a country-code menu beside the box supplies the code; the box gets the number
+  // alone). Only a box that shows an error gets other shapes (see tryPhoneFormats).
   function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1);
     var pat=el.getAttribute('pattern');
     if(d.length===10&&pat){var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6); var fs=[d,'1'+d,'+1'+d,a+'-'+b+'-'+c];

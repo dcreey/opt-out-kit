@@ -1,5 +1,5 @@
 (function(name){
-  var el=document.querySelector('[name="'+name.replace(/"/g,'\"')+'"]')||document.getElementById(name);
+  var el=document.querySelector('[name="'+(window.CSS&&CSS.escape?CSS.escape(name):name.replace(/["\\]/g,'\\$&'))+'"]')||document.getElementById(name);
   var form=el&&el.form; if(!form) return false;
   var buttons=form.querySelectorAll('button,input[type=submit],input[type=button]');
   for(var i=0;i<buttons.length;i++){var b=buttons[i],t=(b.innerText||b.value||'').trim();

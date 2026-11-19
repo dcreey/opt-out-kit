@@ -3,7 +3,7 @@
 //
 // jsdom has no layout, so the few things the scripts read from layout are stood in for here, from the page's own markup:
 //   - getBoundingClientRect / offsetParent: zero size for an element (or an ancestor) that is display:none, visibility:hidden, [hidden], or has an
-//     inline width or height of 0; an element placed off screen (an inline left or top below -1000, as bot traps are) gets that position.
+//     inline width or height of 0, or sits inside a box of no height that clips its overflow (a bot trap); an element placed off screen (an inline left or top below -1000, as bot traps are) gets that position.
 //     A frame is 300 x 150 (or its width and height attributes); everything else is 200 x 30 at the top left.
 //   - innerText: the text of what is shown (hidden elements, <script> and <style> left out), with blocks on their own lines.
 //   - scrollIntoView, scrollTo, scrollBy: recorded, nothing moves.
@@ -39,6 +39,8 @@ function install(window) {
       if (e.hidden || cs.display === 'none' || cs.visibility === 'hidden') return true;
       if (e.tagName === 'DETAILS' && !e.open && e !== el && !(el.closest('summary') && el.closest('details') === e)) return true;
       if (e.tagName === 'INPUT' && e.type === 'hidden') return true;
+      // Inside a box of no height that clips what overflows it (a bot trap): nothing of it shows, as in WebKit.
+      if (e !== el && cs.overflow === 'hidden' && (e.style.height === '0px' || e.style.height === '0')) return true;
     }
     const st = el.style || {};
     return st.width === '0px' || st.height === '0px' || st.width === '0' || st.height === '0';

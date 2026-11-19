@@ -10,6 +10,8 @@ set -euo pipefail
 TEAM="${TEAM_ID:-C84MKW6B2K}"
 OUT="$(mktemp -d)"
 cd "$(dirname "$0")/.."
+# The release gate: only a commit whose unit tests (CI) and integration tests (Integration) passed on GitHub is built and uploaded.
+python3 tools/release_gate.py
 # The API key also signs in for provisioning, so a new bundle id (the share extension) gets its profile without an Xcode account.
 AUTH=(-authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
 xcodegen generate
