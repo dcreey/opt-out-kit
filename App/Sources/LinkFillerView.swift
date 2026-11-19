@@ -78,7 +78,7 @@ final class LinkFiller: ObservableObject {
         await s.scrollChallengeIntoView()
         #if DEBUG
         // Simulator work: what every visible field held after the fill, written to Documents/linkfill.json.
-        if let json = try? await s.webView.evaluateJavaScript("JSON.stringify([...document.querySelectorAll('input,select,textarea')].filter(e=>e.getBoundingClientRect().width>0&&!['hidden','submit','button'].includes(e.type)).map(e=>({id:e.id||e.name||'',type:e.type||e.tagName,value:e.value})))") as? String,
+        if let json = try? await s.webView.evaluateJavaScript(PageScript.source("visible-fields")) as? String,
            let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first { try? json.write(to: docs.appendingPathComponent("linkfill.json"), atomically: true, encoding: .utf8) }
         #endif
         status = autoSubmit() ? Loc.t("Your details are filled in. Check them, solve any check, and we will send it.")

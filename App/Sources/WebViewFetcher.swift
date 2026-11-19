@@ -107,14 +107,14 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
         // Global Privacy Control: every page the app opens is told, in script too, that this person opts out of sale and sharing.
-        config.userContentController.addUserScript(WKUserScript(source: "try{Object.defineProperty(Navigator.prototype,'globalPrivacyControl',{get:function(){return true;},configurable:true});}catch(e){}",
+        config.userContentController.addUserScript(WKUserScript(source: PageScript.source("global-privacy-control"),
                                                                 injectionTime: .atDocumentStart, forMainFrameOnly: false))
         // Every frame that has inputs tells the session, so a form inside a frame from another site can be read and filled.
         config.userContentController.add(reporter, contentWorld: .page, name: "ookFrame")
-        config.userContentController.addUserScript(WKUserScript(source: "(function(){if(window.top===window)return; function r(){try{var n=document.querySelectorAll('input,select,textarea').length; if(n>0) webkit.messageHandlers.ookFrame.postMessage({n:n,href:location.href});}catch(e){}} if(document.readyState==='complete') setTimeout(r,800); else window.addEventListener('load',function(){setTimeout(r,800);}); setTimeout(r,3000);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: false))
+        config.userContentController.addUserScript(WKUserScript(source: PageScript.source("frame-reporter"), injectionTime: .atDocumentEnd, forMainFrameOnly: false))
         // The person's own touches and keys (only real ones, never the page's or the app's scripted events) are noted, so the app can leave the page alone while they type,
         // and tell a confirmation they caused (they pressed a button, a link or Enter) from one the page showed by itself.
-        config.userContentController.addUserScript(WKUserScript(source: "(function(){var top=window.top===window; function tell(m){if(top){ if(m==='ookPress') window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } else try{window.top.postMessage(m,'*');}catch(x){}} ['pointerdown','touchstart','keydown','beforeinput','input'].forEach(function(n){document.addEventListener(n,function(e){ if(e.isTrusted) tell('ookUser'); },true);}); document.addEventListener('click',function(e){ if(!e.isTrusted) return; var t=e.target; if(t&&t.closest&&t.closest('button,[role=button],input[type=submit],input[type=button],input[type=image],a[href]')) tell('ookPress'); },true); document.addEventListener('keydown',function(e){ if(e.isTrusted&&e.key==='Enter'&&e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) tell('ookPress'); },true); if(top) window.addEventListener('message',function(e){ if(e.data==='ookUser') window.__ookUserAt=Date.now(); else if(e.data==='ookPress'){ window.__ookPress=(window.__ookPress||0)+1; window.__ookUserAt=Date.now(); } });})();", injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        config.userContentController.addUserScript(WKUserScript(source: PageScript.source("touch-tracker"), injectionTime: .atDocumentStart, forMainFrameOnly: false))
         if activity != nil {
             // Signs of life from the page itself: the page changing, and a request it made coming back (at most one a second).
             config.userContentController.add(activityReporter, contentWorld: .page, name: "ookActivity")
@@ -181,21 +181,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// The prompt text (the smallest element that holds the gate wording) and the same-site terms and privacy pages it links
     /// to. Nothing is clicked here.
     private func findTermsGate() async -> (prompt: String, links: [URL])? {
-        let js = #"""
-        (function(re){var rx=new RegExp(re,'i'),best=null;
-        document.querySelectorAll('div,section,form,dialog,[role=dialog]').forEach(function(el){var t=el.innerText||'';
-          if(rx.test(t)&&t.length<9000&&(!best||t.length<best.innerText.length))best=el;});
-        if(!best)return null;
-        var agree=/^\s*(i agree|i accept|agree|accept|j'accepte|accepter|tout accepter|acepto|aceptar|ich stimme zu|zustimmen|akzeptieren)\s*$/i,hasButton=false;
-        for(var up=best,d=0;up&&d<4&&!hasButton;up=up.parentElement,d++){
-          var bs=up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]');
-          for(var i=0;i<bs.length;i++){var t=(bs[i].innerText||bs[i].value||'');if(agree.test(t)){hasButton=true;break;}}}
-        if(!hasButton)return null;   // acceptable-use text in a page footer is not a prompt: nothing to accept
-        var host=location.hostname.split('.').slice(-2).join('.'),links=[];
-        document.querySelectorAll('a[href]').forEach(function(a){
-          if(/terms|acceptable use|privacy|conditions|confidentialit|mentions l[ée]gales|t[ée]rminos|condiciones|privacidad|nutzungsbedingungen|datenschutz|agb/i.test((a.innerText||'')+' '+a.href)&&a.hostname.split('.').slice(-2).join('.')===host)links.push(a.href);});
-        return JSON.stringify({prompt:best.innerText,links:links.slice(0,4)});})(\#(Self.jsString(Self.gatePattern)));
-        """#
+        let js = PageScript.call("find-terms-gate", Self.gatePattern)
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String,
               let data = json.data(using: .utf8),
               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -207,28 +193,14 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// Presses "I agree" inside the same dialog that holds the terms text, so a cookie banner elsewhere on the page is never
     /// touched. Returns true if a button was pressed.
     private func clickAgree() async -> Bool {
-        let js = #"""
-        (function(re){var rx=new RegExp(re,'i'),el=null;
-        document.querySelectorAll('div,section,form,dialog,[role=dialog]').forEach(function(e){var t=e.innerText||'';
-          if(rx.test(t)&&t.length<9000&&(!el||t.length<el.innerText.length))el=e;});
-        var agree=/^\s*(i agree|i accept|agree|accept|j'accepte|accepter|tout accepter|acepto|aceptar|ich stimme zu|zustimmen|akzeptieren)\s*$/i;
-        for(var up=el,d=0;up&&d<4;up=up.parentElement,d++){
-          var bs=up.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]');
-          for(var i=0;i<bs.length;i++){var t=(bs[i].innerText||bs[i].value||'');if(agree.test(t)){bs[i].click();return true;}}}
-        return false;})(\#(Self.jsString(Self.gatePattern)));
-        """#
+        let js = PageScript.call("click-agree", Self.gatePattern)
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
     /// Cookie and tracking banners hide the page behind a prompt. We always pick the most private option
     /// ("Reject all", "Decline") and never "Accept". Returns true if a button was clicked.
     private func declineConsentBanner() async -> Bool {
-        let js = """
-        (function(){var re=/^\\s*(reject all|reject|decline|deny|no thanks|only necessary|necessary only|tout refuser|refuser|continuer sans accepter|rechazar todo|rechazar|solo necesarias|alle ablehnen|ablehnen|nur notwendige)\\s*$/i;
-        var els=document.querySelectorAll('button,a,div,span,[role=button],input[type=button]');
-        for(var i=0;i<els.length;i++){var t=(els[i].innerText||els[i].value||'').trim();
-        if(re.test(t)){els[i].click();return true;}}return false;})();
-        """
+        let js = PageScript.source("decline-consent-banner")
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
@@ -280,11 +252,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
             return [p.first?.removingPercentEncoding ?? "", (p.count > 1 ? p[1] : "").removingPercentEncoding ?? ""]
         }
         let json = String(data: try JSONSerialization.data(withJSONObject: fields), encoding: .utf8) ?? "[]"
-        let js = """
-        (function(){var f=document.createElement('form');f.method='POST';f.action=\(Self.jsString(action.absoluteString));
-        \(json).forEach(function(kv){var i=document.createElement('input');i.type='hidden';i.name=kv[0];i.value=kv[1];f.appendChild(i);});
-        document.body.appendChild(f);f.submit();})();
-        """
+        let js = PageScript.call("submit-form", json: [Self.jsString(action.absoluteString), json])
         try await wait { self.webView.evaluateJavaScript(js, completionHandler: nil) }
     }
 
@@ -486,7 +454,7 @@ extension WebViewSession {
         defer { webView.frame = originalFrame }
         try? await Task.sleep(nanoseconds: 400_000_000)
         var top: CGFloat = 0
-        if let token, let y = (try? await webView.evaluateJavaScript("(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); return f? f.getBoundingClientRect().top+window.scrollY : 0;})();")) as? Double {
+        if let token, let y = (try? await webView.evaluateJavaScript(PageScript.call("form-top", token))) as? Double {
             top = max(0, CGFloat(y) - 200)
         }
         let config = WKSnapshotConfiguration()
@@ -511,11 +479,7 @@ extension WebViewSession {
 
     /// Brings the human check into view so the person does not have to hunt for it.
     func scrollChallengeIntoView() async {
-        let js = #"""
-        (function(){var f=[].slice.call(document.querySelectorAll('iframe')).filter(function(x){
-          return /recaptcha|hcaptcha|challenges\.cloudflare\.com/.test(x.src||'');})[0];
-          if(f){f.scrollIntoView({block:'center',behavior:'instant'});return true;} return false;})();
-        """#
+        let js = PageScript.source("scroll-challenge-into-view")
         _ = try? await webView.evaluateJavaScript(js)
     }
 
@@ -526,11 +490,7 @@ extension WebViewSession {
     /// A page that has just loaded, or has no watcher yet, counts as changed. Marks the app puts on the form (`data-ook`) are not changes.
     /// True while the person has the cursor in a box on the page and has touched or typed in the last 45 seconds: nothing may be clicked, scrolled or filled then.
     func userIsTyping() async -> Bool {
-        let js = #"""
-        (function(){var a=document.activeElement; if(!a) return false; var t=window.__ookUserAt||0; if(Date.now()-t>45000) return false;
-          var tag=a.tagName; if(tag==='IFRAME') return true; if(tag==='TEXTAREA'||a.isContentEditable) return true;
-          return tag==='INPUT'&&!/^(checkbox|radio|button|submit|reset|image|file|range|color|hidden)$/i.test(a.type||'');})();
-        """#
+        let js = PageScript.source("user-is-typing")
         return (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
     }
 
@@ -538,15 +498,7 @@ extension WebViewSession {
     func userPresses() async -> Int? { (try? await webView.evaluateJavaScript("window.__ookPress||0")) as? Int }
 
     func pageChanged() async -> Bool {
-        let js = #"""
-        (function(){var W=window.__ook;
-          if(!W){W=window.__ook={dirty:true,last:Date.now()};
-            try{new MutationObserver(function(rs){for(var i=0;i<rs.length;i++){var r=rs[i];
-              if(r.type==='attributes'&&/^data-ook/.test(r.attributeName||'')) continue; W.dirty=true; W.last=Date.now(); return;}})
-              .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style','hidden','open','aria-hidden','aria-expanded','src','disabled']});}catch(e){}}
-          if(!W.ev){W.ev=true; var mark=function(){W.dirty=true;W.last=Date.now();}; document.addEventListener('change',mark,true); document.addEventListener('click',mark,true);}
-          if(W.dirty&&Date.now()-W.last>=600){W.dirty=false;return true;} return false;})();
-        """#
+        let js = PageScript.source("page-changed")
         var changed = (try? await webView.evaluateJavaScript(js)) as? Bool ?? false
         if let f = activeFrame, (try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page)) as? Bool == true { changed = true }
         return changed
@@ -554,13 +506,7 @@ extension WebViewSession {
 
     /// The text currently on screen (what is inside the viewport), from the page and from the frame the form is in. Cheap enough to read every few seconds.
     func viewportText() async -> String {
-        let js = #"""
-        (function(){var out=[],h=innerHeight,w=innerWidth,n=0,tw=document.createTreeWalker(document.body||document.documentElement,NodeFilter.SHOW_TEXT),x;
-          while((x=tw.nextNode())&&n<4000){var t=(x.nodeValue||'').trim(); if(!t) continue; var e=x.parentElement; if(!e) continue;
-            var r=e.getBoundingClientRect(); if(r.width===0||r.height===0||r.bottom<0||r.top>h||r.right<0||r.left>w) continue;
-            var cs=getComputedStyle(e); if(cs.visibility==='hidden'||cs.display==='none') continue; out.push(t); n++;}
-          return out.join('\n').slice(0,8000);})();
-        """#
+        let js = PageScript.source("viewport-text")
         let page = (try? await webView.evaluateJavaScript(js)) as? String ?? ""
         guard let f = activeFrame else { return page }
         let inside = (try? await webView.evaluateJavaScript(js, in: f, contentWorld: .page)) as? String ?? ""
@@ -577,45 +523,14 @@ extension WebViewSession {
 
     /// A human check a person has to act on, as opposed to an invisible one that passes by itself. Never solved here.
     func visibleChallenge() async -> String? {
-        let js = #"""
-        (function(){
-          var text=(document.body?document.body.innerText:'').toLowerCase();
-          // A check the person already passed leaves a token behind; the page's own "please wait for the anti-spam check" line (from an early press) can stay on screen.
-          var solved=[].some.call(document.querySelectorAll('input[name="cf-turnstile-response"],textarea[name="g-recaptcha-response"],textarea[name="h-captcha-response"]'),function(e){return !!e.value;});
-          // The page says its reCAPTCHA refused the send (a score-based one rejects scripted presses): only the person's own tap on the page's button can get past it.
-          if(/recaptcha[^.]{0,40}(missing|invalid|failed|expired|could not be verified)|failed (the )?recaptcha/.test(text)) return 'a reCAPTCHA that rejected the automatic send';
-          if(!solved&&/anti-?spam check|wait for the (anti-?spam|security) check|confirm you are human|i.?m not a robot|select all (the )?(images|squares)|prove you.?re (not a robot|human)|are you a robot|verify you are human|are you a human|checking your browser|just a moment|security challenge|performing security verification|v[ée]rifiez que vous [êe]tes humain|v[ée]rification de s[ée]curit[ée]|verifica que eres humano|comprobaci[oó]n de seguridad|best[äa]tigen sie, dass sie ein mensch|sicherheits[üu]berpr[üu]fung/.test(text)) return 'a human check';
-          var ts=document.querySelector('.cf-turnstile,[class*="turnstile" i],[id*="turnstile" i]');
-          if(ts){var tr=ts.getBoundingClientRect(),tt=document.querySelector('input[name="cf-turnstile-response"]'); if(tr.width>0&&tr.height>0&&(!tt||!tt.value)) return 'a Cloudflare check';}
-          var frames=document.querySelectorAll('iframe');
-          for(var i=0;i<frames.length;i++){var f=frames[i],src=f.src||'',r=f.getBoundingClientRect();
-            if(r.width<40||r.height<40) continue;
-            if(f.closest&&f.closest('.grecaptcha-badge')) continue;
-            if(/recaptcha\/(api2|enterprise)\/bframe/.test(src)) return 'a reCAPTCHA puzzle';
-            if(/recaptcha\/(api2|enterprise)\/anchor/.test(src)){var ta=document.querySelector('textarea[name="g-recaptcha-response"]'); if(!ta||!ta.value) return 'a reCAPTCHA checkbox';}
-            if(/hcaptcha\.com/.test(src)){var h=document.querySelector('textarea[name="h-captcha-response"]'); if(!h||!h.value) return 'an hCaptcha';}
-            if(/challenges\.cloudflare\.com/.test(src)){var t=document.querySelector('input[name="cf-turnstile-response"]'); if(!t||!t.value) return 'a Cloudflare check';}
-          }
-          return null;})();
-        """#
+        let js = PageScript.source("visible-challenge")
         return (try? await webView.evaluateJavaScript(js)) as? String
     }
 
     /// The text of an unticked checkbox that asks the person to certify, authorize or acknowledge something. Only they can tick it:
     /// a certification made for someone by software is not theirs. Nil when there is none.
     func pendingCertification() async -> String? {
-        let js = #"""
-        (function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|consent|under penalty|on behalf|je certifie|j'atteste|je reconnais|j'accepte|consentement|certifico|atesto|reconozco|acepto|consentimiento|ich best[äa]tige|ich versichere|einwilligung|zustimmung|ich stimme/i,out=null;
-          document.querySelectorAll('input[type=checkbox]').forEach(function(c){
-            if(c.checked||out) return;
-            var t='';
-            if(c.id){var l=document.querySelector('label[for="'+c.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
-            if(!t){var n=c.parentElement; t=n?n.innerText:'';}
-            // "I am an authorized agent submitting on behalf of someone else" is an option for agents, not a requirement for the subject.
-            if(re.test(t)&&!/\bagent\b|\bon behalf\b|representative|mandataire|repr[ée]sentant|au nom d|agente|representante|en nombre de|bevollm[äa]chtigt|im namen/i.test(t)) out=t.replace(/\s+/g,' ').trim().slice(0,140);});
-          return out;})();
-        """#
+        let js = PageScript.source("pending-certification")
         return (try? await webView.evaluateJavaScript(js)) as? String
     }
 
@@ -623,20 +538,7 @@ extension WebViewSession {
     /// account owner, who allowed it. Legal certifications, agent statements and terms are left alone (same rule as
     /// `FormFiller.isSelfIdentityBox`). Returns how many were ticked.
     func tickIdentityBoxes() async -> Int {
-        let js = #"""
-        (function(){var yes=/\bi (confirm|verify|am)\b.{0,60}\b(person|owner|me)\b.{0,40}(email|e-mail|address|account|request|record)/i,
-              no=/penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal/i,n=0,
-              ack=/may be required to verify my identity.{0,200}authori[sz]e .{0,60} to contact me/i,notAck=/terms|privacy policy|\bsell|market|newsletter|advertis|share my|third part/i;
-          document.querySelectorAll('input[type=checkbox]').forEach(function(c){
-            if(c.checked) return;
-            var t='';
-            if(c.id){var l=document.querySelector('label[for="'+c.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=c.closest('label'); if(p) t=p.innerText;}
-            if(!t){var q=c.parentElement; t=q?q.innerText:'';}
-            t=t.replace(/\s+/g,' ').trim();
-            if((yes.test(t)&&!no.test(t))||(ack.test(t)&&!notAck.test(t))){c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} n++;}});
-          return n;})();
-        """#
+        let js = PageScript.source("tick-identity-boxes")
         return ((try? await webView.evaluateJavaScript(js)) as? Int) ?? 0
     }
 
@@ -646,47 +548,17 @@ extension WebViewSession {
         let values = allValues.filter { $0.type != FormFiller.confirmIdentityType }
         let payload = values.map { ["name": $0.name, "candidates": $0.candidates] as [String: Any] }
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return 0 }
-        let js = #"""
-        (function(values){var filled=0;
-        function setValue(el,v){var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
-          var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
-          el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
-        values.forEach(function(v){
-          var el=document.querySelector('[name="'+v.name.replace(/"/g,'\"')+'"]')||document.getElementById(v.name); if(!el) return;
-          if(el.tagName==='SELECT'){var done=false;
-            for(var c=0;c<v.candidates.length&&!done;c++){var want=v.candidates[c].toLowerCase();
-              for(var i=0;i<el.options.length;i++){var o=el.options[i];
-                if(o.value.toLowerCase()===want||o.text.trim().toLowerCase()===want){el.value=o.value;done=true;break;}}}
-            if(done){el.dispatchEvent(new Event('change',{bubbles:true}));filled++;}
-          } else {setValue(el,v.candidates[0]);filled++;}
-        });
-        return filled;})(\#(json));
-        """#
+        let js = PageScript.call("fill-fields", json: [json])
         return ((try? await webView.evaluateJavaScript(js)) as? Int) ?? 0
     }
 
     /// Presses the form's own submit button (never one that says agree or accept), or submits the form directly.
     func pressSubmit(for values: [FieldValue]) async -> Bool {
         let first = values.first?.name ?? ""
-        let js = #"""
-        (function(name){
-          var el=document.querySelector('[name="'+name.replace(/"/g,'\"')+'"]')||document.getElementById(name);
-          var form=el&&el.form; if(!form) return false;
-          var buttons=form.querySelectorAll('button,input[type=submit],input[type=button]');
-          for(var i=0;i<buttons.length;i++){var b=buttons[i],t=(b.innerText||b.value||'').trim();
-            if(/agree|accept/i.test(t)) continue;
-            var type=(b.getAttribute('type')||'submit').toLowerCase();
-            if(type==='submit'){b.click();return true;}}
-          if(form.requestSubmit){form.requestSubmit();return true;}
-          form.submit();return true;})(\#(Self.jsLiteral(first)));
-        """#
+        let js = PageScript.call("press-submit", first)
         return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
     }
 
-    private static func jsLiteral(_ s: String) -> String {
-        guard let d = try? JSONSerialization.data(withJSONObject: [s]), let j = String(data: d, encoding: .utf8) else { return "\"\"" }
-        return String(j.dropFirst().dropLast())
-    }
 }
 
 // MARK: Reading a page's links and forms, for finding a moved opt-out page
@@ -723,23 +595,7 @@ private enum WebInspection {
 extension WebViewSession {
     /// The title, visible text, links and forms of the current page.
     func describePage(fallbackURL: URL) async -> PageSnapshot? {
-        let js = #"""
-        (function(){
-          function abs(h){try{return new URL(h,location.href).href}catch(e){return null}}
-          var links=[].slice.call(document.querySelectorAll('a[href]')).map(function(a){return {href:abs(a.getAttribute('href')),text:(a.innerText||'').trim().slice(0,120)};}).filter(function(l){return l.href;});
-          var forms=[].slice.call(document.forms).map(function(f){
-            var fields=[],hasSubmit=!!f.querySelector('button,input[type=submit]');
-            [].slice.call(f.elements).forEach(function(el){
-              var t=(el.type||el.tagName||'').toLowerCase();
-              if(['hidden','submit','button','image','reset','fieldset','object','output'].indexOf(t)>=0) return;
-              var label=''; if(el.id){var l=document.querySelector('label[for="'+el.id+'"]'); if(l) label=l.innerText;}
-              if(!label) label=el.placeholder||el.getAttribute('aria-label')||el.name||'';
-              fields.push({type:t==='select-one'?'select':t,name:el.name||el.id||'',label:String(label).replace(/\s+/g,' ').trim().slice(0,60)});});
-            var a=f.getAttribute('action');
-            return {action:a?abs(a):location.href,method:(f.method||'get').toLowerCase(),fields:fields,hasSubmit:hasSubmit};});
-          return JSON.stringify({url:location.href,title:document.title||'',text:(document.body?document.body.innerText:'').slice(0,4000),links:links.slice(0,300),forms:forms});
-        })();
-        """#
+        let js = PageScript.source("describe-page")
         guard let json = (try? await webView.evaluateJavaScript(js)) as? String, let data = json.data(using: .utf8),
               let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
         let links = (o["links"] as? [[String: Any]] ?? []).compactMap { l -> LinkSnapshot? in
@@ -783,7 +639,7 @@ final class SessionBin {
 
 extension WebViewSession {
     /// Posts (at most once a second) when the page changes or a request it made comes back. Added only for a background run's site.
-    static let activityScript = "(function(){if(window.__ookAct)return;window.__ookAct=1;var last=0;function ping(){var n=Date.now();if(n-last<1000)return;last=n;try{webkit.messageHandlers.ookActivity.postMessage(1);}catch(e){}} try{new MutationObserver(ping).observe(document,{subtree:true,childList:true,attributes:true,characterData:true});}catch(e){} try{var f=window.fetch;if(f){window.fetch=function(){var p=f.apply(this,arguments);try{p.then(ping,ping);}catch(e){}return p;};}}catch(e){} try{var s=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.send=function(){try{this.addEventListener('loadend',ping);}catch(e){}return s.apply(this,arguments);};}catch(e){}})();"
+    static let activityScript = PageScript.source("activity")
 }
 
 /// Hands the page's signs of life to its session.

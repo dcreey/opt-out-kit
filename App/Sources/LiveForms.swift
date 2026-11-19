@@ -5,21 +5,7 @@ import OptOutKitCore
 extension WebViewSession {
     /// Denies cookie and consent prompts that sit over the page. They load late, so this is tried more than once. Never accepts.
     func denyCookies() async -> String? {
-        let js = #"""
-        (function(){
-          var docs=[document]; document.querySelectorAll('iframe').forEach(function(f){try{if(f.contentDocument) docs.push(f.contentDocument);}catch(e){}});
-          var known=['#onetrust-reject-all-handler','#axeptio_btn_dismiss','#axeptio_btn_dismiss_all','#CybotCookiebotDialogBodyButtonDecline','button#truste-consent-required','.cc-deny','[data-cookiefirst-action=reject]',
-                     '.osano-cm-denyAll','#didomi-notice-disagree-button','button[aria-label*="Reject" i]','.cookie-reject','#cookie-reject','.ot-pc-refuse-all-handler'];
-          for(var di=0;di<docs.length;di++){for(var i=0;i<known.length;i++){var e=docs[di].querySelector(known[i]); if(e&&e.offsetParent!==null){e.click();return known[i];}}}
-          var re=/^\s*(reject( all)?( cookies| non-essential( cookies)?)?|deny( all)?|decline( all)?|i do not accept( cookies)?|only (necessary|essential)( cookies)?|necessary( cookies)? only|no,? thanks|disagree|refuse( all)?|do not accept|tout refuser|rechazar todo|alle ablehnen)\s*$/i;
-          for(var dj=0;dj<docs.length;dj++){
-            var els=docs[dj].querySelectorAll('button,a,[role=button],input[type=button],input[type=submit],div,span,li');
-            for(var j=0;j<els.length;j++){var el=els[j],t=(el.innerText||el.value||'').trim();
-              if(!re.test(t)||t.length>40) continue; if(el.children.length>1) continue;
-              var r=el.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
-              el.click(); return t;}}
-          return null;})();
-        """#
+        let js = PageScript.source("deny-cookies")
         return (try? await evaluate(js)) as? String
     }
 
@@ -50,7 +36,7 @@ extension WebViewSession {
 
     /// Brings the frame a form is in to the middle of the screen, so the person sees it.
     func scrollFrameIntoView(_ href: String) async {
-        let js = "(function(h){var fs=[].slice.call(document.querySelectorAll('iframe')); var f=fs.filter(function(x){return x.src&&(h.indexOf(x.src)===0||x.src.indexOf(h)===0);})[0]||fs[0]; if(f) f.scrollIntoView({block:'center'});})(\(Self.liveLiteral(href)));"
+        let js = PageScript.call("scroll-frame-into-view", href)
         _ = try? await evaluate(js)
     }
 
@@ -75,18 +61,7 @@ extension WebViewSession {
         let first = await discoverForms()
         if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
         if let opened = await openFoldedForms() { return opened }
-        let js = #"""
-        (function(){
-          var re=/^\s*(submit (a |your )?(privacy|data|consumer)( rights?)? request|(make|file|start) (a |your )?(privacy|data) request|your privacy choices|privacy (request|choices|center|preferences)|data subject( access)? request|do not (sell|share)( or (sell|share))?( my (personal )?(information|info|data))?|exercise your (privacy )?rights|manage (my )?privacy( settings| choices)?)\s*[.:]?\s*$/i;
-          var els=[].slice.call(document.querySelectorAll('a,button,[role=button],li,span,div,p')).filter(function(e){
-            var t=(e.innerText||'').trim(); if(t.length>60||!re.test(t)) return false; if(e.children.length>2) return false;
-            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) return false;
-            var a=e.closest('a'); var h=a?(a.getAttribute('href')||''):''; return !/^mailto:/i.test(h);});
-          els.sort(function(a,b){var ha=(a.closest('a')||a).getAttribute('href')||'', hb=(b.closest('a')||b).getAttribute('href')||''; var ma=(ha===''||ha==='#'||/^javascript:/i.test(ha))?0:1, mb=(hb===''||hb==='#'||/^javascript:/i.test(hb))?0:1; return ma-mb;});
-          if(!els.length) return null; var e=els[0]; e.scrollIntoView({block:'center'});
-          ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
-          return (e.innerText||'').trim();})();
-        """#
+        let js = PageScript.source("open-request-links")
         if let clicked = (try? await evaluate(js)) as? String, !clicked.isEmpty {
             try? await Task.sleep(nanoseconds: 2_500_000_000)
             let after = await discoverForms()
@@ -99,16 +74,7 @@ extension WebViewSession {
             if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
         }
         // The opt-out is a link to its own page: follow the clearest one that stays on the site (never a mail link or another company's page).
-        let follow = #"""
-        (function(){
-          var host=location.hostname.replace(/^www\./,''), reg=host.split('.').slice(-2).join('.');
-          var re=/^\s*(opt.?out( of (the )?sale( and sharing)?)?( request| form)?( here)?|(individual: )?opt.?out\/?(deletion)?( request)?( form)?|do not sell( or share)?( my (personal )?(information|info))?( request| form)?|submit (a )?(privacy|opt.?out|data) request|(privacy|data) (request|rights) form|delete (my|your) (data|information)|remove my information)\s*[.:]?\s*$/i;
-          var as=[].slice.call(document.querySelectorAll('a[href]')).filter(function(a){
-            var t=(a.innerText||'').replace(/\s+/g,' ').trim(); var h=a.getAttribute('href')||''; if(t.length>70||!re.test(t)) return false;
-            if(/^(mailto:|tel:|javascript:|#)/i.test(h)) return false; var r=a.getBoundingClientRect(); if(r.width<=0||r.height<=0) return false;
-            try{var u=new URL(a.href,location.href); return u.hostname.replace(/^www\./,'').split('.').slice(-2).join('.')===reg||/onetrust|trustarc|datasubject|ketch|transcend|osano|securiti|zendesk|force\.com|atlassian/.test(u.hostname);}catch(e){return false;}});
-          if(!as.length) return ''; as[0].scrollIntoView({block:'center'}); location.href=as[0].href; return as[0].href;})();
-        """#
+        let follow = PageScript.source("open-request-links-follow")
         guard let went = (try? await evaluate(follow)) as? String, !went.isEmpty else { return first }
         try? await Task.sleep(nanoseconds: 4_000_000_000)
         await settlePage(maxWait: 6)
@@ -119,53 +85,7 @@ extension WebViewSession {
 
     /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
     func discoverFormsIn() async -> [LiveForm] {
-        let js = #"""
-        (function(){
-          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!(r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none')) return false;if(r.right<=0||r.left>=window.innerWidth+2000) return false;for(var a=e.parentElement,n=0;a&&n<8;a=a.parentElement,n++){var as=getComputedStyle(a);if(as.overflow!=='visible'&&a.getBoundingClientRect().height<=0) return false;}return true;};
-          var label=function(e){var t='';
-            if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
-            // Form builders (Tally, Typeform) put the question in a heading and point the box at it: aria-labelledby="label_<id>".
-            if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
-            if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.getAttribute('title')||'';
-            if(!t&&e.previousElementSibling) t=e.previousElementSibling.innerText||'';
-            if(!t&&e.parentElement) t=(e.parentElement.innerText||'').slice(0,60);
-            return t.replace(/\s+/g,' ').trim().slice(0,90);};
-          var ctxEl=function(e){var n=e; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var t=(n.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>=25&&t.length<=700) return n;} return e.parentElement||e;};
-          // A rich-text message box (Quill, Draft, a plain contenteditable div) is a box too; it counts as a textarea.
-          var ceSel=',[contenteditable=""],[contenteditable="true"],[role=textbox]:not(input):not(textarea)';
-          var nestedCE=function(e){return e.tagName!=='INPUT'&&e.tagName!=='SELECT'&&e.tagName!=='TEXTAREA'&&!!(e.parentElement&&e.parentElement.closest('[contenteditable=""],[contenteditable="true"],[role=textbox]'));};
-          var ftype=function(e){var t=e.tagName.toLowerCase(); return t==='select'?'select':(t==='textarea'||(t!=='input'&&!('value' in e)))?'textarea':(e.type||'text');};
-          var headOf=function(f){var n=f;for(var i=0;i<6&&n&&n!==document.body;i++,n=n.parentElement){var p=n.previousElementSibling;for(var j=0;j<8&&p;j++,p=p.previousElementSibling){if(/^H[1-6]$/.test(p.tagName))return (p.innerText||'').replace(/\s+/g,' ').trim().slice(0,80);var h=p.querySelector&&p.querySelector('h1,h2,h3,h4,h5,h6');if(h)return (h.innerText||'').replace(/\s+/g,' ').trim().slice(0,80);}}return '';};
-          var out=[];
-          document.querySelectorAll('form').forEach(function(f,i){
-            var ftoken='f'+i; f.setAttribute('data-ook-form',ftoken);
-            var fields=[]; f.querySelectorAll('input,select,textarea'+ceSel).forEach(function(e,j){
-              var type=ftype(e);
-              if(['hidden','submit','button','image','reset'].indexOf(type)>=0||nestedCE(e)||(type==='textarea'&&e.tagName!=='TEXTAREA'&&!vis(e))) return;
-              var token=ftoken+'-'+j; e.setAttribute('data-ook',token);
-              var l=label(e);
-              fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e),disabled:!!e.disabled});});
-            var buttons=[]; f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]').forEach(function(b){
-              if(vis(b)) buttons.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
-                      text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600),head:headOf(f)});});
-          // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
-          var loose=[].slice.call(document.querySelectorAll('input,select,textarea'+ceSel)).filter(function(e){
-            return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e)&&!nestedCE(e);});
-          // A rich-text box alone is no form (a comment box); it joins the loose boxes only beside real inputs.
-          if(!loose.some(function(e){return e.tagName==='INPUT'||e.tagName==='SELECT'||e.tagName==='TEXTAREA';})) loose=[];
-          if(loose.length>=1&&document.body){
-            document.body.setAttribute('data-ook-form','fx'); var lf=[];
-            loose.forEach(function(e,j){var type=ftype(e);
-              var token='fx-'+j; e.setAttribute('data-ook',token); var l=label(e);
-              lf.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:true,disabled:!!e.disabled});});
-            // The buttons that belong to these inputs: those in the same block of the page, else every button.
-            var box=ctxEl(loose[0]); var lb=[]; box.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            if(!lb.length) document.querySelectorAll('button,input[type=submit],[role=button]').forEach(function(b){if(vis(b)) lb.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
-            out.push({token:'fx',action:'',method:'post',visible:true,fields:lf,buttons:lb.slice(0,12),text:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(box.innerText||'').replace(/\s+/g,' ').trim().slice(0,600),head:headOf(box)});}
-          return JSON.stringify(out);})();
-        """#
+        let js = PageScript.source("discover-forms")
         guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8) else { return [] }
         return (try? JSONDecoder().decode([LiveForm].self, from: data)) ?? []
     }
@@ -207,26 +127,7 @@ extension WebViewSession {
     func advanceToRequestForm(loose: Bool = false) async -> String? {
         var clicked: String?
         for _ in 0..<2 {
-            let js = #"""
-            (function(){
-              var pref=[/delet|remov|erase/i,/opt.?out|do not sell|do not share/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
-              var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
-                var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-                return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete (my|your) (user )?(personal )?(data|information)|opt.?out of (the )?(sale|sharing)( (and|or) sharing)?( of (my|your) (personal )?(data|information))?|i am the person opting out[\s\S]{0,70}|i am (a )?consumer[\s\S]{0,50}|opt.?out form|individual: opt.?out.{0,30})$/i.test(t)||(\#(loose ? "true" : "false")&&e.tagName!=='A'&&/^(opt.?out|do not sell( or share)?( my (personal )?(information|data))?|delete( my (data|information|account))?|remove me)$/i.test(t)))&&r.width>0&&r.height>0&&e.children.length<=2;});
-              for(var p=0;p<pref.length;p++){for(var i=0;i<els.length;i++){var t=(els[i].innerText||'').trim();
-                if(pref[p].test(t)&&!skip.test(t)){els[i].scrollIntoView({block:'center'}); els[i].click(); return t;}}}
-              // An opt-out page whose only step is a bare "Continue" (theorg.com): pressed only when the page's own address or title says opt-out, no box of any kind is on screen,
-              // exactly one such button is, and it is not part of a cookie or consent prompt.
-              if(/opt.?out|do.?not.?sell|remove|ccpa|privacy.?(request|rights|choices)/i.test(location.pathname+' '+document.title)){
-                var boxes=[].slice.call(document.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]),select,textarea')).filter(function(i){var r=i.getBoundingClientRect();return r.width>0&&r.height>0;});
-                if(!boxes.length){
-                  var cs=[].slice.call(document.querySelectorAll('button,a,[role=button]')).filter(function(e){var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-                    return /^(continue|next|get started|begin|proceed)$/i.test(t)&&r.width>0&&r.height>0&&!e.closest('[id*=cookie i],[class*=cookie i],[id*=consent i],[class*=consent i],[class*=cmp i],[id*=onetrust i],[role=dialog],[aria-modal=true]');});
-                  if(cs.length===1){cs[0].scrollIntoView({block:'center'}); cs[0].click(); return (cs[0].innerText||'').trim();}
-                }
-              }
-              return '';})();
-            """#
+            let js = PageScript.call("advance-to-request-form", loose)
             guard let t = (await evalLive(js)) as? String, !t.isEmpty else { break }
             clicked = t
             try? await Task.sleep(nanoseconds: 2_500_000_000)
@@ -239,14 +140,7 @@ extension WebViewSession {
     /// beside it (one with its email box switched off): presses the one Next / Continue / Start button so the form that asks for the person's address opens.
     /// Only on a page about opting out, only when exactly one such button shows, and never one in a cookie or consent prompt. Returns true when it pressed it.
     func pressIntroNext() async -> Bool {
-        let js = #"""
-        (function(){
-          if(!/opt.?out|do.?not.?sell|remove|ccpa|privacy.?(request|rights|choices)/i.test(location.pathname+' '+document.title)) return false;
-          var cs=[].slice.call(document.querySelectorAll('button,a,[role=button]')).filter(function(e){var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
-            return /^(continue|next|get started|begin|proceed|start)$/i.test(t)&&r.width>0&&r.height>0&&!e.disabled&&!e.closest('form,[id*=cookie i],[class*=cookie i],[id*=consent i],[class*=consent i],[class*=cmp i],[id*=onetrust i],[role=dialog],[aria-modal=true]');});
-          if(cs.length!==1) return false;
-          cs[0].scrollIntoView({block:'center'}); cs[0].click(); return true;})();
-        """#
+        let js = PageScript.source("press-intro-next")
         guard (try? await evaluate(js)) as? Bool == true else { return false }
         try? await Task.sleep(nanoseconds: 2_500_000_000)
         await settlePage(maxWait: 5)
@@ -285,96 +179,7 @@ extension WebViewSession {
         if values.contains(where: { $0.type == FormFiller.confirmIdentityType }) { _ = await tickIdentityBoxes() }
         let payload = normal.map { ["name": $0.name, "candidates": $0.candidates, "label": $0.label] as [String: Any] }
         guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return (0, []) }
-        let js = #"""
-        (function(values){var filled=0, unmatched=[];
-          // A box or menu the person changed themselves is theirs: later passes leave it alone. Only real input counts, never our own events.
-          if(!window.__ookUserWatch){window.__ookUserWatch=true;
-            ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
-          function isCE(el){return el.tagName!=='INPUT'&&el.tagName!=='TEXTAREA'&&el.tagName!=='SELECT'&&!('value' in el);}
-          function getVal(el){return isCE(el)?(el.innerText||''):(el.value||'');}
-          // The first candidate that fits the box's own character limit (a message box with a short limit gets the short request); else the first, cut at a sentence end.
-          function fit(el,c){var ml=(el.maxLength>0)?el.maxLength:(+el.getAttribute('maxlength')||0), c0=String(c[0]);
-            if(!ml||c0.length<=ml) return c0;
-            for(var i=1;i<c.length;i++){var ci=String(c[i]); if(ci.length<=ml) return ci;}
-            var cut=c0.slice(0,ml), k=cut.lastIndexOf('. '); return k>20?cut.slice(0,k+1):cut.trim();}
-          function setValue(el,v){
-            if(isCE(el)){el.focus(); try{document.execCommand('selectAll',false,null); if(!document.execCommand('insertText',false,v)) el.textContent=v;}catch(e){el.textContent=v;}
-              ['input','change','blur'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); return;}
-            var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
-            var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
-            el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
-          // A phone number is typed as plain digits, with no spaces or punctuation. Only a box that shows an error gets other shapes (see tryPhoneFormats).
-          // A menu of country codes ("United States (+1)") beside the box already supplies the code, so then the box takes the number alone.
-          function hasCountryCode(el){var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){
-              var ss=n.querySelectorAll('select'); for(var i=0;i<ss.length;i++){var o=ss[i].options[ss[i].selectedIndex]; if(o&&/\+\d{1,3}\b/.test(o.text+' '+o.value)) return true;}
-              if(n.tagName==='FORM') break;}
-            return false;}
-          function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1);
-            var pat=el.getAttribute('pattern');
-            if(d.length===10&&pat){var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6); var fs=[d,'1'+d,'+1'+d,a+'-'+b+'-'+c];
-              for(var k=0;k<fs.length;k++){try{if(new RegExp('^(?:'+pat+')$').test(fs[k])) return fs[k];}catch(e){break;}}}
-            return d;}
-          function isDobBox(el){return el.tagName==='INPUT'&&el.type!=='date'&&/birth|dob|born|\bdate\b/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')+' '+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:'')+' '+(el.closest('label')?el.closest('label').innerText:''))&&!/street|address/i.test((el.name||'')+' '+(el.id||''));}
-          // A birthdate, or today's date, in a text box starts in the shape its placeholder shows (dd/mm/yyyy, yyyy-mm-dd, ...), else month/day/year; a box that then shows an error gets the others (see tryDateFormats).
-          function fmtDob(el,iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return iso; var y=m[1],mo=m[2],d=m[3];
-            var ph=(el.getAttribute('placeholder')||'').toLowerCase(), sep;
-            // No placeholder: the shape may be named elsewhere (a pattern, a data- format, a title, the text near the box, a calendar widget's format).
-            if(!/[dmy]{2}/.test(ph)){var hint=''; [].slice.call(el.attributes).forEach(function(a){if(/format|mask|pattern|title|describedby|date/i.test(a.name)) hint+=' '+a.value;});
-              var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement) hint+=' '+(n.innerText||'').slice(0,200);
-              var f=/\b(dd|mm|yyyy|yy|d|m|y)\s*([\/.\-])\s*(dd|mm|yyyy|yy|d|m|y)\s*[\/.\-]\s*(dd|mm|yyyy|yy|d|m|y)\b/i.exec(hint); if(f) ph=(f[1]+f[2]+f[3]+f[2]+f[4]).toLowerCase();}
-            sep=(ph.match(/[^a-z0-9\s]/)||['/'])[0];
-            if(/^y{2,4}/.test(ph)) return y+sep+mo+sep+d; if(/^d/.test(ph)) return d+sep+mo+sep+y; return mo+sep+d+sep+y;}
-          function isPhoneBox(el){return el.tagName==='INPUT'&&(el.type==='tel'||/phone|mobile|\bcell|whatsapp|\btel\b|telephone/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.placeholder||'')));}
-          // A phone split over three boxes (area code, prefix, line number: limits 3, 3 and 4) gets one part per box, never the whole number in each.
-          function splitSeg(el,v){var ml=(el.maxLength>0)?el.maxLength:0; if(el.tagName!=='INPUT'||ml<3||ml>4) return null;
-            var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){
-              var L=[].slice.call(n.querySelectorAll('input')).filter(function(e){return ['hidden','checkbox','radio','submit','button','file','image','reset'].indexOf(e.type)<0&&e.maxLength>0&&e.maxLength<=4;});
-              if(L.length>3) return null;
-              if(L.length===3&&L[0].maxLength===3&&L[1].maxLength===3&&L[2].maxLength===4){var i=L.indexOf(el); if(i<0) return null;
-                var fv=null; for(var k=0;k<values.length;k++){if(values[k].name===L[0].getAttribute('data-ook')) fv=values[k];}
-                var d=String(((fv||v).candidates||[])[0]||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return null;
-                return [d.slice(0,3),d.slice(3,6),d.slice(6)][i];}}
-            return null;}
-          values.forEach(function(v){var el=document.querySelector('[data-ook="'+v.name+'"]'); if(!el) return;
-            if(el.getAttribute('data-ook-user')==='1'){filled++; return;}
-            // Whatever is already in a box or menu stays, unless it is exactly what this fill put there before.
-            // The one exception: a State or Country the page ships with (a default such as "CA") gives way to the person's own, since a page default is not the person's choice.
-            var stateish=/\b(state|province|country)\b/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''))&&!/birth|born|issu|licen|incorporat|e-?mail|phone/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''));
-            var shown=(el.tagName==='SELECT'?((el.options[el.selectedIndex]||{}).text||'')+'|'+el.value:getVal(el)).toLowerCase();
-            var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});});
-            var pageDefault=stateish&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
-            // An email box that ships holding something that is not an address (a page's own "opt-out" or "your email") is not the person's: their address replaces it.
-            var wantsAt=v.candidates.length&&v.candidates[0]!==null&&String(v.candidates[0]).indexOf('@')>0;
-            var junkEmail=wantsAt&&el.tagName!=='SELECT'&&(el.type==='email'||/e-?mail/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||'')))&&getVal(el).trim()!==''&&getVal(el).indexOf('@')<0;
-            if(pageDefault||junkEmail){/* falls through to be filled */}
-            else if(el.tagName==='SELECT'){if(el.selectedIndex>0&&el.value!==''&&el.value!==el.getAttribute('data-ook-last')){filled++; return;}}
-            else if(getVal(el).trim()!==''&&getVal(el)!==el.getAttribute('data-ook-last')){filled++; return;}
-            if(el.tagName==='SELECT'){var done=false;
-              for(var c=0;c<v.candidates.length&&!done;c++){var want=(v.candidates[c]||'').toLowerCase();
-                for(var i=0;i<el.options.length;i++){var o=el.options[i];
-                  if(o.value.toLowerCase()===want||o.text.trim().toLowerCase()===want){el.value=o.value;done=true;break;}}}
-              // Options such as "IL - Illinois" or "Illinois (IL)": a state name inside the text, or the two-letter code as a whole word.
-              for(var c2=0;c2<v.candidates.length&&!done;c2++){var w2=(v.candidates[c2]||'').toLowerCase(); if(!w2) continue;
-                for(var i2=0;i2<el.options.length;i2++){var o2=el.options[i2], tx=o2.text.trim().toLowerCase(); if(!o2.value&&!tx) continue;
-                  var hit=w2.length>2?tx.indexOf(w2)>=0:new RegExp('(^|[^a-z])'+w2+'([^a-z]|$)').test(tx);
-                  if(hit&&!/other|not listed|outside/.test(tx)){el.value=o2.value;done=true;break;}}}
-              // An age (or any number) against a menu of brackets: "18-24", "65+", "under 18".
-              if(!done&&/^\d{1,3}$/.test(String(v.candidates[0]||''))){var n3=+v.candidates[0];
-                for(var i3=0;i3<el.options.length&&!done;i3++){var tx3=el.options[i3].text.replace(/,/g,''), r3, lo=null, hi=null;
-                  if(r3=/(\d{1,3})\s*(?:-|–|—|to)\s*(\d{1,3})/.exec(tx3)){lo=+r3[1];hi=+r3[2];}
-                  else if(r3=/(\d{1,3})\s*\+|(\d{1,3})\s*(?:and|or)\s*(?:over|older|above|up)|(?:over|above)\s*(\d{1,3})/i.exec(tx3)){lo=+(r3[1]||r3[2]||r3[3]);hi=999;}
-                  else if(r3=/(?:under|below|younger than)\s*(\d{1,3})/i.exec(tx3)){lo=0;hi=+r3[1]-1;}
-                  if(lo!==null&&n3>=lo&&n3<=hi){el.value=el.options[i3].value;done=true;}}}
-              if(!done&&/state|province|region/i.test((el.name||'')+' '+(el.id||'')+' '+(el.getAttribute('aria-label')||''))){
-                // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
-                for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();
-                  if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
-              if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
-              else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
-            } else if(\#(keepExistingValues ? "true" : "false")&&!pageDefault&&!junkEmail&&getVal(el).trim()!==''){filled++;}
-            else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); var seg=ph?splitSeg(el,v):null; setValue(el,seg!==null?seg:ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph&&seg===null) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
-          return JSON.stringify({filled:filled,unmatched:unmatched});})(\#(json));
-        """#
+        let js = PageScript.call("fill-live", json: [json, keepExistingValues ? "true" : "false"])
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
         return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
@@ -387,48 +192,7 @@ extension WebViewSession {
     func addAnotherBoxes(form token: String, emails: Int, phones: Int) async -> Int {
         let wantE = min(emails, 5), wantP = min(phones, 5)
         guard wantE > 1 || wantP > 1 else { return 0 }
-        let js = #"""
-        (function(token,wantE,wantP){
-          var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return false;
-          var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!(r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none')) return false;if(r.right<=0||r.left>=window.innerWidth+2000) return false;for(var a=e.parentElement,n=0;a&&n<8;a=a.parentElement,n++){var as=getComputedStyle(a);if(as.overflow!=='visible'&&a.getBoundingClientRect().height<=0) return false;}return true;};
-          function lab(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t+' '+(e.getAttribute('aria-label')||'')+' '+(e.placeholder||'')).replace(/\s+/g,' ');}
-          function kind(e){var t=e.type||'text'; if(['hidden','checkbox','radio','submit','button','file','image','reset'].indexOf(t)>=0) return '';
-            var s=(e.name||'')+' '+(e.id||'')+' '+lab(e);
-            if(/confirm|verify|re-?enter|retype|repeat/i.test(s)) return '';
-            if(t==='email'||/e-?mail/i.test(s)) return 'e'; if(t==='tel'||/phone|mobile|\bcell\b|telephone/i.test(s)) return 'p'; return '';}
-          function boxes(k){return [].slice.call(f.querySelectorAll('input')).filter(function(e){return vis(e)&&kind(e)===k;});}
-          function press(k,kw){var bs=boxes(k); if(!bs.length) return false; var last=bs[bs.length-1];
-            var near=last; for(var up=0;up<3&&near.parentElement&&near.parentElement!==f;up++) near=near.parentElement;
-            var other=k==='e'?'p':'e';
-            var cands=[].slice.call(f.querySelectorAll('button,a,[role=button],input[type=button],span,div')).filter(function(b){
-              if(!vis(b)||b.children.length>3) return false;
-              var t=((b.innerText||b.value||'')+' '+(b.getAttribute('aria-label')||'')+' '+(b.getAttribute('title')||'')).replace(/\s+/g,' ').trim();
-              if(!t||t.length>60||/remove|delete|clear|submit|send|cancel|opt.?out|minus|^[-x\u2212\u00d7]$/i.test(t)) return false;
-              if(b.tagName==='BUTTON'&&b.getAttribute('type')!=='button') return false;
-              if(b.tagName==='INPUT'&&b.type!=='button') return false;
-              if(b.getAttribute('type')==='submit') return false;
-              if(b.tagName==='A'){var h=b.getAttribute('href')||''; if(h&&h!=='#'&&!/^javascript:/i.test(h)) return false;}
-              if(b.hasAttribute('disabled')||b.getAttribute('aria-disabled')==='true') return false;
-              var n=+(b.getAttribute('data-ook-added')||0); if(n>=5) return false;
-              if(new RegExp('(add|another|more|\\+).{0,25}(' + kw + ')|(' + kw + ').{0,25}(add|another|more)\\b','i').test(t)) return true;
-              // A bare "Add another" / "+" counts only when it sits right beside this kind of box and no box of the other kind.
-              if(/^\+?\s*(add( another| more)?|another|more|\+)\s*$/i.test(t)&&near.contains(b)){
-                var inNear=[].slice.call(near.querySelectorAll('input')).some(function(e){return vis(e)&&kind(e)===other;}); return !inNear;}
-              return false;});
-            // An outer wrapper with the same words is not the button: keep the innermost candidates, real buttons and links first.
-            cands=cands.filter(function(c){return !cands.some(function(o){return o!==c&&c.contains(o);});});
-            var rank=function(c){return (c.tagName==='BUTTON'||c.tagName==='A'||c.tagName==='INPUT'||c.getAttribute('role')==='button')?0:1;};
-            cands.sort(function(a,b){return rank(a)-rank(b);});
-            if(!cands.length) return false; var b=cands[0];
-            b.setAttribute('data-ook-added',String((+(b.getAttribute('data-ook-added')||0))+1)); b.scrollIntoView({block:'center'}); b.click(); return true;}
-          // A page can cap its boxes (two extra emails at most) while the button stays: a press that added no box of its kind ends the pressing for that kind.
-          var st=window.__ookAdd=window.__ookAdd||{};
-          function go(k,want,kw){var n=boxes(k).length; if(!(n>0&&n<want)) return false; if(st[token+k]!==undefined&&n<=st[token+k]) return false; var ok=press(k,kw); if(ok) st[token+k]=n; return ok;}
-          if(go('e',wantE,'e-?mail')) return true;
-          if(go('p',wantP,'phone|number|mobile|cell')) return true;
-          return false;})(\#(String(reflecting: token)),\#(wantE),\#(wantP));
-        """#
+        let js = PageScript.call("add-another-boxes", token, wantE, wantP)
         var presses = 0
         for _ in 0..<8 {
             guard await evalLive(js) as? Bool == true else { break }
@@ -451,32 +215,7 @@ extension WebViewSession {
 
     /// One round of `tryPhoneFormats`: false when no box is in error or no other shape is left to try.
     private func phoneFormatStep(_ step: Int) async -> Bool {
-        let js = #"""
-        (function(step){var bad=0, more=false;
-          function hasCC(el){var n=el.parentElement; for(var up=0;n&&up<4;up++,n=n.parentElement){var ss=n.querySelectorAll('select');
-            for(var i=0;i<ss.length;i++){var o=ss[i].options[ss[i].selectedIndex]; if(o&&/\+\d{1,3}\b/.test(o.text+' '+o.value)) return true;} if(n.tagName==='FORM') break;} return false;}
-          function visible(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'&&(e.innerText||'').trim()!=='';}
-          function invalid(el){
-            if(el.willValidate&&!el.checkValidity()) return true;
-            if(el.getAttribute('aria-invalid')==='true') return true;
-            var cls=(el.className||'')+' '+(el.parentElement?el.parentElement.className||'':''); if(/(^|[\s_-])(is-invalid|invalid|has-error|ng-invalid|error)($|[\s_-])/i.test(cls)) return true;
-            var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement){var errs=n.querySelectorAll('[role=alert],.error,.invalid-feedback,.field-error,.help-block,[class*=error]');
-              for(var i=0;i<errs.length;i++) if(!errs[i].contains(el)&&visible(errs[i])&&/phone|number|digit|valid|format|invalid|required/i.test(errs[i].innerText)) return true;}
-            return false;}
-          function set(el,v){var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
-            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value);}
-          [].slice.call(document.querySelectorAll('[data-ook-phone]')).forEach(function(el){
-            if(el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
-            var d=el.getAttribute('data-ook-phone'); if(d.length===11&&d[0]==='1') d=d.slice(1); if(d.length!==10) return;
-            ['blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));});
-            if(!invalid(el)) return;
-            var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
-            var forms=hasCC(el)?[d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c]:[d,'1'+d,'+1'+d,a+'-'+b+'-'+c,'('+a+') '+b+'-'+c,a+'.'+b+'.'+c,a+' '+b+' '+c,'+1 '+a+' '+b+' '+c,'1-'+a+'-'+b+'-'+c];
-            bad++;
-            if(step<forms.length){set(el,forms[step]); more=true;} else { set(el,d); }
-          });
-          return JSON.stringify({bad:bad,more:more});})(\#(step));
-        """#
+        let js = PageScript.call("phone-format-step", step)
         guard let out = await evalLive(js) as? String, let d = out.data(using: .utf8), let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return false }
         return (obj["bad"] as? Int ?? 0) > 0 && obj["more"] as? Bool == true
     }
@@ -496,84 +235,34 @@ extension WebViewSession {
     /// A page's date boxes share one shape: when a box had to be retried (a birthdate that rejected month/day/year), the other date boxes this fill typed
     /// (today's date, which month/day/year would not flag because 11/05 is valid either way) are put in the shape that box settled on.
     private func alignDateFormats() async {
-        let js = #"""
-        (function(){var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
-          function forms(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m) return null; var y=m[1],mo=m[2],d=m[3];
-            return [mo+'/'+d+'/'+y,d+'/'+mo+'/'+y,y+'-'+mo+'-'+d,mo+'-'+d+'-'+y,d+'-'+mo+'-'+y,y+'/'+mo+'/'+d,d+'.'+mo+'.'+y,mo+d+y,d+mo+y,y+mo+d,mn[+mo-1]+' '+(+d)+', '+y,(+d)+' '+mn[+mo-1].slice(0,3)+' '+y,(+mo)+'/'+(+d)+'/'+y];}
-          var boxes=[].slice.call(document.querySelectorAll('[data-ook-dob]')); var learnt=-1;
-          boxes.forEach(function(el){var st=+(el.getAttribute('data-ook-step')||0); if(st>0&&el.value===el.getAttribute('data-ook-last')) learnt=st;});
-          if(learnt<0) return 0; var n=0;
-          boxes.forEach(function(el){if(/[dmy]{2}/i.test(el.getAttribute('placeholder')||'')||el.getAttribute('data-ook-step')||el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
-            var f=forms(el.getAttribute('data-ook-dob')); if(!f) return; var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,f[learnt]);}else{el.value=f[learnt];}
-            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value); el.setAttribute('data-ook-step',String(learnt)); n++;});
-          return n;})();
-        """#
+        let js = PageScript.source("align-date-formats")
         _ = await evalLive(js)
     }
 
     /// One round of `tryDateFormats`: false when no box is in error or no other shape is left to try.
     private func dateFormatStep(_ step: Int) async -> Bool {
-        let js = #"""
-        (function(step){var bad=0, more=false;
-          function visible(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&getComputedStyle(e).visibility!=='hidden'&&(e.innerText||'').trim()!=='';}
-          function invalid(el){
-            if(el.willValidate&&!el.checkValidity()) return true;
-            if(el.getAttribute('aria-invalid')==='true') return true;
-            var cls=(el.className||'')+' '+(el.parentElement?el.parentElement.className||'':''); if(/(^|[\s_-])(is-invalid|invalid|has-error|ng-invalid|error)($|[\s_-])/i.test(cls)) return true;
-            var n=el.parentElement; for(var up=0;n&&up<2;up++,n=n.parentElement){var errs=n.querySelectorAll('[role=alert],.error,.invalid-feedback,.field-error,.help-block,[class*=error]');
-              for(var i=0;i<errs.length;i++) if(!errs[i].contains(el)&&visible(errs[i])&&/date|birth|dob|format|valid|invalid|required|mm|dd|yyyy/i.test(errs[i].innerText)) return true;}
-            return false;}
-          function set(el,v){var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
-            ['input','change','blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); el.setAttribute('data-ook-last',el.value);}
-          [].slice.call(document.querySelectorAll('[data-ook-dob]')).forEach(function(el){
-            if(el.getAttribute('data-ook-user')==='1'||el.value!==el.getAttribute('data-ook-last')) return;
-            var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(el.getAttribute('data-ook-dob')); if(!m) return; var y=m[1],mo=m[2],d=m[3];
-            ['blur','focusout'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));});
-            if(!invalid(el)) return;
-            var mn=['January','February','March','April','May','June','July','August','September','October','November','December'][+mo-1];
-            var forms=[mo+'/'+d+'/'+y,d+'/'+mo+'/'+y,y+'-'+mo+'-'+d,mo+'-'+d+'-'+y,d+'-'+mo+'-'+y,y+'/'+mo+'/'+d,d+'.'+mo+'.'+y,mo+d+y,d+mo+y,y+mo+d,mn+' '+(+d)+', '+y,(+d)+' '+mn.slice(0,3)+' '+y,(+mo)+'/'+(+d)+'/'+y];
-            bad++;
-            var next=+(el.getAttribute('data-ook-step')||0)+1;
-            if(next<forms.length){el.setAttribute('data-ook-step',String(next)); set(el,forms[next]); more=true;} else { set(el,forms[0]); }
-          });
-          return JSON.stringify({bad:bad,more:more});})(\#(step));
-        """#
+        let js = PageScript.call("date-format-step", step)
         guard let out = await evalLive(js) as? String, let d = out.data(using: .utf8), let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return false }
         return (obj["bad"] as? Int ?? 0) > 0 && obj["more"] as? Bool == true
     }
 
     /// Brings the form being filled to the top of the screen, so the person sees what was filled and does not have to hunt for it.
     func scrollFormIntoView(token: String) async {
-        let js = "(function(t){var f=document.querySelector('[data-ook-form=\"'+t+'\"]'); if(f){f.scrollIntoView({block:'start',behavior:'instant'}); window.scrollBy(0,-12); return true;} return false;})(\(Self.liveLiteral(token)));"
+        let js = PageScript.call("scroll-form-to-top", token)
         _ = await evalLive(js)
     }
 
     /// When the page now shows an opt-out button or link below the visible part ("Opt out" next to a listing that a search found), scrolls to it.
     /// Does nothing when one is already on screen, so it never moves a page the person is using. True when it scrolled.
     func scrollToOptOutControl() async -> Bool {
-        let js = #"""
-        (function(){var re=/opt.?(me.?)?out|remove (me|my|this)|do not sell|delete my/i;
-          var els=[].slice.call(document.querySelectorAll('a,button,input[type=submit],input[type=button],[role=button]')).filter(function(e){var t=(e.innerText||e.value||'').trim();
-            if(!re.test(t)||t.length>60) return false; var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&!(e.closest&&e.closest('nav,header,footer'));});
-          if(!els.length) return false;
-          if(els.some(function(e){var r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;})) return false;
-          els[0].scrollIntoView({block:'center',behavior:'smooth'}); return true;})();
-        """#
+        let js = PageScript.source("scroll-to-opt-out-control")
         return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
     /// A page that offers its one opt-out form as tabs ("Phone" and "Name"): opens the name tab, which is the one that takes a person's listing off.
     /// Returns true when it pressed one.
     func chooseNameTab() async -> Bool {
-        let js = #"""
-        (function(){var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
-          var items=[].slice.call(document.querySelectorAll('[role=tab],.nav-link,.tab,li,button,a,label,div,span')).filter(function(e){return vis(e)&&e.children.length<=1&&(e.innerText||'').trim().length<24;});
-          var by=function(re){return items.filter(function(e){return re.test((e.innerText||'').trim());});};
-          var names=by(/^(by )?(full )?(name|name lookup|people|person)$/i), phones=by(/^(by )?(phone|phone number|phone lookup|number)$/i);
-          if(!names.length||!phones.length) return false;
-          var n=names.filter(function(e){return /^(A|BUTTON)$/.test(e.tagName)||e.getAttribute('role')==='tab';})[0]||names.filter(function(e){return e.children.length===0;})[0]||names[0]; if(n.getAttribute('aria-selected')==='true'||/\bactive\b|\bselected\b/.test(n.className||'')) return false;
-          n.click(); return true;})();
-        """#
+        let js = PageScript.source("choose-name-tab")
         return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
@@ -581,156 +270,29 @@ extension WebViewSession {
     /// picks the opt-out choice (else deletion) so that form shows. Never touches a menu the person set, never a menu inside a form, never access or correction.
     /// Returns true when it changed one.
     func chooseRightsPicker() async -> Bool {
-        let js = #"""
-        (function(){var changed=false;
-          [].slice.call(document.querySelectorAll('select')).forEach(function(s){
-            if(changed||s.closest('form')||s.getAttribute('data-ook-user')==='1'||s.getAttribute('data-ook-auto')==='1') return;
-            var r=s.getBoundingClientRect(); if(r.width<=0||r.height<=0) return;
-            var o=[].slice.call(s.options), bad=/opt.?in|\bknow\b|access|correct|portab|copy of|subscribe/i;
-            var pick=o.filter(function(x){return /opt.?out|do not sell|don.?t sell/i.test(x.text)&&!bad.test(x.text);})[0]
-                  ||o.filter(function(x){return /\b(delet|eras|remov)\w*/i.test(x.text)&&!bad.test(x.text);})[0];
-            if(!pick||s.value===pick.value) return;
-            s.setAttribute('data-ook-auto','1'); s.value=pick.value;
-            s.dispatchEvent(new Event('input',{bubbles:true})); s.dispatchEvent(new Event('change',{bubbles:true})); changed=true;});
-          return changed;})();
-        """#
+        let js = PageScript.source("choose-rights-picker")
         return ((try? await evaluate(js)) as? Bool) ?? false
+    }
+
+    /// Every email address the page shows or links to (mailto links and addresses in the text), for the one a privacy request should go to.
+    func pageEmails() async -> [String] {
+        let js = PageScript.source("page-emails")
+        guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8), let list = try? JSONSerialization.jsonObject(with: data) as? [String] else { return [] }
+        return list
+    }
+
+    /// Pages that ask "I am a(n)" or "Select request type" with a row of buttons instead of radio boxes: picks the plain consumer or "other" answer, and the
+    /// opt-out or deletion request (never access, update, correction or transfer). Returns how many it pressed.
+    func chooseTileButtons() async -> Int {
+        let js = PageScript.source("choose-tile-buttons")
+        return (await evalLive(js)) as? Int ?? 0
     }
 
     /// Chooses, inside one form, the options an opt-out needs: "this request is for myself", the opt-out and deletion choices, and a
     /// request-type menu. It never ticks access, correction or marketing choices, and never picks "authorized agent" or "deceased".
     /// Returns what it chose, and the names of required choices it could not make.
-    /// Pages that ask "I am a(n)" or "Select request type" with a row of buttons instead of radio boxes: picks the plain consumer or "other" answer, and the
-    /// opt-out or deletion request (never access, update, correction or transfer). Returns how many it pressed.
-    /// Page script shared by the choosers: what the person tapped or changed is theirs, and what the app chose once it does not choose again.
-    /// A refill (after a check is solved, before sending) must never undo a tile, box or menu the person set, nor tap a tile a second time (a tile that
-    /// toggles would switch our own choice off). Only real taps count (`isTrusted`), never our own clicks.
-    static let ownershipJS = #"""
-        if(!window.__ookUserWatch){window.__ookUserWatch=true;
-          ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
-        if(!window.__ookClickWatch){window.__ookClickWatch=true; window.__ookTouched=[];
-          document.addEventListener('click',function(e){if(e.isTrusted&&e.target&&e.target.nodeType===1){window.__ookTouched.push(e.target); if(window.__ookTouched.length>80) window.__ookTouched.shift();}},true);}
-        var touched=function(el){var t=window.__ookTouched||[];
-          for(var i=0;i<t.length;i++){var x=t[i]; var lab=x.closest?x.closest('label'):null;
-            if(x===el||el.contains(x)||(x.tagName==='LABEL'&&x.htmlFor&&x.htmlFor===el.id)||(lab&&lab.contains(el))) return true;}
-          return el.getAttribute('data-ook-user')==='1';};
-        var autoDone=function(el){return el.getAttribute('data-ook-auto')==='1';};
-        var markAuto=function(el){el.setAttribute('data-ook-auto','1');};
-        """#
-
-    /// Every email address the page shows or links to (mailto links and addresses in the text), for the one a privacy request should go to.
-    func pageEmails() async -> [String] {
-        let js = #"""
-        (function(){var out=[]; document.querySelectorAll('a[href^="mailto:" i]').forEach(function(a){out.push((a.getAttribute('href')||'').replace(/^mailto:/i,'').split('?')[0]);});
-          var m=(document.body?document.body.innerText:'').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g)||[]; return JSON.stringify(out.concat(m));})();
-        """#.replacingOccurrences(of: "\\.", with: "\\.")
-        guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8), let list = try? JSONSerialization.jsonObject(with: data) as? [String] else { return [] }
-        return list
-    }
-
-    func chooseTileButtons() async -> Int {
-        let js = #"""
-        (function(){
-          \#(Self.ownershipJS)
-          var vis=function(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0;};
-          var n=0; window.__ookTiles=window.__ookTiles||{};
-          document.querySelectorAll('label,legend,h2,h3,h4,p,span,div').forEach(function(h){
-            var t=(h.innerText||'').replace(/\s+/g,' ').replace(/\s*required\s*$/i,'').trim(); if(t.length>60||h.children.length>3) return;
-            var who=/^\*?\s*I am an?\b/i.test(t), what=/^\*?\s*(select )?(the )?(request type|right to exercise|type of request)/i.test(t);
-            if(!who&&!what) return;
-            var box=h.parentElement, btns=[]; for(var up=0;up<4&&box;up++,box=box.parentElement){btns=[].slice.call(box.querySelectorAll('button,[role=button],[role=radio],[role=option],label,[class*=option],[class*=choice],[class*=tile]')).filter(function(b){return vis(b)&&b!==h&&(b.innerText||'').trim().length>1&&(b.innerText||'').trim().length<80&&b.children.length<=2;}); if(btns.length>=2) break;}
-            if(btns.length<2) return;
-            // A group is handled once per page: after that, and whenever the person has tapped any of its tiles, it is theirs.
-            if(window.__ookTiles[t]) return; window.__ookTiles[t]=1;
-            if(btns.some(touched)||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
-            var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
-            var prefs=who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/delet|remov|erase/i,/opt.?out|do not sell|do not share/i];
-            for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); markAuto(btns[i]); btns[i].click(); n++; return;}}}
-          });
-          return n;})();
-        """#
-        return (await evalLive(js)) as? Int ?? 0
-    }
-
     func chooseRequestOptions(form token: String, ownerMayConfirm: Bool = false) async -> (chosen: Int, unresolved: [String]) {
-        let js = #"""
-        (function(token){
-          var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return JSON.stringify({chosen:0,unresolved:[]});
-          \#(Self.ownershipJS)
-          var label=function(e){var t='';
-            if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
-            if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
-            if(!t) t=e.getAttribute('aria-label')||e.getAttribute('value')||'';
-            if(!t&&e.nextSibling&&e.nextSibling.textContent) t=e.nextSibling.textContent;
-            return t.replace(/\s+/g,' ').trim();};
-          var title=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t||'').split(/\n/)[0].trim().slice(0,80);};
-          var self=/\b(myself|me|my own|individual|consumer|resident|myself)\b/i, notSelf=/deceased|authori[sz]ed|agent|behalf|represent|business|company|employee|minor|child/i;
-          var yes=/opt.?out|do not sell|don.?t sell|do not share|targeted advertis|cross-context|profil|delete|deletion|remove|erase|unsubscribe|limit the use/i;
-          var no=/opt.?in|\baccess\b|know|correct|portab|copy of|subscribe\b(?!.*(out|unsub))|newsletter|receive/i;
-          var optOutWord=/opt.?out|unsubscribe|do not sell|do not share/i, optInWord=/opt.?in|receive|sign me up/i;
-          var ownerOK=\#(ownerMayConfirm ? "true" : "false");
-          var selfDecl=/\bi (confirm|verify|am|declare)\b.{0,100}\b(person|owner|me)\b.{0,60}(e-?mail|address|account|request|record|name|information)/i, notDecl=/penalty|perjury|agent|behalf|representative|authori[sz]ed to|attest|acknowledg|certif|terms|privacy policy|legal/i;
-          var yesOrOptOut=function(t){return (yes.test(t)&&!no.test(t))||(optOutWord.test(t)&&!optInWord.test(t));};
-          var isDecl=function(t){return ownerOK&&selfDecl.test(t)&&!notDecl.test(t);};
-          var chosen=0, unresolved=[];
-          var groups={};
-          f.querySelectorAll('input[type=radio]').forEach(function(r){(groups[r.name||('g'+Math.random())]=groups[r.name||'']||[]).push(r);});
-          var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
-          // "Are you submitting this request for yourself?" is the opposite question: Yes is the person's answer.
-          var selfQ=/for (yourself|myself)|request for (yourself|yourself or)|are you (the )?(person|individual|consumer) (whose|this)/i;
-          var removal=/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i;
-          Object.keys(groups).forEach(function(k){var rs=groups[k];
-            // The page may start on its gentler choice ("Your privacy choices"); "Remove my information" is the one that takes a listing off.
-            var rm=rs.filter(function(r){return removal.test(title(r));})[0]
-              // Where only one can be chosen, deleting the data beats opting out of its sale.
-              ||rs.filter(function(r){var t=title(r); return /\b(delet|eras)\w*\b/i.test(t)&&!no.test(t)&&!notSelf.test(t);})[0];
-            if(rs.some(touched)||rs.some(autoDone)) return;
-            // A choice of device ID types (GAID is Android's, IDFA is this phone's): this is an iPhone.
-            var idfa=rs.filter(function(r){return /\bidfa\b/i.test(label(r));})[0];
-            if(idfa){ if(!idfa.checked){markAuto(idfa); idfa.click(); if(!idfa.checked){idfa.checked=true; idfa.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;} return; }
-            if(rm&&!rm.checked){markAuto(rm); rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
-            if(rs.some(function(r){return r.checked;})) return;
-            var pick=null;
-            // "Are you an authorized agent / acting on behalf of someone?": the person is asking for themselves, so the answer is No.
-            var ctx=((rs[0].closest('fieldset')||rs[0].closest('div')||{innerText:''}).innerText||'').slice(0,200)+' '+(rs[0].name||'');
-            if(selfQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var ls=label(rs[q]); if(/^\s*(yes|myself|me|my own)\b/i.test(ls)&&!/agent|behalf|represent/i.test(ls)) pick=rs[q];}}
-            if(!pick&&agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
-            for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)) pick=rs[i];}
-            // "Remove my information" (a person-search site taking a listing off) beats a plain "do not sell" choice beside it: it is the stronger opt-out.
-            for(var i=0;i<rs.length&&!pick;i++){var ti=title(rs[i]); if(/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i.test(ti)) pick=rs[i];}
-            for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(yesOrOptOut(t)||isDecl(t)) pick=rs[i];}
-            if(pick){markAuto(pick); pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
-            else if(rs.some(function(r){return r.required;})) unresolved.push(label(rs[0])||k);});
-          f.querySelectorAll('input[type=checkbox]').forEach(function(c){var t=label(c);
-            if(c.checked||!t||touched(c)||autoDone(c)) return;
-            // "I am submitting this request for myself" (next to "...on behalf of someone else"): the person is asking for themselves.
-            if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
-            if(yesOrOptOut(t)||isDecl(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
-          f.querySelectorAll('select').forEach(function(s){
-            var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
-            var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);
-            // A menu of states or countries is filled by value; a request-type menu that merely sits near the word "state" is not one.
-            if(/state|country|province|region/.test(l)||s.options.length>=40) return;
-            if((s.selectedIndex>0 && s.value)||touched(s)||autoDone(s)) return;
-            var best=-1,bestScore=0;
-            var isSelfQ=selfQ.test(l+' '+near), isAgentQ=!isSelfQ&&agentQ.test(l+' '+near);
-            for(var i=0;i<s.options.length;i++){var t=s.options[i].text; var sc=0;
-              if(isSelfQ&&/^\s*(yes|myself|me|my own)\b/i.test(t)&&!/agent|behalf|represent/i.test(t)) sc=5;
-              if(isAgentQ&&/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(t)) sc=5;
-              if(/opt.?out|do not sell|do not share|unsubscribe/i.test(t)) sc=2;
-              if(/delet|remov|eras/i.test(t)) sc=Math.max(sc,3);          // deleting the data beats opting out of its sale
-              if(/\b(consumer|individual|personal|myself|resident|person|the (person|individual|subject)|data subject|yourself|owner|me)\b/i.test(t)&&!/business|agent|deceased|on behalf|representative/i.test(t)) sc=Math.max(sc,1);
-              // "Relationship with us" menus: a person who is only asking to be removed is a consumer, not a customer, employee or partner.
-              if(/relationship|how do we know|are you a|i am/i.test(l+' '+near)&&/\b(consumer|individual|none of the above|not a (customer|client|user)|no relationship|general public|just a consumer|other)\b/i.test(t)&&!/business|agent|employee|partner|client of|vendor/i.test(t)) sc=Math.max(sc,1);
-              if(/access|know|correct|update|portab/i.test(t)) sc=0;
-              if(sc>bestScore){bestScore=sc;best=i;}}
-            var placeholder=s.selectedIndex<=0;
-            if(best>=0&&placeholder){markAuto(s); s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); s.dispatchEvent(new Event('input',{bubbles:true})); chosen++;}
-            else if(s.required&&placeholder) unresolved.push((near.split('\n')[0]||l||'a menu').slice(0,60));});
-          return JSON.stringify({chosen:chosen,unresolved:unresolved});})(\#(Self.liveLiteral(token)));
-        """#
+        let js = PageScript.call("choose-request-options", token, ownerMayConfirm)
         guard let json = (await evalLive(js)) as? String, let data = json.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return (0, []) }
         return (obj["chosen"] as? Int ?? 0, obj["unresolved"] as? [String] ?? [])
@@ -739,19 +301,7 @@ extension WebViewSession {
     /// The label of the first required menu, text box or choice in the form that is still empty, or nil when all are filled. A person is asked to
     /// fill it in: a state list without their state, a request type the app could not pick. Boxes that only certify something are left to their own rule.
     func emptyRequiredChoice(form token: String) async -> String? {
-        let js = #"""
-        (function(token){var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return '';
-          var label=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
-            if(!t){var p=e.closest('label'); if(p) t=p.innerText;} if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.name||'';
-            return t.replace(/\s+/g,' ').replace(/\*|\(required\)/gi,'').trim().slice(0,60);};
-          var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea,[contenteditable=""],[contenteditable="true"]'));
-          for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
-            var req=e.required||e.getAttribute('aria-required')==='true'||/\*/.test(label(e)+(e.closest('label')?e.closest('label').innerText:''));
-            if(!req) continue;
-            var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!((('value' in e)?e.value:e.innerText)||'').trim();
-            if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
-          return '';})(\#(Self.liveLiteral(token)));
-        """#
+        let js = PageScript.call("empty-required-choice", token)
         let out = (await evalLive(js)) as? String
         return (out?.isEmpty ?? true) ? nil : out
     }
@@ -759,12 +309,7 @@ extension WebViewSession {
     /// The label of a confirmation button on the page ("Confirm request", "Verify my email"), scrolled into view, or nil. It is only found, never pressed:
     /// confirming is the person's own tap.
     func confirmButtonLabel() async -> String? {
-        let js = #"""
-        (function(){var bs=[].slice.call(document.querySelectorAll('button,a,[role=button],input[type=submit]')).filter(function(b){
-          var t=((b.innerText||b.value||'')+'').replace(/\s+/g,' ').trim(), r=b.getBoundingClientRect();
-          return r.width>0&&r.height>0&&/^(confirm( my)?( request| email| opt.?out)?|verify( my)?( request| email)?|complete( my)?( request)?|yes,? (confirm|opt out|delete))$/i.test(t);});
-          if(!bs.length) return ''; bs[0].scrollIntoView({block:'center'}); return ((bs[0].innerText||bs[0].value||'')+'').trim();})();
-        """#
+        let js = PageScript.source("confirm-button-label")
         let out = (await evalLive(js)) as? String
         return (out?.isEmpty ?? true) ? nil : out
     }
@@ -786,32 +331,12 @@ extension WebViewSession {
 
     /// One kind of type-ahead box ("state" or "country"): types the name, waits for the list, picks the option that is exactly that name. Returns how many it chose.
     private func pickFromTypeAhead(kind: String, name: String) async -> Int {
-        let open = #"""
-        (function(kind,name){
-          var strip=function(t){return (t||'').replace(/\([^)]*\)/g,' ');};
-          var els=[].slice.call(document.querySelectorAll('input[aria-autocomplete]')).filter(function(e){
-            var r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||e.getAttribute('data-ook-ac-'+kind)) return false;
-            var g=e.closest('.form-group'); g=g&&g.querySelector('label');
-            var l=(strip(e.getAttribute('aria-label'))+' '+(e.id||'')+' '+(e.name||'')+' '+strip(((e.id&&document.querySelector('label[for="'+e.id+'"]'))?document.querySelector('label[for="'+e.id+'"]').innerText:''))+' '+strip(g?g.innerText:'')).toLowerCase();
-            return kind==='country' ? /country/.test(l) : (/state|province|region|residence/.test(l)&&!/country/.test(l));});
-          if(!els.length) return false;
-          var e=els[0]; e.setAttribute('data-ook-ac-'+kind,'1');
-          var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value'); d.set.call(e,name);
-          ['keydown','input','keyup'].forEach(function(t){e.dispatchEvent(new Event(t,{bubbles:true}));});
-          ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
-          return true;})(\#(Self.liveLiteral(kind)),\#(Self.liveLiteral(name)));
-        """#
+        let open = PageScript.call("type-ahead-open", kind, name)
         var chosen = 0
         for _ in 0..<4 {
             guard (await evalLive(open)) as? Bool == true else { break }
             try? await Task.sleep(nanoseconds: 700_000_000)
-            let pick = #"""
-            (function(name){var want=name.toLowerCase();
-              var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=option],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
-              for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim().toLowerCase(); if(t===want){
-                ['mousedown','mouseup','click'].forEach(function(k){opts[i].dispatchEvent(new MouseEvent(k,{bubbles:true,cancelable:true}));}); return true;}}
-              return false;})(\#(Self.liveLiteral(name)));
-            """#
+            let pick = PageScript.call("type-ahead-choose", name)
             if (await evalLive(pick)) as? Bool == true { chosen += 1 }
             try? await Task.sleep(nanoseconds: 400_000_000)
         }
@@ -822,26 +347,10 @@ extension WebViewSession {
         var set = 0
         // Every empty menu on the form is set, however many there are: the loop ends when none is left (the bound only guards against a page that keeps adding menus).
         for _ in 0..<60 {
-            let open = #"""
-            (function(){
-              var els=[].slice.call(document.querySelectorAll('[role=combobox],[aria-haspopup=listbox],.MuiSelect-select')).filter(function(e){
-                var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&!e.getAttribute('data-ook-menu')&&((e.innerText||e.value||'').replace(/[\u200b\s]/g,'')==='');});
-              if(!els.length) return '';
-              var e=els[0]; e.setAttribute('data-ook-menu','1'); e.scrollIntoView({block:'center'});
-              ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
-              return ((e.closest('div[class*=FormControl],div')||e).innerText||'').replace(/\s+/g,' ').slice(0,120)||'menu';})();
-            """#
+            let open = PageScript.source("custom-menus-open")
             guard let label = (await evalLive(open)) as? String, !label.isEmpty else { break }
             try? await Task.sleep(nanoseconds: 700_000_000)
-            let pick = #"""
-            (function(){
-              var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=menuitem],[role=listbox] li')).filter(function(o){var r=o.getBoundingClientRect(); return r.width>0&&r.height>0;});
-              var bad=/employee|customer|client|vendor|partner|supplier|business|contractor|applicant|agent|representative|former|prospect/i;
-              var good=[\#(state.flatMap { $0.isEmpty ? nil : "/^\\s*" + NSRegularExpression.escapedPattern(for: $0) + "\\b/i," } ?? "")/consumer|individual|myself|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
-              for(var g=0;g<good.length;g++){for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim(); if(good[g].test(t)&&!bad.test(t)){opts[i].click(); return t;}}}
-              if(opts.length&&opts.length<40){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
-              document.body.click(); return '';})();
-            """#
+            let pick = PageScript.call("custom-menus-pick", state ?? "")
             if let t = (await evalLive(pick)) as? String, !t.isEmpty { set += 1 }
             try? await Task.sleep(nanoseconds: 400_000_000)
         }
@@ -851,37 +360,13 @@ extension WebViewSession {
     /// After a form's first button ("Review Request"), the page often shows a summary with its own final button ("Submit Request", "Confirm"): presses
     /// that one. Only when the page says it is a review or confirmation step, so a form is never sent twice. Returns whether it pressed something.
     func pressConfirmStep() async -> Bool {
-        let js = #"""
-        (function(){
-          var text=(document.body?document.body.innerText:'').toLowerCase();
-          if(!/review (your )?(request|information|details)|please (review|confirm)|confirm your (request|submission)|check your (details|information)/.test(text)) return false;
-          var bs=[].slice.call(document.querySelectorAll('button,input[type=submit],[role=button]')).filter(function(b){
-            var t=((b.innerText||b.value||'')+'').replace(/\s+/g,' ').trim(), r=b.getBoundingClientRect();
-            return r.width>0&&r.height>0&&/^(submit( request)?|confirm( request)?|send( request)?|yes,? submit)$/i.test(t);});
-          if(!bs.length) return false; bs[bs.length-1].scrollIntoView({block:'center'}); bs[bs.length-1].click(); return true;})();
-        """#
+        let js = PageScript.source("press-confirm-step")
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.
     func pressLiveSubmit(form token: String) async -> Bool {
-        let js = #"""
-        (function(token){var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return false;
-          var bad=/agree|accept|cancel|clear|reset|back|add another|^\+|subscribe/i;
-          // A sign-up, demo or contact button is never pressed, whatever the form around it says (an "unsubscribe" or opt-out button is fine).
-          var signup=/subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\bjoin\b|waitlist|\bdemo\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|get in touch|send message|contact us|book a/i, optout=/opt.?out|unsubscribe|do not sell|remove|delete|privacy/i;
-          var refuse=function(b){var t=((b.innerText||b.value||'')+'').trim(); return signup.test(t)&&!optout.test(t);};
-          var bs=[].slice.call(f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')).filter(function(b){
-            var t=((b.innerText||b.value||'')+'').trim(); var r=b.getBoundingClientRect(); return r.width>0&&r.height>0&&!bad.test(t);});
-          var pick=null;
-          for(var i=0;i<bs.length&&!pick;i++){var ty=(bs[i].getAttribute('type')||'').toLowerCase(); if(ty==='submit') pick=bs[i];}
-          for(var i=0;i<bs.length&&!pick;i++){if(/submit|send|opt|continue|request|go|confirm|remove|delete/i.test((bs[i].innerText||bs[i].value||''))) pick=bs[i];}
-          if(!pick&&bs.length) pick=bs[bs.length-1];
-          if(pick&&refuse(pick)) return false;
-          if(pick){pick.scrollIntoView({block:'center'}); pick.click(); return true;}
-          if([].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).some(refuse)) return false;
-          if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})(\#(Self.liveLiteral(token)));
-        """#
+        let js = PageScript.call("press-live-submit", token)
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
@@ -894,53 +379,26 @@ extension WebViewSession {
 
     /// A visible, empty text box that asks for a code ("Captcha", "Security code"): the person types it, and the form is not sent until it is filled.
     func emptyCodeField() async -> Bool {
-        let js = #"""
-        (function(){var re=/captcha|security.?code|verification.?code|enter the (code|text|characters)|type the (code|characters)/i;
-          var els=document.querySelectorAll('input[type=text],input:not([type]),input[type=tel],input[type=number]');
-          for(var i=0;i<els.length;i++){var e=els[i],r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
-            var l=(e.name||'')+' '+(e.id||'')+' '+(e.placeholder||'')+' '+(e.getAttribute('aria-label')||'');
-            if(e.id){var lb=document.querySelector('label[for="'+e.id+'"]'); if(lb) l+=' '+lb.innerText;}
-            if(re.test(l)&&!e.value) return true;}
-          return false;})();
-        """#
+        let js = PageScript.source("empty-code-field")
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Whether the person is partway through typing a bot-check or code box: it holds something, and the box has the cursor (up to 12 s without a key) or was
     /// typed in within the last 3 s. A box that is empty is `emptyCodeField`; this is the other half, so the first letter typed never counts as "done".
     func codeBoxInUse() async -> Bool {
-        let js = #"""
-        (function(){var re=/captcha|security.?code|verification|confirmation.?code|enter the (code|text|characters)|type the (code|characters)|one.?time|otp|passcode|\bcode\b/i, no=/zip|postal|promo|coupon|discount|area|country/i;
-          var idle=Date.now()-(window.__ookUserAt||0);
-          var els=document.querySelectorAll('input[type=text],input:not([type]),input[type=tel],input[type=number]');
-          for(var i=0;i<els.length;i++){var e=els[i],r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||!e.value) continue;
-            var l=(e.name||'')+' '+(e.id||'')+' '+(e.placeholder||'')+' '+(e.getAttribute('aria-label')||'')+' '+(e.autocomplete||'');
-            if(e.id){var lb=document.querySelector('label[for="'+e.id+'"]'); if(lb) l+=' '+lb.innerText;}
-            if(!re.test(l)||no.test(l)) continue;
-            if(e.getAttribute('data-ook-user')!=='1') continue;       // only a box the person typed in; one we filled is not theirs to wait for
-            if((document.activeElement===e&&idle<12000)||idle<3000) return true;}
-          return false;})();
-        """#
+        let js = PageScript.source("code-box-in-use")
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Whether a visible, empty box asks for a code sent to the person ("Verification code", "Enter the code"): a verification step that is not finished yet.
     func emptyVerificationCodeBox() async -> Bool {
-        let js = #"""
-        (function(){var re=/verification|confirmation|one.?time|otp|passcode|security.?code|enter the code|\bcode\b/i, no=/zip|postal|promo|coupon|discount|area|country/i;
-          var els=document.querySelectorAll('input[type=text],input:not([type]),input[type=tel],input[type=number]');
-          for(var i=0;i<els.length;i++){var e=els[i],r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
-            var l=(e.name||'')+' '+(e.id||'')+' '+(e.placeholder||'')+' '+(e.getAttribute('aria-label')||'')+' '+(e.autocomplete||'');
-            if(e.id){var lb=document.querySelector('label[for="'+e.id+'"]'); if(lb) l+=' '+lb.innerText;}
-            if(re.test(l)&&!no.test(l)&&!e.value) return true;}
-          return false;})();
-        """#
+        let js = PageScript.source("empty-verification-code-box")
         return ((await evalLive(js)) as? Bool) ?? false
     }
 
     /// Whether the chosen form is still on the page and visible, and the page's address.
     func formState(_ token: String) async -> (visible: Bool, url: String) {
-        let js = "(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); var v=false; if(f){var r=f.getBoundingClientRect(),s=getComputedStyle(f); v=r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';} return JSON.stringify({v:v,u:location.href});})();"
+        let js = PageScript.call("form-state", token)
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
               let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (true, "") }
         return (o["v"] as? Bool ?? true, o["u"] as? String ?? "")
@@ -949,29 +407,15 @@ extension WebViewSession {
     /// Hides what is left of a cookie or consent overlay that would not be dismissed, so it does not cover the form or the result.
     /// (It consents to nothing; it only stops covering the page.)
     func hideConsentOverlays() async {
-        let js = #"""
-        (function(){var n=0; document.querySelectorAll('div,section,aside,dialog,[role=dialog]').forEach(function(e){
-          var s=getComputedStyle(e); if(s.position!=='fixed'&&s.position!=='sticky') return;
-          var t=(e.innerText||'').toLowerCase(); if(t.length>1500) return;
-          if(/cookie|consent|gdpr|your privacy choices?:? we use|tracking technolog/.test(t)&&!e.querySelector('form')){e.style.setProperty('display','none','important');n++;}});
-          document.querySelectorAll('iframe').forEach(function(f){var s=getComputedStyle(f); var txt='';
-            try{txt=((f.contentDocument&&f.contentDocument.body&&f.contentDocument.body.innerText)||'').toLowerCase();}catch(e){}
-            if((s.position==='fixed'||s.position==='absolute')&&/cookie|consent|axeptio|gdpr/.test(txt+' '+(f.id||'')+' '+(f.className||''))){f.style.setProperty('display','none','important');n++;}});
-          document.querySelectorAll('[id*="axeptio" i],[class*="axeptio" i],[id*="cookie" i][style*="fixed"]').forEach(function(e){if(!e.querySelector('form')){e.style.setProperty('display','none','important');n++;}});
-          document.documentElement.style.setProperty('overflow','auto','important'); document.body.style.setProperty('overflow','auto','important'); return n;})();
-        """#
+        let js = PageScript.source("hide-consent-overlays")
         _ = await evalLive(js)
     }
 
     /// Scrolls the chosen form to the top of the view, so the picture shows the form and what the site said about it.
     func scrollFormIntoView(_ token: String) async {
-        _ = await evalLive("(function(){var f=document.querySelector('[data-ook-form=\"\(token)\"]'); if(f) f.scrollIntoView({block:'start'}); else window.scrollTo(0,0);})();")
+        _ = await evalLive(PageScript.call("scroll-form-into-view", token))
     }
 
-    fileprivate static func liveLiteral(_ s: String) -> String {
-        guard let d = try? JSONSerialization.data(withJSONObject: [s]), let j = String(data: d, encoding: .utf8) else { return "\"\"" }
-        return String(j.dropFirst().dropLast())
-    }
 }
 
 extension FormRun {
@@ -992,7 +436,7 @@ extension FormRun {
             // For offline analysis: the page as it stands after every click the run made, and a summary of the form it chose.
             var snapshot = (html: ((try? await session.evaluate("document.documentElement.outerHTML")) as? String) ?? "", picked: "")
             if let token = session.chosenForm {
-                let js = "(function(t){var f=document.querySelector('[data-ook-form=\"'+t+'\"]'); if(!f) return ''; var q=function(e){return (e.innerText||e.value||'').replace(/\\s+/g,' ').trim().slice(0,60);}; var n=f; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var x=(n.innerText||'').replace(/\\s+/g,' ').trim(); if(x.length>=25&&x.length<=700) break;} return JSON.stringify({fields:[].slice.call(f.querySelectorAll('input,select,textarea')).filter(function(e){return !/hidden|submit|button|image|reset|checkbox|radio/.test(e.type)}).map(function(e){return (e.type||e.tagName)+':'+(e.name||e.id||'')}),buttons:[].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).map(q).filter(Boolean),ctx:((n&&n.innerText)||'').replace(/\\s+/g,' ').trim().slice(0,300),url:location.href});})(\(WebViewSession.liveLiteral(token)));"
+                let js = PageScript.call("describe-form", token)
                 snapshot.picked = ((try? await session.evaluate(js)) as? String) ?? ""
             }
             snapshot.picked += "\n" + (url.flatMap { debugForms[$0.absoluteString] } ?? "")

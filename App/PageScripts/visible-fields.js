@@ -1,0 +1,1 @@
+JSON.stringify([...document.querySelectorAll('input,select,textarea')].filter(e=>e.getBoundingClientRect().width>0&&!['hidden','submit','button'].includes(e.type)).map(e=>({id:e.id||e.name||'',type:e.type||e.tagName,value:e.value})))

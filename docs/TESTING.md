@@ -12,6 +12,15 @@ Layers, cheapest first:
 | The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for a release, and weekly |
 | Live sites (read-only) | live | `AppTests/Live*` with `OPTOUT_LIVE=1`; `pipeline.yml` | by hand only |
 
+## Page scripts
+
+The JavaScript the app runs inside web pages (finding forms and their boxes, filling them, choosing request options, spotting checks, terms prompts and
+confirmations, declining cookie prompts, telling the app what the person touched) lives in `App/PageScripts/`, one file per script, loaded by
+`App/Sources/PageScript.swift`. A plain script is one expression, run as it is; a script that takes values is a function expression called with its values
+as JSON (`PageScript.call`), so an apostrophe or quote in a name arrives as typed and nothing is left on the page. `//#include name` shares a fragment
+(`ownership.js`). Moved there from Swift strings on 2026-11-19: the plain scripts were checked byte for byte against what Swift produced, and every
+web-view test passed before and after. `PageScriptTests` checks that each one loads, is valid JavaScript and receives its values intact.
+
 ## Unit and integration tests
 
 **Unit tests run on every push; integration tests run for a release.** Unit tests are everything in the two Swift packages and the app's

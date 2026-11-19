@@ -39,6 +39,10 @@ targets:
         buildPhase: resources
       - path: registries/summary.json
         buildPhase: resources
+      # The JavaScript the app runs in web pages, one file per script (App/Sources/PageScript.swift; tested by tools/pagescripts).
+      - path: App/PageScripts
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: OptOutKitCore
       - target: ShareExtension

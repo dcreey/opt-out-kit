@@ -1,0 +1,1 @@
+(function(t){var f=document.querySelector('[data-ook-form="'+t+'"]'); if(f){f.scrollIntoView({block:'start',behavior:'instant'}); window.scrollBy(0,-12); return true;} return false;})

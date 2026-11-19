@@ -1,0 +1,1 @@
+(function(t){var f=document.querySelector('[data-ook-form="'+t+'"]'); var v=false; if(f){var r=f.getBoundingClientRect(),s=getComputedStyle(f); v=r.width>0&&r.height>0&&s.display!=='none'&&s.visibility!=='hidden';} return JSON.stringify({v:v,u:location.href});})
