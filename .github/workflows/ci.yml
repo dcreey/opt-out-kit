@@ -218,8 +218,11 @@ jobs:
         run: rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData
       - name: Wait for the simulator
         run: |
+          # The boot started in the background finishes first (up to 10 minutes): asking for the boot status while that boot is still under way raced
+          # with it and failed shard 0 twice ("Wait for the simulator", c1b0c04 and e08dfbe). Then one check that it really booted.
+          for i in $(seq 1 600); do [ -f $RUNNER_TEMP/simready ] && break; sleep 1; done
+          [ -f $RUNNER_TEMP/simready ] || { echo "::error::the simulator did not boot in 10 minutes"; cat $RUNNER_TEMP/simboot.log; exit 1; }
           xcrun simctl bootstatus "$SIM_UDID" -b || { cat $RUNNER_TEMP/simboot.log; exit 1; }
-          while [ ! -f $RUNNER_TEMP/simready ]; do sleep 1; done
           echo "::notice title=Simulator::ready $(( $(cat $RUNNER_TEMP/simready) - JOB_START )) s after the job started; tests start $(( $(date +%s) - JOB_START )) s in"
       - name: Run this shard
         shell: bash

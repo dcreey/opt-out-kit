@@ -242,8 +242,15 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         return e.domain == "WebKitErrorDomain" && e.code == 102
     }
 
+    /// Loads HTML the app holds (no network). WebKit now and then fails such a load at once with an internal "InvalidTransition" error (seen on CI's
+    /// simulators); the same HTML is loaded once more, since nothing about the page caused it. A cancel or a timeout is not tried again.
     func loadHTML(_ html: String) async throws {
-        try await wait { self.webView.loadHTMLString(html, baseURL: URL(string: "https://example.invalid/")) }
+        let base = URL(string: "https://example.invalid/")
+        do { try await wait { self.webView.loadHTMLString(html, baseURL: base) } }
+        catch where !(error is CancellationError) && (error as? URLError)?.code != .timedOut && !abandoned {
+            NSLog("OOK loadHTML failed once, loading again: %@", "\(error)")
+            try await wait { self.webView.loadHTMLString(html, baseURL: base) }
+        }
     }
 
     func submitForm(action: URL, body: String) async throws {
