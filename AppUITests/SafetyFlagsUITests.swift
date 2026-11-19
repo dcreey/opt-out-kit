@@ -38,13 +38,14 @@ final class SafetyFlagsUITests: XCTestCase {
     }
 
     func testPublicFigureFlagAlsoTurnsSearchingOffAndSurvivesRelaunch() {
-        let app = launch()
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan", "-uitest-seed-profile"]          // a complete profile: only the flag changes
+        app.launch()
         app.buttons["profile-button"].tap()
         let figure = app.switches["flag-public-figure"]
         XCTAssertTrue(app.scrollUntilExists(figure), "the safety flags are in the editor")
         flip(app, figure)
         XCTAssertEqual(figure.value as? String, "1")
-        app.fillRequiredProfile()
         app.buttons["editor-done"].tap()          // the editor's own Done (the keyboard has one too)
         app.terminate()
 

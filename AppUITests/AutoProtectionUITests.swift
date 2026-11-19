@@ -86,11 +86,8 @@ final class AutoProtectionUITests: XCTestCase {
 
     func testBlockedByPaymentIsAnAnswerInQuickChecks() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // searching needs a complete profile; typing one is tested elsewhere
         app.launch()
-        app.buttons["profile-button"].tap()
-        app.fillRequiredProfile()                     // searching needs the profile's legal name, address and the household email
-        app.buttons["editor-done"].tap()
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()

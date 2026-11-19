@@ -287,12 +287,9 @@ final class DirectoryUITests: XCTestCase {
 final class ExposureScanUITests: XCTestCase {
     func testScanShowsGroupedResultsWithoutTouchingTheNetwork() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan"]
+        // A complete made-up profile, so the check has someone to search for (typing a profile is tested in ProfileEditorUITests).
+        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan", "-uitest-seed-profile"]
         app.launch()
-        // Give the default person a name so the check has something to search for.
-        app.buttons["profile-button"].tap()
-        app.fillRequiredProfile()
-        app.buttons["editor-done"].tap()          // the editor's own Done (the keyboard has one too)
 
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]), "the scan is low on the Sites tab")
@@ -305,11 +302,8 @@ final class ExposureScanUITests: XCTestCase {
 final class QuickCheckUITests: XCTestCase {
     func testLookingAtASiteEarnsPoints() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // looking a site up needs a complete profile
         app.launch()
-        app.buttons["profile-button"].tap()
-        app.fillRequiredProfile()                     // looking a site up needs the legal name, address and the household email
-        app.buttons["editor-done"].tap()
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()
