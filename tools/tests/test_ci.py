@@ -35,6 +35,12 @@ class Balance(unittest.TestCase):
         self.assertEqual(sorted(flat), sorted(weights))
         self.assertLessEqual(max(load) - min(load), max(weights.values()))
 
+    def test_a_suite_can_be_chosen(self):
+        unit = S.work({}, suites={"OptOutKitTests"}); ui = S.work({}, suites={"OptOutKitUITests"})
+        self.assertTrue(unit and all(k.startswith("OptOutKitTests/") for k in unit))
+        self.assertTrue(ui and all(k.startswith("OptOutKitUITests/") for k in ui))
+        self.assertEqual(set(unit) | set(ui), set(S.work({})), "together they are everything")
+
     def test_a_shard_with_other_work_gets_less(self):
         weights = {f"T/C{i}": 10.0 for i in range(10)}
         bins, load = S.split(weights, 2, {0: 30.0})

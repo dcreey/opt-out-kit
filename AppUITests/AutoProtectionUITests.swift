@@ -5,30 +5,6 @@ final class AutoProtectionUITests: XCTestCase {
         let a = XCTAttachment(screenshot: app.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
-    /// The first-run page has one switch, automatic opt-out requests, on by default; the answer is saved and shown in Settings. (There was a daily
-    /// scan switch too; the scan is no longer automatic.)
-    func testFirstRunPageTurnsAutomaticOptOutOnByDefaultAndSavesTheAnswer() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
-        app.launch()
-        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.tapNextOnboarding() }
-        app.enterOnboardingEmail()
-        let opt = app.switches["auto-optout-toggle"]
-        XCTAssertTrue(app.scrollUntilExists(opt), "the automatic protection page")
-        XCTAssertEqual(opt.value as? String, "1", "automatic opt-out starts on")
-        XCTAssertFalse(app.switches["auto-scan-toggle"].exists, "there is no automatic scan to turn on")
-        shot(app, "1-first-run-automatic-protection")
-        app.finishOnboarding()
-        // Turned on, it needs the legal name and current address before it can start: the profile gate asks for them next.
-        app.completeProfileGate()
-
-        app.tabBars.buttons["Settings"].tap()
-        let setting = app.switches["settings-optout-toggle"]
-        XCTAssertTrue(app.scrollUntilExists(setting))
-        XCTAssertEqual(setting.value as? String, "1", "Settings shows it on")
-        shot(app, "2-settings-on")
-    }
-
     func testDecliningAtFirstRunTurnsItOffAndTheQueueBannerDisappears() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]

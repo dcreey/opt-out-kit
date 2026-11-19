@@ -1,33 +1,81 @@
-# Testing (placeholder)
+# Testing
 
-Deliberately thin until the app works end to end. Layers, cheapest first:
+Layers, cheapest first:
 
-| Layer | Where | Runs |
-|---|---|---|
-| Broker YAML vs `schema/broker.schema.json` | CI `checks` job | `check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml` |
-| Core logic (decode, queue, progress) | `Packages/OptOutKitCore/Tests` | `swift test` in that folder |
-| Assisted run logic (runner, email handoff, page-text reading) | `Packages/AssistedRunLogic/Tests`, on the app's own sources in `Shared/AssistedRun` | `swift test --package-path Packages/AssistedRunLogic` (Mac, no simulator) |
-| App unit tests (anything that needs UIKit or a web view) | `AppTests` | `xcodebuild test` (needs a simulator) |
-| UI tests | `AppUITests` | same |
+| Layer | Kind | Where | Runs |
+|---|---|---|---|
+| Broker and directory YAML vs `schema/*.schema.json`, the Python tools, translations | check | CI `checks` job | every push |
+| Core logic (decode, queue, plan, rules) | **unit** | `Packages/OptOutKitCore/Tests` | `swift test` in that folder (Mac, no simulator); every push |
+| Assisted run logic (runner, email handoff, page-text reading) | **unit** | `Packages/AssistedRunLogic/Tests`, on the app's own sources in `Shared/AssistedRun` | `swift test --package-path Packages/AssistedRunLogic`; every push |
+| App unit tests (the app model, web views on local pages, storage) | **unit** | `AppTests` (target `OptOutKitTests`) | `xcodebuild test` on a simulator; every push |
+| UI tests (the real app driven on a simulator) | **integration** | `AppUITests` (target `OptOutKitUITests`) | for a release (`.github/workflows/integration.yml`) |
+| The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for a release, and weekly |
+| Live sites (read-only) | live | `AppTests/Live*` with `OPTOUT_LIVE=1`; `pipeline.yml` | by hand only |
+
+## Unit and integration tests
+
+**Unit tests run on every push; integration tests run for a release.** Unit tests are everything in the two Swift packages and the app's
+`OptOutKitTests`: they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
+they run in `.github/workflows/ci.yml` on every push and pull request. Integration tests are the UI tests in `OptOutKitUITests`: they drive the real app
+on a simulator, tap through its screens and check what a person sees. They take far longer (a UI test walks every screen in its way), so they run in
+`.github/workflows/integration.yml` when a GitHub release is published, and by hand from the Actions tab (Integration, Run workflow). The run over every
+site runs there too, and weekly.
+
+**Every rule an integration test checks has a unit test.** A UI test is the end-to-end proof that the screens are wired to the rules; the rule itself is
+proved by a unit test, so a push that breaks a rule fails at once, not at the next release. A test that only checks layout (where something sits on the
+screen, that a sheet stays open, that a keyboard has a Done button) has no rule behind it and is integration only. When a UI test is added, the unit test
+for its rule is added with it, and both go in the table below.
+
+**Releasing:** publish a GitHub release (Releases, Draft a new release, a tag such as `v1.0-48`) for the commit being shipped to TestFlight or the App
+Store. The Integration workflow runs on it; ship once it passes. A failing integration test is fixed (or the release is held) before the build goes to
+review.
+
+| Integration test (`OptOutKitUITests`) | The rules it checks, and their unit tests |
+|---|---|
+| `OnboardingAndSitesUITests.testTheFirstRunFromWalkthroughToQueue` | Walkthrough shown once: `CoreTests.testFreshInstallGetsWalkthrough`, `testUpdateWithNoNewMessageShowsNothing`. The answer saved: `AutoProtectionTests.testSayingYesTurnsOnBothAndNoTurnsBothOff`. The profile asked for: `CoreTests.testAProfileNeedsALegalFirstAndLastNameAndACurrentAddress`. First pass first: `CoreTests.testTheSemiAutomatedQueueWaitsOnlyForTheVeryFirstAutomaticPass`, `BackgroundPassesAppTests`. Page order, scroll-to-unlock: layout |
+| `…testChoosingCaliforniaExplainsItsLawsAndOffersDropInTheQueue`, `testChoosingAnotherCountryShowsItsLawsAndRegulatorAndNeedsReadingToo`, `testAStateWithNoLawPointsToStrongerStatesWithExamples`, `testNotLivingInCaliforniaHidesIt` | Each place's rules and examples: `CoreTests.testEachCountryIsToldItsOwnRulesAndStrongPlacesAreOfferedAsExamples`, `testTheCountriesLoadWithTheEUAndEveryMemberAndAreUniqueByID`. DROP only in California, sites it covers not separate work: `AutomaticRunAppTests.testDROPComesFirstInCaliforniaAndIsLeftOutEverywhereElse`, `PlatformAppTests.testASiteDropHandlesIsListedOnceAndIsNotSeparateWork` |
+| `…testTheDeviceLanguageIsUsedAndTheWalkthroughCanSwitchLanguage` | `PlatformAppTests.testTheAppSpeaksTheChosenLanguageEverywhereItBuildsWords`, `testAnUnsupportedLanguageIsIgnoredAndTheChoiceIsRemembered`, `L10nTests` |
+| `…testFirstVisitsShowAShortGuideOnceInsteadOfWalkthroughPages` | `PlatformAppTests.testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn` |
+| `…testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`, `testSitesTabSearchAndStatus`, `DirectoryUITests.*` | `SiteFilterTests`, `CoreTests.testEachFilterNarrowsAndTextMatchesAddressOrName`; the site page's shared opt-out: `DirectoryTests.testTheCourtRecordsSitesShareOneOptOutThatSubmitsToTheMembersHost` |
+| `…testAboutTabReplaysWalkthrough`, `testThePageDotsSitBelowTheContentNotOnTopOfIt`, `testEveryKeyboardHasADoneButtonThatPutsItAway`, `SiteViewLayoutUITests.*`, `GuidedFlowUITests.testTheGuideSitsOnTopInAColouredFrameAndShowsTheWholeStep`, `AutoProtectionUITests.testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Layout and navigation only |
+| `AutoProtectionUITests.testDecliningAtFirstRunTurnsItOffAndTheQueueBannerDisappears`, `testSkippingTheWalkthroughLeavesAQueueBannerThatOffersToTurnItOn` | `AutoProtectionTests.testNothingRunsUntilThePersonSaysYes`, `testSayingYesTurnsOnBothAndNoTurnsBothOff`, `CoreTests.testDecliningTurnsEverythingOffButRemembersTheAnswer` |
+| `AutoProtectionUITests.testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet`, `testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt`, `DryRunUITests.testDryRunForRealPerson` | `AutoProtectionTests.testOptOutRunSendsToSitesWithAFormAndRecordsOnlyWhatWasSent`, `testPreviewFillsFormsButRecordsNothingAndKeepsTheClockStopped`, `AutomaticRunAppTests`, `BackgroundPassesAppTests`, `ResumeAppTests`, `ActivityPageSpeedTests`, `CoreTests.testDryRunFillsButNeverSends` |
+| `AutoProtectionUITests.testBlockedByPaymentIsAnAnswerInQuickChecks`, `QuickCheckUITests.testLookingAtASiteEarnsPoints` | `CoreTests.testBlockedByPaymentEarnsPointsButIsNeverAVerdict`, `testAPaywalledLookCannotVerifyOrRelistAnOptOut` |
+| `ExposureScanUITests.testScanShowsGroupedResultsWithoutTouchingTheNetwork` | `CoreTests.testScanCoversOnlyCalibratedSitesAndReportsEachOutcome`, `testRechecksAndScansNeverRunForAMinorOrPublicFigure` |
+| `AutoProtectionUITests.testTheBirthdateIsChosenYearThenMonthThenDayAndIsRequired`, `ProfileEditorUITests.*` | `CoreTests.testAProfileNeedsALegalFirstAndLastNameAndACurrentAddress`, `testANicknameOrAPreviousAddressDoesNotMakeAProfileComplete`, `testBlankSpacesDoNotCount`, `testABirthdateUnderEighteenCountsAsAMinorEvenWithTheFlagOff`; saved and encrypted: `PeopleTests.testProfileEditsPersistAcrossLaunchesEncrypted`. The year-month-day picker: layout |
+| `SafetyFlagsUITests.*` | `CoreTests.testBothFlagsDefaultToNoAndAnAdultCanBeSearched`, `testEitherFlagStopsSearching`; the reason shown: `PeopleTests.testSearchingIsOffForAPublicFigureOrAMinorWithTheReason` |
+| `GuidedFlowUITests.testStepsAdvanceByThemselvesWhenSeenAndWithNextWhenNot`, `testCancelLeavesTheGuideAndGoesBackToTheSite`, `testNotWorkingOffersTheReasonsAndRecordsOne`, `BrokerFlowUITests.*`, `SiteViewLayoutUITests.testTheGuideOpensFromTheSiteView` | `GuidedRunnerTests.testLoadingThePageFinishesTheOpenStepAndTheCountIsShown`, `testCopyingTheValueFinishesTheCopyStepAndPutsItOnTheClipboard`, `testStepsItCannotDetectNeedTheNextButtonAndTheFlowFinishes`, `testCancelClosesThePageAndRecordsNothingElse`, `testNotWorkingRecordsTheReasonAndClosesTheFlow`; every broker file loads and is valid: `CoreTests` (registry) and the `checks` schema job |
+| `SolveAndSendUITests.testPreviousSiteReopensTheEarlierSiteAndNextSiteBringsYouForwardAgain` | `EmailAndSkipFlowTests.testBackReopensThePreviousSiteWithoutChangingEitherSiteAndNothingIsSentForThePerson`, `testASkippedSiteDoneNowAfterGoingBackIsRecordedAsDone` |
+| `SolveAndSendUITests.testMyDataIsInTheMenuAndOffersEachDetailToCopy` | `DetailChoicesTests.testEveryDetailOfThePersonIsOfferedOnceInTheOrderAPersonLooksForIt`, `testAProfileWithLittleOnlyOffersWhatItHas` |
+| `SolveAndSendUITests.testAConfirmationNobodyPressedAnythingForAsksWasThisSent` | `PageFlowTests` (the "Was this sent?" question) |
+| `SolveAndSendUITests.testTheFirstGuidedFlowOpensWithAWalkthroughThatCanBePagedThroughOrSkipped`, `testTheGuidedWalkthroughIsReplayedFromAbout` | `PeopleTests.testTheGuidedWalkthroughIsShownOnceThenRemembered`; paging: layout |
+| `BrokerListUITests.testBrokerListShowsQueue` | `CoreTests.testEveryTaskIsInExactlyOneBandOfTheRealQueue` |
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on every push to `main` and every pull request, on GitHub's hosted runners (free for a public repository). No job
-contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`, and the UI tests use the app's fake sites.
+Two workflows, on GitHub's hosted runners (free for a public repository). Neither contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`,
+and the UI tests use the app's fake sites.
+
+**`.github/workflows/ci.yml`: the unit tests, on every push to `main` and every pull request.**
 
 | Job | Machine | What it runs |
 |---|---|---|
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
-| `test` (5 at once) | macOS, one each | Each shard starts booting its simulator before anything else. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 4 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share of the unit and UI tests (`test-without-building`). Shard 0 also runs `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic`. A notice says when the simulator was ready and when the tests started |
+| `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
+| `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 start booting their simulator before anything else; shard 0 builds first and boots after (a booting simulator starves the machine, and its checkout then took minutes), so it gets less of the tests. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`). A notice says when the simulator was ready and when the tests started |
 
-`tools/ci_shards.py` shares the tests out so the 5 shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
+**`.github/workflows/integration.yml`: the integration tests, for a release.** On a published GitHub release and by hand: the UI tests (`OptOutKitUITests`)
+in 5 shards, built and handed over the same way. On a release, by hand and weekly (Mondays): the automatic run over every site (see below).
+
+`tools/ci_shards.py` shares the tests out (`--suite` picks the unit or the UI tests) so the shards end at about the same time: unit tests a class at a time, UI tests one test at a time (one UI
 class can take ten minutes). Each is weighed by the seconds it took in the last measured run (`tools/ci_timings.json`); one never measured is estimated
 from its number of tests, and shard 0 is given less to make room for the package tests (`--reserve`). Every shard prints its timings as a notice, and
 `python3 tools/ci_shards.py --fetch-run RUN_ID` reads them back from a finished run (public API, no login) into that file, so the split stays balanced as
 tests change. Every failed test and its message is an annotation too, readable without logging in. Tests are read from the sources, so a new class needs
 no change to the workflow (`--list` shows the split; `tools/tests/test_ci.py` checks that everything runs exactly once, a known-failing test is left out
 wherever it lands, a shard with other work gets less, failures become annotations, and the file times are set from the commits). The free plan runs at
-most 5 macOS jobs at once, which is why there are 5 shards and the build is done by one of them rather than a sixth job: nothing waits for a free machine.
+most 5 macOS jobs at once, which is why the unit tests have 4 shards beside the package job, the UI tests 5, and the build is done by one of the shards
+rather than a job of its own: nothing waits for a free machine.
 Building once instead of in every shard was measured to matter: these machines have three cores, and five shards each compiling while their simulator
 booted slowed both (the tests started 8 to 9 minutes in). A failing shard keeps its result
 bundle as an artifact for a week.
@@ -56,8 +104,8 @@ run waited for it for ever. The walkthrough's advertising-ID page has its own te
 (`-uitest-coach`, `-uitest-explainers`), so a fresh simulator, as in CI, behaves like a used one: on CI the email-links explainer covered the run report.
 A UI test that only needs a complete profile starts with `-uitest-seed-profile` instead of typing one (typing is tested in `ProfileEditorUITests`).
 
-**Weekly end-to-end** (`.github/workflows/e2e.yml`, Mondays and by hand): the same automatic-run UI tests over every site (`TEST_RUNNER_OPTOUT_ALL_SITES=1`
-lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
+**The run over every site** (`integration.yml`, job `all-sites`: on a release, Mondays and by hand): the same automatic-run UI tests over every site
+(`TEST_RUNNER_OPTOUT_ALL_SITES=1` lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
 
 Family profiles are switched off (`Features.otherProfiles`), so they have no UI test (the tests that added relatives were removed on 2026-11-18); their
 rules (relationships, minors and public figures are never searched) are Mac tests in `CoreTests`. No test is left out of CI (`KNOWN_FAILING` is empty).

@@ -112,6 +112,33 @@ final class PeopleTests: XCTestCase {
         XCTAssertTrue(makeModel(url: url, keys: keys).people.contains { $0.displayName == "Dad" }, "written at the unlock")
     }
 
+    /// Why the Sites tab's searches are off (its UI test, `SafetyFlagsUITests`, shows the reason): a public figure or a minor is never searched, and says
+    /// so; anyone else can be searched once the profile is complete.
+    func testSearchingIsOffForAPublicFigureOrAMinorWithTheReason() throws {
+        let model = makeModel()
+        var me = try XCTUnwrap(model.selectedPerson)
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        model.update(me); model.setContactEmail("pat@example.com")
+        XCTAssertNil(model.searchBlockedReason, "a complete profile of an adult can be searched")
+        me.isPublicFigure = true; model.update(me)
+        XCTAssertTrue(model.searchBlockedReason?.contains("a public figure") ?? false, model.searchBlockedReason ?? "nil")
+        me.isPublicFigure = false; me.isMinor = true; model.update(me)
+        XCTAssertTrue(model.searchBlockedReason?.contains("under 18") ?? false, model.searchBlockedReason ?? "nil")
+    }
+
+    func testSearchingWaitsForACompleteProfile() {
+        XCTAssertNotNil(makeModel().searchBlockedReason, "an empty profile has nothing to search for, and says what is missing")
+    }
+
+    /// The guided sites walkthrough (its UI tests, `SolveAndSendUITests`, page through it): shown before the first guided site, then not again.
+    func testTheGuidedWalkthroughIsShownOnceThenRemembered() {
+        let model = makeModel()
+        XCTAssertFalse(model.guidedIntroSeen)
+        model.markGuidedIntroSeen()
+        XCTAssertTrue(model.guidedIntroSeen)
+    }
+
     func testAddedRelativeIsAPersonWithARelationship() throws {
         let model = makeModel()
         let mum = try XCTUnwrap(model.addPerson(named: "Mum", relationship: .parent))

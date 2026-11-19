@@ -3,6 +3,7 @@
 same time.
 
   ci_shards.py --shards 5 --index 0          the -only-testing: arguments for shard 0, one per line
+  ci_shards.py --suite OptOutKitTests ...    only the unit tests (CI on every push); --suite OptOutKitUITests: only the UI tests (the integration workflow)
   ci_shards.py --shards 5 --list             every shard, its classes and its expected seconds
   ci_shards.py --timings-from-log LOG        the seconds each class took in an xcodebuild log, as one line of JSON (CI prints it as a notice)
   ci_shards.py --failures-from-log LOG      each failed test and its message, as annotations (CI prints them)
@@ -49,10 +50,12 @@ def classes(directory):
 BY_TEST = {"OptOutKitUITests"}
 
 
-def work(timings, root=ROOT):
-    """Everything to run, as "Target/Class" or "Target/Class/test", with its expected seconds."""
+def work(timings, root=ROOT, suites=None):
+    """Everything to run, as "Target/Class" or "Target/Class/test", with its expected seconds. `suites`: only these test targets (CI on push runs the
+    unit tests, OptOutKitTests; the integration workflow runs the UI tests, OptOutKitUITests)."""
     out = {}
     for target, folder in SUITES:
+        if suites and target not in suites: continue
         for cls, tests in methods(os.path.join(root, folder)).items():
             if target in BY_TEST:
                 for t in tests: out[f"{target}/{cls}/{t}"] = float(timings.get(f"{target}/{cls}/{t}", GUESS[target]))
@@ -131,6 +134,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shards", type=int); ap.add_argument("--index", type=int)
     ap.add_argument("--list", action="store_true"); ap.add_argument("--skip", action="append", default=[])
+    ap.add_argument("--suite", action="append", default=[], help="only this test target (repeatable); default: every target")
     ap.add_argument("--reserve", action="append", default=[], help="SHARD:SECONDS of other work on that shard")
     ap.add_argument("--build-summary"); ap.add_argument("--cache", default=""); ap.add_argument("--folder")
     ap.add_argument("--timings-from-log"); ap.add_argument("--failures-from-log"); ap.add_argument("--fetch-run")
@@ -140,7 +144,7 @@ def main():
     if a.failures_from_log: print("\n".join(failures_from_log(open(a.failures_from_log, errors="replace").read()))); return
     if a.fetch_run: fetch_run(a.fetch_run); return
     if not a.shards: sys.exit("--shards is required")
-    weights = work(load_timings())
+    weights = work(load_timings(), suites=set(a.suite) or None)
     if not weights: sys.exit("no XCTestCase classes found")
     reserve = {int(r.split(":")[0]): float(r.split(":")[1]) for r in a.reserve}
     bins, load = split(weights, a.shards, reserve)

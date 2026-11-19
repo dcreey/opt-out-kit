@@ -1,28 +1,36 @@
 import XCTest
 
 final class OnboardingAndSitesUITests: XCTestCase {
-    func testWalkthroughShowsOnFirstInstallAndCanBeFinished() {
+    /// The whole first run, in one walk (each page must be scrolled to its end, so walking it is slow): the first page is automatic removal, the advertising
+    /// ID page can be passed without sharing it, automatic opt-out is on by default with no scan switch, the profile is asked for next, the queue starts
+    /// with the automatic pass, Settings shows it on, and the walkthrough does not come back at the next launch. Each rule behind these is also a unit
+    /// test (docs/TESTING.md, "Unit and integration tests").
+    func testTheFirstRunFromWalkthroughToQueue() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
         app.launch()
-        XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
-        app.enterOnboardingEmail()
-        app.finishOnboarding()
-        app.completeProfileGate()
-        // A new person: the first automatic pass is the first step (it starts by itself once the profile is in), and the semi-automated queue waits for it.
-        XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 10), "the queue starts with the automatic pass")
-    }
-
-    func testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
-        app.launch()
-        XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
-        for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
-        app.enterOnboardingEmail()
+        XCTAssertTrue(app.staticTexts["We remove your data for you"].waitForExistence(timeout: 10), "the first page is automatic removal")
+        XCTAssertFalse(app.staticTexts["Work through a site"].exists, "with no site pages")
+        for _ in 0..<3 { XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10)); app.tapNextOnboarding() }
+        app.enterOnboardingEmail()              // email, place, terms and the advertising ID page, passed without sharing it
         XCTAssertTrue(app.staticTexts["Automatic protection"].waitForExistence(timeout: 5), "passing the advertising ID page leads on to automatic protection")
+        let opt = app.switches["auto-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(opt))
+        XCTAssertEqual(opt.value as? String, "1", "automatic opt-out starts on")
+        XCTAssertFalse(app.switches["auto-scan-toggle"].exists, "there is no automatic scan to turn on")
         app.finishOnboarding()
+        app.completeProfileGate()               // turned on, it needs the legal name and current address next
+        XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 10), "the queue starts with the automatic pass")
+        app.tabBars.buttons["Settings"].tap()
+        let setting = app.switches["settings-optout-toggle"]
+        XCTAssertTrue(app.scrollUntilExists(setting))
+        XCTAssertEqual(setting.value as? String, "1", "Settings shows it on")
+        app.terminate()
+
+        let again = XCUIApplication()
+        again.launch()
+        XCTAssertTrue(again.buttons["profile-button"].waitForExistence(timeout: 15), "the next launch opens on the queue")
+        XCTAssertFalse(again.buttons["onboarding-next"].exists, "without the walkthrough")
     }
 
     func testChoosingCaliforniaExplainsItsLawsAndOffersDropInTheQueue() {
@@ -77,15 +85,6 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertLessThanOrEqual(dots.frame.maxY, next.frame.minY + 1, "dots above the buttons")
         let body = app.scrollViews.firstMatch.frame
         XCTAssertGreaterThanOrEqual(dots.frame.minY, body.maxY - 1, "dots below the scrolling content, not over it")
-    }
-
-    func testTheWalkthroughOpensWithAutomaticRemovalAndHasNoSitePages() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
-        app.launch()
-        XCTAssertTrue(app.staticTexts["We remove your data for you"].waitForExistence(timeout: 10), "the first page is automatic removal")
-        XCTAssertFalse(app.staticTexts["Work through a site"].exists)
-        XCTAssertFalse(app.staticTexts["Track every site"].exists)
     }
 
     func testFirstVisitsShowAShortGuideOnceInsteadOfWalkthroughPages() {
@@ -204,22 +203,6 @@ final class OnboardingAndSitesUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-start"].waitForExistence(timeout: 10), "the app's own run comes first when there is no official service")
         XCTAssertFalse(app.descendants(matching: .any)["first-pass-platform"].exists, "and California's DROP is not offered")
-    }
-
-    func testWalkthroughDoesNotReappearOnNextLaunch() {
-        let first = XCUIApplication()
-        first.launchArguments = ["-uitest-reset", "-uitest-onboarding"]
-        first.launch()
-        for _ in 0..<3 { first.tapNextOnboarding() }          // there is no Skip: each page is scrolled to its end, then Next
-        first.enterOnboardingEmail()
-        first.finishOnboarding()
-        first.completeProfileGate()
-        first.terminate()
-
-        let again = XCUIApplication()
-        again.launch()
-        XCTAssertTrue(again.buttons["profile-button"].waitForExistence(timeout: 10), "the app opens on the queue")
-        XCTAssertFalse(again.buttons["onboarding-next"].exists)
     }
 
     func testSitesTabSearchAndStatus() {

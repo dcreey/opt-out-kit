@@ -18,6 +18,8 @@ Every change to behavior updates the docs in the same piece of work, before it i
 
 - Every behavior gets a Mac test where it can (`swift test --package-path Packages/OptOutKitCore`, `Packages/AssistedRunLogic`); otherwise a simulator test.
 - The semi-automated "Solve and send" flow is the most trusted: do not break it. Share logic and UI across flows instead of copying it.
+- Unit tests (the Swift packages and `AppTests`) run on every push (`ci.yml`); integration tests (the UI tests in `AppUITests`) run for a GitHub release
+  (`integration.yml`). Every rule a UI test checks also has a unit test, listed in `docs/TESTING.md` ("Unit and integration tests"); add both together.
 
 ## Translations
 

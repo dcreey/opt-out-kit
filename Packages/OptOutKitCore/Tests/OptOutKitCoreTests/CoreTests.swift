@@ -633,6 +633,14 @@ final class DirectoryTests: XCTestCase {
         }
     }
 
+    /// What the Sites search shows on texascourtrecords.us's page (its UI test, `DirectoryUITests`, only checks the page shows it): one shared opt-out
+    /// for the court-records family, sent to the members host.
+    func testTheCourtRecordsSitesShareOneOptOutThatSubmitsToTheMembersHost() throws {
+        let e = try XCTUnwrap(Registry.loadDirectory(directoryURL).first { $0.domain == "texascourtrecords.us" })
+        XCTAssertEqual(e.familyParent, "courtrecords.us", "it shares the family's opt-out")
+        XCTAssertEqual(e.optOutForm?.action?.host, "members.courtrecords.us", "and the form posts to the members host")
+    }
+
     func testGeneratedDirectoryDecodesAndIsComplete() throws {
         let entries = try Registry.loadDirectory(directoryURL)
         XCTAssertGreaterThanOrEqual(entries.count, 200, "the 212 EasyOptOuts sites")
