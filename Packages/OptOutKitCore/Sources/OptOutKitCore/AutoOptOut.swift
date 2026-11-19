@@ -64,11 +64,20 @@ public extension FormSubmitter {
     var reportsActivity: Bool { false }
 }
 
-/// The last sign of life from a site's page, shared between the work and its watchdog.
+/// The last sign of life from a site's page, shared between the work and its watchdog, and whether its form has been sent yet.
 final class ActivityClock: @unchecked Sendable {
-    private let lock = NSLock(); private var last = Date()
+    private let lock = NSLock(); private var last = Date(); private var sentAt: Date?
     func touch() { lock.lock(); last = Date(); lock.unlock() }
+    func markSent() { lock.lock(); if sentAt == nil { sentAt = Date() }; last = Date(); lock.unlock() }
     var quietFor: TimeInterval { lock.lock(); defer { lock.unlock() }; return Date().timeIntervalSince(last) }
+    var sent: Bool { lock.lock(); defer { lock.unlock() }; return sentAt != nil }
+}
+
+/// What the work of one background-run site tells its watchdog beyond signs of life. The app's page code calls `markSent` the moment it presses a form's
+/// send button, so a site given up after that is not recorded as never sent (it may well have gone through) and is never sent again in the same pass.
+/// Outside a background run (Solve and send, guides) nothing is listening and the call does nothing.
+public enum SiteRun {
+    @TaskLocal public static var markSent: (@Sendable () -> Void)?
 }
 
 /// A site already reached by a platform request the person made (California DROP): we leave it alone until `until`.
@@ -153,22 +162,39 @@ public struct AutoOptOut: Sendable {
     public static let wentQuiet = "the site stopped answering, so it moved to semi-automatic"
 
     /// Runs one site's work, giving it up (nil) when `idle` seconds pass with no `touch`, or `cap` seconds in all. `idle` nil: only the cap applies.
-    /// The given-up work is cancelled (the app closes that site's web pages when it sees the cancel) but not waited for: a step stuck waiting on a page
-    /// may not notice, so the run must not wait for it. Left running, given-up pages piled up in memory until iOS closed the app.
+    /// `sent`: the work had pressed send (`SiteRun.markSent`) before it was given up. The given-up work is cancelled (the app closes that site's web pages
+    /// when it sees the cancel) but not waited for: a step stuck waiting on a page may not notice, so the run must not wait for it. Left running, given-up
+    /// pages piled up in memory until iOS closed the app.
     public static func watched<T: Sendable>(idle: TimeInterval?, cap: TimeInterval,
-                                            _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool) {
+                                            _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool, sent: Bool) {
         let once = FirstOnce(), clock = ActivityClock(), start = Date()
-        return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool), Never>) in
-            let worker = Task { let value = await work({ clock.touch() }); if once.claim() { c.resume(returning: (value, false)) } }
+        return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool, sent: Bool), Never>) in
+            let worker = Task {
+                let value = await SiteRun.$markSent.withValue({ clock.markSent() }) { await work({ clock.touch() }) }
+                if once.claim() { c.resume(returning: (value, false, clock.sent)) }
+            }
             Task {
                 while true {
                     try? await Task.sleep(nanoseconds: 250_000_000)
-                    if let idle, clock.quietFor >= idle { if once.claim() { worker.cancel(); c.resume(returning: (nil, true)) }; return }
-                    if Date().timeIntervalSince(start) >= cap { if once.claim() { worker.cancel(); c.resume(returning: (nil, false)) }; return }
+                    if let idle, clock.quietFor >= idle { if once.claim() { worker.cancel(); c.resume(returning: (nil, true, clock.sent)) }; return }
+                    if Date().timeIntervalSince(start) >= cap { if once.claim() { worker.cancel(); c.resume(returning: (nil, false, clock.sent)) }; return }
                 }
             }
         }
     }
+
+    /// What a given-up site is recorded as: after its form was sent, that it was sent and not confirmed (never sent again in this pass, and the person is told
+    /// it may have gone through); before, that it went quiet or took too long (tried once more at the end of the pass).
+    static func givenUp(quiet: Bool, sent: Bool) -> SubmitOutcome {
+        if sent { return .failed(sentUnconfirmed) }
+        return .failed(quiet ? wentQuiet : tooSlow)
+    }
+
+    /// A site given up after its form was sent: the site may have taken it, so it is not sent again by the run; the person checks it in the semi-automated queue.
+    public static let sentUnconfirmed = "the form was sent, but the site did not confirm it in time; check it before sending again"
+
+    /// Whether a result is a give-up before anything was sent (the page went quiet or ran out of time), which the run tries once more at the end of the pass.
+    static func gaveUpBeforeSending(_ result: AutoOptOutResult) -> Bool { result == .failed(wentQuiet) || result == .failed(tooSlow) }
 
     /// Forms read from the page, and forms found on the live page (a stand-in form carries the page; the live run decides what is filled).
     public static func standIn(_ e: DirectoryEntry) -> DirectoryEntry {
@@ -272,16 +298,25 @@ public struct AutoOptOut: Sendable {
         // right now waits for that send's result.
         var sent: [String: (AutoOptOutResult, Data?)] = [:]
         var waiting: [String: [Int]] = [:]
-        var done = 0
+        // Pages given up before anything was sent: each is tried once more after every other site, with the sites that share it.
+        var retry: [(key: String, indices: [Int], form: OptOutForm, plan: FillPlan)] = []
+        var done = 0, total = targets.count
         let submitter = self.submitter, idle = submitter.reportsActivity ? idleLimit : nil, cap = siteLimit, spacing = self.spacing
         func record(_ i: Int, _ result: AutoOptOutResult, shot: Data?) async {
             let entry = targets[i]
+            out.removeAll { $0.index == i }          // a site tried again keeps only its last result
             out.append((i, entry, result))
             if let shot, !dryRun { evidence?(entry, shot) }
             await onResult?(entry, result)          // kept right away: closing the app now must not lose a request that was already sent
-            done += 1
-            progressCallback?(done, targets.count)
         }
+        func advance() { done += 1; progressCallback?(done, total) }
+        let attempt: @Sendable (OptOutForm, FillPlan) async -> SubmitEvidence = { form, plan in
+            let watched = await Self.watched(idle: idle, cap: cap) { touch in
+                await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
+            }
+            return watched.value ?? SubmitEvidence(outcome: Self.givenUp(quiet: watched.quiet, sent: watched.sent))
+        }
+        var plans: [String: (OptOutForm, FillPlan)] = [:]
         await withTaskGroup(of: (Int, String, SubmitEvidence).self) { group in
             var inFlight = 0, launched = 0
             func collect() async {
@@ -289,34 +324,49 @@ public struct AutoOptOut: Sendable {
                 inFlight -= 1
                 let result = Self.result(for: report.outcome)
                 sent[key] = (result, report.screenshot)
-                await record(i, result, shot: report.screenshot)
-                for j in waiting.removeValue(forKey: key) ?? [] { await record(j, result, shot: report.screenshot) }
+                let sharers = [i] + (waiting.removeValue(forKey: key) ?? [])
+                // Its second try is a step of the run from now on, so the count never reads finished before the end.
+                if Self.gaveUpBeforeSending(result), let (form, plan) = plans[key] { retry.append((key, sharers, form, plan)); total += 1 }
+                for j in sharers { await record(j, result, shot: report.screenshot); advance() }
             }
             for (i, entry) in targets.enumerated() {
                 // The app is about to be suspended or closed, or the person pressed Stop: start no more sites. The ones in progress finish, so what
                 // is done is kept and the rest waits for the next run.
                 if await shouldStop?() == true { break }
                 let pre = Self.precheck(entry: entry, person: person, progress: progress, now: now, minInterval: minInterval, hold: holds[entry.id], period: period)
-                if let result = pre.result { await record(i, result, shot: nil); continue }
-                guard let plan = pre.plan, let form = entry.optOutForm else { done += 1; progressCallback?(done, targets.count); continue }
+                if let result = pre.result { await record(i, result, shot: nil); advance(); continue }
+                guard let plan = pre.plan, let form = entry.optOutForm else { advance(); continue }
                 let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
-                if let again = sent[key] { await record(i, again.0, shot: again.1); continue }
+                if let again = sent[key] {
+                    await record(i, again.0, shot: again.1); advance()
+                    if Self.gaveUpBeforeSending(again.0), let r = retry.firstIndex(where: { $0.key == key }) { retry[r].indices.append(i) }
+                    continue
+                }
                 if waiting[key] != nil { waiting[key]!.append(i); continue }
                 while inFlight >= parallel { await collect() }
                 // Waiting for a free lane took time: Stop may have been pressed meanwhile.
                 if await shouldStop?() == true { break }
                 // Requests are spaced out a little: each lane waits before its next site.
                 let wait = launched >= parallel ? spacing : 0
-                waiting[key] = []; inFlight += 1; launched += 1
+                waiting[key] = []; plans[key] = (form, plan); inFlight += 1; launched += 1
                 group.addTask {
                     if wait > 0 { try? await Task.sleep(nanoseconds: UInt64(wait * 1_000_000_000)) }
-                    let watched = await Self.watched(idle: idle, cap: cap) { touch in
-                        await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
-                    }
-                    return (i, key, watched.value ?? SubmitEvidence(outcome: .failed(watched.quiet ? Self.wentQuiet : Self.tooSlow)))
+                    return (i, key, await attempt(form, plan))
                 }
             }
             while inFlight > 0 { await collect() }
+        }
+        // A page that went quiet or ran out of time before anything was sent is often only slow for a moment: it is tried once more, after every other site,
+        // so it does not hold the others up. Each try counts as a step of the run, so the progress keeps moving.
+        if !retry.isEmpty, await shouldStop?() != true {
+            for item in retry {
+                if await shouldStop?() == true { break }
+                if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
+                let report = await attempt(item.form, item.plan)
+                let result = Self.result(for: report.outcome)
+                for j in item.indices { await record(j, result, shot: report.screenshot) }
+                advance()
+            }
         }
         // In the order the sites were given, whatever order they finished in.
         return out.sorted { $0.index < $1.index }.map { ($0.entry, $0.result) }

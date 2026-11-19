@@ -1192,6 +1192,75 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertLessThanOrEqual(AutoOptOut.idleLimit, AutoOptOut.siteLimit)
     }
 
+    /// A site given up after its form was sent may have gone through: it is recorded as sent and not confirmed (so the person checks before sending again), and
+    /// the run never sends it a second time.
+    func testASiteGivenUpAfterItsFormWasSentIsRecordedAsSentUnconfirmedAndNotSentAgain() async {
+        final class Calls: @unchecked Sendable { private let l = NSLock(); private var v: [String] = []; func add(_ s: String) { l.lock(); v.append(s); l.unlock() }; var all: [String] { l.lock(); defer { l.unlock() }; return v } }
+        struct SentThenHangs: FormSubmitter {
+            let calls: Calls
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                calls.add(form.page.host ?? "")
+                SiteRun.markSent?()                                                                             // the send button was pressed
+                await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in }                         // and the confirmation never comes
+                return .submitted(awaitingEmail: false)
+            }
+        }
+        let calls = Calls()
+        let engine = AutoOptOut(submitter: SentThenHangs(calls: calls), spacing: 0, siteLimit: 0.3)
+        let results = await engine.run(entries: [timedSite("sent.example")], person: pat, progress: OptOutKitCore.Progress())
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.sentUnconfirmed))
+        XCTAssertEqual(calls.all, ["sent.example"], "sent once: a site that may have taken the form is not sent again")
+        XCTAssertNil(SiteRun.markSent, "outside a background run nothing listens (Solve and send, guides)")
+    }
+
+    /// A site that ran out of time before anything was sent is tried once more after every other site, and that try is its result. The progress keeps moving:
+    /// every try is a step of its own, so the count never stands still or goes back.
+    func testASiteThatRanOutOfTimeBeforeSendingIsTriedOnceMoreAtTheEndAndProgressKeepsMoving() async {
+        final class Calls: @unchecked Sendable { private let l = NSLock(); private var v: [String] = []; private var p: [(Int, Int)] = []
+            func add(_ s: String) -> Int { l.lock(); defer { l.unlock() }; v.append(s); return v.filter { $0 == s }.count }
+            func step(_ d: Int, _ t: Int) { l.lock(); p.append((d, t)); l.unlock() }
+            var all: [String] { l.lock(); defer { l.unlock() }; return v }
+            var steps: [(Int, Int)] { l.lock(); defer { l.unlock() }; return p } }
+        struct SlowOnce: FormSubmitter {
+            let calls: Calls
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                let n = calls.add(form.page.host ?? "")
+                if form.page.host == "slow.example", n == 1 { await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in } }   // slow the first time only
+                return .submitted(awaitingEmail: false)
+            }
+        }
+        let calls = Calls()
+        let engine = AutoOptOut(submitter: SlowOnce(calls: calls), spacing: 0, siteLimit: 0.3)
+        let results = await engine.run(entries: [timedSite("slow.example"), timedSite("fine.example")], person: pat, progress: OptOutKitCore.Progress(),
+                                       progressCallback: { calls.step($0, $1) })
+        XCTAssertEqual(calls.all, ["slow.example", "fine.example", "slow.example"], "tried again after the others, once")
+        XCTAssertEqual(results.map(\.1), [.submitted(awaitingEmail: false), .submitted(awaitingEmail: false)], "the second try is the site's result")
+        let done = calls.steps.map(\.0)
+        XCTAssertEqual(done, done.sorted(), "the count of sites done never goes back")
+        XCTAssertEqual(calls.steps.last?.0, calls.steps.last?.1, "the run ends at its full count")
+        XCTAssertTrue(calls.steps.dropLast().allSatisfy { $0.0 < $0.1 }, "never reads finished before the end (iOS would take the task as done): \(calls.steps)")
+        XCTAssertEqual(calls.steps.last?.1, 3, "two sites and one second try")
+    }
+
+    private func timedSite(_ host: String) -> DirectoryEntry {
+        var f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email")])
+        f.page = URL(string: "https://\(host)/optout")!
+        return DirectoryEntry(id: host, domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+    }
+
+    /// A page is waited on while it says it is still working, in whole words only: build 48 took "downloading your data" for "loading" and waited the full limit
+    /// at every step. Settled means unchanged for a second and a half, looked at every quarter second.
+    func testAPageIsLoadingOnlyWhenItSaysSoInWholeWords() {
+        XCTAssertTrue(PageSettle.stillLoading("Loading…"))
+        XCTAssertTrue(PageSettle.stillLoading("complete|Please wait while we find your records"))
+        XCTAssertTrue(PageSettle.stillLoading("Searching..."))
+        XCTAssertFalse(PageSettle.stillLoading("complete|You can request downloading your data or uploading a document."))
+        XCTAssertFalse(PageSettle.stillLoading("complete|Opt out of the sale of your personal information"))
+        XCTAssertFalse(PageSettle.settled(sameFor: 5))
+        XCTAssertTrue(PageSettle.settled(sameFor: 6))
+        XCTAssertLessThan(PageSettle.quietFor, 2, "quicker than the two seconds it was")
+    }
+
     /// A page that goes quiet (no load, no change, no request coming back) for the idle limit is given up and moved to semi-automatic; a page that keeps
     /// showing signs of life is waited for, even past the idle limit in all.
     func testASiteWhosePageGoesQuietIsMovedToSemiAutomaticAndABusyOneIsWaitedFor() async {

@@ -9,6 +9,36 @@ extension WebViewSession {
         return (try? await evaluate(js)) as? String
     }
 
+    /// The page's address and visible text (in the frame the form lives in, when it does), to tell when a click changed it.
+    func pageMark() async -> String {
+        let text = (await evalLive("document.body ? document.body.innerText : ''")) as? String ?? ""
+        return (webView.url?.absoluteString ?? "") + "|" + text
+    }
+
+    /// Waits until the page differs from `mark` (a click opened something or moved to another page), at most `seconds`. Returns at once when it does,
+    /// where a fixed pause always waited the whole time. Then the caller lets the page settle.
+    @discardableResult
+    func waitForChange(from mark: String, upTo seconds: TimeInterval) async -> Bool {
+        let deadline = Date().addingTimeInterval(seconds)
+        while Date() < deadline, !abandoned, !Task.isCancelled {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+            if await pageMark() != mark { return true }
+        }
+        return false
+    }
+
+    /// Looks for an opt-out form every quarter second for at most `seconds` (it can take a moment to appear after a click), returning as soon as one shows.
+    /// The last look also reads the page's frames, as a single look always did.
+    func formsAppearing(upTo seconds: TimeInterval) async -> [LiveForm] {
+        let deadline = Date().addingTimeInterval(seconds)
+        while Date() < deadline, !abandoned, !Task.isCancelled {
+            let now = await discoverForms(waitForFrames: false)
+            if LiveFormPicker.pick(now, pageContext: await pageContext()) != nil { return now }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        return await discoverForms()
+    }
+
     /// Evaluates in the frame the chosen form lives in (a page inside the page), else in the page itself.
     func evalLive(_ js: String) async -> Any? {
         if let f = activeFrame { return try? await evaluate(js, in: f, contentWorld: .page) }
@@ -22,13 +52,31 @@ extension WebViewSession {
         let main = await discoverFormsIn()
         let context = await pageContext()
         if LiveFormPicker.pick(main, pageContext: context) != nil { return main }
-        if waitForFrames, frames.isEmpty, ((try? await evaluate("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 {
-            try? await Task.sleep(nanoseconds: 2_500_000_000)        // a frame reports itself only once it has loaded
-        }
-        for frame in frames {
-            activeFrame = frame.info
-            let inside = await discoverFormsIn()
-            if LiveFormPicker.pick(inside, pageContext: context) != nil { await scrollFrameIntoView(frame.href); return inside }
+        // A frame reports itself only once it has loaded: when the page has frames none of which has reported yet, each one is read as it reports,
+        // for up to 2.5 seconds (the fixed pause this replaced), and the first holding an opt-out form is the one.
+        var waitsForFrames = false
+        if waitForFrames, frames.isEmpty { waitsForFrames = ((try? await evaluate("document.querySelectorAll('iframe').length")) as? Int ?? 0) > 0 }
+        let deadline = Date().addingTimeInterval(waitsForFrames ? 2.5 : 0)
+        var read = Set<String>()
+        repeat {
+            for frame in frames where !read.contains(frame.href) {
+                read.insert(frame.href)
+                activeFrame = frame.info
+                let inside = await discoverFormsIn()
+                if LiveFormPicker.pick(inside, pageContext: context) != nil { await scrollFrameIntoView(frame.href); return inside }
+            }
+            activeFrame = nil
+            if Date() >= deadline || abandoned || Task.isCancelled { break }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        } while true
+        // Nothing found while waiting: every frame is read once more as it stands now (one that reported early may have built its form since), as the
+        // single look after the pause did.
+        if waitsForFrames {
+            for frame in frames {
+                activeFrame = frame.info
+                let inside = await discoverFormsIn()
+                if LiveFormPicker.pick(inside, pageContext: context) != nil { await scrollFrameIntoView(frame.href); return inside }
+            }
         }
         activeFrame = nil
         return main
@@ -61,22 +109,23 @@ extension WebViewSession {
         let first = await discoverForms()
         if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
         if let opened = await openFoldedForms() { return opened }
+        // Each click is followed by looking for the form until it shows (at most the pause each used to wait in full).
         let js = PageScript.source("open-request-links")
         if let clicked = (try? await evaluate(js)) as? String, !clicked.isEmpty {
-            try? await Task.sleep(nanoseconds: 2_500_000_000)
-            let after = await discoverForms()
+            let after = await formsAppearing(upTo: 2.5)
             if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
         }
         // A choice of requests or a "who is asking" step in front of the form.
         if await advanceToRequestForm(loose: true) != nil {
-            try? await Task.sleep(nanoseconds: 2_500_000_000)
-            let after = await discoverForms()
+            let after = await formsAppearing(upTo: 2.5)
             if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
         }
         // The opt-out is a link to its own page: follow the clearest one that stays on the site (never a mail link or another company's page).
         let follow = PageScript.source("open-request-links-follow")
+        let before = await pageMark()
         guard let went = (try? await evaluate(follow)) as? String, !went.isEmpty else { return first }
-        try? await Task.sleep(nanoseconds: 4_000_000_000)
+        // Until the new page has replaced the old one (the old one would look settled), then until it settles.
+        await waitForChange(from: before, upTo: 4)
         await settlePage(maxWait: 6)
         let after = await discoverForms()
         if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
@@ -128,9 +177,11 @@ extension WebViewSession {
         var clicked: String?
         for _ in 0..<2 {
             let js = PageScript.call("advance-to-request-form", loose)
+            let before = await pageMark()
             guard let t = (await evalLive(js)) as? String, !t.isEmpty else { break }
             clicked = t
-            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            // Until the click has changed the page (at most the 2.5 seconds this always waited), then until it settles.
+            await waitForChange(from: before, upTo: 2.5)
             await settlePage(maxWait: 5)
         }
         return clicked
@@ -141,8 +192,9 @@ extension WebViewSession {
     /// Only on a page about opting out, only when exactly one such button shows, and never one in a cookie or consent prompt. Returns true when it pressed it.
     func pressIntroNext() async -> Bool {
         let js = PageScript.source("press-intro-next")
+        let before = await pageMark()
         guard (try? await evaluate(js)) as? Bool == true else { return false }
-        try? await Task.sleep(nanoseconds: 2_500_000_000)
+        await waitForChange(from: before, upTo: 2.5)
         await settlePage(maxWait: 5)
         return true
     }
@@ -367,7 +419,9 @@ extension WebViewSession {
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.
     func pressLiveSubmit(form token: String) async -> Bool {
         let js = PageScript.call("press-live-submit", token)
-        return ((await evalLive(js)) as? Bool) ?? false
+        let pressed = ((await evalLive(js)) as? Bool) ?? false
+        if pressed { SiteRun.markSent?() }          // a background run's watchdog now knows the form went to the site (`SiteRun`)
+        return pressed
     }
 
     /// The page's address path and title: a form on a page about opting out is more likely the opt-out form.
@@ -449,10 +503,10 @@ extension FormRun {
     @MainActor
     private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval, advertisingID: String?) async -> SubmitOutcome {
         await session.settlePage(maxWait: 10)
-        _ = await session.denyCookies()
-        try? await Task.sleep(nanoseconds: 1_200_000_000)
-        _ = await session.denyCookies()                       // prompts that load late
-        await session.settlePage(maxWait: 4)
+        // The page has been still for a moment, so a cookie prompt has had time to show. The page settles again only after a prompt was answered (it then
+        // reloads or moves); a fixed pause and a second wait for every site cost about four seconds each.
+        if await session.denyCookies() != nil { await session.settlePage(maxWait: 4) }
+        if await session.denyCookies() != nil { await session.settlePage(maxWait: 4) }      // prompts that load late
         await session.hideConsentOverlays()
         if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }

@@ -253,6 +253,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         }
         let json = String(data: try JSONSerialization.data(withJSONObject: fields), encoding: .utf8) ?? "[]"
         let js = PageScript.call("submit-form", json: [Self.jsString(action.absoluteString), json])
+        SiteRun.markSent?()          // a background run's watchdog now knows the form went to the site (`SiteRun`)
         try await wait { self.webView.evaluateJavaScript(js, completionHandler: nil) }
     }
 
@@ -279,14 +280,14 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     private func settle(maxWait: TimeInterval) async {
         let deadline = Date().addingTimeInterval(maxWait)
         var last = -1, stable = 0
+        // Looked at every quarter second; settled once loaded and unchanged for `PageSettle.quietFor` (it was two seconds, looked at every half second).
         while Date() < deadline, !abandoned, !Task.isCancelled {
-            try? await Task.sleep(nanoseconds: 500_000_000)
+            try? await Task.sleep(nanoseconds: UInt64(PageSettle.pollEvery * 1_000_000_000))
             let probe = (try? await webView.evaluateJavaScript("(document.readyState||'') + '|' + (document.body ? document.body.innerText : '')")) as? String ?? ""
             let ready = probe.hasPrefix("complete|")
-            let loading = probe.lowercased().contains("loading") || probe.lowercased().contains("please wait") || probe.lowercased().contains("searching")
-            if ready && probe.count == last && !loading { stable += 1 } else { stable = 0 }
+            if ready && probe.count == last && !PageSettle.stillLoading(probe) { stable += 1 } else { stable = 0 }
             last = probe.count
-            if stable >= 4 { return }          // two quiet seconds
+            if PageSettle.settled(sameFor: stable) { return }
         }
     }
 
@@ -556,7 +557,9 @@ extension WebViewSession {
     func pressSubmit(for values: [FieldValue]) async -> Bool {
         let first = values.first?.name ?? ""
         let js = PageScript.call("press-submit", first)
-        return ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        let pressed = ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        if pressed { SiteRun.markSent?() }          // a background run's watchdog now knows the form went to the site (`SiteRun`)
+        return pressed
     }
 
 }
