@@ -28,7 +28,9 @@ class Balance(unittest.TestCase):
         weights = S.work({})
         units = {k for k in weights if k.startswith("OptOutKitTests/")}
         ui = {k for k in weights if k.startswith("OptOutKitUITests/")}
-        self.assertTrue(all(k.count("/") == 1 for k in units), "unit tests by class")
+        self.assertTrue(all(k.count("/") in (1, 2) for k in units), "unit tests by class, a slow class test by test")
+        whole = {k for k in units if k.count("/") == 1}
+        self.assertFalse(any("/".join(k.split("/")[:2]) in whole for k in units if k.count("/") == 2), "a class is never both whole and split")
         self.assertTrue(all(k.count("/") == 2 for k in ui), "UI tests one by one")
         bins, load = S.split(weights, 5)
         flat = [k for b in bins for k in b]
@@ -64,7 +66,16 @@ class Balance(unittest.TestCase):
         log = ("Test Case '-[OptOutKitTests.PeopleTests testA]' passed (1.25 seconds).\n"
                "Test Case '-[OptOutKitTests.PeopleTests testB]' failed (0.75 seconds).\n"
                "Test Case '-[OptOutKitUITests.DryRunUITests testRun]' passed (40.5 seconds).\n")
-        self.assertEqual(S.timings_from_log(log), {"OptOutKitTests/PeopleTests": 2.0, "OptOutKitUITests/DryRunUITests/testRun": 40.5})
+        self.assertEqual(S.timings_from_log(log), {"OptOutKitTests/PeopleTests": 2.0, "OptOutKitTests/PeopleTests/testA": 1.2, "OptOutKitTests/PeopleTests/testB": 0.8,
+                                                   "OptOutKitUITests/DryRunUITests/testRun": 40.5})
+
+    def test_a_slow_unit_test_class_is_handed_out_test_by_test(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "AppTests")); os.makedirs(os.path.join(d, "AppUITests"))
+            open(os.path.join(d, "AppTests", "A.swift"), "w").write("final class SlowTests: XCTestCase {\n    func testA() {}\n    func testB() {}\n}\nfinal class QuickTests: XCTestCase {\n    func testC() {}\n}\n")
+            w = S.work({"OptOutKitTests/SlowTests": 200.0, "OptOutKitTests/SlowTests/testA": 150.0, "OptOutKitTests/QuickTests": 3.0}, root=d)
+            self.assertEqual(w, {"OptOutKitTests/SlowTests/testA": 150.0, "OptOutKitTests/SlowTests/testB": 100.0, "OptOutKitTests/QuickTests": 3.0},
+                             "measured tests keep their time, the others share the class's")
 
 
 class Failures(unittest.TestCase):

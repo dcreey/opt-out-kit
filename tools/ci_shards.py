@@ -50,6 +50,10 @@ def classes(directory):
 BY_TEST = {"OptOutKitUITests"}
 
 
+# A unit-test class that takes longer than this is shared out one test at a time too (the web-view classes take minutes: one class held a whole shard).
+SPLIT_CLASS_OVER = 45.0
+
+
 def work(timings, root=ROOT, suites=None):
     """Everything to run, as "Target/Class" or "Target/Class/test", with its expected seconds. `suites`: only these test targets (CI on push runs the
     unit tests, OptOutKitTests; the integration workflow runs the UI tests, OptOutKitUITests)."""
@@ -60,7 +64,11 @@ def work(timings, root=ROOT, suites=None):
             if target in BY_TEST:
                 for t in tests: out[f"{target}/{cls}/{t}"] = float(timings.get(f"{target}/{cls}/{t}", GUESS[target]))
             else:
-                out[f"{target}/{cls}"] = float(timings.get(f"{target}/{cls}", len(tests) * GUESS[target]))
+                whole = float(timings.get(f"{target}/{cls}", len(tests) * GUESS[target]))
+                if whole > SPLIT_CLASS_OVER and len(tests) > 1:
+                    for t in tests: out[f"{target}/{cls}/{t}"] = float(timings.get(f"{target}/{cls}/{t}", whole / len(tests)))
+                else:
+                    out[f"{target}/{cls}"] = whole
     return out
 
 
@@ -76,8 +84,8 @@ def split(weights, shards, reserve=None):
 def timings_from_log(text):
     out = {}
     for target, cls, test, secs in CASE.findall(text):
-        key = f"{target}/{cls}/{test}" if target in BY_TEST else f"{target}/{cls}"
-        out[key] = out.get(key, 0.0) + float(secs)
+        out[f"{target}/{cls}/{test}" if target in BY_TEST else f"{target}/{cls}"] = out.get(f"{target}/{cls}/{test}" if target in BY_TEST else f"{target}/{cls}", 0.0) + float(secs)
+        if target not in BY_TEST: out[f"{target}/{cls}/{test}"] = out.get(f"{target}/{cls}/{test}", 0.0) + float(secs)          # each test too, for a split class
     return {k: round(v, 1) for k, v in out.items()}          # rounded once, at the end
 
 
