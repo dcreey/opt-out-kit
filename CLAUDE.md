@@ -20,6 +20,8 @@ Every change to behavior updates the docs in the same piece of work, before it i
 - The semi-automated "Solve and send" flow is the most trusted: do not break it. Share logic and UI across flows instead of copying it.
 - Unit tests (the Swift packages and `AppTests`) run on every push (`ci.yml`); integration tests (the UI tests in `AppUITests`) run for a GitHub release
   (`integration.yml`). Every rule a UI test checks also has a unit test, listed in `docs/TESTING.md` ("Unit and integration tests"); add both together.
+- JavaScript the app runs in web pages lives in `App/PageScripts/*.js` (never a Swift string). Every script and every rule in it has a unit test in
+  `tools/pagescripts` (`npm test`); `coverage.test.js` fails for a script without one.
 
 ## Translations
 

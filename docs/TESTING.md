@@ -8,6 +8,7 @@ Layers, cheapest first:
 | Core logic (decode, queue, plan, rules) | **unit** | `Packages/OptOutKitCore/Tests` | `swift test` in that folder (Mac, no simulator); every push |
 | Assisted run logic (runner, email handoff, page-text reading) | **unit** | `Packages/AssistedRunLogic/Tests`, on the app's own sources in `Shared/AssistedRun` | `swift test --package-path Packages/AssistedRunLogic`; every push |
 | App unit tests (the app model, web views on local pages, storage) | **unit** | `AppTests` (target `OptOutKitTests`) | `xcodebuild test` on a simulator; every push |
+| Page scripts (the JavaScript the app runs in web pages) | **unit** | `tools/pagescripts` (headless DOM) | `npm test` in that folder; every push |
 | UI tests (the real app driven on a simulator) | **integration** | `AppUITests` (target `OptOutKitUITests`) | for a release (`.github/workflows/integration.yml`) |
 | The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for a release, and weekly |
 | Live sites (read-only) | live | `AppTests/Live*` with `OPTOUT_LIVE=1`; `pipeline.yml` | by hand only |
@@ -20,6 +21,42 @@ confirmations, declining cookie prompts, telling the app what the person touched
 as JSON (`PageScript.call`), so an apostrophe or quote in a name arrives as typed and nothing is left on the page. `//#include name` shares a fragment
 (`ownership.js`). Moved there from Swift strings on 2026-11-19: the plain scripts were checked byte for byte against what Swift produced, and every
 web-view test passed before and after. `PageScriptTests` checks that each one loads, is valid JavaScript and receives its values intact.
+
+**Unit tests** (`tools/pagescripts`, `npm test`, in CI's `checks` job on every push; about 1 second): each script runs against small test pages in a
+headless DOM (jsdom), loaded and called exactly as the app does it (`harness.js`). jsdom has no layout, so the harness stands in for what the scripts read
+from it, from the page's own markup: an element that is hidden (or inside a hidden one, a closed `<details>`, a zero-height box) has no size, one placed
+far off screen (a bot trap) is off screen, a frame is 300 x 150, anything else is 200 x 30; `innerText` is the shown text. What a real browser does with
+layout, input masks and real taps stays covered by the WebKit tests (`LiveFormTests` and the others), which run in the integration workflow.
+`coverage.test.js` fails when a script has no test.
+
+| Test file | Scripts |
+|---|---|
+| `discover-forms.test.js` | `discover-forms` (tokens, where a label comes from, required, visible, kinds of box, buttons, loose boxes, headings) |
+| `fill-live.test.js` | `fill-live` (events, exact values, the person's boxes, kept and replaced values, page defaults, length limits, menus, age brackets, phones, split phones, birthdates, rich text) |
+| `choose-request-options.test.js` | `choose-request-options` (removal and deletion first, never access, agent and self questions, IDFA, self-declarations only when allowed, menus, what the person set) |
+| `fill-helpers.test.js` | `add-another-boxes`, `phone-format-step`, `date-format-step`, `align-date-formats`, `empty-required-choice`, `choose-tile-buttons` |
+| `checks-and-prompts.test.js` | `visible-challenge`, `pending-certification`, `tick-identity-boxes`, `find-terms-gate`, `click-agree` (with the app's own `gatePattern`) |
+| `navigation.test.js` | `deny-cookies`, `decline-consent-banner`, `hide-consent-overlays`, `press-intro-next`, `advance-to-request-form`, `open-request-links`, `open-request-links-follow`, `press-confirm-step`, `confirm-button-label`, `choose-name-tab`, `choose-rights-picker` |
+| `menus-and-sending.test.js` | `custom-menus-open`, `custom-menus-pick`, `type-ahead-open`, `type-ahead-choose`, `press-live-submit` (never a sign-up or agree button), `fill-fields`, `press-submit`, `submit-form` |
+| `page-reading-and-person.test.js` | `describe-page`, `describe-form`, `form-state`, `form-top`, `page-emails`, `visible-fields`, `viewport-text`, `page-changed`, `user-is-typing`, `code-box-in-use`, `empty-code-field`, `empty-verification-code-box`, `global-privacy-control`, `frame-reporter`, `touch-tracker`, `activity`, the scroll helpers |
+| `coverage.test.js` | every script has a test; `ownership` (the fragment) on its own |
+
+**Audit findings (2026-11-19).** Writing these tests turned up the following. Fixed: (3). The rest are recorded and pinned by tests where they are
+behaviour, to be fixed one at a time (each changes what a form gets):
+
+1. `discover-forms`: a box with no label of its own borrows the label of the box before it (its fallback reads the previous element, which can be another
+   box's `<label>`); it is then taken for that box's kind, and as required when that label has a star.
+2. `fill-live`: `hasCountryCode` is defined and never called. Harmless: the plain number is typed anyway, so a box beside a country-code menu already gets
+   the number alone.
+3. Fixed: `choose-tile-buttons` could tap the same tile twice when a heading and the block around it both read "I am a ..." (two groups); on a tile that
+   toggles, the second tap undid the app's choice. A group whose tile the app already tapped is now skipped.
+4. `empty-required-choice`: the name of a box inside a wrapping `<label>` includes a menu's options ("State Choose IL"), shown in the "still needed" line.
+5. `decline-consent-banner` clicks the first element anywhere whose text is exactly "Reject" or "Decline" without checking that it is shown (`deny-cookies`
+   checks).
+6. `press-submit`, `fill-fields`: a field name is "escaped" with `replace(/"/g,'\"')`, which in JavaScript leaves it unchanged; a name holding a quote would
+   break the selector. Field names with quotes are rare.
+7. `touch-tracker`: in the page itself, any `postMessage('ookPress')` counts as the person pressing a button; the message is not checked to come from one of
+   the page's own frames, so a page's script could make a confirmation look like the person's press.
 
 ## Unit and integration tests
 
@@ -69,7 +106,7 @@ and the UI tests use the app's fake sites.
 
 | Job | Machine | What it runs |
 |---|---|---|
-| `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the shard split |
+| `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the page-script unit tests (`tools/pagescripts`); the shard split |
 | `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
 | `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 start booting their simulator before anything else; shard 0 builds first and boots after (a booting simulator starves the machine, and its checkout then took minutes), so it gets less of the tests. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`). A notice says when the simulator was ready and when the tests started |
 
