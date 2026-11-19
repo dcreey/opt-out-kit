@@ -151,6 +151,8 @@ profile editor's own Done is `editor-done` (the keyboard has a Done too); the pr
 run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`). `-uitest-reset` also marks the first-visit guide cards and the once-only explainers (email links, follow-ups) as seen unless a test asks for them
 (`-uitest-coach`, `-uitest-explainers`), so a fresh simulator, as in CI, behaves like a used one: on CI the email-links explainer covered the run report.
 A UI test that only needs a complete profile starts with `-uitest-seed-profile` instead of typing one (typing is tested in `ProfileEditorUITests`).
+A test that relaunches the app to check what was kept opens it again with `-uitest-relaunch` (it keeps the data): a launch with no `-uitest` flag behaves like
+a real one, so it resumed the first-run setup over the half-typed profile and started the automatic run, and on CI the profile editor never showed.
 
 **The run over every site** (`integration.yml`, job `all-sites`: on a release, Mondays and by hand): the same automatic-run UI tests over every site
 (`TEST_RUNNER_OPTOUT_ALL_SITES=1` lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.

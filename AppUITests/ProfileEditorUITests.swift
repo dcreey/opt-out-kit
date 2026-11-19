@@ -4,7 +4,9 @@ import XCTest
 final class ProfileEditorUITests: XCTestCase {
     private func launch(reset: Bool) -> XCUIApplication {
         let app = XCUIApplication()
-        if reset { app.launchArguments = ["-uitest-reset"] }
+        // Without a reset it still opens as a test run (`-uitest-relaunch` keeps the data): a bare launch resumed the first-run setup over the
+        // incomplete profile and started the automatic run, and on CI the editor never showed.
+        app.launchArguments = [reset ? "-uitest-reset" : "-uitest-relaunch"]
         app.launch()
         return app
     }
