@@ -7,6 +7,8 @@ person must clear (the audit's blockers). Run tools/apply_audit_blockers.py on t
   apply_audit_live.py RESULTS.json [--dir directory]"""
 import argparse, datetime, json, os, re
 
+import yamlio
+
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("results"); ap.add_argument("--dir", default="directory"); a = ap.parse_args()
@@ -14,16 +16,14 @@ def main():
     for x in json.load(open(a.results)):
         if not x.get("formFound") or not str(x.get("outcome", "")).startswith("filled"): continue
         if any(f.get("type") == "password" or re.search(r"password|sign.?in|log.?in", f.get("label", ""), re.I) for f in x.get("fields", [])): continue       # a login form is not an opt-out
-        path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", x["domain"].lower()).strip("_") + ".yml")
+        path = yamlio.entry_path(a.dir, x["domain"])
         if not os.path.exists(path): continue
-        s = open(path).read()
-        m = re.search(r"\nlive_form:\n(?:[ \t]+.*\n?)*", s)
-        if m and re.search(r"  found: true", m.group(0)): continue          # already a live form: leave it
+        doc = yamlio.load(path)
+        if (doc.get("live_form") or {}).get("found") is True: continue          # already a live form: leave it
         page = x.get("finalURL") or x.get("opens") or ""
         blockers = list(dict.fromkeys(x.get("blockers") or []))
-        block = '\nlive_form:\n  checked: "%s"\n  found: true\n  page: "%s"\n  blockers: [%s]\n' % (datetime.date.today(), page.replace('"', "%22"), ", ".join(json.dumps(b, ensure_ascii=False) for b in blockers))
-        s = s.replace(m.group(0), block, 1) if m else s.rstrip("\n") + block
-        open(path, "w").write(s); n += 1
+        doc["live_form"] = {"checked": str(datetime.date.today()), "found": True, "page": page.replace('"', "%22"), "blockers": blockers}
+        yamlio.save(path, doc); n += 1
     print(n, "sites promoted to a live form")
 
 

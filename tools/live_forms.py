@@ -8,7 +8,9 @@ notes what a person would have to clear (a bot check, a terms prompt). It fills 
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/live_forms.py [--dir directory] [--workers 8] [--out .live-forms] [--only a.com,b.com]
 Writes <out>/shard-0.tsv for tools/apply_live_forms.py.
 """
-import argparse, asyncio, glob, os, re, sys, urllib.parse
+import argparse, asyncio, os, re, sys, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as P
 from playwright.async_api import async_playwright
@@ -198,13 +200,12 @@ async def main():
     ap.add_argument("--out", default=".live-forms"); ap.add_argument("--only", default="")
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     targets = []
-    for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^opt_out_form: ", s, re.M) or re.search(r"^excluded:", s, re.M): continue          # excluded sites are never crawled
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1); m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
+    for _, doc in yamlio.entries(a.dir):
+        if "opt_out_form" in doc or "excluded" in doc: continue          # excluded sites are never crawled
+        d = doc["domain"]
         if a.only and d not in a.only.split(","): continue
-        if re.search(r'blockers: \["wall"\]', s): continue            # walled off by a bot check: not recrawled
-        targets.append((d, m.group(1) if m else None))
+        if any(isinstance(v, dict) and list(v.get("blockers") or []) == ["wall"] for v in doc.values()): continue            # walled off by a bot check: not recrawled
+        targets.append((d, doc.get("opt_out_url")))
     sem = asyncio.Semaphore(a.workers); done = 0
     async with async_playwright() as p:
         browser = await p.chromium.launch()

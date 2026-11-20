@@ -1,0 +1,3 @@
+# What the Python tools need beyond the standard library (pip install -r tools/requirements.txt).
+# ruamel.yaml: tools/yamlio.py reads and writes the repository's YAML, keeping comments and hand edits, in the style .yamllint.yml requires.
+ruamel.yaml==0.19.1

@@ -11,6 +11,8 @@ Usage: describe_persistence.py [--about .about] [--dir directory] [--dry-run]
 """
 import argparse, glob, json, os, re
 
+import yamlio
+
 PERMANENT = [
     r"permanently (opt|remov|suppress|delet)", r"suppression (list|file)", r"(will|shall|do) not (re-?add|re-?list|re-?publish|add you back|re-?collect)",
     r"remain(s)? (opted|removed|suppressed)", r"will not be (re-?added|re-?listed|re-?published)",
@@ -57,9 +59,9 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--about", default=".about"); ap.add_argument("--dir", default="directory"); ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(); counts = {}
     for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read()
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
-        cat = (re.search(r'^about: (\{.*\})$', s, re.M) and json.loads(re.search(r'^about: (\{.*\})$', s, re.M).group(1)).get("category")) or "other"
+        doc = yamlio.load(f)
+        d = doc["domain"]
+        cat = (doc.get("about") or {}).get("category") or "other"
         p = os.path.join(a.about, d + ".json")
         ev = json.load(open(p)) if os.path.exists(p) else {}
         text = ((ev.get("policy") or {}).get("text") or "") + " " + ((ev.get("home") or {}).get("text") or "")[:4000]
@@ -68,8 +70,8 @@ def main():
         if src and out["result"] != "unknown": out["source"] = src
         counts[out["result"]] = counts.get(out["result"], 0) + 1
         if a.dry_run: continue
-        s = re.sub(r"\npersistence: \{.*\}\n?", "\n", s).rstrip("\n") + "\npersistence: " + json.dumps(out, ensure_ascii=False) + "\n"
-        open(f, "w").write(s)
+        doc.pop("persistence", None); doc["persistence"] = out
+        yamlio.save(f, doc)
     print(counts)
 
 

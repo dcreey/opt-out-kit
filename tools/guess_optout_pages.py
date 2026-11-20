@@ -5,7 +5,9 @@ Reads nothing personal, fills nothing, sends nothing.
 
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/guess_optout_pages.py [--workers 8] [--out .guess/guesses.tsv] [--only a.com,b.com]
 """
-import argparse, asyncio, glob, os, re, urllib.parse
+import argparse, asyncio, os, re, urllib.parse
+
+import yamlio
 from playwright.async_api import async_playwright
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -23,12 +25,11 @@ JS = """() => { const vis=e=>{const r=e.getBoundingClientRect();return r.width>0
 
 def domains(only):
     out = []
-    for f in sorted(glob.glob("directory/*.yml")):
-        s = open(f).read()
-        if re.search(r"^(excluded|closed):", s, re.M) or re.search(r"live_form:\n  checked: [^\n]*\n  found: true", s): continue
-        if not (re.search(r"^opt_out_url: null", s, re.M) or 'blockers: ["wall"]' in s): continue
-        if only is not None and False: pass
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
+    for _, doc in yamlio.entries("directory"):
+        if "excluded" in doc or "closed" in doc or (doc.get("live_form") or {}).get("found") is True: continue
+        walled = any(isinstance(v, dict) and list(v.get("blockers") or []) == ["wall"] for v in doc.values())
+        if not (("opt_out_url" in doc and doc["opt_out_url"] is None) or walled): continue
+        d = doc["domain"]
         if not only or d in only: out.append(d)
     return out
 

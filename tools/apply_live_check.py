@@ -8,6 +8,8 @@ Nothing is sent anywhere. Usage: apply_live_check.py LOG [--dir directory] [--da
 """
 import argparse, datetime, os, re, sys
 
+import yamlio
+
 
 def parse(log):
     out = {}
@@ -21,11 +23,6 @@ def parse(log):
     return out
 
 
-def block(date, blockers):
-    items = ", ".join('"' + b.replace('"', "'") + '"' for b in blockers)
-    return f"live_check:\n  checked: \"{date}\"\n  blockers: [{items}]\n"
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("log"); ap.add_argument("--dir", default="directory"); ap.add_argument("--date", default=datetime.date.today().isoformat())
@@ -33,12 +30,11 @@ def main():
     results = parse(a.log)
     done = 0
     for domain, blockers in results.items():
-        path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", domain.lower()).strip("_") + ".yml")
+        path = yamlio.entry_path(a.dir, domain)
         if not os.path.exists(path): print("no entry for", domain, file=sys.stderr); continue
-        text = open(path).read()
-        text = re.sub(r"\nlive_check:\n(?:[ \t]+.*\n?)*", "\n", text)          # replace an older block
-        text = text.rstrip("\n") + "\n" + block(a.date, blockers)
-        open(path, "w").write(text); done += 1
+        doc = yamlio.load(path)
+        doc["live_check"] = {"checked": a.date, "blockers": [b.replace('"', "'") for b in blockers]}          # replaces an older block
+        yamlio.save(path, doc); done += 1
     print(f"wrote live_check to {done} of {len(results)} sites; "
           f"{sum(1 for b in results.values() if not b)} had nothing blocking the form")
 

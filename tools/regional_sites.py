@@ -10,7 +10,9 @@ A broker that runs example.co.uk or fr.example.com operates there: that is a str
   regional_sites.py validate keep a probed country domain only if its page links back to the broker's main site (same company), else drop it
   regional_sites.py apply    write `regional_sites:` and the matching `regions:` tags into directory/*.yml (adds only)
 """
-import concurrent.futures, glob, json, os, re, socket, sys, urllib.parse, urllib.request
+import concurrent.futures, json, os, re, socket, sys, urllib.parse, urllib.request
+
+import yamlio
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "pipeline", "regional-sites.json")
@@ -49,10 +51,9 @@ def has_dns(host):
 
 
 def entries():
-    for f in sorted(glob.glob(os.path.join(ROOT, "directory", "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^excluded:", s, re.M): continue
-        yield f, re.search(r'^domain: "(.*)"', s, re.M).group(1)
+    for f, doc in yamlio.entries(os.path.join(ROOT, "directory")):
+        if "excluded" in doc: continue
+        yield f, doc["domain"]
 
 
 def region_label(code): return "UK" if code == "GB" else code
@@ -149,22 +150,20 @@ def main(cmd):
     for f, dom in entries():
         res = data.get(dom)
         if not res: continue
-        s = open(f).read()
+        doc = yamlio.load(f)
         res = [x for x in res if not (x["how"] == "country path" and (urllib.parse.urlparse(x["url"]).path.strip("/").split("/") or [""])[0].lower() not in PATHS)]
         if not res: continue
-        s = re.sub(r"^regional_sites: .*\n", "", s, flags=re.M)
-        s = s.rstrip("\n") + "\nregional_sites: " + json.dumps(res, ensure_ascii=False) + "\n"
-        m = re.search(r"^regions: (\{.*\})$", s, re.M)
-        if m:
-            r = json.loads(m.group(1))
+        doc.pop("regional_sites", None); doc["regional_sites"] = res
+        if doc.get("regions"):
+            r = yamlio.plain(doc["regions"])
             for x in res:
                 if x["how"].startswith("probed"): continue      # same name under a country domain: kept as a lead, not as evidence
                 lab = region_label(x["region"])
                 if lab not in r["list"]:
                     r["list"].append(lab)
                     r["evidence"] = (r.get("evidence", "") + "; has a " + lab + " site at " + x["url"] + " (" + x["how"] + ")").lstrip("; ")
-            s = s[:m.start()] + "regions: " + json.dumps(r, ensure_ascii=False) + s[m.end():]
-        open(f, "w").write(s); n += 1
+            doc["regions"] = r
+        yamlio.save(f, doc); n += 1
     print("updated", n)
 
 

@@ -3,6 +3,10 @@
 `directory/*.yml` has one generated entry per site in `pipeline/census-sites.txt` (856 today: EasyOptOuts' 214 plus 642 more added from the state broker registries, see `docs/JURISDICTIONS.md`; the first 214 came from the EasyOptOuts
 list). Entries are provisional guesses written by a tool, not hand-written flows. Real flows live in `brokers/`.
 
+The files are YAML a person can read and edit: single-quoted values and block mappings, linted with `.yamllint.yml` like every YAML file here. The tools
+write and change them only through `tools/yamlio.py` (`pip install -r tools/requirements.txt`), which keeps comments and hand edits and changes only the
+fields a tool owns, so a person's edit survives the next run.
+
 ## The compiled catalog (what the app ships)
 
 The app does not ship or parse any of this YAML. At build time the core package's `CatalogPlugin` (a SwiftPM build tool, applied to the app target in

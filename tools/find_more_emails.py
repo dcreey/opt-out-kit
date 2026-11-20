@@ -9,6 +9,7 @@ Usage: find_more_emails.py [--apply]
 """
 import argparse, asyncio, glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
+import yamlio  # noqa: E402  (after the path insert)
 import live_forms as L
 import profile_brokers as P
 from playwright.async_api import async_playwright
@@ -47,9 +48,9 @@ async def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--apply", action="store_true"); a = ap.parse_args()
     todo = []
     for f in sorted(glob.glob("directory/*.yml")):
-        t = open(f).read()
-        if re.search(r"^(closed|excluded):|^opt_out_form:|^  found: true|^contact_email:", t, re.M): continue
-        todo.append((f, re.search(r'^domain: "([^"]+)"', t, re.M).group(1)))
+        doc = yamlio.load(f)
+        if any(k in doc for k in ("closed", "excluded", "opt_out_form", "contact_email")) or yamlio.any_found(doc): continue
+        todo.append((f, doc["domain"]))
     results = {}
     for f, d in todo:                                            # 1. the policy text we already have
         p = os.path.join(".about", d + ".json")
@@ -74,8 +75,9 @@ async def main():
     print(len(results), "addresses found in total")
     for f, d in todo:
         if d in results and a.apply:
-            c, src = results[d]; t = open(f).read().rstrip("\n")
-            open(f, "w").write(t + f'\ncontact_email: "{c}"\ncontact_email_source: "{src}"\n')
+            c, src = results[d]; doc = yamlio.load(f)
+            doc["contact_email"] = c; doc["contact_email_source"] = src
+            yamlio.save(f, doc)
     json.dump({d: v[0] for d, v in results.items()}, open("/tmp/more_emails.json", "w"), indent=1)
 
 

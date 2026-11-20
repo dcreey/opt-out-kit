@@ -56,12 +56,8 @@ jobs:
     steps:
       - uses: 'actions/checkout@v4'
       - run: 'pip install yamllint==1.38.0'
-      # Hand-written YAML (workflows, brokers/, jurisdictions/, platforms/, project.yml, the lint configs): the abcxyz rules in .yamllint.yml.
-      - name: 'Hand-written YAML'
-        run: "git ls-files -z '*.yml' '*.yaml' | xargs -0 yamllint -f github"
-      # YAML the tools write (directory/, terms/library.yml): mistakes only, in .yamllint-generated.yml (the tools write and read their own style).
-      - name: 'Generated YAML'
-        run: "git ls-files -z 'directory/*.yml' 'terms/*.yml' | xargs -0 yamllint -c .yamllint-generated.yml -f github"
+      # Every YAML file, hand-written or written by the tools (tools/yamlio.py writes this style): the abcxyz rules in .yamllint.yml.
+      - run: "git ls-files -z '*.yml' '*.yaml' | xargs -0 yamllint -f github"
 
   lint-json:
     name: 'Lint: JSON'
@@ -97,7 +93,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: 'actions/checkout@v4'
-      - run: 'pip install check-jsonschema pyyaml'
+      - run: 'pip install check-jsonschema pyyaml -r tools/requirements.txt'          # the tools' own needs: tools/requirements.txt
       - name: 'Broker and directory files match their schemas'
         run: |
           check-jsonschema --schemafile schema/broker.schema.json brokers/*.yml

@@ -14,7 +14,9 @@ search per site at a time, and uses no personal data. Needs: python -m pip insta
 
   python3 tools/browser_profile.py [--dir directory] [--workers 3] [--only domain,...] [--limit N]
 """
-import argparse, asyncio, datetime, glob, json, os, re, sys, urllib.parse
+import argparse, asyncio, datetime, os, re, sys, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as P
 import profile_search as S
@@ -119,24 +121,21 @@ async def profile_one(browser, entry, sem):
 
 def load_entries(d, only, limit):
     out = []
-    for f in sorted(glob.glob(os.path.join(d, "*.yml"))):
-        s = open(f).read()
-        if not re.search(r'^  status: "(undifferentiated|needs_browser|terms_gate)"', s, re.M): continue
-        m = re.search(r"^  candidate: (.*)$", s, re.M)
-        if not m: continue
-        dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)
+    for f, doc in yamlio.entries(d):
+        check = doc.get("search_check") or {}
+        if check.get("status") not in ("undifferentiated", "needs_browser", "terms_gate") or not check.get("candidate"): continue
+        dom = doc["domain"]
         if only and dom not in only: continue
-        out.append({"file": f, "domain": dom, "check": {"candidate": json.loads(m.group(1))}})
+        out.append({"file": f, "domain": dom, "check": {"candidate": yamlio.plain(check["candidate"])}})
     return out[:limit] if limit else out
 
 
 def write_result(entry, r):
-    s = open(entry["file"]).read()
+    doc = yamlio.load(entry["file"])
     cand = entry["check"]["candidate"]
-    s = re.sub(r"\nsearch_check:\n(?:  .*\n)+", "\n", s).rstrip("\n") + "\n"
     r = {**r, "candidate": cand, "checked": datetime.date.today().isoformat()} if r["status"] != "calibrated" else {**r, "checked": datetime.date.today().isoformat()}
-    s += "search_check:\n" + "\n".join(f"  {k}: {json.dumps(v)}" for k, v in r.items()) + "\n"
-    open(entry["file"], "w").write(s)
+    doc.pop("search_check", None); doc["search_check"] = r
+    yamlio.save(entry["file"], doc)
 
 
 async def main():

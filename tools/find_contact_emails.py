@@ -6,6 +6,7 @@ family's) that look like privacy contacts are kept. Usage: find_contact_emails.p
 """
 import argparse, concurrent.futures as cf, glob, os, re, sys, urllib.parse
 sys.path.insert(0, os.path.dirname(__file__))
+import yamlio  # noqa: E402  (after the path insert)
 import profile_brokers as P
 
 MAIL = re.compile(r"mailto:([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})", re.I)
@@ -37,14 +38,14 @@ def fetch(f, url):
 
 def one(path):
     """One address per site, looked for in this order: the opt-out page, the privacy policy it links to, the home page and its policy."""
-    s = open(path).read()
-    if "contact_email:" in s: return None
-    d = re.search(r'^domain: "([^"]+)"', s, re.M)
+    doc = yamlio.load(path)
+    if "contact_email" in doc: return None
+    d = doc.get("domain")
     if not d: return None
-    m = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
+    m = doc.get("opt_out_url")
     f = P.Fetcher()
-    starts = [m.group(1)] if m else []
-    starts.append(f"https://{d.group(1)}/")
+    starts = [m] if m else []
+    starts.append(f"https://{d}/")
     for start in starts:
         body = fetch(f, start)
         if not body: continue
@@ -70,11 +71,11 @@ def main():
     with cf.ThreadPoolExecutor(a.workers) as ex:
         for r in ex.map(one, sorted(glob.glob(os.path.join(a.dir, "*.yml")))):
             if not r: continue
-            path, addr, how = r; s = open(path).read()
-            lines = s.split("\n")
-            i = next((k for k, l in enumerate(lines) if l.startswith("opt_out_url:")), next(k for k, l in enumerate(lines) if l.startswith("confidence:")))
-            lines.insert(i + 1, f'contact_email: "{addr}"'); lines.insert(i + 2, f'contact_email_source: "{how}"')
-            open(path, "w").write("\n".join(lines)); n += 1
+            path, addr, how = r; doc = yamlio.load(path)
+            keys = list(doc.keys())
+            i = keys.index("opt_out_url") if "opt_out_url" in keys else keys.index("confidence")          # right after the opt-out page, as before
+            doc.insert(i + 1, "contact_email", addr); doc.insert(i + 2, "contact_email_source", how)
+            yamlio.save(path, doc); n += 1
     print(f"wrote contact_email to {n} sites")
 
 

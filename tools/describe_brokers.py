@@ -8,6 +8,8 @@ Output: an `about:` and a `priority:` line in each directory/*.yml. Usage: descr
 """
 import argparse, glob, json, os, re
 
+import yamlio
+
 OVERRIDES = json.load(open(os.path.join(os.path.dirname(__file__), "category_overrides.json")))      # categories fixed by reading the site, which win over the keywords
 
 CATEGORIES = [   # (id, label, pattern); the best-scoring one wins, ties go to the earlier one
@@ -113,16 +115,17 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--about", default=".about"); ap.add_argument("--dir", default="directory"); ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(); n = 0; dist = {}
     for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read()
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
+        doc = yamlio.load(f)
+        d = doc["domain"]
         ev_path = os.path.join(a.about, d + ".json")
         if not os.path.exists(ev_path): continue
         ev = json.load(open(ev_path))
         if not ev.get("home") and not ev.get("policy"): continue
         about, score = describe(ev); dist[about["category"]] = dist.get(about["category"], 0) + 1; n += 1
         if a.dry_run: continue
-        s = re.sub(r"\nabout: \{.*\}\n?", "\n", s); s = re.sub(r"\npriority: \d+\n?", "\n", s)
-        open(f, "w").write(s.rstrip("\n") + f"\nabout: {json.dumps(about, ensure_ascii=False)}\npriority: {score}\n")
+        doc.pop("about", None); doc.pop("priority", None)
+        doc["about"] = about; doc["priority"] = score
+        yamlio.save(f, doc)
     print(n, "described;", dict(sorted(dist.items(), key=lambda x: -x[1])))
 
 

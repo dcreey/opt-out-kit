@@ -7,7 +7,9 @@ Reads nothing personal, fills nothing, sends nothing.
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/policy_links.py [--workers 6] [--site-timeout 90] [--out .guess/policy-links.json] [--only a.com,b.com]
 Writes the JSON (one entry per site) and prints one line per site as it finishes.
 """
-import argparse, asyncio, glob, json, os, re, urllib.parse
+import argparse, asyncio, json, os, re, urllib.parse
+
+import yamlio
 from playwright.async_api import async_playwright
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -37,20 +39,15 @@ JS = """() => {
 
 def queue(only):
     out = []
-    for f in sorted(glob.glob("directory/*.yml")):
-        s = open(f).read()
-        if re.search(r"^(excluded|closed):", s, re.M): continue
-        d0 = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
-        if only and d0 in only:            # a site named on the command line is always read
-            u0 = re.search(r'^opt_out_url: "([^"]+)"', s, re.M); out.append((d0, u0.group(1) if u0 else "")); continue
-        if "\nopt_out_form:" in s: continue
-        live = re.search(r"live_form:\n  checked: [^\n]*\n  found: (true|false)", s)
-        if live and live.group(1) == "true":
-            m = re.search(r"live_form:\n(?:  .*\n)*", s); b = re.search(r"blockers: \[([^\]]*)\]", m.group(0)) if m else None
-            if not (b and "business" in b.group(1)): continue
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
-        u = re.search(r'^opt_out_url: "([^"]+)"', s, re.M)
-        if not only: out.append((d, u.group(1) if u else ""))
+    for _, doc in yamlio.entries("directory"):
+        if "excluded" in doc or "closed" in doc: continue
+        d = doc["domain"]; u = doc.get("opt_out_url") or ""
+        if only and d in only:            # a site named on the command line is always read
+            out.append((d, u)); continue
+        if "opt_out_form" in doc: continue
+        live = doc.get("live_form") or {}
+        if live.get("found") is True and "business" not in " ".join(str(b) for b in live.get("blockers") or []): continue
+        if not only: out.append((d, u))
     return out
 
 async def visit(ctx, url, clicks=False):

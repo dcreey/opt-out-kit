@@ -2,7 +2,9 @@
 """Applies tools/audit_forms.py output: a browser-found form (`live`) whose page failed the audit and has a better page proposed gets that
 page; one with no better page is marked not found so it is not trusted. Forms read from the page (`page`) are only listed.
 Usage: apply_audit.py DIR [--dir directory] [--date YYYY-MM-DD]"""
-import argparse, datetime, os, re
+import argparse, datetime, os
+
+import yamlio
 
 
 def main():
@@ -11,19 +13,20 @@ def main():
     for line in open(os.path.join(a.audit, "audit.tsv")):
         d, src, url, verdict, reasons, score, alt = (line.rstrip("\n").split("\t") + [""] * 7)[:7]
         if verdict != "suspect": continue
-        path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", d.lower()).strip("_") + ".yml")
-        s = open(path).read()
+        path = yamlio.entry_path(a.dir, d)
+        doc = yamlio.load(path)
+        live = doc.get("live_form")
         if src == "live" and alt:
-            s = s.replace(f'  page: "{url}"', f'  page: "{alt}"', 1); moved += 1
-            open(path, "w").write(s)
+            if live is not None and live.get("page") == url: live["page"] = alt
+            moved += 1; yamlio.save(path, doc)
         elif src == "page" and alt:
             # The saved form was the wrong one and a better page passed its own audit: use that page instead.
-            s = re.sub(r"\nopt_out_form: \{.*\}\n", "\n", s)
-            s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", "\n", s).rstrip("\n") + f'\nlive_form:\n  checked: "{a.date}"\n  found: true\n  page: "{alt}"\n  blockers: []\n'
-            moved += 1; open(path, "w").write(s)
-        elif src == "live" and re.search(r"HTTP 4|no form on the page|page did not load", reasons) and "bot wall" not in reasons:
-            s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", f'\nlive_form:\n  checked: "{a.date}"\n  found: false\n', s); dropped += 1
-            open(path, "w").write(s)
+            doc.pop("opt_out_form", None)
+            doc["live_form"] = {"checked": a.date, "found": True, "page": alt, "blockers": []}
+            moved += 1; yamlio.save(path, doc)
+        elif src == "live" and any(w in reasons for w in ("HTTP 4", "no form on the page", "page did not load")) and "bot wall" not in reasons:
+            if live is not None: doc["live_form"] = {"checked": a.date, "found": False}
+            dropped += 1; yamlio.save(path, doc)
         else: listed += 1; left.append((d, src, url, reasons, alt))
     print(f"moved {moved} to a better page, dropped {dropped} dead ones, {listed} left to review")
     with open(os.path.join(a.audit, "review.tsv"), "w") as f:

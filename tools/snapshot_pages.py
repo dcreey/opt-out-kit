@@ -5,17 +5,17 @@ It fills nothing and sends nothing. <out>/index.tsv lists domain, address asked 
 
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/snapshot_pages.py [--dir directory] [--workers 10] [--out .rendered-html] [--only a.com,b.com]
 """
-import argparse, asyncio, glob, os, re, sys
+import argparse, asyncio, os, sys
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 from playwright.async_api import async_playwright
 
 
-def target(text, domain):
-    for key in ("opt_out_url", "page"):
-        for m in re.finditer(rf'{key}: "(https?://[^"]+)"', text):
-            return m.group(1)
-    return f"https://{domain}/"
+def target(doc, domain):
+    """The page to snapshot: the site's opt-out page, else a page a form was found on, else its home page."""
+    return yamlio.http(doc.get("opt_out_url")) or yamlio.live_page(doc) or yamlio.form_page(doc) or f"https://{domain}/"
 
 
 async def snap(browser, domain, url, out):
@@ -48,10 +48,9 @@ async def main():
     ap.add_argument("--out", default=".rendered-html"); ap.add_argument("--only", default=""); ap.add_argument("--redo-failed", action="store_true")
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     targets = []
-    for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^excluded:", s, re.M): continue
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
+    for _, s in yamlio.entries(a.dir):
+        if "excluded" in s: continue
+        d = s["domain"]
         if a.only and d not in a.only.split(","): continue
         if a.redo_failed and os.path.exists(os.path.join(a.out, d + ".html")): continue
         targets.append((d, target(s, d)))

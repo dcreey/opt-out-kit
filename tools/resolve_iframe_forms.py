@@ -6,6 +6,8 @@ Usage: resolve_iframe_forms.py --domains a.com,b.com [--apply] [--dir directory]
 Without --apply it only prints what it found: `domain<TAB>old page<TAB>frame page<TAB>score`.
 """
 import argparse, asyncio, datetime, os, re, sys
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 from playwright.async_api import async_playwright
@@ -13,11 +15,9 @@ from playwright.async_api import async_playwright
 SKIP = re.compile(r"recaptcha|hcaptcha|challenges\.cloudflare|cookiebot|onetrust\.com/consent|doubleclick|googletagmanager|facebook|clym-widget|hubspot\.com/feedback|youtube|vimeo", re.I)
 
 
-def current_page(text):
-    for pat in (r'^  page: "([^"]+)"', r'^opt_out_form: \{"page": "([^"]+)"', r'^opt_out_url: "([^"]+)"'):
-        m = re.search(pat, text, re.M)
-        if m: return m.group(1)
-    return None
+def current_page(doc):
+    """The page the site's opt-out lives on as far as we know: where a live look found it, where the stored form came from, its opt-out page."""
+    return (doc.get("live_form") or {}).get("page") or (doc.get("opt_out_form") or {}).get("page") or doc.get("opt_out_url")
 
 
 async def find(ctx, url):
@@ -46,9 +46,9 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch(); sem = asyncio.Semaphore(6)
         async def one(d):
-            path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", d.lower()).strip("_") + ".yml")
+            path = yamlio.entry_path(a.dir, d)
             if not os.path.exists(path): return d, None, None, -100
-            text = open(path).read(); old = current_page(text) or "https://" + d
+            doc = yamlio.load(path); old = current_page(doc) or "https://" + d
             async with sem:
                 ctx = await browser.new_context(user_agent=L.UA, viewport={"width": 390, "height": 844}, is_mobile=True)
                 try: main_score, (score, frame) = await asyncio.wait_for(find(ctx, old), timeout=70)
@@ -56,9 +56,9 @@ async def main():
                 finally: await ctx.close()
             if frame and score >= 5 and score > main_score:
                 if a.apply:
-                    text = re.sub(r"\nopt_out_form: \{.*\}\n", "\n", text)
-                    text = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", "\n", text).rstrip("\n") + f'\nlive_form:\n  checked: "{a.date}"\n  found: true\n  page: "{frame}"\n  blockers: []\n'
-                    open(path, "w").write(text)
+                    doc.pop("opt_out_form", None); doc.pop("live_form", None)
+                    doc["live_form"] = {"checked": a.date, "found": True, "page": frame, "blockers": []}
+                    yamlio.save(path, doc)
                 return d, old, frame, score
             return d, old, None, score
         for coro in asyncio.as_completed([one(d) for d in a.domains.split(",")]):

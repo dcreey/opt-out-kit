@@ -6,7 +6,9 @@ A person looked at the screenshot each site showed after the automatic opt-out s
 an error, a required menu left empty, a bot check, ...). The app classifies by this before any guess made from reading the page.
 Usage: apply_run_check.py [--dir directory] [--date YYYY-MM-DD]
 """
-import argparse, datetime, os, re
+import argparse, datetime, os
+
+import yamlio
 
 CONFIRMED = {"lionsharemarketing.com": "thank-you page: allow up to 45 days", "scileads.com": "it said Request received",
              "apollo.io": "it said We sent an email to you, please check your inbox"}
@@ -42,11 +44,11 @@ def main():
     for domain, note in {**{d: ("confirmed", t) for d, t in CONFIRMED.items()}, **{d: ("failed", t) for d, t in FAILED.items()}}.items():
         if only and domain not in only: continue
         result, text = note
-        path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", domain.lower()).strip("_") + ".yml")
+        path = yamlio.entry_path(a.dir, domain)
         if not os.path.exists(path): print("no entry for", domain); continue
-        s = open(path).read()
-        s = re.sub(r"\nrun_check:\n(?:[ \t]+.*\n?)*", "\n", s).rstrip("\n") + f'\nrun_check:\n  date: "{a.date}"\n  result: "{result}"\n  note: "{text}"\n'
-        open(path, "w").write(s); n += 1
+        doc = yamlio.load(path)
+        doc["run_check"] = {"date": a.date, "result": result, "note": text}
+        yamlio.save(path, doc); n += 1
     print(f"wrote run_check to {n} sites")
 
 

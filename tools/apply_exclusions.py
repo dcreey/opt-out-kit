@@ -8,6 +8,8 @@ Usage: apply_exclusions.py [--dir directory] [--date YYYY-MM-DD]
 """
 import argparse, datetime, json, os, re
 
+import yamlio
+
 START, END = "<!-- excluded-table:start -->", "<!-- excluded-table:end -->"
 
 
@@ -16,15 +18,14 @@ def main():
     a = ap.parse_args(); listed = json.load(open("pipeline/not-personal-sites.json")); done = 0; rows = []
     for name in sorted(os.listdir(a.dir)):
         if not name.endswith(".yml"): continue
-        path = os.path.join(a.dir, name); s = open(path).read()
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
-        had = re.search(r"\nexcluded:\n(?:[ \t]+.*\n?)*", s)
-        s = re.sub(r"\nexcluded:\n(?:[ \t]+.*\n?)*", "\n", s).rstrip("\n") + "\n"
+        path = os.path.join(a.dir, name); doc = yamlio.load(path)
+        d = doc["domain"]
+        had = doc.pop("excluded", None)
         if d in listed:
-            e = listed[d]; checked = (re.search(r'checked: "([^"]+)"', had.group(0)).group(1) if had else a.date)
-            s += f'excluded:\n  checked: "{checked}"\n  kind: "{e["kind"]}"\n  reason: {json.dumps(e["reason"])}\n'; done += 1
+            e = listed[d]
+            doc["excluded"] = {"checked": had["checked"] if had else a.date, "kind": e["kind"], "reason": e["reason"]}; done += 1
             rows.append((d, e["kind"], e["reason"]))
-        open(path, "w").write(s)
+        yamlio.save(path, doc)
     table = "| Site | Why it is kept out | Details |\n|---|---|---|\n" + "".join(
         f"| `{d}` | {'Business-only opt-out' if k == 'business_only' else 'Not a data broker'} | {r} |\n" for d, k, r in rows)
     doc = open("docs/EXCLUDED_SITES.md").read()

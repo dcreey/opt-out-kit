@@ -4,7 +4,9 @@
 Input is the shard files of AppTests/LiveFormDiscoveryTests: `domain<TAB>result<TAB>page<TAB>blockers`. `form` means an opt-out form was
 found and filled on the live page (nothing sent). Usage: apply_live_forms.py DIR_WITH_TSV [--dir directory] [--date YYYY-MM-DD]
 """
-import argparse, datetime, glob, os, re
+import argparse, datetime, glob, os
+
+import yamlio
 
 
 def main():
@@ -15,17 +17,17 @@ def main():
             parts = line.rstrip("\n").split("\t")
             if len(parts) < 4: continue
             domain, result, page, blockers = parts[:4]; mail = parts[4] if len(parts) > 4 else ""
-            path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", domain.lower()).strip("_") + ".yml")
+            path = yamlio.entry_path(a.dir, domain)
             if not os.path.exists(path): continue
-            s = re.sub(r"\nlive_form:\n(?:[ \t]+.*\n?)*", "\n", open(path).read()).rstrip("\n")
+            doc = yamlio.load(path)
             ok = result == "form"
-            items = ", ".join('"' + b.replace('"', "'") + '"' for b in blockers.split(";") if b)
-            block = f'\nlive_form:\n  checked: "{a.date}"\n  found: {"true" if ok else "false"}\n'
-            if blockers == "wall": block += '  blockers: ["wall"]\n'
-            if ok: block += f'  page: "{page}"\n  blockers: [{items}]\n'
-            if mail and "\ncontact_email:" not in s:
-                block += f'contact_email: "{mail}"\ncontact_email_source: "browser"\n'
-            open(path, "w").write(s + block); found += ok; missing += not ok
+            live = {"checked": a.date, "found": ok}
+            if blockers == "wall": live["blockers"] = ["wall"]
+            if ok: live["page"] = page; live["blockers"] = [b.replace('"', "'") for b in blockers.split(";") if b]
+            doc.pop("live_form", None); doc["live_form"] = live
+            if mail and "contact_email" not in doc:
+                doc["contact_email"] = mail; doc["contact_email_source"] = "browser"
+            yamlio.save(path, doc); found += ok; missing += not ok
     print(f"found a form on {found} sites, none on {missing}")
 
 

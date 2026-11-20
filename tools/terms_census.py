@@ -12,7 +12,9 @@ With --lang it asks each site for its pages in that language (Accept-Language, t
 switcher or a language path), checks the text really is in that language, and stores it under .terms-cache/<site>/<lang>/. A site
 with no translation is reported as such and nothing is stored: the master list keeps the site's own words and never translates them.
 """
-import argparse, asyncio, glob, hashlib, os, re, sys, urllib.parse
+import argparse, asyncio, hashlib, os, re, sys, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as P
 import terms_lang as TL
@@ -123,9 +125,8 @@ async def main():
     a = ap.parse_args()
     if not a.out: a.out = "pipeline/terms-census.md" if a.lang == "en" else f"pipeline/terms-census-{a.lang}.md"
     domains = []
-    for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read()
-        if re.search(r'^  status: "terms_gate"', s, re.M): domains.append(re.search(r'^domain: "(.*)"', s, re.M).group(1))
+    for _, doc in yamlio.entries(a.dir):
+        if any(isinstance(v, dict) and v.get("status") == "terms_gate" for v in doc.values()): domains.append(doc["domain"])
     if a.only: domains = a.only.split(",")             # named sites are read whether or not they show a terms gate
     sem = asyncio.Semaphore(a.workers)
     async with async_playwright() as p:

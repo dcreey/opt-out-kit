@@ -17,7 +17,9 @@ search_check.status:
   needs_browser     the search page is built by JavaScript
   no_search         no name search found
 """
-import argparse, concurrent.futures as cf, datetime, glob, json, os, re, sys, time, urllib.parse
+import argparse, concurrent.futures as cf, datetime, json, os, re, sys, time, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as P
 
@@ -241,7 +243,8 @@ def find_candidate(domain, fetcher):
 
 
 def to_flow(v):
-    return "\n".join(["search_check:"] + [f"  {k}: {json.dumps(x)}" for k, x in v.items() if k != "evidence"]) + "\n"
+    """The search_check block as written to the site's file (the evidence stays in the cache)."""
+    return {k: x for k, x in v.items() if k != "evidence"}
 
 
 def main():
@@ -253,9 +256,8 @@ def main():
     a = ap.parse_args()
     os.makedirs(a.cache, exist_ok=True)
     entries = []
-    for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
-        s = open(f).read(); d = re.search(r'^domain: "(.*)"', s, re.M).group(1)
-        auto = re.search(r'^automation: "(.*)"', s, re.M).group(1)
+    for f, doc in yamlio.entries(a.dir):
+        d = doc["domain"]; auto = doc["automation"]
         if a.only and d not in a.only.split(","): continue
         entries.append((f, d, auto))
     fetcher = P.Fetcher()
@@ -263,19 +265,18 @@ def main():
     if a.candidates:
         todo = []
         for f, d, auto in entries:
-            t = open(f).read()
-            if re.search(r'^  status: "(undifferentiated|needs_browser)"', t, re.M): todo.append((f, d))
+            if (yamlio.load(f).get("search_check") or {}).get("status") in ("undifferentiated", "needs_browser"): todo.append((f, d))
         def cand(item):
             f, d = item; return f, find_candidate(d, fetcher)
         with cf.ThreadPoolExecutor(a.workers) as ex: found = list(ex.map(cand, todo))
         n = 0
         for f, c in found:
             if not c: continue
-            t = open(f).read()
-            t = re.sub(r"\n  candidate: .*", "", t)
-            t = re.sub(r'(\nsearch_check:\n(?:  .*\n)*?)', lambda m: m.group(1), t)
-            t = t.rstrip("\n") + "\n  candidate: " + json.dumps(c) + "\n"
-            open(f, "w").write(t); n += 1
+            doc = yamlio.load(f)
+            check = doc.get("search_check") or {}
+            check.pop("candidate", None); check["candidate"] = c
+            doc["search_check"] = check
+            yamlio.save(f, doc); n += 1
         print(f"{n} of {len(todo)} sites have a candidate search request"); return
 
     def work(item):
@@ -297,7 +298,7 @@ def main():
         while n < min(len(a), len(b)) and a[-1 - n] == b[-1 - n]: n += 1
         return n
     calibrated = [(f, r) for f, r in results if r["status"] == "calibrated"]
-    domains = {f: re.search(r'^domain: "(.*)"', open(f).read(), re.M).group(1) for f, _ in results}
+    domains = {f: d for f, d, _ in entries}
     skip_status = {"blocked", "robots_disallowed"}
     todo = [(f, r) for f, r in results if r["status"] not in {"calibrated"} | skip_status]
     def propagate(item):
@@ -317,10 +318,9 @@ def main():
     from collections import Counter
     counts = Counter()
     for f, r in results:
-        s = open(f).read()
-        s = re.sub(r"\nsearch_check:\n(?:  .*\n)+", "\n", s)         # replace a previous result
-        s = s.rstrip("\n") + "\n" + to_flow({k: v for k, v in r.items()}) 
-        open(f, "w").write(s); counts[r["status"]] += 1
+        doc = yamlio.load(f)
+        doc.pop("search_check", None); doc["search_check"] = to_flow(r)         # replace a previous result
+        yamlio.save(f, doc); counts[r["status"]] += 1
     lines = [f"# Search-check profile ({datetime.date.today()})", "", f"{len(results)} sites.", "", "| Result | Sites |", "|---|---|"]
     lines += [f"| {k} | {v} |" for k, v in counts.most_common()]
     open(os.path.join(a.dir, "SEARCH-REPORT.md"), "w").write("\n".join(lines) + "\n")

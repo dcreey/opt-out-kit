@@ -11,7 +11,9 @@ No evidence leaves the list as ["US"]; that is "not shown to reach anywhere else
   tag_regions.py ico CSV    match our sites' company names to the ICO register of data protection fee payers (a UK presence signal); writes pipeline/ico-matches.json
   tag_regions.py apply      read the pages, the vendor list and the ICO matches, write `regions:` into directory/*.yml
 """
-import concurrent.futures, glob, json, os, re, sys, urllib.request, urllib.parse
+import concurrent.futures, json, os, re, sys, urllib.request, urllib.parse
+
+import yamlio
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = os.path.join(ROOT, "pipeline", "region-pages")
@@ -41,13 +43,13 @@ CCTLD = {"uk": "UK", "de": "EU", "fr": "EU", "es": "EU", "it": "EU", "nl": "EU",
 
 
 def entries():
-    for f in sorted(glob.glob(os.path.join(ROOT, "directory", "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^excluded:", s, re.M): continue
-        dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)
-        urls = []
-        for pat in (r'"source": "(https?://[^"]+)"', r'^opt_out_url: "(https?://[^"]+)"', r'^  page: "(https?://[^"]+)"', r'"page": "(https?://[^"]+)"'):
-            urls += re.findall(pat, s, re.M)
+    for f, doc in yamlio.entries(os.path.join(ROOT, "directory")):
+        if "excluded" in doc: continue
+        dom = doc["domain"]
+        # The pages its file names: where its description and persistence verdict came from, its opt-out page, the page a form was found on.
+        urls = [(doc.get(k) or {}).get("source") for k in ("about", "persistence")] + [doc.get("opt_out_url")]
+        urls += [(doc.get(k) or {}).get("page") for k in ("live_form", "opt_out_form", "search_check")]
+        urls = [u for u in urls if isinstance(u, str) and u.startswith(("http://", "https://"))]
         yield f, dom, list(dict.fromkeys(urls))[:3] or ["https://" + dom + "/privacy"]
 
 
@@ -109,12 +111,10 @@ def ico_match(csv_path):
     import csv
     csv.field_size_limit(10**8)
     ours = {}
-    for f in sorted(glob.glob(os.path.join(ROOT, "directory", "*.yml"))):
-        s = open(f).read()
-        dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)
-        name = re.search(r'^name: "(.*)"', s, re.M)
+    for f, doc in yamlio.entries(os.path.join(ROOT, "directory")):
+        dom = doc["domain"]
         # Only the company's legal name, and only a name distinctive enough to be one company (two words, or a long single word).
-        n = norm(name.group(1)) if name else ""
+        n = norm(doc["name"]) if doc.get("name") else ""
         if len(n.split()) >= 2 or len(n) >= 8: ours.setdefault(n, set()).add(dom)
     out = {}
     with open(csv_path, newline="", encoding="utf-8", errors="ignore") as fh:
@@ -163,11 +163,10 @@ def main(cmd):
             m = re.search(rx, text)
             if m and code not in regions:
                 regions.append(code); ev.append("its pages mention " + m.group(0))
-        s = open(f).read()
-        s = re.sub(r"^regions: .*\n", "", s, flags=re.M)
-        line = "regions: " + json.dumps({"list": regions, "evidence": "; ".join(ev) or "registered with a US state; nothing found for other places", "checked": "2026-10-26"}, ensure_ascii=False) + "\n"
-        s = s.rstrip("\n") + "\n" + line
-        open(f, "w").write(s)
+        doc = yamlio.load(f)
+        doc.pop("regions", None)
+        doc["regions"] = {"list": regions, "evidence": "; ".join(ev) or "registered with a US state; nothing found for other places", "checked": "2026-10-26"}
+        yamlio.save(f, doc)
         key = "+".join(regions); counts[key] = counts.get(key, 0) + 1
     for k, v in sorted(counts.items(), key=lambda x: -x[1]): print(v, k)
 

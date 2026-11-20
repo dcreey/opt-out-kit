@@ -7,7 +7,9 @@ English, Spanish, Portuguese, Chinese, Arabic and Russian are spoken in too many
   site_languages.py find    write pipeline/site-languages.json (resumes)
   site_languages.py apply   write `languages:` and the matching `regions:` tags into directory/*.yml (adds only)
 """
-import concurrent.futures, glob, json, os, re, sys, urllib.parse, urllib.request
+import concurrent.futures, json, os, re, sys, urllib.parse, urllib.request
+
+import yamlio
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "pipeline", "site-languages.json")
@@ -29,15 +31,9 @@ def get(url, limit=500_000):
 
 
 def entries():
-    for f in sorted(glob.glob(os.path.join(ROOT, "directory", "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^excluded:", s, re.M): continue
-        dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)
-        opt = None
-        for pat in (r'"page": "(https?://[^"]+)"', r'^  page: "(https?://[^"]+)"', r'^opt_out_url: "(https?://[^"]+)"'):
-            m = re.search(pat, s, re.M)
-            if m: opt = m.group(1); break
-        yield f, dom, opt
+    for f, doc in yamlio.entries(os.path.join(ROOT, "directory")):
+        if "excluded" in doc: continue
+        yield f, doc["domain"], yamlio.form_page(doc) or yamlio.live_page(doc) or yamlio.http(doc.get("opt_out_url"))
 
 
 def langs_of(html, base):
@@ -81,17 +77,16 @@ def main(cmd):
     for f, dom, _ in entries():
         res = data.get(dom)
         if not res or not res["list"]: continue
-        s = open(f).read()
-        s = re.sub(r"^languages: .*\n", "", s, flags=re.M)
+        doc = yamlio.load(f)
+        doc.pop("languages", None)
         # Translations of the opt-out page must live on the site itself or on a privacy portal, not on a tracker or analytics host.
         def same(u):
             h = urllib.parse.urlparse(u).hostname or ""
             return h.endswith(dom.split(".", 1)[-1] if dom.count(".") > 1 else dom) or dom.rsplit(".", 1)[0].split(".")[-1] in h or re.search(r"onetrust|trustarc|datasubject|ketch|transcend|osano|securiti|zendesk|force\.com", h)
         pages = {k: v for k, v in res["pages"].items() if same(v)}
-        s = s.rstrip("\n") + "\nlanguages: " + json.dumps({"list": res["list"], "pages": pages, "checked": "2026-10-26"}, ensure_ascii=False) + "\n"
-        m = re.search(r"^regions: (\{.*\})$", s, re.M)
-        if m:
-            r = json.loads(m.group(1))
+        doc["languages"] = {"list": res["list"], "pages": pages, "checked": "2026-10-26"}
+        if doc.get("regions"):
+            r = yamlio.plain(doc["regions"])
             for code in (res["list"] if len(res["list"]) <= 15 else []):   # a picker with dozens of languages is a worldwide signal (GLOBAL below), not a list of countries
                 c = ONE_COUNTRY.get(code)
                 if c and c not in r["list"] and ("EU" not in r["list"] or True):
@@ -102,8 +97,8 @@ def main(cmd):
             if "GLOBAL" not in r["list"] and (len(res["list"]) >= 8 or len(others) >= 4):
                 why = ("its site is offered in %d languages" % len(res["list"])) if len(res["list"]) >= 8 else ("it was found in %d regions besides the US" % len(others))
                 r["list"].append("GLOBAL"); r["evidence"] = (r.get("evidence", "") + "; " + why + ", which suggests it serves people worldwide").lstrip("; ")
-            s = s[:m.start()] + "regions: " + json.dumps(r, ensure_ascii=False) + s[m.end():]
-        open(f, "w").write(s); n += 1
+            doc["regions"] = r
+        yamlio.save(f, doc); n += 1
     print("updated", n, "sites; region tags added from languages:", tagged)
 
 

@@ -7,21 +7,19 @@ healed by the same crawl the app uses (home page -> scored privacy/opt-out links
 Exits 1 when a hand-written broker's link is broken and nothing newer was found. Polite: robots.txt honored, ~1 request/second.
 """
 import argparse, concurrent.futures as cf, datetime, glob, os, re, sys, time, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as pb
 
 
 def first_open(path):
-    for line in open(path):
-        m = re.match(r"\s*-\s*open:\s*(\S+)", line)
-        if m: return m.group(1).strip("\"'")
-    return None
+    """The page a hand-written flow opens first (its first `open:` step)."""
+    return next((str(step["open"]) for step in yamlio.load(path).get("steps") or [] if isinstance(step, dict) and step.get("open")), None)
 
 
 def directory_form_page(path):
-    text = open(path).read()
-    m = re.search(r'^opt_out_form: \{"page": "([^"]+)"', text, re.M)
-    return m.group(1) if m else None
+    return (yamlio.load(path).get("opt_out_form") or {}).get("page")
 
 
 def healthy(fetcher, url):

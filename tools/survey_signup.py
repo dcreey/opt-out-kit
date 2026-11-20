@@ -7,7 +7,9 @@ redirects to a sign-up or login address, or when its forms carry sign-up wording
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/survey_signup.py [--workers 8]
 Writes pipeline/signup-survey.json: {domain: {url, final, flags: [...], forms: [{buttons, fields, head}]}}
 """
-import argparse, asyncio, glob, json, os, re, sys
+import argparse, asyncio, json, os, re, sys
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 from playwright.async_api import async_playwright
@@ -20,15 +22,10 @@ BAD_PATH = re.compile(r"/(sign-?up|register|registration|login|log-in|signin|sig
 
 
 def entries():
-    for f in sorted(glob.glob(os.path.join(ROOT, "directory", "*.yml"))):
-        s = open(f).read()
-        if re.search(r"^excluded:", s, re.M): continue
-        dom = re.search(r'^domain: "(.*)"', s, re.M).group(1)
-        url = None
-        for pat in (r'^  page: "(https?://[^"]+)"', r'"page": "(https?://[^"]+)"', r'^opt_out_url: "(https?://[^"]+)"'):
-            m = re.search(pat, s, re.M)
-            if m: url = m.group(1); break
-        if url: yield dom, url
+    for _, doc in yamlio.entries(os.path.join(ROOT, "directory")):
+        if "excluded" in doc: continue
+        url = yamlio.live_page(doc) or yamlio.form_page(doc) or yamlio.http(doc.get("opt_out_url"))
+        if url: yield doc["domain"], url
 
 
 async def one(ctx, item, sem):

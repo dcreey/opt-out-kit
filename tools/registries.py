@@ -15,6 +15,8 @@ drop the file into registries/inbox/vt.csv or vt.xlsx and it is imported). A sta
 Polite: robots.txt honored, retries with backoff, one request per file. Registries are public records.
 """
 import argparse, csv, datetime, glob, io, json, os, re, sys, urllib.parse, urllib.request, zipfile
+
+import yamlio
 import xml.etree.ElementTree as ET
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as pb
@@ -281,15 +283,12 @@ def our_domains():
     domains = set()
     for line in open("pipeline/census-sites.txt"):
         if line.strip() and not line.startswith("#"): domains.add(line.split()[0].lower())
-    for p in glob.glob("directory/*.yml"):
-        m = re.search(r'^domain:\s*"([^"]+)"', open(p).read(), re.M)
-        if m: domains.add(m.group(1).lower())
-    for p in glob.glob("brokers/*.yml"):
-        t = open(p).read()
-        # Values may be quoted (the hand-written YAML single-quotes them: .yamllint.yml).
-        for m in re.finditer(r"^\s*-\s*open:\s*(\S+)", t, re.M): domains.add(urllib.parse.urlsplit(m.group(1).strip("'\"")).netloc.lower().removeprefix("www."))
-        m = re.search(r"^covers:\s*\[(.*?)\]", t, re.M)
-        if m: domains.update(x.strip().strip("'\"").lower() for x in m.group(1).split(",") if x.strip())
+    for _, doc in yamlio.entries("directory"):
+        if doc.get("domain"): domains.add(str(doc["domain"]).lower())
+    for _, doc in yamlio.entries("brokers"):
+        for step in doc.get("steps") or []:
+            if isinstance(step, dict) and step.get("open"): domains.add(urllib.parse.urlsplit(str(step["open"])).netloc.lower().removeprefix("www."))
+        domains.update(str(x).lower() for x in doc.get("covers") or [])
     return sorted(domains)
 
 

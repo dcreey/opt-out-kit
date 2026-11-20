@@ -6,7 +6,9 @@ heading above the form), and the form's buttons are not a newsletter, search, lo
 the reasons, and the crawler is run again from the site's home page to propose a better page (`alt`).
 Output: TSV `domain, source, page, verdict, reasons, score, alt`. Usage: audit_forms.py --out DIR [--only a.com,b.com]
 """
-import argparse, asyncio, glob, os, re, sys, urllib.parse
+import argparse, asyncio, os, re, sys, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 import profile_brokers as P
@@ -18,15 +20,14 @@ ABOUT = re.compile(r"opt.?out|do not sell|don.?t sell|privacy|delete|deletion|re
 
 def targets(only):
     out = []
-    for f in sorted(glob.glob("directory/*.yml")):
-        s = open(f).read()
-        if re.search(r"^(closed|excluded):", s, re.M): continue
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
+    for _, doc in yamlio.entries("directory"):
+        if "closed" in doc or "excluded" in doc: continue
+        d = doc["domain"]
         if only and d not in only: continue
-        m = re.search(r'^opt_out_form: \{"page": "([^"]+)"', s, re.M)
-        if m: out.append((d, "page", m.group(1))); continue
-        m = re.search(r'^live_form:\n  checked: "[^"]*"\n  found: true\n  page: "([^"]+)"', s, re.M)
-        if m: out.append((d, "live", m.group(1)))
+        page = (doc.get("opt_out_form") or {}).get("page")
+        if page: out.append((d, "page", page)); continue
+        live = doc.get("live_form") or {}
+        if live.get("found") is True and live.get("page"): out.append((d, "live", live["page"]))
     return out
 
 

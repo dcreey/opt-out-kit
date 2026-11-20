@@ -4,7 +4,9 @@
 Output: DIR/<domain>.json with {name, home: {title, description, headings, text}, policy: {url, text}, registry: {...}}.
 Usage: collect_about.py --out .about [--only a.com,b.com] [--workers 8]
 """
-import argparse, asyncio, glob, json, os, re, sys, urllib.parse
+import argparse, asyncio, json, os, re, sys, urllib.parse
+
+import yamlio
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 from playwright.async_api import async_playwright
@@ -42,8 +44,8 @@ async def one(browser, d, entry, reg, out, sem):
             async def run():
                 home = await grab(ctx, "https://" + d + "/") or await grab(ctx, "https://www." + d + "/")
                 cands = list((reg.get("privacy_urls") or {}).values())
-                m = re.search(r'^opt_out_url: "([^"]+)"', entry, re.M)
-                if m and re.search(r"privacy|ccpa|rights|policy", m.group(1), re.I): cands.append(m.group(1))
+                url = entry.get("opt_out_url")
+                if url and re.search(r"privacy|ccpa|rights|policy", url, re.I): cands.append(url)
                 if home:
                     own = urllib.parse.urlsplit(home["url"]).netloc.replace("www.", "").split(".")[-2:]
                     for href, text in home["links"]:
@@ -65,12 +67,11 @@ async def one(browser, d, entry, reg, out, sem):
 async def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=".about"); ap.add_argument("--only", default=""); ap.add_argument("--workers", type=int, default=8)
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); reg = registry(); sem = asyncio.Semaphore(a.workers); todo = []
-    for f in sorted(glob.glob("directory/*.yml")):
-        s = open(f).read()
-        if re.search(r"^(closed|excluded):", s, re.M): continue
-        d = re.search(r'^domain: "([^"]+)"', s, re.M).group(1)
+    for _, doc in yamlio.entries("directory"):
+        if "closed" in doc or "excluded" in doc: continue
+        d = doc["domain"]
         if a.only and d not in a.only.split(","): continue
-        todo.append((d, s))
+        todo.append((d, doc))
     async with async_playwright() as p:
         browser = await p.chromium.launch(); done = 0
         for coro in asyncio.as_completed([one(browser, d, s, reg.get(d, {}), a.out, sem) for d, s in todo]):

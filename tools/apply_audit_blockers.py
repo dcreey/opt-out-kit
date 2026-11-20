@@ -9,7 +9,9 @@ puts a typed-code form last) before anything is opened.
   code      a required typed code or puzzle (the form stays semi-automated, but goes last)
 
 Input is the audit's results.json. Usage: apply_audit_blockers.py RESULTS.json [--dir directory]"""
-import argparse, json, os, re
+import argparse, datetime, json, os, re
+
+import yamlio
 
 RULES = [("business", r"company|organi[sz]ation|job|title|industry|role|department|purpose|relationship|division|how did you hear|research|your needs"),
          ("other", r"^your answer$"),
@@ -24,19 +26,15 @@ def main():
         if not x["formFound"]: continue
         req = [f["label"].lower() for f in x["fields"] if f["required"] and not f["filled"] and f["type"] not in ("checkbox", "radio", "hidden")]
         found = [name for name, pat in RULES if any(re.search(pat, l) for l in req)]
-        path = os.path.join(a.dir, re.sub(r"[^a-z0-9]+", "_", x["domain"].lower()).strip("_") + ".yml")
+        path = yamlio.entry_path(a.dir, x["domain"])
         if not found or not os.path.exists(path): continue
-        s = open(path).read(); m = re.search(r"(\nlive_form:\n(?:[ \t]+.*\n?)*)", s)
-        if not m:   # a form read from the page has no live block yet: add one that only carries what the audit saw
-            import datetime
-            s = s.rstrip("\n") + f'\nlive_form:\n  checked: "{datetime.date.today()}"\n  found: false\n'; open(path, "w").write(s)
-            m = re.search(r"(\nlive_form:\n(?:[ \t]+.*\n?)*)", s)
-        block = m.group(1); b = re.search(r"  blockers: \[(.*)\]", block)
-        have = [t.strip().strip('"') for t in b.group(1).split(",") if t.strip()] if b else []
-        merged = have + [f for f in found if f not in have]
-        line = "  blockers: [" + ", ".join(f'"{t}"' for t in merged) + "]"
-        block2 = re.sub(r"  blockers: \[.*\]", line, block) if b else block.rstrip("\n") + "\n" + line + "\n"
-        open(path, "w").write(s.replace(block, block2)); n += 1
+        doc = yamlio.load(path)
+        # A form read from the page has no live block yet: add one that only carries what the audit saw.
+        live = doc.get("live_form") or {"checked": str(datetime.date.today()), "found": False}
+        have = list(live.get("blockers") or [])
+        live["blockers"] = have + [f for f in found if f not in have]
+        doc["live_form"] = live
+        yamlio.save(path, doc); n += 1
     print(n, "sites updated")
 
 

@@ -626,8 +626,9 @@ final class DirectoryTests: XCTestCase {
         let files = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
         for f in files {
             let text = try String(contentsOf: f, encoding: .utf8)
+            // The value as written in the file (the loader cleans it, so it is read raw here), single- or double-quoted.
             for line in text.split(separator: "\n") where line.hasPrefix("contact_email:") {
-                let v = line.dropFirst("contact_email:".count).trimmingCharacters(in: CharacterSet(charactersIn: " \""))
+                let v = line.dropFirst("contact_email:".count).trimmingCharacters(in: CharacterSet(charactersIn: " \"'")).replacingOccurrences(of: "''", with: "'")
                 XCTAssertEqual(ContactEmail.cleaned(v), v, "\(f.lastPathComponent): \(v)")
             }
         }
@@ -3956,15 +3957,13 @@ final class LegalBasisFillTests: XCTestCase {
     func testNoOptOutPageIsAListForDeceasedPeopleAndMelissaUsesItsConsumerPrivacyForm() throws {
         let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
-        let files = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
-        for f in files {
-            let text = try String(contentsOf: f, encoding: .utf8)
-            for line in text.split(separator: "\n") where line.hasPrefix("opt_out_url:") || line.contains("page: \"") {
-                XCTAssertFalse(line.lowercased().contains("deceased"), "\(f.lastPathComponent): \(line)")
-            }
+        // Every page a site's opt-out may open (decoded, so it holds whatever the quoting).
+        for e in try Registry.loadDirectory(dir) {
+            let pages = [e.optOutURL?.absoluteString, e.optOutForm?.page.absoluteString, e.liveForm?.page].compactMap { $0 }
+            for page in pages { XCTAssertFalse(page.lowercased().contains("deceased"), "\(e.domain): \(page)") }
         }
-        let melissa = try String(contentsOf: dir.appendingPathComponent("melissa_com.yml"), encoding: .utf8)
-        XCTAssertTrue(melissa.contains("opt_out_url: \"https://apps.melissa.com/user/consumerprivacy.aspx\""))
+        let melissa = try XCTUnwrap(Registry.loadDirectory(dir).first { $0.domain == "melissa.com" })
+        XCTAssertEqual(melissa.optOutURL?.absoluteString, "https://apps.melissa.com/user/consumerprivacy.aspx")
     }
 }
 

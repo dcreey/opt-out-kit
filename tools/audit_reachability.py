@@ -15,6 +15,8 @@ Usage: audit_reachability.py [--dir directory] [--out pipeline/reachability.json
 """
 import argparse, collections, concurrent.futures as cf, datetime, glob, json, os, re, subprocess, threading
 
+import yamlio
+
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 BLOCK = re.compile(r"just a moment|attention required|cf-chl|captcha|are you a human|access denied|enable javascript and cookies|ddos|incapsula|akamai|perimeterx|px-captcha|security check|verify you are human", re.I)
 SOFT404 = re.compile(r"<title>[^<]*(404|not found|page unavailable|no longer available|doesn.t exist|does not exist|page cannot be found)[^<]*</title>", re.I)
@@ -27,24 +29,13 @@ def gate(host):
         return HOST_GATES[host]
 
 
-def field(text, name):
-    m = re.search(rf'^{name}: "([^"]*)"', text, re.M)
-    return m.group(1) if m else None
-
-
 def parse(path):
-    t = open(path).read()
-    e = {"id": field(t, "id"), "domain": field(t, "domain"), "name": field(t, "name"), "url": field(t, "opt_out_url"), "email": field(t, "contact_email"),
-         "closed": bool(re.search(r"^closed:", t, re.M)), "excluded": bool(re.search(r"^excluded:", t, re.M))}
-    m = re.search(r'^opt_out_form: \{"page": "([^"]+)"', t, re.M)
-    e["form_page"] = m.group(1) if m else None
-    lf = re.search(r"^live_form:\n((?:[ \t]+.*\n?)*)", t, re.M)
-    e["live_page"] = None
-    if lf:
-        block = lf.group(1)
-        if re.search(r"found: true", block):
-            p = re.search(r'page: "([^"]+)"', block)
-            e["live_page"] = p.group(1) if p else None
+    t = yamlio.load(path)
+    e = {"id": t.get("id"), "domain": t.get("domain"), "name": t.get("name"), "url": t.get("opt_out_url"), "email": t.get("contact_email"),
+         "closed": "closed" in t, "excluded": "excluded" in t}
+    e["form_page"] = (t.get("opt_out_form") or {}).get("page")
+    live = t.get("live_form") or {}
+    e["live_page"] = live.get("page") if live.get("found") is True else None
     return e
 
 

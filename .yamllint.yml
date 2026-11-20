@@ -1,6 +1,6 @@
-# yamllint for every hand-written YAML file (workflows, brokers/, jurisdictions/, platforms/, project.yml, the lint configs): the rules of
+# yamllint for every YAML file in the repository, hand-written or written by the tools (tools/yamlio.py writes this style): the rules of
 # https://github.com/abcxyz/actions/blob/main/.yamllint.yml (Apache License 2.0, copyright 2023 The Authors), unchanged but for the ignored paths below.
-# The YAML the tools write follows .yamllint-generated.yml. docs/TESTING.md, "Lint".
+# docs/TESTING.md, "Lint".
 
 rules:
   anchors:
@@ -91,9 +91,6 @@ ignore:
   - 'third_party/'
   - 'vendor/'
   - '.abc/'
-  # Written by the tools: checked with .yamllint-generated.yml instead.
-  - 'directory/'
-  - 'terms/library.yml'
   - 'node_modules/'
   - '.build/'
   - 'DerivedData/'

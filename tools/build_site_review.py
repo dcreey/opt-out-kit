@@ -4,7 +4,9 @@ Tags are kept by the page itself (its shared database, or the browser when there
 
   python3 tools/build_site_review.py [--out .guess/site-review.html]
 """
-import argparse, glob, json, os, re
+import argparse, json, os
+
+import yamlio
 
 SIG = {"captcha_recaptcha": "reCAPTCHA", "captcha_turnstile": "Cloudflare check", "captcha_hcaptcha": "hCaptcha", "captcha_datadome": "DataDome check",
        "email_contact": "email listed", "email_input": "has an email box", "email_only_wording": "wording says email", "phone_verify": "phone code", "phone_input": "phone box",
@@ -12,35 +14,30 @@ SIG = {"captcha_recaptcha": "reCAPTCHA", "captcha_turnstile": "Cloudflare check"
        "listing_url_input": "asks for your listing link", "search_first": "search first", "name_input": "name box", "script_rendered_page": "page built by script",
        "script_rendered_form": "form built by script", "portal_osano": "Osano portal", "portal_trustarc": "TrustArc portal", "bot_check_on_home": "blocks scripts"}
 
-def field(s, key):
-    m = re.search(r'^%s: "([^"]*)"' % key, s, re.M)
-    return m.group(1) if m else ""
+def field(doc, key):
+    v = doc.get(key)
+    return str(v) if v is not None else ""
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=".guess/site-review.html"); ap.add_argument("--skip", default="", help="comma-separated domains already settled (tagged or corrected): left out"); ap.add_argument("--no-email-only", action="store_true", help="leave out sites that already have an email address as a way out"); ap.add_argument("--hide-later", action="store_true", help="leave out sites marked find_later"); a = ap.parse_args()
     skip = set(x.strip() for x in a.skip.split(",") if x.strip())
     sites = []
-    for f in sorted(glob.glob("directory/*.yml")):
-        s = open(f).read()
-        if re.search(r"^(excluded|closed):", s, re.M): continue
-        form = "\nopt_out_form:" in s
-        live = re.search(r"live_form:\n  checked: [^\n]*\n  found: (true|false)", s)
-        found = bool(live and live.group(1) == "true")
-        blockers = ""
-        m = re.search(r"live_form:\n(?:  .*\n)*", s)
-        if m:
-            b = re.search(r"blockers: \[([^\]]*)\]", m.group(0)); blockers = b.group(1) if b else ""
+    for _, s in yamlio.entries("directory"):
+        if "excluded" in s or "closed" in s: continue
+        form = "opt_out_form" in s
+        live = s.get("live_form") or {}
+        found = live.get("found") is True
+        blockers = " ".join(str(b) for b in (live.get("blockers") or []))
         business = found and "business" in blockers
         if (form or found) and not business: continue
         if field(s, "domain") in skip: continue
         url, mail = field(s, "opt_out_url"), field(s, "contact_email")
         if a.no_email_only and mail: continue
-        if a.hide_later and re.search(r"^find_later: true", s, re.M): continue
-        sig = re.search(r"^signals: \[([^\]]*)\]", s, re.M); sig = [x.strip() for x in sig.group(1).split(",")] if sig else []
+        if a.hide_later and s.get("find_later") is True: continue
+        sig = [str(x) for x in (s.get("signals") or [])]
         why = ("A form on its page asks for business details, so the app only walks you to it" if business else
                "Its page has no form the app can read" if url else "No opt-out page on file" + (" (the site blocked our scan)" if "wall" in blockers else ""))
-        pr = re.search(r"^priority: (\d+)", s, re.M)
-        sites.append({"d": field(s, "domain"), "n": field(s, "name"), "u": url, "e": mail, "w": why, "s": [SIG[x] for x in sig if x in SIG][:8], "p": int(pr.group(1)) if pr else 0})
+        sites.append({"d": field(s, "domain"), "n": field(s, "name"), "u": url, "e": mail, "w": why, "s": [SIG[x] for x in sig if x in SIG][:8], "p": int(s.get("priority") or 0)})
     sites.sort(key=lambda x: -x["p"])
     tpl = open("tools/site_review_template.html").read()
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
