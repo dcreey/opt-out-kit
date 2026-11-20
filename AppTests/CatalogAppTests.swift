@@ -30,4 +30,15 @@ final class CatalogAppTests: XCTestCase {
         XCTAssertEqual(model.registrySummary, source.registrySummary)
         XCTAssertEqual(model.termsLibrary, source.termsLibrary)
     }
+
+    /// The Sites search uses the bundled catalog's full-text index (SQLite's FTS5, part of iOS): by the start of a name, and by what a company holds.
+    func testTheSitesSearchFindsSitesInTheBundledCatalog() throws {
+        let model = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                             defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        XCTAssertEqual(model.siteSearch("spok").first, "spokeo_com")
+        let phone = model.siteSearch("phone numbers")
+        XCTAssertGreaterThan(phone.count, 100)
+        XCTAssertTrue(phone.allSatisfy { model.sites[id: $0] != nil }, "every hit is a site the app shows")
+        XCTAssertEqual(model.siteSearch("phone numbers"), phone, "asked again (every redraw), the same answer")
+    }
 }

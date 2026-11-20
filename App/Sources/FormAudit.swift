@@ -42,7 +42,7 @@ enum FormAudit {
     /// The first `n` sites of each kind, in the order the daily batch would take them (best first).
     static func firstPerKind(_ n: Int, model: AppModel) -> [String] {
         let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)
-        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        let byDomain = model.sites.byDomain
         var out: [String] = []
         for kind in BrokerCategory.ranked {
             var picks = queue.filter { byDomain[$0]?.about?.category == kind.rawValue }.prefix(n).map { $0 }
@@ -74,7 +74,7 @@ enum FormAudit {
         guard let me = model.people.first(where: { $0.relationship == .me }) else { return }
         let person = model.formPerson(me)
         for d in domains where !done.contains(d) {
-            guard let entry = model.directory.first(where: { $0.domain == d }).map(model.resolved) else { continue }
+            guard let entry = model.sites[domain: d].map(model.resolved) else { continue }
             let page = entry.optOutForm?.page ?? entry.liveForm?.page.flatMap(URL.init(string:)) ?? entry.optOutURL
             guard let page else { continue }
             let report = await FormRun.runLive(url: page, html: nil, person: person, dryRun: false, maxWait: 25, capture: true)
@@ -102,7 +102,7 @@ enum FormAudit {
         guard let me = model.people.first(where: { $0.relationship == .me }) else { return }
         let person = model.formPerson(me)
         var rows: [[String: String]] = []
-        let todo = domains.compactMap { d in model.directory.first(where: { $0.domain == d }).map(model.resolved) }
+        let todo = domains.compactMap { d in model.sites[domain: d].map(model.resolved) }
         var next = 0
         // Four sites at a time. Each writes <domain>.html (the page after every click the run made), <domain>.picked.json and a screenshot.
         await withTaskGroup(of: [String: String]?.self) { group in
@@ -132,7 +132,7 @@ enum FormAudit {
     /// Sites `from` to `to` (counting from 1) of each kind in the daily order, semi-automated queue only.
     static func range(from: Int, to: Int, model: AppModel) -> [String] {
         let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)
-        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        let byDomain = model.sites.byDomain
         var out: [String] = []
         for kind in BrokerCategory.ranked {
             let ofKind = queue.filter { byDomain[$0]?.about?.category == kind.rawValue }
@@ -152,7 +152,7 @@ enum FormAudit {
         // Resume: sites already audited are kept and skipped, so a long run can be stopped and started again.
         var results: [AuditSite] = (try? Data(contentsOf: file)).flatMap { try? JSONDecoder().decode([AuditSite].self, from: $0) } ?? []
         let done = Set(results.map(\.domain))
-        let todo: [DirectoryEntry] = domains.filter { !done.contains($0) }.compactMap { d in model.directory.first(where: { $0.domain == d }).map(model.resolved) }
+        let todo: [DirectoryEntry] = domains.filter { !done.contains($0) }.compactMap { d in model.sites[domain: d].map(model.resolved) }
         let width = 4
         var next = 0
         await withTaskGroup(of: AuditSite?.self) { group in

@@ -43,7 +43,21 @@ enum Features { static let otherProfiles = false }
 final class AppModel: ObservableObject {
     @Published private(set) var brokers: [Broker] = [] { didSet { planCache = nil } }
     /// Every profiled site, including those with no hand-written flow yet.
-    @Published private(set) var directory: [DirectoryEntry] = [] { didSet { planCache = nil } }
+    @Published private(set) var directory: [DirectoryEntry] = [] { didSet { planCache = nil; sites = SiteIndex(directory) } }
+    /// The sites by id, domain and family, rebuilt when the list changes: how one site is found (`SiteIndex`), never by scanning the list.
+    private(set) var sites = SiteIndex([])
+    /// The compiled catalog in the bundle; searched directly by `siteSearch` (its full-text index).
+    private let catalogURL: URL?
+    private var lastSearch: (text: String, ids: [String])?
+
+    /// The sites the catalog's full-text search finds for what the person typed, best first (`Catalog.search`): by name, web address, what the company
+    /// is, holds and sells (in any of the app's languages) and its description. The last answer is kept, since the screen asks again on every redraw.
+    func siteSearch(_ text: String) -> [String] {
+        if let last = lastSearch, last.text == text { return last.ids }
+        let ids = catalogURL.flatMap { try? Catalog.search(text, in: $0) } ?? []
+        lastSearch = (text, ids)
+        return ids
+    }
     /// Government and industry services that send one request to many brokers at once (California DROP). See docs/PLATFORMS.md.
     @Published private(set) var platforms: [Platform] = [] { didSet { planCache = nil } }
     /// What each state requires of data brokers and gives its residents, and the counts from the registries we pull.
@@ -162,6 +176,7 @@ final class AppModel: ObservableObject {
          defaults: UserDefaults = .standard,
          catalog: [Announcement] = AnnouncementCatalog.all) {
         self.store = store
+        self.catalogURL = catalogURL
         self.evidence = EvidenceStore(directory: store.url.deletingPathExtension().appendingPathExtension("evidence"), keys: store.keyProvider)
         self.defaults = defaults
         self.catalog = catalog
@@ -400,7 +415,7 @@ final class AppModel: ObservableObject {
     var lockedSites: [DirectoryEntry] { OptOutPlan.locked(plan, entries: directory) }
 
     /// Every directory entry by its domain, for looking a task's sites up.
-    var entryByDomain: [String: DirectoryEntry] { Dictionary(directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a }) }
+    var entryByDomain: [String: DirectoryEntry] { sites.byDomain }
 
     var closedSites: [DirectoryEntry] { directory.filter { $0.closed != nil }.sorted { $0.domain < $1.domain } }
 
@@ -526,18 +541,17 @@ final class AppModel: ObservableObject {
         switch task.kind {
         case .platform(let id): return progress.isDone(id)
         case .flow(let id): return brokers.first { $0.id == id }.map { household.summary(for: $0).isFinished } ?? false
-        case .site(let id): return directory.first(where: { $0.id == id })?.isCurrent(attempts: progress.optOutAttempts) ?? (progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false)
+        case .site(let id): return sites[id: id]?.isCurrent(attempts: progress.optOutAttempts) ?? (progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false)
         case .verify:
-            let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
+            let ids = Set(sites.entries(domains: task.domains).map(\.id))
             return !ids.isEmpty && ids.allSatisfy { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false }
         case .emails:
-            let ids = Set(directory.filter { task.domains.contains($0.domain) }.map(\.id))
+            let ids = Set(sites.entries(domains: task.domains).map(\.id))
             return !ids.isEmpty && ids.allSatisfy { wasEmailed($0) }
         case .automatic:
             // Done once every site has gone through this period (the next period starts it afresh).
             if let tally = currentPeriodTally, tally.total > 0 { return tally.complete }
-            let byDomain = Dictionary(directory.map { ($0.domain, $0.id) }, uniquingKeysWith: { a, _ in a })
-            return !task.domains.isEmpty && task.domains.allSatisfy { d in byDomain[d].map { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false } ?? true }
+            return !task.domains.isEmpty && task.domains.allSatisfy { d in sites[domain: d].map(\.id).map { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false } ?? true }
         }
     }
 
@@ -1069,7 +1083,7 @@ final class AppModel: ObservableObject {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
             var retry: [DirectoryEntry] = []
             for (entry, _) in gone {
-                if let original = directory.first(where: { $0.id == entry.id }), await healLink(for: original, inspector: inspector) != nil { retry.append(resolved(original)) }
+                if let original = sites[id: entry.id], await healLink(for: original, inspector: inspector) != nil { retry.append(resolved(original)) }
             }
             if !retry.isEmpty {
                 let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false, period: runPeriod(now: now),
@@ -1176,7 +1190,7 @@ final class AppModel: ObservableObject {
 
     /// Sites that were sent but said an email would follow with more to do, oldest first.
     var pendingFollowUps: [(entry: DirectoryEntry, since: Date)] {
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let byID = sites.byID
         return FollowUps.pending(progress.optOutAttempts).compactMap { p in byID[p.id].map { ($0, p.since) } }
     }
 
@@ -1202,7 +1216,7 @@ final class AppModel: ObservableObject {
     /// not waiting on anything (the person sent it somewhere else, or it was never in the queue) is recorded as sent now, so it counts as done like any other.
     /// `moreEmail`: this step is finished but the site has another email step still to come (or the person cannot tell), so it stays on the waiting list.
     func completeFromLink(_ entryID: String, moreEmail: Bool = false) {
-        guard let entry = directory.first(where: { $0.id == entryID }), let me = selectedPerson else { markFollowUpDone(entryID); if moreEmail { addFollowUpStep(entryID) }; return }
+        guard let entry = sites[id: entryID], let me = selectedPerson else { markFollowUpDone(entryID); if moreEmail { addFollowUpStep(entryID) }; return }
         if pendingFollowUps.contains(where: { $0.entry.id == entryID }) { markFollowUpDone(entryID); if moreEmail { addFollowUpStep(entryID) } }
         else { recordAssisted(entry, .submitted(awaitingEmail: moreEmail), for: me) }
     }
@@ -1274,7 +1288,7 @@ final class AppModel: ObservableObject {
 
     /// Requests that have waited on the site's confirmation email longer than sites usually take (45 days), oldest first.
     var overdueFollowUps: [(entry: DirectoryEntry, since: Date)] {
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let byID = sites.byID
         return FollowUps.overdue(progress.optOutAttempts).compactMap { p in byID[p.id].map { ($0, p.since) } }
     }
     var overdueFollowUpCount: Int { FollowUps.overdue(progress.optOutAttempts).count }
@@ -1296,8 +1310,8 @@ final class AppModel: ObservableObject {
 
     /// Sites still waiting for the semi-automated step, and so how many days at one batch a day.
     var verifyRemaining: Int {
-        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites(); let ids = Set(directory.filter { queued.contains($0.domain) && !parked.contains($0.id) }.map(\.id))
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a }); return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count
+        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites(); let ids = Set(sites.entries(domains: queued).filter { !parked.contains($0.id) }.map(\.id))
+        let byID = sites.byID; return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count
     }
 
     // MARK: Opt-out emails
@@ -1318,7 +1332,7 @@ final class AppModel: ObservableObject {
 
     /// What one company's email carries, or nil for a message to several companies.
     func emailDetails(for batch: EmailBatch) -> EmailDetails? {
-        guard batch.entryIDs.count == 1, let entry = directory.first(where: { $0.id == batch.entryIDs[0] }) else { return nil }
+        guard batch.entryIDs.count == 1, let entry = sites[id: batch.entryIDs[0]] else { return nil }
         return EmailDetails.needs(for: entry)
     }
 
@@ -1386,7 +1400,7 @@ final class AppModel: ObservableObject {
     func reviewItems(for person: Person) -> [ReviewItem] {
         guard let lastRun = household.autoSettings.lastOptOut else { return [] }
         let attempts = household.progress(for: person.id).optOutAttempts
-        let byID = Dictionary(directory.map { ($0.id, $0.domain) }, uniquingKeysWith: { a, _ in a })
+        let byID = sites.byID.mapValues(\.domain)
         let items: [ReviewItem] = attempts.compactMap { id, list in
             guard let last = list.last, abs(last.date.timeIntervalSince(lastRun)) < 3600, let domain = byID[id] else { return nil }
             return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date,
@@ -1398,7 +1412,7 @@ final class AppModel: ObservableObject {
     /// The latest attempt that reached a site, as a review item (for its status page), or nil when none was recorded.
     func reviewItem(entryID id: String, for person: Person) -> ReviewItem? {
         guard let last = household.progress(for: person.id).optOutAttempts[id]?.filter({ $0.outcome != "emailed" }).max(by: { $0.date < $1.date }),
-              let domain = directory.first(where: { $0.id == id })?.domain else { return nil }
+              let domain = sites[id: id]?.domain else { return nil }
         return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date, hasScreenshot: evidence.exists(person: person.id, site: id),
                           pageSaid: last.pageSaid)
     }
@@ -1589,7 +1603,7 @@ final class AppModel: ObservableObject {
 
     /// Sites set aside and not finished since, with when each returns (nil: for good, or already back).
     var skippedSites: [(entry: DirectoryEntry, skip: SiteSkip, returns: Date?, forever: Bool)] {
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let byID = sites.byID
         let p = progress
         return p.skippedSites().compactMap { id in
             guard let e = byID[id], let skip = p.lastSkip(id) else { return nil }

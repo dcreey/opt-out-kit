@@ -186,15 +186,26 @@ struct SiteSearchView: View {
 
     var body: some View {
         let shown = SiteStatus.allCases.filter { filter.status == nil || filter.status == $0 }
+        // What the catalog's search finds, best first; with text typed, sites whose name or address matches come first, then the others by that rank.
+        let ranked = filter.text.isEmpty ? [] : model.siteSearch(filter.text)
+        let rank = Dictionary(ranked.enumerated().map { ($1, $0) }, uniquingKeysWith: { a, _ in a })
+        let hits = Set(ranked)
         let results = Dictionary(uniqueKeysWithValues: shown.map { s in
-            (s, rows.rows(s).filter { filter.accepts(domain: $0.domain, entry: $0.entry, status: $0.status, inRegion: $0.inRegion, method: $0.task?.method, alsoNamed: $0.handlerName) })
+            let found = rows.rows(s).filter { filter.accepts(domain: $0.domain, entry: $0.entry, status: $0.status, inRegion: $0.inRegion, method: $0.task?.method, alsoNamed: $0.handlerName, searchHits: hits) }
+            guard !filter.text.isEmpty else { return (s, found) }
+            let ordered = found.enumerated().sorted { a, b in
+                let ka = (filter.namesMatch(domain: a.element.domain, entry: a.element.entry, alsoNamed: a.element.handlerName) ? 0 : 1, a.element.entry.flatMap { rank[$0.id] } ?? Int.max, a.offset)
+                let kb = (filter.namesMatch(domain: b.element.domain, entry: b.element.entry, alsoNamed: b.element.handlerName) ? 0 : 1, b.element.entry.flatMap { rank[$0.id] } ?? Int.max, b.offset)
+                return ka < kb
+            }.map(\.element)
+            return (s, ordered)
         })
         let total = results.values.reduce(0) { $0 + $1.count }
         List {
             Section {
                 HStack {
                     Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                    TextField("Search by name or web address", text: $state.filter.text)
+                    TextField("Search by name, web address or what they do", text: $state.filter.text)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
                         .focused($focused)
                         .accessibilityIdentifier("site-search-field")

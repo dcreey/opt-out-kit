@@ -229,7 +229,7 @@ struct AutoActivityView: View {
                 Section {
                     if isOpen(g) {
                         ForEach(items) { r in
-                            if let entry = model.directory.first(where: { $0.id == r.id }) {
+                            if let entry = model.sites[id: r.id] {
                                 NavigationLink { DirectoryInfoView(entry: entry) } label: { activityRow(r) }.accessibilityIdentifier("period-site-\(r.domain)")
                             } else { activityRow(r) }
                         }

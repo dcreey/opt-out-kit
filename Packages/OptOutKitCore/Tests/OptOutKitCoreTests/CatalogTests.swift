@@ -62,6 +62,25 @@ final class CatalogTests: XCTestCase {
         }
     }
 
+    /// The Sites search reads the catalog's full-text index: the start of a word finds a name ("spok"), every word must match in any order, what a
+    /// company holds is found in any of the app's languages, the best match comes first, and an excluded site is never found.
+    func testTheSearchFindsSitesByNameStartWhatTheyHoldInAnyLanguageBestFirst() throws {
+        let loaded = try Catalog.load(repository: Self.repository)
+        let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
+        try Catalog.write(loaded, to: file)
+        XCTAssertEqual(try Catalog.search("spok", in: file).first, "spokeo_com", "the start of a name")
+        XCTAssertEqual(try Catalog.search("Spokeo.com", in: file).first, "spokeo_com", "a web address as typed")
+        let phone = Set(try Catalog.search("phone numbers", in: file))
+        XCTAssertGreaterThan(phone.count, 100)
+        XCTAssertEqual(Set(try Catalog.search("numéros de téléphone", in: file)), phone, "the same sites, searched in French")
+        XCTAssertEqual(Set(try Catalog.search("telephone", in: file)), Set(try Catalog.search("téléphone", in: file)), "accents do not matter")
+        let both = Set(try Catalog.search("court records", in: file))
+        XCTAssertTrue(both.isSubset(of: Set(try Catalog.search("court", in: file))), "every word must match")
+        XCTAssertEqual(try Catalog.search("   ", in: file), [])
+        for gone in loaded.sites where gone.excluded != nil { XCTAssertFalse(try Catalog.search(gone.domain, in: file).contains(gone.id), gone.domain) }
+        XCTAssertEqual(Catalog.searchQuery("Spokeo's \"site\""), "\"spokeo\"* \"s\"* \"site\"*", "typed quotes and punctuation cannot break the query")
+    }
+
     /// Reading the whole catalog is quick: the app does it on the main thread at launch. (Parsing the same sites from YAML took 0.14 to 0.23 s in a
     /// release build on a Mac; this test builds in debug, so the bound is loose.)
     func testReadingTheWholeCatalogIsQuick() throws {

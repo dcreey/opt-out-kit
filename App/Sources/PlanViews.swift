@@ -104,7 +104,7 @@ struct PlanDestinations: ViewModifier {
                 case .verify:
                     VerifyQueueView(domains: task.domains)
                 case .site(let id):
-                    if let e = model.directory.first(where: { $0.id == id }) { DirectoryInfoView(entry: e, alsoHandles: task.domains.filter { $0 != e.domain }) }
+                    if let e = model.sites[id: id] { DirectoryInfoView(entry: e, alsoHandles: task.domains.filter { $0 != e.domain }) }
                 }
             }
             .navigationDestination(for: Int.self) { BandDetailView(rank: $0) }

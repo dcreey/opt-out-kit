@@ -8,7 +8,7 @@ import SQLite3
 /// tool) loads the YAML with the same loaders the tests use, so the catalog holds exactly what they return, and a bad file fails the build. docs/DIRECTORY.md.
 public enum Catalog {
     /// The layout of the file. Raised when the tables change; the app reads only a catalog of its own version (they ship together).
-    public static let schemaVersion: Int32 = 1
+    public static let schemaVersion: Int32 = 2          // 2: the site_search full-text index
     public static let fileName = "Catalog.sqlite"
 
     /// What the catalog holds, as the app uses it.
@@ -73,6 +73,7 @@ public enum Catalog {
             CREATE TABLE platforms (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, body BLOB NOT NULL);
             CREATE TABLE jurisdictions (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, code TEXT NOT NULL, body BLOB NOT NULL);
             CREATE TABLE documents (name TEXT PRIMARY KEY, body BLOB NOT NULL);
+            CREATE VIRTUAL TABLE site_search USING fts5 (id UNINDEXED, name, domain, kind, about, tokenize = 'unicode61 remove_diacritics 2', detail = column);
             """)
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
         try exec("BEGIN")
@@ -95,12 +96,40 @@ public enum Catalog {
         for (i, e) in c.sites.enumerated() {
             try insert("INSERT INTO sites VALUES (?, ?, ?, ?, ?, ?)", [i, e.id, e.domain, e.name, e.excluded == nil ? 0 : 1, try encoder.encode(e)])
         }
+        for e in c.sites where e.excluded == nil {
+            let words = searchWords(e)
+            try insert("INSERT INTO site_search VALUES (?, ?, ?, ?, ?)", [e.id, e.name, words.domain, words.kind, words.about])
+        }
         for (i, b) in c.brokers.enumerated() { try insert("INSERT INTO brokers VALUES (?, ?, ?)", [i, b.id, try encoder.encode(b)]) }
         for (i, p) in c.platforms.enumerated() { try insert("INSERT INTO platforms VALUES (?, ?, ?)", [i, p.id, try encoder.encode(p)]) }
         for (i, j) in c.jurisdictions.enumerated() { try insert("INSERT INTO jurisdictions VALUES (?, ?, ?, ?)", [i, j.id, j.code, try encoder.encode(j)]) }
         if let s = c.registrySummary { try insert("INSERT INTO documents VALUES (?, ?)", ["registry_summary", try encoder.encode(s)]) }
         if let t = c.termsLibrary { try insert("INSERT INTO documents VALUES (?, ?)", ["terms_library", try encoder.encode(t)]) }
         try exec("COMMIT")
+    }
+
+    /// What a site is found by in the search (`search`): its web address split into words (spokeo.com as "spokeo com spokeo.com"), what kind of company it
+    /// is and what it holds and sells (in every language the app speaks, so "téléphone" finds the same sites as "phone"), and its description.
+    static func searchWords(_ e: DirectoryEntry) -> (domain: String, kind: String, about: String) {
+        let domain = e.domain.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "-", with: " ") + " " + e.domain
+        var kinds: [String] = []
+        let was = L10n.language
+        defer { L10n.language = was }
+        for lang in ["en", "fr", "es", "de"] {
+            L10n.language = lang
+            if let c = e.about.flatMap({ BrokerCategory(rawValue: $0.category) }) { kinds.append(c.title) }
+            kinds += (e.about?.tracks ?? []).compactMap { DataKind(rawValue: $0)?.title }
+            kinds += (e.about?.sellsTo ?? []).compactMap { BuyerKind(rawValue: $0)?.title }
+        }
+        return (domain, Array(NSOrderedSet(array: kinds)).compactMap { $0 as? String }.joined(separator: " "), e.about?.summary ?? "")
+    }
+
+    /// The full-text query for what a person typed: every word must match, each as the start of a word ("spok" finds Spokeo), in any order.
+    /// Nil when nothing searchable was typed.
+    public static func searchQuery(_ text: String) -> String? {
+        let words = text.lowercased().components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
+        guard !words.isEmpty else { return nil }
+        return words.map { "\"\($0)\"*" }.joined(separator: " ")
     }
 
     // MARK: Reading (in the app)
@@ -152,6 +181,22 @@ public enum Catalog {
                      jurisdictions: try rows(db, "SELECT body FROM jurisdictions ORDER BY seq", Jurisdiction.self),
                      registrySummary: try rows(db, "SELECT body FROM documents WHERE name = 'registry_summary'", RegistrySummary.self).first,
                      termsLibrary: try rows(db, "SELECT body FROM documents WHERE name = 'terms_library'", TermsLibrary.self).first)
+        }
+    }
+
+    /// The sites a search finds, best first: their ids, ranked so a match in the name counts most, then the web address, then what the company is
+    /// and holds, then its description (BM25). Excluded sites are not in the index. Empty when nothing searchable was typed.
+    public static func search(_ text: String, in url: URL, limit: Int = 500) throws -> [String] {
+        guard let query = searchQuery(text) else { return [] }
+        return try withDatabase(url) { db in
+            var stmt: OpaquePointer?
+            let sql = "SELECT id FROM site_search WHERE site_search MATCH ? ORDER BY bm25(site_search, 0, 10, 8, 3, 1) LIMIT \(limit)"
+            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { throw CatalogError.sqlite(String(cString: sqlite3_errmsg(db))) }
+            defer { sqlite3_finalize(stmt) }
+            sqlite3_bind_text(stmt, 1, query, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            var ids: [String] = []
+            while sqlite3_step(stmt) == SQLITE_ROW { if let c = sqlite3_column_text(stmt, 0) { ids.append(String(cString: c)) } }
+            return ids
         }
     }
 

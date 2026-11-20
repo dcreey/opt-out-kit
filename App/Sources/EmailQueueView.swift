@@ -82,7 +82,7 @@ struct EmailQueueView: View {
         }
         .sheet(isPresented: Binding(get: { explainAdID != nil }, set: { if !$0 { explainAdID = nil } })) {
             if let a = explainAdID {
-                AdIDExplainer(siteName: model.directory.first { $0.id == a.batch.entryIDs.first }?.name ?? "This company",
+                AdIDExplainer(siteName: a.batch.entryIDs.first.flatMap { model.sites[id: $0] }?.name ?? "This company",
                               onContinue: { explainAdID = nil; Task { await model.loadAdID(for: a.batch); launch(a.batch, app: a.app) } },
                               onSkip: { explainAdID = nil; model.skipAdID(); launch(a.batch, app: a.app) })
             }
@@ -116,7 +116,7 @@ struct VerifyQueueView: View {
     /// The sites of this list: the ones still to do first, finished ones (with a check mark) after. Every site opens its page, which shows the
     /// screenshot of what happened for a finished one.
     @ViewBuilder private var siteRows: some View {
-        let byDomain = Dictionary(model.directory.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
+        let byDomain = model.sites.byDomain
         let attempts = model.progress.optOutAttempts
         let entries = domains.compactMap { byDomain[$0] }
         let finished = Set(entries.filter { $0.isCurrent(attempts: attempts) }.map(\.id))

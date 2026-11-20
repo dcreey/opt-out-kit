@@ -20264,25 +20264,25 @@
     }
    }
   },
-  "Search by name or web address": {
+  "Search by name, web address or what they do": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Rechercher par nom ou adresse web"
+      "value": "Rechercher par nom, adresse web ou activité"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Buscar por nombre o dirección web"
+      "value": "Buscar por nombre, dirección web o actividad"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nach Name oder Webadresse suchen"
+      "value": "Nach Name, Webadresse oder Tätigkeit suchen"
      }
     }
    }

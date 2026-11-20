@@ -144,7 +144,7 @@ struct SitesView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(e.domain).font(.headline)
                 Text(model.method(for: e).reason).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                let n = Directory.familySize(of: e, in: model.directory)
+                let n = model.sites.familySize(of: e)
                 if n > 1 { Text("Shares one opt-out with \(n - 1) other sites").font(.caption).foregroundStyle(.blue) }
                 if let note = platformNote(for: e) { Text(note).font(.caption).foregroundStyle(.teal) }
                 if model.activeIssue(for: e.id) != nil { Text("Marked as not working").font(.caption).foregroundStyle(.red) }
@@ -584,7 +584,7 @@ struct DirectoryInfoView: View {
         let others = (entry.languages?.list ?? []).filter { $0 != "en" }
         let places = (entry.regions?.list ?? ["US"]).filter { $0 != "US" && $0 != "GLOBAL" }
         let worldwide = entry.regions?.list.contains("GLOBAL") == true
-        let n = Directory.familySize(of: entry, in: model.directory)
+        let n = model.sites.familySize(of: entry)
         Section {
             DisclosureGroup("More details") {
                 VStack(alignment: .leading, spacing: 14) {

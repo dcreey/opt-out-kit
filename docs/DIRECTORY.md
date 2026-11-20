@@ -22,7 +22,14 @@ The app does not ship or parse any of this YAML. At build time the core package'
 - **Read-only.** It is written as one self-contained file (a rollback journal, not WAL) and opened `immutable`, so SQLite writes nothing beside it inside
   the app's signed bundle.
 - **Speed.** Reading the whole catalog takes about 0.02 s (release build, Mac); parsing the same sites from YAML took 0.14 to 0.23 s, on the main thread at
-  every launch. 855 sites, 5 flows, 1 platform and 107 places make a 2.2 MB file, built in about 0.4 s.
+  every launch. 855 sites, 5 flows, 1 platform and 107 places make a 3.8 MB file with the search index, built in about 0.4 s.
+- **Search.** `site_search` is a full-text index (SQLite's FTS5, part of iOS) over each shown site's name, its web address as words, what kind of company
+  it is and what it holds and sells (the app's own names for them, in all four languages) and its description; `Catalog.search` ranks a match in the
+  name highest, then the address, the kind, the description (BM25). It is what the Sites search screen uses beside its plain name match. It adds about
+  1.5 MB (3.8 MB in all).
+- **In memory too.** The app keeps every site in memory as well (the plan, the automatic run and the activity page work over all of them), found by
+  id, domain or family through `SiteIndex`, built once when the list changes (until 2026-11-20 lookups scanned the list, and the Sites rows took 0.1 s in a
+  debug build; 0.017 s with the index).
 - **By hand:** `swift run --package-path Packages/OptOutKitCore catalog-builder . /tmp/Catalog.sqlite` (any SQLite tool can open the result).
 - Xcode runs the step on every build (about half a second), not only when the data changed: the declared inputs do not stop it yet.
 

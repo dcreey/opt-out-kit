@@ -31,7 +31,7 @@ struct RunReviewView: View {
 
     private func row(_ item: AppModel.ReviewItem) -> some View {
         NavigationLink {
-            if let entry = model.directory.first(where: { $0.id == item.id }) { DirectoryInfoView(entry: entry) }
+            if let entry = model.sites[id: item.id] { DirectoryInfoView(entry: entry) }
         } label: {
             HStack(spacing: 12) {
                 Thumbnail(item: item, person: person).frame(width: 44, height: 78)

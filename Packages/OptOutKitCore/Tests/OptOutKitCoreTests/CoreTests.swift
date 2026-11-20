@@ -4207,6 +4207,14 @@ final class SiteFilterTests: XCTestCase {
                       "a flow's own name finds the sites it handles")
         f = SiteFilter(status: .done); f.text = "q"; f.inRegion = true; f.clear()
         XCTAssertFalse(f.narrowed); XCTAssertEqual(f.text, "q", "clearing filters keeps the search text")
+        // What the catalog's full-text search found (by what the company is and holds) counts too; a name match is listed first.
+        f = SiteFilter(); f.text = "tenant"
+        XCTAssertFalse(ok(f), "not in the name or address")
+        XCTAssertTrue(f.accepts(domain: "acme.com", entry: e, status: .todo, inRegion: true, method: nil, searchHits: [e.id]), "found by the search")
+        f.status = .done
+        XCTAssertFalse(f.accepts(domain: "acme.com", entry: e, status: .todo, inRegion: true, method: nil, searchHits: [e.id]), "the other filters still apply")
+        f = SiteFilter(); f.text = "acme"
+        XCTAssertTrue(f.namesMatch(domain: "acme.com", entry: e)); f.text = "tenant"; XCTAssertFalse(f.namesMatch(domain: "acme.com", entry: e))
     }
 
     func testAGuideWithNoKnownFormOpensThePageTheLiveCheckFoundTheFormOn() {

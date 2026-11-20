@@ -33,8 +33,10 @@ public struct SiteFilter: Equatable, Sendable {
     public mutating func clear() { let t = text; self = SiteFilter(); text = t }
 
     /// Whether a site fits. The text matches the web address, the company's name, or `alsoNamed` (the name of the hand-written flow or
-    /// official service that handles it, so "peopleconnect" finds TruthFinder), ignoring case and spaces around it.
-    public func accepts(domain: String, entry: DirectoryEntry?, status: SiteStatus, inRegion: Bool, method: OptOutMethod?, alsoNamed: String? = nil) -> Bool {
+    /// official service that handles it, so "peopleconnect" finds TruthFinder), ignoring case and spaces around it; or the site is among
+    /// `searchHits`, what the catalog's full-text search found (`Catalog.search`: what the company is, holds and sells, its description).
+    public func accepts(domain: String, entry: DirectoryEntry?, status: SiteStatus, inRegion: Bool, method: OptOutMethod?, alsoNamed: String? = nil,
+                        searchHits: Set<String>? = nil) -> Bool {
         if let s = self.status, s != status { return false }
         if let r = self.inRegion, r != inRegion { return false }
         if let m = self.method, m != method { return false }
@@ -43,6 +45,13 @@ public struct SiteFilter: Equatable, Sendable {
         }
         let q = text.trimmingCharacters(in: .whitespaces).lowercased()
         guard !q.isEmpty else { return true }
+        return namesMatch(domain: domain, entry: entry, alsoNamed: alsoNamed) || (entry.map { searchHits?.contains($0.id) ?? false } ?? false)
+    }
+
+    /// Whether the text appears in the web address, the company's name or `alsoNamed`: such a site is listed before the other search hits.
+    public func namesMatch(domain: String, entry: DirectoryEntry?, alsoNamed: String? = nil) -> Bool {
+        let q = text.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !q.isEmpty else { return false }
         return domain.lowercased().contains(q) || (entry?.name.lowercased().contains(q) ?? false) || (alsoNamed?.lowercased().contains(q) ?? false)
     }
 }
