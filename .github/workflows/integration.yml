@@ -43,7 +43,7 @@ jobs:
     steps:
       # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout (38 MB) took 104 to 119 s on the
       # shards that boot first. One commit, no history, for every job (file times come from contents: tools/ci_file_times.py). Shard 0 builds, so it
-      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings and the test sources it lists the
+      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings, the data folders the tests read, and the test sources it lists the
       # tests from), about 1 MB.
       - uses: 'actions/checkout@v4'
         if: 'matrix.index == 0'
@@ -55,6 +55,12 @@ jobs:
             tools
             AppTests
             AppUITests
+            directory
+            brokers
+            platforms
+            jurisdictions
+            terms
+            registries
           sparse-checkout-cone-mode: true
       - name: 'Start booting a simulator (the steps after it mostly wait on the network, so the boot gets the processor)'
         id: 'xcode'
