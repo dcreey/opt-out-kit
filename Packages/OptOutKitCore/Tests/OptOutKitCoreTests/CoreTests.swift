@@ -1143,6 +1143,23 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(ids(.repeatSent), ["sent"], "a repeat pass sends again only where the last send went through")
     }
 
+    /// A site the run gave up on before anything was sent (it went quiet or ran out of time) was never really tried: the repeat pass, and so Run now after a full
+    /// pass, takes it again. One stopped by a check, refused, or sent and not confirmed does not come back by itself. Build 48 left some 300 such sites for six months.
+    func testARepeatPassTakesBackTheSitesGivenUpBeforeAnythingWasSent() {
+        let ok = form([("text", "first", "First name"), ("email", "email", "Email")])
+        var progress = OptOutKitCore.Progress()
+        let cases: [(String, String, String?)] = [("slow", "failed", AutoOptOut.tooSlow), ("quiet", "failed", AutoOptOut.wentQuiet),
+                                                   ("unconfirmed", "failed", AutoOptOut.sentUnconfirmed), ("checked", "challenged", "a human check"),
+                                                   ("refused", "rejected", "email invalid"), ("noform", "failed", "no opt-out form was found on the page")]
+        for (id, outcome, detail) in cases { progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: outcome, detail: detail), site: id) }
+        let all = cases.map { entry($0.0, form: ok) }
+        let repeatIDs = AutoOptOut.backgroundSites(.repeatSent, entries: all, person: pat, progress: progress, now: t0 + day).map(\.id)
+        XCTAssertEqual(repeatIDs, ["slow", "quiet"])
+        // Once it goes through on that second chance, it is an ordinary sent site.
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "slow")
+        XCTAssertTrue(AutoOptOut.inRepeatPass(all[0], progress: progress))
+    }
+
     func testTheFirstRunAndThenEverySixMonthsAreFullPassesAndTheOnesBetweenAreRepeats() {
         var s = AutoSettings()
         XCTAssertEqual(s.nextRunKind(now: t0), .full, "the first run is the full pass")

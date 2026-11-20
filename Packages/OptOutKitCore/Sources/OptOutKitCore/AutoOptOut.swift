@@ -270,11 +270,24 @@ public struct AutoOptOut: Sendable {
         progress.optOutAttempts[entry.id]?.last?.wasSubmitted ?? false
     }
 
-    /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass only the ones whose latest attempt went through.
+    /// Whether the site's latest attempt was given up before anything was sent (the page went quiet or ran out of time): the site was never really tried, so it is
+    /// not left for the next full pass. Build 48 gave up on many sites that way (its waits used up the time), and they sat in the semi-automated queue for six months.
+    public static func lastAttemptGaveUpBeforeSending(_ entry: DirectoryEntry, progress: Progress) -> Bool {
+        guard let last = progress.optOutAttempts[entry.id]?.last, last.outcome == "failed" else { return false }
+        return last.detail == wentQuiet || last.detail == tooSlow
+    }
+
+    /// The sites a repeat pass (and "Run now" after a full pass) takes on: those whose latest attempt went through, and those whose latest attempt was given up
+    /// before anything was sent. Not one stopped by a check, refused, or sent and not confirmed: those wait for the person or the next full pass.
+    public static func inRepeatPass(_ entry: DirectoryEntry, progress: Progress) -> Bool {
+        lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress)
+    }
+
+    /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass the ones `inRepeatPass` takes.
     public static func backgroundSites(_ kind: RunKind, entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), plans: FillPlans? = nil) -> [DirectoryEntry] {
         entries.filter { e in
             guard backgroundAttemptable(e, person: person, progress: progress, now: now, plans: plans) else { return false }
-            return kind == .full || lastAttemptWentThrough(e, progress: progress)
+            return kind == .full || inRepeatPass(e, progress: progress)
         }
     }
 

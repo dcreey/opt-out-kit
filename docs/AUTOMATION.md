@@ -161,7 +161,7 @@ The run has two kinds, both sending the forms themselves, one site at a time (`A
 | Pass | When | Sites | What a site that does not go through does |
 |---|---|---|---|
 | **Full** | The first run, then every 6 months (`AutoSettings.fullEvery`, two periods; due 3 days early) | Every site that `AutoOptOut.backgroundAttemptable` accepts (about 490 of 829 today; `AppModel.fullPassSize` counts it for the explanation) | Recorded as `failed`, `rejected` or `challenged`; the site is semi-automated, with that as the reason |
-| **Repeat** | Every 3 months (`AutoSettings.optOutEvery` = 91 days) between full passes | Only the sites whose latest attempt went through (`AutoOptOut.lastAttemptWentThrough`) | The same: a repeat that does not go through moves the site to semi-automated |
+| **Repeat** | Every 3 months (`AutoSettings.optOutEvery` = 91 days) between full passes | The sites whose latest attempt went through, and the sites whose latest attempt was given up before anything was sent ("took too long", "stopped answering": never really tried, so not left for six months; build 48 left about 300 that way) (`AutoOptOut.inRepeatPass`). Run now after a full pass takes the same sites | The same: a repeat that does not go through moves the site to semi-automated |
 
 For a new person the first full pass comes before anything else: the Queue shows it as step 1 and holds back the semi-automated queue until it has finished (`AutoSettings.firstPassPending`), so the queue starts with exactly the sites that need a person. See [UX.md](UX.md).
 

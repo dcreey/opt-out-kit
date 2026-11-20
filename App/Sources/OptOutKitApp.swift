@@ -896,7 +896,7 @@ final class AppModel: ObservableObject {
         let pass = Set(fullSites.map(\.domain))
         let neverTried = Set(i.entries.filter { (progress.optOutAttempts[$0.id] ?? []).isEmpty }.map(\.domain))
         let nextPass = i.nextKind == .full ? pass
-            : Set(fullSites.filter { AutoOptOut.lastAttemptWentThrough($0, progress: progress) }.map(\.domain)).union(pass.intersection(neverTried))
+            : Set(fullSites.filter { AutoOptOut.inRepeatPass($0, progress: progress) }.map(\.domain)).union(pass.intersection(neverTried))
         var reasons: [String: String?] = [:]
         func reason(_ e: DirectoryEntry) -> String? {
             if let r = reasons[e.id] { return r }
