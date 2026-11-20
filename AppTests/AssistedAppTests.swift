@@ -129,10 +129,12 @@ final class WebAssistedDriverTests: XCTestCase {
         XCTAssertEqual(driver.discoveredEmail(for: form), "privacy@x.example", "the site's own privacy address, not info@ or another company's")
     }
 
+    /// The check stays on the page for 15 seconds (it was 6.5): on a slow CI machine preparing the page took longer than that, the check was gone before the
+    /// run looked, and the test failed although the run did the right thing.
     func testFillsTheFormWaitsForAPersonToClearTheCheckThenSendsAndReadsTheConfirmation() async {
         let challenge = "<iframe id=\"block\" src=\"https://www.google.com/recaptcha/api2/bframe\" style=\"width:300px;height:400px\"></iframe>"
         let sink = Sink()
-        let runner = AssistedRunner(items: [item()], driver: WebAssistedDriver(htmlOverride: page(removeAfterMs: 6500, blocker: challenge))) { e, r in sink.rows.append((e.domain, r)) }
+        let runner = AssistedRunner(items: [item()], driver: WebAssistedDriver(htmlOverride: page(removeAfterMs: 15000, blocker: challenge))) { e, r in sink.rows.append((e.domain, r)) }
         runner.pollInterval = 0.3; runner.pauseAfterSent = 0
         var sawCheck = false
         let watcher = Task { @MainActor in while !runner.finished { if runner.phase == .waitingForCheck { sawCheck = true }; try? await Task.sleep(nanoseconds: 50_000_000) } }
@@ -144,7 +146,7 @@ final class WebAssistedDriverTests: XCTestCase {
     func testATermsPromptIsWaitedForNotAccepted() async {
         let gate = "<div id=\"block\" role=\"dialog\">ACCEPTABLE USE POLICY AND TERMS. You must agree to continue. <button onclick=\"document.title='CLICKED'\">I Agree</button></div>"
         let sink = Sink()
-        let runner = AssistedRunner(items: [item()], driver: WebAssistedDriver(htmlOverride: page(removeAfterMs: 6500, blocker: gate))) { e, r in sink.rows.append((e.domain, r)) }
+        let runner = AssistedRunner(items: [item()], driver: WebAssistedDriver(htmlOverride: page(removeAfterMs: 15000, blocker: gate))) { e, r in sink.rows.append((e.domain, r)) }
         runner.pollInterval = 0.3; runner.pauseAfterSent = 0
         var sawTerms = false
         let watcher = Task { @MainActor in while !runner.finished { if runner.phase == .waitingForTerms { sawTerms = true }; try? await Task.sleep(nanoseconds: 50_000_000) } }
