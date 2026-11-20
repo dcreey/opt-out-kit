@@ -856,7 +856,7 @@ final class ScoringTests: XCTestCase {
     }
 
     func testOldSavedRecordsWithoutASourceStillDecode() throws {
-        let json = #"{"date": 0, "result": "removed"}"#.data(using: .utf8)!
+        let json = Data(#"{"date": 0, "result": "removed"}"#.utf8)
         let r = try JSONDecoder().decode(CheckRecord.self, from: json)
         XCTAssertEqual(r.source, .automatic)
     }
@@ -2200,7 +2200,7 @@ final class ListingFlowTests: XCTestCase {
     func testAFormThatNeedsYourListingIsLeftToYouUnlessYouPickedOne() {
         let form = entry().optOutForm!
         XCTAssertTrue(FormFiller.needsListing(form))
-        if case .needsYou = FormFiller.plan(for: form, signals: nil, person: pat).verdict {} else { XCTFail() }
+        if case .needsYou = FormFiller.plan(for: form, signals: nil, person: pat).verdict {} else { XCTFail("the person is needed") }
         let listing = URL(string: "https://www.spokeo.com/Pat-Example/Chicago-IL/p123")!
         let plan = FormFiller.plan(for: form, signals: nil, person: pat, listingURL: listing)
         XCTAssertEqual(plan.verdict, .ready)
@@ -2221,7 +2221,7 @@ final class ListingFlowTests: XCTestCase {
         let plan = GuidedPlanner.listingPlan(for: entry(), search: search)
         XCTAssertEqual(plan.steps.map(\.title), ["Open your own listing", "Open the opt-out page", "We fill in your details", "Clear the check", "We send it"])
         XCTAssertEqual(plan.listingFields, ["url"])
-        if case .pickListing = plan.steps[0].action {} else { XCTFail() }
+        if case .pickListing = plan.steps[0].action {} else { XCTFail("the first step picks the listing") }
         XCTAssertNil(plan.steps[0].rule, "never guessed: only the person's tap finishes it")
     }
 
@@ -3801,7 +3801,7 @@ final class SkippedSitesTests: XCTestCase {
 
     func testOlderSavedProgressWithoutSkipsStillLoads() throws {
         let data = try JSONEncoder().encode(Progress())
-        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         json["siteSkips"] = nil
         let back = try JSONDecoder().decode(Progress.self, from: JSONSerialization.data(withJSONObject: json))
         XCTAssertTrue(back.siteSkips.isEmpty)
@@ -4217,7 +4217,7 @@ final class SiteFilterTests: XCTestCase {
         guard case .openPage(let url)? = GuidedPlanner.plan(for: e).steps.first?.action else { return XCTFail("first step opens a page") }
         XCTAssertEqual(url.absoluteString, "https://d.example/privacy-request")
         e.liveForm = nil
-        guard case .openPage(let home)? = GuidedPlanner.plan(for: e).steps.first?.action else { return XCTFail() }
+        guard case .openPage(let home)? = GuidedPlanner.plan(for: e).steps.first?.action else { return XCTFail("the first step opens a page") }
         XCTAssertEqual(home.absoluteString, "https://d.example/", "no live form: the recorded page is used")
     }
 }

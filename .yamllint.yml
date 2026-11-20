@@ -1,21 +1,99 @@
-# yamllint (the "YAML" job in .github/workflows/ci.yml): what makes a YAML file wrong or easy to misread, not its style. The broker, directory and
-# registry files are written by tools in flow style ({ a: 1, b: 2 }) on long lines, so the style rules are off. docs/TESTING.md, "Lint".
-extends: default
-ignore: |
-  node_modules/
-  .build/
-  DerivedData/
+# yamllint for every hand-written YAML file (workflows, brokers/, jurisdictions/, platforms/, project.yml, the lint configs): the rules of
+# https://github.com/abcxyz/actions/blob/main/.yamllint.yml (Apache License 2.0, copyright 2023 The Authors), unchanged but for the ignored paths below.
+# The YAML the tools write follows .yamllint-generated.yml. docs/TESTING.md, "Lint".
+
 rules:
-  line-length: disable
-  braces: disable
-  brackets: disable
-  commas: disable
-  document-start: disable
-  comments: disable
-  comments-indentation: disable
-  truthy:
-    allowed-values: ["true", "false"]
-    check-keys: false          # GitHub Actions' `on:` key
+  anchors:
+    forbid-duplicated-anchors: true
+    forbid-undeclared-aliases: true
+    forbid-unused-anchors: true
+
+  braces:
+    forbid: 'non-empty'
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: 1
+
+  commas:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 1
+
+  comments-indentation: 'disable'
+
+  document-end:
+    present: false
+
+  document-start:
+    present: false
+
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: true
+
+  float-values:
+    forbid-inf: false
+    forbid-nan: false
+    forbid-scientific-notation: false
+    require-numeral-before-decimal: false
+
+  hyphens:
+    max-spaces-after: 1
+
   indentation:
-    spaces: consistent
-    indent-sequences: whatever
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  key-duplicates: {}
+
+  new-line-at-end-of-file: {}
+
+  new-lines:
+    type: 'unix'
+
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: false
+
+  quoted-strings:
+    quote-type: 'single'
+    required: true
+    allow-quoted-quotes: true
+
+  trailing-spaces: {}
+
+  truthy:
+    allowed-values: ['true', 'false', 'on'] # GitHub Actions uses "on"
+    check-keys: true
+
+ignore:
+  - 'thirdparty/'
+  - 'third_party/'
+  - 'vendor/'
+  - '.abc/'
+  # Written by the tools: checked with .yamllint-generated.yml instead.
+  - 'directory/'
+  - 'terms/library.yml'
+  - 'node_modules/'
+  - '.build/'
+  - 'DerivedData/'

@@ -27,13 +27,13 @@ final class EmailHandoff: ObservableObject {
     /// The batch comes from the composer itself: the sheet may already have cleared `composing` by the time it reports.
     func composeFinished(_ batch: EmailBatch, sent: Bool) {
         composing = nil
-        sent ? done(batch) : declined()
+        if sent { done(batch) } else { declined() }
     }
 
     func answer(sent: Bool) {
         guard let batch = confirming else { return }
         confirming = nil
-        sent ? done(batch) : declined()
+        if sent { done(batch) } else { declined() }
     }
 
     private func done(_ batch: EmailBatch) {

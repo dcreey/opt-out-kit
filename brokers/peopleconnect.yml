@@ -1,19 +1,19 @@
-id: peopleconnect
-name: PeopleConnect (TruthFinder, Instant Checkmate, Intelius, US Search)
-tier: C
-covers: [truthfinder.com, instantcheckmate.com, intelius.com, ussearch.com]
-signals: [app_only, email_link, time_limited_link, phone_verify, third_party_refused]
-fields: [email, full_name, birthdate, phone]
+id: 'peopleconnect'
+name: 'PeopleConnect (TruthFinder, Instant Checkmate, Intelius, US Search)'
+tier: 'C'
+covers: ['truthfinder.com', 'instantcheckmate.com', 'intelius.com', 'ussearch.com']
+signals: ['app_only', 'email_link', 'time_limited_link', 'phone_verify', 'third_party_refused']
+fields: ['email', 'full_name', 'birthdate', 'phone']
 steps:
-  - open: https://suppression.peopleconnect.us/login
-  - copy: email
-  - say: "Enter your email, accept the terms and tap Continue."
+  - open: 'https://suppression.peopleconnect.us/login'
+  - copy: 'email'
+  - say: 'Enter your email, accept the terms and tap Continue.'
   - wait_for_email:
-      subject: "Confirm your email address"
+      subject: 'Confirm your email address'
       within_minutes: 15
-  - say: "Check the birthdate. It can't be changed after you continue."
+  - say: 'Check the birthdate. It can''t be changed after you continue.'
     confirm: true
-  - say: "Select the records that are you, then choose the suppression setting."
+  - say: 'Select the records that are you, then choose the suppression setting.'
     confirm: true
 recheck_days: 30
 verified: null   # set after the first real run

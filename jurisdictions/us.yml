@@ -5,642 +5,642 @@
 # Secondary sources disagree on some dates; an entry says so where it matters. Check the agency page before treating a date as exact.
 # GPC/universal opt-out: 'required' is stated by statute or rule in the sources checked; 'reported' is listed by some sources only.
 reviewed: 2026-10-22
-kind: us_state
+kind: 'us_state'
 jurisdictions:
-  - id: us-al
-    code: AL
-    name: Alabama
+  - id: 'us-al'
+    code: 'AL'
+    name: 'Alabama'
     privacy_law:
-      name: "Alabama Data Privacy Act"
-      effective: "2027-05-01"
-      status: enacted
+      name: 'Alabama Data Privacy Act'
+      effective: '2027-05-01'
+      status: 'enacted'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/alabama-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ak
-    code: AK
-    name: Alaska
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/alabama-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ak'
+    code: 'AK'
+    name: 'Alaska'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/alaska-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-az
-    code: AZ
-    name: Arizona
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/alaska-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-az'
+    code: 'AZ'
+    name: 'Arizona'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/arizona-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ar
-    code: AR
-    name: Arkansas
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/arizona-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ar'
+    code: 'AR'
+    name: 'Arkansas'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/arkansas-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ca
-    code: CA
-    name: California
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/arkansas-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ca'
+    code: 'CA'
+    name: 'California'
     privacy_law:
-      name: "California Consumer Privacy Act (CCPA, amended by CPRA)"
-      effective: "2020-01-01"
-      status: in_effect
+      name: 'California Consumer Privacy Act (CCPA, amended by CPRA)'
+      effective: '2020-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry:
-      status: live
-      agency: "California Privacy Protection Agency (CalPrivacy)"
-      law: "Delete Act (SB 362) and Civil Code 1798.99.80"
-      url: "https://cppa.ca.gov/data_broker_registry/"
-      fetcher: "ca"
-      note: "Annual registration by January 31."
-    deletion_platform: ca-drop
+      status: 'live'
+      agency: 'California Privacy Protection Agency (CalPrivacy)'
+      law: 'Delete Act (SB 362) and Civil Code 1798.99.80'
+      url: 'https://cppa.ca.gov/data_broker_registry/'
+      fetcher: 'ca'
+      note: 'Annual registration by January 31.'
+    deletion_platform: 'ca-drop'
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/california-data-privacy-laws/", "https://cppa.ca.gov/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-co
-    code: CO
-    name: Colorado
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/california-data-privacy-laws/', 'https://cppa.ca.gov/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-co'
+    code: 'CO'
+    name: 'Colorado'
     privacy_law:
-      name: "Colorado Privacy Act"
-      effective: "2023-07-01"
-      status: in_effect
+      name: 'Colorado Privacy Act'
+      effective: '2023-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/colorado-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ct
-    code: CT
-    name: Connecticut
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/colorado-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ct'
+    code: 'CT'
+    name: 'Connecticut'
     privacy_law:
-      name: "Connecticut Data Privacy Act"
-      effective: "2023-07-01"
-      status: in_effect
+      name: 'Connecticut Data Privacy Act'
+      effective: '2023-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry:
-      status: planned
-      agency: "Connecticut Department of Consumer Protection"
-      law: "Public Act 26-64"
-      note: "Registration required from 2027-01-01."
-    deletion_mechanism_note: "Brokers will have to honor a universal deletion mechanism once it is built."
+      status: 'planned'
+      agency: 'Connecticut Department of Consumer Protection'
+      law: 'Public Act 26-64'
+      note: 'Registration required from 2027-01-01.'
+    deletion_mechanism_note: 'Brokers will have to honor a universal deletion mechanism once it is built.'
     future_work:
-      - kind: broker_registry
-        name: "Connecticut data broker registration"
-        url: "https://www.pandectes.io/blog/data-broker-compliance-in-2026-a-guide-to-california-connecticut-new-jersey-and-beyond/"
-        note: "Registration provisions became active on 1 October 2026. Once the state publishes the list we can pull it."
+      - kind: 'broker_registry'
+        name: 'Connecticut data broker registration'
+        url: 'https://www.pandectes.io/blog/data-broker-compliance-in-2026-a-guide-to-california-connecticut-new-jersey-and-beyond/'
+        note: 'Registration provisions became active on 1 October 2026. Once the state publishes the list we can pull it.'
         sourced: true
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/connecticut-data-privacy-laws/", "https://www.cga.ct.gov/2026/act/Pa/pdf/2026PA-00064-R00SB-00004-PA.PDF", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/connecticut-data-privacy-laws/', 'https://www.cga.ct.gov/2026/act/Pa/pdf/2026PA-00064-R00SB-00004-PA.PDF', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Data broker registration (Public Act 26-64)"
-        stage: passed
-        kind: data_broker
-        effective: "2027-01-01"
+      - name: 'Data broker registration (Public Act 26-64)'
+        stage: 'passed'
+        kind: 'data_broker'
+        effective: '2027-01-01'
         as_of: 2026-10-22
-        url: "https://www.cga.ct.gov/2026/act/Pa/pdf/2026PA-00064-R00SB-00004-PA.PDF"
-        note: "Signed 2026-05-27. From 2027-01-01 data brokers must register with the Department of Consumer Protection each year, and Connecticut plans a universal deletion mechanism."
+        url: 'https://www.cga.ct.gov/2026/act/Pa/pdf/2026PA-00064-R00SB-00004-PA.PDF'
+        note: 'Signed 2026-05-27. From 2027-01-01 data brokers must register with the Department of Consumer Protection each year, and Connecticut plans a universal deletion mechanism.'
 
-  - id: us-de
-    code: DE
-    name: Delaware
+  - id: 'us-de'
+    code: 'DE'
+    name: 'Delaware'
     privacy_law:
-      name: "Delaware Personal Data Privacy Act"
-      effective: "2025-01-01"
-      status: in_effect
+      name: 'Delaware Personal Data Privacy Act'
+      effective: '2025-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/delaware-data-privacy-laws/", "https://legis.delaware.gov/BillDetail/143105", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/delaware-data-privacy-laws/', 'https://legis.delaware.gov/BillDetail/143105', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Amendments to the Personal Data Privacy Act (HB 380)"
-        stage: passed
-        kind: privacy
-        effective: "2027-01-01"
+      - name: 'Amendments to the Personal Data Privacy Act (HB 380)'
+        stage: 'passed'
+        kind: 'privacy'
+        effective: '2027-01-01'
         as_of: 2026-10-22
-        url: "https://legis.delaware.gov/BillDetail/143105"
-        note: "Signed 2026-09-02: fewer consumers needed for the law to apply (10,000), neural data counted as sensitive data, and contract and due-diligence duties when selling data."
+        url: 'https://legis.delaware.gov/BillDetail/143105'
+        note: 'Signed 2026-09-02: fewer consumers needed for the law to apply (10,000), neural data counted as sensitive data, and contract and due-diligence duties when selling data.'
 
-  - id: us-dc
-    code: DC
-    name: District of Columbia
+  - id: 'us-dc'
+    code: 'DC'
+    name: 'District of Columbia'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/district-of-columbia-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-fl
-    code: FL
-    name: Florida
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/district-of-columbia-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-fl'
+    code: 'FL'
+    name: 'Florida'
     privacy_law:
-      name: "Florida Digital Bill of Rights"
-      effective: "2024-07-01"
-      status: in_effect
+      name: 'Florida Digital Bill of Rights'
+      effective: '2024-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
       narrow: true
-      note: "Applies only to very large platforms, so it rarely reaches data brokers."
+      note: 'Applies only to very large platforms, so it rarely reaches data brokers.'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/florida-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ga
-    code: GA
-    name: Georgia
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/florida-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ga'
+    code: 'GA'
+    name: 'Georgia'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/georgia-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-hi
-    code: HI
-    name: Hawaii
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/georgia-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-hi'
+    code: 'HI'
+    name: 'Hawaii'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/hawaii-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-id
-    code: ID
-    name: Idaho
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/hawaii-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-id'
+    code: 'ID'
+    name: 'Idaho'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/idaho-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-il
-    code: IL
-    name: Illinois
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/idaho-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-il'
+    code: 'IL'
+    name: 'Illinois'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/illinois-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/illinois-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Illinois Consumer Data Privacy Act (SB 2875)"
-        stage: proposed
-        kind: privacy
+      - name: 'Illinois Consumer Data Privacy Act (SB 2875)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Introduced 2026-01-16 and still in a Senate committee."
-      - name: "Data broker registration and deletion mechanism (SB 3890)"
-        stage: proposed
-        kind: data_broker
+        note: 'Introduced 2026-01-16 and still in a Senate committee.'
+      - name: 'Data broker registration and deletion mechanism (SB 3890)'
+        stage: 'proposed'
+        kind: 'data_broker'
         as_of: 2026-10-22
-        note: "Introduced 2026-02-06: annual registration with the Attorney General and one central deletion request."
+        note: 'Introduced 2026-02-06: annual registration with the Attorney General and one central deletion request.'
 
-  - id: us-in
-    code: IN
-    name: Indiana
+  - id: 'us-in'
+    code: 'IN'
+    name: 'Indiana'
     privacy_law:
-      name: "Indiana Consumer Data Protection Act"
-      effective: "2026-01-01"
-      status: in_effect
+      name: 'Indiana Consumer Data Protection Act'
+      effective: '2026-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/indiana-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ia
-    code: IA
-    name: Iowa
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/indiana-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ia'
+    code: 'IA'
+    name: 'Iowa'
     privacy_law:
-      name: "Iowa Consumer Data Protection Act"
-      effective: "2025-01-01"
-      status: in_effect
+      name: 'Iowa Consumer Data Protection Act'
+      effective: '2025-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/iowa-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ks
-    code: KS
-    name: Kansas
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/iowa-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ks'
+    code: 'KS'
+    name: 'Kansas'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/kansas-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ky
-    code: KY
-    name: Kentucky
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/kansas-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ky'
+    code: 'KY'
+    name: 'Kentucky'
     privacy_law:
-      name: "Kentucky Consumer Data Protection Act"
-      effective: "2026-01-01"
-      status: in_effect
+      name: 'Kentucky Consumer Data Protection Act'
+      effective: '2026-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/kentucky-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-la
-    code: LA
-    name: Louisiana
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/kentucky-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-la'
+    code: 'LA'
+    name: 'Louisiana'
     privacy_law:
-      name: "Louisiana Act 502"
-      effective: "2027-01-01"
-      status: enacted
+      name: 'Louisiana Act 502'
+      effective: '2027-01-01'
+      status: 'enacted'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/louisiana-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-me
-    code: ME
-    name: Maine
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/louisiana-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-me'
+    code: 'ME'
+    name: 'Maine'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/maine-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-md
-    code: MD
-    name: Maryland
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/maine-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-md'
+    code: 'MD'
+    name: 'Maryland'
     privacy_law:
-      name: "Maryland Online Data Privacy Act"
-      effective: "2025-10-01"
-      status: in_effect
+      name: 'Maryland Online Data Privacy Act'
+      effective: '2025-10-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: reported
-      note: "Applies to processing from 2026-04-01."
+      universal_opt_out: 'reported'
+      note: 'Applies to processing from 2026-04-01.'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/maryland-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ma
-    code: MA
-    name: Massachusetts
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/maryland-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ma'
+    code: 'MA'
+    name: 'Massachusetts'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/massachusetts-data-privacy-laws/", "https://malegislature.gov/Bills/194/S2619", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/massachusetts-data-privacy-laws/', 'https://malegislature.gov/Bills/194/S2619', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Massachusetts Data Privacy Act"
-        stage: advancing
-        kind: privacy
+      - name: 'Massachusetts Data Privacy Act'
+        stage: 'advancing'
+        kind: 'privacy'
         as_of: 2026-10-22
-        url: "https://malegislature.gov/Bills/194/S2619"
-        note: "The Senate passed S.2619 on 2025-09-25 and the House passed its own version 146-0 on 2026-06-04. A conference committee is reconciling them; the session ends 2027-01-05."
+        url: 'https://malegislature.gov/Bills/194/S2619'
+        note: 'The Senate passed S.2619 on 2025-09-25 and the House passed its own version 146-0 on 2026-06-04. A conference committee is reconciling them; the session ends 2027-01-05.'
 
-  - id: us-mi
-    code: MI
-    name: Michigan
+  - id: 'us-mi'
+    code: 'MI'
+    name: 'Michigan'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/michigan-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/michigan-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Personal Data Privacy Act (SB 359)"
-        stage: proposed
-        kind: privacy
+      - name: 'Personal Data Privacy Act (SB 359)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Introduced 2025-06-05 and reported by a Senate committee; it includes annual data broker registration with the Attorney General. Neither chamber has passed it."
+        note: 'Introduced 2025-06-05 and reported by a Senate committee; it includes annual data broker registration with the Attorney General. Neither chamber has passed it.'
 
-  - id: us-mn
-    code: MN
-    name: Minnesota
+  - id: 'us-mn'
+    code: 'MN'
+    name: 'Minnesota'
     privacy_law:
-      name: "Minnesota Consumer Data Privacy Act"
-      effective: "2025-07-31"
-      status: in_effect
+      name: 'Minnesota Consumer Data Privacy Act'
+      effective: '2025-07-31'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/minnesota-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ms
-    code: MS
-    name: Mississippi
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/minnesota-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ms'
+    code: 'MS'
+    name: 'Mississippi'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/mississippi-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-mo
-    code: MO
-    name: Missouri
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/mississippi-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-mo'
+    code: 'MO'
+    name: 'Missouri'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/missouri-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-mt
-    code: MT
-    name: Montana
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/missouri-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-mt'
+    code: 'MT'
+    name: 'Montana'
     privacy_law:
-      name: "Montana Consumer Data Privacy Act"
-      effective: "2024-10-01"
-      status: in_effect
+      name: 'Montana Consumer Data Privacy Act'
+      effective: '2024-10-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/montana-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ne
-    code: NE
-    name: Nebraska
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/montana-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ne'
+    code: 'NE'
+    name: 'Nebraska'
     privacy_law:
-      name: "Nebraska Data Privacy Act"
-      effective: "2025-01-01"
-      status: in_effect
+      name: 'Nebraska Data Privacy Act'
+      effective: '2025-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: reported
+      universal_opt_out: 'reported'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/nebraska-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-nv
-    code: NV
-    name: Nevada
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/nebraska-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-nv'
+    code: 'NV'
+    name: 'Nevada'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/nevada-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-nh
-    code: NH
-    name: New Hampshire
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/nevada-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-nh'
+    code: 'NH'
+    name: 'New Hampshire'
     privacy_law:
-      name: "New Hampshire Privacy Act"
-      effective: "2025-01-01"
-      status: in_effect
+      name: 'New Hampshire Privacy Act'
+      effective: '2025-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry: null
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-hampshire-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-nj
-    code: NJ
-    name: New Jersey
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/new-hampshire-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-nj'
+    code: 'NJ'
+    name: 'New Jersey'
     privacy_law:
-      name: "New Jersey Data Privacy Act"
-      effective: "2025-01-15"
-      status: in_effect
+      name: 'New Jersey Data Privacy Act'
+      effective: '2025-01-15'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: reported
+      universal_opt_out: 'reported'
     broker_registry:
-      status: planned
-      agency: "New Jersey Division of Consumer Affairs"
-      law: "A5328 (enacted June 2026)"
-      note: "Registry expected to open in 2027."
+      status: 'planned'
+      agency: 'New Jersey Division of Consumer Affairs'
+      law: 'A5328 (enacted June 2026)'
+      note: 'Registry expected to open in 2027.'
     future_work:
-      - kind: broker_registry
-        name: "New Jersey data broker registry"
-        url: "https://www.faegredrinker.com/en/insights/publications/2026/7/new-jersey-enacts-sweeping-data-broker-and-data-collector-registration-law"
-        note: "Law enacted 30 June 2026. Registration starts 27 March 2027 and the state plans to launch the registry in spring 2027. When it is public we can pull its brokers like the other states."
+      - kind: 'broker_registry'
+        name: 'New Jersey data broker registry'
+        url: 'https://www.faegredrinker.com/en/insights/publications/2026/7/new-jersey-enacts-sweeping-data-broker-and-data-collector-registration-law'
+        note: 'Law enacted 30 June 2026. Registration starts 27 March 2027 and the state plans to launch the registry in spring 2027. When it is public we can pull its brokers like the other states.'
         sourced: true
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-jersey-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-nm
-    code: NM
-    name: New Mexico
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/new-jersey-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-nm'
+    code: 'NM'
+    name: 'New Mexico'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-mexico-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ny
-    code: NY
-    name: New York
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/new-mexico-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ny'
+    code: 'NY'
+    name: 'New York'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/new-york-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/new-york-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "New York Privacy Act (S3044)"
-        stage: proposed
-        kind: privacy
+      - name: 'New York Privacy Act (S3044)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Cleared a Senate committee in 2025 and was referred again; no floor vote."
-      - name: "Biometric Privacy Act (S1422A)"
-        stage: advancing
-        kind: privacy
+        note: 'Cleared a Senate committee in 2025 and was referred again; no floor vote.'
+      - name: 'Biometric Privacy Act (S1422A)'
+        stage: 'advancing'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Passed the Senate 41-20 on 2026-06-03 and awaits the Assembly."
+        note: 'Passed the Senate 41-20 on 2026-06-03 and awaits the Assembly.'
 
-  - id: us-nc
-    code: NC
-    name: North Carolina
+  - id: 'us-nc'
+    code: 'NC'
+    name: 'North Carolina'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/north-carolina-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/north-carolina-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Personal Data Privacy Act (HB 462) and Consumer Privacy Act (SB 757)"
-        stage: proposed
-        kind: privacy
+      - name: 'Personal Data Privacy Act (HB 462) and Consumer Privacy Act (SB 757)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Both sit in committee with no floor vote."
+        note: 'Both sit in committee with no floor vote.'
 
-  - id: us-nd
-    code: ND
-    name: North Dakota
+  - id: 'us-nd'
+    code: 'ND'
+    name: 'North Dakota'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/north-dakota-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-oh
-    code: OH
-    name: Ohio
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/north-dakota-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-oh'
+    code: 'OH'
+    name: 'Ohio'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/ohio-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ok
-    code: OK
-    name: Oklahoma
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/ohio-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ok'
+    code: 'OK'
+    name: 'Oklahoma'
     privacy_law:
-      name: "Oklahoma Consumer Data Privacy Act"
-      effective: "2027-01-01"
-      status: enacted
+      name: 'Oklahoma Consumer Data Privacy Act'
+      effective: '2027-01-01'
+      status: 'enacted'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/oklahoma-data-privacy-laws/", "https://www.oklegislature.gov/cf_pdf/2025-26%20ENR/SB/SB546%20ENR.PDF", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-or
-    code: OR
-    name: Oregon
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/oklahoma-data-privacy-laws/', 'https://www.oklegislature.gov/cf_pdf/2025-26%20ENR/SB/SB546%20ENR.PDF', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-or'
+    code: 'OR'
+    name: 'Oregon'
     privacy_law:
-      name: "Oregon Consumer Privacy Act"
-      effective: "2024-07-01"
-      status: in_effect
+      name: 'Oregon Consumer Privacy Act'
+      effective: '2024-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: required
+      universal_opt_out: 'required'
     broker_registry:
-      status: live
-      agency: "Department of Consumer and Business Services, Division of Financial Regulation"
-      law: "ORS 646A.593"
-      url: "https://dfr.oregon.gov/business/licensing/data-broker-registry/pages/index.aspx"
-      fetcher: "or"
-      note: "The public file has names and addresses but no websites."
+      status: 'live'
+      agency: 'Department of Consumer and Business Services, Division of Financial Regulation'
+      law: 'ORS 646A.593'
+      url: 'https://dfr.oregon.gov/business/licensing/data-broker-registry/pages/index.aspx'
+      fetcher: 'or'
+      note: 'The public file has names and addresses but no websites.'
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/oregon-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-pa
-    code: PA
-    name: Pennsylvania
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/oregon-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-pa'
+    code: 'PA'
+    name: 'Pennsylvania'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/pennsylvania-data-privacy-laws/", "https://www.palegis.us/legislation/bills/2025/hb78", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/pennsylvania-data-privacy-laws/', 'https://www.palegis.us/legislation/bills/2025/hb78', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Consumer Data Privacy Act (HB 78)"
-        stage: advancing
-        kind: privacy
+      - name: 'Consumer Data Privacy Act (HB 78)'
+        stage: 'advancing'
+        kind: 'privacy'
         as_of: 2026-10-22
-        url: "https://www.palegis.us/legislation/bills/2025/hb78"
-        note: "Passed the House 127-76 on 2025-10-01; a Senate committee amended and re-reported it on 2026-06-24. It has not had a full Senate vote."
+        url: 'https://www.palegis.us/legislation/bills/2025/hb78'
+        note: 'Passed the House 127-76 on 2025-10-01; a Senate committee amended and re-reported it on 2026-06-24. It has not had a full Senate vote.'
 
-  - id: us-ri
-    code: RI
-    name: Rhode Island
+  - id: 'us-ri'
+    code: 'RI'
+    name: 'Rhode Island'
     privacy_law:
-      name: "Rhode Island Data Transparency and Privacy Protection Act"
-      effective: "2026-01-01"
-      status: in_effect
+      name: 'Rhode Island Data Transparency and Privacy Protection Act'
+      effective: '2026-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/rhode-island-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-sc
-    code: SC
-    name: South Carolina
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/rhode-island-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-sc'
+    code: 'SC'
+    name: 'South Carolina'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/south-carolina-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-sd
-    code: SD
-    name: South Dakota
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/south-carolina-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-sd'
+    code: 'SD'
+    name: 'South Dakota'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/south-dakota-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-tn
-    code: TN
-    name: Tennessee
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/south-dakota-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-tn'
+    code: 'TN'
+    name: 'Tennessee'
     privacy_law:
-      name: "Tennessee Information Protection Act"
-      effective: "2025-07-01"
-      status: in_effect
+      name: 'Tennessee Information Protection Act'
+      effective: '2025-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/tennessee-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-tx
-    code: TX
-    name: Texas
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/tennessee-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-tx'
+    code: 'TX'
+    name: 'Texas'
     privacy_law:
-      name: "Texas Data Privacy and Security Act"
-      effective: "2024-07-01"
-      status: in_effect
+      name: 'Texas Data Privacy and Security Act'
+      effective: '2024-07-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
-      universal_opt_out: reported
+      universal_opt_out: 'reported'
     broker_registry:
-      status: live
-      agency: "Texas Secretary of State"
-      law: "Business and Commerce Code chapter 509 (recodified as chapter 510 by H.B. 1620, per one source)"
-      url: "https://texas-sos.appianportalsgov.com/data-broker-registry"
-      fetcher: "tx"
-      note: "Applies to businesses whose principal revenue is licensing third-party data."
+      status: 'live'
+      agency: 'Texas Secretary of State'
+      law: 'Business and Commerce Code chapter 509 (recodified as chapter 510 by H.B. 1620, per one source)'
+      url: 'https://texas-sos.appianportalsgov.com/data-broker-registry'
+      fetcher: 'tx'
+      note: 'Applies to businesses whose principal revenue is licensing third-party data.'
     gpc: true
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/texas-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-ut
-    code: UT
-    name: Utah
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/texas-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-ut'
+    code: 'UT'
+    name: 'Utah'
     privacy_law:
-      name: "Utah Consumer Privacy Act"
-      effective: "2023-12-31"
-      status: in_effect
+      name: 'Utah Consumer Privacy Act'
+      effective: '2023-12-31'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/utah-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-vt
-    code: VT
-    name: Vermont
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/utah-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-vt'
+    code: 'VT'
+    name: 'Vermont'
     privacy_law:
-      name: "Vermont Act 145 (comprehensive privacy law)"
-      effective: "2028-01-01"
-      status: enacted
+      name: 'Vermont Act 145 (comprehensive privacy law)'
+      effective: '2028-01-01'
+      status: 'enacted'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry:
-      status: live
-      agency: "Vermont Secretary of State"
-      law: "9 V.S.A. chapter 62, section 2446 (Act 171 of 2018); amended by H.211 from 2027-01-01"
-      url: "https://bizfilings.vermont.gov/online/DatabrokerInquire"
-      fetcher: "vt"
-      note: "The bulk download needs a free Secretary of State online-services account, so it is imported by hand."
+      status: 'live'
+      agency: 'Vermont Secretary of State'
+      law: '9 V.S.A. chapter 62, section 2446 (Act 171 of 2018); amended by H.211 from 2027-01-01'
+      url: 'https://bizfilings.vermont.gov/online/DatabrokerInquire'
+      fetcher: 'vt'
+      note: 'The bulk download needs a free Secretary of State online-services account, so it is imported by hand.'
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/vermont-data-privacy-laws/", "https://legislature.vermont.gov/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/vermont-data-privacy-laws/', 'https://legislature.vermont.gov/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "Data broker amendments (Act 138, H.211)"
-        stage: passed
-        kind: data_broker
-        effective: "2027-01-01"
+      - name: 'Data broker amendments (Act 138, H.211)'
+        stage: 'passed'
+        kind: 'data_broker'
+        effective: '2027-01-01'
         as_of: 2026-10-22
-        note: "Signed 2026-06-16: higher registration fee and bond, bigger penalties, and brokers that offer deletion must publish a request page. The Secretary of State studies one central deletion tool (report due 2028-12-01)."
+        note: 'Signed 2026-06-16: higher registration fee and bond, bigger penalties, and brokers that offer deletion must publish a request page. The Secretary of State studies one central deletion tool (report due 2028-12-01).'
 
-  - id: us-va
-    code: VA
-    name: Virginia
+  - id: 'us-va'
+    code: 'VA'
+    name: 'Virginia'
     privacy_law:
-      name: "Virginia Consumer Data Protection Act"
-      effective: "2023-01-01"
-      status: in_effect
+      name: 'Virginia Consumer Data Protection Act'
+      effective: '2023-01-01'
+      status: 'in_effect'
       deletion_right: true
       opt_out_of_sale: true
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/virginia-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-wa
-    code: WA
-    name: Washington
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/virginia-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-wa'
+    code: 'WA'
+    name: 'Washington'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/washington-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/washington-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
     pending:
-      - name: "People's Privacy Act (HB 1671)"
-        stage: proposed
-        kind: privacy
+      - name: 'People''s Privacy Act (HB 1671)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        note: "Reintroduced 2026-01-12 and held in the House Appropriations committee."
+        note: 'Reintroduced 2026-01-12 and held in the House Appropriations committee.'
 
-  - id: us-wv
-    code: WV
-    name: West Virginia
+  - id: 'us-wv'
+    code: 'WV'
+    name: 'West Virginia'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/west-virginia-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-wi
-    code: WI
-    name: Wisconsin
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/west-virginia-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-wi'
+    code: 'WI'
+    name: 'Wisconsin'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/wisconsin-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
-  - id: us-wy
-    code: WY
-    name: Wyoming
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/wisconsin-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']
+  - id: 'us-wy'
+    code: 'WY'
+    name: 'Wyoming'
     privacy_law: null
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.recordinglaw.com/us-laws/data-privacy-laws/wyoming-data-privacy-laws/", "https://iapp.org/resources/article/us-state-privacy-legislation-tracker/"]
+    sources: ['https://www.recordinglaw.com/us-laws/data-privacy-laws/wyoming-data-privacy-laws/', 'https://iapp.org/resources/article/us-state-privacy-legislation-tracker/']

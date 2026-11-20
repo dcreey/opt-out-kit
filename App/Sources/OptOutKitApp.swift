@@ -583,7 +583,6 @@ final class AppModel: ObservableObject {
     /// What "My data" in the page menu of every flow offers to copy.
     var pageDetails: [DetailGroup] { selectedPerson.map { DetailChoices.groups(for: $0, email: formEmail) } ?? [] }
 
-    /// The editor's single write: the profile and, when given, the household email, saved together once.
     // MARK: The profile being typed (kept for a crash) and the first-run setup
 
     private var draftStore: ProfileDraftStore { ProfileDraftStore(url: store.url.deletingLastPathComponent().appendingPathComponent("profile-draft.sealed"), keys: store.keyProvider) }
@@ -608,6 +607,7 @@ final class AppModel: ObservableObject {
         showProfileGate = true
     }
 
+    /// The editor's single write: the profile and, when given, the household email, saved together once.
     func saveProfile(_ person: Person, contactEmail: String?) {
         household.update(person)
         if let contactEmail { household.setContactEmail(contactEmail) }
@@ -1225,8 +1225,6 @@ final class AppModel: ObservableObject {
     var composesInApp: Bool { mailApp == .mail && MFMailComposeViewController.canSendMail() }
 
     private static let gpcKey = "gpc.setup.done"
-    /// Whether the person said they turned on the Global Privacy Control in the browser they use. It is a one-time setting task, not a site: it
-    /// is not in the plan, so it never counts toward the day's sites, requests sent or the streak.
     // MARK: Sending for the person
 
     private static let autoSubmitKey = "autosubmit.default"
@@ -1237,6 +1235,8 @@ final class AppModel: ObservableObject {
     @Published var autoSubmitSession: Bool?
     var autoSubmit: Bool { autoSubmitSession ?? autoSubmitDefault }
 
+    /// Whether the person said they turned on the Global Privacy Control in the browser they use. It is a one-time setting task, not a site: it
+    /// is not in the plan, so it never counts toward the day's sites, requests sent or the streak.
     var gpcSetupDone: Bool { _ = regionTick; return defaults.bool(forKey: Self.gpcKey) }
     func setGPCSetupDone(_ on: Bool) { defaults.set(on, forKey: Self.gpcKey); regionTick += 1 }
 

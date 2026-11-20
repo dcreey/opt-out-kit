@@ -1,4 +1,4 @@
-name: Broker pipeline
+name: 'Broker pipeline'
 
 # Read-only dry run of every broker definition against the live web, plus a reachability census.
 # Nothing is submitted and no personal data is used: calibration searches a made-up name and "John Smith".
@@ -17,23 +17,23 @@ on:
 
 jobs:
   pipeline:
-    runs-on: macos-latest
+    runs-on: 'macos-latest'
     steps:
-      - uses: actions/checkout@v4
-      - name: Run the pipeline
-        working-directory: Packages/OptOutKitCore
+      - uses: 'actions/checkout@v4'
+      - name: 'Run the pipeline'
+        working-directory: 'Packages/OptOutKitCore'
         run: |
           swift run -c release broker-pipeline \
             --brokers ../../brokers \
             --directory ../../directory \
             --census ../../pipeline/census-sites.txt \
             --report "$RUNNER_TEMP/pipeline-report.md"
-      - name: Publish the report
-        if: always()
+      - name: 'Publish the report'
+        if: 'always()'
         run: |
           cat "$RUNNER_TEMP/pipeline-report.md" >> "$GITHUB_STEP_SUMMARY" || true
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - uses: 'actions/upload-artifact@v4'
+        if: 'always()'
         with:
-          name: pipeline-report
-          path: ${{ runner.temp }}/pipeline-report.md
+          name: 'pipeline-report'
+          path: '${{ runner.temp }}/pipeline-report.md'

@@ -120,7 +120,8 @@ struct WebAssistedDriver: AssistedDriver {
 
 @MainActor
 final class WebAssistedPage: AssistedPage {
-    private let session: WebViewSession
+    /// The page's web view (the app's own tests clear a check on it the way a person would).
+    let session: WebViewSession
     private var plan: FillPlan
     private var liveForm: String?
     private var ownerMayConfirm = false

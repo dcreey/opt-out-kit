@@ -1,0 +1,47 @@
+# SwiftLint (the "Lint: Swift" job in .github/workflows/ci.yml): rules that catch mistakes, not style. The code's own layout (one-line statements, long
+# lines, short names) is deliberate, so only the rules listed here run. docs/TESTING.md, "Lint".
+included:
+  - 'App'
+  - 'Shared'
+  - 'ShareExtension'
+  - 'Packages/OptOutKitCore/Sources'
+  - 'Packages/AssistedRunLogic/Sources'
+  - 'AppTests'
+  - 'AppUITests'
+  - 'Packages/OptOutKitCore/Tests'
+  - 'Packages/AssistedRunLogic/Tests'
+excluded:
+  - '**/.build'
+  - 'DerivedData'
+# Left out on purpose: force_try (every `try!` builds a constant regular expression once; a bad pattern is a mistake the unit tests that use it catch),
+# optional_data_string_conversion (`String(decoding:as:)` keeps what can be read of a web page with a few bad bytes, which is what the app wants).
+only_rules:
+  - 'class_delegate_protocol'
+  - 'compiler_protocol_init'
+  - 'discarded_notification_center_observer'
+  - 'duplicate_conditions'
+  - 'duplicate_enum_cases'
+  - 'duplicate_imports'
+  - 'duplicated_key_in_dictionary_literal'
+  - 'dynamic_inline'
+  - 'empty_xctest_method'
+  - 'force_cast'
+  - 'identical_operands'
+  - 'invalid_swiftlint_command'
+  - 'non_optional_string_data_conversion'
+  - 'notification_center_detachment'
+  - 'orphaned_doc_comment'
+  - 'private_unit_test'
+  - 'self_in_property_initialization'
+  - 'trailing_newline'
+  - 'trailing_whitespace'
+  - 'unavailable_condition'
+  - 'unused_enumerated'
+  - 'unused_optional_binding'
+  - 'unused_setter_value'
+  - 'valid_ibinspectable'
+  - 'void_function_in_ternary'
+  - 'weak_delegate'
+  - 'xctfail_message'
+trailing_whitespace:
+  ignores_empty_lines: true

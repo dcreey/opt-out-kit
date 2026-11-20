@@ -1,19 +1,19 @@
-id: thisnation
-name: ThisNation (everyjoe.com)
-tier: B
-covers: [everyjoe.com]
-signals: [search_first, email_link]
-fields: [email, full_name]
+id: 'thisnation'
+name: 'ThisNation (everyjoe.com)'
+tier: 'B'
+covers: ['everyjoe.com']
+signals: ['search_first', 'email_link']
+fields: ['email', 'full_name']
 steps:
-  - open: https://www.thisnation.com/do-not-sell/
-  - say: "Search for yourself at the top of the page: your name, then your state and city. Open the record that is you and copy its address from the browser's address bar."
+  - open: 'https://www.thisnation.com/do-not-sell/'
+  - say: 'Search for yourself at the top of the page: your name, then your state and city. Open the record that is you and copy its address from the browser''s address bar.'
     confirm: true
-  - say: "Come back to the removal form (tap Remove My Info), paste the record's link into the box and tap Submit."
+  - say: 'Come back to the removal form (tap Remove My Info), paste the record''s link into the box and tap Submit.'
     confirm: true
-  - say: "On the next page enter your email address. They send one message to it."
+  - say: 'On the next page enter your email address. They send one message to it.'
   - wait_for_email:
       within_minutes: 60
-  - say: "Open the email and tap its link. The record is taken down as soon as it opens. If you have more than one record (a maiden name, an old address), repeat these steps for each."
+  - say: 'Open the email and tap its link. The record is taken down as soon as it opens. If you have more than one record (a maiden name, an old address), repeat these steps for each.'
     confirm: true
 recheck_days: 120
 verified: null   # steps read from the live pages on 2026-11-10 (/remove-my-info/ and /do-not-sell/); confirm on the first real run

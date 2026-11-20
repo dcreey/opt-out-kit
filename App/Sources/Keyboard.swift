@@ -11,16 +11,19 @@ enum Keyboard {
     /// for every kind of input, including the text fields of a site in the guide's browser. It is drawn on the app's window by UIKit
     /// instead of using SwiftUI's keyboard toolbar or an input accessory view: those depend on each field's configuration, and the
     /// toolbar made the keyboard flicker.
+    private static var observers: [NSObjectProtocol] = []
+
     static func install() {
         guard !installed else { return }
         installed = true
         let center = NotificationCenter.default
-        center.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: .main) { note in
+        // Kept for the app's whole life (the overlay is shared and never goes away), so they are never removed.
+        observers = [center.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: .main) { note in
             guard let end = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
             let screen = UIScreen.main.bounds
             if end.minY >= screen.height - 1 || end.height < 100 { DoneOverlay.shared.hide() } else { DoneOverlay.shared.show(above: end.minY) }
-        }
-        center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in DoneOverlay.shared.hide() }
+        },
+        center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in DoneOverlay.shared.hide() }]
     }
 }
 

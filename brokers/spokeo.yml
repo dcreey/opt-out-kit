@@ -1,24 +1,27 @@
-id: spokeo
-name: Spokeo
-tier: A
-covers: [freepeopledirectory.com]   # FreePeopleDirectory is sponsored by Spokeo: its "Do Not Sell My Info" link goes to spokeo.com/privacy/control, so one Spokeo request clears both
-signals: [search_first, email_link]
-fields: [email, full_name]
+id: 'spokeo'
+name: 'Spokeo'
+tier: 'A'
+covers: ['freepeopledirectory.com'] # FreePeopleDirectory is sponsored by Spokeo: its "Do Not Sell My Info" link goes to spokeo.com/privacy/control, so one Spokeo request clears both
+signals: ['search_first', 'email_link']
+fields: ['email', 'full_name']
 steps:
-  - open: https://www.spokeo.com/optout   # (FreePeopleDirectory's footer link lands in this same flow, verified 2026-10-21)  # dry run 2026-10-20: this is a privacy hub, not the form; the removal flow is probably under /privacy/control/ (unverified)
-  - search_match: "Search for yourself and confirm which listing is you. Nothing is sent before this."
-  - say: "Paste your listing's URL and enter your email."
+  - open: 'https://www.spokeo.com/optout' # (FreePeopleDirectory's footer link lands in this same flow, verified 2026-10-21)  # dry run 2026-10-20: this is a privacy hub, not the form; the removal flow is probably under /privacy/control/ (unverified)
+  - search_match: 'Search for yourself and confirm which listing is you. Nothing is sent before this.'
+  - say: 'Paste your listing''s URL and enter your email.'
   - wait_for_email:
       within_minutes: 60
-  - say: "Open the confirmation link from the email."
+  - say: 'Open the confirmation link from the email.'
     confirm: true
 recheck_days: 120
 processing_days: 3
 # Checked 2026-10-20 against live pages with a made-up name (no match) and "John Smith" (matches).
 # Limit: a common name also matches other people with that name in the same city, so it reads as still listed.
 recheck:
-  search_url: "https://www.spokeo.com/{first}-{last}/{state_slug}/{city_slug}"
-  valid_page: ["did not match any results", "Phone Number, Email, Address - Spokeo"]
-  no_results: ["did not match any results"]
-  calibration: { listed_name: "John Smith", city: "Springfield", state: "IL" }
+  search_url: 'https://www.spokeo.com/{first}-{last}/{state_slug}/{city_slug}'
+  valid_page: ['did not match any results', 'Phone Number, Email, Address - Spokeo']
+  no_results: ['did not match any results']
+  calibration:
+    listed_name: 'John Smith'
+    city: 'Springfield'
+    state: 'IL'
 verified: null   # PLACEHOLDER steps drafted from docs/DESIGN.md; confirm on first real run

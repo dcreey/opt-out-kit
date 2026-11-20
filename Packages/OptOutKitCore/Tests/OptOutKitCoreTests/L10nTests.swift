@@ -100,10 +100,10 @@ final class RemindersTests: XCTestCase {
     }
 
     /// Opted out at 21:00; the next morning's reminder is about eleven hours later, never skipped to a later day.
-    func testAnOptOutAtNineInTheEveningStillGetsTheNextMorningsReminder() {
+    func testAnOptOutAtNineInTheEveningStillGetsTheNextMorningsReminder() throws {
         let night = day(1, hour: 21)
         let plan = Reminders.plan(lastActive: night, streak: 1, target: nil, now: night, calendar: cal)
-        let first = try! XCTUnwrap(plan.first)
+        let first = try XCTUnwrap(plan.first)
         XCTAssertEqual(first.stage, .streak)
         let hours = first.fireDate.timeIntervalSince(night) / 3600
         XCTAssertTrue(hours > 10.9 && hours < 11.3, "\(hours) hours")

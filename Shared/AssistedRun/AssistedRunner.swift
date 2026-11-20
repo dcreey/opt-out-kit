@@ -605,4 +605,3 @@ final class AssistedRunner: ObservableObject {
         onResult(item.entry, result)
     }
 }
-

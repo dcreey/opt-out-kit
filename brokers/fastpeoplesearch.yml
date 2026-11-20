@@ -1,13 +1,13 @@
-id: fastpeoplesearch
-name: FastPeopleSearch
-tier: B
-signals: [captcha]
-fields: [full_name]
+id: 'fastpeoplesearch'
+name: 'FastPeopleSearch'
+tier: 'B'
+signals: ['captcha']
+fields: ['full_name']
 steps:
-  - open: https://www.fastpeoplesearch.com
-  - say: "Find your listing, then look for the site's opt-out or removal link."
-  - search_match: "Confirm which listing is you."
-  - say: "Solve the CAPTCHA yourself and submit the removal request."
+  - open: 'https://www.fastpeoplesearch.com'
+  - say: 'Find your listing, then look for the site''s opt-out or removal link.'
+  - search_match: 'Confirm which listing is you.'
+  - say: 'Solve the CAPTCHA yourself and submit the removal request.'
     confirm: true
 recheck_days: 120
 verified: null   # PLACEHOLDER: opt-out URL not yet researched; update on first real run

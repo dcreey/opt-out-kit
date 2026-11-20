@@ -6,1109 +6,1109 @@
 # `unclear` (the sources do not say) or `no`. Broker registries: only the US states publish ones we can pull; `databases` and `controllers`
 # registries list organizations, not data brokers, so we do not pull them. This is not legal advice.
 reviewed: 2026-10-22
-kind: country
+kind: 'country'
 jurisdictions:
-  - id: eu
-    code: EU
-    name: European Union
-    kind: bloc
+  - id: 'eu'
+    code: 'EU'
+    name: 'European Union'
+    kind: 'bloc'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
     regulator:
-      name: "National data protection authorities, coordinated by the European Data Protection Board"
-      url: "https://www.edpb.europa.eu"
+      name: 'National data protection authorities, coordinated by the European Data Protection Board'
+      url: 'https://www.edpb.europa.eu'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu"]
-  - id: country-ar
-    code: AR
-    name: "Argentina"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu']
+  - id: 'country-ar'
+    code: 'AR'
+    name: 'Argentina'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data Protection Law 25,326"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Personal Data Protection Law 25,326'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Agency for Access to Public Information (AAIP)"
-      url: "https://www.argentina.gob.ar/aaip"
+      name: 'Agency for Access to Public Information (AAIP)'
+      url: 'https://www.argentina.gob.ar/aaip'
     broker_registry:
-      status: live
-      kind: databases
-      agency: "Agency for Access to Public Information (AAIP)"
-      note: "Searchable by the controller's CUIT only; no bulk file was found, so it cannot be pulled (see docs/REGIONS.md)."
+      status: 'live'
+      kind: 'databases'
+      agency: 'Agency for Access to Public Information (AAIP)'
+      note: 'Searchable by the controller''s CUIT only; no bulk file was found, so it cannot be pulled (see docs/REGIONS.md).'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=AR"]
-  - id: country-au
-    code: AU
-    name: "Australia"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=AR']
+  - id: 'country-au'
+    code: 'AU'
+    name: 'Australia'
+    kind: 'country'
     privacy_law:
-      name: "Privacy Act 1988, amended by the Privacy and Other Legislation Amendment Act 2024"
-      status: in_effect
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Privacy Act 1988, amended by the Privacy and Other Legislation Amendment Act 2024'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Office of the Australian Information Commissioner (OAIC)"
-      url: "https://www.oaic.gov.au"
+      name: 'Office of the Australian Information Commissioner (OAIC)'
+      url: 'https://www.oaic.gov.au'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Do Not Call Register"
-        url: "https://www.donotcall.gov.au"
-        note: "Run by the ACMA under the Do Not Call Register Act 2006 for phone and fax marketing."
+      - kind: 'central_register'
+        name: 'Do Not Call Register'
+        url: 'https://www.donotcall.gov.au'
+        note: 'Run by the ACMA under the Do Not Call Register Act 2006 for phone and fax marketing.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=AU"]
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=AU']
     pending:
-      - name: "Privacy Amendment (Personal Data Protection) Bill 2026"
-        stage: proposed
-        kind: privacy
+      - name: 'Privacy Amendment (Personal Data Protection) Bill 2026'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        url: "https://www.twobirds.com/en/insights/2026/australia/tranche-2-privacy-reforms-are-here"
-        note: "An exposure draft was released 2026-08-31. It would add a right to erasure against large digital platforms. It is not yet a bill before Parliament."
+        url: 'https://www.twobirds.com/en/insights/2026/australia/tranche-2-privacy-reforms-are-here'
+        note: 'An exposure draft was released 2026-08-31. It would add a right to erasure against large digital platforms. It is not yet a bill before Parliament.'
 
-  - id: country-at
-    code: AT
-    name: "Austria"
-    kind: country
-    bloc: eu
+  - id: 'country-at'
+    code: 'AT'
+    name: 'Austria'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Datenschutzgesetz (DSG)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Datenschutzgesetz (DSG)'
     regulator:
-      name: "Austrian Data Protection Authority (Datenschutzbehörde)"
-      url: "https://www.dsb.gv.at"
+      name: 'Austrian Data Protection Authority (Datenschutzbehörde)'
+      url: 'https://www.dsb.gv.at'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-be
-    code: BE
-    name: "Belgium"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-be'
+    code: 'BE'
+    name: 'Belgium'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law of 30 July 2018 on the protection of natural persons with regard to the processing of personal data"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law of 30 July 2018 on the protection of natural persons with regard to the processing of personal data'
     regulator:
-      name: "Belgian Data Protection Authority"
-      url: "https://www.dataprotectionauthority.be"
+      name: 'Belgian Data Protection Authority'
+      url: 'https://www.dataprotectionauthority.be'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Robinson list"
-        note: "A national marketing opt-out list. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Robinson list'
+        note: 'A national marketing opt-out list. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-br
-    code: BR
-    name: "Brazil"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-br'
+    code: 'BR'
+    name: 'Brazil'
+    kind: 'country'
     privacy_law:
-      name: "General Data Protection Law (LGPD)"
-      effective: "2020-09-18"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
+      name: 'General Data Protection Law (LGPD)'
+      effective: '2020-09-18'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
     regulator:
-      name: "National Data Protection Authority (ANPD)"
-      url: "https://www.gov.br/anpd"
+      name: 'National Data Protection Authority (ANPD)'
+      url: 'https://www.gov.br/anpd'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=BR", "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"]
-  - id: country-bg
-    code: BG
-    name: "Bulgaria"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=BR', 'https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm']
+  - id: 'country-bg'
+    code: 'BG'
+    name: 'Bulgaria'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Protection Act"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Protection Act'
     regulator:
-      name: "Commission for Personal Data Protection"
-      url: "https://www.cpdp.bg"
+      name: 'Commission for Personal Data Protection'
+      url: 'https://www.cpdp.bg'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-ca
-    code: CA
-    name: "Canada"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-ca'
+    code: 'CA'
+    name: 'Canada'
+    kind: 'country'
     privacy_law:
-      name: "PIPEDA (federal), Quebec's private-sector privacy act (Law 25) and the Alberta and British Columbia PIPAs"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'PIPEDA (federal), Quebec''s private-sector privacy act (Law 25) and the Alberta and British Columbia PIPAs'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Office of the Privacy Commissioner of Canada"
-      url: "https://www.priv.gc.ca"
+      name: 'Office of the Privacy Commissioner of Canada'
+      url: 'https://www.priv.gc.ca'
     broker_registry:
-      status: live
-      kind: agents
-      agency: "Commission d'accès à l'information du Québec"
+      status: 'live'
+      kind: 'agents'
+      agency: 'Commission d''accès à l''information du Québec'
     future_work:
-      - kind: central_register
-        name: "National Do Not Call List"
-        url: "https://lnnte-dncl.gc.ca"
-        note: "Run by the CRTC for telemarketing calls. Charities, pollsters and some others are exempt."
+      - kind: 'central_register'
+        name: 'National Do Not Call List'
+        url: 'https://lnnte-dncl.gc.ca'
+        note: 'Run by the CRTC for telemarketing calls. Charities, pollsters and some others are exempt.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=CA", "https://www.priv.gc.ca"]
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=CA', 'https://www.priv.gc.ca']
     pending:
-      - name: "Protecting Privacy and Consumer Data Act (Bill C-36)"
-        stage: proposed
-        kind: privacy
+      - name: 'Protecting Privacy and Consumer Data Act (Bill C-36)'
+        stage: 'proposed'
+        kind: 'privacy'
         as_of: 2026-10-22
-        url: "https://www.dlapiper.com/en/insights/publications/2026/06/canada-tables-bill-c36-the-protecting-privacy-and-consumer-data-act"
-        note: "Introduced 2026-06-15 to replace the privacy part of PIPEDA; it is at first reading. PIPEDA still applies until it passes."
+        url: 'https://www.dlapiper.com/en/insights/publications/2026/06/canada-tables-bill-c36-the-protecting-privacy-and-consumer-data-act'
+        note: 'Introduced 2026-06-15 to replace the privacy part of PIPEDA; it is at first reading. PIPEDA still applies until it passes.'
 
-  - id: country-cl
-    code: CL
-    name: "Chile"
-    kind: country
+  - id: 'country-cl'
+    code: 'CL'
+    name: 'Chile'
+    kind: 'country'
     privacy_law:
-      name: "Law 19.628, as amended by Law 21.719"
-      effective: "2026-12-01"
-      status: enacted
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Law 19.628, as amended by Law 21.719'
+      effective: '2026-12-01'
+      status: 'enacted'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Agency for the Protection of Personal Data"
+      name: 'Agency for the Protection of Personal Data'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=CL"]
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=CL']
     pending:
-      - name: "Law 21.719 on personal data protection"
-        stage: passed
-        kind: privacy
-        effective: "2026-12-01"
+      - name: 'Law 21.719 on personal data protection'
+        stage: 'passed'
+        kind: 'privacy'
+        effective: '2026-12-01'
         as_of: 2026-10-22
-        note: "Passed and published 2024-12-13, with general application from 2026-12-01. One source says the government is weighing a delay; the date has not changed."
+        note: 'Passed and published 2024-12-13, with general application from 2026-12-01. One source says the government is weighing a delay; the date has not changed.'
 
-  - id: country-co
-    code: CO
-    name: "Colombia"
-    kind: country
+  - id: 'country-co'
+    code: 'CO'
+    name: 'Colombia'
+    kind: 'country'
     privacy_law:
-      name: "Statutory Law 1581 of 2012"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Statutory Law 1581 of 2012'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Superintendence of Industry and Commerce (SIC)"
-      url: "https://www.sic.gov.co"
+      name: 'Superintendence of Industry and Commerce (SIC)'
+      url: 'https://www.sic.gov.co'
     broker_registry:
-      status: live
-      kind: databases
-      agency: "Superintendence of Industry and Commerce (RNBD)"
+      status: 'live'
+      kind: 'databases'
+      agency: 'Superintendence of Industry and Commerce (RNBD)'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=CO"]
-  - id: country-hr
-    code: HR
-    name: "Croatia"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=CO']
+  - id: 'country-hr'
+    code: 'HR'
+    name: 'Croatia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Act on the Implementation of the General Data Protection Regulation"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Act on the Implementation of the General Data Protection Regulation'
     regulator:
-      name: "Croatian Personal Data Protection Agency (AZOP)"
-      url: "https://azop.hr"
+      name: 'Croatian Personal Data Protection Agency (AZOP)'
+      url: 'https://azop.hr'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-cy
-    code: CY
-    name: "Cyprus"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-cy'
+    code: 'CY'
+    name: 'Cyprus'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law 125(I)/2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law 125(I)/2018'
     regulator:
-      name: "Office of the Commissioner for Personal Data Protection"
-      url: "https://www.dataprotection.gov.cy"
+      name: 'Office of the Commissioner for Personal Data Protection'
+      url: 'https://www.dataprotection.gov.cy'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-cz
-    code: CZ
-    name: "Czechia"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-cz'
+    code: 'CZ'
+    name: 'Czechia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Act No. 110/2019 on personal data processing"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Act No. 110/2019 on personal data processing'
     regulator:
-      name: "Office for Personal Data Protection (ÚOOÚ)"
-      url: "https://www.uoou.cz"
+      name: 'Office for Personal Data Protection (ÚOOÚ)'
+      url: 'https://www.uoou.cz'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-dk
-    code: DK
-    name: "Denmark"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-dk'
+    code: 'DK'
+    name: 'Denmark'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Danish Data Protection Act (Databeskyttelsesloven)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Danish Data Protection Act (Databeskyttelsesloven)'
     regulator:
-      name: "Danish Data Protection Agency (Datatilsynet)"
-      url: "https://www.datatilsynet.dk"
+      name: 'Danish Data Protection Agency (Datatilsynet)'
+      url: 'https://www.datatilsynet.dk'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-ee
-    code: EE
-    name: "Estonia"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-ee'
+    code: 'EE'
+    name: 'Estonia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Protection Act"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Protection Act'
     regulator:
-      name: "Estonian Data Protection Inspectorate"
-      url: "https://www.aki.ee"
+      name: 'Estonian Data Protection Inspectorate'
+      url: 'https://www.aki.ee'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-fi
-    code: FI
-    name: "Finland"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-fi'
+    code: 'FI'
+    name: 'Finland'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Data Protection Act (1050/2018)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Data Protection Act (1050/2018)'
     regulator:
-      name: "Office of the Data Protection Ombudsman"
-      url: "https://tietosuoja.fi"
+      name: 'Office of the Data Protection Ombudsman'
+      url: 'https://tietosuoja.fi'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Finnish mail and phone marketing bans"
-        note: "Finland has combined mail and phone marketing opt-out services. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Finnish mail and phone marketing bans'
+        note: 'Finland has combined mail and phone marketing opt-out services. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-fr
-    code: FR
-    name: "France"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-fr'
+    code: 'FR'
+    name: 'France'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Loi Informatique et Libertés (Law No. 78-17)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Loi Informatique et Libertés (Law No. 78-17)'
     regulator:
-      name: "Commission nationale de l'informatique et des libertés (CNIL)"
-      url: "https://www.cnil.fr"
+      name: 'Commission nationale de l''informatique et des libertés (CNIL)'
+      url: 'https://www.cnil.fr'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Bloctel"
-        url: "https://www.bloctel.gouv.fr"
-        note: "The state telemarketing opt-out list. Companies must check it before calling."
+      - kind: 'central_register'
+        name: 'Bloctel'
+        url: 'https://www.bloctel.gouv.fr'
+        note: 'The state telemarketing opt-out list. Companies must check it before calling.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-de
-    code: DE
-    name: "Germany"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-de'
+    code: 'DE'
+    name: 'Germany'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Federal Data Protection Act (BDSG)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Federal Data Protection Act (BDSG)'
     regulator:
-      name: "Federal Commissioner for Data Protection and Freedom of Information (BfDI) and the state authorities"
-      url: "https://www.bfdi.bund.de"
+      name: 'Federal Commissioner for Data Protection and Freedom of Information (BfDI) and the state authorities'
+      url: 'https://www.bfdi.bund.de'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Robinsonliste"
-        note: "An industry-run list, not a statutory register. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Robinsonliste'
+        note: 'An industry-run list, not a statutory register. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-gr
-    code: GR
-    name: "Greece"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-gr'
+    code: 'GR'
+    name: 'Greece'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law 4624/2019"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law 4624/2019'
     regulator:
-      name: "Hellenic Data Protection Authority"
-      url: "https://www.dpa.gr"
+      name: 'Hellenic Data Protection Authority'
+      url: 'https://www.dpa.gr'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-hk
-    code: HK
-    name: "Hong Kong"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-hk'
+    code: 'HK'
+    name: 'Hong Kong'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data (Privacy) Ordinance (Cap. 486)"
-      effective: "1996-12-20"
-      status: in_effect
-      deletion_right: "unclear"
-      objection: marketing
+      name: 'Personal Data (Privacy) Ordinance (Cap. 486)'
+      effective: '1996-12-20'
+      status: 'in_effect'
+      deletion_right: 'unclear'
+      objection: 'marketing'
     regulator:
-      name: "Office of the Privacy Commissioner for Personal Data (PCPD)"
-      url: "https://www.pcpd.org.hk"
+      name: 'Office of the Privacy Commissioner for Personal Data (PCPD)'
+      url: 'https://www.pcpd.org.hk'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Do-Not-Call registers"
-        note: "Hong Kong’s registers under the Unsolicited Electronic Messages Ordinance. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Do-Not-Call registers'
+        note: 'Hong Kong’s registers under the Unsolicited Electronic Messages Ordinance. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=HK"]
-  - id: country-hu
-    code: HU
-    name: "Hungary"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=HK']
+  - id: 'country-hu'
+    code: 'HU'
+    name: 'Hungary'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Act CXII of 2011 on Informational Self-determination"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Act CXII of 2011 on Informational Self-determination'
     regulator:
-      name: "National Authority for Data Protection and Freedom of Information (NAIH)"
-      url: "https://naih.hu"
+      name: 'National Authority for Data Protection and Freedom of Information (NAIH)'
+      url: 'https://naih.hu'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-is
-    code: IS
-    name: "Iceland"
-    kind: country
-    bloc: eea
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-is'
+    code: 'IS'
+    name: 'Iceland'
+    kind: 'country'
+    bloc: 'eea'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Act 90/2018 on Data Protection"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Act 90/2018 on Data Protection'
     regulator:
-      name: "Icelandic Data Protection Authority (Persónuvernd)"
-      url: "https://www.personuvernd.is"
+      name: 'Icelandic Data Protection Authority (Persónuvernd)'
+      url: 'https://www.personuvernd.is'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-in
-    code: IN
-    name: "India"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-in'
+    code: 'IN'
+    name: 'India'
+    kind: 'country'
     privacy_law:
-      name: "Digital Personal Data Protection Act 2023 (Rules notified 2025-11-13)"
-      effective: "2027-05-13"
-      status: enacted
-      deletion_right: "limited"
-      objection: limited
+      name: 'Digital Personal Data Protection Act 2023 (Rules notified 2025-11-13)'
+      effective: '2027-05-13'
+      status: 'enacted'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Data Protection Board of India"
+      name: 'Data Protection Board of India'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "National Customer Preference Register (TRAI)"
-        note: "India’s do-not-disturb register for commercial calls and texts. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'National Customer Preference Register (TRAI)'
+        note: 'India’s do-not-disturb register for commercial calls and texts. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=IN"]
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=IN']
     pending:
-      - name: "Digital Personal Data Protection Rules, later phases"
-        stage: passed
-        kind: privacy
-        effective: "2027-05-13"
+      - name: 'Digital Personal Data Protection Rules, later phases'
+        stage: 'passed'
+        kind: 'privacy'
+        effective: '2027-05-13'
         as_of: 2026-10-22
-        url: "https://dpdpa.dcomply.in/rules/"
-        note: "The rules are phased: the Data Protection Board began 2025-11-13, consent managers register from about 2026-11-13, and most duties, including erasure requests, start 2027-05-13. Sources differ by a day on the dates."
+        url: 'https://dpdpa.dcomply.in/rules/'
+        note: 'The rules are phased: the Data Protection Board began 2025-11-13, consent managers register from about 2026-11-13, and most duties, including erasure requests, start 2027-05-13. Sources differ by a day on the dates.'
 
-  - id: country-id
-    code: ID
-    name: "Indonesia"
-    kind: country
+  - id: 'country-id'
+    code: 'ID'
+    name: 'Indonesia'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data Protection Law (Law 27 of 2022)"
-      effective: "2022-10-17"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Personal Data Protection Law (Law 27 of 2022)'
+      effective: '2022-10-17'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Ministry of Communications and Digital (KOMDIGI); a dedicated agency is planned"
-      url: "https://www.komdigi.go.id"
+      name: 'Ministry of Communications and Digital (KOMDIGI); a dedicated agency is planned'
+      url: 'https://www.komdigi.go.id'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=ID"]
-  - id: country-ie
-    code: IE
-    name: "Ireland"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=ID']
+  - id: 'country-ie'
+    code: 'IE'
+    name: 'Ireland'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Data Protection Act 2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Data Protection Act 2018'
     regulator:
-      name: "Data Protection Commission"
-      url: "https://www.dataprotection.ie"
+      name: 'Data Protection Commission'
+      url: 'https://www.dataprotection.ie'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-il
-    code: IL
-    name: "Israel"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-il'
+    code: 'IL'
+    name: 'Israel'
+    kind: 'country'
     privacy_law:
-      name: "Protection of Privacy Law 5741-1981, as amended by Amendment 13"
-      effective: "2025-08-14"
-      status: in_effect
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Protection of Privacy Law 5741-1981, as amended by Amendment 13'
+      effective: '2025-08-14'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Privacy Protection Authority"
-      url: "https://www.gov.il/en/departments/the_privacy_protection_authority"
+      name: 'Privacy Protection Authority'
+      url: 'https://www.gov.il/en/departments/the_privacy_protection_authority'
     broker_registry:
-      status: live
-      kind: brokers
-      agency: "Privacy Protection Authority (database registrar)"
+      status: 'live'
+      kind: 'brokers'
+      agency: 'Privacy Protection Authority (database registrar)'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=IL"]
-  - id: country-it
-    code: IT
-    name: "Italy"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=IL']
+  - id: 'country-it'
+    code: 'IT'
+    name: 'Italy'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Protection Code (Legislative Decree 196/2003)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Protection Code (Legislative Decree 196/2003)'
     regulator:
-      name: "Garante per la protezione dei dati personali"
-      url: "https://www.garanteprivacy.it"
+      name: 'Garante per la protezione dei dati personali'
+      url: 'https://www.garanteprivacy.it'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Registro Pubblico delle Opposizioni"
-        url: "https://www.registrodelleopposizioni.it"
-        note: "A public register to stop telemarketing and paper-mail marketing from the lists the law covers."
+      - kind: 'central_register'
+        name: 'Registro Pubblico delle Opposizioni'
+        url: 'https://www.registrodelleopposizioni.it'
+        note: 'A public register to stop telemarketing and paper-mail marketing from the lists the law covers.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-jp
-    code: JP
-    name: "Japan"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-jp'
+    code: 'JP'
+    name: 'Japan'
+    kind: 'country'
     privacy_law:
-      name: "Act on the Protection of Personal Information (APPI)"
-      effective: "2022-04-01"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Act on the Protection of Personal Information (APPI)'
+      effective: '2022-04-01'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Personal Information Protection Commission (PPC)"
-      url: "https://www.ppc.go.jp/en/"
+      name: 'Personal Information Protection Commission (PPC)'
+      url: 'https://www.ppc.go.jp/en/'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=JP"]
-  - id: country-ke
-    code: KE
-    name: "Kenya"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=JP']
+  - id: 'country-ke'
+    code: 'KE'
+    name: 'Kenya'
+    kind: 'country'
     privacy_law:
-      name: "Data Protection Act 2019"
-      effective: "2019-11-25"
-      status: in_effect
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Data Protection Act 2019'
+      effective: '2019-11-25'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Office of the Data Protection Commissioner (ODPC)"
-      url: "https://www.odpc.go.ke"
+      name: 'Office of the Data Protection Commissioner (ODPC)'
+      url: 'https://www.odpc.go.ke'
     broker_registry:
-      status: live
-      kind: controllers
-      agency: "Office of the Data Protection Commissioner"
+      status: 'live'
+      kind: 'controllers'
+      agency: 'Office of the Data Protection Commissioner'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=KE"]
-  - id: country-lv
-    code: LV
-    name: "Latvia"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=KE']
+  - id: 'country-lv'
+    code: 'LV'
+    name: 'Latvia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Processing Law"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Processing Law'
     regulator:
-      name: "Data State Inspectorate"
-      url: "https://www.dvi.gov.lv"
+      name: 'Data State Inspectorate'
+      url: 'https://www.dvi.gov.lv'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-li
-    code: LI
-    name: "Liechtenstein"
-    kind: country
-    bloc: eea
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-li'
+    code: 'LI'
+    name: 'Liechtenstein'
+    kind: 'country'
+    bloc: 'eea'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Data Protection Act (DSG)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Data Protection Act (DSG)'
     regulator:
-      name: "Data Protection Authority (Datenschutzstelle)"
-      url: "https://www.datenschutzstelle.li"
+      name: 'Data Protection Authority (Datenschutzstelle)'
+      url: 'https://www.datenschutzstelle.li'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-lt
-    code: LT
-    name: "Lithuania"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-lt'
+    code: 'LT'
+    name: 'Lithuania'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law on the Legal Protection of Personal Data"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law on the Legal Protection of Personal Data'
     regulator:
-      name: "State Data Protection Inspectorate"
-      url: "https://vdai.lrv.lt"
+      name: 'State Data Protection Inspectorate'
+      url: 'https://vdai.lrv.lt'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-lu
-    code: LU
-    name: "Luxembourg"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-lu'
+    code: 'LU'
+    name: 'Luxembourg'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law of 1 August 2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law of 1 August 2018'
     regulator:
-      name: "National Commission for Data Protection (CNPD)"
-      url: "https://cnpd.public.lu"
+      name: 'National Commission for Data Protection (CNPD)'
+      url: 'https://cnpd.public.lu'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-mt
-    code: MT
-    name: "Malta"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-mt'
+    code: 'MT'
+    name: 'Malta'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Data Protection Act (Cap. 586)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Data Protection Act (Cap. 586)'
     regulator:
-      name: "Information and Data Protection Commissioner"
-      url: "https://idpc.org.mt"
+      name: 'Information and Data Protection Commissioner'
+      url: 'https://idpc.org.mt'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-mx
-    code: MX
-    name: "Mexico"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-mx'
+    code: 'MX'
+    name: 'Mexico'
+    kind: 'country'
     privacy_law:
-      name: "Federal Law for the Protection of Personal Data in Possession of Private Parties (2025)"
-      status: in_effect
-      deletion_right: "limited"
-      objection: general
+      name: 'Federal Law for the Protection of Personal Data in Possession of Private Parties (2025)'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'general'
     regulator:
-      name: "Secretaría Anticorrupción y Buen Gobierno"
+      name: 'Secretaría Anticorrupción y Buen Gobierno'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "REPEP (Registro Público para Evitar Publicidad)"
-        url: "https://repep.profeco.gob.mx"
-        note: "Free Profeco register to stop marketing calls and texts. Businesses must stop within 30 days of registration."
+      - kind: 'central_register'
+        name: 'REPEP (Registro Público para Evitar Publicidad)'
+        url: 'https://repep.profeco.gob.mx'
+        note: 'Free Profeco register to stop marketing calls and texts. Businesses must stop within 30 days of registration.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=MX"]
-  - id: country-nl
-    code: NL
-    name: "Netherlands"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=MX']
+  - id: 'country-nl'
+    code: 'NL'
+    name: 'Netherlands'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Dutch GDPR Implementation Act (UAVG)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Dutch GDPR Implementation Act (UAVG)'
     regulator:
-      name: "Dutch Data Protection Authority (Autoriteit Persoonsgegevens)"
-      url: "https://www.autoriteitpersoonsgegevens.nl"
+      name: 'Dutch Data Protection Authority (Autoriteit Persoonsgegevens)'
+      url: 'https://www.autoriteitpersoonsgegevens.nl'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Bel-me-niet Register"
-        note: "The Dutch do-not-call register. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Bel-me-niet Register'
+        note: 'The Dutch do-not-call register. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-nz
-    code: NZ
-    name: "New Zealand"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-nz'
+    code: 'NZ'
+    name: 'New Zealand'
+    kind: 'country'
     privacy_law:
-      name: "Privacy Act 2020"
-      effective: "2020-12-01"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Privacy Act 2020'
+      effective: '2020-12-01'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Office of the Privacy Commissioner"
-      url: "https://www.privacy.org.nz"
+      name: 'Office of the Privacy Commissioner'
+      url: 'https://www.privacy.org.nz'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Name Removal Service (marketing lists)"
-        note: "A national service to be removed from addressed marketing lists. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Name Removal Service (marketing lists)'
+        note: 'A national service to be removed from addressed marketing lists. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=NZ"]
-  - id: country-ng
-    code: NG
-    name: "Nigeria"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=NZ']
+  - id: 'country-ng'
+    code: 'NG'
+    name: 'Nigeria'
+    kind: 'country'
     privacy_law:
-      name: "Nigeria Data Protection Act 2023"
-      effective: "2023-06-13"
-      status: in_effect
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Nigeria Data Protection Act 2023'
+      effective: '2023-06-13'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Nigeria Data Protection Commission (NDPC)"
-      url: "https://ndpc.gov.ng"
+      name: 'Nigeria Data Protection Commission (NDPC)'
+      url: 'https://ndpc.gov.ng'
     broker_registry:
-      status: live
-      kind: controllers
-      agency: "Nigeria Data Protection Commission"
+      status: 'live'
+      kind: 'controllers'
+      agency: 'Nigeria Data Protection Commission'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=NG"]
-  - id: country-no
-    code: "NO"
-    name: "Norway"
-    kind: country
-    bloc: eea
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=NG']
+  - id: 'country-no'
+    code: 'NO'
+    name: 'Norway'
+    kind: 'country'
+    bloc: 'eea'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Act"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Act'
     regulator:
-      name: "Norwegian Data Protection Authority (Datatilsynet)"
-      url: "https://www.datatilsynet.no"
+      name: 'Norwegian Data Protection Authority (Datatilsynet)'
+      url: 'https://www.datatilsynet.no'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-pe
-    code: PE
-    name: "Peru"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-pe'
+    code: 'PE'
+    name: 'Peru'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data Protection Law 29733 (new regulation in force since 2025-03-30)"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Personal Data Protection Law 29733 (new regulation in force since 2025-03-30)'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "National Data Protection Authority (ANPD)"
-      url: "https://www.gob.pe/minjus"
+      name: 'National Data Protection Authority (ANPD)'
+      url: 'https://www.gob.pe/minjus'
     broker_registry:
-      status: live
-      kind: databases
-      agency: "National Data Protection Authority"
+      status: 'live'
+      kind: 'databases'
+      agency: 'National Data Protection Authority'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=PE"]
-  - id: country-ph
-    code: PH
-    name: "Philippines"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=PE']
+  - id: 'country-ph'
+    code: 'PH'
+    name: 'Philippines'
+    kind: 'country'
     privacy_law:
-      name: "Data Privacy Act of 2012 (Republic Act 10173)"
-      effective: "2012-09-08"
-      status: in_effect
-      deletion_right: "limited"
-      objection: general
+      name: 'Data Privacy Act of 2012 (Republic Act 10173)'
+      effective: '2012-09-08'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'general'
     regulator:
-      name: "National Privacy Commission (NPC)"
-      url: "https://privacy.gov.ph"
+      name: 'National Privacy Commission (NPC)'
+      url: 'https://privacy.gov.ph'
     broker_registry:
-      status: live
-      kind: controllers
-      agency: "National Privacy Commission"
+      status: 'live'
+      kind: 'controllers'
+      agency: 'National Privacy Commission'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=PH"]
-  - id: country-pl
-    code: PL
-    name: "Poland"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=PH']
+  - id: 'country-pl'
+    code: 'PL'
+    name: 'Poland'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Protection Act of 10 May 2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Protection Act of 10 May 2018'
     regulator:
-      name: "President of the Personal Data Protection Office (UODO)"
-      url: "https://uodo.gov.pl"
+      name: 'President of the Personal Data Protection Office (UODO)'
+      url: 'https://uodo.gov.pl'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-pt
-    code: PT
-    name: "Portugal"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-pt'
+    code: 'PT'
+    name: 'Portugal'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law 58/2019"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law 58/2019'
     regulator:
-      name: "National Data Protection Commission (CNPD)"
-      url: "https://www.cnpd.pt"
+      name: 'National Data Protection Commission (CNPD)'
+      url: 'https://www.cnpd.pt'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-ro
-    code: RO
-    name: "Romania"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-ro'
+    code: 'RO'
+    name: 'Romania'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Law 190/2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Law 190/2018'
     regulator:
-      name: "National Supervisory Authority for Personal Data Processing (ANSPDCP)"
-      url: "https://www.dataprotection.ro"
+      name: 'National Supervisory Authority for Personal Data Processing (ANSPDCP)'
+      url: 'https://www.dataprotection.ro'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-sg
-    code: SG
-    name: "Singapore"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-sg'
+    code: 'SG'
+    name: 'Singapore'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data Protection Act 2012"
-      effective: "2014-07-02"
-      status: in_effect
-      deletion_right: "no"
-      objection: marketing
+      name: 'Personal Data Protection Act 2012'
+      effective: '2014-07-02'
+      status: 'in_effect'
+      deletion_right: 'no'
+      objection: 'marketing'
     regulator:
-      name: "Personal Data Protection Commission (PDPC)"
-      url: "https://www.pdpc.gov.sg"
+      name: 'Personal Data Protection Commission (PDPC)'
+      url: 'https://www.pdpc.gov.sg'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Do Not Call Registry"
-        url: "https://www.dnc.gov.sg"
-        note: "Singapore’s registry for marketing calls, texts and faxes. Needs checking against the operator’s current site."
+      - kind: 'central_register'
+        name: 'Do Not Call Registry'
+        url: 'https://www.dnc.gov.sg'
+        note: 'Singapore’s registry for marketing calls, texts and faxes. Needs checking against the operator’s current site.'
         sourced: false
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=SG"]
-  - id: country-sk
-    code: SK
-    name: "Slovakia"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=SG']
+  - id: 'country-sk'
+    code: 'SK'
+    name: 'Slovakia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Act 18/2018"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Act 18/2018'
     regulator:
-      name: "Office for Personal Data Protection"
-      url: "https://dataprotection.gov.sk"
+      name: 'Office for Personal Data Protection'
+      url: 'https://dataprotection.gov.sk'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-si
-    code: SI
-    name: "Slovenia"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-si'
+    code: 'SI'
+    name: 'Slovenia'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Personal Data Protection Act (ZVOP-2)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Personal Data Protection Act (ZVOP-2)'
     regulator:
-      name: "Information Commissioner"
-      url: "https://www.ip-rs.si"
+      name: 'Information Commissioner'
+      url: 'https://www.ip-rs.si'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-za
-    code: ZA
-    name: "South Africa"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-za'
+    code: 'ZA'
+    name: 'South Africa'
+    kind: 'country'
     privacy_law:
-      name: "Protection of Personal Information Act (POPIA)"
-      effective: "2021-07-01"
-      status: in_effect
-      deletion_right: "limited"
-      objection: general
+      name: 'Protection of Personal Information Act (POPIA)'
+      effective: '2021-07-01'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'general'
     regulator:
-      name: "Information Regulator"
-      url: "https://inforegulator.org.za"
+      name: 'Information Regulator'
+      url: 'https://inforegulator.org.za'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=ZA"]
-  - id: country-kr
-    code: KR
-    name: "South Korea"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=ZA']
+  - id: 'country-kr'
+    code: 'KR'
+    name: 'South Korea'
+    kind: 'country'
     privacy_law:
-      name: "Personal Information Protection Act (PIPA)"
-      effective: "2011-09-30"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Personal Information Protection Act (PIPA)'
+      effective: '2011-09-30'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Personal Information Protection Commission (PIPC)"
-      url: "https://www.pipc.go.kr"
+      name: 'Personal Information Protection Commission (PIPC)'
+      url: 'https://www.pipc.go.kr'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=KR"]
-  - id: country-es
-    code: ES
-    name: "Spain"
-    kind: country
-    bloc: eu
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=KR']
+  - id: 'country-es'
+    code: 'ES'
+    name: 'Spain'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Organic Law 3/2018 (LOPDGDD)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Organic Law 3/2018 (LOPDGDD)'
     regulator:
-      name: "Spanish Data Protection Agency (AEPD)"
-      url: "https://www.aepd.es"
+      name: 'Spanish Data Protection Agency (AEPD)'
+      url: 'https://www.aepd.es'
     broker_registry: null
     future_work:
-      - kind: central_register
-        name: "Lista Robinson"
-        url: "https://www.listarobinson.es"
-        note: "A register of people who do not want advertising by email, SMS, post or phone, overseen by the data protection agency."
+      - kind: 'central_register'
+        name: 'Lista Robinson'
+        url: 'https://www.listarobinson.es'
+        note: 'A register of people who do not want advertising by email, SMS, post or phone, overseen by the data protection agency.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-se
-    code: SE
-    name: "Sweden"
-    kind: country
-    bloc: eu
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-se'
+    code: 'SE'
+    name: 'Sweden'
+    kind: 'country'
+    bloc: 'eu'
     privacy_law:
-      name: "General Data Protection Regulation (EU) 2016/679"
-      effective: "2018-05-25"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
-      national_act: "Data Protection Act (2018:218)"
+      name: 'General Data Protection Regulation (EU) 2016/679'
+      effective: '2018-05-25'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
+      national_act: 'Data Protection Act (2018:218)'
     regulator:
-      name: "Swedish Authority for Privacy Protection (IMY)"
-      url: "https://www.imy.se"
+      name: 'Swedish Authority for Privacy Protection (IMY)'
+      url: 'https://www.imy.se'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://eur-lex.europa.eu/eli/reg/2016/679/oj", "https://www.edpb.europa.eu/about-edpb/about-edpb/members_en"]
-  - id: country-ch
-    code: CH
-    name: "Switzerland"
-    kind: country
+    sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'https://www.edpb.europa.eu/about-edpb/about-edpb/members_en']
+  - id: 'country-ch'
+    code: 'CH'
+    name: 'Switzerland'
+    kind: 'country'
     privacy_law:
-      name: "Federal Act on Data Protection (revised FADP)"
-      effective: "2023-09-01"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Federal Act on Data Protection (revised FADP)'
+      effective: '2023-09-01'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Federal Data Protection and Information Commissioner (FDPIC)"
-      url: "https://www.edoeb.admin.ch"
+      name: 'Federal Data Protection and Information Commissioner (FDPIC)'
+      url: 'https://www.edoeb.admin.ch'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=CH"]
-  - id: country-th
-    code: TH
-    name: "Thailand"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=CH']
+  - id: 'country-th'
+    code: 'TH'
+    name: 'Thailand'
+    kind: 'country'
     privacy_law:
-      name: "Personal Data Protection Act B.E. 2562 (2019)"
-      effective: "2022-06-01"
-      status: in_effect
-      deletion_right: "limited"
-      objection: marketing
+      name: 'Personal Data Protection Act B.E. 2562 (2019)'
+      effective: '2022-06-01'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'marketing'
     regulator:
-      name: "Personal Data Protection Committee (PDPC)"
-      url: "https://www.pdpc.or.th"
+      name: 'Personal Data Protection Committee (PDPC)'
+      url: 'https://www.pdpc.or.th'
     broker_registry: null
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=TH"]
-  - id: country-tr
-    code: TR
-    name: "Türkiye"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=TH']
+  - id: 'country-tr'
+    code: 'TR'
+    name: 'Türkiye'
+    kind: 'country'
     privacy_law:
-      name: "Law on the Protection of Personal Data No. 6698"
-      effective: "2016-04-07"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Law on the Protection of Personal Data No. 6698'
+      effective: '2016-04-07'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Personal Data Protection Authority (KVKK)"
-      url: "https://www.kvkk.gov.tr"
+      name: 'Personal Data Protection Authority (KVKK)'
+      url: 'https://www.kvkk.gov.tr'
     broker_registry:
-      status: live
-      kind: controllers
-      agency: "Personal Data Protection Authority (VERBIS)"
+      status: 'live'
+      kind: 'controllers'
+      agency: 'Personal Data Protection Authority (VERBIS)'
     future_work:
-      - kind: central_register
-        name: "İYS (Message Management System)"
-        url: "https://iys.org.tr"
-        note: "A central system run by the Ministry of Trade. No marketing message may be sent to a person who has no consent recorded there, and opt-outs are passed to it within three days. The sources date from 2020 to 2021, so deadlines need checking."
+      - kind: 'central_register'
+        name: 'İYS (Message Management System)'
+        url: 'https://iys.org.tr'
+        note: 'A central system run by the Ministry of Trade. No marketing message may be sent to a person who has no consent recorded there, and opt-outs are passed to it within three days. The sources date from 2020 to 2021, so deadlines need checking.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=TR"]
-  - id: country-gb
-    code: GB
-    name: "United Kingdom"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=TR']
+  - id: 'country-gb'
+    code: 'GB'
+    name: 'United Kingdom'
+    kind: 'country'
     privacy_law:
-      name: "UK GDPR, Data Protection Act 2018 and the Data (Use and Access) Act 2025"
-      effective: "2021-01-01"
-      status: in_effect
-      deletion_right: "yes"
-      objection: general
+      name: 'UK GDPR, Data Protection Act 2018 and the Data (Use and Access) Act 2025'
+      effective: '2021-01-01'
+      status: 'in_effect'
+      deletion_right: 'yes'
+      objection: 'general'
     regulator:
-      name: "Information Commissioner's Office (ICO)"
-      url: "https://ico.org.uk"
+      name: 'Information Commissioner''s Office (ICO)'
+      url: 'https://ico.org.uk'
     broker_registry:
-      status: live
-      kind: controllers
-      agency: "Information Commissioner's Office (ICO)"
-      url: "https://ico.org.uk/about-the-ico/what-we-do/register-of-fee-payers/download-the-register/"
-      note: "Lists every organisation that pays the data protection fee, not brokers. Used only to confirm by name that a broker is present in the UK (see docs/REGIONS.md)."
+      status: 'live'
+      kind: 'controllers'
+      agency: 'Information Commissioner''s Office (ICO)'
+      url: 'https://ico.org.uk/about-the-ico/what-we-do/register-of-fee-payers/download-the-register/'
+      note: 'Lists every organisation that pays the data protection fee, not brokers. Used only to confirm by name that a broker is present in the UK (see docs/REGIONS.md).'
     future_work:
-      - kind: central_register
-        name: "Telephone Preference Service and Mailing Preference Service"
-        url: "https://www.tpsonline.org.uk"
-        note: "Free registers for unwanted sales calls (TPS, backed by law and overseen by the ICO) and addressed mail (MPS). Marketers must check them. No data broker registry exists."
+      - kind: 'central_register'
+        name: 'Telephone Preference Service and Mailing Preference Service'
+        url: 'https://www.tpsonline.org.uk'
+        note: 'Free registers for unwanted sales calls (TPS, backed by law and overseen by the ICO) and addressed mail (MPS). Marketers must check them. No data broker registry exists.'
         sourced: true
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=GB", "https://ico.org.uk"]
-  - id: country-uy
-    code: UY
-    name: "Uruguay"
-    kind: country
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=GB', 'https://ico.org.uk']
+  - id: 'country-uy'
+    code: 'UY'
+    name: 'Uruguay'
+    kind: 'country'
     privacy_law:
-      name: "Law 18.331 on Personal Data Protection and Habeas Data"
-      status: in_effect
-      deletion_right: "limited"
-      objection: limited
+      name: 'Law 18.331 on Personal Data Protection and Habeas Data'
+      status: 'in_effect'
+      deletion_right: 'limited'
+      objection: 'limited'
     regulator:
-      name: "Regulatory and Control Unit of Personal Data (URCDP)"
-      url: "https://www.gub.uy/unidad-reguladora-control-datos-personales"
+      name: 'Regulatory and Control Unit of Personal Data (URCDP)'
+      url: 'https://www.gub.uy/unidad-reguladora-control-datos-personales'
     broker_registry:
-      status: live
-      kind: databases
-      agency: "Regulatory and Control Unit of Personal Data (URCDP)"
+      status: 'live'
+      kind: 'databases'
+      agency: 'Regulatory and Control Unit of Personal Data (URCDP)'
     reviewed: 2026-10-22
-    sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=UY"]
+    sources: ['https://www.dlapiperdataprotection.com/index.html?t=law&c=UY']

@@ -1,118 +1,120 @@
-name: OptOutKit
+name: 'OptOutKit'
 options:
-  bundleIdPrefix: dev.optoutkit
-  developmentLanguage: en
-  knownRegions: [en, fr, es, de, Base]
+  bundleIdPrefix: 'dev.optoutkit'
+  developmentLanguage: 'en'
+  knownRegions: ['en', 'fr', 'es', 'de', 'Base']
   deploymentTarget:
-    iOS: "17.0"
+    iOS: '17.0'
 settings:
   base:
-    SWIFT_VERSION: "5.0"
-    SWIFT_EMIT_LOC_STRINGS: "YES"
-    LOCALIZATION_PREFERS_STRING_CATALOGS: "YES"
-    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: '5.0'
+    SWIFT_EMIT_LOC_STRINGS: 'YES'
+    LOCALIZATION_PREFERS_STRING_CATALOGS: 'YES'
+    CODE_SIGN_STYLE: 'Automatic'
 packages:
   OptOutKitCore:
-    path: Packages/OptOutKitCore
+    path: 'Packages/OptOutKitCore'
 targets:
   OptOutKit:
-    type: application
-    platform: iOS
+    type: 'application'
+    platform: 'iOS'
     sources:
-      - App/Sources
-      - Shared/AssistedRun
-      - App/Resources
-      - path: brokers
-        type: folder
-        buildPhase: resources
-      - path: directory
-        type: folder
-        buildPhase: resources
-      - path: terms
-        type: folder
-        buildPhase: resources
-      - path: platforms
-        type: folder
-        buildPhase: resources
-      - path: jurisdictions
-        type: folder
-        buildPhase: resources
-      - path: registries/summary.json
-        buildPhase: resources
+      - 'App/Sources'
+      - 'Shared/AssistedRun'
+      - 'App/Resources'
+      - path: 'brokers'
+        type: 'folder'
+        buildPhase: 'resources'
+      - path: 'directory'
+        type: 'folder'
+        buildPhase: 'resources'
+      - path: 'terms'
+        type: 'folder'
+        buildPhase: 'resources'
+      - path: 'platforms'
+        type: 'folder'
+        buildPhase: 'resources'
+      - path: 'jurisdictions'
+        type: 'folder'
+        buildPhase: 'resources'
+      - path: 'registries/summary.json'
+        buildPhase: 'resources'
       # The JavaScript the app runs in web pages, one file per script (App/Sources/PageScript.swift; tested by tools/pagescripts).
-      - path: App/PageScripts
-        type: folder
-        buildPhase: resources
+      - path: 'App/PageScripts'
+        type: 'folder'
+        buildPhase: 'resources'
     dependencies:
-      - package: OptOutKitCore
-      - target: ShareExtension
+      - package: 'OptOutKitCore'
+      - target: 'ShareExtension'
     info:
-      path: App/Info.plist
+      path: 'App/Info.plist'
       properties:
-        CFBundleDisplayName: "Exnay"
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "51"
+        CFBundleDisplayName: 'Exnay'
+        CFBundleShortVersionString: '1.0'
+        CFBundleVersion: '51'
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
-        CFBundleURLTypes: [{CFBundleURLName: dev.optoutkit.app, CFBundleURLSchemes: [exnay]}]
-        UIBackgroundModes: [fetch, processing]
-        NSUserTrackingUsageDescription: "Some data brokers opt your phone out using its advertising ID. Exnay reads it only to give it to those brokers when you opt out, and never stores it."
-        LSApplicationQueriesSchemes: [googlegmail, ms-outlook, ymail, readdle-spark, protonmail]
-        BGTaskSchedulerPermittedIdentifiers: [dev.optoutkit.app.recheck, dev.optoutkit.app.scan, dev.optoutkit.app.optout, dev.optoutkit.app.optout.run]
+        CFBundleURLTypes:
+          - CFBundleURLName: 'dev.optoutkit.app'
+            CFBundleURLSchemes: ['exnay']
+        UIBackgroundModes: ['fetch', 'processing']
+        NSUserTrackingUsageDescription: 'Some data brokers opt your phone out using its advertising ID. Exnay reads it only to give it to those brokers when you opt out, and never stores it.'
+        LSApplicationQueriesSchemes: ['googlegmail', 'ms-outlook', 'ymail', 'readdle-spark', 'protonmail']
+        BGTaskSchedulerPermittedIdentifiers: ['dev.optoutkit.app.recheck', 'dev.optoutkit.app.scan', 'dev.optoutkit.app.optout', 'dev.optoutkit.app.optout.run']
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app
-        DEVELOPMENT_TEAM: C84MKW6B2K
-        TARGETED_DEVICE_FAMILY: "1"
-        GENERATE_INFOPLIST_FILE: "NO"
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_BUNDLE_IDENTIFIER: 'dev.optoutkit.app'
+        DEVELOPMENT_TEAM: 'C84MKW6B2K'
+        TARGETED_DEVICE_FAMILY: '1'
+        GENERATE_INFOPLIST_FILE: 'NO'
+        ASSETCATALOG_COMPILER_APPICON_NAME: 'AppIcon'
   ShareExtension:
-    type: app-extension
-    platform: iOS
-    sources: [ShareExtension]
+    type: 'app-extension'
+    platform: 'iOS'
+    sources: ['ShareExtension']
     info:
-      path: ShareExtension/Info.plist
+      path: 'ShareExtension/Info.plist'
       properties:
-        CFBundleDisplayName: "Exnay"
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "51"
+        CFBundleDisplayName: 'Exnay'
+        CFBundleShortVersionString: '1.0'
+        CFBundleVersion: '51'
         NSExtension:
-          NSExtensionPointIdentifier: com.apple.share-services
-          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionPointIdentifier: 'com.apple.share-services'
+          NSExtensionPrincipalClass: '$(PRODUCT_MODULE_NAME).ShareViewController'
           NSExtensionAttributes:
             NSExtensionActivationRule:
               NSExtensionActivationSupportsWebURLWithMaxCount: 1
               NSExtensionActivationSupportsText: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.share
-        DEVELOPMENT_TEAM: C84MKW6B2K
-        TARGETED_DEVICE_FAMILY: "1"
-        GENERATE_INFOPLIST_FILE: "NO"
+        PRODUCT_BUNDLE_IDENTIFIER: 'dev.optoutkit.app.share'
+        DEVELOPMENT_TEAM: 'C84MKW6B2K'
+        TARGETED_DEVICE_FAMILY: '1'
+        GENERATE_INFOPLIST_FILE: 'NO'
   OptOutKitTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: [AppTests]
+    type: 'bundle.unit-test'
+    platform: 'iOS'
+    sources: ['AppTests']
     dependencies:
-      - target: OptOutKit
+      - target: 'OptOutKit'
     settings:
       base:
-        GENERATE_INFOPLIST_FILE: "YES"
-        PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.tests
+        GENERATE_INFOPLIST_FILE: 'YES'
+        PRODUCT_BUNDLE_IDENTIFIER: 'dev.optoutkit.app.tests'
   OptOutKitUITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources: [AppUITests]
+    type: 'bundle.ui-testing'
+    platform: 'iOS'
+    sources: ['AppUITests']
     dependencies:
-      - target: OptOutKit
+      - target: 'OptOutKit'
     settings:
       base:
-        GENERATE_INFOPLIST_FILE: "YES"
-        PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.uitests
+        GENERATE_INFOPLIST_FILE: 'YES'
+        PRODUCT_BUNDLE_IDENTIFIER: 'dev.optoutkit.app.uitests'
 schemes:
   OptOutKit:
     build:
       targets:
-        OptOutKit: all
+        OptOutKit: 'all'
     test:
-      targets: [OptOutKitTests, OptOutKitUITests]
+      targets: ['OptOutKitTests', 'OptOutKitUITests']

@@ -22,7 +22,9 @@ Every change to behavior updates the docs in the same piece of work, before it i
   (`integration.yml`). Every rule a UI test checks also has a unit test, listed in `docs/TESTING.md` ("Unit and integration tests"); add both together.
 - A GitHub release (and Integration) is for releasing the app on the App Store, not for TestFlight. A TestFlight upload needs only CI to pass for its
   commit (`tools/release_gate.py --for testflight`, run by `tools/release_testflight.sh`); App Store review needs CI and Integration (`release_gate.py`).
-- CI lints the workflows, YAML, JSON, Python and shell scripts (`lint-*` jobs in `ci.yml`; commands in `docs/TESTING.md`, "Lint"). Run them before pushing a change to those files.
+- CI lints Swift, the workflows, YAML, JSON, Python and shell scripts (`lint-*` jobs in `ci.yml`; commands in `docs/TESTING.md`, "Lint"). Run them before pushing a change to those files.
+- Hand-written YAML (workflows, `brokers/`, `jurisdictions/`, `platforms/`, `project.yml`) follows `.yamllint.yml`: single-quoted string values, block mappings.
+  YAML the tools write (`directory/`, `terms/library.yml`) follows `.yamllint-generated.yml`; leave its style to the tools.
 - JavaScript the app runs in web pages lives in `App/PageScripts/*.js` (never a Swift string). Every script and every rule in it has a unit test in
   `tools/pagescripts` (`npm test`); `coverage.test.js` fails for a script without one.
 

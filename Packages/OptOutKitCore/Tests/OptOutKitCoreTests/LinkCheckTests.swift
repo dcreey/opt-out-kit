@@ -22,7 +22,7 @@ final class LinkCheckTests: XCTestCase {
 
     func testAnOptOutPageOnAnotherHostCountsAsTheSite() {
         let es = [entry("acme.com", optOut: "https://privacyportal.net/acme")]
-        guard case .known = LinkCheck.check(URL(string: "https://app.privacyportal.net/confirm")!, entries: es, attempts: [:]) else { return XCTFail() }
+        guard case .known = LinkCheck.check(URL(string: "https://app.privacyportal.net/confirm")!, entries: es, attempts: [:]) else { return XCTFail("the link was not read as expected") }
     }
 
     func testRegistrableDomainHandlesTwoPartSuffixes() {
@@ -40,7 +40,7 @@ final class LinkCheckTests: XCTestCase {
 
     func testTheLinkCheckSaysWhenTheRequestWasAlreadyFinished() {
         let r = LinkCheck.check(URL(string: "https://liveintent.com/x")!, entries: [entry("liveintent.com")], attempts: ["liveintent_com": [OptOutAttempt(date: day, outcome: "submitted")]])
-        guard case .known(_, _, let done, _) = r else { return XCTFail() }
+        guard case .known(_, _, let done, _) = r else { return XCTFail("the link was not read as expected") }
         XCTAssertEqual(done, day)
     }
 
@@ -55,14 +55,14 @@ final class LinkCheckTests: XCTestCase {
     func testALinkOnASharedProviderDomainIsNotGuessedBetweenSites() {
         let es = [tenant("acme.com", host: "acme-privacy.my.onetrust.com"), tenant("blackbaud.com", host: "blackbaud-privacy.my.onetrust.com"), tenant("cybba.com", host: "cybba-requests.my.onetrust.com")]
         // The generic portal host names no tenant: the person chooses, whichever site happens to come first.
-        guard case .shared(let host, let ids) = LinkCheck.check(URL(string: "https://privacyportal.onetrust.com/webform/1/2")!, entries: es, attempts: [:]) else { return XCTFail() }
+        guard case .shared(let host, let ids) = LinkCheck.check(URL(string: "https://privacyportal.onetrust.com/webform/1/2")!, entries: es, attempts: [:]) else { return XCTFail("the link was not read as expected") }
         XCTAssertEqual(host, "privacyportal.onetrust.com")
         XCTAssertEqual(Set(ids), ["acme_com", "blackbaud_com", "cybba_com"])
     }
 
     func testATenantsOwnAddressPicksThatSiteAndNoOtherOnTheProvider() {
         let es = [tenant("acme.com", host: "acme-privacy.my.onetrust.com"), tenant("blackbaud.com", host: "blackbaud-privacy.my.onetrust.com")]
-        guard case .known(let id, _, _, _) = LinkCheck.check(URL(string: "https://blackbaud-privacy.my.onetrust.com/webform/x")!, entries: es, attempts: [:]) else { return XCTFail() }
+        guard case .known(let id, _, _, _) = LinkCheck.check(URL(string: "https://blackbaud-privacy.my.onetrust.com/webform/x")!, entries: es, attempts: [:]) else { return XCTFail("the link was not read as expected") }
         XCTAssertEqual(id, "blackbaud_com")
     }
 
@@ -76,14 +76,14 @@ final class LinkCheckTests: XCTestCase {
     func testSitesWaitingOnAnEmailAreSuggestedFirst() {
         let es = [tenant("acme.com", host: "a.my.onetrust.com"), tenant("blackbaud.com", host: "b.my.onetrust.com"), tenant("cybba.com", host: "c.my.onetrust.com")]
         let waiting = ["cybba_com": [OptOutAttempt(date: day, outcome: "submitted_email")]]
-        guard case .shared(_, let ids) = LinkCheck.check(URL(string: "https://privacyportal.onetrust.com/x")!, entries: es, attempts: waiting) else { return XCTFail() }
+        guard case .shared(_, let ids) = LinkCheck.check(URL(string: "https://privacyportal.onetrust.com/x")!, entries: es, attempts: waiting) else { return XCTFail("the link was not read as expected") }
         XCTAssertEqual(ids.first, "cybba_com", "the site that is waiting on an email is the likeliest")
         XCTAssertEqual(ids.count, 3, "the others stay available")
     }
 
     func testSisterSitesThatShareOneAddressAreAskedAboutWithTheMainSiteAheadOfThem() {
         let es = [tenant("neighbor.example", host: "www.beenverified.com", name: "Neighbor Report"), entry("beenverified.com")]
-        guard case .shared(_, let ids) = LinkCheck.check(URL(string: "https://www.beenverified.com/app/optout")!, entries: es, attempts: [:]) else { return XCTFail() }
+        guard case .shared(_, let ids) = LinkCheck.check(URL(string: "https://www.beenverified.com/app/optout")!, entries: es, attempts: [:]) else { return XCTFail("the link was not read as expected") }
         XCTAssertEqual(ids, ["beenverified_com", "neighbor_example"])
     }
 

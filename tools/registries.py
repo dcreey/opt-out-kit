@@ -286,9 +286,10 @@ def our_domains():
         if m: domains.add(m.group(1).lower())
     for p in glob.glob("brokers/*.yml"):
         t = open(p).read()
-        for m in re.finditer(r"^\s*-\s*open:\s*(\S+)", t, re.M): domains.add(urllib.parse.urlsplit(m.group(1)).netloc.lower().removeprefix("www."))
+        # Values may be quoted (the hand-written YAML single-quotes them: .yamllint.yml).
+        for m in re.finditer(r"^\s*-\s*open:\s*(\S+)", t, re.M): domains.add(urllib.parse.urlsplit(m.group(1).strip("'\"")).netloc.lower().removeprefix("www."))
         m = re.search(r"^covers:\s*\[(.*?)\]", t, re.M)
-        if m: domains.update(x.strip().lower() for x in m.group(1).split(",") if x.strip())
+        if m: domains.update(x.strip().strip("'\"").lower() for x in m.group(1).split(",") if x.strip())
     return sorted(domains)
 
 

@@ -98,7 +98,8 @@ public enum OptOutPlan {
         for b in brokers {
             let own = Directory.entry(for: b, in: entries)?.domain
             let domains = ([own].compactMap { $0 } + (b.covers ?? [])).filter { !claimed.contains($0) }
-            let unique = Array(NSOrderedSet(array: domains)) as! [String]
+            var seen = Set<String>()
+            let unique = domains.filter { seen.insert($0).inserted }          // each domain once, in order
             guard !unique.isEmpty || own == nil else { continue }
             claimed.formUnion(unique)
             let v = classifyBroker(b)

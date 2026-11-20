@@ -59,7 +59,10 @@ def swiftui_keys():
 
 def state_names():
     """US state names and the EU's name, which the app translates itself. Country names come from the system's region names."""
-    names = set(re.findall(r"^    name: (.+)$", open("jurisdictions/us.yml").read(), re.M)) | {"European Union", "General Data Protection Regulation (EU) 2016/679"}
+    # The state names as written: single-quoted in the hand-written YAML (.yamllint.yml), with '' for an apostrophe.
+    raw = re.findall(r"^    name: (.+?)\s*$", open("jurisdictions/us.yml").read(), re.M)
+    unq = lambda v: v[1:-1].replace("''", "'") if len(v) > 1 and v[0] == v[-1] == "'" else (v[1:-1] if len(v) > 1 and v[0] == v[-1] == '"' else v)
+    names = {unq(v) for v in raw} | {"European Union", "General Data Protection Regulation (EU) 2016/679"}
     return {n: {"jurisdictions"} for n in names}
 
 
