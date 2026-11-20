@@ -49,7 +49,9 @@ final class FirstOnce: @unchecked Sendable {
 public struct SubmitEvidence: Sendable {
     public var outcome: SubmitOutcome
     public var screenshot: Data?
-    public init(outcome: SubmitOutcome, screenshot: Data? = nil) { self.outcome = outcome; self.screenshot = screenshot }
+    /// What the page said at the end: the text that appeared after sending (the confirmation, the error), or, when nothing was sent, the text on screen.
+    public var pageText: String?
+    public init(outcome: SubmitOutcome, screenshot: Data? = nil, pageText: String? = nil) { self.outcome = outcome; self.screenshot = screenshot; self.pageText = pageText }
 }
 
 public extension FormSubmitter {
@@ -78,6 +80,17 @@ final class ActivityClock: @unchecked Sendable {
 /// Outside a background run (Solve and send, guides) nothing is listening and the call does nothing.
 public enum SiteRun {
     @TaskLocal public static var markSent: (@Sendable () -> Void)?
+    /// When the run gives this site up (`AutoOptOut.siteLimit` from its start). The page code waits after sending only as long as leaves `readReserve`, so it
+    /// still reads what the page said and takes its screenshot: build 49 waited the full time and was cut off first, so many sites ended "sent, not confirmed"
+    /// with nothing to show. Nil outside a background run (Solve and send waits as long as it likes).
+    @TaskLocal public static var deadline: Date?
+    /// The time kept for reading the page and taking the screenshot once the waiting is over.
+    public static let readReserve: TimeInterval = 5
+    /// How long a step may still wait, given at most `upTo`: what is left before the deadline less the reserve (never below zero), or `upTo` outside a run.
+    public static func wait(upTo: TimeInterval, now: Date = Date()) -> TimeInterval {
+        guard let deadline else { return upTo }
+        return max(0, min(upTo, deadline.timeIntervalSince(now) - readReserve))
+    }
 }
 
 /// A site already reached by a platform request the person made (California DROP): we leave it alone until `until`.
@@ -123,7 +136,10 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
     public var date: Date
     public var outcome: String           // "submitted", "submitted_email", "challenged", "rejected", "failed"
     public var detail: String?
-    public init(date: Date, outcome: String, detail: String? = nil) { self.date = date; self.outcome = outcome; self.detail = detail }
+    /// What the page said at the end (`AutoOptOut.pageSaid`): the confirmation or error that appeared after sending, or the text on screen when nothing was sent.
+    /// Kept on the device only, with the rest of the history (it can hold the person's own details, as the page showed them).
+    public var pageSaid: String?
+    public init(date: Date, outcome: String, detail: String? = nil, pageSaid: String? = nil) { self.date = date; self.outcome = outcome; self.detail = detail; self.pageSaid = pageSaid }
     /// A form was sent to the site. Emailing a request is tracked separately (`outcome == "emailed"`), so one never stands in for the other.
     public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" }
     public var wasEmailed: Bool { outcome == "emailed" }
@@ -170,7 +186,9 @@ public struct AutoOptOut: Sendable {
         let once = FirstOnce(), clock = ActivityClock(), start = Date()
         return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool, sent: Bool), Never>) in
             let worker = Task {
-                let value = await SiteRun.$markSent.withValue({ clock.markSent() }) { await work({ clock.touch() }) }
+                let value = await SiteRun.$deadline.withValue(start.addingTimeInterval(cap)) {
+                    await SiteRun.$markSent.withValue({ clock.markSent() }) { await work({ clock.touch() }) }
+                }
                 if once.claim() { c.resume(returning: (value, false, clock.sent)) }
             }
             Task {
@@ -280,7 +298,16 @@ public struct AutoOptOut: Sendable {
     /// The sites a repeat pass (and "Run now" after a full pass) takes on: those whose latest attempt went through, and those whose latest attempt was given up
     /// before anything was sent. Not one stopped by a check, refused, or sent and not confirmed: those wait for the person or the next full pass.
     public static func inRepeatPass(_ entry: DirectoryEntry, progress: Progress) -> Bool {
-        lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress)
+        lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress) || sentUnconfirmedOnce(entry, progress: progress)
+    }
+
+    /// The site's latest attempt was sent and not confirmed in time, and the one before was not: it gets one more try, which now reads the page before its time
+    /// is up (`SiteRun.deadline`). Sending an opt-out a second time does no harm; a second unconfirmed send is left for the person, so it is never sent over and over.
+    public static func sentUnconfirmedOnce(_ entry: DirectoryEntry, progress: Progress) -> Bool {
+        let list = progress.optOutAttempts[entry.id] ?? []
+        guard let last = list.last, last.outcome == "failed", last.detail == sentUnconfirmed else { return false }
+        let before = list.dropLast().last
+        return !(before?.outcome == "failed" && before?.detail == sentUnconfirmed)
     }
 
     /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass the ones `inRepeatPass` takes.
@@ -303,24 +330,24 @@ public struct AutoOptOut: Sendable {
                     holds: [String: PlatformHold] = [:], progressCallback: (@Sendable (Int, Int) -> Void)? = nil,
                     evidence: (@Sendable (DirectoryEntry, Data) -> Void)? = nil,
                     period: RunPeriod? = nil,
-                    onResult: (@Sendable (DirectoryEntry, AutoOptOutResult) async -> Void)? = nil,
+                    onResult: (@Sendable (DirectoryEntry, AutoOptOutResult, String?) async -> Void)? = nil,
                     shouldStop: (@Sendable () async -> Bool)? = nil) async -> [(DirectoryEntry, AutoOptOutResult)] {
         let targets = entries.map(Self.standIn).filter { $0.optOutForm != nil }
         var out: [(index: Int, entry: DirectoryEntry, result: AutoOptOutResult)] = []
         // Sites that share one opt-out page (a family) are sent once; the others get the same result and picture. One whose page is being sent
         // right now waits for that send's result.
-        var sent: [String: (AutoOptOutResult, Data?)] = [:]
+        var sent: [String: (AutoOptOutResult, Data?, String?)] = [:]
         var waiting: [String: [Int]] = [:]
         // Pages given up before anything was sent: each is tried once more after every other site, with the sites that share it.
         var retry: [(key: String, indices: [Int], form: OptOutForm, plan: FillPlan)] = []
         var done = 0, total = targets.count
         let submitter = self.submitter, idle = submitter.reportsActivity ? idleLimit : nil, cap = siteLimit, spacing = self.spacing
-        func record(_ i: Int, _ result: AutoOptOutResult, shot: Data?) async {
+        func record(_ i: Int, _ result: AutoOptOutResult, shot: Data?, said: String? = nil) async {
             let entry = targets[i]
             out.removeAll { $0.index == i }          // a site tried again keeps only its last result
             out.append((i, entry, result))
             if let shot, !dryRun { evidence?(entry, shot) }
-            await onResult?(entry, result)          // kept right away: closing the app now must not lose a request that was already sent
+            await onResult?(entry, result, said)          // kept right away: closing the app now must not lose a request that was already sent
         }
         func advance() { done += 1; progressCallback?(done, total) }
         let attempt: @Sendable (OptOutForm, FillPlan) async -> SubmitEvidence = { form, plan in
@@ -336,11 +363,11 @@ public struct AutoOptOut: Sendable {
                 guard let (i, key, report) = await group.next() else { return }
                 inFlight -= 1
                 let result = Self.result(for: report.outcome)
-                sent[key] = (result, report.screenshot)
+                sent[key] = (result, report.screenshot, report.pageText)
                 let sharers = [i] + (waiting.removeValue(forKey: key) ?? [])
                 // Its second try is a step of the run from now on, so the count never reads finished before the end.
                 if Self.gaveUpBeforeSending(result), let (form, plan) = plans[key] { retry.append((key, sharers, form, plan)); total += 1 }
-                for j in sharers { await record(j, result, shot: report.screenshot); advance() }
+                for j in sharers { await record(j, result, shot: report.screenshot, said: report.pageText); advance() }
             }
             for (i, entry) in targets.enumerated() {
                 // The app is about to be suspended or closed, or the person pressed Stop: start no more sites. The ones in progress finish, so what
@@ -351,7 +378,7 @@ public struct AutoOptOut: Sendable {
                 guard let plan = pre.plan, let form = entry.optOutForm else { advance(); continue }
                 let key = form.page.absoluteString + "|" + (form.action?.absoluteString ?? "")
                 if let again = sent[key] {
-                    await record(i, again.0, shot: again.1); advance()
+                    await record(i, again.0, shot: again.1, said: again.2); advance()
                     if Self.gaveUpBeforeSending(again.0), let r = retry.firstIndex(where: { $0.key == key }) { retry[r].indices.append(i) }
                     continue
                 }
@@ -377,7 +404,7 @@ public struct AutoOptOut: Sendable {
                 if spacing > 0 { try? await Task.sleep(nanoseconds: UInt64(spacing * 1_000_000_000)) }
                 let report = await attempt(item.form, item.plan)
                 let result = Self.result(for: report.outcome)
-                for j in item.indices { await record(j, result, shot: report.screenshot) }
+                for j in item.indices { await record(j, result, shot: report.screenshot, said: report.pageText) }
                 advance()
             }
         }
@@ -399,16 +426,32 @@ public struct AutoOptOut: Sendable {
     }
 
     /// The attempts worth remembering: only ones that reached the site. Skips and "needs you" are recomputed each run.
-    public static func attempt(for result: AutoOptOutResult, now: Date) -> OptOutAttempt? {
+    public static func attempt(for result: AutoOptOutResult, now: Date, pageSaid: String? = nil) -> OptOutAttempt? {
+        let said = Self.pageSaid(pageSaid)
         switch result {
-        case .submitted(let email): return OptOutAttempt(date: now, outcome: email ? "submitted_email" : "submitted")
+        case .submitted(let email): return OptOutAttempt(date: now, outcome: email ? "submitted_email" : "submitted", pageSaid: said)
         // The form did not go through and the person emailed the site instead: the request was made, so the site counts as done.
         case .emailed: return OptOutAttempt(date: now, outcome: "submitted", detail: "sent by email instead")
-        case .challenged(let why): return OptOutAttempt(date: now, outcome: "challenged", detail: why)
-        case .rejected(let why): return OptOutAttempt(date: now, outcome: "rejected", detail: why)
-        case .failed(let why): return OptOutAttempt(date: now, outcome: "failed", detail: why)
+        case .challenged(let why): return OptOutAttempt(date: now, outcome: "challenged", detail: why, pageSaid: said)
+        case .rejected(let why): return OptOutAttempt(date: now, outcome: "rejected", detail: why, pageSaid: said)
+        case .failed(let why): return OptOutAttempt(date: now, outcome: "failed", detail: why, pageSaid: said)
         default: return nil
         }
+    }
+
+    /// The most of a page's text kept with an attempt: enough for a confirmation or an error message, not the whole page.
+    public static let pageSaidLimit = 400
+
+    /// A page's text as kept with an attempt: lines trimmed, blank ones dropped, at most `pageSaidLimit` characters (cut at a word, with "…"); nil when empty.
+    public static func pageSaid(_ text: String?) -> String? {
+        guard let text else { return nil }
+        let lines = text.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        let joined = lines.joined(separator: "\n")
+        guard !joined.isEmpty else { return nil }
+        if joined.count <= pageSaidLimit { return joined }
+        var cut = String(joined.prefix(pageSaidLimit))
+        if let space = cut.lastIndex(where: { $0 == " " || $0 == "\n" }), cut.distance(from: cut.startIndex, to: space) > pageSaidLimit / 2 { cut = String(cut[..<space]) }
+        return cut + "…"
     }
 }
 

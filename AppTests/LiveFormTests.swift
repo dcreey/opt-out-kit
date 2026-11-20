@@ -44,23 +44,26 @@ final class LiveFormTests: XCTestCase {
         XCTAssertFalse(got.contains("who=dead") || got.contains("who=agent"))
     }
 
-    /// A site whose page keeps working after its send button was pressed and never confirms in time: the background run's watchdog learns from the page code
-    /// itself that the form was sent (`SiteRun.markSent`, through `pressLiveSubmit`), so the site is recorded as sent and not confirmed, never as unsent.
-    /// A page given up before its send button was pressed is not marked sent.
-    func testAPageGivenUpAfterItsSendWasPressedIsKnownToHaveBeenSent() async {
+    /// A site whose page keeps working after its send button was pressed: the background run's watchdog learns from the page code itself that the form was
+    /// sent (`SiteRun.markSent`, through `pressLiveSubmit`), and the wait after sending ends in time (`SiteRun.deadline`) to read what the page said, so the
+    /// site has a real result and the page's message, not "sent, not confirmed" with nothing to show (build 49). A page given up before its send button was
+    /// pressed is not marked sent.
+    func testAfterSendingTheRunReadsWhatThePageSaidBeforeItsTimeIsUp() async {
         let pat = self.pat
         let busy = """
-        <html><body><form id="opt" onsubmit="event.preventDefault(); var n=0; setInterval(function(){ document.getElementById('s').textContent+='.'; }, 100);">
+        <html><body><form id="opt" onsubmit="event.preventDefault(); document.getElementById('m').textContent='We could not process your request. Please try again later.'; setInterval(function(){ document.getElementById('s').textContent+='.'; }, 100);">
           <h2>Do Not Sell My Personal Information</h2>
           <label>First name *<input name="fn"></label><label>Last name *<input name="ln"></label><label>Email *<input type="email" name="em"></label>
-          <button type="submit">Submit request</button></form><p id="s"></p></body></html>
+          <button type="submit">Submit request</button></form><p id="m"></p><p id="s"></p></body></html>
         """
-        // The fill takes a few seconds; after the press the page never settles, so the cap is reached while it waits for a confirmation.
-        let sent = await AutoOptOut.watched(idle: nil, cap: 12) { _ in
+        // The fill takes a few seconds; after the press the page never settles, and the run still reads it before the cap.
+        let sent = await AutoOptOut.watched(idle: nil, cap: 14) { _ in
             await FormRun.runLive(url: nil, html: busy, person: pat, dryRun: false, maxWait: 20, capture: false)
         }
-        XCTAssertNil(sent.value, "the confirmation never came, so the run gave the site up")
         XCTAssertTrue(sent.sent, "the send button had been pressed")
+        XCTAssertNotNil(sent.value, "read in time, not given up")
+        XCTAssertNotEqual(sent.value?.outcome, .submitted(awaitingEmail: false), "an error is not a confirmation")
+        XCTAssertTrue(sent.value?.pageText?.contains("could not process your request") == true, "what the page said is kept: \(sent.value?.pageText ?? "nil")")
 
         // The same kind of page busy from the start, so the run gives up while it is still waiting for the page, before any send.
         let neverReady = "<html><body><p id=s></p><script>var n=0; setInterval(function(){ document.getElementById('s').textContent+='.'; }, 100);</script><form><input name=em type=email></form></body></html>"
@@ -69,6 +72,11 @@ final class LiveFormTests: XCTestCase {
         }
         XCTAssertNil(unsent.value)
         XCTAssertFalse(unsent.sent, "nothing was pressed")
+
+        // A page stopped before sending (no opt-out form on it) keeps no page text: only a form that was sent does.
+        let noForm = await FormRun.runLive(url: nil, html: "<html><body><h1>Privacy</h1><p>We respect your privacy.</p></body></html>", person: pat, dryRun: false, maxWait: 6, capture: false)
+        XCTAssertNotEqual(noForm.outcome, .submitted(awaitingEmail: false))
+        XCTAssertNil(noForm.pageText, "nothing was sent, so no page text is kept")
     }
 
     /// ididata.com has a "bot trap" block (`height:0; overflow:hidden; left:-8000px`) with a confirmation menu, a date and an "I agree" box that a person never sees;

@@ -536,9 +536,17 @@ struct DirectoryInfoView: View {
         let screenshot = review?.hasScreenshot == true
         let issue = model.activeIssue(for: entry.id)
         let parked = model.progress.isParked(entry.id)
-        if failed || screenshot || issue != nil || parked {
+        let said = review?.pageSaid
+        if failed || screenshot || said != nil || issue != nil || parked {
             Section {
                 if failed, let review { Text(review.label).font(.footnote).foregroundStyle(.orange) }
+                // What the site's page said at the end of the automatic try: its confirmation, its error, or what was on screen when it stopped.
+                if let said {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("What the page said").font(.caption).foregroundStyle(.secondary)
+                        Text(said).font(.footnote).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                    }.accessibilityElement(children: .combine).accessibilityIdentifier("site-page-said")
+                }
                 if let review, let person, review.hasScreenshot { SiteScreenshot(item: review, person: person) }
                 if let issue {
                     Label("You marked this site as not working: \(issue.kind.label.lowercased()).", systemImage: "exclamationmark.bubble")

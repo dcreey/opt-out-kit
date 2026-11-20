@@ -484,7 +484,8 @@ extension FormRun {
             else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
             else { return SubmitEvidence(outcome: .failed("not a secure page")) }
         } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
-        let outcome = await liveSteps(session, page: url ?? URL(string: "https://local.test/")!, person: person, dryRun: dryRun, maxWait: maxWait, advertisingID: advertisingID)
+        let said = SaidBox()
+        let outcome = await liveSteps(session, page: url ?? URL(string: "https://local.test/")!, person: person, dryRun: dryRun, maxWait: maxWait, advertisingID: advertisingID, said: said)
         #if DEBUG
         if dryRun, capture {
             // For offline analysis: the page as it stands after every click the run made, and a summary of the form it chose.
@@ -497,11 +498,21 @@ extension FormRun {
             if let url { debugSnapshots[url.absoluteString] = snapshot }
         }
         #endif
-        return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil)
+        // What the page said, only for a form that was sent: what appeared after sending, or (nothing new appeared) the text on screen. A site stopped
+        // before sending keeps none; its reason says why.
+        var pageText: String?
+        if !dryRun, let text = said.text { pageText = text.isEmpty ? await session.viewportText() : text }
+        return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil, pageText: pageText)
     }
 
+    /// A form with more steps than the site's time allowed: the last step was not sent.
+    static let moreStepsThanTime = "the form had more steps than the time allowed"
+
+    /// Carries the text the page showed after sending out of `liveSteps`; nil when send was never pressed.
+    @MainActor final class SaidBox { var text: String? }
+
     @MainActor
-    private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval, advertisingID: String?) async -> SubmitOutcome {
+    private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval, advertisingID: String?, said: SaidBox) async -> SubmitOutcome {
         await session.settlePage(maxWait: 10)
         // The page has been still for a moment, so a cookie prompt has had time to show. The page settles again only after a prompt was answered (it then
         // reloads or moves); a fixed pause and a second wait for every site cost about four seconds each.
@@ -553,9 +564,15 @@ extension FormRun {
         var result: SubmitOutcome = .failed("no submit button found")
         var sentAny = false, sentEmail = false, rounds = 0
         while rounds < 6 {
+            // Another round only while the site has time left to read its page afterwards (`SiteRun.deadline`): a round that is cut off reads nothing.
+            if rounds > 0, SiteRun.wait(upTo: 10) < 3 {
+                result = sentAny ? .submitted(awaitingEmail: sentEmail) : .failed(FormRun.moreStepsThanTime)
+                break
+            }
             rounds += 1
             await prepared.refill()
             let step = await PageFlow.sendOnce(prepared)
+            if let text = prepared.lastSaid, !text.isEmpty || said.text == nil { said.text = text }          // set once send was pressed (empty: nothing new)
             #if DEBUG
             debugLastPageText = await session.visibleText()
             #endif

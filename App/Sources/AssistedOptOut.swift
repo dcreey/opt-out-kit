@@ -141,6 +141,9 @@ final class WebAssistedPage: AssistedPage {
     private var textBeforeChoices = ""
     private var planVerdict: FillPlan.Verdict = .ready
     var currentFormToken: String? { liveForm }
+    /// The text that appeared on the page after the last press of send (empty when nothing changed; nil until send was pressed), kept with the run's result
+    /// (`OptOutAttempt.pageSaid`) only for a form that was sent.
+    private(set) var lastSaid: String?
     private var moreLiveForms: [LiveForm] = []
     var formsRemaining: Int { moreLiveForms.count }
     func queueMoreForms(_ forms: [LiveForm]) { moreLiveForms = forms; for f in forms { knownSignatures.insert(WebAssistedDriver.signature(f)) } }
@@ -278,10 +281,12 @@ final class WebAssistedPage: AssistedPage {
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed("no submit button found") }
-        await session.settlePage(maxWait: maxWait)
-        if await session.pressConfirmStep() { await session.settlePage(maxWait: maxWait) }
-        if let why = await session.visibleChallenge() { return .challenged(why) }
+        // In a background run the waits end in time to read the page and take its picture (`SiteRun.deadline`); elsewhere they are as before.
+        await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait))
+        if await session.pressConfirmStep() { await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait)) }
         let after = await session.visibleText()
+        lastSaid = FormRun.newText(before: before, after: after)          // what appeared after sending: the confirmation, the error
+        if let why = await session.visibleChallenge() { return .challenged(why) }
         let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: after)
         // A multi-step form (Next, then Submit): the same form is still there with other boxes. That is its next step, not a result; the run fills it and presses again.
         if case .submitted = outcome { return outcome }

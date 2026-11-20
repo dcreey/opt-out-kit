@@ -928,9 +928,9 @@ final class AppModel: ObservableObject {
     }
 
     /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
-    func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, for personID: UUID, dryRun: Bool) {
+    func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, pageSaid: String? = nil, for personID: UUID, dryRun: Bool) {
         guard !dryRun else { return }
-        if let attempt = AutoOptOut.attempt(for: result, now: Date()) { household.mutateProgress(for: personID) { $0.recordOptOutAttempt(attempt, site: entry.id) } }
+        if let attempt = AutoOptOut.attempt(for: result, now: Date(), pageSaid: pageSaid) { household.mutateProgress(for: personID) { $0.recordOptOutAttempt(attempt, site: entry.id) } }
         var rows = optOutRun[personID] ?? []
         rows.removeAll { $0.id == entry.id }
         rows.append(AutoOptOutRow(id: entry.id, domain: entry.domain, result: result))
@@ -1048,7 +1048,7 @@ final class AppModel: ObservableObject {
                                        Self.exportForReview(entry.domain, shot)
                                    },
                                    period: everySite ? nil : runPeriod(now: now),
-                                   onResult: { [weak self] entry, result in await self?.recordAutoResult(entry, result, for: person.id, dryRun: dryRun) },
+                                   onResult: { [weak self] entry, result, said in await self?.recordAutoResult(entry, result, pageSaid: said, for: person.id, dryRun: dryRun) },
                                    shouldStop: { [weak self] in await self?.shouldStopRun ?? true })
         // Finished only if every site it set out to do has a result. A stop flag is not proof either way: it can be cleared again after the loop has already stopped.
         let expected = toRun.filter { AutoOptOut.standIn($0).optOutForm != nil }.count
@@ -1064,7 +1064,7 @@ final class AppModel: ObservableObject {
             }
             if !retry.isEmpty {
                 let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false, period: runPeriod(now: now),
-                                             onResult: { [weak self] entry, result in await self?.recordAutoResult(entry, result, for: person.id, dryRun: false) })
+                                             onResult: { [weak self] entry, result, said in await self?.recordAutoResult(entry, result, pageSaid: said, for: person.id, dryRun: false) })
                 for (entry, result) in again { if let i = results.firstIndex(where: { $0.0.id == entry.id }) { results[i] = (entry, result) } }
             }
         }
@@ -1358,6 +1358,8 @@ final class AppModel: ObservableObject {
         let detail: String?
         let date: Date
         let hasScreenshot: Bool
+        /// What the page said at the end of the attempt (`OptOutAttempt.pageSaid`), shown on the site's screen.
+        var pageSaid: String? = nil
         var worked: Bool { outcome.hasPrefix("submitted") }
         var label: String {
             switch outcome {
@@ -1379,7 +1381,7 @@ final class AppModel: ObservableObject {
         let items: [ReviewItem] = attempts.compactMap { id, list in
             guard let last = list.last, abs(last.date.timeIntervalSince(lastRun)) < 3600, let domain = byID[id] else { return nil }
             return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date,
-                              hasScreenshot: evidence.exists(person: person.id, site: id))
+                              hasScreenshot: evidence.exists(person: person.id, site: id), pageSaid: last.pageSaid)
         }
         return items.sorted { ($0.worked ? 1 : 0, $0.domain) < ($1.worked ? 1 : 0, $1.domain) }
     }
@@ -1388,7 +1390,8 @@ final class AppModel: ObservableObject {
     func reviewItem(entryID id: String, for person: Person) -> ReviewItem? {
         guard let last = household.progress(for: person.id).optOutAttempts[id]?.filter({ $0.outcome != "emailed" }).max(by: { $0.date < $1.date }),
               let domain = directory.first(where: { $0.id == id })?.domain else { return nil }
-        return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date, hasScreenshot: evidence.exists(person: person.id, site: id))
+        return ReviewItem(id: id, domain: domain, outcome: last.outcome, detail: last.detail, date: last.date, hasScreenshot: evidence.exists(person: person.id, site: id),
+                          pageSaid: last.pageSaid)
     }
 
     func screenshot(for item: ReviewItem, person: Person) -> Data? { evidence.load(person: person.id, site: item.id) }

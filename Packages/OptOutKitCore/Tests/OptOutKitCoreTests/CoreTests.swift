@@ -1144,7 +1144,7 @@ final class AutoOptOutTests: XCTestCase {
     }
 
     /// A site the run gave up on before anything was sent (it went quiet or ran out of time) was never really tried: the repeat pass, and so Run now after a full
-    /// pass, takes it again. One stopped by a check, refused, or sent and not confirmed does not come back by itself. Build 48 left some 300 such sites for six months.
+    /// pass, takes it again. One stopped by a check or refused does not come back by itself. Build 48 left some 300 such sites for six months.
     func testARepeatPassTakesBackTheSitesGivenUpBeforeAnythingWasSent() {
         let ok = form([("text", "first", "First name"), ("email", "email", "Email")])
         var progress = OptOutKitCore.Progress()
@@ -1154,7 +1154,7 @@ final class AutoOptOutTests: XCTestCase {
         for (id, outcome, detail) in cases { progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: outcome, detail: detail), site: id) }
         let all = cases.map { entry($0.0, form: ok) }
         let repeatIDs = AutoOptOut.backgroundSites(.repeatSent, entries: all, person: pat, progress: progress, now: t0 + day).map(\.id)
-        XCTAssertEqual(repeatIDs, ["slow", "quiet"])
+        XCTAssertEqual(repeatIDs, ["slow", "quiet", "unconfirmed"], "and a send not confirmed in time gets one more try (testASiteSentAndNotConfirmedGetsOneMoreTryNotMore)")
         // Once it goes through on that second chance, it is an ordinary sent site.
         progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "slow")
         XCTAssertTrue(AutoOptOut.inRepeatPass(all[0], progress: progress))
@@ -1257,6 +1257,48 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(calls.steps.last?.0, calls.steps.last?.1, "the run ends at its full count")
         XCTAssertTrue(calls.steps.dropLast().allSatisfy { $0.0 < $0.1 }, "never reads finished before the end (iOS would take the task as done): \(calls.steps)")
         XCTAssertEqual(calls.steps.last?.1, 3, "two sites and one second try")
+    }
+
+    /// After sending, a background run waits only as long as leaves time to read the page and take its picture; Solve and send (no run) waits as before.
+    func testAfterSendingTheRunWaitsOnlyAsLongAsLeavesTimeToReadThePage() async {
+        XCTAssertEqual(SiteRun.wait(upTo: 14), 14, "outside a background run: the full wait")
+        let inRun = await AutoOptOut.watched(idle: nil, cap: 12) { _ in SiteRun.wait(upTo: 14) }
+        XCTAssertEqual(inRun.value ?? -1, 12 - SiteRun.readReserve, accuracy: 0.5, "the site's time less the reserve for reading the page")
+        let late = await AutoOptOut.watched(idle: nil, cap: 3) { _ in SiteRun.wait(upTo: 14) }
+        XCTAssertEqual(late.value, 0, "never below zero: the page is read at once")
+        XCTAssertLessThan(SiteRun.readReserve, AutoOptOut.siteLimit / 2)
+    }
+
+    /// What the page said is kept with the attempt (the person sees it on the site's screen), trimmed to the message, never the whole page.
+    func testWhatThePageSaidIsKeptWithTheAttemptTrimmed() async throws {
+        XCTAssertEqual(AutoOptOut.pageSaid("  \n Thank you.  \n\n Your request was received. \n"), "Thank you.\nYour request was received.")
+        XCTAssertNil(AutoOptOut.pageSaid(" \n "))
+        let long = AutoOptOut.pageSaid(String(repeating: "word ", count: 200))!
+        XCTAssertLessThanOrEqual(long.count, AutoOptOut.pageSaidLimit + 1); XCTAssertTrue(long.hasSuffix("…"))
+        XCTAssertEqual(AutoOptOut.attempt(for: .rejected("the site showed an error after sending"), now: t0, pageSaid: "Invalid email address")?.pageSaid, "Invalid email address")
+        // The run hands it on with the result.
+        struct Says: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .failed("x") }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitEvidence { SubmitEvidence(outcome: .rejected("error"), pageText: "Please enter a valid ZIP code") }
+        }
+        final class Seen: @unchecked Sendable { var said: String? }
+        let seen = Seen()
+        _ = await AutoOptOut(submitter: Says(), spacing: 0).run(entries: [timedSite("says.example")], person: pat, progress: OptOutKitCore.Progress(),
+                                                                onResult: { _, _, said in seen.said = said })
+        XCTAssertEqual(seen.said, "Please enter a valid ZIP code")
+        // A history saved before this field existed still reads.
+        let old = try JSONDecoder().decode(OptOutAttempt.self, from: Data(#"{"date":0,"outcome":"failed","detail":"x"}"#.utf8))
+        XCTAssertNil(old.pageSaid)
+    }
+
+    /// A site sent and not confirmed in time gets one more try (which now reads the page in time); a second unconfirmed send is left for the person.
+    func testASiteSentAndNotConfirmedGetsOneMoreTryNotMore() {
+        let e = entry("unconfirmed", form: form([("text", "first", "First name"), ("email", "email", "Email")]))
+        var progress = OptOutKitCore.Progress()
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed", detail: AutoOptOut.sentUnconfirmed), site: e.id)
+        XCTAssertTrue(AutoOptOut.inRepeatPass(e, progress: progress), "one more try")
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "failed", detail: AutoOptOut.sentUnconfirmed), site: e.id)
+        XCTAssertFalse(AutoOptOut.inRepeatPass(e, progress: progress), "unconfirmed twice: not sent over and over")
     }
 
     private func timedSite(_ host: String) -> DirectoryEntry {
@@ -1362,7 +1404,7 @@ final class AutoOptOutTests: XCTestCase {
         actor Done { var n = 0; func add() { n += 1 }; func atLeast(_ k: Int) -> Bool { n >= k } }
         let done = Done()
         let stopped = await AutoOptOut(submitter: Slow(gauge: stopGauge), spacing: 0, parallel: 3)
-            .run(entries: entries, person: pat, progress: OptOutKitCore.Progress(), onResult: { _, _ in await done.add() }, shouldStop: { await done.atLeast(2) })
+            .run(entries: entries, person: pat, progress: OptOutKitCore.Progress(), onResult: { _, _, _ in await done.add() }, shouldStop: { await done.atLeast(2) })
         // Three start; one finishes and a fourth starts; a second finishes and Stop is seen. The two still running finish; none is started after.
         XCTAssertEqual(stopped.count, 4, "the sites already started finish; none is started after Stop")
         XCTAssertEqual(stopGauge.sentPages.count, 4)
@@ -3695,7 +3737,7 @@ final class InterruptedRunTests: XCTestCase {
         let engine = AutoOptOut(submitter: Sender(), minInterval: 30 * 86_400, spacing: 0)
         var progress = Progress()
         let first = await engine.run(entries: entries, person: person, progress: progress,
-                                     onResult: { e, _ in await box.add(e.domain) }, shouldStop: { await box.shouldStop() })
+                                     onResult: { e, _, _ in await box.add(e.domain) }, shouldStop: { await box.shouldStop() })
         XCTAssertEqual(first.count, 2, "stopped between sites after two")
         let seen = await box.seen
         XCTAssertEqual(seen, ["s0.com", "s1.com"], "each result was handed over the moment it was done")
