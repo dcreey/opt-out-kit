@@ -23,8 +23,9 @@ env:
   # GitHub's free plan runs at most 5 macOS jobs at once: 4 shards of the app's unit tests, balanced by measured time, and the package tests.
   SHARDS: 4
   SUITE: 'OptOutKitTests'
-  # Every shard builds the app from the cache while its simulator boots; shard 0 then also saves the caches (about a minute), so it is given that much less.
-  SAVE_SECONDS: 60
+  # Shard 0 builds the app for every shard (the others wait for it meanwhile, booting their simulators). It boots its simulator only after the build
+  # (about two minutes), so it is given that much less.
+  PACKAGES_SECONDS: 120
 
 jobs:
   # Lint: one small job each, on Linux (seconds, and no macOS machine taken from the tests). Pinned versions, so a new release never fails a push by itself.
@@ -57,7 +58,7 @@ jobs:
       - uses: 'actions/checkout@v4'
       - run: 'pip install yamllint==1.38.0'
       # Every YAML file, hand-written or written by the tools (tools/yamlio.py writes this style): the abcxyz rules in .yamllint.yml.
-      - run: "git ls-files -z '*.yml' '*.yaml' | xargs -0 yamllint -f github"
+      - run: 'git ls-files -z ''*.yml'' ''*.yaml'' | xargs -0 yamllint -f github'
 
   lint-json:
     name: 'Lint: JSON'
@@ -111,7 +112,7 @@ jobs:
         working-directory: 'tools/pagescripts'
         run: 'npm ci --no-audit --no-fund && npm test'
       - name: 'The test shards (by measured time, tools/ci_timings.json)'
-        run: 'python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$SAVE_SECONDS" --list'
+        run: 'python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$PACKAGES_SECONDS" --list'
 
   packages:
     name: 'Mac package tests'
@@ -149,14 +150,27 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: 'read'
+      actions: 'read'        # shards 1 to 4 look up shard 0's build in this run
     strategy:
       fail-fast: false
       matrix:
         index: [0, 1, 2, 3]          # keep in step with SHARDS
     steps:
-      # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout took 104 to 119 s on the shards that
-      # booted first. One commit, no history (file times come from contents: tools/ci_file_times.py).
+      # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout (38 MB) took 104 to 119 s on the
+      # shards that boot first. One commit, no history, for every job (file times come from contents: tools/ci_file_times.py). Shard 0 builds, so it
+      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings and the test sources it lists the
+      # tests from), about 1 MB.
       - uses: 'actions/checkout@v4'
+        if: 'matrix.index == 0'
+      - uses: 'actions/checkout@v4'
+        if: 'matrix.index != 0'
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            AppTests
+            AppUITests
+          sparse-checkout-cone-mode: true
       - name: 'Start booting a simulator (the steps after it mostly wait on the network, so the boot gets the processor)'
         id: 'xcode'
         run: |
@@ -167,13 +181,15 @@ jobs:
           UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
           echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
           echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
-          # Boots in the background while the shard builds, and notes when it is ready (reported in a notice below). Every shard builds for itself from the
-          # cache (about a minute and a half): shards 1 to 3 used to wait for shard 0's build and download it, and shard 0 booted only after building, so it
-          # started its tests about 90 s after the others.
-          nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > "$RUNNER_TEMP/simboot.log" 2>&1 &
+          # Boots in the background and notes when it is ready (reported in a notice below). Not on shard 0: it builds for everyone, and a booting
+          # simulator starves the machine (its checkout took three minutes), so it boots once the build is handed over.
+          if [ "${{ matrix.index }}" != "0" ]; then
+            nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > "$RUNNER_TEMP/simboot.log" 2>&1 &
+          fi
       - name: 'Restore the generated project (XcodeGen runs only when project.yml or the list of files changed)'
+        if: 'matrix.index == 0'
         id: 'xcproj'
-        uses: 'actions/cache/restore@v4'
+        uses: 'actions/cache@v4'
         with:
           path: |
             OptOutKit.xcodeproj
@@ -182,46 +198,52 @@ jobs:
           key: 'xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles(''project.yml'') }}-${{ hashFiles(''.github/workflows/ci.yml'') }}-${{ github.sha }}'
           restore-keys: 'xcproj-${{ env.XCODEGEN_VERSION }}-${{ hashFiles(''project.yml'') }}-'
       - name: 'Check the restored project matches this commit''s files'
+        if: 'matrix.index == 0'
         id: 'files'
         run: |
           LIST=$(git ls-files | shasum | cut -c1-16)
           if [ -f OptOutKit.xcodeproj/.files ] && [ "$(cat OptOutKit.xcodeproj/.files)" = "$LIST" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; else echo "same=false" >> "$GITHUB_OUTPUT"; fi
           echo "list=$LIST" >> "$GITHUB_OUTPUT"
       - name: 'Restore XcodeGen'
-        if: 'steps.files.outputs.same != ''true'''
+        if: 'matrix.index == 0 && steps.files.outputs.same != ''true'''
         id: 'xcodegen'
-        uses: 'actions/cache/restore@v4'
+        uses: 'actions/cache@v4'
         with:
           path: '~/xcodegen'
           key: 'xcodegen-${{ env.XCODEGEN_VERSION }}'
       - name: 'Download XcodeGen (only when it is not cached; brew is slow on these machines)'
-        if: 'steps.files.outputs.same != ''true'' && steps.xcodegen.outputs.cache-hit != ''true'''
+        if: 'matrix.index == 0 && steps.files.outputs.same != ''true'' && steps.xcodegen.outputs.cache-hit != ''true'''
         run: |
           curl -fsSL -o /tmp/xcodegen.zip "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODEGEN_VERSION/xcodegen.zip"
           mkdir -p ~/xcodegen && unzip -q /tmp/xcodegen.zip -d ~/xcodegen
       - name: 'Generate the project'
-        if: 'steps.files.outputs.same != ''true'''
+        if: 'matrix.index == 0 && steps.files.outputs.same != ''true'''
         run: |
           XG=$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)
           "$XG" --version && "$XG" generate
           echo "${{ steps.files.outputs.list }}" > OptOutKit.xcodeproj/.files
       - name: 'Give each file a time worked out from its contents (so a restored build folder rebuilds only what changed)'
+        if: 'matrix.index == 0'
         run: 'python3 tools/ci_file_times.py'
       - name: 'Pin the packages for Xcode (the committed lockfile; the build then resolves nothing over the network)'
+        if: 'matrix.index == 0'
         run: |
           mkdir -p OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
           cp Packages/OptOutKitCore/Package.resolved OptOutKit.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
       - name: 'Fingerprint the sources from git''s own tree hashes (hashing every file took over two minutes and timed out)'
+        if: 'matrix.index == 0'
         id: 'src'
         run: 'echo "hash=$(git ls-tree HEAD project.yml App Shared ShareExtension AppTests AppUITests Packages brokers directory platforms jurisdictions terms | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"'
-      - name: 'Restore the app''s build folder (shard 0 saves it again at the end of its job, so nothing waits for it)'
+      - name: 'Restore the app''s build folder (saved again by this step''s post step, at the end of the job, so nothing waits for it)'
+        if: 'matrix.index == 0'
         id: 'dd'
-        uses: 'actions/cache/restore@v4'
+        uses: 'actions/cache@v4'
         with:
           path: 'DerivedData'
           key: 'dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-${{ steps.src.outputs.hash }}'
           restore-keys: 'dd-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-${{ steps.xcode.outputs.week }}-'
-      - name: 'Build the app and its tests (from the cached build folder; the simulator boots meanwhile)'
+      - name: 'Build the app and its tests once, for every shard'
+        if: 'matrix.index == 0'
         run: |
           set -o pipefail
           # Which cache the build started from (actions/cache only says whether the key matched exactly; a build folder already here means an earlier one).
@@ -234,7 +256,37 @@ jobs:
           # No app icon in the test build: rendering its variants took over three minutes on these machines (CI only; release builds keep it).
           # Where the build's time went (the slowest kinds of step), how much it compiled, and how big the build folder is.
           python3 tools/ci_shards.py --build-summary build.log --cache "$CACHE" --folder DerivedData
-      - name: 'Leave the logs out of the build folder shard 0 saves (so the cache does not grow)'
+      - name: 'Hand the build to the other shards'
+        if: 'matrix.index == 0'
+        uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'test-products'
+          path: 'DerivedData/Build/Products'
+          retention-days: 1
+      - name: 'Boot shard 0''s simulator now that the build is handed over'
+        if: 'matrix.index == 0'
+        run: 'nohup sh -c "xcrun simctl boot $SIM_UDID; xcrun simctl bootstatus $SIM_UDID -b; date +%s > $RUNNER_TEMP/simready" > "$RUNNER_TEMP/simboot.log" 2>&1 &'
+      - name: 'Wait for shard 0''s build (the simulator boots meanwhile; this shard compiles nothing)'
+        if: 'matrix.index != 0'
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          API="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          for _ in $(seq 1 180); do
+            n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/artifacts?name=test-products" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))' || echo 0)
+            [ "$n" -gt 0 ] && { echo "the build arrived after $(( $(date +%s) - JOB_START )) s"; exit 0; }
+            gone=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/jobs?per_page=30" | python3 -c 'import json,sys; print(any(j["name"] == "Unit tests 0" and j["status"] == "completed" for j in json.load(sys.stdin)["jobs"]))' || echo False)
+            [ "$gone" = True ] && { echo "::error::shard 0 ended without handing over its build"; exit 1; }
+            sleep 5
+          done
+          echo "::error::no build from shard 0 after 15 minutes"; exit 1
+      - name: 'Download the build'
+        if: 'matrix.index != 0'
+        uses: 'actions/download-artifact@v4'
+        with:
+          name: 'test-products'
+          path: 'DerivedData/Build/Products'
+      - name: 'Leave the logs out of the build folder the post step saves (so the cache does not grow)'
         if: 'always() && matrix.index == 0'
         run: 'rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData'
       - name: 'Wait for the simulator'
@@ -250,7 +302,7 @@ jobs:
         run: |
           SKIP=(); for t in $KNOWN_FAILING; do SKIP+=(--skip "$t"); done
           ARGS=()          # one argument per line (macOS ships bash 3.2, which has no mapfile)
-          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$SAVE_SECONDS" --index "${{ matrix.index }}" ${SKIP[@]+"${SKIP[@]}"})
+          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$PACKAGES_SECONDS" --index "${{ matrix.index }}" ${SKIP[@]+"${SKIP[@]}"})
           printf '%s\n' "${ARGS[@]}"
           XCTESTRUN=$(find DerivedData/Build/Products -maxdepth 1 -name '*.xctestrun' | head -1)
           set -o pipefail
@@ -271,26 +323,3 @@ jobs:
           name: 'results-${{ matrix.index }}'
           path: 'Results-${{ matrix.index }}.xcresult'
           retention-days: 7
-      # Only shard 0 saves the caches, after its tests (the split gives it that much less to run: SAVE_SECONDS); every shard restored them at the start.
-      # Saving before the tests once held them up for 3.4 minutes.
-      - name: 'Save the app''s build folder'
-        if: 'always() && matrix.index == 0 && steps.dd.outputs.cache-hit != ''true'''
-        uses: 'actions/cache/save@v4'
-        with:
-          path: 'DerivedData'
-          key: '${{ steps.dd.outputs.cache-primary-key }}'
-      - name: 'Save the generated project'
-        if: 'always() && matrix.index == 0 && steps.files.outputs.same != ''true'''
-        uses: 'actions/cache/save@v4'
-        with:
-          path: |
-            OptOutKit.xcodeproj
-            App/Info.plist
-            ShareExtension/Info.plist
-          key: '${{ steps.xcproj.outputs.cache-primary-key }}'
-      - name: 'Save XcodeGen'
-        if: 'always() && matrix.index == 0 && steps.files.outputs.same != ''true'' && steps.xcodegen.outputs.cache-hit != ''true'''
-        uses: 'actions/cache/save@v4'
-        with:
-          path: '~/xcodegen'
-          key: '${{ steps.xcodegen.outputs.cache-primary-key }}'

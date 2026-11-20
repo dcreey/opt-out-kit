@@ -36,16 +36,18 @@ def _yaml():
     return y
 
 
-def styled(node):
+def styled(node, depth=0):
     """The value in the house style: string values single-quoted, mappings and sequences of mappings as blocks. Block scalars (`|`, `>`) stay."""
     if isinstance(node, dict):
         out = node if isinstance(node, CommentedMap) else CommentedMap(node)
         out.fa.set_block_style()
         for pos, k in enumerate(list(out.keys())):
-            v = styled(out[k])
+            v = styled(out[k], depth + 1)
             # A key a YAML 1.1 reader would take for true or false (Norwegian's language code `no`) is quoted; any other key is written plainly,
             # even one that came "quoted" from inline JSON.
-            want = SingleQuotedScalarString(str(k)) if isinstance(k, str) and str(k).lower() in BOOLEAN_WORDS else (str(k) if isinstance(k, ScalarString) else k)
+            # (GitHub Actions' top-level `on:` stays plain: the rules allow it, and it is how every workflow is written.)
+            boolean = isinstance(k, str) and str(k).lower() in BOOLEAN_WORDS and not (str(k) == "on" and depth == 0)
+            want = SingleQuotedScalarString(str(k)) if boolean else (str(k) if isinstance(k, ScalarString) else k)
             if want is not k or type(want) is not type(k):
                 del out[k]
                 out.insert(pos, want, v)
@@ -59,7 +61,7 @@ def styled(node):
         else:
             out.fa.set_flow_style()              # a list of plain values stays on one line: ['a', 'b']
         for i, x in enumerate(out):
-            out[i] = styled(x)
+            out[i] = styled(x, depth + 1)
         return out
     if isinstance(node, (LiteralScalarString, FoldedScalarString)):
         return node
