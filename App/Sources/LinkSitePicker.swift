@@ -12,7 +12,8 @@ struct PendingLink: Identifiable {
 /// "Which site is this for?": the sites that share the link's address first (those waiting on an email on top), then a search through every site in the list.
 struct LinkSitePicker: View {
     let pending: PendingLink
-    let directory: [DirectoryEntry]
+    let sites: SiteIndex
+    private var directory: [DirectoryEntry] { sites.entries }
     /// Entry ids of the sites waiting on an email.
     let waiting: Set<String>
     var choose: (DirectoryEntry) -> Void
@@ -29,8 +30,7 @@ struct LinkSitePicker: View {
     }
     private var suggested: [DirectoryEntry] {
         guard case .shared(_, let ids) = pending.check else { return [] }
-        let byID = Dictionary(directory.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        return ids.compactMap { byID[$0] }
+        return ids.compactMap { sites[id: $0] }
     }
     private var waitingElsewhere: [DirectoryEntry] {
         let shown = Set(suggested.map(\.id))

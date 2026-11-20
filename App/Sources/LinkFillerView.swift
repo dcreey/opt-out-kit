@@ -140,7 +140,7 @@ struct LinkFillerView: View {
         .sentQuestionAlert(filler.sentQuestion)
         .sheet(isPresented: $showTour, onDismiss: { model.markLinkFillerToured() }) { LinkFillerTour { showTour = false } }
         .sheet(item: $choosing) { pending in
-            LinkSitePicker(pending: pending, directory: model.directory, waiting: Set(model.pendingFollowUps.map(\.entry.id)),
+            LinkSitePicker(pending: pending, sites: model.sites, waiting: Set(model.pendingFollowUps.map(\.entry.id)),
                            choose: { entry in pickSite(entry, for: pending) },
                            openAnyway: pending.url.map { url in { choosing = nil; open(url, pending.check, fill: false) } },
                            cancel: { choosing = nil; if pending.url != nil { returnToChooser() } })
