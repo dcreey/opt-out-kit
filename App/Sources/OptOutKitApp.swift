@@ -149,13 +149,16 @@ final class AppModel: ObservableObject {
         return HouseholdStore(url: dir.appendingPathComponent("household.sealed"), keys: KeychainKey())
     }
 
+    /// `catalogURL`: the data the app ships, compiled at build time (`Catalog`, Catalog.sqlite in the bundle); the app reads only that, never YAML.
+    /// The folder parameters are for tests, which may hand in a small folder of their own in place of one part of the catalog.
     init(store: HouseholdStore = AppModel.defaultStore(),
-         brokersDirectory: URL? = Bundle.main.url(forResource: "brokers", withExtension: nil),
-         directoryURL: URL? = Bundle.main.url(forResource: "directory", withExtension: nil),
-         termsLibraryURL: URL? = Bundle.main.url(forResource: "terms", withExtension: nil)?.appendingPathComponent("library.yml"),
-         platformsURL: URL? = Bundle.main.url(forResource: "platforms", withExtension: nil),
-         jurisdictionsURL: URL? = Bundle.main.url(forResource: "jurisdictions", withExtension: nil),
-         registrySummaryURL: URL? = Bundle.main.url(forResource: "summary", withExtension: "json"),
+         catalogURL: URL? = Bundle.main.url(forResource: "Catalog", withExtension: "sqlite"),
+         brokersDirectory: URL? = nil,
+         directoryURL: URL? = nil,
+         termsLibraryURL: URL? = nil,
+         platformsURL: URL? = nil,
+         jurisdictionsURL: URL? = nil,
+         registrySummaryURL: URL? = nil,
          defaults: UserDefaults = .standard,
          catalog: [Announcement] = AnnouncementCatalog.all) {
         self.store = store
@@ -198,17 +201,23 @@ final class AppModel: ObservableObject {
         unlockObserver = NotificationCenter.default.addObserver(forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.protectedDataAvailable() }
         }
+        // Everything the app ships, from the compiled catalog: one read-only SQLite file, read in a few hundredths of a second (parsing the YAML here took
+        // 0.14 to 0.23 s on a Mac, on this thread, at every launch). Excluded sites are left out by the query itself.
+        do {
+            guard let catalogURL else { throw CocoaError(.fileNoSuchFile) }
+            let c = try Catalog.contents(of: catalogURL)
+            directory = c.sites; brokers = c.brokers; platforms = c.platforms; jurisdictions = c.jurisdictions
+            registrySummary = c.registrySummary; termsLibrary = c.termsLibrary
+        } catch {
+            loadError = Loc.f("Could not load the broker registry: %@", error)
+        }
+        // Tests only: a part of the catalog replaced by a small folder of the test's own.
         if let directoryURL { directory = ((try? Registry.loadDirectory(directoryURL)) ?? []).filter { $0.excluded == nil } }       // excluded sites are never shown
         if let jurisdictionsURL { jurisdictions = (try? JurisdictionLoader.load(directory: jurisdictionsURL)) ?? [] }
         if let registrySummaryURL { registrySummary = JurisdictionLoader.loadSummary(registrySummaryURL) }
         if let platformsURL { platforms = (try? PlatformLoader.load(directory: platformsURL)) ?? [] }
         if let termsLibraryURL { termsLibrary = try? TermsLibrary.load(termsLibraryURL) }
-        do {
-            guard let brokersDirectory else { throw CocoaError(.fileNoSuchFile) }
-            brokers = try Registry.load(directory: brokersDirectory)
-        } catch {
-            loadError = Loc.f("Could not load the broker registry: %@", error)
-        }
+        if let brokersDirectory { brokers = (try? Registry.load(directory: brokersDirectory)) ?? [] }
         #if DEBUG
         // UI tests: `-uitest-sites N` keeps only the first N sites that have a known form, so a test of a whole automatic run takes seconds, not minutes.
         // The weekly end-to-end job (.github/workflows/e2e.yml) runs the same tests over every site.

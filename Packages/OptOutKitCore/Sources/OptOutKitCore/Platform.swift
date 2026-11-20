@@ -4,7 +4,7 @@ import Yams
 /// A government or industry service that sends one request to many brokers at once (California's DROP is the first). It is shaped
 /// like a hand-written broker walkthrough, plus who may use it, which of our sites it reaches, and how long to wait before
 /// trusting it. Adding another jurisdiction is a new file in `platforms/`, not new code.
-public struct Platform: Equatable, Identifiable, Sendable {
+public struct Platform: Codable, Equatable, Identifiable, Sendable {
     /// What a registry says about one of our sites.
     public struct Coverage: Codable, Equatable, Sendable {
         public var broker: String          // the registered business's name

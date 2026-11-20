@@ -4,10 +4,10 @@ import Yams
 /// What a place's law says about data brokers and about its residents' rights, with enough detail to tell a person what the app does
 /// for them there. Facts live in `jurisdictions/*.yml`, each reviewed by a person on a date, and are refreshed periodically.
 /// US states first; countries use the same shape (`kind`) when they are added.
-public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
+public struct Jurisdiction: Codable, Identifiable, Equatable, Sendable {
     /// How firm a right is: `yes` (a defined right with the usual exceptions), `limited` (only in some circumstances), `unclear`
     /// (the sources do not say) or `no`. Older entries wrote `true` and `false`.
-    public enum Right: String, Decodable, Equatable, Sendable {
+    public enum Right: String, Codable, Equatable, Sendable {
         case yes, limited, unclear, no
         public init(from decoder: Decoder) throws {
             let c = try decoder.singleValueContainer()
@@ -18,7 +18,7 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
         }
     }
 
-    public struct PrivacyLaw: Decodable, Equatable, Sendable {
+    public struct PrivacyLaw: Codable, Equatable, Sendable {
         public var name: String
         public var effective: String?        // nil when the sources are not clear about the date
         public var status: String            // in_effect | enacted
@@ -40,7 +40,7 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
 
     /// A law that is being considered, moving through a legislature, or passed but not in effect yet. `stage` is `proposed`
     /// (introduced or in committee), `advancing` (passed a chamber or in conference) or `passed` (signed, takes effect later).
-    public struct PendingLaw: Decodable, Equatable, Sendable {
+    public struct PendingLaw: Codable, Equatable, Sendable {
         public var name: String
         public var stage: String
         public var kind: String?             // privacy | data_broker
@@ -51,12 +51,12 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
         enum CodingKeys: String, CodingKey { case name, stage, kind, effective, url, note, asOf = "as_of" }
     }
 
-    public struct Regulator: Decodable, Equatable, Sendable {
+    public struct Regulator: Codable, Equatable, Sendable {
         public var name: String
         public var url: String?
     }
 
-    public struct BrokerRegistry: Decodable, Equatable, Sendable {
+    public struct BrokerRegistry: Codable, Equatable, Sendable {
         public var status: String            // live | planned
         /// What the registry lists: `brokers` (the default), `databases`, `controllers` or `agents`. Only brokers' registries are pulled.
         public var kind: String?
@@ -68,7 +68,7 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
     }
 
     /// A list or mechanism a law or government runs that the app does not use yet. Kept as future work, with where it was found.
-    public struct FutureWork: Decodable, Equatable, Sendable, Identifiable {
+    public struct FutureWork: Codable, Equatable, Sendable, Identifiable {
         public var kind: String              // broker_registry | central_register | one_stop_deletion | opt_out_signal
         public var name: String
         public var url: String?
@@ -128,8 +128,8 @@ public struct Jurisdiction: Decodable, Identifiable, Equatable, Sendable {
 }
 
 /// Counts from the registries we pull, produced by `tools/registries.py merge`.
-public struct RegistrySummary: Decodable, Equatable, Sendable {
-    public struct Count: Decodable, Equatable, Sendable { public var count: Int; public var withWebsite: Int
+public struct RegistrySummary: Codable, Equatable, Sendable {
+    public struct Count: Codable, Equatable, Sendable { public var count: Int; public var withWebsite: Int
         enum CodingKeys: String, CodingKey { case count, withWebsite = "with_website" } }
     public var generated: String
     public var knownSites: Int

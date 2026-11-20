@@ -22,27 +22,16 @@ targets:
       - 'App/Sources'
       - 'Shared/AssistedRun'
       - 'App/Resources'
-      - path: 'brokers'
-        type: 'folder'
-        buildPhase: 'resources'
-      - path: 'directory'
-        type: 'folder'
-        buildPhase: 'resources'
-      - path: 'terms'
-        type: 'folder'
-        buildPhase: 'resources'
-      - path: 'platforms'
-        type: 'folder'
-        buildPhase: 'resources'
-      - path: 'jurisdictions'
-        type: 'folder'
-        buildPhase: 'resources'
-      - path: 'registries/summary.json'
-        buildPhase: 'resources'
+      # The data (directory/, brokers/, platforms/, jurisdictions/, terms/, the registry summary) ships compiled into Catalog.sqlite (buildToolPlugins below).
       # The JavaScript the app runs in web pages, one file per script (App/Sources/PageScript.swift; tested by tools/pagescripts).
       - path: 'App/PageScripts'
         type: 'folder'
         buildPhase: 'resources'
+    # Compiles directory/, brokers/, platforms/, jurisdictions/, terms/ and the registry summary into Catalog.sqlite inside the app (Catalog in the
+    # core package): the app reads that and never parses YAML.
+    buildToolPlugins:
+      - plugin: 'CatalogPlugin'
+        package: 'OptOutKitCore'
     dependencies:
       - package: 'OptOutKitCore'
       - target: 'ShareExtension'

@@ -23,6 +23,8 @@ Every change to behavior updates the docs in the same piece of work, before it i
 - A GitHub release (and Integration) is for releasing the app on the App Store, not for TestFlight. A TestFlight upload needs only CI to pass for its
   commit (`tools/release_gate.py --for testflight`, run by `tools/release_testflight.sh`); App Store review needs CI and Integration (`release_gate.py`).
 - CI lints Swift, the workflows, YAML, JSON, Python and shell scripts (`lint-*` jobs in `ci.yml`; commands in `docs/TESTING.md`, "Lint"). Run them before pushing a change to those files.
+- The app ships its data compiled into `Catalog.sqlite` at build time (`Catalog`, `CatalogPlugin`; docs/DIRECTORY.md) and never parses YAML on the phone.
+  A new kind of bundled data goes into the catalog, not into the bundle as a file.
 - Hand-written YAML (workflows, `brokers/`, `jurisdictions/`, `platforms/`, `project.yml`) follows `.yamllint.yml`: single-quoted string values, block mappings.
   YAML the tools write (`directory/`, `terms/library.yml`) follows `.yamllint-generated.yml`; leave its style to the tools.
 - JavaScript the app runs in web pages lives in `App/PageScripts/*.js` (never a Swift string). Every script and every rule in it has a unit test in

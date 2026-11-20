@@ -712,7 +712,8 @@ final class ResumeAppTests: XCTestCase {
     /// The first sites of the directory that have a known form, copied to their own folder: a resume needs a handful of sites, not every one (a run over
     /// the whole directory made these tests take a minute on CI).
     private static let smallDirectory: URL = {
-        let source = Bundle.main.url(forResource: "directory", withExtension: nil)!
+        // The repository's own folder (the app ships only the compiled catalog; the simulator reads the Mac's files).
+        let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ook-dir-\(UUID())")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let files = ((try? FileManager.default.contentsOfDirectory(at: source, includingPropertiesForKeys: nil)) ?? []).filter { $0.pathExtension == "yml" }.sorted { $0.path < $1.path }

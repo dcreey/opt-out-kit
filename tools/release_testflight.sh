@@ -16,7 +16,9 @@ python3 tools/release_gate.py --for testflight
 # The API key also signs in for provisioning, so a new bundle id (the share extension) gets its profile without an Xcode account.
 AUTH=(-authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
 xcodegen generate
-xcodebuild archive -project OptOutKit.xcodeproj -scheme OptOutKit -configuration Release -destination 'generic/platform=iOS' -archivePath "$OUT/Exnay.xcarchive" -allowProvisioningUpdates "${AUTH[@]}"
+# -skipPackagePluginValidation: the core package's CatalogPlugin compiles the app's data into Catalog.sqlite during the build (a command-line build
+# would otherwise stop to ask whether to trust it).
+xcodebuild archive -skipPackagePluginValidation -project OptOutKit.xcodeproj -scheme OptOutKit -configuration Release -destination 'generic/platform=iOS' -archivePath "$OUT/Exnay.xcarchive" -allowProvisioningUpdates "${AUTH[@]}"
 cat > "$OUT/Export.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

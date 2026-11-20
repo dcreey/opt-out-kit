@@ -3,6 +3,25 @@
 `directory/*.yml` has one generated entry per site in `pipeline/census-sites.txt` (856 today: EasyOptOuts' 214 plus 642 more added from the state broker registries, see `docs/JURISDICTIONS.md`; the first 214 came from the EasyOptOuts
 list). Entries are provisional guesses written by a tool, not hand-written flows. Real flows live in `brokers/`.
 
+## The compiled catalog (what the app ships)
+
+The app does not ship or parse any of this YAML. At build time the core package's `CatalogPlugin` (a SwiftPM build tool, applied to the app target in
+`project.yml`) runs `catalog-builder`, which loads `directory/`, `brokers/`, `platforms/` (with its coverage JSON), `jurisdictions/`,
+`registries/summary.json` and `terms/library.yml` with the same loaders the tests use, and writes them into one read-only SQLite file,
+`Catalog.sqlite`, in the app bundle (`Catalog` in `Packages/OptOutKitCore`). The app reads only that (`AppModel`, `Catalog.contents`).
+
+- **Checked at build time.** A file that does not decode, or a repeated id, fails the build; so does a value the catalog cannot carry exactly (the builder
+  reads the file back and compares it with what the loaders gave).
+- **Layout.** One table per kind (`sites`, `brokers`, `platforms`, `jurisdictions`) and `documents` (the registry counts, the terms library). Each row
+  keeps the entry as JSON, its position, and the columns the app looks up by (`id`, `domain`, `excluded`, `code`), indexed; `PRAGMA user_version` is the
+  layout's version (`Catalog.schemaVersion`). Excluded sites are in the file (the build checks them) and the app's query leaves them out.
+- **Read-only.** It is written as one self-contained file (a rollback journal, not WAL) and opened `immutable`, so SQLite writes nothing beside it inside
+  the app's signed bundle.
+- **Speed.** Reading the whole catalog takes about 0.02 s (release build, Mac); parsing the same sites from YAML took 0.14 to 0.23 s, on the main thread at
+  every launch. 855 sites, 5 flows, 1 platform and 107 places make a 2.2 MB file, built in about 0.4 s.
+- **By hand:** `swift run --package-path Packages/OptOutKitCore catalog-builder . /tmp/Catalog.sqlite` (any SQLite tool can open the result).
+- Xcode runs the step on every build (about half a second), not only when the data changed: the declared inputs do not stop it yet.
+
 ## The repeatable process
 
 ```bash
