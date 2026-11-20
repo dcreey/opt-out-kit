@@ -2,7 +2,7 @@
 """A deep second look at sites recorded as having no opt-out form: both a phone-sized and a desktop-sized browser, longer waits, collapsed sections
 opened, buttons clicked, frames read, and links followed three deep. Prints what it finds so a person can check each one.
 Usage: probe_no_form.py LIST.tsv   (domain<TAB>opt-out page<TAB>has email<TAB>walled)"""
-import asyncio, os, re, sys, urllib.parse
+import asyncio, os, sys, urllib.parse
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 import profile_brokers as P

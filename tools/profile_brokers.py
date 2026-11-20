@@ -12,7 +12,7 @@ It copies no prose from the sites. Re-run it any time: results are cached, so on
 Tier guide (docs/DESIGN.md): A form + email link, B adds a bot check, C phone / ID / account / app-only, D email or mail only.
 A tier here is a guess from the page's shape. A person or the pipeline firms it up when a real flow is written.
 """
-import argparse, concurrent.futures as cf, datetime, hashlib, json, os, re, sys, time, urllib.parse, urllib.request, urllib.robotparser
+import argparse, concurrent.futures as cf, datetime, hashlib, json, os, re, time, urllib.parse, urllib.request, urllib.robotparser
 from html.parser import HTMLParser
 
 UA = "OptOutKit-Profiler/1.0 (open source; polite, robots.txt honored)"
@@ -240,7 +240,7 @@ def crawl_for_form(start_url, fetcher, own_registrable, max_pages=6, max_depth=3
     for g in GUESS_PATHS:       # common opt-out addresses, tried after the links the site itself offers
         u = f"{base.scheme}://{base.netloc}{g}"
         if u not in best_pri: best_pri[u] = -1; trail_of[u] = [start_url, u]; queue.append((1, 1, u))
-    import heapq; heapq.heapify(queue)
+    heapq.heapify(queue)
     fetched = 0; best = None; blocked_seen = False
     while queue and fetched < max_pages:
         _, depth, url = heapq.heappop(queue)

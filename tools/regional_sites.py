@@ -62,7 +62,6 @@ def crawl_regional(url, brand):
     """The privacy / opt-out page of a regional site, and whether it has a form."""
     final, html = get(url)
     if not html: return None
-    host = urllib.parse.urlparse(final).hostname or ""
     links = []
     for href, label in re.findall(r'(?is)<a[^>]+href="([^"#]+)"[^>]*>(.*?)</a>', html):
         if LEGAL.search(href) or LEGAL.search(re.sub(r"<[^>]+>", " ", label)):

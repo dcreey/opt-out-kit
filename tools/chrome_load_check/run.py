@@ -1,4 +1,4 @@
-import asyncio, json, sys, re
+import asyncio, json, sys
 from playwright.async_api import async_playwright
 H=open('tools/chrome_load_check/h.js').read().rstrip(); H=H[:H.rindex('JSON.stringify(out)')]+'return JSON.stringify(out)'
 sites=json.load(open('tools/chrome_load_check/sites.json'))
@@ -46,7 +46,7 @@ async def one(br, s, sem, out):
                     await loc.scroll_into_view_if_needed(timeout=3000)
                     await loc.screenshot(path='/tmp/claude-501/h/shots/'+s['d']+'.png',timeout=8000)
                     res['shot']=1
-                except Exception as e:
+                except Exception:
                     res['shot']=0
                     try: await pg.screenshot(path='/tmp/claude-501/h/shots/'+s['d']+'.png'); res['shot']=2
                     except Exception: pass

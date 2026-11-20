@@ -1,0 +1,21 @@
+# yamllint (the "YAML" job in .github/workflows/ci.yml): what makes a YAML file wrong or easy to misread, not its style. The broker, directory and
+# registry files are written by tools in flow style ({ a: 1, b: 2 }) on long lines, so the style rules are off. docs/TESTING.md, "Lint".
+extends: default
+ignore: |
+  node_modules/
+  .build/
+  DerivedData/
+rules:
+  line-length: disable
+  braces: disable
+  brackets: disable
+  commas: disable
+  document-start: disable
+  comments: disable
+  comments-indentation: disable
+  truthy:
+    allowed-values: ["true", "false"]
+    check-keys: false          # GitHub Actions' `on:` key
+  indentation:
+    spaces: consistent
+    indent-sequences: whatever

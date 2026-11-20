@@ -5,7 +5,7 @@ Reads nothing personal, fills nothing, sends nothing.
 
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/guess_optout_pages.py [--workers 8] [--out .guess/guesses.tsv] [--only a.com,b.com]
 """
-import argparse, asyncio, glob, os, re, sys, urllib.parse
+import argparse, asyncio, glob, os, re, urllib.parse
 from playwright.async_api import async_playwright
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"

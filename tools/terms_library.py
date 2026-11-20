@@ -11,7 +11,7 @@ it and set `reviewed: true` and `verdict: ok`. Re-running keeps existing verdict
 
   python3 tools/terms_library.py [--cache .terms-cache] [--out terms/library.yml]
 """
-import argparse, collections, datetime, glob, json, os, re, sys
+import argparse, datetime, glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import terms_canon as T
 import terms_lang as TL

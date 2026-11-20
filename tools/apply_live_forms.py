@@ -4,7 +4,7 @@
 Input is the shard files of AppTests/LiveFormDiscoveryTests: `domain<TAB>result<TAB>page<TAB>blockers`. `form` means an opt-out form was
 found and filled on the live page (nothing sent). Usage: apply_live_forms.py DIR_WITH_TSV [--dir directory] [--date YYYY-MM-DD]
 """
-import argparse, datetime, glob, os, re, sys
+import argparse, datetime, glob, os, re
 
 
 def main():

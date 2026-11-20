@@ -6,7 +6,7 @@ fields, labels, required marks, buttons) and any bot check, and saves a full-pag
 
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/inspect_form.py URL [URL ...] [--out .inspect]
 """
-import argparse, asyncio, json, os, re, sys
+import argparse, asyncio, json, os, re
 from playwright.async_api import async_playwright
 
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"

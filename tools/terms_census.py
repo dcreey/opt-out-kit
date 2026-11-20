@@ -12,7 +12,7 @@ With --lang it asks each site for its pages in that language (Accept-Language, t
 switcher or a language path), checks the text really is in that language, and stores it under .terms-cache/<site>/<lang>/. A site
 with no translation is reported as such and nothing is stored: the master list keeps the site's own words and never translates them.
 """
-import argparse, asyncio, glob, hashlib, json, os, re, sys, urllib.parse
+import argparse, asyncio, glob, hashlib, os, re, sys, urllib.parse
 sys.path.insert(0, os.path.dirname(__file__))
 import profile_brokers as P
 import terms_lang as TL

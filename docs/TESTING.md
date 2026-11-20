@@ -109,16 +109,35 @@ hours.
 
 ## Continuous integration
 
-Two workflows, on GitHub's hosted runners (free for a public repository). Neither contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`,
+Two workflows (and the lint jobs in the first), on GitHub's hosted runners (free for a public repository). Neither contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`,
 and the UI tests use the app's fake sites.
 
 **`.github/workflows/ci.yml`: the unit tests, on every push to `main` and every pull request.**
 
 | Job | Machine | What it runs |
 |---|---|---|
+| `lint-actions`, `lint-yaml`, `lint-json`, `lint-python`, `lint-shell` | Linux, one each | The linters (below, "Lint"); seconds each |
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the page-script unit tests (`tools/pagescripts`); the shard split |
 | `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
-| `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 start booting their simulator before anything else; shard 0 builds first and boots after (a booting simulator starves the machine, and its checkout then took minutes), so it gets less of the tests. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`), once the boot started in the background has finished (up to 10 minutes; asking for the boot status while that boot was still going raced with it and failed shard 0 twice). A notice says when the simulator was ready and when the tests started |
+| `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 check out only what they read (`tools`, `AppTests`, `AppUITests`: about 1 MB, shallow) and then start booting their simulator; checked out after the boot had started, the whole 38 MB tree took 104 to 119 s, because a booting simulator starves the machine; shard 0 builds first and boots after (a booting simulator starves the machine, and its checkout then took minutes), so it gets less of the tests. Shard 0 builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`), once the boot started in the background has finished (up to 10 minutes; asking for the boot status while that boot was still going raced with it and failed shard 0 twice). A notice says when the simulator was ready and when the tests started |
+
+**Lint** (jobs `lint-*` in `ci.yml`, each on its own Linux machine, versions pinned so a new release of a linter never fails a push by itself; part
+of CI, so the TestFlight gate needs them too). They look for what is wrong, not for style: the code's own style (one-line statements, flow-style YAML,
+long lines) is deliberate.
+
+| Job | Tool | Checks | Run it here |
+|---|---|---|---|
+| `lint-actions` | actionlint (with shellcheck) | Every workflow: expressions and the outputs they read, job and step keys, each `run:` script | `actionlint` |
+| `lint-yaml` | yamllint, `.yamllint.yml` | Syntax, duplicate keys, indentation, stray blank lines and spaces, unquoted yes / no values | `yamllint $(git ls-files '*.yml')` |
+| `lint-json` | Python | Every `.json` file and string catalog parses | |
+| `lint-python` | ruff, rules `E9,F,B018` | Syntax errors, unused imports and variables, undefined names, statements that do nothing | `ruff check --isolated --select E9,F,B018 .` |
+| `lint-shell` | shellcheck | Every `.sh` script | `shellcheck tools/*.sh` |
+
+What they found when they were added (2026-11-20), all fixed: Norway's country code was an unquoted `NO` in `jurisdictions/countries.yml`, which a YAML 1.1
+reader (PyYAML, as in the Python tools) takes for `false` (the app's decoder reads it into a text field, so the app most likely read it right); it and the `YES` / `NO` build settings in `project.yml` are quoted (the generated project is byte for byte the
+same); the build notice always said "cache: none" because it read a `cache-matched-key` output `actions/cache` does not have (it now looks for a restored
+build folder); 16 unused imports, variables and a repeated import in the Python tools; unquoted variables and unused loop counters in the workflows' scripts.
+Swift has no lint job yet: swift-format's layout checks cannot be turned off and would mean reformatting every file.
 
 **`.github/workflows/integration.yml`: the integration tests, for a release.** On a published GitHub release and by hand: the UI tests (`OptOutKitUITests`)
 in 5 shards, built and handed over the same way. On a release, by hand and weekly (Mondays): the automatic run over every site (see below).
@@ -138,15 +157,18 @@ bundle as an artifact for a week.
 
 Between runs it keeps four things in GitHub's cache: the app's build folder (`DerivedData`, saved by `actions/cache`'s post step at the end of shard 0's job, after its tests, because saving it takes minutes; without its logs; started afresh each week so stale build products never pile up in it), the two packages'
 `.build` folders, the generated Xcode project (XcodeGen runs only when `project.yml` or the list of files changed: the project carries a hash of the file
-list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). The checkout fetches the last 100
-commits, which is enough for the file times. The packages' `Package.resolved` files are committed: they pin Yams, and the CI build copies the core package's into the
+list), and XcodeGen itself (downloaded from its release rather than installed with Homebrew, which is slow there). Every checkout is one commit with no
+history (the file times come from contents). The packages' `Package.resolved` files are committed: they pin Yams, and the CI build copies the core package's into the
 generated project and builds with `-disableAutomaticPackageResolution` (no package resolution over the network), `-skipPackagePluginValidation` and
 `-skipMacroValidation`; `swift test` runs with `--disable-automatic-resolution`. The CI test build leaves out the app icon
 (`ASSETCATALOG_COMPILER_APPICON_NAME=`): rendering its appearance variants took over three minutes on those machines, and no test looks at it. The build
 cache's key comes from git's tree hashes of the source folders (hashing every file with `hashFiles` took over two minutes and timed out). Code signing stays on (ad hoc): the app's encryption key lives in the
 Keychain, which needs a signed app on the simulator. Xcode and SwiftPM decide what to rebuild by file times, and a fresh checkout
-gives every file the time of the checkout, so before building `tools/ci_restore_mtimes.py` gives each file the time of its last commit; then only what
-changed since the cached build is compiled. Each shard's build posts a notice with the Swift files it compiled, the cache it started from, the build
+gives every file the time of the checkout, so before building `tools/ci_file_times.py` gives each file a time worked out from git's hash of its
+contents (the same contents, the same time; changed contents, another), and only what changed since the cached build is compiled. It reads the hashes
+from the checkout itself, so every job checks out one commit with no history (it used each file's last commit time until 2026-11-20, which needed the
+last 100 commits, and a cache older than those rebuilt more). Checked on the core package: a fresh checkout with the build folder restored rebuilt nothing
+(0.2 s), and one changed file rebuilt only that. Each shard's build posts a notice with the Swift files it compiled, the cache it started from, the build
 folder's size and its slowest kinds of step (`-showBuildTimingSummary`, read by `ci_shards.py --build-summary`). The caches are keyed by the Xcode version and the sources, so a new
 Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have
 room for slower CI machines.

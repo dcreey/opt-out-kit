@@ -252,7 +252,6 @@ def main():
     ap.add_argument("--candidates", action="store_true", help="record the search request for sites a plain request cannot read")
     a = ap.parse_args()
     os.makedirs(a.cache, exist_ok=True)
-    skip = {"unreachable", "blocked", "robots_disallowed"}
     entries = []
     for f in sorted(glob.glob(os.path.join(a.dir, "*.yml"))):
         s = open(f).read(); d = re.search(r'^domain: "(.*)"', s, re.M).group(1)

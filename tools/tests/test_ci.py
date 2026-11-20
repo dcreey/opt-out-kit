@@ -98,36 +98,41 @@ class BuildSummary(unittest.TestCase):
 
 
 class FileTimes(unittest.TestCase):
-    def test_files_get_their_last_commits_time(self):
-        with tempfile.TemporaryDirectory() as d:
-            git = lambda *a, **k: subprocess.run(["git", "-C", d, *a], check=True, capture_output=True, **k)
-            git("init", "-q"); git("config", "user.email", "t@example.com"); git("config", "user.name", "t")
-            open(os.path.join(d, "a.txt"), "w").write("1")
-            env = dict(os.environ, GIT_COMMITTER_DATE="2001-01-01T00:00:00Z", GIT_AUTHOR_DATE="2001-01-01T00:00:00Z")
-            git("add", "."); git("commit", "-qm", "one", env=env)
-            open(os.path.join(d, "b.txt"), "w").write("2")
-            git("add", "."); git("commit", "-qm", "two")
-            script = os.path.abspath(os.path.join(ROOT, "tools", "ci_restore_mtimes.py"))
-            subprocess.run([sys.executable, script], cwd=d, check=True, capture_output=True)
-            self.assertEqual(int(os.path.getmtime(os.path.join(d, "a.txt"))), 978307200, "set to its commit's time")
-            self.assertGreater(os.path.getmtime(os.path.join(d, "b.txt")), 978307200)
+    """tools/ci_file_times.py: a file's time comes from its contents, so a restored build folder rebuilds only what changed, with no history needed."""
 
-    def test_a_shallow_checkout_gives_files_not_changed_in_it_the_oldest_time(self):
+    def _repo(self, d):
+        git = lambda *a, **k: subprocess.run(["git", "-C", d, *a], check=True, capture_output=True, **k)
+        git("init", "-q"); git("config", "user.email", "t@example.com"); git("config", "user.name", "t")
+        return git
+
+    def _run(self, cwd):
+        script = os.path.abspath(os.path.join(ROOT, "tools", "ci_file_times.py"))
+        subprocess.run([sys.executable, script], cwd=cwd, check=True, capture_output=True)
+
+    def test_the_same_contents_get_the_same_time_in_any_checkout_and_changed_contents_another(self):
         with tempfile.TemporaryDirectory() as d:
-            src, dst = os.path.join(d, "src"), os.path.join(d, "dst")
-            os.mkdir(src)
-            git = lambda where, *a, **k: subprocess.run(["git", "-C", where, *a], check=True, capture_output=True, **k)
-            git(src, "init", "-q"); git(src, "config", "user.email", "t@example.com"); git(src, "config", "user.name", "t")
-            for i, name in enumerate(["old.txt", "mid.txt", "new.txt"]):
-                open(os.path.join(src, name), "w").write(name)
-                when = f"200{i + 1}-01-01T00:00:00Z"
-                git(src, "add", "."); git(src, "commit", "-qm", name, env=dict(os.environ, GIT_COMMITTER_DATE=when, GIT_AUTHOR_DATE=when))
-            subprocess.run(["git", "clone", "-q", "--depth", "2", "file://" + src, dst], check=True, capture_output=True)
-            script = os.path.abspath(os.path.join(ROOT, "tools", "ci_restore_mtimes.py"))
-            subprocess.run([sys.executable, script], cwd=dst, check=True, capture_output=True)
-            t = lambda n: int(os.path.getmtime(os.path.join(dst, n)))
-            self.assertLess(t("old.txt"), t("new.txt"), "a file older than the fetched commits is not taken as new")
-            self.assertLessEqual(t("old.txt"), t("mid.txt"))
+            src, one, two = (os.path.join(d, n) for n in ("src", "one", "two"))
+            os.mkdir(src); git = self._repo(src)
+            for name, text in [("a.txt", "kept"), ("b.txt", "before")]: open(os.path.join(src, name), "w").write(text)
+            git("add", "."); git("commit", "-qm", "one")
+            subprocess.run(["git", "clone", "-q", "--depth", "1", "file://" + src, one], check=True, capture_output=True)
+            self._run(one)
+            open(os.path.join(src, "b.txt"), "w").write("after"); git("commit", "-qam", "two")
+            subprocess.run(["git", "clone", "-q", "--depth", "1", "file://" + src, two], check=True, capture_output=True)   # one commit: no history
+            self._run(two)
+            t = lambda where, n: int(os.path.getmtime(os.path.join(where, n)))
+            self.assertEqual(t(one, "a.txt"), t(two, "a.txt"), "unchanged: the time the last build saw, so it is not rebuilt")
+            self.assertNotEqual(t(one, "b.txt"), t(two, "b.txt"), "changed: a new time, so it is rebuilt")
+            self.assertLess(t(two, "a.txt"), 978307200 + 5 * 365 * 86400 + 1)
+
+    def test_a_file_with_uncommitted_changes_keeps_its_own_time(self):
+        with tempfile.TemporaryDirectory() as d:
+            git = self._repo(d)
+            open(os.path.join(d, "a.txt"), "w").write("1"); git("add", "."); git("commit", "-qm", "one")
+            open(os.path.join(d, "a.txt"), "w").write("2")
+            before = os.path.getmtime(os.path.join(d, "a.txt"))
+            self._run(d)
+            self.assertEqual(os.path.getmtime(os.path.join(d, "a.txt")), before)
 
 
 if __name__ == "__main__":

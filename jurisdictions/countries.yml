@@ -770,7 +770,7 @@ jurisdictions:
     reviewed: 2026-10-22
     sources: ["https://www.dlapiperdataprotection.com/index.html?t=law&c=NG"]
   - id: country-no
-    code: NO
+    code: "NO"
     name: "Norway"
     kind: country
     bloc: eea

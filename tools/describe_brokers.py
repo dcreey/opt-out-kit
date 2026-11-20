@@ -94,7 +94,6 @@ def describe(ev):
                 if b not in sells: sells.append(b)
             if not note and re.search(r"\bsell|\bsold|licen[sc]e|disclos", low): note = s[:240]
     if cid in ("people_search", "arrests", "genealogy") and re.search(r"subscription|membership|premium|pay[- ]per|unlimited (searches|reports)|get (the )?report", htext): sells.append("public")
-    says_no_sale = bool(NOT_SOLD.search(ptext)) and not sells
     tagline = re.sub(r"\s+", " ", home.get("description") or "").strip()
     if tagline and len(tagline) > 190: tagline = tagline[:187].rsplit(" ", 1)[0] + "..."
     parts = [f"{name} is {'an' if label[0] in 'aeiou' else 'a'} {label}."]

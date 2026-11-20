@@ -4,7 +4,7 @@
   PLAYWRIGHT_BROWSERS_PATH=$PWD/.tools-browsers .tools-venv/bin/python tools/check_crawl.py [--out .guess/crawl-check.json] [--no-run]
 Exit status 1 when any site misses its route.
 """
-import argparse, json, os, subprocess, sys
+import argparse, json, subprocess, sys
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--out", default=".guess/crawl-check.json"); ap.add_argument("--no-run", action="store_true"); a = ap.parse_args()

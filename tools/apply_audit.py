@@ -2,7 +2,7 @@
 """Applies tools/audit_forms.py output: a browser-found form (`live`) whose page failed the audit and has a better page proposed gets that
 page; one with no better page is marked not found so it is not trusted. Forms read from the page (`page`) are only listed.
 Usage: apply_audit.py DIR [--dir directory] [--date YYYY-MM-DD]"""
-import argparse, datetime, os, re, sys
+import argparse, datetime, os, re
 
 
 def main():

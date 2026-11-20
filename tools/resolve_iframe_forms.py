@@ -5,7 +5,7 @@ address as the page to open, because the app's live path reads the top page only
 Usage: resolve_iframe_forms.py --domains a.com,b.com [--apply] [--dir directory] [--date YYYY-MM-DD]
 Without --apply it only prints what it found: `domain<TAB>old page<TAB>frame page<TAB>score`.
 """
-import argparse, asyncio, datetime, os, re, sys, urllib.parse
+import argparse, asyncio, datetime, os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import live_forms as L
 from playwright.async_api import async_playwright

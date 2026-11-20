@@ -8,8 +8,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    SWIFT_EMIT_LOC_STRINGS: YES
-    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: "YES"
+    LOCALIZATION_PREFERS_STRING_CATALOGS: "YES"
     CODE_SIGN_STYLE: Automatic
 packages:
   OptOutKitCore:
@@ -64,7 +64,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app
         DEVELOPMENT_TEAM: C84MKW6B2K
         TARGETED_DEVICE_FAMILY: "1"
-        GENERATE_INFOPLIST_FILE: NO
+        GENERATE_INFOPLIST_FILE: "NO"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
   ShareExtension:
     type: app-extension
@@ -88,7 +88,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.share
         DEVELOPMENT_TEAM: C84MKW6B2K
         TARGETED_DEVICE_FAMILY: "1"
-        GENERATE_INFOPLIST_FILE: NO
+        GENERATE_INFOPLIST_FILE: "NO"
   OptOutKitTests:
     type: bundle.unit-test
     platform: iOS
@@ -97,7 +97,7 @@ targets:
       - target: OptOutKit
     settings:
       base:
-        GENERATE_INFOPLIST_FILE: YES
+        GENERATE_INFOPLIST_FILE: "YES"
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.tests
   OptOutKitUITests:
     type: bundle.ui-testing
@@ -107,7 +107,7 @@ targets:
       - target: OptOutKit
     settings:
       base:
-        GENERATE_INFOPLIST_FILE: YES
+        GENERATE_INFOPLIST_FILE: "YES"
         PRODUCT_BUNDLE_IDENTIFIER: dev.optoutkit.app.uitests
 schemes:
   OptOutKit:

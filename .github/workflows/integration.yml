@@ -41,10 +41,25 @@ jobs:
       matrix:
         index: [0, 1, 2, 3, 4]          # keep in step with SHARDS
     steps:
-      - name: Start booting a simulator first (the steps after it mostly wait on the network, so the boot gets the processor)
+      # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout (38 MB) took 104 to 119 s on the
+      # shards that boot first. One commit, no history, for every job (file times come from contents: tools/ci_file_times.py). Shard 0 builds, so it
+      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings and the test sources it lists the
+      # tests from), about 1 MB.
+      - uses: actions/checkout@v4
+        if: matrix.index == 0
+      - uses: actions/checkout@v4
+        if: matrix.index != 0
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            AppTests
+            AppUITests
+          sparse-checkout-cone-mode: true
+      - name: Start booting a simulator (the steps after it mostly wait on the network, so the boot gets the processor)
         id: xcode
         run: |
-          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$(find /Applications -maxdepth 1 -name 'Xcode*.app' | sort -V | tail -1)"
           xcodebuild -version
           echo "version=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
           echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"          # the build-folder cache starts afresh each week, so it never grows
@@ -54,11 +69,8 @@ jobs:
           # Boots in the background and notes when it is ready (reported in a notice below). Not on shard 0: it builds for everyone, and a booting
           # simulator starves the machine (its checkout took three minutes), so it boots once the build is handed over.
           if [ "${{ matrix.index }}" != "0" ]; then
-            nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > $RUNNER_TEMP/simboot.log 2>&1 &
+            nohup sh -c "xcrun simctl boot $UDID; xcrun simctl bootstatus $UDID -b; date +%s > $RUNNER_TEMP/simready" > "$RUNNER_TEMP/simboot.log" 2>&1 &
           fi
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ matrix.index == 0 && 100 || 1 }}          # shard 0 builds and needs recent history for the file times; the others only test
       - name: Restore the generated project (XcodeGen runs only when project.yml or the list of files changed)
         if: matrix.index == 0
         id: xcproj
@@ -95,9 +107,9 @@ jobs:
           XG=$(find ~/xcodegen -type f -name xcodegen -perm -u+x | head -1)
           "$XG" --version && "$XG" generate
           echo "${{ steps.files.outputs.list }}" > OptOutKit.xcodeproj/.files
-      - name: Give each file its last commit's time (so a restored build folder rebuilds only what changed)
+      - name: Give each file a time worked out from its contents (so a restored build folder rebuilds only what changed)
         if: matrix.index == 0
-        run: python3 tools/ci_restore_mtimes.py
+        run: python3 tools/ci_file_times.py
       - name: Pin the packages for Xcode (the committed lockfile; the build then resolves nothing over the network)
         if: matrix.index == 0
         run: |
@@ -119,6 +131,8 @@ jobs:
         if: matrix.index == 0
         run: |
           set -o pipefail
+          # Which cache the build started from (actions/cache only says whether the key matched exactly; a build folder already here means an earlier one).
+          if [ "${{ steps.dd.outputs.cache-hit }}" = true ]; then CACHE=exact; elif [ -d DerivedData ]; then CACHE="earlier build"; else CACHE=none; fi
           xcodebuild build-for-testing -project OptOutKit.xcodeproj -scheme OptOutKit \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath DerivedData \
             -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation -showBuildTimingSummary \
@@ -126,7 +140,7 @@ jobs:
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
           # No app icon in the test build: rendering its variants took over three minutes on these machines (CI only; release builds keep it).
           # Where the build's time went (the slowest kinds of step), how much it compiled, and how big the build folder is.
-          python3 tools/ci_shards.py --build-summary build.log --cache "${{ steps.dd.outputs.cache-hit == 'true' && 'exact' || steps.dd.outputs.cache-matched-key != '' && 'earlier build' || 'none' }}" --folder DerivedData
+          python3 tools/ci_shards.py --build-summary build.log --cache "$CACHE" --folder DerivedData
       - name: Hand the build to the other shards
         if: matrix.index == 0
         uses: actions/upload-artifact@v4
@@ -136,14 +150,14 @@ jobs:
           retention-days: 1
       - name: Boot shard 0's simulator now that the build is handed over
         if: matrix.index == 0
-        run: nohup sh -c "xcrun simctl boot $SIM_UDID; xcrun simctl bootstatus $SIM_UDID -b; date +%s > $RUNNER_TEMP/simready" > $RUNNER_TEMP/simboot.log 2>&1 &
+        run: nohup sh -c "xcrun simctl boot $SIM_UDID; xcrun simctl bootstatus $SIM_UDID -b; date +%s > $RUNNER_TEMP/simready" > "$RUNNER_TEMP/simboot.log" 2>&1 &
       - name: Wait for shard 0's build (the simulator boots meanwhile; this shard compiles nothing)
         if: matrix.index != 0
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           API="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          for i in $(seq 1 180); do
+          for _ in $(seq 1 180); do
             n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/artifacts?name=ui-test-products" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))' || echo 0)
             [ "$n" -gt 0 ] && { echo "the build arrived after $(( $(date +%s) - JOB_START )) s"; exit 0; }
             gone=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/jobs?per_page=30" | python3 -c 'import json,sys; print(any(j["name"] == "UI tests 0" and j["status"] == "completed" for j in json.load(sys.stdin)["jobs"]))' || echo False)
@@ -164,18 +178,18 @@ jobs:
         run: |
           # The boot started in the background finishes first (up to 10 minutes): asking for the boot status while that boot is still under way raced
           # with it and failed shard 0 twice ("Wait for the simulator", c1b0c04 and e08dfbe). Then one check that it really booted.
-          for i in $(seq 1 600); do [ -f $RUNNER_TEMP/simready ] && break; sleep 1; done
-          [ -f $RUNNER_TEMP/simready ] || { echo "::error::the simulator did not boot in 10 minutes"; cat $RUNNER_TEMP/simboot.log; exit 1; }
-          xcrun simctl bootstatus "$SIM_UDID" -b || { cat $RUNNER_TEMP/simboot.log; exit 1; }
-          echo "::notice title=Simulator::ready $(( $(cat $RUNNER_TEMP/simready) - JOB_START )) s after the job started; tests start $(( $(date +%s) - JOB_START )) s in"
+          for _ in $(seq 1 600); do [ -f "$RUNNER_TEMP/simready" ] && break; sleep 1; done
+          [ -f "$RUNNER_TEMP/simready" ] || { echo "::error::the simulator did not boot in 10 minutes"; cat "$RUNNER_TEMP/simboot.log"; exit 1; }
+          xcrun simctl bootstatus "$SIM_UDID" -b || { cat "$RUNNER_TEMP/simboot.log"; exit 1; }
+          echo "::notice title=Simulator::ready $(( $(cat "$RUNNER_TEMP/simready") - JOB_START )) s after the job started; tests start $(( $(date +%s) - JOB_START )) s in"
       - name: Run this shard
         shell: bash
         run: |
           SKIP=(); for t in $KNOWN_FAILING; do SKIP+=(--skip "$t"); done
           ARGS=()          # one argument per line (macOS ships bash 3.2, which has no mapfile)
-          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --suite $SUITE --shards $SHARDS --reserve 0:$PACKAGES_SECONDS --index ${{ matrix.index }} ${SKIP[@]+"${SKIP[@]}"})
+          while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$PACKAGES_SECONDS" --index "${{ matrix.index }}" ${SKIP[@]+"${SKIP[@]}"})
           printf '%s\n' "${ARGS[@]}"
-          XCTESTRUN=$(ls DerivedData/Build/Products/*.xctestrun | head -1)
+          XCTESTRUN=$(find DerivedData/Build/Products -maxdepth 1 -name '*.xctestrun' | head -1)
           set -o pipefail
           xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
             -resultBundlePath "Results-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \
@@ -203,7 +217,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Use the newest Xcode, and start booting a simulator
         run: |
-          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$(find /Applications -maxdepth 1 -name 'Xcode*.app' | sort -V | tail -1)"
           xcodebuild -version
           UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if 'iPhone' in x['name']))")
           echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
@@ -227,7 +241,7 @@ jobs:
           TEST_RUNNER_OPTOUT_ALL_SITES: "1"
         run: |
           set -o pipefail
-          xcodebuild test-without-building -xctestrun "$(ls DerivedData/Build/Products/*.xctestrun | head -1)" -destination "id=$SIM_UDID" \
+          xcodebuild test-without-building -xctestrun "$(find DerivedData/Build/Products -maxdepth 1 -name '*.xctestrun' | head -1)" -destination "id=$SIM_UDID" \
             -resultBundlePath Results.xcresult \
             -only-testing:OptOutKitUITests/AutoProtectionUITests/testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere \
             -only-testing:OptOutKitUITests/AutoProtectionUITests/testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet \
