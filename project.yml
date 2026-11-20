@@ -23,12 +23,9 @@ targets:
       - 'Shared/AssistedRun'
       - 'App/Resources'
       # The data (directory/, brokers/, platforms/, jurisdictions/, terms/, the registry summary) ships compiled into Catalog.sqlite (buildToolPlugins below).
-      # The JavaScript the app runs in web pages, one file per script (App/Sources/PageScript.swift; tested by tools/pagescripts).
-      - path: 'App/PageScripts'
-        type: 'folder'
-        buildPhase: 'resources'
-    # Compiles directory/, brokers/, platforms/, jurisdictions/, terms/ and the registry summary into Catalog.sqlite inside the app (Catalog in the
-    # core package): the app reads that and never parses YAML.
+      # The JavaScript the app runs in web pages (App/PageScripts, one file per script; tested by tools/pagescripts) ships compiled into the catalog too.
+    # Compiles directory/, brokers/, platforms/, jurisdictions/, terms/, the registry summary, the page scripts and the ZIP table into Catalog.sqlite inside
+    # the app (Catalog in the core package): the app reads that and nothing else bundled.
     buildToolPlugins:
       - plugin: 'CatalogPlugin'
         package: 'OptOutKitCore'
@@ -40,7 +37,7 @@ targets:
       properties:
         CFBundleDisplayName: 'Exnay'
         CFBundleShortVersionString: '1.0'
-        CFBundleVersion: '51'
+        CFBundleVersion: '52'
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         CFBundleURLTypes:
@@ -66,7 +63,7 @@ targets:
       properties:
         CFBundleDisplayName: 'Exnay'
         CFBundleShortVersionString: '1.0'
-        CFBundleVersion: '51'
+        CFBundleVersion: '52'
         NSExtension:
           NSExtensionPointIdentifier: 'com.apple.share-services'
           NSExtensionPrincipalClass: '$(PRODUCT_MODULE_NAME).ShareViewController'
