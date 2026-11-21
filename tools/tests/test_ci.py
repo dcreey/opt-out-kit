@@ -19,8 +19,8 @@ class Shards(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             open(os.path.join(d, "A.swift"), "w").write(
                 "@MainActor\nfinal class OneTests: XCTestCase {\n    func testA() {}\n    func testB() async throws {}\n    func helper() {}\n}\n"
-                "class Empty: XCTestCase {}\nstruct NotATest {}\nprivate final class TwoTests: XCTestCase { }\n")
-            self.assertEqual(S.classes(d), {"OneTests": 2})
+                "class Empty: XCTestCase {}\nstruct NotATest {}\nprivate final class TwoTests: XCTestCase { }\nfinal class ThreeTests: UITestCase {\n    func testC() {}\n}\n")
+            self.assertEqual(S.classes(d), {"OneTests": 2, "ThreeTests": 1})
 
 
 class Balance(unittest.TestCase):

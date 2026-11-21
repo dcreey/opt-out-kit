@@ -9,7 +9,7 @@ same time.
   ci_shards.py --failures-from-log LOG      each failed test and its message, as annotations (CI prints them)
   ci_shards.py --fetch-run RUN_ID            reads those notices from a finished GitHub run (public API, no login) into tools/ci_timings.json
 
-Classes are found by reading the test sources (`class Name: XCTestCase`), so a new class is picked up with no change here. A class weighs the
+Classes are found by reading the test sources (`class Name: XCTestCase`, or `: UITestCase`, the base of every UI test: AppUITests/UITestCase.swift), so a new class is picked up with no change here. A class weighs the
 seconds it took in the last measured run (tools/ci_timings.json); a class never measured is estimated from its number of tests. Shards are filled
 longest class first, each class going to the shard with the least so far. UI tests are handed out one test at a time, unit tests one class at a time. `--skip Target/Class/testMethod` leaves a test out;
 used for tests known to fail, which are listed in docs/TESTING.md.
@@ -22,7 +22,7 @@ TIMINGS = os.path.join(ROOT, "tools", "ci_timings.json")
 # Seconds a test is guessed to take before it has been measured: a UI test launches the app and taps through screens.
 GUESS = {"OptOutKitTests": 2.0, "OptOutKitUITests": 40.0}
 
-CLASS = re.compile(r'^\s*(?:@MainActor\s+)?(?:final\s+)?class\s+(\w+)\s*:\s*XCTestCase', re.M)
+CLASS = re.compile(r'^\s*(?:@MainActor\s+)?(?:final\s+)?class\s+(\w+)\s*:\s*(?:XCTestCase|UITestCase)\b', re.M)
 TEST = re.compile(r'^\s*(?:@MainActor\s+)?func\s+(test\w*)\s*\(', re.M)
 CASE = re.compile(r"Test Case '-\[(\w+)\.(\w+) (\w+)\]' (?:passed|failed|skipped) \((\d+(?:\.\d+)?) seconds\)")
 
