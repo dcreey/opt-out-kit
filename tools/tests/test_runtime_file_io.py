@@ -9,15 +9,15 @@ import re
 import unittest
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-RUNTIME = ["App/Sources", "Shared/AssistedRun", "ShareExtension", "Packages/OptOutKitCore/Sources/OptOutKitCore"]
+RUNTIME = ["App/Sources", "Shared/AssistedRun", "Shared/Model", "ShareExtension", "Packages/OptOutKitCore/Sources/OptOutKitCore"]
 FORBIDDEN = re.compile(r"FileManager|Data\(contentsOf|String\(contentsOf|contentsOfDirectory|\.write\(to:|Bundle\.(main|module)\.(url|urls|path|paths|resourceURL)|NSFileProtection|fileExists|UserDefaults|@AppStorage|@SceneStorage|NSUbiquitousKeyValueStore")
 
 # file -> (what it may do, the strings that identify the allowed lines)
 ALLOWED = {
-    "App/Sources/AppCatalog.swift": ("finds the compiled catalog in the bundle and opens it", ["Bundle.main.url(forResource: \"Catalog\""]),
-    "App/Sources/OptOutKitApp.swift": ("names the database file's folder (Application Support) and the old files it is moved in from",
+    "Shared/Model/AppCatalog.swift": ("finds the compiled catalog in the bundle and opens it", ["Bundle.main.url(forResource: \"Catalog\""]),
+    "Shared/Model/AppModel.swift": ("names the database file's folder (Application Support) and the old files it is moved in from",
                                        [".applicationSupportDirectory"]),
-    "App/Sources/Loc.swift": ("iOS's own translated strings (Xcode compiles the catalog into .lproj for the system)", ["ofType: \"lproj\""]),
+    "Shared/Model/Loc.swift": ("iOS's own translated strings (Xcode compiles the catalog into .lproj for the system)", ["ofType: \"lproj\""]),
     "Packages/OptOutKitCore/Sources/OptOutKitCore/L10n.swift": ("the same, and the raw catalog when the package is built without Xcode (tests)",
                                                                 ["ofType: \"lproj\"", "withExtension: \"xcstrings\"", "Data(contentsOf: url)"]),
     "Packages/OptOutKitCore/Sources/OptOutKitCore/Preferences.swift": ("the one-time move of an older build's UserDefaults values into the database (importLegacy)",

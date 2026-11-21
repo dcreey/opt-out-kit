@@ -326,10 +326,6 @@ extension BrokerListView {
 /// Why a day's batch is being chosen: the first of the day, or another batch after finishing.
 enum ChooserMode: String, Identifiable { case start, more; var id: String { rawValue } }
 
-/// The words every opt-out flow repeats: finishing an opt-out sometimes takes a follow-up email.
-enum FollowUpNote {
-    static let text = Loc.t("Some sites will email you afterwards with a link, a code or one more step to finish the opt-out. Watch your inbox, including spam. We will do our best to complete every opt-out inside the app.")
-}
 
 /// Pick which kind of broker to work on: each is described in plain words with how many sites are left.
 struct KindChooserView: View {

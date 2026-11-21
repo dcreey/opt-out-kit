@@ -21,7 +21,7 @@ env:
   # Tests known to fail, left out until they are fixed (docs/TESTING.md lists them). Empty: every test runs.
   KNOWN_FAILING: ''
   # GitHub's free plan runs at most 5 macOS jobs at once: 4 shards of the app's unit tests, balanced by measured time, and the package tests.
-  SHARDS: 4
+  SHARDS: 2
   SUITE: 'OptOutKitTests'
   # Shard 0 builds the app for every shard (the others wait for it meanwhile, booting their simulators). It boots its simulator only after the build
   # (about two minutes), so it is given that much less.
@@ -154,7 +154,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        index: [0, 1, 2, 3]          # keep in step with SHARDS
+        index: [0, 1]          # keep in step with SHARDS
     steps:
       # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout (38 MB) took 104 to 119 s on the
       # shards that boot first. One commit, no history, for every job (file times come from contents: tools/ci_file_times.py). Shard 0 builds, so it

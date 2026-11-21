@@ -78,7 +78,7 @@ final class TermsAcceptanceTests: XCTestCase {
         }
         let box = LogBox()
         func policy(_ lib: TermsLibrary, approved: Bool) -> LibraryTermsPolicy {
-            LibraryTermsPolicy(library: lib, approval: approved ? TermsApproval(libraryVersion: 3) : nil) { box.entries.append($0) }
+            LibraryTermsPolicy(library: lib, approval: approved ? TermsApproval(libraryVersion: 3) : nil, fetchDocument: { _ in nil }, onAccepted: { box.entries.append($0) })
         }
         // reviewed and approved: accepted, and logged
         var page = try await WebViewFetcher(maxWait: 8, termsPolicy: policy(library(reviewed: true), approved: true)).render(html: gatePage, domain: domain)
@@ -129,61 +129,5 @@ final class TermsAcceptanceTests: XCTestCase {
         }
         let none = try await liveBlockers(nil)
         XCTAssertTrue(none.contains(.terms), "with the setting off the person always accepts")
-    }
-}
-
-@MainActor
-final class TermsSettingsTests: XCTestCase {
-    private func model(library: TermsLibrary? = nil) throws -> AppModel {
-        // The catalog the app ships with its terms library replaced by the test's own (nothing is read from a folder).
-        var contents: Catalog.Contents?
-        if let library {
-            var c = try Catalog.contents(of: try XCTUnwrap(AppCatalog.url))
-            c.termsLibrary = library
-            contents = c
-        }
-        return AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-terms-\(UUID()).sqlite"), keys: FixedKey()),
-                        contents: contents, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
-    }
-
-    func testTheShippedLibraryIsReviewedButNothingIsAcceptedUntilThePersonAllowsIt() throws {
-        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
-                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
-        XCTAssertGreaterThan(m.termsLibrary?.paragraphs.count ?? 0, 100)
-        XCTAssertGreaterThan(m.termsReviewedCount, 0, "the owner approved the list, so the switch can be turned on")
-        XCTAssertNil(m.termsApproval, "it is off until the person allows it")
-        XCTAssertFalse(m.termsActive)
-        XCTAssertNil(m.makeTermsPolicy())
-        m.approveTerms()                       // the person taps Allow
-        XCTAssertTrue(m.termsActive)
-        XCTAssertNotNil(m.makeTermsPolicy())
-        m.revokeTerms()
-        XCTAssertFalse(m.termsActive); XCTAssertNil(m.makeTermsPolicy())
-    }
-
-    func testApprovalTurnsItOnAndRevokingTurnsItOff() throws {
-        let lib = TermsLibrary(version: 5, paragraphs: [TermsParagraph(hash: "aaaa", sites: 2, kinds: ["terms"], flags: [], prefix: "x", reviewed: true, verdict: "ok")])
-        let m = try model(library: lib)
-        XCTAssertEqual(m.termsReviewedCount, 1)
-        XCTAssertFalse(m.termsActive)
-        XCTAssertNil(m.makeTermsPolicy(), "reviewed paragraphs alone are not enough: the person must approve")
-        m.approveTerms()
-        XCTAssertTrue(m.termsActive)
-        XCTAssertNotNil(m.makeTermsPolicy())
-        m.revokeTerms()
-        XCTAssertFalse(m.termsActive)
-        XCTAssertNil(m.makeTermsPolicy())
-    }
-}
-
-final class TermsSummaryTests: XCTestCase {
-    func testSummaryCoversTheClausesAPersonMustKnowAbout() {
-        let all = TermsSummary.sections.flatMap(\.bullets).joined(separator: " ").lowercased()
-        for must in ["indemnity", "minors", "public officials", "cookies", "as-is", "without telling you"] {
-            XCTAssertTrue(all.contains(must), "summary should mention \(must)")
-        }
-        XCTAssertTrue(all.contains("credit, insurance, employment or tenant"), "the CourtRecords.us use restriction")
-        XCTAssertFalse(TermsSummary.basis.isEmpty, "the summary must say what it was based on")
-        XCTAssertGreaterThanOrEqual(TermsSummary.sections.count, 4)
     }
 }

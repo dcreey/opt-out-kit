@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// The app ships its data compiled into Catalog.sqlite (built by the CatalogPlugin build step) and reads only that: no YAML, no script file, no table file in
 /// the bundle, and the model, the page scripts and the ZIP lookup get their data from it. (That the catalog holds exactly what the repository's YAML holds is
@@ -10,16 +10,6 @@ final class CatalogAppTests: XCTestCase {
     private func model() -> AppModel {
         AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sqlite"), keys: FixedKey()),
                  defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
-    }
-
-    func testTheAppShipsTheCompiledCatalogAndNoDataFiles() throws {
-        let bundle = try XCTUnwrap(Bundle.main.resourceURL)
-        XCTAssertNotNil(Bundle.main.url(forResource: "Catalog", withExtension: "sqlite"), "the build step put the catalog in the app")
-        for folder in ["directory", "brokers", "platforms", "jurisdictions", "terms", "PageScripts", "data"] {
-            XCTAssertFalse(FileManager.default.fileExists(atPath: bundle.appendingPathComponent(folder).path), "\(folder)/ is compiled into the catalog, not shipped")
-        }
-        let files = (FileManager.default.enumerator(atPath: bundle.path)?.allObjects as? [String] ?? []).filter { ["yml", "yaml", "js", "tsv"].contains(($0 as NSString).pathExtension) }
-        XCTAssertEqual(files, [], "no YAML, script or table file anywhere in the app")
     }
 
     func testTheModelLoadsItsDataFromTheCatalog() throws {

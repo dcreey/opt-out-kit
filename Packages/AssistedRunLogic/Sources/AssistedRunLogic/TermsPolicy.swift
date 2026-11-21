@@ -1,0 +1,1 @@
+../../../../Shared/Model/TermsPolicy.swift

@@ -1,7 +1,7 @@
 import XCTest
 import CryptoKit
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 @MainActor
 private func makeModel(url: URL? = nil, keys: KeyProviding = FixedKey()) -> AppModel {
@@ -154,16 +154,6 @@ final class PeopleTests: XCTestCase {
     }
 }
 
-final class KeychainKeyTests: XCTestCase {
-    func testKeyIsCreatedOnceAndStable() throws {
-        let provider = KeychainKey(service: "dev.optoutkit.tests.\(UUID())", account: "k")
-        let a = try provider.key(), b = try provider.key()
-        XCTAssertEqual(a.withUnsafeBytes { Data($0) }, b.withUnsafeBytes { Data($0) })
-        XCTAssertEqual(a.bitCount, 256)
-    }
-}
-
-
 @MainActor
 final class OnboardingTests: XCTestCase {
     private func model(_ defaults: UserDefaults, catalog: [Announcement]) -> AppModel {
@@ -218,40 +208,6 @@ final class DirectoryModelTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(model.directory.count, 200)
         XCTAssertFalse(model.unguidedSites.contains { $0.domain == "spokeo.com" }, "Spokeo already has a guided flow")
         XCTAssertTrue(model.unguidedSites.count < model.directory.count)
-    }
-}
-
-@MainActor
-final class WebViewFetcherTests: XCTestCase {
-    /// The point of the web view: a page that fills in its results with JavaScript after a "loading" screen.
-    func testWaitsForScriptToFillInResults() async throws {
-        let html = """
-        <html><head><title>Directory</title></head><body><div id="r">Loading...</div>
-        <script>setTimeout(function(){document.getElementById('r').innerText='Search results: Pat Example, Springfield';}, 1500);</script>
-        </body></html>
-        """
-        let page = try await WebViewFetcher().render(html: html)
-        XCTAssertTrue(page.text.contains("Search results: Pat Example"), "got: \(page.text)")
-        XCTAssertFalse(page.text.contains("Loading..."))
-    }
-
-    func testPlainStaticPageReturnsItsText() async throws {
-        let page = try await WebViewFetcher().render(html: "<html><body>No results found</body></html>")
-        XCTAssertTrue(page.text.contains("No results found"))
-    }
-
-    func testRechecksThroughTheWebViewFetcherLikeAnyOtherFetcher() async throws {
-        // A spec checked against a page that only has its content after script runs: a plain fetcher would see "Loading...".
-        struct ScriptedPage: PageFetcher {
-            func fetch(_ url: URL) async throws -> FetchedPage {
-                try await WebViewFetcher().render(html: "<body>Directory <span id=a>Loading...</span><script>setTimeout(()=>a.innerText='No result for this name',800)</script></body>")
-            }
-        }
-        let broker = Broker(id: "b", name: "B", tier: .B, covers: nil, signals: nil, fields: nil, steps: [Step(say: "x")], recheckDays: 30, verified: nil,
-                            recheck: Recheck(searchURL: "https://b.example/{first}-{last}", validPage: ["directory"], noResults: ["no result"], ignoreLocation: true))
-        let pat = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
-        let outcome = await Rechecker(fetcher: ScriptedPage()).check(broker, for: pat)
-        XCTAssertEqual(outcome, .removed)
     }
 }
 

@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// The household's one email address, and that every form for every profile gets it (exactly as typed).
 @MainActor
@@ -83,46 +83,9 @@ final class ContactEmailAppTests: XCTestCase {
     }
 }
 
-@MainActor
-final class BrowserHandoffTests: XCTestCase {
-    func testOpeningAsksAtOnceAndYesFinishesNoDoesNot() {
-        let h = BrowserHandoff()
-        var opened: [URL] = []
-        h.open(URL(string: "https://example.com/optout")!) { opened.append($0) }
-        XCTAssertTrue(h.asking); XCTAssertEqual(opened.count, 1)
-        var finished = 0
-        h.answer(completed: false) { finished += 1 }
-        XCTAssertFalse(h.asking); XCTAssertEqual(finished, 0)
-        h.open(URL(string: "https://example.com/optout")!) { _ in }
-        h.answer(completed: true) { finished += 1 }
-        XCTAssertEqual(finished, 1)
-    }
-
-    func testOnlyWebAddressesOpen() {
-        let h = BrowserHandoff()
-        h.open(URL(string: "file:///etc/passwd")!) { _ in XCTFail("not a web page") }
-        XCTAssertFalse(h.asking)
-    }
-}
 
 import SwiftUI
 
-final class RowFieldTests: XCTestCase {
-    private struct Row { var name: String }
-
-    func testARowDeletedUnderTheBindingGivesTheDefaultAndIgnoresStoresInsteadOfTrapping() {
-        var rows = [Row(name: "a"), Row(name: "b")]
-        let list = Binding(get: { rows }, set: { rows = $0 })
-        let second = RowField.binding(list, 1, \Row.name, default: "")
-        XCTAssertEqual(second.wrappedValue, "b")
-        second.wrappedValue = "B"; XCTAssertEqual(rows[1].name, "B")
-        rows.remove(at: 1)                                        // the row is deleted; SwiftUI still holds its binding
-        XCTAssertEqual(second.wrappedValue, "", "no trap: the default")
-        second.wrappedValue = "late"; XCTAssertEqual(rows.count, 1, "a late store is ignored")
-        rows.removeAll()
-        XCTAssertEqual(RowField.binding(list, 0, \Row.name, default: "x").wrappedValue, "x")
-    }
-}
 
 @MainActor
 final class FirstRunResumeTests: XCTestCase {
@@ -152,45 +115,4 @@ final class FirstRunResumeTests: XCTestCase {
         m.resumeSetupIfNeeded()
         XCTAssertFalse(m.showProfileGate)
     }
-
-    func testEmptyRowsAreDroppedWhenAProfileIsSaved() {
-        var p = Person(displayName: "Me", relationship: .me)
-        p.names = [NameEntry(kind: .legal, name: "Pat Example"), NameEntry(kind: .nickname, name: "  "), NameEntry(kind: .nickname, name: "Patty")]
-        p.phones = ["(773) 633-1564", ""]; p.emails = ["", "pat@example.com"]
-        p.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(city: "", state: ""), Address(city: "Peoria", state: "IL")]
-        let q = PersonEditorView.pruned(p)
-        XCTAssertEqual(q.names.map(\.name), ["Pat Example", "Patty"])
-        XCTAssertEqual(q.phones, ["(773) 633-1564"]); XCTAssertEqual(q.emails, ["pat@example.com"])
-        XCTAssertEqual(q.addresses.map(\.city), ["Springfield", "Peoria"], "a started earlier address stays; an empty one goes")
-    }
 }
-
-#if DEBUG
-@MainActor
-final class SiteReviewTests: XCTestCase {
-    private func entries() throws -> [DirectoryEntry] {
-        return try Catalog.contents(of: try XCTUnwrap(AppCatalog.url), includeExcluded: true).sites
-    }
-
-    func testTheQueueIsTheSitesWithNoReadableFormMostImportantFirst() throws {
-        let rows = SiteReview.rows(from: try entries())
-        XCTAssertGreaterThan(rows.count, 100)
-        XCTAssertFalse(rows.contains { $0.domain == "peoplefinders.com" }, "a site with a readable form is not asked about")
-        let all = try entries()
-        let pri = rows.compactMap { r in all.first { $0.id == r.id }?.priority ?? 0 }
-        XCTAssertEqual(pri, pri.sorted(by: >), "most important first")
-    }
-
-    func testTagsFromTheWebPageAreMergedAndTheNewerOneWins() throws {
-        let review = SiteReview(entries: try entries())
-        let first = try XCTUnwrap(review.rows.first)
-        let json = #"[{"d":"\#(first.domain)","tag":"ok","url":"https://x.example/optout","at":"2099-01-01T00:00:00Z"}]"#
-        XCTAssertEqual(review.importJSON(json), 1)
-        XCTAssertTrue(review.isDone(first)); XCTAssertEqual(review.tags[first.domain]?.url, "https://x.example/optout")
-        let older = #"[{"d":"\#(first.domain)","tag":"none","at":"2000-01-01T00:00:00Z"}]"#
-        XCTAssertEqual(review.importJSON(older), 0, "an older tag never replaces a newer one")
-        XCTAssertNotEqual(review.current?.domain, first.domain, "the queue moves past a site that is done")
-        try? FileManager.default.removeItem(at: review.file)
-    }
-}
-#endif

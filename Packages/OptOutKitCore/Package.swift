@@ -7,6 +7,8 @@ let package = Package(
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(name: "OptOutKitCore", targets: ["OptOutKitCore"]),
+        // Reads the repository's YAML into a catalog: the Mac tests of the model build one (`Packages/AssistedRunLogic`); the app links neither this nor Yams.
+        .library(name: "CatalogSource", targets: ["CatalogSource"]),
         .executable(name: "broker-pipeline", targets: ["broker-pipeline"]),
         .executable(name: "catalog-builder", targets: ["catalog-builder"]),
         // Builds Catalog.sqlite into the app at build time (applied to the app target in project.yml).

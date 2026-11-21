@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// The app's preferences are rows of its database, and what an older build kept in UserDefaults is moved in the first time the model starts.
 @MainActor

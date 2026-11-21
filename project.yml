@@ -21,6 +21,7 @@ targets:
     sources:
       - 'App/Sources'
       - 'Shared/AssistedRun'
+      - 'Shared/Model'
       - 'App/Resources'
       # The data (directory/, brokers/, platforms/, jurisdictions/, terms/, the registry summary) ships compiled into Catalog.sqlite (buildToolPlugins below).
       # The JavaScript the app runs in web pages (App/PageScripts, one file per script; tested by tools/pagescripts) ships compiled into the catalog too.

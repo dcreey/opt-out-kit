@@ -1,6 +1,6 @@
 import XCTest
 import JavaScriptCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// The page scripts load from the compiled catalog and are valid JavaScript, and a value passed to one arrives exactly as given, whatever it holds.
 /// (What each script does to a page is tested in tools/pagescripts, in a headless DOM; docs/TESTING.md, "Page scripts".)

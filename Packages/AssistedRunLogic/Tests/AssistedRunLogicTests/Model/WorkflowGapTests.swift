@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// Workflows that had no test at all (found in the audit in docs/TESTING.md): the California link in Settings, and the Global Privacy Control
 /// walkthrough being remembered. (A link opened from outside the app is covered by AppModelTests.testOnlyAWebAddressInsideAnExnayLinkIsTaken.)
@@ -31,13 +31,13 @@ final class WorkflowGapTests: XCTestCase {
     }
 
     func testAPastedLinkBecomesAnHTTPSAddressAndJunkIsRefused() {
-        XCTAssertEqual(LinkFiller.normalized("https://example.com/confirm?id=1")?.absoluteString, "https://example.com/confirm?id=1")
-        XCTAssertEqual(LinkFiller.normalized("http://example.com/x")?.scheme, "https", "an http link is upgraded")
-        XCTAssertEqual(LinkFiller.normalized("  example.com/optout \n")?.absoluteString, "https://example.com/optout", "a bare address gets https and stray spaces go")
-        XCTAssertNil(LinkFiller.normalized(""))
-        XCTAssertNil(LinkFiller.normalized("not a link"))
-        XCTAssertNil(LinkFiller.normalized("ftp://example.com/file"))
-        XCTAssertNil(LinkFiller.normalized("javascript:alert(1)"))
+        XCTAssertEqual(LinkAddress.normalized("https://example.com/confirm?id=1")?.absoluteString, "https://example.com/confirm?id=1")
+        XCTAssertEqual(LinkAddress.normalized("http://example.com/x")?.scheme, "https", "an http link is upgraded")
+        XCTAssertEqual(LinkAddress.normalized("  example.com/optout \n")?.absoluteString, "https://example.com/optout", "a bare address gets https and stray spaces go")
+        XCTAssertNil(LinkAddress.normalized(""))
+        XCTAssertNil(LinkAddress.normalized("not a link"))
+        XCTAssertNil(LinkAddress.normalized("ftp://example.com/file"))
+        XCTAssertNil(LinkAddress.normalized("javascript:alert(1)"))
     }
 
     func testSendingForThePersonIsOnByDefaultTheSessionBoxOverridesItAndSettingsChangesTheDefault() {

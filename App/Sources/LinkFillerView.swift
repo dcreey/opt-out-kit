@@ -15,15 +15,8 @@ final class LinkFiller: ObservableObject {
     /// Bumped when the person cancels (or another page is opened): a load still running for an older number stops quietly.
     private var generation = 0
 
-    /// A web address from pasted text: https only (an http link is upgraded), with a real host.
-    static func normalized(_ text: String) -> URL? {
-        var t = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !t.isEmpty else { return nil }
-        if !t.contains("://") { t = "https://" + t }
-        guard var c = URLComponents(string: t), let host = c.host, host.contains(".") else { return nil }
-        if c.scheme == "http" { c.scheme = "https" }
-        return c.scheme == "https" ? c.url : nil
-    }
+    /// A web address from pasted text (`LinkAddress.normalized`).
+    static func normalized(_ text: String) -> URL? { LinkAddress.normalized(text) }
 
     /// Test hook: works on a session that already holds a page.
     func attach(_ session: WebViewSession) { close(); self.session = session; webView = session.presentable(); host = "test" }

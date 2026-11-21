@@ -9,7 +9,12 @@ enum AppCatalog {
         Fixtures.allowFetching()
         if let fixtures = Fixtures.catalog { return fixtures }          // an integration test's catalog of fixture brokers (docs/TESTING.md)
         #endif
-        return Bundle.main.url(forResource: "Catalog", withExtension: "sqlite")
+        if let bundled = Bundle.main.url(forResource: "Catalog", withExtension: "sqlite") { return bundled }
+        #if canImport(CatalogSource)
+        return MacCatalog.built          // the model's Mac tests (Packages/AssistedRunLogic): a catalog built from the repository's data
+        #else
+        return nil
+        #endif
     }()
 
     private static let opened: Void = { if let url { try? Catalog.use(url) } }()

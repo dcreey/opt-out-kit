@@ -1,7 +1,7 @@
 import XCTest
 import WebKit
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// Answers for any host as the same moved site.
 private struct AnySite: PageInspector {
@@ -105,36 +105,6 @@ final class LinkHealingTests: XCTestCase {
     }
 }
 
-@MainActor
-final class WebPageInspectorTests: XCTestCase {
-    func testReadsTitleTextLinksAndFormsFromTheLiveDOM() async throws {
-        let html = """
-        <html><head><title>Privacy Request Portal</title></head><body>
-        <p>Welcome. You have the right to opt out of the sale of your information.</p>
-        <a href="/privacy-rights">Your Privacy Rights</a> <a href="https://other.example/x#frag">Other</a>
-        <form action="https://x.example/submit" method="post">
-          <label for="f">First name</label><input id="f" name="first">
-          <input type="email" name="email" placeholder="Your email">
-          <input type="hidden" name="token" value="x">
-          <select name="state"><option>IL</option></select>
-          <button type="submit">Send</button>
-        </form></body></html>
-        """
-        let snap = try await XCTUnwrapAsync(await WebPageInspector().snapshot(html: html, url: URL(string: "https://x.example/request-portal/")!))
-        XCTAssertEqual(snap.title, "Privacy Request Portal")
-        XCTAssertTrue(snap.text.contains("right to opt out"))
-        XCTAssertTrue(snap.links.contains { $0.text == "Your Privacy Rights" })
-        XCTAssertEqual(snap.forms.count, 1)
-        let form = snap.forms[0]
-        XCTAssertEqual(form.method, "post")
-        XCTAssertTrue(form.hasSubmit)
-        XCTAssertEqual(form.fields.map(\.name), ["first", "email", "state"], "hidden inputs are left out")
-        XCTAssertEqual(form.fields.first?.label, "First name", "labels come from <label for>")
-        XCTAssertEqual(form.fields.last?.type, "select")
-        // and the finder's rules accept it as an opt-out form on an opt-out page
-        XCTAssertNotNil(LinkRules.bestForm(on: PageSnapshot(url: URL(string: "https://x.example/request-portal/")!, title: snap.title, text: snap.text, links: snap.links, forms: snap.forms)))
-    }
-}
 
 private func XCTUnwrapAsync<T>(_ value: @autoclosure () async -> T?, file: StaticString = #filePath, line: UInt = #line) async throws -> T {
     let v = await value()

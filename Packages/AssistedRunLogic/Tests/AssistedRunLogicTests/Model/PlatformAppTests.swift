@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 /// California DROP in the app: who is offered it, what it covers, and that covered sites are left alone after it is submitted.
 @MainActor
@@ -560,53 +560,6 @@ final class StateRulesAppTests: XCTestCase {
 }
 
 @MainActor
-final class LanguageAppTests: XCTestCase {
-    override func tearDown() { L10n.language = "en"; Loc.language = "en" }
-
-    private func model() -> AppModel {
-        AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
-                 defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
-    }
-
-    func testTheAppSpeaksTheChosenLanguageEverywhereItBuildsWords() throws {
-        let m = model()
-        XCTAssertEqual(m.language, "en")
-        m.setLanguage("fr")
-        XCTAssertEqual(m.language, "fr")
-        XCTAssertEqual(Loc.t("Next step"), "Étape suivante")
-        XCTAssertEqual(OptOutMethod.manual.title, "Plus tard, pas encore de voie", "words from the core package follow the same choice")
-        m.setLanguage("de")
-        XCTAssertEqual(Loc.f("Step %lld of %lld", 2, 5), "Schritt 2 von 5")
-        let ca = try XCTUnwrap(m.jurisdiction(code: "CA"))
-        XCTAssertTrue(m.statements(for: ca)[0].text.hasPrefix("Kalifornien verlangt"), m.statements(for: ca)[0].text)
-        m.setLanguage("es")
-        XCTAssertEqual(m.jurisdiction(code: "NY")?.displayName, "Nueva York")
-    }
-
-    func testAnUnsupportedLanguageIsIgnoredAndTheChoiceIsRemembered() {
-        let defaults = UserDefaults(suiteName: "ook.test.\(UUID())")!
-        let store = HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey())
-        let a = AppModel(store: store, defaults: defaults)
-        a.setLanguage("xx")
-        XCTAssertEqual(a.language, "en")
-        a.setLanguage("es")
-        let b = AppModel(store: store, defaults: defaults)
-        XCTAssertEqual(b.language, "es", "remembered across launches")
-    }
-
-    func testEveryAppStringHasAllThreeTranslations() throws {
-        let url = try XCTUnwrap(Bundle(for: AppModel.self).url(forResource: "es", withExtension: "lproj"))
-        XCTAssertNotNil(Bundle(url: url))
-        for lang in ["fr", "es", "de"] {
-            Loc.language = lang
-            XCTAssertNotEqual(Loc.t("Next step"), "Next step", lang)
-            XCTAssertNotEqual(Loc.t("Mark done"), "Mark done", lang)
-        }
-    }
-}
-
-
-@MainActor
 final class CountryAppTests: XCTestCase {
     override func tearDown() { L10n.language = "en"; Loc.language = "en" }
 
@@ -647,25 +600,6 @@ final class CountryAppTests: XCTestCase {
     }
 }
 
-final class EvidenceImageTests: XCTestCase {
-    private func jpeg(gray: CGFloat) -> Data {
-        UIGraphicsImageRenderer(size: CGSize(width: 40, height: 80)).image { ctx in
-            UIColor(white: gray, alpha: 1).setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 40, height: 80))
-            UIColor(white: 0, alpha: 1).setFill(); ctx.fill(CGRect(x: 10, y: 10, width: 20, height: 20))
-        }.jpegData(compressionQuality: 0.9)!
-    }
-
-    func testAnAlmostBlackScreenshotIsBrightenedAndANormalOneIsLeftAlone() throws {
-        let dark = try XCTUnwrap(UIImage(data: jpeg(gray: 5.0 / 255)))
-        XCTAssertLessThan(EvidenceImage.mean(of: dark), 0.03)
-        let fixed = try XCTUnwrap(EvidenceImage.image(from: jpeg(gray: 5.0 / 255)))
-        XCTAssertGreaterThan(EvidenceImage.mean(of: fixed), 0.3, "the page shows again")
-        let normal = try XCTUnwrap(EvidenceImage.image(from: jpeg(gray: 1)))
-        XCTAssertGreaterThan(EvidenceImage.mean(of: normal), 0.8)
-    }
-}
-
-/// The automatic opt-out page must open at once, with the real directory of about 800 sites.
 @MainActor
 final class ActivityPageSpeedTests: XCTestCase {
     func testTheActivityPageIsWorkedOutQuickly() {
@@ -785,3 +719,5 @@ final class ResumeAppTests: XCTestCase {
         XCTAssertNil(m.autoSettings.passEverySite, "finished: the next Run now is an ordinary one")
     }
 }
+
+// Helpers of the app's own screens (a view's binding helper, the web-view handoff, the admin review screen, the profile editor's pruning): they need the iOS app.

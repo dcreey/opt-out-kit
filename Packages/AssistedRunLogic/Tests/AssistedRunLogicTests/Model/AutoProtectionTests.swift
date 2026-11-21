@@ -1,6 +1,6 @@
 import XCTest
 import OptOutKitCore
-@testable import OptOutKit
+@testable import AssistedRunLogic
 
 private struct CountingSubmitter: FormSubmitter {
     let box: CallBox
