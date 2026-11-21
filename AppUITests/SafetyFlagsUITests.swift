@@ -50,7 +50,7 @@ final class SafetyFlagsUITests: UITestCase {
         XCTAssertTrue(app.scrollUntilExists(figure), "the safety flags are in the editor")
         flip(app, figure)
         XCTAssertEqual(figure.value as? String, "1")
-        app.buttons["editor-done"].tap()          // the editor's own Done (the keyboard has one too)
+        app.buttons["editor-done"].tap()          // the editor's own Done button (the keyboard has only its keyboard-down button)
         app.terminate()
 
         let again = XCUIApplication()

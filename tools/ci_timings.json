@@ -83,7 +83,7 @@
  "OptOutKitUITests/OnboardingAndSitesUITests/testAboutTabReplaysWalkthrough": 31.4,
  "OptOutKitUITests/OnboardingAndSitesUITests/testChoosingAnotherCountryShowsItsLawsAndRegulatorAndNeedsReadingToo": 53.9,
  "OptOutKitUITests/OnboardingAndSitesUITests/testChoosingCaliforniaExplainsItsLawsAndOffersDropInTheQueue": 130.6,
- "OptOutKitUITests/OnboardingAndSitesUITests/testEveryKeyboardHasADoneButtonThatPutsItAway": 43.8,
+ "OptOutKitUITests/OnboardingAndSitesUITests/testEveryKeyboardHasOnlyTheKeyboardDownButtonThatPutsItAway": 43.8,
  "OptOutKitUITests/OnboardingAndSitesUITests/testFirstVisitsShowAShortGuideOnceInsteadOfWalkthroughPages": 32.0,
  "OptOutKitUITests/OnboardingAndSitesUITests/testNotLivingInCaliforniaHidesIt": 18.4,
  "OptOutKitUITests/OnboardingAndSitesUITests/testSitesTabSearchAndStatus": 38.1,

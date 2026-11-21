@@ -124,7 +124,7 @@ Each line: the story, the test, what it proves.
 
 ### Checks of layout and affordances (not journeys)
 
-`testThePageDotsSit...`, `testEveryKeyboardHasADoneButton...`, `testTheSitesTabShowsNoTiers`, `testTheGuideSitsOnTop...`, `testABrokerSiteViewLeads...`,
+`testThePageDotsSit...`, `testEveryKeyboardHasOnlyTheKeyboardDownButton...`, `testTheSitesTabShowsNoTiers`, `testTheGuideSitsOnTop...`, `testABrokerSiteViewLeads...`,
 `testADirectorySiteViewHasTheSiteLink...`, `testProfileButtonOpensEditor...` (existence), `testBrokerListShowsQueue` (existence). They assert where things sit or
 that an element exists. Useful as guards, but they would pass on a screen a person could not use.
 
@@ -133,7 +133,7 @@ that an element exists. Useful as guards, but they would pass on a screen a pers
 | Kind | Count | Examples |
 |---|---|---|
 | Behavioural journey: a person acts, the result is checked | 35 | first run, California, profile survives relaunch, Run now, Previous site |
-| Layout or existence: where something sits, or that it is there | 8 | page dots, guide frame, keyboard Done, queue list exists |
+| Layout or existence: where something sits, or that it is there | 8 | page dots, guide frame, the keyboard-down button, queue list exists |
 | Regression of one fixed bug | 1 | status page push bounced back |
 | Live only (a real person's details, a real site), skipped in CI | 1 | `DryRunUITests` |
 
@@ -236,7 +236,7 @@ Key: ✅ walked end to end by a UI test · 🟡 walked in part (what is missing 
 | 48 | replay either walkthrough | ✅ | |
 | 49 | erase my saved data and start over | ❌ | and see **Product gaps** below |
 | 50 | trust that my data survives a relaunch, and an upgrade from the old files | 🟡 | relaunch ✅; **the move from build 51's files and UserDefaults has no UI test** |
-| 51 | find a Done button on every keyboard | 🟡 | one keyboard checked |
+| 51 | put the keyboard away with one keyboard-down button, on every keyboard | ✅ | `UITestCase` checks it in every UI test |
 | 52 | get reminders to come back | ❌ | system notifications: not drivable |
 | 53 | use it with large text, dark mode, VoiceOver, on iPad | ❌ | no accessibility or appearance test exists |
 | 54 | use it with no network | 🟡 | every UI test is offline by construction, so nothing tests the offline *message* |
