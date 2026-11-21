@@ -49,7 +49,7 @@ struct RootView: View {
                 await FormAudit.run(domains: args[i + 1].split(separator: ",").map(String.init), model: model)
             }
             // Simulator work: `-semi-domains a.com,b.com` opens the Solve-and-send screen on those sites for the owner's profile.
-            if let i = args.firstIndex(of: "-semi-domains"), args.indices.contains(i + 1), let me = model.people.first(where: { $0.relationship == .me }) {
+            if let i = args.firstIndex(of: "-semi-domains"), args.indices.contains(i + 1), let me = model.people.first(where: { args.contains("-uitest-seed-family") ? $0.relationship == .parent : $0.relationship == .me }) {
                 let items = model.verifyItems(domains: args[i + 1].split(separator: ",").map(String.init), for: me)
                 debugSemi = DebugSemi(runner: AssistedRunner(items: items, driver: model.makeAssistedDriver()) { _, _ in })
             }

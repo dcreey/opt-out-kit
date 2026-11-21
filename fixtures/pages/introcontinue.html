@@ -1,0 +1,12 @@
+<h1>Opt out of {{site}}</h1>
+<p>To opt out of the sale of your personal information, continue to the request form.</p>
+<div id="host"><button type="button" id="go" onclick="show()">Continue</button></div>
+<script>
+// A bare Continue with no box of any kind on screen; the form only exists after it is pressed.
+function show() {
+  document.getElementById('host').innerHTML = '<form method="POST" action="/{{site}}/send">' +
+    '<label>Full name <input type="text" name="name" required></label><br>' +
+    '<label>Email address <input type="email" name="email" required></label><br>' +
+    '<button type="submit">Submit request</button></form>';
+}
+</script>

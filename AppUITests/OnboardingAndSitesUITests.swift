@@ -285,7 +285,7 @@ final class ExposureScanUITests: UITestCase {
         app.buttons["start-scan"].tap()
         let summary = app.staticTexts["scan-summary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 60))
-        XCTAssertEqual(summary.label, "Found a listing on 2 of 3 sites checked.", "two of the three fixture brokers list me")
+        XCTAssertEqual(summary.label, "Found a listing on 3 of 4 sites checked.", "three of the four fixture brokers list me")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'listed-1.fixture.test'")).firstMatch.exists, "the site that lists me is shown")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "scan-results"; shot.lifetime = .keepAlways; add(shot)
     }

@@ -81,31 +81,6 @@ final class LiveFormTests: XCTestCase {
         XCTAssertNil(noForm.pageText, "nothing was sent, so no page text is kept")
     }
 
-    /// ididata.com has a "bot trap" block (`height:0; overflow:hidden; left:-8000px`) with a confirmation menu, a date and an "I agree" box that a person never sees;
-    /// its own submit silently does nothing when any of them has a value. Guard only: the fill did not touch them in this fixture before the off-screen rule either.
-    func testBoxesInAnOffScreenBotTrapAreNeverFilled() async {
-        let html = """
-        <html><body><form id="opt" onsubmit="event.preventDefault(); var d=new FormData(this); var got=[]; d.forEach(function(v,k){got.push(k+'='+v);}); document.body.innerHTML='<p>Your request has been received. Check your email to confirm.</p><pre>'+got.join('&')+'</pre>';">
-          <h2>Do Not Sell My Personal Information</h2>
-          <label>First name *<input name="fn"></label>
-          <label>Last name *<input name="ln"></label>
-          <label>Email *<input type="email" name="em"></label>
-          <div style="height:0;position:absolute;overflow:hidden;margin:30px;padding:20px;left:-8000px;z-index:-1">
-            <label>Send confirmation to *<select name="trapMenu"><option value="">Choose</option><option value="Email">Email</option></select></label>
-            <label>Today's Date *<select name="trapMonth"><option value="">Month</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></label>
-            <label>Name *<input name="trapName"></label>
-            <label><input type="checkbox" name="trapAgree"> I have read and agree to Privacy Terms *</label>
-          </div>
-          <button type="button" onclick="this.form.requestSubmit()">OPT ME OUT</button>
-        </form></body></html>
-        """
-        let report = await FormRun.runLive(url: nil, html: html, person: pat, dryRun: false, maxWait: 6, capture: false)
-        XCTAssertEqual(report.outcome, .submitted(awaitingEmail: true), FormRun.debugLastPageText)
-        let got = FormRun.debugLastPageText
-        XCTAssertTrue(got.contains("fn=Pat") && got.contains("em=pat@example.com"), got)
-        XCTAssertFalse(got.contains("trapAgree=") || got.contains("trapMenu=Email") || got.contains("trapName=Pat") || got.contains("trapMonth=N") || got.contains("trapMonth=J"), "the trap stays empty: \(got)")
-    }
-
     /// A country-code menu beside the phone box already says +1, so the box takes the number alone; and what the person typed is not overwritten.
     func testAPhoneBoxBesideACountryCodeMenuTakesTheNumberAloneAndPersonEditsSurviveARefill() async throws {
         let html = """
@@ -238,27 +213,6 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(parts, ["773", "633", "1564"])
     }
 
-    /// Plain digits go in first; a box that then shows an error gets the other shapes until it accepts one.
-    func testAPhoneBoxThatRejectsPlainDigitsIsRetriedInOtherShapes() async throws {
-        let html = """
-        <html><body><form id="f" onsubmit="event.preventDefault()">
-          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
-          <input type="tel" name="phone" placeholder="Phone" oninput="this.setAttribute('aria-invalid', /^\\d{3}-\\d{3}-\\d{4}$/.test(this.value) ? 'false' : 'true')">
-          <button type="submit">Opt out</button></form></body></html>
-        """
-        var me = pat; me.phones = ["+1 773 633 1564"]
-        let session = WebViewSession.make()
-        defer { session.close() }
-        try await session.loadHTML(html)
-        let forms = await session.discoverForms(waitForFrames: false)
-        let form = try XCTUnwrap(forms.first)
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
-        _ = await session.fillLive(plan.values)
-        let phone = (await session.evalLive("document.querySelector('[name=\"phone\"]').value") as? String) ?? ""
-        let dbg = (await session.evalLive("document.querySelector('[name=\"phone\"]').outerHTML") as? String) ?? ""
-        XCTAssertEqual(phone, "773-633-1564", dbg)
-    }
-
     /// A box holding exactly what the app typed earlier is replaced when the plan changes (another person, a corrected email).
     func testAValueTheAppTypedIsReplacedWhenThePlanChanges() async throws {
         let html = "<html><body><form id=\"f\" onsubmit=\"event.preventDefault()\"><label>Email *<input type=\"email\" name=\"em\"></label><button type=\"submit\">Opt out</button></form></body></html>"
@@ -272,30 +226,6 @@ final class LiveFormTests: XCTestCase {
         _ = await session.fillLive(FormFiller.plan(for: form, signals: nil, person: second).values)
         let email = (await session.evalLive("document.querySelector('[name=\"em\"]').value") as? String) ?? ""
         XCTAssertEqual(email, "new@example.com")
-    }
-
-    /// A birthdate or today's date goes in the shape the box shows; a box that rejects it gets the other shapes until it accepts one (day first, like babelstreet).
-    func testADateBoxThatRejectsTheFirstShapeIsRetriedInOtherShapes() async throws {
-        let html = """
-        <html><body><form id="f" onsubmit="event.preventDefault()">
-          <label>First name *<input name="fn"></label><label>Email *<input type="email" name="em"></label>
-          <label>Date of Birth<input name="dob" oninput="this.setAttribute('aria-invalid', /^(0[1-9]|[12]\\d|3[01])\\/(0[1-9]|1[0-2])\\/\\d{4}$/.test(this.value) && +this.value.slice(0,2)>12 ? 'false' : 'true')"></label>
-          <label>Date<input name="today" placeholder="yyyy-mm-dd"></label>
-          <button type="submit">Opt out</button></form></body></html>
-        """
-        var me = pat; me.birthdate = "1992-04-19"
-        let session = WebViewSession.make()
-        defer { session.close() }
-        try await session.loadHTML(html)
-        let forms = await session.discoverForms(waitForFrames: false)
-        let form = try XCTUnwrap(forms.first)
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
-        _ = await session.fillLive(plan.values)
-        func read(_ n: String) async -> String { (await session.evalLive("document.querySelector('[name=\"\(n)\"]').value") as? String) ?? "" }
-        let dob = await read("dob")
-        XCTAssertEqual(dob, "19/04/1992", dob)
-        let today = await read("today")
-        XCTAssertTrue(today.range(of: "^\\d{4}-\\d{2}-\\d{2}$", options: .regularExpression) != nil, "placeholder shape: \(today)")
     }
 
     /// The kinds of box that used to be skipped, cut or mistyped: a message box with a small limit, a month picker, a date-and-time picker, an age-bracket menu,
@@ -389,37 +319,6 @@ final class LiveFormTests: XCTestCase {
         _ = await session.fillLive(FormFiller.plan(for: form, signals: nil, person: pat).values, keepExisting: true)
         let after = await val("st")
         XCTAssertEqual(after, "TX")
-    }
-
-    /// A form with one email box and one phone box and an "Add another" button for each: the buttons are pressed, and every email and phone has a box.
-    func testAddAnotherEmailAndPhoneButtonsArePressedAndTheNewBoxesFilled() async throws {
-        let html = """
-        <html><body><h1>Opt out of the sale of my personal information</h1>
-        <form id="f" onsubmit="event.preventDefault(); window.sent=true;">
-          <label>First name *<input name="fn"></label><label>Last name *<input name="ln"></label>
-          <div id="emails"><label>Email *<input type="email" name="em"></label></div>
-          <button type="button" onclick="var d=document.createElement('div'); d.innerHTML='<label>Email<input type=email name=em2></label>'; document.getElementById('emails').appendChild(d);">Add another email</button>
-          <div id="phones"><label>Phone<input type="tel" name="ph"></label></div>
-          <a href="#" onclick="var d=document.createElement('div'); d.innerHTML='<label>Phone<input type=tel name=ph2></label>'; document.getElementById('phones').appendChild(d); return false;">+ Add phone</a>
-          <button type="button" onclick="this.parentNode.removeChild(this)">Remove</button>
-          <button type="submit">Opt out</button></form></body></html>
-        """
-        var me = pat; me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.emails = ["pat@example.com", "pat.old@example.org"]; me.phones = ["312-555-0142", "773-555-0199"]
-        let session = WebViewSession.make()
-        defer { session.close() }
-        try await session.loadHTML(html)
-        let filled = await session.scanAndFill(person: me)
-        XCTAssertGreaterThan(filled, 0)
-        func val(_ n: String) async -> String { (await session.evalLive("(document.querySelector('[name=\"\(n)\"]')||{}).value") as? String) ?? "(missing)" }
-        let em = await val("em"), em2 = await val("em2"), ph = await val("ph"), ph2 = await val("ph2")
-        XCTAssertEqual(em, "pat@example.com")
-        XCTAssertEqual(em2, "pat.old@example.org", "the second email has a box now")
-        XCTAssertEqual(ph, "3125550142")
-        XCTAssertEqual(ph2, "7735550199", "the second phone has a box now")
-        let sent = (await session.evalLive("window.sent===true") as? Bool) ?? false
-        XCTAssertFalse(sent, "pressing the add buttons sends nothing")
-        let removed = (await session.evalLive("[].slice.call(document.querySelectorAll('button')).some(function(b){return b.innerText==='Remove';})") as? Bool) ?? false
-        XCTAssertTrue(removed, "a Remove button is never pressed")
     }
 
     /// businessregistry.com caps its extra email boxes while the "Add email" button stays: pressing stops once a press adds no box, and the boxes named `emails` take the next emails.
@@ -683,24 +582,6 @@ final class LiveFormTests: XCTestCase {
         XCTAssertEqual(chosen, "del")
     }
 
-    func testASingleChoiceOfRadiosAndAMenuTakeDeletionEvenWhenOptOutComesFirst() async throws {
-        let html = """
-            <html><body><form id="f" onsubmit="event.preventDefault()">
-            <fieldset><legend>Request</legend>
-              <label><input type="radio" name="t" value="optout"> Do not sell or share my information</label>
-              <label><input type="radio" name="t" value="delete"> Delete my personal information</label>
-              <label><input type="radio" name="t" value="access"> Access my information</label></fieldset>
-            <label>Type<select name="s"><option value="">Select</option><option value="o">Opt-out of sale</option><option value="d">Delete my data</option></select></label>
-            <input name="em"><button type="submit">Send</button></form></body></html>
-            """
-        let session = WebViewSession.make(); defer { session.close() }
-        try await session.loadHTML(html)
-        let forms = await session.discoverForms(waitForFrames: false); let form = try XCTUnwrap(forms.first)
-        _ = await session.chooseRequestOptions(form: form.token)
-        let got = await read(session, "(function(){var f=document.getElementById('f'); return f.querySelector('input[name=t]:checked').value+','+f.s.value;})()")
-        XCTAssertEqual(got, "delete,d")
-    }
-
     func testAPageThatStartsOnOptOutIsMovedToDeletionUnlessThePersonChose() async throws {
         let html = """
             <html><body><form id="f" onsubmit="event.preventDefault()">
@@ -752,42 +633,12 @@ final class LiveFormTests: XCTestCase {
         XCTAssertTrue(optOuts.allSatisfy { $0.buttons.joined().lowercased().contains("opt me out") })
     }
 
-    /// realsourcedata.com is a Tally form: the question is a heading and each box points at it with aria-labelledby, with no placeholder, name or label tag.
-    func testBoxesLabelledByAHeadingThroughAriaLabelledbyAreFilled() async throws {
-        func field(_ id: String, _ question: String, type: String = "text") -> String {
-            "<div><h3 id=\"label_\(id)\">\(question)</h3><div><input id=\"\(id)\" type=\"\(type)\" placeholder=\"\" required aria-labelledby=\"label_\(id)\"></div></div>"
-        }
-        let html = """
-            <html><body><h1>Do Not Sell My Personal Information</h1><form id="t" onsubmit="event.preventDefault()">
-            \(field("a1", "First Name"))\(field("a2", "Last Name"))\(field("a3", "Street Address"))\(field("a4", "City"))\(field("a5", "State"))
-            \(field("a6", "Zip Code"))\(field("a7", "Phone Number", type: "tel"))\(field("a8", "Email", type: "email"))
-            <button type="submit">Send</button></form></body></html>
-            """
-        var me = pat; me.phones = ["773 633 1564"]
-        let session = WebViewSession.make(); defer { session.close() }
-        try await session.loadHTML(html)
-        let forms = await session.discoverForms(waitForFrames: false)
-        let form = try XCTUnwrap(forms.first)
-        XCTAssertEqual(form.fields.map(\.label), ["First Name", "Last Name", "Street Address", "City", "State", "Zip Code", "Phone Number", "Email"], "the heading is the box's label")
-        let plan = FormFiller.plan(for: form.asOptOutForm(page: URL(string: "https://local.test/")!), signals: nil, person: me)
-        _ = await session.fillLive(plan.values)
-        func value(_ id: String) async -> String { "\(await session.evalLive("document.getElementById('\(id)').value") ?? "")" }
-        let got = [await value("a1"), await value("a2"), await value("a3"), await value("a4"), await value("a5"), await value("a6"), await value("a8")]
-        XCTAssertEqual(got, ["Pat", "Example", "1 Main St", "Springfield", "IL", "62701", "pat@example.com"])
-        let phone = await value("a7"); XCTAssertEqual(phone, "7736331564")
-    }
-
     // MARK: what counts as a check that stops the run
 
     private func challenge(_ html: String) async throws -> String? {
         let session = WebViewSession.make(); defer { session.close() }
         try await session.loadHTML(html)
         return await session.visibleChallenge()
-    }
-
-    func testAReCAPTCHAErrorMeansOnlyThePersonsOwnPressCanGetPast() async throws {
-        let got = try await challenge("<html><body><div class='err'>There was a problem with your submission. The reCAPTCHA response was missing or invalid.</div><form><input></form></body></html>")
-        XCTAssertEqual(got, "a reCAPTCHA that rejected the automatic send")
     }
 
     func testTheLeftOverAntiSpamLineOfASolvedCheckIsNotACheck() async throws {

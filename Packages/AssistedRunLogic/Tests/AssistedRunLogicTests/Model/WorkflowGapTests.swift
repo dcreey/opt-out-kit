@@ -11,6 +11,14 @@ final class WorkflowGapTests: XCTestCase {
                  defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
     }
 
+    /// Only the owner's profile may have "I am this person" boxes ticked (the page rules are end to end in `FixturePageTypeUITests`).
+    func testTheOwnerNeedsNoSettingAndFamilyNeverGetsIt() {
+        let m = model()
+        _ = m.addPerson(named: "Mom", relationship: .parent)
+        XCTAssertTrue(m.household.people.first { $0.relationship == .me }!.mayConfirmOwnIdentity())
+        XCTAssertFalse(m.household.people.first { $0.displayName == "Mom" }!.mayConfirmOwnIdentity())
+    }
+
     func testTheCaliforniaLinkInSettingsShowsOnlyWhenCaliforniaIsChosen() {
         let m = model()
         m.setOwnerCountry("US"); m.setOwnerState("TX")

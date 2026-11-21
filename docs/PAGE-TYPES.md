@@ -22,13 +22,13 @@ form when it was loaded for real, and the boxes of its form where one was read).
 | A certification box the person must tick | 10 | `certify` | `testACertificationBoxIsLeftForMeToTickAndTheFormIsSentWhenIHaveTickedIt` | covered |
 | A form built by script after the page loads | 73 | `jsform` | `testAFormBuiltByScriptAfterTheLoadIsFoundFilledAndSent` | covered |
 | A multi-step form (Next, then Submit) | 3 | `steps` | `testATwoStepFormIsWalkedThroughAndSent` | covered |
-| No online form: a postal address or an email to write to | 423 | `noform` | `testSolveAndSendSendsNothingToAPageWithNoFormAndLetsMeMarkItDone` | partly |
+| No online form: a postal address or an email to write to | 423 | `noform`, `noformemail` | `testSolveAndSendSendsNothingToAPageWithNoFormAndLetsMeMarkItDone`<br>`testAPageThatOnlyGivesAnEmailAddressOffersToSendAnEmail` | covered |
 | A confirmation that says an email follows | 1 | `emaillink` | `testSolveAndSendSeesThatASitePromisesAnEmailAndListsItForTheFollowUp` | covered |
 | A form that needs a login or an account | 58 | `login` | `testASignInPageIsNeverFilledOrSent` | partly |
 | A form that needs ID or a file upload | 59 | `upload` | `testAFormThatWantsAFileUploadIsNotSentWithoutIt` | covered |
 | A third-party privacy portal (Osano, OneTrust, TrustArc) | 33 | (none yet) |  | not covered |
 | A bot check on the site's home page, before its form | 45 | (none yet) |  | not covered |
-| A terms prompt to accept before the form | 2 | (none yet) |  | not covered |
+| A terms prompt to accept before the form | 2 | `terms` | `testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed` | covered |
 | A form for an agent, a business or another person | 32 | `agent` | `testAnAuthorizedAgentQuestionIsAnsweredNo` | partly |
 
 The count of a kind that has no fixture is the work still to do. Sites counted per kind overlap, so the column does not add up to the number of sites.

@@ -101,6 +101,12 @@ class Handler(BaseHTTPRequestHandler):
                 text = (f'<h1>{what[8:].replace("-", " ").title()}</h1><p>Age 34. Lives in Springfield IL. Relatives: Sam Example.</p>'
                         f'<p><a href="/{site}/optout">Remove this record</a></p>')
             return self.send(200, SHELL.format(title=site, body=text))
+        if kind == 'scriptlisted' and what == 'search':
+            # Results built by script after a moment (a page that needs a real browser): "Loading" first, then Pat's listing.
+            q = parse_qs(urlsplit(self.path).query).get('q', [''])[0].lower()
+            result = 'Pat Example, 34, Springfield IL' if 'pat' in q else 'No records found for your search.'
+            text = ('<h1>Search</h1><div id="r">Loading...</div><script>setTimeout(function(){document.getElementById("r").innerHTML="<h2>Search results</h2><p>' + result + '</p>";}, 1500);</script>')
+            return self.send(200, SHELL.format(title=site, body=text))
         if what == 'search' and kind in ('listed', 'unlisted'):
             # A name search for the exposure scan: 'listed' finds anyone whose name has "pat" in it, 'unlisted' finds nobody.
             q = parse_qs(urlsplit(self.path).query).get('q', [''])[0].lower()

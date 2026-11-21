@@ -1,0 +1,7 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Date of birth <input type="text" name="dob" required pattern="\d{4}-\d{2}-\d{2}" title="Use the format yyyy-mm-dd"></label><br>
+  <button type="submit">Submit request</button>
+</form>

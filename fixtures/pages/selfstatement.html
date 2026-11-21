@@ -1,0 +1,8 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label><input type="checkbox" name="self" value="yes" required> I confirm that I am the person this request is about.</label><br>
+  <label><input type="checkbox" name="agent" value="yes"> I am an authorized agent acting on behalf of the person.</label><br>
+  <button type="submit">Submit request</button>
+</form>

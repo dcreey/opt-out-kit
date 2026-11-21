@@ -1,0 +1,7 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Phone number <input type="tel" name="phone" required pattern="\(\d{3}\) \d{3}-\d{4}" title="Use the format (123) 456-7890"></label><br>
+  <button type="submit">Submit request</button>
+</form>

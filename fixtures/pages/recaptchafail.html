@@ -1,0 +1,14 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send" onsubmit="return check(event)">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <p id="m"></p>
+  <button type="submit" id="b" onpointerdown="window.__pressTrusted = true">Submit request</button>
+</form>
+<script>
+// A score-based reCAPTCHA refuses a press a script made (no real pointer): only the person's own tap goes through.
+function check(e) {
+  if (!window.__pressTrusted) { document.getElementById('m').textContent = 'The reCAPTCHA could not be verified. Please try again.'; return false; }
+  return true;
+}
+</script>

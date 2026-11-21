@@ -1,0 +1,10 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'noformemail'). docs/TESTING.md, 'End-to-end tests against fixture pages'; docs/PAGE-TYPES.md says which recorded sites it stands for.
+id: 'fx_noformemail_1'
+domain: 'noformemail-1.fixture.test'
+name: 'Fixture noformemail 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+contact_email: 'privacy@noformemail-1.fixture.test'
+opt_out_url: 'http://127.0.0.1:8765/fx_noformemail_1/optout'

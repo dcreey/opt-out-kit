@@ -1,0 +1,9 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <div style="position:absolute;left:-9999px;top:0;height:0;overflow:hidden"><label>Website <input type="text" name="website"></label></div>
+  <div style="display:none"><label>Company <input type="text" name="company"></label></div>
+  <div aria-hidden="true" style="opacity:0;position:absolute;height:1px;width:1px"><label>Leave this empty <input type="text" name="leave_empty"></label></div>
+  <button type="submit">Submit request</button>
+</form>

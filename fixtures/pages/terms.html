@@ -1,0 +1,11 @@
+<h1>Opt out of {{site}}</h1>
+<div id="gate" style="border:2px solid #333;padding:12px;margin-bottom:16px">
+  <p>TERMS OF ENTRY. By entering this site you waive all claims against Example Holdings, grant it a perpetual licence to anything you submit, and agree to binding arbitration in the state of Delaware. You must agree to accept the terms of use and our privacy policy to continue.</p>
+  <button type="button" id="agree" onclick="document.getElementById('gate').remove()">I Agree</button>
+  <button type="button" id="no">I Don't Agree</button>
+</div>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <button type="submit">Submit request</button>
+</form>

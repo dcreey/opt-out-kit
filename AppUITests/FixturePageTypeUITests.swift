@@ -20,7 +20,9 @@ final class FixturePageTypeUITests: UITestCase {
 
     /// Waits for the broker to receive the form, and returns the fields it got.
     private func sent(_ site: String, timeout: TimeInterval = 60) -> [String: String] {
-        XCTAssertTrue(server.waitForSent(timeout: timeout) { $0.contains(site) }, "the form was sent: \(server.requests)")
+        let arrived = server.waitForSent(timeout: timeout) { $0.contains(site) }
+        if !arrived { let shot = XCTAttachment(screenshot: XCUIApplication().screenshot()); shot.name = "not-sent-\(site)"; shot.lifetime = .keepAlways; add(shot) }
+        XCTAssertTrue(arrived, "the form was sent: \(server.requests)")
         return server.requests.last { $0.site == site && $0.path == "send" }?.fields ?? [:]
     }
 
@@ -194,5 +196,116 @@ final class FixturePageTypeUITests: UITestCase {
         Thread.sleep(forTimeInterval: 10)
         XCTAssertTrue(server.requests.isEmpty, "nothing was sent to a sign-in form: \(server.requests)")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "sign-in"; shot.lifetime = .keepAlways; add(shot)
+    }
+
+    // MARK: Formats, traps and prompts
+
+    /// A terms gate ("I Agree") in front of the form (about 20 recorded sites): the app never accepts terms for me; once I tap "I Agree", it fills and sends.
+    func testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed() {
+        let app = solveAndSend("terms-1")
+        let agree = app.webViews.buttons["I Agree"]
+        XCTAssertTrue(agree.waitForExistence(timeout: 40), "the page shows its terms")
+        Thread.sleep(forTimeInterval: 8)
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "terms-after-wait"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'accept its terms'")).firstMatch.exists, "the app says the terms are mine to accept")
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing was sent behind the terms: \(server.requests)")
+        let agreeNow = app.webViews.descendants(matching: .any).matching(NSPredicate(format: "label == 'I Agree'")).firstMatch
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 6 {
+            if agreeNow.exists { let f = agreeNow.frame; app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap() }
+            Thread.sleep(forTimeInterval: 3); taps += 1
+        }
+        let f = sent("fx_terms_1", timeout: 20)
+        XCTAssertEqual(f["name"], "Pat Example")
+    }
+
+    /// A phone box that only takes "(123) 456-7890": the app retypes the number in the shape the box asks for.
+    func testAPhoneBoxThatWantsParenthesesAndADashGetsThePhoneInThatShape() {
+        _ = solveAndSend("phoneformat-1", extra: ["-uitest-seed-multi"])
+        let f = sent("fx_phoneformat_1")
+        XCTAssertNotNil(f["phone"]?.range(of: "^\\(\\d{3}\\) \\d{3}-\\d{4}$", options: .regularExpression), "the phone is in the box's shape: \(f)")
+    }
+
+    /// A date-of-birth box that wants yyyy-mm-dd: the app types the date in the shape the box accepts.
+    func testADateBoxThatWantsYearMonthDayGetsTheBirthDateInThatShape() {
+        _ = solveAndSend("dateformat-1")
+        let f = sent("fx_dateformat_1")
+        XCTAssertNotNil(f["dob"]?.range(of: "^\\d{4}-\\d{2}-\\d{2}$", options: .regularExpression), "the date is in the box's shape: \(f)")
+    }
+
+    /// Hidden boxes bots fill (off-screen, display none, invisible): the app leaves them empty, so the site does not take the request for a bot's.
+    func testHiddenBoxesBotsFillAreLeftEmpty() {
+        _ = solveAndSend("bottrap-1")
+        let f = sent("fx_bottrap_1")
+        XCTAssertEqual(f["name"], "Pat Example")
+        XCTAssertEqual(f["website"] ?? "", "", "the off-screen box is empty: \(f)")
+        XCTAssertEqual(f["company"] ?? "", "", "the display:none box is empty: \(f)")
+        XCTAssertEqual(f["leave_empty"] ?? "", "", "the invisible box is empty: \(f)")
+    }
+
+    /// A page with a disabled email box and a bare "Continue" button: the app presses Continue, then fills the box that opened up and sends.
+    func testABareContinueButtonIsPressedToOpenTheEmailBoxThenTheFormIsSent() {
+        _ = solveAndSend("introcontinue-1")
+        let f = sent("fx_introcontinue_1")
+        XCTAssertEqual(f["email"], "pat@example.com", "the box opened by Continue got the email: \(f)")
+    }
+
+    /// A score-based reCAPTCHA that refuses a press a script made: the app does not claim the request went through; only my own press sends it.
+    func testAFormThatRefusesAScriptedPressIsOnlySentByMyOwnPress() {
+        let app = solveAndSend("recaptchafail-1")
+        XCTAssertTrue(app.webViews.staticTexts["Opt out of fx_recaptchafail_1"].waitForExistence(timeout: 40), "the page loaded")
+        XCTAssertTrue(app.webViews.staticTexts.matching(NSPredicate(format: "label CONTAINS 'could not be verified'")).firstMatch.waitForExistence(timeout: 40), "the page refused the scripted press")
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing counted as sent: \(server.requests)")
+        let button = app.webViews.buttons["Submit request"]
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 6 {
+            if button.exists { button.tap() }
+            Thread.sleep(forTimeInterval: 3); taps += 1
+        }
+        _ = sent("fx_recaptchafail_1", timeout: 20)
+    }
+
+    /// Boxes named only by a heading they point at (aria-labelledby, no label element): the app still knows which is the name and which the email.
+    func testBoxesLabelledOnlyByAriaAreFilledWithTheRightValues() {
+        _ = solveAndSend("arialabel-1")
+        let f = sent("fx_arialabel_1")
+        XCTAssertEqual(f["n1"], "Pat Example"); XCTAssertEqual(f["e1"], "pat@example.com")
+    }
+
+    /// "I am the person this request is about": for my own profile the app ticks that plain self-statement and nothing else (not the
+    /// the agent box), and sends.
+    func testOnlyThePlainSelfStatementIsTickedForTheOwnerAndTheFormIsSent() {
+        _ = solveAndSend("selfstatement-1")
+        let f = sent("fx_selfstatement_1")
+        XCTAssertEqual(f["self"], "yes", "the self-statement was ticked: \(f)")
+        XCTAssertNil(f["agent"], "the agent box was not: \(f)")
+    }
+
+    /// The same page for a family member's profile: nothing is ticked on their behalf, so the form is not sent.
+    func testNothingIsTickedForAFamilyProfileAndTheFormIsNotSent() {
+        let app = solveAndSend("selfstatement-1", extra: ["-uitest-seed-family"])
+        XCTAssertTrue(app.webViews.staticTexts["Opt out of fx_selfstatement_1"].waitForExistence(timeout: 40), "the page loaded")
+        Thread.sleep(forTimeInterval: 10)
+        XCTAssertTrue(server.sentSites.isEmpty, "no self-statement was ticked for a family profile: \(server.requests)")
+    }
+
+    /// A page with no form but an email address to write to: nothing is sent, and the app offers to email instead.
+    func testAPageThatOnlyGivesAnEmailAddressOffersToSendAnEmail() {
+        let app = solveAndSend("noformemail-1")
+        XCTAssertTrue(app.buttons["assisted-write-email"].waitForExistence(timeout: 40), "the email is offered: Write the email")
+        XCTAssertTrue(server.sentSites.isEmpty)
+    }
+
+    /// A name search whose results are built by script (the site needs a real browser): the scan waits for them and still finds my listing.
+    func testAScanOfASiteWhoseResultsAreBuiltByScriptFindsMyListing() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
+        app.launch()
+        app.tabBars.buttons["Sites"].tap()
+        XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]))
+        app.buttons["scan-exposure"].tap()
+        app.buttons["start-scan"].tap()
+        XCTAssertTrue(app.staticTexts["scan-summary"].waitForExistence(timeout: 90))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'scriptlisted-1.fixture.test'")).firstMatch.exists, "the script-built listing was found")
     }
 }

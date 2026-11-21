@@ -1,0 +1,19 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'scriptlisted'). docs/TESTING.md, 'End-to-end tests against fixture pages'; docs/PAGE-TYPES.md says which recorded sites it stands for.
+id: 'fx_scriptlisted_1'
+domain: 'scriptlisted-1.fixture.test'
+name: 'Fixture scriptlisted 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_scriptlisted_1/optout'
+search_check:
+  status: 'calibrated'
+  needs_browser: true
+  search_url: 'http://127.0.0.1:8765/fx_scriptlisted_1/search?q={first}+{last}'
+  valid_page: ['Search results']
+  no_results: ['No records found']
+  ignore_location: true
+  calibration:
+    listed_name: 'Pat Example'
+  checked: '2026-11-21'

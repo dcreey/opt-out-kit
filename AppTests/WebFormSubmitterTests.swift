@@ -99,23 +99,9 @@ final class WebFormSubmitterTests: XCTestCase {
         XCTAssertEqual(outcome, .filledNotSubmitted)
     }
 
-    func testAVisibleBotCheckStopsTheRunAndIsNeverSolved() async {
-        let challenge = page(extra: "<iframe src=\"https://www.google.com/recaptcha/api2/bframe\" style=\"width:300px;height:400px\"></iframe>")
-        let outcome = await WebFormSubmitter(maxWait: 6).submit(html: challenge, plan: plan(fields), dryRun: false)
-        guard case .challenged(let why) = outcome else { return XCTFail("expected challenged, got \(outcome)") }
-        XCTAssertTrue(why.contains("reCAPTCHA"))
-    }
-
     func testABotCheckPageTextStopsTheRun() async {
         let outcome = await WebFormSubmitter(maxWait: 6).submit(html: "<body>Just a moment... checking your browser</body>", plan: plan(fields), dryRun: false)
         guard case .challenged = outcome else { return XCTFail("expected challenged, got \(outcome)") }
-    }
-
-    func testATermsPromptStopsTheRunWithoutAcceptingIt() async {
-        let gate = "<div role=dialog>ACCEPTABLE USE POLICY AND TERMS. You must agree to continue. <button onclick=\"document.title='ACCEPTED'\">I Agree</button></div>"
-        let outcome = await WebFormSubmitter(maxWait: 6).submit(html: page(extra: gate), plan: plan(fields), dryRun: false)
-        guard case .challenged(let why) = outcome else { return XCTFail("expected challenged, got \(outcome)") }
-        XCTAssertTrue(why.contains("terms"))
     }
 
     func testAcceptableUseTextInAPageFooterIsNotATermsPrompt() async {
@@ -123,13 +109,6 @@ final class WebFormSubmitterTests: XCTestCase {
         let footer = "<div id=\"footer\">ACCEPTABLE USE POLICY AND TERMS. You must follow these rules when using this site and must not misuse the records you find.</div>"
         let outcome = await WebFormSubmitter(maxWait: 8).submit(html: page(extra: footer), plan: plan(fields), dryRun: false)
         XCTAssertEqual(outcome, .submitted(awaitingEmail: true), "a footer is not a blocker")
-    }
-
-    func testAnUntickedCertificationBoxStopsTheRunAndIsNeverTickedForTheirOwner() async {
-        let cert = "<label><input type=\"checkbox\" name=\"certify\"> I authorize you to contact me and I certify that I am the subject of this request.</label>"
-        let outcome = await WebFormSubmitter(maxWait: 6).submit(html: page(extra: cert), plan: plan(fields), dryRun: false)
-        guard case .challenged(let why) = outcome else { return XCTFail("expected challenged, got \(outcome)") }
-        XCTAssertTrue(why.contains("certification"))
     }
 
     func testAnOptionalAgentBoxIsNotABlockerForSomeoneSubmittingForThemselves() async {

@@ -240,6 +240,13 @@ final class AppModel: ObservableObject {
             me.phones = ["7735550101", "7735550102"]
             household.update(me)
         }
+        // UI tests: `-uitest-seed-family` adds a complete parent's profile (the details of the seeded one); `-semi-domains` then runs for her, so the owner's
+        // self-statement is shown never to be ticked for a family member.
+        if args.contains("-uitest-seed-family"), let me = household.people.first(where: { $0.relationship == .me }) {
+            var mom = me
+            mom.id = UUID(); mom.displayName = "Mom"; mom.relationship = .parent
+            household.add(mom); selectedID = mom.id
+        }
         // UI tests: automatic protection on, as a new person who said yes at first use (the first pass then starts when the app is open).
         if args.contains("-uitest-auto-on") { household.updateAuto { $0.turnOnBoth(now: Date()) } }
         #endif

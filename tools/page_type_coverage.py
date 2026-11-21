@@ -78,14 +78,14 @@ KINDS = [
     ('A certification box the person must tick', has_blocker('certify'), ['certify'], ['testACertificationBoxIsLeftForMeToTickAndTheFormIsSentWhenIHaveTickedIt'], 'covered'),
     ('A form built by script after the page loads', has_signal('script_rendered_page', 'script_rendered_form'), ['jsform'], ['testAFormBuiltByScriptAfterTheLoadIsFoundFilledAndSent'], 'covered'),
     ('A multi-step form (Next, then Submit)', has_blocker('step'), ['steps'], ['testATwoStepFormIsWalkedThroughAndSent'], 'covered'),
-    ('No online form: a postal address or an email to write to', has_signal('mail_option', 'email_contact', 'email_only_wording'), ['noform'],
-     ['testSolveAndSendSendsNothingToAPageWithNoFormAndLetsMeMarkItDone'], 'partial'),
+    ('No online form: a postal address or an email to write to', has_signal('mail_option', 'email_contact', 'email_only_wording'), ['noform', 'noformemail'],
+     ['testSolveAndSendSendsNothingToAPageWithNoFormAndLetsMeMarkItDone', 'testAPageThatOnlyGivesAnEmailAddressOffersToSendAnEmail'], 'covered'),
     ('A confirmation that says an email follows', has_signal('email_link'), ['emaillink'], ['testSolveAndSendSeesThatASitePromisesAnEmailAndListsItForTheFollowUp'], 'covered'),
     ('A form that needs a login or an account', has_signal('account_hint', 'login_required'), ['login'], ['testASignInPageIsNeverFilledOrSent'], 'partial'),
     ('A form that needs ID or a file upload', has_signal('id_required', 'file_upload'), ['upload'], ['testAFormThatWantsAFileUploadIsNotSentWithoutIt'], 'covered'),
     ('A third-party privacy portal (Osano, OneTrust, TrustArc)', has_signal('portal_osano', 'portal_onetrust', 'portal_trustarc'), [], [], 'none'),
     ('A bot check on the site\'s home page, before its form', has_signal('bot_check_on_home'), [], [], 'none'),
-    ('A terms prompt to accept before the form', has_blocker('terms'), [], [], 'none'),
+    ('A terms prompt to accept before the form', has_blocker('terms'), ['terms'], ['testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed'], 'covered'),
     ('A form for an agent, a business or another person', lambda d: any(has_blocker(p)(d) for p in ('agent', 'business', 'other')), ['agent'], ['testAnAuthorizedAgentQuestionIsAnsweredNo'], 'partial'),
 ]
 
