@@ -246,10 +246,16 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// simulators); the same HTML is loaded once more, since nothing about the page caused it. A cancel or a timeout is not tried again.
     func loadHTML(_ html: String) async throws {
         let base = URL(string: "https://example.invalid/")
-        do { try await wait { self.webView.loadHTMLString(html, baseURL: base) } }
-        catch where !(error is CancellationError) && (error as? URLError)?.code != .timedOut && !abandoned {
-            NSLog("OOK loadHTML failed once, loading again: %@", "\(error)")
-            try await wait { self.webView.loadHTMLString(html, baseURL: base) }
+        // WebKit sometimes refuses a load that follows another too closely ("InvalidTransition"); it is loaded again, up to twice, a moment apart (a busy CI machine
+        // failed `testFillsTheFormWaitsForAPersonToClearTheCheck...` with the one retry this had).
+        var attempt = 0
+        while true {
+            do { try await wait { self.webView.loadHTMLString(html, baseURL: base) }; return }
+            catch where !(error is CancellationError) && (error as? URLError)?.code != .timedOut && !abandoned && attempt < 2 {
+                attempt += 1
+                NSLog("OOK loadHTML failed, loading again (%d): %@", attempt, "\(error)")
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
         }
     }
 
