@@ -12,10 +12,9 @@ final class LiveWebViewTests: XCTestCase {
         let env = ProcessInfo.processInfo.environment
         try XCTSkipUnless(env["OPTOUT_LIVE"] == "1", "set TEST_RUNNER_OPTOUT_LIVE=1 to run")
         let limit = Int(env["OPTOUT_LIMIT"] ?? "") ?? 24
-        // The repository's own folder (the app ships only the compiled catalog; the simulator reads the Mac's files).
-        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
+        let entries0 = try Catalog.contents(of: try XCTUnwrap(AppCatalog.url), includeExcluded: true).sites
         let only = (env["OPTOUT_ONLY"] ?? "").split(separator: ",").map(String.init)
-        let entries = try Registry.loadDirectory(dir).filter { $0.searchCheck?.candidate != nil && (only.isEmpty || only.contains($0.domain)) }
+        let entries = entries0.filter { $0.searchCheck?.candidate != nil && (only.isEmpty || only.contains($0.domain)) }
         // Spread the sample across the list instead of taking the first few, which share one template.
         let stride = max(entries.count / max(limit, 1), 1)
         let sample = Array(entries.enumerated().filter { $0.offset % stride == 0 }.map(\.element).prefix(limit))

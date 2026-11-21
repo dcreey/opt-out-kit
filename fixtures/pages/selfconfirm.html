@@ -1,0 +1,12 @@
+<h1>Opt out of {{site}}</h1>
+<div id="box">
+<form id="f" onsubmit="return false">
+  <label>Full name <input type="text" name="name"></label><br>
+  <label>Email address <input type="email" name="email"></label><br>
+  <button type="submit">Submit request</button>
+</form>
+</div>
+<script>
+// The page says the request was received by itself, with nobody having pressed anything (a form that sends itself, or a page left open from before).
+setTimeout(function () { document.getElementById('box').innerHTML = '<h2>Thank you</h2><p>Your request has been received. We will remove your information within 30 days.</p>'; }, 6000);
+</script>

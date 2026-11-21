@@ -1,0 +1,12 @@
+<h1>Opt out of {{site}}</h1>
+<form id="who" onsubmit="return false">
+  <p>Who is this request for?</p>
+  <label><input type="radio" name="who" value="me" onclick="document.getElementById('f').style.display='block'"> Myself</label><br>
+  <label><input type="radio" name="who" value="other" onclick="document.getElementById('f').style.display='none'"> Someone else</label>
+</form>
+<form id="f" method="POST" action="/{{site}}/send" style="display:none">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <button type="submit">Submit request</button>
+</form>

@@ -1,4 +1,5 @@
 import Foundation
+import CatalogSource
 import OptOutKitCore
 
 // Usage: broker-pipeline [--brokers DIR] [--directory DIR] [--report FILE] [--census FILE] [--spacing SECONDS]

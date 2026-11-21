@@ -2,7 +2,8 @@ name: 'Integration'
 
 # The integration tests: the app's UI tests, driving the real app on a simulator (unit tests run on every push: ci.yml). They run when a GitHub release
 # is published (a release is the app going to the App Store; TestFlight needs only ci.yml), when started by hand from the Actions tab, and the run over
-# every site also weekly. Sending is faked (-uitest-fake-submit): no broker site is contacted. docs/TESTING.md, "Unit and integration tests".
+# every site also weekly. They never run on a push and never gate TestFlight; only the App Store gate (tools/release_gate.py) needs them. The end-to-end
+# tests send to fixture brokers on this machine (fixtures/server.py), never to a real site. docs/TESTING.md, "Unit and integration tests".
 on:
   release:
     types: ['published']
@@ -43,7 +44,7 @@ jobs:
     steps:
       # Checked out before the simulator starts booting: a booting simulator starves the machine, and the checkout (38 MB) took 104 to 119 s on the
       # shards that boot first. One commit, no history, for every job (file times come from contents: tools/ci_file_times.py). Shard 0 builds, so it
-      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings, the data folders the tests read, and the test sources it lists the
+      # takes the whole tree; the others only test, so they take just what they read (the shard splitter, its timings and the test sources it lists the
       # tests from), about 1 MB.
       - uses: 'actions/checkout@v4'
         if: 'matrix.index == 0'
@@ -55,12 +56,7 @@ jobs:
             tools
             AppTests
             AppUITests
-            directory
-            brokers
-            platforms
-            jurisdictions
-            terms
-            registries
+            fixtures
           sparse-checkout-cone-mode: true
       - name: 'Start booting a simulator (the steps after it mostly wait on the network, so the boot gets the processor)'
         id: 'xcode'
@@ -124,7 +120,7 @@ jobs:
       - name: 'Fingerprint the sources from git''s own tree hashes (hashing every file took over two minutes and timed out)'
         if: 'matrix.index == 0'
         id: 'src'
-        run: 'echo "hash=$(git ls-tree HEAD project.yml App Shared ShareExtension AppTests AppUITests Packages brokers directory platforms jurisdictions terms | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"'
+        run: 'echo "hash=$(git ls-tree HEAD project.yml App Shared ShareExtension AppTests AppUITests Packages brokers directory platforms jurisdictions terms registries data | shasum | cut -c1-20)" >> "$GITHUB_OUTPUT"'
       - name: 'Restore the app''s build folder (saved again by this step''s post step, at the end of the job, so nothing waits for it)'
         if: 'matrix.index == 0'
         id: 'dd'
@@ -147,6 +143,9 @@ jobs:
           # No app icon in the test build: rendering its variants took over three minutes on these machines (CI only; release builds keep it).
           # Where the build's time went (the slowest kinds of step), how much it compiled, and how big the build folder is.
           python3 tools/ci_shards.py --build-summary build.log --cache "$CACHE" --folder DerivedData
+      - name: 'Compile the catalog of fixture brokers (the end-to-end tests run against it; fixtures/build_catalog.sh)'
+        if: 'matrix.index == 0'
+        run: 'bash fixtures/build_catalog.sh "$PWD/DerivedData/Build/Products/FixtureCatalog.sqlite"'
       - name: 'Hand the build to the other shards'
         if: 'matrix.index == 0'
         uses: 'actions/upload-artifact@v4'
@@ -196,6 +195,12 @@ jobs:
           while IFS= read -r a; do ARGS+=("$a"); done < <(python3 tools/ci_shards.py --suite "$SUITE" --shards "$SHARDS" --reserve "0:$PACKAGES_SECONDS" --index "${{ matrix.index }}" ${SKIP[@]+"${SKIP[@]}"})
           printf '%s\n' "${ARGS[@]}"
           XCTESTRUN=$(find DerivedData/Build/Products -maxdepth 1 -name '*.xctestrun' | head -1)
+          # The fixture brokers: a local web server the end-to-end tests send to (docs/TESTING.md, "End-to-end tests against fixture pages"); the catalog that
+          # carries their sites came with the build.
+          python3 fixtures/server.py 8765 > fixture-server.log 2>&1 &
+          trap 'kill $! 2>/dev/null || true' EXIT
+          export TEST_RUNNER_OPTOUT_FIXTURE_CATALOG="$PWD/DerivedData/Build/Products/FixtureCatalog.sqlite" TEST_RUNNER_OPTOUT_FIXTURE_URL="http://127.0.0.1:8765"
+          for _ in $(seq 1 50); do curl -sf http://127.0.0.1:8765/__ready >/dev/null && break; sleep 0.1; done
           set -o pipefail
           xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
             -resultBundlePath "Results-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \

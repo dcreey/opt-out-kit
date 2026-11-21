@@ -125,7 +125,7 @@ struct SiteReviewView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var review: SiteReview
     @StateObject private var browser = ReviewBrowser()
-    @AppStorage("guide.collapsed") private var collapsed = false
+    @Preference("guide.collapsed") private var collapsed = false
     @State private var kind: SiteReview.Kind = .form
     @State private var email = ""
     @State private var note = ""

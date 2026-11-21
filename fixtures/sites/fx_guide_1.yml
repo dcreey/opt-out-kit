@@ -1,0 +1,9 @@
+# A fixture broker for the end-to-end tests: opted out of with a guide (fixtures/flows/fxguide.yml), its page served by fixtures/server.py (kind 'guide'). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_guide_1'
+domain: 'guide-1.fixture.test'
+name: 'Fixture guide 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'guided'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_guide_1/optout'

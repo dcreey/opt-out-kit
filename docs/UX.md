@@ -63,14 +63,14 @@ person or add one) and the profile editor, with encrypted on-device storage.
 
 ## Lost phone means lost data
 
-Accepted trade-off: there is no server, so nothing can be recovered from us. The data lives in one encrypted file, and
+Accepted trade-off: there is no server, so nothing can be recovered from us. The data lives in one encrypted SQLite database (docs/STORAGE.md), and
 its key is in the iOS Keychain. The key is not "this device only", so a normal encrypted iPhone backup carries both and
 the profiles come back when the phone is restored. The editor says so: "If you lose your phone without a backup, this
 data is gone. Back up your phone as usual and it comes with it."
 
 Not yet verified on a real backup and restore. An explicit passphrase-protected export is a possible later addition.
 
-**Profile editor, after the tester feedback (2026-11-09).** What is typed is also kept as a sealed **draft** (`ProfileDraftStore`, its own small file) a second after typing stops, and comes
+**Profile editor, after the tester feedback (2026-11-09).** What is typed is also kept as a sealed **draft** (`ProfileDraftStore`, one row of the database) a second after typing stops, and comes
 back when the editor reopens after a crash or a close; saving the profile removes it (nothing else is rewritten while typing, so there is no lag). The **first-run setup is remembered**: until the profile is
 complete (or its setup screen is finished once) the profile screen reopens at every launch, after the walkthrough (`resumeSetupIfNeeded`; "Not now" skips it for that session only). Every other name,
 previous address, phone and email has a visible red minus button, and one that was added and left empty is dropped when the profile is saved. A previous address asks only for city, state and ZIP code
@@ -184,3 +184,7 @@ Many sites send people to the same address: privacy-portal providers (OneTrust a
 - **A page already open with no site matched:** the guide line reads "We could not tell which site this link is for. Tap to choose it", and **Mark completed** opens the same screen, then finishes the site chosen.
 
 **A site already marked finished:** the link no longer just says so. The app asks "*Site* is already marked finished. Does this link ask for more: a confirmation, another form or another step?" with **Yes, it needs more: open it** (the site goes back on the waiting list until that step is done, and the page opens as usual), **It is a different site** (the screen above) and **No, it is finished** (nothing opens).
+
+## Reviewing what a site said and showed
+
+A site's page (from the review of the last run, or the Sites tab) shows, when its form was sent, "What the page said" and the screenshot taken then; a tap on the screenshot opens it full size on a page of its own (a row of the page's list with a button that presented a full-screen cover never opened it, and the screenshot itself never appeared on the site's page, because its loader sat on a view that was empty until the picture arrived: it now shows a spinner meanwhile). Covered end to end by `FixtureJourneyUITests` (docs/TESTING.md).

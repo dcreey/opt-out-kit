@@ -49,40 +49,45 @@ public struct FixedKey: KeyProviding {
     public func key() throws -> SymmetricKey { value }
 }
 
-/// The whole household as one encrypted file on the device. Nothing is written in plaintext.
+/// The whole household as one sealed row of the app's database (`UserDatabase`). Nothing is written in plaintext.
 public struct HouseholdStore {
-    public let url: URL
+    public let database: UserDatabase
     private let keys: KeyProviding
+    private let legacy: UserDatabase.LegacyFiles?
 
-    public init(url: URL, keys: KeyProviding) {
-        self.url = url
+    /// `url` is the database file. `legacy`: where build 51 and earlier kept the household, its screenshots and the profile draft as separate files; they are
+    /// moved into the database the first time it is read (`UserDatabase.importLegacy`).
+    public init(url: URL, keys: KeyProviding, legacy: UserDatabase.LegacyFiles? = nil) {
+        self.database = UserDatabase(url: url)
         self.keys = keys
+        self.legacy = legacy
     }
+
+    public var url: URL { database.url }
 
     /// The same key, for other things kept sealed beside the household (the screenshots of what each site showed).
     public var keyProvider: KeyProviding { keys }
 
-    /// Nil when nothing has been saved yet. Throws when the file exists but cannot be opened
-    /// (wrong key, corruption), so callers never overwrite data they could not read.
+    /// Nil when nothing has been saved yet. Throws when the household exists but cannot be opened
+    /// (wrong key, corruption, a locked phone), so callers never overwrite data they could not read.
     public func load() throws -> Household? {
-        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
-        let plain = try SealedStore.open(Data(contentsOf: url), key: keys.key())
+        try moveLegacy()
+        guard let sealed = try database.get(.household) else { return nil }
+        let plain = try SealedStore.open(sealed, key: keys.key())
         return try JSONDecoder().decode(Household.self, from: plain)
     }
 
     public func save(_ household: Household) throws {
-        let sealed = try SealedStore.seal(JSONEncoder().encode(household), key: keys.key())
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        #if os(iOS)
-        // iOS data protection: unreadable until the phone is first unlocked after it starts. Not "complete" (unreadable whenever locked): the
-        // automatic run works while the phone is locked in a pocket or charging overnight, and must be able to keep what it did.
-        try sealed.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
-        #else
-        try sealed.write(to: url, options: [.atomic])   // macOS (tests, tools) has no per-file data protection
-        #endif
+        // A household still in the old file is moved first: saving over it would lose it.
+        try moveLegacy()
+        try database.put(.household, try SealedStore.seal(JSONEncoder().encode(household), key: keys.key()))
     }
 
-    public func erase() throws {
-        if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
+    public func erase() throws { try database.delete(.household) }
+
+    /// Moves what the old files hold into the database (once per run), the screenshots under their opaque keys.
+    private func moveLegacy() throws {
+        guard let legacy else { return }
+        try database.importLegacy(legacy) { person, site in EvidenceStore.rowKey(person: person, site: site, key: try keys.key()) }
     }
 }

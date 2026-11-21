@@ -123,7 +123,7 @@ final class AppModel: ObservableObject {
     private let store: HouseholdStore
     /// Screenshots of what each site showed when an automatic opt-out finished, sealed with the household key.
     let evidence: EvidenceStore
-    private let defaults: UserDefaults
+    private let defaults: Preferences
     private let catalog: [Announcement]
     private static let seenKey = "announcement.lastSeen"
     private static let languageKey = "appLanguage"
@@ -144,7 +144,7 @@ final class AppModel: ObservableObject {
         defaults.set(code, forKey: Self.languageKey)
     }
 
-    private static func initialLanguage(_ defaults: UserDefaults) -> String {
+    private static func initialLanguage(_ defaults: Preferences) -> String {
         if let saved = defaults.string(forKey: languageKey), languages.contains(where: { $0.code == saved }) { return saved }
         for preferred in Locale.preferredLanguages {
             let base = String(preferred.split(separator: "-").first ?? "")
@@ -159,25 +159,33 @@ final class AppModel: ObservableObject {
     var selectedPerson: Person? { household.people.first { $0.id == selectedID } }
 
     nonisolated static func defaultStore() -> HouseholdStore {
+        // One SQLite file holds the household, the screenshots and the profile draft (`UserDatabase`). Until build 52 they were separate files there, and the
+        // first read moves them in.
         let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return HouseholdStore(url: dir.appendingPathComponent("household.sealed"), keys: KeychainKey())
+        return HouseholdStore(url: dir.appendingPathComponent("exnay.sqlite"), keys: KeychainKey(),
+                              legacy: UserDatabase.LegacyFiles(household: dir.appendingPathComponent("household.sealed"), evidence: dir.appendingPathComponent("household.evidence"),
+                                                               draft: dir.appendingPathComponent("profile-draft.sealed")))
     }
 
-    /// `catalogURL`: the data the app ships, compiled at build time (`Catalog`, Catalog.sqlite in the bundle); the app reads only that, never YAML.
-    /// The folder parameters are for tests, which may hand in a small folder of their own in place of one part of the catalog.
+    /// `catalogURL`: the data the app ships, compiled at build time (`Catalog`, Catalog.sqlite in the bundle); the app reads only that, never YAML or any
+    /// other bundled file. `contents` replaces what it holds with data a test builds in memory (a small list of sites, one terms library); nothing is read
+    /// from a folder.
     init(store: HouseholdStore = AppModel.defaultStore(),
-         catalogURL: URL? = Bundle.main.url(forResource: "Catalog", withExtension: "sqlite"),
-         brokersDirectory: URL? = nil,
-         directoryURL: URL? = nil,
-         termsLibraryURL: URL? = nil,
-         platformsURL: URL? = nil,
-         jurisdictionsURL: URL? = nil,
-         registrySummaryURL: URL? = nil,
-         defaults: UserDefaults = .standard,
+         catalogURL: URL? = AppCatalog.url,
+         contents: Catalog.Contents? = nil,
+         defaults: Preferences? = nil,
          catalog: [Announcement] = AnnouncementCatalog.all) {
         self.store = store
         self.catalogURL = catalogURL
-        self.evidence = EvidenceStore(directory: store.url.deletingPathExtension().appendingPathExtension("evidence"), keys: store.keyProvider)
+        // The preferences are rows of the same database as the household (`StoredPreferences`); what an older build kept in UserDefaults is moved in first.
+        // A test hands in its own (a UserDefaults suite, or memory).
+        let defaults: Preferences = defaults ?? {
+            let stored = StoredPreferences(database: store.database)
+            stored.importLegacy(from: .standard, domain: Bundle.main.bundleIdentifier)
+            return stored
+        }()
+        AppPreferences.current = defaults
+        self.evidence = EvidenceStore(database: store.database, keys: store.keyProvider)
         self.defaults = defaults
         self.catalog = catalog
         let args = ProcessInfo.processInfo.arguments
@@ -192,7 +200,7 @@ final class AppModel: ObservableObject {
         language = initial; L10n.language = initial; Loc.language = initial
         if args.contains("-uitest-reset") {
             try? store.erase()
-            try? FileManager.default.removeItem(at: evidence.directory)
+            evidence.removeEverything()
             // UI tests skip the walkthrough unless a test asks for it.
             if args.contains("-uitest-onboarding") { defaults.removeObject(forKey: Self.seenKey) }
             else { defaults.set(Announcements.newestID(catalog), forKey: Self.seenKey) }
@@ -219,20 +227,19 @@ final class AppModel: ObservableObject {
         // Everything the app ships, from the compiled catalog: one read-only SQLite file, read in a few hundredths of a second (parsing the YAML here took
         // 0.14 to 0.23 s on a Mac, on this thread, at every launch). Excluded sites are left out by the query itself.
         do {
-            guard let catalogURL else { throw CocoaError(.fileNoSuchFile) }
-            let c = try Catalog.contents(of: catalogURL)
-            directory = c.sites; brokers = c.brokers; platforms = c.platforms; jurisdictions = c.jurisdictions
-            registrySummary = c.registrySummary; termsLibrary = c.termsLibrary
+            if let contents {
+                directory = contents.sites.filter { $0.excluded == nil }; brokers = contents.brokers; platforms = contents.platforms
+                jurisdictions = contents.jurisdictions; registrySummary = contents.registrySummary; termsLibrary = contents.termsLibrary
+            } else {
+                guard let catalogURL else { throw CocoaError(.fileNoSuchFile) }
+                try Catalog.use(catalogURL)          // the page scripts and the ZIP lookup read through the same catalog
+                let c = try Catalog.contents(of: catalogURL)
+                directory = c.sites; brokers = c.brokers; platforms = c.platforms; jurisdictions = c.jurisdictions
+                registrySummary = c.registrySummary; termsLibrary = c.termsLibrary
+            }
         } catch {
             loadError = Loc.f("Could not load the broker registry: %@", error)
         }
-        // Tests only: a part of the catalog replaced by a small folder of the test's own.
-        if let directoryURL { directory = ((try? Registry.loadDirectory(directoryURL)) ?? []).filter { $0.excluded == nil } }       // excluded sites are never shown
-        if let jurisdictionsURL { jurisdictions = (try? JurisdictionLoader.load(directory: jurisdictionsURL)) ?? [] }
-        if let registrySummaryURL { registrySummary = JurisdictionLoader.loadSummary(registrySummaryURL) }
-        if let platformsURL { platforms = (try? PlatformLoader.load(directory: platformsURL)) ?? [] }
-        if let termsLibraryURL { termsLibrary = try? TermsLibrary.load(termsLibraryURL) }
-        if let brokersDirectory { brokers = (try? Registry.load(directory: brokersDirectory)) ?? [] }
         #if DEBUG
         // UI tests: `-uitest-sites N` keeps only the first N sites that have a known form, so a test of a whole automatic run takes seconds, not minutes.
         // The weekly end-to-end job (.github/workflows/e2e.yml) runs the same tests over every site.
@@ -249,6 +256,15 @@ final class AppModel: ObservableObject {
             household.update(me)
             household.setContactEmail("pat@example.com")
             household.updateAuto { $0.decidedAt = Date() }
+        }
+        // UI tests: `-uitest-seed-multi` (with `-uitest-seed-profile`) gives the person several of everything (previous addresses, a second email and phone, a previous name and
+        // a nickname), for pages that ask for more than one address, email or phone.
+        if args.contains("-uitest-seed-multi"), var me = household.people.first(where: { $0.relationship == .me }) {
+            me.names += [NameEntry(kind: .previousLegal, name: "Patricia Example"), NameEntry(kind: .nickname, name: "Patty")]
+            me.addresses += [Address(street: "22 Oak Ave", city: "Portland", state: "OR", zip: "97201"), Address(street: "9 Pine Rd", city: "Austin", state: "TX", zip: "78701")]
+            me.emails = ["pat.work@example.com", "pat.old@example.org"]
+            me.phones = ["7735550101", "7735550102"]
+            household.update(me)
         }
         // UI tests: automatic protection on, as a new person who said yes at first use (the first pass then starts when the app is open).
         if args.contains("-uitest-auto-on") { household.updateAuto { $0.turnOnBoth(now: Date()) } }
@@ -608,7 +624,7 @@ final class AppModel: ObservableObject {
 
     // MARK: The profile being typed (kept for a crash) and the first-run setup
 
-    private var draftStore: ProfileDraftStore { ProfileDraftStore(url: store.url.deletingLastPathComponent().appendingPathComponent("profile-draft.sealed"), keys: store.keyProvider) }
+    private var draftStore: ProfileDraftStore { ProfileDraftStore(database: store.database, keys: store.keyProvider) }
 
     /// Keeps what is typed in the profile editor, sealed, off the main thread. Not the profile itself: nothing is rebuilt and the household is not rewritten.
     func saveDraft(_ person: Person, email: String) {
@@ -757,7 +773,7 @@ final class AppModel: ObservableObject {
     /// UI tests that fake sending have no site to be polite to, so the pause between sites is skipped.
     private static var usesFakeSubmitter: Bool {
         #if DEBUG
-        ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit")
+        ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") || Fixtures.active
         #else
         false
         #endif
@@ -1512,7 +1528,7 @@ final class AppModel: ObservableObject {
         let person = formPerson(original)
         let progress = household.progress(for: person.id)
         let holdMap = holds(for: original, now: now)
-        return directory.map(resolved).compactMap { entry -> AssistedRunner.Item? in
+        return directory.filter(Self.inTestScope).map(resolved).compactMap { entry -> AssistedRunner.Item? in
             guard let form = entry.optOutForm else { return nil }
             let pre = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: now, hold: holdMap[entry.id])
             // A form that wants the person's own listing: the runner searches the site and has them pick it first.
@@ -1524,11 +1540,17 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func makeAssistedDriver() -> AssistedDriver {
+    /// Simulator work: with `-only-domains a.com,b.com` the semi-automated queue holds just those sites, as the automatic run does.
+    nonisolated static func inTestScope(_ entry: DirectoryEntry) -> Bool {
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("-uitest-fake-submit") { return FakeAssistedDriver() }
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-only-domains"), args.indices.contains(i + 1) { return args[i + 1].split(separator: ",").contains { $0 == entry.domain } }
         #endif
-        return WebAssistedDriver(person: selectedPerson.map(formPerson), advertisingID: nil, termsPolicy: makeTermsPolicy())
+        return true
+    }
+
+    func makeAssistedDriver() -> AssistedDriver {
+        WebAssistedDriver(person: selectedPerson.map(formPerson), advertisingID: nil, termsPolicy: makeTermsPolicy())
     }
 
     /// The pages in the "tap to verify" task, ready for the visible runner. A placeholder plan stands in when the stored form's plan is
@@ -1558,11 +1580,6 @@ final class AppModel: ObservableObject {
             if progress.optOutAttempts[entry.id]?.contains(where: { $0.wasSubmitted && Date().timeIntervalSince($0.date) < AutoOptOut.defaultMinInterval }) == true { return nil }
             let plan = AutoOptOut.precheck(entry: entry, person: person, progress: progress, now: Date()).plan ?? FillPlan(values: [], verdict: .ready)
             let search = FormFiller.needsListing(form) ? entry.listingSearchURL(for: person) : nil
-            #if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("-uitest-fake-listing"), entry.domain == "advancedbackgroundchecks.com" {
-                return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback, searchURL: URL(string: "https://example.com/search"))
-            }
-            #endif
             return AssistedRunner.Item(entry: entry, form: shown, plan: plan, fallbackForm: fallback, searchURL: search)
         }
     }
@@ -1640,12 +1657,7 @@ final class AppModel: ObservableObject {
     func effectiveURL(for broker: Broker) -> URL? { household.healedLink(for: broker.id)?.form.page ?? broker.steps.compactMap(\.open).first }
 
     func makeInspector() -> PageInspector {
-        #if DEBUG
-        let args = ProcessInfo.processInfo.arguments
-        if args.contains("-uitest-fake-heal") { return FakeInspector() }
-        if args.contains("-uitest-fake-guided") { return NothingInspector() }      // UI tests never crawl real sites
-        #endif
-        return WebPageInspector()
+        WebPageInspector()
     }
 
     /// Looks for a site's current opt-out form by crawling from its home page, and remembers it on this device. Sends nothing
@@ -1680,7 +1692,6 @@ final class AppModel: ObservableObject {
     func makeGuidedPageMaker() -> GuidedPageMaker {
         #if DEBUG
         if let override = guidedPageMakerOverride { return override }
-        if ProcessInfo.processInfo.arguments.contains("-uitest-fake-guided") { return FakeGuidedPageMaker() }
         #endif
         return WebGuidedPageMaker()
     }
@@ -1910,7 +1921,7 @@ final class AppModel: ObservableObject {
     /// The user chose to discard unreadable data and start over.
     func eraseAndStartOver() {
         try? store.erase()
-        try? FileManager.default.removeItem(at: evidence.directory)
+        evidence.removeEverything()
         household = Household()
         household.add(Person(displayName: "Me", relationship: .me))
         selectedID = household.people[0].id
@@ -1921,6 +1932,7 @@ final class AppModel: ObservableObject {
     /// The phone was unlocked (or the app came to the front, which means it is): profiles that could not be opened while it was locked are opened
     /// now, and a save that had to wait is written.
     func protectedDataAvailable() {
+        (defaults as? StoredPreferences)?.reload()          // the preferences work in memory until the database can be opened
         if loadWaitsForUnlock {
             do {
                 let saved = try store.load()
@@ -2006,81 +2018,6 @@ struct FakeSubmitter: FormSubmitter {
             }
         }
         return SubmitEvidence(outcome: outcome, screenshot: image.jpegData(compressionQuality: 0.5))
-    }
-}
-#endif
-
-
-#if DEBUG
-/// UI tests use this so the Solve-and-send screen never loads a real site: each page shows a check for two polls, then sends.
-@MainActor
-struct FakeAssistedDriver: AssistedDriver {
-    func prepare(_ form: OptOutForm, plan: FillPlan) async -> AssistedPage? { FakeAssistedPage() }
-    func openSearch(_ url: URL) async -> SearchPage? { FakeSearchPage() }
-}
-
-@MainActor
-final class FakeSearchPage: SearchPage {
-    private let view = WKWebView(frame: .zero)
-    var webView: WKWebView? { view }
-    init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h2>Results for Pat Example</h2><p><b>Pat Example</b>, 34<br>Springfield, IL<br>Relatives: Sam Example</p><hr><p><b>Pat Example</b>, 61<br>Portland, OR</p><hr><p><b>Patricia Example</b>, 29<br>Austin, TX</p></body></html>", baseURL: nil) }
-    func currentURL() -> URL? { URL(string: "https://example.com/people/pat-example-il") }
-    func close() {}
-}
-
-@MainActor
-final class FakeAssistedPage: AssistedPage {
-    private var polls = 0
-    private let view = WKWebView(frame: .zero)
-    var webView: WKWebView? { view }
-    init() { view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Opt out of example.com</h1><p>Email</p><input value='you@example.com' style='width:100%;font-size:18px'><p>Full name</p><input value='Pat Example' style='width:100%;font-size:18px'><br><br><button style='font-size:18px'>Submit request</button></body></html>", baseURL: nil) }
-    // -uitest-fake-hold keeps the check up, so a test can work on the screen without the site sending itself meanwhile.
-    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= (ProcessInfo.processInfo.arguments.contains("-uitest-fake-hold") ? 10_000 : 2) ? [.check("a human check")] : [] }
-    func refill() async {}
-    func send() async -> SubmitOutcome { .submitted(awaitingEmail: ProcessInfo.processInfo.arguments.contains("-uitest-fake-email")) }
-    func close() {}
-}
-#endif
-
-
-#if DEBUG
-/// UI tests use this so guided flows never load a real site: a real web view shows a local page, and the checks are scripted.
-@MainActor
-struct FakeGuidedPageMaker: GuidedPageMaker { func make() -> GuidedPage { FakeGuidedPage() } }
-
-@MainActor
-final class FakeGuidedPage: GuidedPage {
-    private let view = WKWebView(frame: .zero)
-    private var polls = 0
-    var webView: WKWebView? { view }
-    func load(_ url: URL) async {
-        view.loadHTMLString("<html><body style='font-family:-apple-system;padding:24px'><h1>Fake opt-out page</h1><p>\(url.host ?? "site")</p><form><input placeholder='Email'><br><br><button>Submit</button></form></body></html>", baseURL: nil)
-    }
-    func currentURL() -> URL? { URL(string: "https://fake.example/page") }
-    func visibleText() async -> String { "Fake opt-out page" }
-    func fill(_ values: [FieldValue]) async -> Int { values.count }
-    func blockers() async -> [AssistedBlocker] { polls += 1; return polls <= 2 ? [.check("a human check")] : [] }
-    func send(_ values: [FieldValue]) async -> SubmitOutcome { .submitted(awaitingEmail: true) }
-    func close() {}
-}
-#endif
-
-
-#if DEBUG
-/// UI tests use this so healing never crawls a real site: the home page links to a privacy page that links to a request portal.
-struct NothingInspector: PageInspector { func snapshot(_ url: URL) async -> PageSnapshot? { nil } }
-
-struct FakeInspector: PageInspector {
-    func snapshot(_ url: URL) async -> PageSnapshot? {
-        let base = "https://\(url.host ?? "fake.example")"
-        switch url.path {
-        case "", "/": return PageSnapshot(url: url, title: "Fake site", text: "Welcome", links: [LinkSnapshot(href: URL(string: base + "/privacy-rights")!, text: "Your Privacy Rights")])
-        case "/privacy-rights": return PageSnapshot(url: url, title: "Privacy Rights", text: "Your privacy rights. Right to opt out.", links: [LinkSnapshot(href: URL(string: base + "/request-portal/")!, text: "Privacy Request Portal")])
-        case "/request-portal/":
-            return PageSnapshot(url: url, title: "Request Portal", text: "Privacy Request Portal. Right to opt out and delete.",
-                                forms: [FormSnapshot(action: url, method: "post", fields: [FormField(type: "text", name: "first", label: "First"), FormField(type: "email", name: "email", label: "Email")], hasSubmit: true)])
-        default: return PageSnapshot(url: url, status: 404, title: "Page not found", text: "Nothing here.")
-        }
     }
 }
 #endif

@@ -1,6 +1,15 @@
 import XCTest
 
 final class AutoProtectionUITests: XCTestCase {
+    /// Settings, then the automatic opt-out page.
+    private func openAutomaticPage(_ app: XCUIApplication) {
+        app.tabBars.buttons["Settings"].tap()
+        let status = app.buttons["auto-activity"]
+        XCTAssertTrue(app.scrollUntilExists(status), "Settings opens the automatic opt-out page")
+        status.tap()
+        XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 10) || app.buttons["activity-count-sent"].waitForExistence(timeout: 10))
+    }
+
     private func shot(_ app: XCUIApplication, _ name: String) {
         let a = XCTAttachment(screenshot: app.screenshot()); a.name = name; a.lifetime = .keepAlways; add(a)
     }
@@ -32,7 +41,10 @@ final class AutoProtectionUITests: XCTestCase {
         XCTAssertFalse(app.buttons["auto-banner"].waitForExistence(timeout: 2))
     }
 
-    func testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet() {
+    /// The weekly job's check that every real site's page and form read in a run, with sending faked (no broker is contacted). The run against fixture brokers
+    /// that sends for real is `FixtureJourneyUITests.testRunNowFillsAndSendsTheFormOnEachBrokerPage`.
+    func testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet() throws {
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1", "the weekly run over every real site; the fixture journeys cover Run now otherwise")
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-fake-submit", "-uitest-fake-scan"] + XCUIApplication.fewSites
         app.launch()
@@ -76,19 +88,26 @@ final class AutoProtectionUITests: XCTestCase {
 
     /// A site on the automatic status page must open its page and stay there. (It once bounced straight back: the page declared a navigation destination of
     /// its own while opened by a closure-style link, so SwiftUI built it twice and rejected the push.)
-    func testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere() {
+    func testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-demo-run"] + XCUIApplication.fewSites
-        app.launch()
-        // The whole run, then its result sheet: 25 sites in CI, every site in the weekly end-to-end job.
-        let done = app.buttons["run-report-done"]
         let everySite = ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1"
+        if everySite {
+            // The weekly job runs the real catalog with sending faked (no broker is contacted).
+            app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-demo-run"]
+        } else {
+            // Every other run: a real run against fixture brokers (docs/TESTING.md, "End-to-end tests against fixture pages").
+            let server = try FixtureBrokers.start()
+            app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-only-domains", "plain-1.fixture.test,plain-2.fixture.test"] + server.launchArguments
+        }
+        app.launch()
+        if !everySite { openAutomaticPage(app); app.buttons["auto-run-now"].tap() }
+        // The whole run, then its result sheet.
+        let done = app.buttons["run-report-done"]
         XCTAssertTrue(done.waitForExistence(timeout: everySite ? 5400 : 120), "the run finished and reported")
         done.tap()
-        app.tabBars.buttons["Settings"].tap()
-        let status = app.buttons["auto-activity"]
-        XCTAssertTrue(app.scrollUntilExists(status), "Settings opens the automatic opt-out page")
-        status.tap()
+        if everySite { openAutomaticPage(app) }
+        let status = app.buttons["activity-count-sent"]
+        _ = status
         XCTAssertTrue(app.buttons["activity-count-sent"].waitForExistence(timeout: 10), "the page opens with the three counts")
         shot(app, "5a-activity-page-folded")
         // The groups are folded except "Need you"; tapping a count opens its list.
@@ -119,9 +138,10 @@ final class AutoProtectionUITests: XCTestCase {
     }
 
     /// A new person: the automatic pass goes first and the semi-automated queue waits for it, then opens with the sites that need a person.
-    func testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt() {
+    func testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt() throws {
+        let server = try FixtureBrokers.start()
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on", "-uitest-fake-submit", "-only-domains", "abovedata.io,acronymix.com"] + XCUIApplication.fewSites
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-auto-on", "-only-domains", "plain-1.fixture.test,turnstile-1.fixture.test"] + server.launchArguments
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 15), "step 2 is shown as waiting for step 1")
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.exists, "the semi-automated queue is not offered yet")
@@ -132,8 +152,12 @@ final class AutoProtectionUITests: XCTestCase {
         XCTAssertTrue(later.waitForExistence(timeout: 120), "the first pass finishes and says what it did")
         shot(app, "6b-first-pass-report")
         if later.exists && later.isHittable { later.tap() }          // on a slow machine the report can already have been put away
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'kind-'")).firstMatch.waitForExistence(timeout: 10), "then the semi-automated queue opens")
+        // The queue shows what to tackle today (the chooser, or today's task with Continue once a choice is made).
+        let opened = app.staticTexts["What do you want to tackle today?"].waitForExistence(timeout: 10) || app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Continue'")).firstMatch.exists
+        shot(app, "6c-queue-after-first-pass")
+        XCTAssertTrue(opened, "then the semi-automated queue opens")
         XCTAssertFalse(app.descendants(matching: .any)["first-pass-step2"].exists)
         shot(app, "6c-queue-after-first-pass")
+        XCTAssertEqual(server.sentSites, ["fx_plain_1"], "the pass sent the plain form and left the one behind a check for the queue")
     }
 }

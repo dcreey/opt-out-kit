@@ -1,0 +1,9 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send" onsubmit="if(!document.getElementById('human').checked){document.getElementById('m').textContent='Please confirm you are human.';return false}">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <div style="border:1px solid #888;padding:12px;width:260px"><label><input type="checkbox" id="human" name="human" value="yes" onchange="document.getElementById('t').textContent=this.checked?'Verified':'I\'m not a robot'"> <span id="t">I'm not a robot</span></label></div>
+  <p id="m"></p>
+  <button type="submit">Submit request</button>
+</form>

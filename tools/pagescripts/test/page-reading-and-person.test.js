@@ -165,3 +165,13 @@ test('scroll-to-opt-out-control does nothing when the button is already on scree
   const below = page('<div style="position:absolute;top:-5000px"><button>Remove my listing</button></div>');
   assert.equal(run(below, 'scroll-to-opt-out-control'), true, 'off screen: scrolled to it');
 });
+
+test('a code box that is hidden until a button emails the code still counts as a code to type, until it is filled', () => {
+  const step = (value) => '<form><input name="email"><button type="button">Email me a verification code</button>' +
+    '<div style="display:none"><label>Verification code <input name="code" autocomplete="one-time-code"' + (value ? ' value="750439"' : '') + '></label></div>' +
+    '<button type="submit">Submit request</button></form>';
+  assert.equal(run(page(step(false)), 'empty-code-field'), true, 'the code has not been asked for or typed');
+  assert.equal(run(page(step(true)), 'empty-code-field'), false, 'typed');
+  assert.equal(run(page('<form><input name="code"><button type="submit">Submit</button></form>'), 'empty-code-field'), false, 'a box named code, hidden, with no button that emails one: not a code step');
+  assert.equal(run(page('<form><button type="button">Send message</button><div style="display:none"><input name="promo_code"></div></form>'), 'empty-code-field'), false, 'a promo code is not a verification code');
+});

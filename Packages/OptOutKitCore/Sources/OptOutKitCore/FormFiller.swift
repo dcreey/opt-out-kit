@@ -101,7 +101,10 @@ public enum FormFiller {
         for field in form.fields {
             // A hint in brackets tells the person what to do, not what the box is: "State (select country first)" is the state, not the country or a first name.
             let hint = "\\s*\\(((select|choose|pick|enter|type|please)|[^)]*(country code|area code|including|include|e\\.g|example|format|dashes|digits))[^)]*\\)"
-            let key = (field.name + " " + field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive]).lowercased()
+            // A live form's boxes are named by the app's own tokens (`f0-9`): they say nothing about the box, and their digits once read as "previous address 9" or "2" (a box
+            // labelled "Previous street address" with token f0-9 got no address, and "Previous ZIP code" with f0-12 got the second previous address's).
+            let tokenFree = field.name.range(of: "^f\\d+-\\d+$", options: .regularExpression) != nil ? "" : field.name
+            let key = (tokenFree + " " + field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive]).lowercased()
             if isTypedCode(field) { continue }          // left empty: the person types it, and the runner waits for it
             // A live form carries the page's own label first, then " | " and the field's code name; rules about what the box says use the label alone.
             let visibleLabel = (field.label.components(separatedBy: " | ").first ?? field.label).replacingOccurrences(of: hint, with: "", options: [.regularExpression, .caseInsensitive])

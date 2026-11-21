@@ -1,0 +1,8 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <iframe src="/{{site}}/recaptcha/api2/anchor?k=fixture" style="width:304px;height:78px;border:1px solid #888" title="reCAPTCHA"></iframe>
+  <textarea name="g-recaptcha-response" style="display:none"></textarea>
+  <button type="submit">Submit request</button>
+</form>

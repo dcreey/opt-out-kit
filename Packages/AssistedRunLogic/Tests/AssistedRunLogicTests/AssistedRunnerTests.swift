@@ -426,6 +426,17 @@ final class PrematureDoneTests: XCTestCase {
         XCTAssertEqual(FormRun.classifyConfirmed("There was a problem with your submission. The reCAPTCHA response was missing or invalid."), .rejected("the site showed an error after sending"))
         XCTAssertEqual(FormRun.classifyConfirmed(consent + "\nThank you. Your request has been submitted."), .submitted(awaitingEmail: false))
     }
+
+    /// A code the site did not accept is a refusal (even though the page asks for the code again), and a page that only asks for the code is still waiting.
+    func testAWrongEmailedCodeIsARefusalNotASend() {
+        for text in ["That code is not right\nThe verification code did not match. Go back and enter the code from your email.", "Invalid verification code. Please enter the code we emailed you.",
+                     "Your one-time code has expired.", "Incorrect code"] {
+            XCTAssertEqual(FormRun.classifyConfirmed(text), .rejected(FormRun.wrongCodeReason), text)
+        }
+        XCTAssertEqual(FormRun.classifyConfirmed("We sent a code to your email. Enter the code to continue."), .failed("the page is waiting for a code from the person"))
+        XCTAssertFalse(FormRun.rejectsCode("Thank you. Your request has been submitted."))
+        XCTAssertTrue(FormRun.rejectsCode("The code is incorrect"))
+    }
 }
 
 /// When a page says an email follows, and when it says with confidence that nothing does.

@@ -9,9 +9,9 @@ fields a tool owns, so a person's edit survives the next run.
 
 ## The compiled catalog (what the app ships)
 
-The app does not ship or parse any of this YAML. At build time the core package's `CatalogPlugin` (a SwiftPM build tool, applied to the app target in
+The app does not ship or parse any of this YAML, and nothing else it ships is a loose file either (docs/STORAGE.md). At build time the core package's `CatalogPlugin` (a SwiftPM build tool, applied to the app target in
 `project.yml`) runs `catalog-builder`, which loads `directory/`, `brokers/`, `platforms/` (with its coverage JSON), `jurisdictions/`,
-`registries/summary.json` and `terms/library.yml` with the same loaders the tests use, and writes them into one read-only SQLite file,
+`registries/summary.json` and `terms/library.yml` with the same loaders the tests use (the `CatalogSource` module: the only code that reads YAML, so the app does not link the YAML reader), adds the page scripts (`App/PageScripts/*.js`, `scripts` table) and the ZIP table (`data/zips-us.tsv`, `zips` table, found by key), and writes them into one read-only SQLite file,
 `Catalog.sqlite`, in the app bundle (`Catalog` in `Packages/OptOutKitCore`). The app reads only that (`AppModel`, `Catalog.contents`).
 
 - **Checked at build time.** A file that does not decode, or a repeated id, fails the build; so does a value the catalog cannot carry exactly (the builder
@@ -22,7 +22,7 @@ The app does not ship or parse any of this YAML. At build time the core package'
 - **Read-only.** It is written as one self-contained file (a rollback journal, not WAL) and opened `immutable`, so SQLite writes nothing beside it inside
   the app's signed bundle.
 - **Speed.** Reading the whole catalog takes about 0.02 s (release build, Mac); parsing the same sites from YAML took 0.14 to 0.23 s, on the main thread at
-  every launch. 855 sites, 5 flows, 1 platform and 107 places make a 3.8 MB file with the search index, built in about 0.4 s.
+  every launch. 855 sites, 5 flows, 1 platform, 107 places, 55 scripts and 40,977 ZIP codes make a 4.8 MB file with the search index, built in about 0.9 s.
 - **Search.** `site_search` is a full-text index (SQLite's FTS5, part of iOS) over each shown site's name, its web address as words, what kind of company
   it is and what it holds and sells (the app's own names for them, in all four languages) and its description; `Catalog.search` ranks a match in the
   name highest, then the address, the kind, the description (BM25). It is what the Sites search screen uses beside its plain name match. It adds about

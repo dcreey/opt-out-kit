@@ -709,25 +709,17 @@ final class ResumeAppTests: XCTestCase {
         }
     }
 
-    /// The first sites of the directory that have a known form, copied to their own folder: a resume needs a handful of sites, not every one (a run over
-    /// the whole directory made these tests take a minute on CI).
-    private static let smallDirectory: URL = {
-        // The repository's own folder (the app ships only the compiled catalog; the simulator reads the Mac's files).
-        let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("directory")
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ook-dir-\(UUID())")
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let files = ((try? FileManager.default.contentsOfDirectory(at: source, includingPropertiesForKeys: nil)) ?? []).filter { $0.pathExtension == "yml" }.sorted { $0.path < $1.path }
-        var n = 0
-        for f in files where n < 20 {
-            guard let text = try? String(contentsOf: f, encoding: .utf8), text.contains("opt_out_form:") || text.contains("\"found\": true") else { continue }
-            try? FileManager.default.copyItem(at: f, to: dir.appendingPathComponent(f.lastPathComponent)); n += 1
-        }
-        return dir
+    /// The catalog's first sites that have a known form: a resume needs a handful of sites, not every one (a run over the whole directory made these tests
+    /// take a minute on CI). Everything else is the catalog the app ships.
+    private static let smallContents: Catalog.Contents = {
+        guard let url = AppCatalog.url, var c = try? Catalog.contents(of: url) else { return Catalog.Contents(sites: [], brokers: [], platforms: [], jurisdictions: [], registrySummary: nil, termsLibrary: nil) }
+        c.sites = Array(c.sites.filter { $0.optOutForm != nil || $0.liveForm?.found == true }.prefix(20))
+        return c
     }()
 
     private func readyModel() -> (AppModel, Person) {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
-                         directoryURL: Self.smallDirectory, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+                         contents: Self.smallContents, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
         var me = m.people.first { $0.relationship == .me }!
         me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
         me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]

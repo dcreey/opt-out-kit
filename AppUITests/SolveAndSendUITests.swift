@@ -1,10 +1,23 @@
 import XCTest
 
-/// The Solve-and-send screen on two real directory sites with the fake driver (no site is loaded): skipping on, then back to the earlier site.
+/// The Solve-and-send screen on fixture brokers that hold for the person (a page with no form, a page that is down): the real engine and web view, nothing
+/// faked. docs/TESTING.md, "End-to-end tests against fixture pages".
 final class SolveAndSendUITests: XCTestCase {
+    private var server: FixtureBrokers!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        server = try FixtureBrokers.start()
+    }
+
+    /// Launch arguments for Solve and send on two sites that hold for the person, so nothing is sent while the screen is looked at.
+    private func holding(_ extra: [String] = []) -> [String] {
+        ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments + ["-semi-domains", "noform-1.fixture.test,down-1.fixture.test"] + extra
+    }
+
     func testPreviousSiteReopensTheEarlierSiteAndNextSiteBringsYouForwardAgain() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com"]
+        app.launchArguments = holding()
         app.launch()
         let label = app.staticTexts["assisted-site"]
         XCTAssertTrue(label.waitForExistence(timeout: 20), "the Solve-and-send screen opened")
@@ -38,7 +51,8 @@ final class SolveAndSendUITests: XCTestCase {
         waitForExpectations(timeout: 20)
         let words = app.staticTexts["assisted-instruction"]
         XCTAssertTrue(words.waitForExistence(timeout: 10))
-        XCTAssertTrue(words.label.contains("back on this site"), "it says nothing is sent for you: \(words.label)")
+        // The earlier site's page loads again first; once it is up the app says it will not send anything for a site visited again.
+        expectation(for: NSPredicate(format: "label CONTAINS 'back on this site'"), evaluatedWith: words); waitForExpectations(timeout: 30)
         let next = app.buttons["assisted-next"]
         XCTAssertTrue(next.waitForExistence(timeout: 5))
         next.tap()
@@ -48,7 +62,7 @@ final class SolveAndSendUITests: XCTestCase {
 
     func testMyDataIsInTheMenuAndOffersEachDetailToCopy() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com"]
+        app.launchArguments = holding()
         app.launch()
         XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 20))
         app.buttons["assisted-more"].tap()
@@ -61,18 +75,21 @@ final class SolveAndSendUITests: XCTestCase {
 
     func testAConfirmationNobodyPressedAnythingForAsksWasThisSent() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com", "-show-sent-question"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments + ["-semi-domains", "selfconfirm-1.fixture.test"]
         app.launch()
+        // The page says "Your request has been received" by itself, though I pressed nothing: the app asks rather than assuming.
         let alert = app.alerts["Was this sent?"]
-        XCTAssertTrue(alert.waitForExistence(timeout: 30), "the question is on screen")
+        XCTAssertTrue(alert.waitForExistence(timeout: 60), "the question is on screen")
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing was sent: the page only said so")
         XCTAssertTrue(alert.buttons["Yes, it was sent"].exists)
         XCTAssertTrue(alert.buttons["No, stay on this page"].exists)
         alert.buttons["No, stay on this page"].tap()
         XCTAssertFalse(alert.waitForExistence(timeout: 2), "answering closes it")
+        XCTAssertFalse(app.buttons["finish-done"].exists, "No means it is not counted as sent or done")
     }
 
     func testTheFirstGuidedFlowOpensWithAWalkthroughThatCanBePagedThroughOrSkipped() {
-        let args = ["-uitest-reset", "-uitest-seed-profile", "-uitest-fake-submit", "-uitest-fake-hold", "-semi-domains", "abovedata.io,accudata.com", "-show-guided-intro"]
+        let args = holding(["-show-guided-intro"])
         let app = XCUIApplication()
         app.launchArguments = args
         app.launch()

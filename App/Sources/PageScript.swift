@@ -1,4 +1,5 @@
 import Foundation
+import OptOutKitCore
 
 /// The JavaScript the app runs inside a web page (reading forms, filling them, finding checks and confirmations) lives in `App/PageScripts/*.js`, one
 /// file per script, so it can be unit tested on its own: `tools/pagescripts` runs every file against test pages in a headless DOM (docs/TESTING.md,
@@ -8,7 +9,8 @@ import Foundation
 /// - A script that takes values is a function expression, `(function(token, step){ ... })`, called with its values as JSON (`PageScript.call`). The
 ///   values are encoded once, here, the same way the Swift strings used to escape them; nothing is left on the page after it runs.
 ///
-/// A line `//#include name` is replaced with the text of `name.js` (a fragment shared by several scripts). Files are read from the app bundle once and kept.
+/// A line `//#include name` is replaced with the text of `name.js` (a fragment shared by several scripts). The files are compiled into the app's catalog at build
+/// time (`Catalog`, the `scripts` table) and read from it once each and kept: the app reads no script file at runtime.
 enum PageScript {
     private static let lock = NSLock()
     private nonisolated(unsafe) static var cache: [String: String] = [:]
@@ -40,15 +42,12 @@ enum PageScript {
     }
 
     /// Every script the app has (for the test that each one loads).
-    static var names: [String] {
-        let urls = Bundle.main.urls(forResourcesWithExtension: "js", subdirectory: "PageScripts") ?? []
-        return urls.map { $0.deletingPathExtension().lastPathComponent }.sorted()
-    }
+    static var names: [String] { AppCatalog.ensureOpen(); return Catalog.scriptNames() }
 
     private static func load(_ name: String) -> String {
-        guard let url = Bundle.main.url(forResource: name, withExtension: "js", subdirectory: "PageScripts"),
-              let text = try? String(contentsOf: url, encoding: .utf8) else {
-            assertionFailure("page script \(name).js is missing from the app bundle")
+        AppCatalog.ensureOpen()
+        guard let text = Catalog.script(named: name) else {
+            assertionFailure("page script \(name) is missing from the app's catalog")
             return "null"
         }
         return text.trimmingCharacters(in: .whitespacesAndNewlines)

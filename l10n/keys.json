@@ -1211,6 +1211,7 @@
   "We chose \"%@\" for you. Read the page and confirm with its own button.",
   "We could not confirm a general right to have your data deleted under this law, so a deletion request may be refused.",
   "We could not confirm it was sent (%@). Finish it yourself in the page, then tap Next step.",
+  "We could not find a form to fill in on this page, so nothing was sent. If it asks you to do something, do it here and tap Mark as done; otherwise tap Next site.",
   "We could not find an opt-out page on this site.",
   "We could not find the form automatically.",
   "We could not match any of this form's fields to your profile.",

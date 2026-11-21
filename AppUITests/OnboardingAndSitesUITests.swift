@@ -268,17 +268,24 @@ final class DirectoryUITests: XCTestCase {
 }
 
 final class ExposureScanUITests: XCTestCase {
-    func testScanShowsGroupedResultsWithoutTouchingTheNetwork() {
+    /// As a user I want to check where I am listed: the app searches each site that can be checked for my name, and says which ones list me and which do not.
+    /// Three fixture brokers answer a name search (two list anyone named Pat, one lists nobody); nothing else is contacted.
+    func testScanSearchesEachSiteForMyNameAndSaysWhichListMe() throws {
+        let server = try FixtureBrokers.start()
         let app = XCUIApplication()
         // A complete made-up profile, so the check has someone to search for (typing a profile is tested in ProfileEditorUITests).
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan", "-uitest-seed-profile"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
         app.launch()
 
         app.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]), "the scan is low on the Sites tab")
         app.buttons["scan-exposure"].tap()
         app.buttons["start-scan"].tap()
-        XCTAssertTrue(app.staticTexts["scan-summary"].waitForExistence(timeout: 30))
+        let summary = app.staticTexts["scan-summary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 60))
+        XCTAssertEqual(summary.label, "Found a listing on 2 of 3 sites checked.", "two of the three fixture brokers list me")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'listed-1.fixture.test'")).firstMatch.exists, "the site that lists me is shown")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "scan-results"; shot.lifetime = .keepAlways; add(shot)
     }
 }
 

@@ -115,7 +115,7 @@ struct LinkFillerView: View {
     @State private var showDone = false
     @StateObject private var browserHandoff = BrowserHandoff()
     @StateObject private var finishQuestion = FinishQuestion()
-    @AppStorage("guide.collapsed") private var guideCollapsed = false
+    @Preference("guide.collapsed") private var guideCollapsed = false
     var startLink: String = ""
 
     var body: some View {

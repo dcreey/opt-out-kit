@@ -1,0 +1,10 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <fieldset><legend>Are you an authorized agent acting on behalf of someone?</legend>
+    <label><input type="radio" name="agent" value="yes" required> Yes</label>
+    <label><input type="radio" name="agent" value="no" required> No</label>
+  </fieldset>
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <button type="submit">Submit request</button>
+</form>

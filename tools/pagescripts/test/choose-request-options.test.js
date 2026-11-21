@@ -96,3 +96,13 @@ test('a token that is not on the page chooses nothing', () => {
   const w = page('<form><input type=checkbox id=a></form>');
   assert.deepEqual(JSON.parse(call(w, 'choose-request-options', 'nope', false)), { chosen: 0, unresolved: [] });
 });
+
+test('a "know" choice that says "me" is not read as the person answering "myself": the opt-out beside it is chosen', () => {
+  const r = choose(radio('t', 'a', 'Know what personal information you hold about me') + radio('t', 'b', 'Opt out of the sale or sharing of my personal information') +
+                   radio('t', 'c', 'Limit the use of my sensitive personal information'));
+  assert.deepEqual([r.$('#a').checked, r.$('#b').checked, r.$('#c').checked], [false, true, false]);
+  const delivered = choose(radio('t', 'a', 'Send me a copy of my data') + radio('t', 'b', 'Do not sell my information'));
+  assert.deepEqual([delivered.$('#a').checked, delivered.$('#b').checked], [false, true]);
+  const who = choose(radio('w', 'a', 'Myself') + radio('w', 'b', 'Authorized agent'));
+  assert.equal(who.$('#a').checked, true, 'the real self-answer still wins');
+});

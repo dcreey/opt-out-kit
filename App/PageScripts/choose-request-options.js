@@ -41,7 +41,8 @@
     var ctx=((rs[0].closest('fieldset')||rs[0].closest('div')||{innerText:''}).innerText||'').slice(0,200)+' '+(rs[0].name||'');
     if(selfQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var ls=label(rs[q]); if(/^\s*(yes|myself|me|my own)\b/i.test(ls)&&!/agent|behalf|represent/i.test(ls)) pick=rs[q];}}
     if(!pick&&agentQ.test(ctx)){for(var q=0;q<rs.length&&!pick;q++){var lt=label(rs[q]); if(/^\s*(no|myself|me|my own|not an agent|individual)\b/i.test(lt)) pick=rs[q];}}
-    for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)) pick=rs[i];}
+    // (Not a request choice: "Know what you hold about me" says "me" too, and was picked here ahead of the opt-out beside it.)
+    for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(self.test(t)&&!notSelf.test(t)&&!yes.test(t)&&!no.test(t)) pick=rs[i];}
     // "Remove my information" (a person-search site taking a listing off) beats a plain "do not sell" choice beside it: it is the stronger opt-out.
     for(var i=0;i<rs.length&&!pick;i++){var ti=title(rs[i]); if(/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i.test(ti)) pick=rs[i];}
     for(var i=0;i<rs.length&&!pick;i++){var t=label(rs[i]); if(yesOrOptOut(t)||isDecl(t)) pick=rs[i];}

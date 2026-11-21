@@ -1,0 +1,17 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name"></label><br>
+  <div id="emails"><label>Email address <input type="email" name="email"></label></div>
+  <button type="button" onclick="addBox('emails', 'email', 'Email address', 'email')">Add another email</button><br>
+  <div id="phones"><label>Phone number <input type="tel" name="phone"></label></div>
+  <button type="button" onclick="addBox('phones', 'phone', 'Phone number', 'tel')">Add another phone</button><br>
+  <button type="submit">Submit request</button>
+</form>
+<script>
+var counts = {};
+function addBox(where, name, label, type) {
+  counts[name] = (counts[name] || 1) + 1;
+  var l = document.createElement('label'); l.innerHTML = '<br>' + label + ' <input type="' + type + '" name="' + name + counts[name] + '">';
+  document.getElementById(where).appendChild(l);
+}
+</script>

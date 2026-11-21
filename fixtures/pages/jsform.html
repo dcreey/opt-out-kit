@@ -1,0 +1,10 @@
+<h1>Opt out of {{site}}</h1>
+<div id="mount"><p>Loading the request form…</p></div>
+<script>
+setTimeout(function () {
+  document.getElementById('mount').innerHTML = '<form method="POST" action="/{{site}}/send">' +
+    '<label>Full name <input type="text" name="name" required></label><br>' +
+    '<label>Email address <input type="email" name="email" required></label><br>' +
+    '<button type="submit">Submit request</button></form>';
+}, 2500);
+</script>

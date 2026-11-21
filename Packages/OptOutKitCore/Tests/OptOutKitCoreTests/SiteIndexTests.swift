@@ -1,4 +1,5 @@
 import XCTest
+import CatalogSource
 @testable import OptOutKitCore
 
 /// `SiteIndex`: how the app finds one site among all of them, without scanning the list.

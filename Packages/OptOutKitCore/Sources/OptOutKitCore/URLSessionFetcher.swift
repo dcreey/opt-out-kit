@@ -19,13 +19,26 @@ public struct URLSessionFetcher: PageFetcher {
         self.maxBytes = maxBytes
     }
 
+    /// Only https addresses are fetched. In a debug build a UI test may also fetch the fixture brokers on this machine (a loopback address, `allowLoopback`).
+    static func allows(_ url: URL) -> Bool {
+        if url.scheme == "https" { return true }
+        #if DEBUG
+        return allowLoopback && url.scheme == "http" && url.host == "127.0.0.1"
+        #else
+        return false
+        #endif
+    }
+    #if DEBUG
+    nonisolated(unsafe) public static var allowLoopback = false
+    #endif
+
     public func fetch(_ url: URL) async throws -> FetchedPage {
-        guard url.scheme == "https" else { throw URLError(.unsupportedURL) }
+        guard Self.allows(url) else { throw URLError(.unsupportedURL) }
         return try await send(URLRequest(url: url))
     }
 
     public func post(_ url: URL, body: String) async throws -> FetchedPage {
-        guard url.scheme == "https" else { throw URLError(.unsupportedURL) }
+        guard Self.allows(url) else { throw URLError(.unsupportedURL) }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")

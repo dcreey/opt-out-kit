@@ -1,5 +1,4 @@
 import Foundation
-import Yams
 
 /// How far a site can be automated, as judged by tools/profile_brokers.py from the shape of its opt-out page.
 public enum Automation: String, Codable, Sendable {
@@ -289,22 +288,6 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
         case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, caution, persistence, regions, languages, regionalSites = "regional_sites", about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent", noFill = "no_fill", findLater = "find_later"
-    }
-}
-
-public extension Registry {
-    /// Loads every `*.yml` in the directory folder. Files that fail to decode are an error, not skipped.
-    static func loadDirectory(_ directory: URL) throws -> [DirectoryEntry] {
-        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
-            .filter { $0.pathExtension == "yml" }
-        let entries = try files.map { file -> DirectoryEntry in
-            var e = try YAMLDecoder().decode(DirectoryEntry.self, from: String(contentsOf: file, encoding: .utf8))
-            e.contactEmail = ContactEmail.cleaned(e.contactEmail)      // a trailing "." from the sentence it was found in would make the address invalid
-            return e
-        }
-        var seen = Set<String>()
-        for e in entries where !seen.insert(e.id).inserted { throw RegistryError.duplicateID(e.id) }
-        return entries.sorted { $0.domain < $1.domain }
     }
 }
 

@@ -22,8 +22,19 @@ enum FormRun {
         if text.isEmpty { return .failed("") }
         // A sub-form that sends a code to the person's email ("Verify Email") is a step, not the end: the page says a code was sent, or asks for it, and the person types it in.
         // Only what the page reports counts; a form's standing instructions ("submitted only after you enter the code") are already left out of `kept`.
+        // A code the site did not accept ("That code is not right", "invalid code", "the code expired") is a refusal, even though the page also asks for the code again.
+        if rejectsCode(text) { return .rejected(wrongCodeReason) }          // read before the instruction lines are dropped: "Invalid code. Please enter it again." is one
         if asksForCode(kept) { return .failed("the page is waiting for a code from the person") }
         return kept.isEmpty ? .failed("no success message was shown") : classify(kept)
+    }
+
+    /// What a site that did not accept the emailed code is reported as.
+    nonisolated static let wrongCodeReason = "the site did not accept the code"
+
+    /// New text that says the code the person typed was wrong, expired or not accepted.
+    nonisolated static func rejectsCode(_ text: String) -> Bool {
+        text.range(of: "(code|otp|passcode)[^.\\n]{0,40}(not (right|correct|valid|accepted)|incorrect|invalid|did not match|does not match|doesn.t match|didn.t match|expired|wrong)|(incorrect|invalid|wrong|expired) (verification |security |one[- ]?time |confirmation )?(code|otp|passcode)",
+                   options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// A line that tells the person what to do or what will happen, or asks for their consent, with no sign that it already did.

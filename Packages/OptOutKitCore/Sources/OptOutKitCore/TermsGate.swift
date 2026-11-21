@@ -1,5 +1,4 @@
 import Foundation
-import Yams
 
 /// One distinct paragraph of terms text, identified by the hash of its canonical form. The library holds hashes, never
 /// site text. A paragraph only counts once a person has read it (`reviewed`) and judged it (`verdict`).
@@ -44,10 +43,6 @@ public struct TermsLibrary: Codable, Equatable, Sendable {
     }
 
     public init(version: Int, paragraphs: [TermsParagraph]) { self.version = version; self.paragraphs = paragraphs }
-
-    public static func load(_ url: URL) throws -> TermsLibrary {
-        try YAMLDecoder().decode(TermsLibrary.self, from: String(contentsOf: url, encoding: .utf8))
-    }
 
     var byHash: [String: TermsParagraph] { Dictionary(paragraphs.map { ($0.hash, $0) }, uniquingKeysWith: { a, _ in a }) }
 

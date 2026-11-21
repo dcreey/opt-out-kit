@@ -1,0 +1,26 @@
+<h1>Opt out of {{site}}</h1><p>Tell us every way you may appear in our data.</p>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name"></label><br>
+  <label>Email address <input type="email" name="email"></label><br>
+  <label>Alternate email <input type="email" name="email2"></label><br>
+  <label>Phone number <input type="tel" name="phone"></label><br>
+  <label>Alternate phone <input type="tel" name="phone2"></label><br>
+  <h3>Current address</h3>
+  <label>Street address <input type="text" name="street"></label><br>
+  <label>City <input type="text" name="city"></label><br>
+  <label>State <input type="text" name="state"></label><br>
+  <label>ZIP code <input type="text" name="zip"></label><br>
+  <h3>Previous address</h3>
+  <label>Previous street address <input type="text" name="prev_street"></label><br>
+  <label>Previous city <input type="text" name="prev_city"></label><br>
+  <label>Previous state <input type="text" name="prev_state"></label><br>
+  <label>Previous ZIP code <input type="text" name="prev_zip"></label><br>
+  <h3>Second previous address</h3>
+  <label>Second previous street address <input type="text" name="prev2_street"></label><br>
+  <label>Second previous city <input type="text" name="prev2_city"></label><br>
+  <label>Second previous state <input type="text" name="prev2_state"></label><br>
+  <label>Second previous ZIP code <input type="text" name="prev2_zip"></label><br>
+  <label>Other names you have used <input type="text" name="other_names"></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <button type="submit">Submit request</button>
+</form>

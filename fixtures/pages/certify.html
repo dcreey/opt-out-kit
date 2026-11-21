@@ -1,0 +1,7 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label><input type="checkbox" name="certify" value="yes" required> I certify under penalty of perjury that I am the person this request is about, or authorised to act for them, and that the information I have given is true.</label><br>
+  <button type="submit">Submit request</button>
+</form>

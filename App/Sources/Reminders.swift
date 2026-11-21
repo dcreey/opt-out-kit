@@ -9,7 +9,7 @@ enum ReminderScheduler {
     private static let firstLaunchKey = "reminders.firstLaunch"
 
     /// The date the reminders count from when no request has been sent yet.
-    private static func firstLaunch(_ defaults: UserDefaults = .standard) -> Date {
+    private static func firstLaunch(_ defaults: Preferences = AppPreferences.current) -> Date {
         if let d = defaults.object(forKey: firstLaunchKey) as? Date { return d }
         let now = Date(); defaults.set(now, forKey: firstLaunchKey); return now
     }

@@ -266,6 +266,9 @@ final class WebAssistedPage: AssistedPage {
             _ = await session.chooseTileButtons()
             // Choosing "remove my information" (or a state) can reveal more boxes (name, birth year): read the form again and fill those too.
             if options.chosen > 0 || typedAhead > 0 { _ = await adoptNewForm(force: true) }
+            // More emails or phones than boxes: press the page's own "Add another email" / "+ Add phone" button, then read the form again and fill the new boxes (the first
+            // read of a form never did this: only a form that appeared later was given its extra boxes).
+            if let person, await session.addAnotherBoxes(form: liveForm, emails: person.emails.count, phones: person.phones.count) > 0 { _ = await adoptNewForm(force: true) }
         } else { _ = await session.fillFields(plan.values) }
     }
 
@@ -294,7 +297,9 @@ final class WebAssistedPage: AssistedPage {
         // No confirmation wording, but the form is gone or the page moved on, and nothing on the page says it went wrong: the site took it.
         if case .failed = outcome, let liveForm, let was = stateBefore {
             let now = await session.formState(liveForm)
-            let errorSeen = FormRun.classify(FormRun.newText(before: before, after: after)) != .failed("no success message was shown")
+            let newText = FormRun.newText(before: before, after: after)
+            // The page asking for a code, or saying the code was wrong, is not the site taking the request.
+            let errorSeen = FormRun.classify(newText) != .failed("no success message was shown") || FormRun.rejectsCode(newText) || FormRun.asksForCode(newText)
             if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen { return .submitted(awaitingEmail: false) }
         }
         if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged(PageFlow.nextStepMarker) }
@@ -338,27 +343,15 @@ struct AssistedOptOutView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var runner: AssistedRunner
     @State private var showSent = false
-    @AppStorage("guide.collapsed") private var guideCollapsed = false
+    @Preference("guide.collapsed") private var guideCollapsed = false
     @State private var showSkipped = false
     @StateObject private var handoff: EmailHandoff
     @StateObject private var browserHandoff = BrowserHandoff()
     private var livePage: WebAssistedPage? { runner.page as? WebAssistedPage }
     private var liveSearch: WebSearchPage? { runner.searchPage as? WebSearchPage }
-    /// The web view of whichever page is on screen (the scripted pages UI tests use have one too).
-    private var pageWebView: WKWebView? {
-        if let live = livePage { return live.webView }
-        #if DEBUG
-        if let fake = runner.page as? FakeAssistedPage { return fake.webView }
-        #endif
-        return nil
-    }
-    private var searchWebView: WKWebView? {
-        if let live = liveSearch { return live.webView }
-        #if DEBUG
-        if let fake = runner.searchPage as? FakeSearchPage { return fake.webView }
-        #endif
-        return nil
-    }
+    /// The web view of whichever page is on screen.
+    private var pageWebView: WKWebView? { livePage?.webView }
+    private var searchWebView: WKWebView? { liveSearch?.webView }
     init(runner: AssistedRunner) { _runner = StateObject(wrappedValue: runner); _handoff = StateObject(wrappedValue: EmailHandoff(runner: runner)) }
     @State private var explainAdID: (batch: EmailBatch, name: String)?
     @State private var explainEmail = false
@@ -375,10 +368,6 @@ struct AssistedOptOutView: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
         .sentQuestionAlert(runner.sentQuestion)
-        #if DEBUG
-        // Simulator work and its UI test: `-show-sent-question` puts the "Was this sent?" question on screen as soon as the screen opens.
-        .task { if ProcessInfo.processInfo.arguments.contains("-show-sent-question") { try? await Task.sleep(nanoseconds: 3_000_000_000); _ = await runner.sentQuestion.ask(awaitingEmail: false) } }
-        #endif
         .finishQuestionAlert(runner.finishQuestion)
         .task {
             intro = !model.guidedIntroSeen
@@ -624,6 +613,8 @@ struct AssistedOptOutView: View {
         case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)
         case .sending: return "Sending…"
         case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : Loc.t("Sent.")
+        case .needsMore(let why) where why == AssistedRunner.heldForPerson:
+            return Loc.t("We could not find a form to fill in on this page, so nothing was sent. If it asks you to do something, do it here and tap Mark as done; otherwise tap Next site.")
         case .needsMore(let why): return why == AutoOptOut.rateLimited
             ? Loc.t("The site said \"too many requests\". It limits how fast it takes them, and this company runs several of these sites. Wait a few minutes and try it again later; tap Next site to carry on.")
             : Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)

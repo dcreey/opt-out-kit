@@ -481,7 +481,7 @@ extension FormRun {
         defer { session.close() }
         do {
             if let html { try await session.loadHTML(html) }
-            else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
+            else if let url, url.isSecureWebPage { try await session.load(URLRequest(url: url)) }
             else { return SubmitEvidence(outcome: .failed("not a secure page")) }
         } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
         let said = SaidBox()
@@ -535,6 +535,9 @@ extension FormRun {
             return .failed("no opt-out form was found on the page")
         }
         prepared.maxWait = maxWait
+        // A form the page shows only once a choice is made ("Who is this request for? Myself") appears when the choices are answered, which the fill does: the form on
+        // screen has nothing to fill until then, so it is filled again (as Solve and send does, which adopts the form that appeared) before it is judged.
+        if prepared.problem != nil { await prepared.refill() }
         if let problem = prepared.problem { return .failed(problem) }
         // Some forms send themselves the moment a choice is made: then the page already shows the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)

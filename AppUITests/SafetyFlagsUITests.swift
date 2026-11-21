@@ -3,9 +3,13 @@ import XCTest
 /// Minor and public-figure flags: off by default, saved, and they switch searching off for that profile. (Family profiles are switched off,
 /// `Features.otherProfiles`; the rules for them and for minors are Mac tests: `CoreTests` on `canBeSearched` and the relationships.)
 final class SafetyFlagsUITests: XCTestCase {
+    private var brokers: FixtureBrokers!
+
+    override func setUpWithError() throws { brokers = try FixtureBrokers.start() }
+
     private func launch() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan"]   // fake scan: never touches the internet
+        app.launchArguments = ["-uitest-reset"] + brokers.launchArguments   // only the fixture brokers on this machine are ever searched
         app.launch()
         return app
     }
@@ -39,7 +43,7 @@ final class SafetyFlagsUITests: XCTestCase {
 
     func testPublicFigureFlagAlsoTurnsSearchingOffAndSurvivesRelaunch() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-fake-scan", "-uitest-seed-profile"]          // a complete profile: only the flag changes
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + brokers.launchArguments          // a complete profile: only the flag changes
         app.launch()
         app.buttons["profile-button"].tap()
         let figure = app.switches["flag-public-figure"]
@@ -50,7 +54,7 @@ final class SafetyFlagsUITests: XCTestCase {
         app.terminate()
 
         let again = XCUIApplication()
-        again.launchArguments = ["-uitest-fake-scan"]        // no reset: it must have been saved
+        again.launchArguments = brokers.launchArguments        // no reset: it must have been saved
         again.launch()
         again.tabBars.buttons["Sites"].tap()
         XCTAssertTrue(again.scrollUntilExists(again.staticTexts["search-blocked"]), "searching is off, with the reason")      // low on the Sites tab

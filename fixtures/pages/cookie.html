@@ -1,0 +1,12 @@
+<div id="banner" style="position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(255,255,255,.96);z-index:9999;padding:24px">
+  <h2>We use cookies</h2><p>We use cookies to improve your experience.</p>
+  <button type="button" onclick="document.getElementById('banner').remove()">Accept all</button>
+  <button type="button" onclick="document.getElementById('banner').remove()">Reject all</button>
+</div>
+<h1>Opt out of {{site}}</h1>
+<form id="f" method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <button type="submit">Submit request</button>
+</form>

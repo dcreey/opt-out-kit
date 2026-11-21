@@ -1,0 +1,11 @@
+<h1>Opt out of {{site}}</h1>
+<form id="f" method="POST" action="/{{site}}/send" onsubmit="return true">
+  <div id="step1">
+    <label>Email address <input type="email" name="email" required></label><br>
+    <button type="button" onclick="document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block';">Next</button>
+  </div>
+  <div id="step2" style="display:none">
+    <label>Full name <input type="text" name="name" required></label><br>
+    <button type="submit">Submit request</button>
+  </div>
+</form>

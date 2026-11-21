@@ -13,7 +13,7 @@ struct WebViewFetcher: PageFetcher {
     var termsPolicy: TermsPolicy?
 
     func fetch(_ url: URL) async throws -> FetchedPage {
-        guard url.scheme == "https" else { throw URLError(.unsupportedURL) }
+        guard url.isSecureWebPage else { throw URLError(.unsupportedURL) }
         return try await WebViewSession.run(maxWait: maxWait, terms: termsPolicy, domain: url.host ?? "") { session in
             try await session.load(URLRequest(url: url))
         }
@@ -22,7 +22,7 @@ struct WebViewFetcher: PageFetcher {
     /// A browser POST: load the site's own origin first (so the form is same-origin, as it would be for a person),
     /// then submit a real HTML form. WKWebView drops the body of a direct POST request, so it cannot be done any other way.
     func post(_ url: URL, body: String) async throws -> FetchedPage {
-        guard url.scheme == "https", let origin = URL(string: "/", relativeTo: url)?.absoluteURL else { throw URLError(.unsupportedURL) }
+        guard url.isSecureWebPage, let origin = URL(string: "/", relativeTo: url)?.absoluteURL else { throw URLError(.unsupportedURL) }
         return try await WebViewSession.run(maxWait: maxWait, terms: termsPolicy, domain: url.host ?? "") { session in
             try await session.load(URLRequest(url: origin))
             try await session.submitForm(action: url, body: body)
@@ -303,7 +303,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// A link that asks for a new window (target="_blank", window.open) opens in this same page: there is no second window to show, and without this the tap does nothing.
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         if navigationAction.targetFrame == nil || navigationAction.targetFrame?.isMainFrame == false,
-           let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https" { webView.load(navigationAction.request) }
+           let url = navigationAction.request.url, url.scheme == "http" || url.isSecureWebPage { webView.load(navigationAction.request) }
         return nil
     }
 
@@ -365,13 +365,25 @@ struct WebFormSubmitter: FormSubmitter {
     /// The same, with every web view made for this site telling `activity` of the page's signs of life.
     /// When the run gives the site up, its work is cancelled and every web view it made is ended at once.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+        await submitCapturing(form, plan: plan, dryRun: dryRun, activity: activity, giveUp: GiveUpCapture())
+    }
+
+    /// When the run gives the site up after its form was sent, what the page showed (its text and a screenshot) is read before its pages are ended and handed to
+    /// `giveUp`: a site that goes quiet after sending ("Processing your request...") then still shows the person what it said.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
         let bin = await MainActor.run { SessionBin() }
+        let sent = SentFlag(), outer = SiteRun.markSent
         return await withTaskCancellationHandler {
             await PageActivity.$bin.withValue(bin) {
-                await PageActivity.$report.withValue(activity) { await submitCapturing(form, plan: plan, dryRun: dryRun) }
+                await SiteRun.$markSent.withValue({ sent.set(); outer?() }) {
+                    await PageActivity.$report.withValue(activity) { await submitCapturing(form, plan: plan, dryRun: dryRun) }
+                }
             }
         } onCancel: {
-            Task { @MainActor in bin.abandonAll(); NSLog("OptOutRun: gave up a site, its pages were ended") }
+            Task { @MainActor in
+                if sent.isSet, !dryRun, let seen = await bin.snapshot() { giveUp.set(seen) }
+                bin.abandonAll(); NSLog("OptOutRun: gave up a site, its pages were ended")
+            }
         }
     }
 
@@ -408,7 +420,7 @@ extension FormRun {
         defer { session.close() }
         do {
             if let html { try await session.loadHTML(html) }
-            else if let url, url.scheme == "https" { try await session.load(URLRequest(url: url)) }
+            else if let url, url.isSecureWebPage { try await session.load(URLRequest(url: url)) }
             else { return SubmitEvidence(outcome: .failed("not a secure page")) }
         } catch { return SubmitEvidence(outcome: .failed("the page would not load")) }
         let outcome = await steps(session, plan: plan, dryRun: dryRun, maxWait: maxWait)
@@ -467,7 +479,9 @@ extension WebViewSession {
         }
         let config = WKSnapshotConfiguration()
         config.rect = CGRect(x: 0, y: min(top, max(0, fullHeight - 800)), width: webView.bounds.width, height: min(capHeight, fullHeight - min(top, max(0, fullHeight - 800))))
-        guard let image = try? await webView.takeSnapshot(configuration: config) else { return nil }
+        let taken: UIImage?
+        do { taken = try await webView.takeSnapshot(configuration: config) } catch { NSLog("OptOutRun: snapshot failed: \(error) frame=\(webView.frame) bounds=\(webView.bounds) rect=\(config.rect)"); taken = nil }
+        guard let image = taken else { return nil }
         // A page without its own background snapshots with transparency, which a JPEG shows as black: paint it on white first.
         let flat = UIGraphicsImageRenderer(size: image.size).image { ctx in
             UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: image.size))
@@ -578,7 +592,7 @@ struct WebPageInspector: PageInspector {
     var maxWait: TimeInterval = 8
 
     func snapshot(_ url: URL) async -> PageSnapshot? {
-        guard url.scheme == "https" else { return nil }
+        guard url.isSecureWebPage else { return nil }
         return await WebInspection.run(url: url, html: nil, maxWait: maxWait)
     }
 
@@ -630,6 +644,13 @@ enum PageActivity {
     @TaskLocal static var bin: SessionBin?
 }
 
+/// Whether a background-run site's form has been sent (set from the work, read when the site is given up).
+final class SentFlag: @unchecked Sendable {
+    private let lock = NSLock(); private var value = false
+    func set() { lock.lock(); value = true; lock.unlock() }
+    var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
+}
+
 /// The web views one background-run site made. When the run gives the site up (its work is cancelled), they are all ended (`WebViewSession.abandon`).
 @MainActor
 final class SessionBin {
@@ -638,6 +659,12 @@ final class SessionBin {
     func add(_ s: WebViewSession) {
         if ended { s.abandon(); return }
         sessions.append(WeakSession(s))
+    }
+    /// What the site's latest page shows now: its text and a screenshot (for a site given up after its form was sent).
+    func snapshot() async -> SubmitEvidence? {
+        guard let session = sessions.last?.value else { return nil }
+        let text = await session.viewportText()
+        return SubmitEvidence(outcome: .failed(AutoOptOut.sentUnconfirmed), screenshot: await session.screenshotJPEG(aroundForm: session.chosenForm), pageText: text)
     }
     func abandonAll() {
         ended = true

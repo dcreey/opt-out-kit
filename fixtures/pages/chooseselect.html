@@ -1,0 +1,13 @@
+<h1>Privacy requests for {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+<p><label>Request type <select name="request_type" required>
+    <option value="">Select a request type</option>
+    <option value="know">Know what personal information you hold about me</option>
+    <option value="correct">Correct my personal information</option>
+    <option value="delete">Delete my personal information</option>
+    <option value="optout">Opt out of the sale or sharing of my personal information</option>
+  </select></label></p>
+  <button type="submit">Submit request</button>
+</form>

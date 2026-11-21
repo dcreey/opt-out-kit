@@ -8,7 +8,7 @@ import SQLite3
 /// tool) loads the YAML with the same loaders the tests use, so the catalog holds exactly what they return, and a bad file fails the build. docs/DIRECTORY.md.
 public enum Catalog {
     /// The layout of the file. Raised when the tables change; the app reads only a catalog of its own version (they ship together).
-    public static let schemaVersion: Int32 = 2          // 2: the site_search full-text index
+    public static let schemaVersion: Int32 = 3          // 2: the site_search full-text index; 3: scripts and zips
     public static let fileName = "Catalog.sqlite"
 
     /// What the catalog holds, as the app uses it.
@@ -37,93 +37,6 @@ public enum Catalog {
         }
     }
 
-    // MARK: Building (at build time, on the Mac)
-
-    /// Loads the repository's data folders with the app's own loaders: `directory/`, `brokers/`, `platforms/`, `jurisdictions/`,
-    /// `registries/summary.json`, `terms/library.yml`. Any file that does not decode, or a repeated id, is an error.
-    public static func load(repository root: URL) throws -> Contents {
-        let summaryURL = root.appendingPathComponent("registries/summary.json")
-        let termsURL = root.appendingPathComponent("terms/library.yml")
-        return Contents(sites: try Registry.loadDirectory(root.appendingPathComponent("directory")),
-                        brokers: try Registry.load(directory: root.appendingPathComponent("brokers")),
-                        platforms: try PlatformLoader.load(directory: root.appendingPathComponent("platforms")),
-                        jurisdictions: try JurisdictionLoader.load(directory: root.appendingPathComponent("jurisdictions")),
-                        registrySummary: FileManager.default.fileExists(atPath: summaryURL.path) ? JurisdictionLoader.loadSummary(summaryURL) : nil,
-                        termsLibrary: FileManager.default.fileExists(atPath: termsURL.path) ? try TermsLibrary.load(termsURL) : nil)
-    }
-
-    /// Writes the contents to a new catalog file at `url` (replacing one that is there). Each row keeps the entry as JSON with the columns the app looks up
-    /// by beside it, and its position, so the app gets the entries back in the order the loaders gave them.
-    public static func write(_ c: Contents, to url: URL) throws {
-        try? FileManager.default.removeItem(at: url)
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nil) == SQLITE_OK, let db else {
-            throw CatalogError.sqlite("could not create \(url.path)")
-        }
-        defer { sqlite3_close(db) }
-        func exec(_ sql: String) throws {
-            if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw CatalogError.sqlite(String(cString: sqlite3_errmsg(db))) }
-        }
-        // A plain rollback journal (not WAL), so the finished file is one self-contained file the app can open read-only inside its signed bundle.
-        try exec("PRAGMA journal_mode = DELETE; PRAGMA user_version = \(schemaVersion);")
-        try exec("""
-            CREATE TABLE sites (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, domain TEXT NOT NULL, name TEXT NOT NULL, excluded INTEGER NOT NULL, body BLOB NOT NULL);
-            CREATE INDEX sites_domain ON sites (domain);
-            CREATE TABLE brokers (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, body BLOB NOT NULL);
-            CREATE TABLE platforms (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, body BLOB NOT NULL);
-            CREATE TABLE jurisdictions (seq INTEGER NOT NULL, id TEXT PRIMARY KEY, code TEXT NOT NULL, body BLOB NOT NULL);
-            CREATE TABLE documents (name TEXT PRIMARY KEY, body BLOB NOT NULL);
-            CREATE VIRTUAL TABLE site_search USING fts5 (id UNINDEXED, name, domain, kind, about, tokenize = 'unicode61 remove_diacritics 2', detail = column);
-            """)
-        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
-        try exec("BEGIN")
-        func insert(_ sql: String, _ values: [Any]) throws {
-            var stmt: OpaquePointer?
-            guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { throw CatalogError.sqlite(String(cString: sqlite3_errmsg(db))) }
-            defer { sqlite3_finalize(stmt) }
-            let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-            for (i, v) in values.enumerated() {
-                let at = Int32(i + 1)
-                switch v {
-                case let n as Int: sqlite3_bind_int64(stmt, at, Int64(n))
-                case let t as String: sqlite3_bind_text(stmt, at, t, -1, transient)
-                case let d as Data: _ = d.withUnsafeBytes { sqlite3_bind_blob(stmt, at, $0.baseAddress, Int32(d.count), transient) }
-                default: throw CatalogError.sqlite("cannot store \(type(of: v))")
-                }
-            }
-            guard sqlite3_step(stmt) == SQLITE_DONE else { throw CatalogError.sqlite(String(cString: sqlite3_errmsg(db))) }
-        }
-        for (i, e) in c.sites.enumerated() {
-            try insert("INSERT INTO sites VALUES (?, ?, ?, ?, ?, ?)", [i, e.id, e.domain, e.name, e.excluded == nil ? 0 : 1, try encoder.encode(e)])
-        }
-        for e in c.sites where e.excluded == nil {
-            let words = searchWords(e)
-            try insert("INSERT INTO site_search VALUES (?, ?, ?, ?, ?)", [e.id, e.name, words.domain, words.kind, words.about])
-        }
-        for (i, b) in c.brokers.enumerated() { try insert("INSERT INTO brokers VALUES (?, ?, ?)", [i, b.id, try encoder.encode(b)]) }
-        for (i, p) in c.platforms.enumerated() { try insert("INSERT INTO platforms VALUES (?, ?, ?)", [i, p.id, try encoder.encode(p)]) }
-        for (i, j) in c.jurisdictions.enumerated() { try insert("INSERT INTO jurisdictions VALUES (?, ?, ?, ?)", [i, j.id, j.code, try encoder.encode(j)]) }
-        if let s = c.registrySummary { try insert("INSERT INTO documents VALUES (?, ?)", ["registry_summary", try encoder.encode(s)]) }
-        if let t = c.termsLibrary { try insert("INSERT INTO documents VALUES (?, ?)", ["terms_library", try encoder.encode(t)]) }
-        try exec("COMMIT")
-    }
-
-    /// What a site is found by in the search (`search`): its web address split into words (spokeo.com as "spokeo com spokeo.com"), what kind of company it
-    /// is and what it holds and sells (in every language the app speaks, so "téléphone" finds the same sites as "phone"), and its description.
-    static func searchWords(_ e: DirectoryEntry) -> (domain: String, kind: String, about: String) {
-        let domain = e.domain.replacingOccurrences(of: ".", with: " ").replacingOccurrences(of: "-", with: " ") + " " + e.domain
-        var kinds: [String] = []
-        let was = L10n.language
-        defer { L10n.language = was }
-        for lang in ["en", "fr", "es", "de"] {
-            L10n.language = lang
-            if let c = e.about.flatMap({ BrokerCategory(rawValue: $0.category) }) { kinds.append(c.title) }
-            kinds += (e.about?.tracks ?? []).compactMap { DataKind(rawValue: $0)?.title }
-            kinds += (e.about?.sellsTo ?? []).compactMap { BuyerKind(rawValue: $0)?.title }
-        }
-        return (domain, Array(NSOrderedSet(array: kinds)).compactMap { $0 as? String }.joined(separator: " "), e.about?.summary ?? "")
-    }
-
     /// The full-text query for what a person typed: every word must match, each as the start of a word ("spok" finds Spokeo), in any order.
     /// Nil when nothing searchable was typed.
     public static func searchQuery(_ text: String) -> String? {
@@ -132,11 +45,79 @@ public enum Catalog {
         return words.map { "\"\($0)\"*" }.joined(separator: " ")
     }
 
+
+    // MARK: The process-wide handle (page scripts and the ZIP table)
+
+    /// The catalog the app is running with, opened read-only once: what is looked up one row at a time (a page script, a ZIP code) goes through it instead
+    /// of being loaded into memory or read from a file. Nil until `use` is called (the app does at launch).
+    private final class Handle: @unchecked Sendable {
+        let db: OpaquePointer
+        let lock = NSLock()
+        init(db: OpaquePointer) { self.db = db }
+        deinit { sqlite3_close(db) }
+    }
+    nonisolated(unsafe) private static var shared: Handle?
+    private static let sharedLock = NSLock()
+
+    /// Opens the catalog at `url` read-only for the rest of the run (replacing a catalog opened before: tests do).
+    public static func use(_ url: URL) throws {
+        let handle = try withDatabase(url, keepOpen: true) { Handle(db: $0) }
+        sharedLock.lock(); shared = handle; sharedLock.unlock()
+    }
+
+    private static var handle: Handle? { sharedLock.lock(); defer { sharedLock.unlock() }; return shared }
+
+    /// One text column of the first row the query returns (bound to `key`), through the shared handle; nil when there is no row or no catalog.
+    private static func lookup(_ sql: String, _ key: String) -> [String]? {
+        guard let h = handle else { return nil }
+        h.lock.lock(); defer { h.lock.unlock() }
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(h.db, sql, -1, &stmt, nil) == SQLITE_OK else { return nil }
+        defer { sqlite3_finalize(stmt) }
+        sqlite3_bind_text(stmt, 1, key, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        guard sqlite3_step(stmt) == SQLITE_ROW else { return nil }
+        return (0..<sqlite3_column_count(stmt)).map { sqlite3_column_text(stmt, $0).map { String(cString: $0) } ?? "" }
+    }
+
+    /// The source text of a page script (App/PageScripts/<name>.js, compiled into the catalog), nil when there is none.
+    public static func script(named name: String) -> String? { lookup("SELECT body FROM scripts WHERE name = ?", name)?.first }
+
+    /// The names of every page script the catalog holds, sorted.
+    public static func scriptNames() -> [String] {
+        guard let h = handle else { return [] }
+        h.lock.lock(); defer { h.lock.unlock() }
+        var stmt: OpaquePointer?
+        guard sqlite3_prepare_v2(h.db, "SELECT name FROM scripts ORDER BY name", -1, &stmt, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(stmt) }
+        var names: [String] = []
+        while sqlite3_step(stmt) == SQLITE_ROW { if let c = sqlite3_column_text(stmt, 0) { names.append(String(cString: c)) } }
+        return names
+    }
+
+    /// The city and state of a five-digit ZIP code, through the catalog's `zips` table (41,000 rows, found by key: none is held in memory).
+    public static func zip(_ zip: String) -> (city: String, state: String)? {
+        guard let row = lookup("SELECT city, state FROM zips WHERE zip = ?", zip), row.count == 2 else { return nil }
+        return (row[0], row[1])
+    }
+
+    /// How many page scripts and ZIP codes the catalog at `url` holds (the build checks what it wrote).
+    public static func counts(in url: URL) throws -> (scripts: Int, zips: Int) {
+        try withDatabase(url) { db in
+            func count(_ table: String) -> Int {
+                var stmt: OpaquePointer?
+                defer { sqlite3_finalize(stmt) }
+                guard sqlite3_prepare_v2(db, "SELECT count(*) FROM \(table)", -1, &stmt, nil) == SQLITE_OK, sqlite3_step(stmt) == SQLITE_ROW else { return 0 }
+                return Int(sqlite3_column_int64(stmt, 0))
+            }
+            return (count("scripts"), count("zips"))
+        }
+    }
+
     // MARK: Reading (in the app)
 
     /// Opens the catalog read-only and immutable: SQLite then creates no journal or lock file beside it, which it could not do inside the app's
     /// signed, read-only bundle.
-    static func withDatabase<T>(_ url: URL, _ body: (OpaquePointer) throws -> T) throws -> T {
+    static func withDatabase<T>(_ url: URL, keepOpen: Bool = false, _ body: (OpaquePointer) throws -> T) throws -> T {
         var db: OpaquePointer?
         var parts = URLComponents(); parts.scheme = "file"; parts.path = url.path; parts.queryItems = [URLQueryItem(name: "immutable", value: "1")]
         let uri = parts.string ?? "file:\(url.path)?immutable=1"
@@ -144,13 +125,14 @@ public enum Catalog {
             if let db { sqlite3_close(db) }
             throw CatalogError.sqlite("could not open \(url.lastPathComponent)")
         }
-        defer { sqlite3_close(db) }
+        var closeIt = !keepOpen
+        defer { if closeIt { sqlite3_close(db) } }
         var stmt: OpaquePointer?
         var version: Int32 = 0
         if sqlite3_prepare_v2(db, "PRAGMA user_version", -1, &stmt, nil) == SQLITE_OK, sqlite3_step(stmt) == SQLITE_ROW { version = sqlite3_column_int(stmt, 0) }
         sqlite3_finalize(stmt)
-        guard version == schemaVersion else { throw CatalogError.wrongVersion(found: version) }
-        return try body(db)
+        guard version == schemaVersion else { closeIt = true; throw CatalogError.wrongVersion(found: version) }
+        do { return try body(db) } catch { closeIt = true; throw error }
     }
 
     /// Every `body` the query returns, decoded, in the order the query gives.

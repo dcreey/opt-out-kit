@@ -1,5 +1,4 @@
 import Foundation
-import Yams
 
 /// A government or industry service that sends one request to many brokers at once (California's DROP is the first). It is shaped
 /// like a hand-written broker walkthrough, plus who may use it, which of our sites it reaches, and how long to wait before
@@ -22,6 +21,12 @@ public struct Platform: Codable, Equatable, Identifiable, Sendable {
     public var summary: String
     public var registered: Int              // how many brokers the registry lists
     public var coverage: [String: Coverage] // our site or hand-written flow domain -> registry match
+
+    public init(walkthrough: Broker, shortName: String, jurisdiction: String, states: [String], requestURL: URL, holdDays: Int, live: Bool, summary: String,
+                registered: Int, coverage: [String: Coverage]) {
+        self.walkthrough = walkthrough; self.shortName = shortName; self.jurisdiction = jurisdiction; self.states = states; self.requestURL = requestURL
+        self.holdDays = holdDays; self.live = live; self.summary = summary; self.registered = registered; self.coverage = coverage
+    }
 
     public var id: String { walkthrough.id }
     public var name: String { walkthrough.name }
@@ -47,51 +52,4 @@ public struct Platform: Codable, Equatable, Identifiable, Sendable {
 
     /// When covered sites may be asked directly again, given when the person submitted.
     public func holdUntil(submitted: Date) -> Date { submitted.addingTimeInterval(Double(holdDays) * 86_400) }
-}
-
-public enum PlatformLoader {
-    struct Meta: Decodable {
-        struct Body: Decodable {
-            var shortName: String
-            var jurisdiction: String
-            var states: [String]
-            var requestURL: URL
-            var holdDays: Int
-            var live: Bool?
-            var summary: String
-            var coverageFile: String?
-            enum CodingKeys: String, CodingKey {
-                case jurisdiction, states, summary, live
-                case shortName = "short_name"
-                case requestURL = "request_url", holdDays = "hold_days", coverageFile = "coverage_file"
-            }
-        }
-        var platform: Body
-    }
-
-    struct CoverageFile: Decodable {
-        var registered: Int
-        var covered: [String: Platform.Coverage]
-    }
-
-    /// Loads every `*.yml` in `platforms/`. Each file is a broker walkthrough with a `platform:` block, plus the coverage JSON it names.
-    public static func load(directory: URL) throws -> [Platform] {
-        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil).filter { $0.pathExtension == "yml" }
-        return try files.sorted { $0.lastPathComponent < $1.lastPathComponent }.map { file in
-            let text = try String(contentsOf: file, encoding: .utf8)
-            let broker = try YAMLDecoder().decode(Broker.self, from: text)
-            if broker.id.isEmpty { throw RegistryError.emptyID(file: file.lastPathComponent) }
-            if broker.steps.isEmpty { throw RegistryError.noSteps(broker.id) }
-            let meta = try YAMLDecoder().decode(Meta.self, from: text).platform
-            var coverage: [String: Platform.Coverage] = [:]
-            var registered = 0
-            if let name = meta.coverageFile {
-                let data = try Data(contentsOf: directory.appendingPathComponent(name))
-                let file = try JSONDecoder().decode(CoverageFile.self, from: data)
-                coverage = file.covered; registered = file.registered
-            }
-            return Platform(walkthrough: broker, shortName: meta.shortName, jurisdiction: meta.jurisdiction, states: meta.states, requestURL: meta.requestURL,
-                            holdDays: meta.holdDays, live: meta.live ?? true, summary: meta.summary, registered: registered, coverage: coverage)
-        }
-    }
 }

@@ -409,7 +409,7 @@ struct GuidedPanel: View {
     var maxStepHeight: CGFloat = 140
     @State private var stepHeight: CGFloat = 0
     @StateObject private var browserHandoff = BrowserHandoff()
-    @AppStorage("guide.collapsed") private var guideCollapsed = false
+    @Preference("guide.collapsed") private var guideCollapsed = false
 
     var body: some View {
         VStack(spacing: 0) {

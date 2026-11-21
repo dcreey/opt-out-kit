@@ -1,4 +1,5 @@
 import XCTest
+import CatalogSource
 import Yams
 @testable import OptOutKitCore
 
@@ -93,7 +94,7 @@ final class StorageTests: XCTestCase {
         XCTAssertEqual(try store.load(), h)
     }
 
-    func testFileHoldsNoPlaintext() throws {
+    func testTheDatabaseFileHoldsNoPlaintext() throws {
         let store = HouseholdStore(url: tempURL(), keys: FixedKey())
         defer { try? store.erase() }
         try store.save(sample())
@@ -115,9 +116,9 @@ final class StorageTests: XCTestCase {
         let store = HouseholdStore(url: tempURL(), keys: key)
         defer { try? store.erase() }
         try store.save(sample())
-        var raw = try Data(contentsOf: store.url)
-        raw[raw.count - 5] ^= 0xFF
-        try raw.write(to: store.url)
+        var sealed = try XCTUnwrap(try store.database.get(.household))
+        sealed[sealed.count - 5] ^= 0xFF
+        try store.database.put(.household, sealed)
         XCTAssertThrowsError(try store.load())
     }
 
@@ -1344,6 +1345,47 @@ final class AutoOptOutTests: XCTestCase {
         let results = await engine.run(entries: [site("quiet.example"), site("busy.example")], person: pat, progress: OptOutKitCore.Progress())
         XCTAssertEqual(results.first?.1, .failed(AutoOptOut.wentQuiet), "quiet for longer than the idle limit: given up")
         XCTAssertEqual(results.last?.1, .submitted(awaitingEmail: false), "busy for twice the idle limit, with signs of life: waited for")
+    }
+
+    /// A site given up after its form was sent (it went quiet, "Processing your request...") keeps what its page showed then: the submitter hands the page's text
+    /// and a screenshot over as it is cancelled, and the run records them with the "sent but not confirmed" result. One given up before sending keeps neither.
+    func testASiteGivenUpAfterItsFormWasSentKeepsWhatItsPageShowed() async {
+        struct Quiet: FormSubmitter {
+            var reportsActivity: Bool { true }
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+                await submitCapturing(form, plan: plan, dryRun: dryRun, activity: activity, giveUp: GiveUpCapture())
+            }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
+                activity()
+                if form.page.host == "sent.example" { SiteRun.markSent?() }
+                await withTaskCancellationHandler {
+                    await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in }          // then nothing: the page goes quiet
+                } onCancel: {
+                    if form.page.host == "sent.example" { giveUp.set(SubmitEvidence(outcome: .failed("x"), screenshot: Data([1, 2, 3]), pageText: "Processing your request")) }
+                }
+                return SubmitEvidence(outcome: .submitted(awaitingEmail: false))
+            }
+        }
+        func site(_ host: String) -> DirectoryEntry {
+            var f = form([("text", "firstname", "First Name*"), ("text", "lastname", "Last Name*"), ("email", "email", "Email")])
+            f.page = URL(string: "https://\(host)/optout")!
+            return DirectoryEntry(id: host, domain: host, name: host, bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        }
+        final class Saved: @unchecked Sendable { private let l = NSLock(); private var v: [String: (Data, String?)] = [:]
+            func add(_ d: String, _ data: Data, _ said: String?) { l.lock(); v[d] = (data, said); l.unlock() }
+            func get(_ d: String) -> (Data, String?)? { l.lock(); defer { l.unlock() }; return v[d] } }
+        let saved = Saved()
+        let engine = AutoOptOut(submitter: Quiet(), spacing: 0, siteLimit: 30, idleLimit: 0.3)
+        let said = Saved()
+        let results = await engine.run(entries: [site("sent.example"), site("unsent.example")], person: pat, progress: OptOutKitCore.Progress(),
+                                       evidence: { entry, shot in saved.add(entry.domain, shot, nil) },
+                                       onResult: { entry, _, text in said.add(entry.domain, Data(), text) })
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.sentUnconfirmed), "sent, then quiet: sent and not confirmed")
+        XCTAssertEqual(saved.get("sent.example")?.0, Data([1, 2, 3]), "its screenshot was kept")
+        XCTAssertEqual(said.get("sent.example")?.1, "Processing your request", "and what its page said")
+        XCTAssertEqual(results.last?.1, .failed(AutoOptOut.wentQuiet), "quiet before anything was sent: moved to semi-automatic")
+        XCTAssertNil(saved.get("unsent.example"), "nothing is kept for a site that was never sent")
     }
 
     /// A site the run gives up on has its work cancelled, so the app can end its pages: left running, given-up pages piled up until iOS closed the app.
@@ -2763,17 +2805,16 @@ final class MeasuredAutomaticTests: XCTestCase {
 }
 
 final class EvidenceTests: XCTestCase {
-    private func store() -> EvidenceStore {
-        EvidenceStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent("ook-evidence-\(UUID())"), keys: FixedKey())
-    }
+    private var databaseURL = FileManager.default.temporaryDirectory.appendingPathComponent("ook-evidence-\(UUID()).sqlite")
+    private func store() -> EvidenceStore { EvidenceStore(database: UserDatabase(url: databaseURL), keys: FixedKey()) }
 
     func testAScreenshotIsKeptSealedAndComesBackIntact() throws {
         let s = store(), who = UUID()
         let image = Data((0..<2000).map { UInt8($0 % 251) })
         try s.save(image, person: who, site: "example.com")
         XCTAssertEqual(s.load(person: who, site: "example.com"), image)
-        let raw = try Data(contentsOf: s.directory.appendingPathComponent(who.uuidString).appendingPathComponent("example.com.jpg.sealed"))
-        XCTAssertNil(raw.range(of: image.prefix(64)), "the file does not hold the picture in the clear")
+        let raw = try Data(contentsOf: databaseURL)
+        XCTAssertNil(raw.range(of: image.prefix(64)), "the database does not hold the picture in the clear")
         XCTAssertNil(s.load(person: UUID(), site: "example.com"), "another person's screenshots are separate")
         s.removeAll(person: who)
         XCTAssertFalse(s.exists(person: who, site: "example.com"))
@@ -3550,6 +3591,37 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertNil(v(plan([("textarea", "b", "Other email addresses (one per line)"), ("email", "e", "Email")], person: wide), "b"), "one email: nothing to list")
     }
 
+    /// A form that splits each previous address into street, city, state and ZIP boxes (47 recorded forms have boxes for other addresses): every box of the first
+    /// previous address gets that address, every box of the second previous one gets the next, and the current address is never repeated.
+    func testPreviousAddressesSplitIntoStreetCityStateAndZipBoxesEachGetTheirOwnAddress() {
+        let multi = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                           addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(street: "22 Oak Ave", city: "Portland", state: "OR", zip: "97201"),
+                                       Address(street: "9 Pine Rd", city: "Austin", state: "TX", zip: "78701")], emails: ["pat@example.com"])
+        let p = plan([("text", "street", "Street address"), ("text", "city", "City"), ("text", "state", "State"), ("text", "zip", "ZIP code"),
+                      ("text", "prev_street", "Previous street address"), ("text", "prev_city", "Previous city"), ("text", "prev_state", "Previous state"), ("text", "prev_zip", "Previous ZIP code"),
+                      ("text", "prev2_street", "Second previous street address"), ("text", "prev2_city", "Second previous city"), ("text", "prev2_state", "Second previous state"), ("text", "prev2_zip", "Second previous ZIP code")], person: multi)
+        XCTAssertEqual(v(p, "street")?.first, "1 Main St"); XCTAssertEqual(v(p, "zip")?.first, "62701")
+        XCTAssertEqual(v(p, "prev_street")?.first, "22 Oak Ave", "the previous street box: \(p.values.map { "\($0.name)=\($0.candidates.first ?? "")" })")
+        XCTAssertEqual(v(p, "prev_city")?.first, "Portland"); XCTAssertEqual(v(p, "prev_state")?.first, "OR")
+        XCTAssertEqual(v(p, "prev_zip")?.first, "97201", "the previous ZIP box has the previous address's ZIP, not the next one's")
+        XCTAssertEqual(v(p, "prev2_street")?.first, "9 Pine Rd"); XCTAssertEqual(v(p, "prev2_city")?.first, "Austin")
+        XCTAssertEqual(v(p, "prev2_state")?.first, "TX"); XCTAssertEqual(v(p, "prev2_zip")?.first, "78701")
+    }
+
+    /// The same page read live: its boxes are named by the app's tokens (f0-9, f0-12), whose digits must not be read as "previous address 9" or "previous address 2".
+    func testThePreviousAddressBoxesOfALiveFormAreNotMisreadFromTheirTokenNumbers() {
+        let multi = Person(displayName: "Pat", relationship: .me, names: [NameEntry(kind: .legal, name: "Pat Example")],
+                           addresses: [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701"), Address(street: "22 Oak Ave", city: "Portland", state: "OR", zip: "97201"),
+                                       Address(street: "9 Pine Rd", city: "Austin", state: "TX", zip: "78701")], emails: ["pat@example.com"])
+        let labels = ["Street address | street", "City | city", "State | state", "ZIP code | zip", "Previous street address | prev_street", "Previous city | prev_city", "Previous state | prev_state",
+                      "Previous ZIP code | prev_zip", "Second previous street address | prev2_street", "Second previous city | prev2_city", "Second previous state | prev2_state", "Second previous ZIP code | prev2_zip"]
+        let p = plan(labels.enumerated().map { ("text", "f0-\($0.offset + 5)", $0.element) }, person: multi)
+        func value(_ i: Int) -> String? { v(p, "f0-\(i + 5)")?.first }
+        XCTAssertEqual(value(4), "22 Oak Ave", "Previous street address (token f0-9)"); XCTAssertEqual(value(5), "Portland")
+        XCTAssertEqual(value(6), "OR"); XCTAssertEqual(value(7), "97201", "Previous ZIP code (token f0-12)")
+        XCTAssertEqual(value(8), "9 Pine Rd"); XCTAssertEqual(value(9), "Austin"); XCTAssertEqual(value(10), "TX"); XCTAssertEqual(value(11), "78701")
+    }
+
     func testPreviousAddressesAndOtherNamesFillTheirOwnBoxes() {
         let p = plan([("text", "a", "Previous address"), ("text", "b", "Second previous address"), ("text", "c", "Previous address 3"), ("text", "d", "Maiden name"), ("text", "e", "Other names used"),
                       ("text", "f", "Nickname"), ("text", "g", "Mother's maiden name")], person: many)
@@ -4047,9 +4119,8 @@ final class FormsNeedingThePersonTests: XCTestCase {
 }
 
 final class ProfileDraftTests: XCTestCase {
-    private func store() -> ProfileDraftStore {
-        ProfileDraftStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("draft-\(UUID().uuidString).sealed"), keys: FixedKey())
-    }
+    private let database = UserDatabase(url: FileManager.default.temporaryDirectory.appendingPathComponent("draft-\(UUID().uuidString).sqlite"))
+    private func store() -> ProfileDraftStore { ProfileDraftStore(database: database, keys: FixedKey()) }
 
     func testADraftComesBackAfterTheAppIsClosedAndIsGoneOnceCleared() throws {
         let s = store()
@@ -4064,17 +4135,19 @@ final class ProfileDraftTests: XCTestCase {
     func testADraftIsSealedNotPlainText() throws {
         let s = store(); var p = Person(displayName: "Me", relationship: .me); p.names = [NameEntry(kind: .legal, name: "Zelda Quux")]
         try s.save(ProfileDraft(personID: p.id, person: p, email: "z@example.com"))
-        let raw = try Data(contentsOf: s.url)
+        let raw = try Data(contentsOf: database.url)
         XCTAssertNil(String(decoding: raw, as: UTF8.self).range(of: "Zelda"))
     }
 
     func testADraftThatCannotBeReadIsIgnoredNotFatal() throws {
-        let s = store(); try Data("not a draft".utf8).write(to: s.url)
+        let s = store(); try database.put(.draft, Data("not a draft".utf8))
         XCTAssertNil(s.load())
     }
 }
 
 final class ZipLookupTests: XCTestCase {
+    override func setUpWithError() throws { try CatalogFixture.use() }
+
     func testAZipCodeGivesItsCityAndState() {
         XCTAssertEqual(ZipLookup.place(for: "62701"), ZipLookup.Place(city: "Springfield", state: "IL"))
         XCTAssertEqual(ZipLookup.place(for: "60614")?.city, "Chicago")

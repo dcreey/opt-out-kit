@@ -171,6 +171,8 @@ final class AssistedRunner: ObservableObject {
     static let unloadable = "the page would not load, so it was skipped"
     /// The page loaded but has no opt-out form we can fill (a contact form, or only an email address): skipped, and the email offer is the way through.
     static let noForm = "the site has no online opt-out form we can fill, and we have no email address for it, so it was skipped"
+    /// Why a page the app opened and held for the person (it has no form we can fill, or a handsOff site) is not confirmed: nothing was sent, the person finishes it in the page.
+    static let heldForPerson = "waiting for you to finish in the page"
     /// Counts requests sent that now wait on an email, so the screen can explain the email step the first time.
     @Published private(set) var sentAwaitingEmail = 0
     /// Sites whose form could not be read but whose page was opened and held for the person: nothing is ever sent on them.
@@ -513,7 +515,7 @@ final class AssistedRunner: ObservableObject {
                 if !revisiting { noteSend(items[i]) }
             // A "Block Profile" page has no form of ours to send (pressing its "Start" would only run another search): the person blocks their own listings.
             let manual = !revisiting && !items[i].handsOff && !heldFallback.contains(i) && (!autoSubmit() || forceManual)
-            let step: SendStep = items[i].handsOff || heldFallback.contains(i) || revisiting || manual ? .notConfirmed(.failed("waiting for you to finish in the page")) : await PageFlow.sendOnce(ready)
+            let step: SendStep = items[i].handsOff || heldFallback.contains(i) || revisiting || manual ? .notConfirmed(.failed(Self.heldForPerson)) : await PageFlow.sendOnce(ready)
             switch step {
                 case .sent(let email, let more):
                     sentForms += 1; sentEmail = sentEmail || email

@@ -57,8 +57,10 @@ final class LiveFormTests: XCTestCase {
           <button type="submit">Submit request</button></form><p id="m"></p><p id="s"></p></body></html>
         """
         // The fill takes a few seconds; after the press the page never settles, and the run still reads it before the cap.
-        let sent = await AutoOptOut.watched(idle: nil, cap: 14) { _ in
-            await FormRun.runLive(url: nil, html: busy, person: pat, dryRun: false, maxWait: 20, capture: false)
+        // The cap is generous (a slow CI machine took over 14 s just to fill the form), and the wait after sending is 60 s if nothing limits it: the cap is only
+        // met in time when the wait stops early, 5 s before it (`SiteRun.deadline`), which is what this checks.
+        let sent = await AutoOptOut.watched(idle: nil, cap: 24) { _ in
+            await FormRun.runLive(url: nil, html: busy, person: pat, dryRun: false, maxWait: 60, capture: false)
         }
         XCTAssertTrue(sent.sent, "the send button had been pressed")
         XCTAssertNotNil(sent.value, "read in time, not given up")

@@ -16,8 +16,8 @@ Layers, cheapest first:
 ## Page scripts
 
 The JavaScript the app runs inside web pages (finding forms and their boxes, filling them, choosing request options, spotting checks, terms prompts and
-confirmations, declining cookie prompts, telling the app what the person touched) lives in `App/PageScripts/`, one file per script, loaded by
-`App/Sources/PageScript.swift`. A plain script is one expression, run as it is; a script that takes values is a function expression called with its values
+confirmations, declining cookie prompts, telling the app what the person touched) lives in `App/PageScripts/`, one file per script, compiled into the
+app's catalog at build time and read from it by `App/Sources/PageScript.swift` (the app ships no script file: docs/STORAGE.md). A plain script is one expression, run as it is; a script that takes values is a function expression called with its values
 as JSON (`PageScript.call`), so an apostrophe or quote in a name arrives as typed and nothing is left on the page. `//#include name` shares a fragment
 (`ownership.js`). Moved there from Swift strings on 2026-11-19: the plain scripts were checked byte for byte against what Swift produced, and every
 web-view test passed before and after. `PageScriptTests` checks that each one loads, is valid JavaScript and receives its values intact.
@@ -58,6 +58,8 @@ layout, input masks and real taps stays covered by the WebKit tests (`LiveFormTe
    no longer looks like the person's press.
 
 ## Unit and integration tests
+
+For what a person can do and which UI test walks it (the journeys, the gaps, the plan), see `docs/JOURNEYS.md`.
 
 **Unit tests run on every push (and gate TestFlight); integration tests run for an App Store release.** Unit tests are everything in the two Swift packages and the app's
 `OptOutKitTests`: they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
@@ -107,6 +109,60 @@ hours.
 | `SolveAndSendUITests.testTheFirstGuidedFlowOpensWithAWalkthroughThatCanBePagedThroughOrSkipped`, `testTheGuidedWalkthroughIsReplayedFromAbout` | `PeopleTests.testTheGuidedWalkthroughIsShownOnceThenRemembered`; paging: layout |
 | `BrokerListUITests.testBrokerListShowsQueue` | `CoreTests.testEveryTaskIsInExactlyOneBandOfTheRealQueue` |
 
+## End-to-end tests against fixture pages
+
+The direction for every integration test: run the app's real code against fixture brokers, a real local web server, with nothing faked (docs/JOURNEYS.md
+lists the journeys and what is still on the older fakes). The app is not changed to fit them: it loads fixture *sites* from a catalog exactly as it loads
+real ones, and the engine, web view and page scripts do the same work they do on a real broker.
+
+- `fixtures/sites/*.yml`: the fixture brokers, in the directory's own format (so the same loader reads them), each with its opt-out page on
+  `http://127.0.0.1:8765`. A site's id names its page kind: `fx_<kind>_<n>` is shown `fixtures/pages/<kind>.html`.
+- `fixtures/server.py`: the web server (Python's standard library, nothing to install). It serves the pages, records what each form posted, and tells the
+  tests (`GET /__received`, `POST /__reset`).
+- `fixtures/build_catalog.sh`: compiles a catalog from the app's real laws, platforms, terms, page scripts and ZIP table with the fixture sites in place of
+  the directory, using the same `catalog-builder` as the app's build.
+- `tools/run_e2e.sh`: builds that catalog, starts the server, runs `FixtureJourneyUITests` (or the tests named in its arguments) and stops the server.
+  Run it with the usual `-destination`; it passes the catalog and server address to the tests. In the Integration workflow (`integration.yml`) shard 0 compiles
+  the catalog into the build it hands over, and every shard starts the server before its tests.
+- `App/Sources/Fixtures.swift` (debug builds only): `-uitest-catalog <path>` opens that catalog in place of the bundled one, and lets the web view load the
+  loopback server (`URL.isSecureWebPage`; a loopback IP address is outside App Transport Security). The shipped app opens only its bundled catalog.
+- `AppUITests/FixtureBrokers.swift`: the tests' side: the launch arguments, and what the server received (`sentSites`, `requests`).
+
+Page kinds so far (`fixtures/pages`; each is a site in `fixtures/sites`): `plain` (a form that confirms), `turnstile` (a Cloudflare box only the person can
+tap), `robot` ("I'm not a robot" tick box), `tiles` (request-type buttons that reveal the form), `reveal` ("Who is this request for?" that shows the form),
+`cookie` (a consent banner over the form), `iframe` (the form in a frame), `emaillink` (a confirmation that says an email is coming), `selfconfirm` (a page that
+says "received" by itself, with nothing pressed), `noform` (no form, post only), `down` (503), `slow` (posts the form, then says it is processing for ever),
+`errorpage` (answers a send with an error), `code` (a page that emails a code before it accepts a request: an "Email me a verification code" button reveals the
+code box; the server takes the request only with the code, 750439, and records a wrong or empty one as `rejected`), `guide` (a broker with a hand-written guide,
+`fixtures/flows/fxguide.yml`), `longform` / `longneeds` / `longdynamic` (a very long page with its request form at the very end: one the app sends, one that needs a case number it lacks, one that also gets a fixed "opt out" banner after it loads; they report every scroll position and whether a finger moved it to `/__scroll`), `search` (find your listing, then a form wants its link), `multi` / `multiadd` (boxes for previous addresses, a second email and phone, other names; "Add another" buttons), `choose` / `chooseoptout` / `chooseselect` / `checkboxes` (choose exactly one request, from radios with and without a delete, a menu, or tick the right ones), `recaptcha` (a real-shaped reCAPTCHA frame), `certify`, `jsform` (a form built by script), `steps` (Next, then Submit), `upload` (needs an ID photo), `agent` ("Are you an authorized agent?"), `login`, and `listed` / `unlisted` (only a name search, for the exposure scan: `listed` finds anyone named Pat). To add, from the real
+kinds (the page scripts in `App/PageScripts`, the rules in docs/FORM-FILLING.md): an image-puzzle check, custom menus, a phone or date box that rejects a
+format, a disabled email box, a listing to pick from, a block widget, an emailed link to paste. A new kind is a page, a site file, and a journey. The fakes the
+UI tests used to launch with (`-uitest-fake-hold`, `-fake-guided`, `-uitest-fake-heal`, `-uitest-fake-listing`, `-show-sent-question`) are gone; the Core fetcher
+may read the fixture server's loopback address in a debug build only (`URLSessionFetcher.allowLoopback`, set by `-uitest-catalog`).
+
+| Journey | Test |
+|---|---|
+| Run now sends every broker whose page can be completed without me (plain, tiles, cookie banner, frame, email promise) and leaves the ones that need me (checks, a form that only appears after a choice, no form, down) | `FixtureJourneyUITests.testRunNowFillsAndSendsTheFormOnEachBrokerPage` |
+| Solve and send fills and sends a form with no check, waits for my check on the next, sends it when I clear it (the broker gets the token), and asks "Is it completely done?" after each | `FixtureJourneyUITests.testSolveAndSendFillsTheFormWaitsForMyCheckThenSendsAndMovesOn` |
+| Solve and send waits for an "I'm not a robot" box, and sends when I tick it | `testSolveAndSendWaitsForTheNotARobotBoxAndSendsWhenITickIt` |
+| Solve and send sees that a site promises an email, and lists it as sent with the email still to confirm | `testSolveAndSendSeesThatASitePromisesAnEmailAndListsItForTheFollowUp` |
+| Solve and send answers "Who is this request for?" and fills the form that appears | `testSolveAndSendAnswersWhoTheRequestIsForAndFillsTheFormThatAppears` |
+| Solve and send sends nothing to a page with no form, and I can mark it done | `testSolveAndSendSendsNothingToAPageWithNoFormAndLetsMeMarkItDone` |
+| Solve and send leaves a broker that is down unsent, and I can skip it | `testSolveAndSendLeavesABrokerThatIsDownUnsentAndLetsMeSkipIt` |
+| Solve and send is not done until I have entered the code the site emailed: nothing is sent while the code is missing, the broker never sees an empty code, and once I type it the form is sent and the app asks whether it is done | `testSolveAndSendIsNotDoneUntilIHaveEnteredTheCodeFromTheEmail` (page-script rule: `tools/pagescripts`, "a code box that is hidden until a button emails the code") |
+| Scrolling on a very long page with the form at the end (auto-sent; needs a missing detail; gets an opt-out banner late): the app moves the page by itself only once, before the page is shown, and never after the person has touched it; the timeline (what the app and the person scrolled, and when the broker received the form) is attached | `FixtureScrollUITests` (3 tests) |
+| Every kind of recorded page below: search first (find my listing, its link goes into the form), several addresses / emails / phones / names (including "Add another" buttons), choose exactly one request (radios with and without a delete, a menu, checkboxes), a reCAPTCHA, a certification, a script-built form, a two-step form, an ID upload, an agent question, a sign-in page. `docs/PAGE-TYPES.md` counts each kind in the recorded sites and says which fixture and test covers it (`tools/page_type_coverage.py`; `tools/tests/test_page_type_coverage.py` keeps it true) | `FixturePageTypeUITests` (15 tests); `-uitest-seed-multi` gives the person several addresses, emails, phones and names |
+| Guide: it sits on the page with the whole step, advances by itself when it sees a step done, is cancelled without a report, can be reported as not working (broken link: it looks for the new page), and walking it to the end sends my request and shows the site as submitted | `FixtureGuideUITests` (6 tests) |
+| Solve and send: Previous / Next site and the "Send it for me" switch; My data to copy; a page that says "received" with nothing pressed asks "Was this sent?"; the first-time walkthrough | `SolveAndSendUITests` |
+| Exposure scan over two fixture brokers: it says it found a listing on 1 of 2 sites and shows which | `ExposureScanUITests` |
+| The first pass sends the plain form and leaves the one behind a check; the queue opens after it; a site opens from the status page and stays | `AutoProtectionUITests` |
+| A wrong emailed code is not counted as sent or done | `FixtureJourneyUITests.testAWrongEmailedCodeIsNotCountedAsSent` |
+| Run now over a site that posts the form and then says it is processing for ever: the run reports it, the review says "the site did not confirm in time", the site's page shows what the page said and its screenshot, and the screenshot opens full size | `testRunNowShowsWhatAPageSaidAndItsScreenshotWhenTheSiteDidNotConfirmInTime` |
+| Run now sends what it can, then the report's semi-automated start leads to the site it could not send: its page says "Stopped: a human check" with a screenshot of the filled form, "Opt out" opens it, and clearing the check sends it | `testRunNowThenTheSemiAutomatedQueueFinishesWhatTheRunCouldNot` |
+| I stop a run part way (what was sent stays sent); Run now carries on with only what is left and sends nothing twice | `testIStopTheRunPartWayAndRunNowCarriesOnWithOnlyWhatIsLeft` |
+| I skip a site for now and bring it back from its page | `testISkipASiteForNowAndBringItBackFromTheSkippedList` |
+| I mark a site done by hand, and nothing is sent | `testIMarkASiteDoneByHandAndItShowsAsDone` |
+
 ## Continuous integration
 
 Two workflows (and the lint jobs in the first), on GitHub's hosted runners (free for a public repository). Neither contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`,
@@ -119,7 +175,7 @@ and the UI tests use the app's fake sites.
 | `lint-actions`, `lint-swift`, `lint-yaml`, `lint-json`, `lint-python`, `lint-shell` | Linux, one each | The linters (below, "Lint"); seconds each |
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the page-script unit tests (`tools/pagescripts`); the shard split |
 | `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
-| `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 check out only what they read (`tools`, `AppTests`, `AppUITests` and the data folders the tests load: `directory`, `brokers`, `platforms`, `jurisdictions`, `terms`, `registries`; shallow) before starting to boot their simulator (checked out after the boot had started, the whole tree took 104 to 119 s, because a booting simulator starves the machine). Shard 0 checks out the whole tree, builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact, then boots its own simulator; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`), once the boot started in the background has finished (up to 10 minutes; asking for the boot status while that boot was still going raced with it and failed shard 0 twice). Tried on 2026-11-20 and undone: every shard building for itself while its simulator booted. The run took 15.1 minutes instead of about 11: building beside a booting simulator took 162 to 355 s (85 s alone), the boot itself slowed, and four shards downloading the 740 MB build cache at once took up to 2 minutes each. A notice says when the simulator was ready and when the tests started |
+| `test` (4 at once) | macOS, one each | The app's unit tests (`OptOutKitTests`). Shards 1 to 3 check out only what they read (`tools`, `AppTests`, `AppUITests`: about 1 MB, shallow; no test reads the repository's data, the app tests read the catalog in the app) before starting to boot their simulator (checked out after the boot had started, the whole tree took 104 to 119 s, because a booting simulator starves the machine). Shard 0 checks out the whole tree, builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact, then boots its own simulator; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`), once the boot started in the background has finished (up to 10 minutes; asking for the boot status while that boot was still going raced with it and failed shard 0 twice). Tried on 2026-11-20 and undone: every shard building for itself while its simulator booted. The run took 15.1 minutes instead of about 11: building beside a booting simulator took 162 to 355 s (85 s alone), the boot itself slowed, and four shards downloading the 740 MB build cache at once took up to 2 minutes each. A notice says when the simulator was ready and when the tests started |
 
 **Lint** (jobs `lint-*` in `ci.yml`, each on its own Linux machine, versions pinned so a new release of a linter never fails a push by itself; part
 of CI, so the TestFlight gate needs them too). They look for what is wrong, not for style: the code's own style (one-line statements, flow-style YAML,
@@ -180,9 +236,9 @@ folder's size and its slowest kinds of step (`-showBuildTimingSummary`, read by 
 Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have
 room for slower CI machines.
 
-**UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). A UI test of a whole automatic
-run uses `-uitest-sites 25` (`XCUIApplication.fewSites`): the first 25 sites with a known form, so the run finishes in seconds and the test checks the
-finished run and its report. Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
+**UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). The weekly job's test of a whole automatic
+run over the real catalog (sending faked: `-uitest-fake-submit`, the only fake left) uses `-uitest-sites 25` (`XCUIApplication.fewSites`) outside that job: the first 25 sites with a known form, so the run finishes in seconds and the test checks the
+finished run and its report. Every other UI test runs against the fixture brokers (below). Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
 profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
 `-uitest` flag a run never asks iOS for the advertising ID: on a fresh simulator (as in CI) the tracking prompt came up at an unpredictable moment and the
 run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`). `-uitest-reset` also marks the first-visit guide cards and the once-only explainers (email links, follow-ups) as seen unless a test asks for them
@@ -319,7 +375,13 @@ Notes about how a test works live in the test file itself. This is the list of w
 | The automatic opt-out page is worked out off the main thread, each form's fill once, with the same counts as the run's own rules | `ActivityPageSpeedTests.testTheActivityPageIsWorkedOutQuickly` (equal rows and Run now count, under 0.3 s after the first time) | Sim |
 | A site that never answers is given up as too slow and the run goes on; a run settles a site at least every 30 s; Stop ends a run part-way and keeps the rest for later | `CoreTests.testASiteThatNeverAnswersIsGivenUpAndTheRunGoesOnToTheNext`, `AutomaticRunAppTests.testStopEndsTheRunPartWayAndLeavesTheRestForLater` | Mac, Sim |
 | A site given up after its form was sent is recorded as sent and not confirmed and never sent again in the pass; one that ran out of time before sending is tried once more at the end, and the progress count never stands still or goes back | `CoreTests.testASiteGivenUpAfterItsFormWasSentIsRecordedAsSentUnconfirmedAndNotSentAgain`, `CoreTests.testASiteThatRanOutOfTimeBeforeSendingIsTriedOnceMoreAtTheEndAndProgressKeepsMoving`, `LiveFormTests.testAfterSendingTheRunReadsWhatThePageSaidBeforeItsTimeIsUp` (a real page: pressing send reaches the watchdog, and the page is read in time) | Mac, Sim |
-| The app ships its data compiled into Catalog.sqlite and no YAML; what it reads equals what the YAML loaders return for every real file; the file is one read-only file opened without writing beside it; another layout version is refused; reading it all takes about 0.02 s | `CatalogTests` (5), `CatalogAppTests.testTheAppShipsTheCompiledCatalogAndNoDataYAML`, `testTheModelLoadsFromTheCatalogWhatTheRepositorysYAMLHolds` | Mac, Sim |
+| What the person keeps is rows of one SQLite file, sealed: nothing in plaintext, replaced and deleted by kind and key, still there after a relaunch, a deleted screenshot overwritten and the file shrunk, a file the system will not open reported as locked, opening and reading leave the file byte for byte as it was | `UserDatabaseTests` (6), `HouseholdStoreTests`, `EvidenceTests`, `ProfileDraftTests`, `AppModelTests` (unreadable data never overwritten, locked phone) | Mac, Sim |
+| The preferences are rows of the database and every kind of value comes back as it went in, across a relaunch; they work in memory while the database cannot be opened and are written at the unlock; the old UserDefaults values are moved in, removed from UserDefaults only once stored, never while the database cannot be written, and a value already here wins | `PreferencesTests` (6), `PreferencesAppTests` | Mac, Sim |
+| The database does not say which people or sites have a screenshot (opaque keys: no person id or site name anywhere in the file; other key, other row keys); a file of a newer layout is refused and left unchanged | `UserDatabaseTests.testTheRowKeysDoNotNameThePersonOrTheSite`, `testAFileOfANewerLayoutIsRefused` | Mac |
+| The move from the old files (build 51 and earlier): the sealed bytes copied exactly and read back before a file is deleted; an old household that cannot be read is never saved over; the newer of a file and a row wins; nothing to move is just an empty database | `UserDatabaseTests` (the move tests) | Mac |
+| The app does no file-system work while it runs: no file API outside a short allow-list, a non-persistent web view, the YAML reader not linked into the app | `tools/tests/test_runtime_file_io.py` | CI `checks` |
+| The page scripts and the ZIP table are read from the catalog as the source files hold them; a catalog missing one fails the build's own check | `CatalogTests.testThePageScriptsAndTheZIPTableAreReadFromTheCatalogAsTheSourceFilesHoldThem`, `CatalogAppTests` | Mac, Sim |
+| The app ships its data compiled into Catalog.sqlite and no YAML, script or table file; what it reads equals what the YAML loaders return for every real file; the file is one read-only file opened without writing beside it; another layout version is refused; reading it all takes about 0.02 s | `CatalogTests` (5), `CatalogAppTests.testTheAppShipsTheCompiledCatalogAndNoDataYAML`, `testTheModelLoadsFromTheCatalogWhatTheRepositorysYAMLHolds` | Mac, Sim |
 | The Sites search finds sites by the start of a name, by what they hold in any of the app's languages (accents ignored), every word must match, best first, never an excluded site; a name match is listed first and the other filters still apply | `CatalogTests.testTheSearchFindsSitesByNameStartWhatTheyHoldInAnyLanguageBestFirst`, `SiteFilterTests.testEachFilterNarrowsAndTextMatchesAddressOrName`, `CatalogAppTests.testTheSitesSearchFindsSitesInTheBundledCatalog`, `DirectoryUITests` | Mac, Sim |
 | One site is found by id, domain or family without scanning the list, with the same answer scanning gave, on every real site | `SiteIndexTests` (2) | Mac |
 | A page counts as still loading only when it says so in whole words ("downloading your data" is not "loading"); settled is unchanged for 1.5 s | `CoreTests.testAPageIsLoadingOnlyWhenItSaysSoInWholeWords` | Mac |

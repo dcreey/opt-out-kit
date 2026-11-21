@@ -20,8 +20,28 @@ public protocol FormSubmitter: Sendable {
     /// The same, calling `activity` whenever the page shows a sign of life (a load starting or finishing, the page changing, a request it made coming
     /// back). The run gives up on a site that shows none for `AutoOptOut.idleLimit`.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence
+    /// The same, and when the run gives the site up after its form was sent, the submitter hands what its page showed at that moment (its text and a
+    /// screenshot) to `giveUp` before it closes the page, so a site that never confirms still leaves something to look at.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence
     /// Whether this submitter reports the page's signs of life (so the idle limit applies).
     var reportsActivity: Bool { get }
+}
+
+/// What a site's page showed when the run gave the site up after sending its form: filled in by the submitter as it is cancelled, read by the run.
+public final class GiveUpCapture: @unchecked Sendable {
+    private let lock = NSLock(); private var evidence: SubmitEvidence?
+    public init() {}
+    public func set(_ e: SubmitEvidence) { lock.lock(); evidence = e; lock.unlock() }
+    /// What was captured, waiting up to `seconds` for it (the page is read and photographed while the site is being given up).
+    public func wait(upTo seconds: TimeInterval) async -> SubmitEvidence? {
+        let start = Date()
+        while Date().timeIntervalSince(start) < seconds {
+            if let e = current { return e }
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+        return current
+    }
+    private var current: SubmitEvidence? { lock.lock(); defer { lock.unlock() }; return evidence }
 }
 
 /// How each site's form is filled for one person, worked out once and kept. Working it out is the slow part of deciding which sites a run tries (about a
@@ -61,6 +81,10 @@ public extension FormSubmitter {
     /// A submitter that has no page to watch reports nothing; it is held only to the overall limit, not the idle one.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
         await submitCapturing(form, plan: plan, dryRun: dryRun)
+    }
+    /// A submitter that cannot read its page when it is given up has nothing to hand over.
+    func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
+        await submitCapturing(form, plan: plan, dryRun: dryRun, activity: activity)
     }
     /// Whether this submitter reports the page's signs of life (so the idle limit applies).
     var reportsActivity: Bool { false }
@@ -351,10 +375,15 @@ public struct AutoOptOut: Sendable {
         }
         func advance() { done += 1; progressCallback?(done, total) }
         let attempt: @Sendable (OptOutForm, FillPlan) async -> SubmitEvidence = { form, plan in
+            let capture = GiveUpCapture()
             let watched = await Self.watched(idle: idle, cap: cap) { touch in
-                await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch)
+                await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch, giveUp: capture)
             }
-            return watched.value ?? SubmitEvidence(outcome: Self.givenUp(quiet: watched.quiet, sent: watched.sent))
+            if let value = watched.value { return value }
+            var given = SubmitEvidence(outcome: Self.givenUp(quiet: watched.quiet, sent: watched.sent))
+            // A site given up after its form was sent keeps what its page showed then (its words and a screenshot), so the person can see why it is not confirmed.
+            if watched.sent, !dryRun, let seen = await capture.wait(upTo: 5) { given.screenshot = seen.screenshot; given.pageText = seen.pageText }
+            return given
         }
         var plans: [String: (OptOutForm, FillPlan)] = [:]
         await withTaskGroup(of: (Int, String, SubmitEvidence).self) { group in

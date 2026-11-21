@@ -60,7 +60,7 @@ extension GuideSurface {
 struct GuideCollapseButton: View {
     @Binding var collapsed: Bool
     /// The first time the guide is shown, the button pulses and a bubble says what it does; seen once, never again.
-    @AppStorage("guide.collapseHintSeen") private var hintSeen = false
+    @Preference("guide.collapseHintSeen") private var hintSeen = false
     @State private var pulse = false
     var body: some View {
         Button { hintSeen = true; withAnimation(.easeInOut(duration: 0.2)) { collapsed.toggle() } } label: {

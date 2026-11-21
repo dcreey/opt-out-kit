@@ -169,8 +169,7 @@ final class FirstRunResumeTests: XCTestCase {
 @MainActor
 final class SiteReviewTests: XCTestCase {
     private func entries() throws -> [DirectoryEntry] {
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        return try Registry.loadDirectory(root.appendingPathComponent("directory"))
+        return try Catalog.contents(of: try XCTUnwrap(AppCatalog.url), includeExcluded: true).sites
     }
 
     func testTheQueueIsTheSitesWithNoReadableFormMostImportantFirst() throws {

@@ -23,11 +23,12 @@ Every change to behavior updates the docs in the same piece of work, before it i
 - A GitHub release (and Integration) is for releasing the app on the App Store, not for TestFlight. A TestFlight upload needs only CI to pass for its
   commit (`tools/release_gate.py --for testflight`, run by `tools/release_testflight.sh`); App Store review needs CI and Integration (`release_gate.py`).
 - CI lints Swift, the workflows, YAML, JSON, Python and shell scripts (`lint-*` jobs in `ci.yml`; commands in `docs/TESTING.md`, "Lint"). Run them before pushing a change to those files.
-- The app ships its data compiled into `Catalog.sqlite` at build time (`Catalog`, `CatalogPlugin`; docs/DIRECTORY.md) and never parses YAML on the phone.
-  A new kind of bundled data goes into the catalog, not into the bundle as a file.
+- The app does no file-system work while it runs (docs/STORAGE.md): what it ships is compiled into `Catalog.sqlite` at build time (`Catalog`, `CatalogPlugin`)
+  and read through SQLite; what the person keeps is rows of `UserDatabase`. New bundled data goes into the catalog, new user data into a `kind` of the database.
+  `tools/tests/test_runtime_file_io.py` fails on any other file API in the runtime sources.
 - All YAML follows `.yamllint.yml`: single-quoted string values, block mappings. Tools read and write YAML only through `tools/yamlio.py` (never as text
   with patterns); `pip install -r tools/requirements.txt` first.
-- JavaScript the app runs in web pages lives in `App/PageScripts/*.js` (never a Swift string). Every script and every rule in it has a unit test in
+- JavaScript the app runs in web pages lives in `App/PageScripts/*.js` (never a Swift string; compiled into the catalog). Every script and every rule in it has a unit test in
   `tools/pagescripts` (`npm test`); `coverage.test.js` fails for a script without one.
 
 ## Translations

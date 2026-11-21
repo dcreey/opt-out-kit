@@ -1,0 +1,21 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'login'). docs/TESTING.md, 'End-to-end tests against fixture pages'; docs/PAGE-TYPES.md says which recorded sites it stands for.
+id: 'fx_login_1'
+domain: 'login-1.fixture.test'
+name: 'Fixture login 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_login_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_login_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_login_1/send'
+  fields:
+    - type: 'text'
+      name: 'username'
+      label: 'Username'
+    - type: 'password'
+      name: 'password'
+      label: 'Password'
+  hops: 0

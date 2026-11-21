@@ -68,29 +68,27 @@ struct SiteScreenshot: View {
     let item: AppModel.ReviewItem
     let person: Person
     @State private var image: UIImage?
-    @State private var enlarged = false
 
     var body: some View {
         Group {
             if let image {
-                Button { enlarged = true } label: {
+                NavigationLink {
+                    ScrollView {
+                        Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity).accessibilityIdentifier("screenshot-full")
+                    }
+                    .navigationTitle(item.domain).navigationBarTitleDisplayMode(.inline)
+                } label: {
                     VStack(alignment: .leading, spacing: 6) {
                         Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
                             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.4)))
                         Label("Tap to enlarge the page it showed on \(Loc.date(item.date))", systemImage: "arrow.up.left.and.arrow.down.right").font(.caption).foregroundStyle(.secondary)
                     }
-                }.buttonStyle(.plain).accessibilityIdentifier("site-screenshot")
+                }.accessibilityIdentifier("site-screenshot")
+            } else {
+                // Something is always on screen while it loads: a `.task` on an empty view never runs, and the screenshot then never appeared on the site's page.
+                ProgressView().controlSize(.small)
             }
         }
         .task { if let data = model.screenshot(for: item, person: person) { image = EvidenceImage.image(from: data) } }
-        .fullScreenCover(isPresented: $enlarged) {
-            NavigationStack {
-                ScrollView {
-                    if let image { Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity) }
-                }
-                .navigationTitle(item.domain).navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { enlarged = false }.accessibilityIdentifier("screenshot-close") } }
-            }
-        }
     }
 }

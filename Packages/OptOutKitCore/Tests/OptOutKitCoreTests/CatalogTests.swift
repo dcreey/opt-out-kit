@@ -1,4 +1,5 @@
 import XCTest
+import CatalogSource
 import SQLite3
 @testable import OptOutKitCore
 
@@ -17,11 +18,12 @@ final class CatalogTests: XCTestCase {
     /// What the app reads from the catalog is exactly what the YAML loaders return for the repository's real data, every site, flow, platform,
     /// place, the registry counts and the terms library; and the excluded sites are left out by the query, as the app used to filter them.
     func testTheCatalogHoldsExactlyWhatTheYAMLLoadersReturnForTheRealData() throws {
-        let loaded = try Catalog.load(repository: Self.repository)
+        let source = try Catalog.load(repository: Self.repository)
+        let loaded = source.contents
         XCTAssertGreaterThan(loaded.sites.count, 800); XCTAssertFalse(loaded.brokers.isEmpty); XCTAssertFalse(loaded.platforms.isEmpty)
         XCTAssertGreaterThan(loaded.jurisdictions.count, 100); XCTAssertNotNil(loaded.registrySummary); XCTAssertNotNil(loaded.termsLibrary)
         let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
-        try Catalog.write(loaded, to: file)
+        try Catalog.write(source, to: file)
         XCTAssertEqual(try Catalog.contents(of: file, includeExcluded: true), loaded, "every value survives the catalog unchanged, in the same order")
         let shown = try Catalog.contents(of: file)
         XCTAssertEqual(shown.sites, loaded.sites.filter { $0.excluded == nil })
@@ -29,9 +31,10 @@ final class CatalogTests: XCTestCase {
     }
 
     func testASiteIsFoundByItsDomainThroughTheIndexAndAnExcludedOneIsNot() throws {
-        let loaded = try Catalog.load(repository: Self.repository)
+        let source = try Catalog.load(repository: Self.repository)
+        let loaded = source.contents
         let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
-        try Catalog.write(loaded, to: file)
+        try Catalog.write(source, to: file)
         let some = try XCTUnwrap(loaded.sites.first { $0.excluded == nil })
         XCTAssertEqual(try Catalog.site(domain: some.domain.uppercased(), in: file), some)
         if let gone = loaded.sites.first(where: { $0.excluded != nil }) { XCTAssertNil(try Catalog.site(domain: gone.domain, in: file)) }
@@ -43,7 +46,7 @@ final class CatalogTests: XCTestCase {
     func testTheCatalogIsOneFileAndReadsInAFolderNobodyMayWriteTo() throws {
         let dir = try temporaryFolder()
         let file = dir.appendingPathComponent(Catalog.fileName)
-        try Catalog.write(Catalog.Contents(sites: [], brokers: [], platforms: [], jurisdictions: [], registrySummary: nil, termsLibrary: nil), to: file)
+        try Catalog.write(Catalog.Source(contents: Catalog.Contents(sites: [], brokers: [], platforms: [], jurisdictions: [], registrySummary: nil, termsLibrary: nil)), to: file)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: dir.path), [Catalog.fileName], "no journal or WAL file left behind")
         try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: dir.path)
         XCTAssertNoThrow(try Catalog.contents(of: file))
@@ -53,7 +56,7 @@ final class CatalogTests: XCTestCase {
     /// A catalog of another layout is refused (the app and its catalog are built together, so this only guards against a stale file).
     func testACatalogOfAnotherVersionIsRefused() throws {
         let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
-        try Catalog.write(Catalog.Contents(sites: [], brokers: [], platforms: [], jurisdictions: [], registrySummary: nil, termsLibrary: nil), to: file)
+        try Catalog.write(Catalog.Source(contents: Catalog.Contents(sites: [], brokers: [], platforms: [], jurisdictions: [], registrySummary: nil, termsLibrary: nil)), to: file)
         var db: OpaquePointer?
         XCTAssertEqual(sqlite3_open(file.path, &db), SQLITE_OK)
         sqlite3_exec(db, "PRAGMA user_version = 999", nil, nil, nil); sqlite3_close(db)
@@ -65,9 +68,10 @@ final class CatalogTests: XCTestCase {
     /// The Sites search reads the catalog's full-text index: the start of a word finds a name ("spok"), every word must match in any order, what a
     /// company holds is found in any of the app's languages, the best match comes first, and an excluded site is never found.
     func testTheSearchFindsSitesByNameStartWhatTheyHoldInAnyLanguageBestFirst() throws {
-        let loaded = try Catalog.load(repository: Self.repository)
+        let source = try Catalog.load(repository: Self.repository)
+        let loaded = source.contents
         let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
-        try Catalog.write(loaded, to: file)
+        try Catalog.write(source, to: file)
         XCTAssertEqual(try Catalog.search("spok", in: file).first, "spokeo_com", "the start of a name")
         XCTAssertEqual(try Catalog.search("Spokeo.com", in: file).first, "spokeo_com", "a web address as typed")
         let phone = Set(try Catalog.search("phone numbers", in: file))
@@ -92,4 +96,40 @@ final class CatalogTests: XCTestCase {
         print("catalog read: \(c.sites.count) sites in \(String(format: "%.3f", seconds)) s")
         XCTAssertLessThan(seconds, 1.0)
     }
+
+    /// The page scripts and the ZIP table are compiled into the catalog and read from it: every script exactly as the source file has it, every ZIP
+    /// code found by key (the build's own check, `Catalog.verify`, reads them all back before it lets a build succeed).
+    func testThePageScriptsAndTheZIPTableAreReadFromTheCatalogAsTheSourceFilesHoldThem() throws {
+        let source = try Catalog.load(repository: Self.repository)
+        XCTAssertGreaterThan(source.scripts.count, 50); XCTAssertGreaterThan(source.zips.count, 40_000)
+        let file = try temporaryFolder().appendingPathComponent(Catalog.fileName)
+        try Catalog.write(source, to: file)
+        XCTAssertNoThrow(try Catalog.verify(source, at: file))
+        XCTAssertEqual(Catalog.scriptNames(), source.scripts.keys.sorted())
+        let name = try XCTUnwrap(source.scripts.keys.sorted().first)
+        XCTAssertEqual(Catalog.script(named: name), source.scripts[name])
+        XCTAssertNil(Catalog.script(named: "no-such-script"))
+        XCTAssertEqual(ZipLookup.place(for: "62701"), ZipLookup.Place(city: "Springfield", state: "IL"))
+        XCTAssertNil(ZipLookup.place(for: "00000"))
+        // A catalog that lost a script does not verify, so the build fails instead of shipping it.
+        var short = source; short.scripts.removeValue(forKey: name)
+        XCTAssertThrowsError(try Catalog.verify(short, at: file))
+    }
+}
+
+/// The catalog built from the repository once for the whole test run and opened as the process-wide catalog (what the app does at launch): tests of
+/// things the catalog serves (the ZIP table) call `use()`.
+enum CatalogFixture {
+    private static let built: URL? = {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("ook-fixture-\(UUID())").appendingPathComponent(Catalog.fileName)
+        do {
+            try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Catalog.write(try Catalog.load(repository: root), to: file)
+            return file
+        } catch { return nil }
+    }()
+
+    static func use() throws { try Catalog.use(try XCTUnwrap(built, "the catalog could not be built from the repository")) }
 }

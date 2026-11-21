@@ -1,0 +1,18 @@
+<h1>Opt out of {{site}}</h1>
+<div id="box">
+<form id="f" onsubmit="return go(this)">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <button type="submit">Submit request</button>
+</form>
+</div>
+<script>
+// The request is posted, then the page says it is working on it and never says it is done (a site that does not confirm in time).
+function go(form) {
+  var body = new URLSearchParams(new FormData(form)).toString();
+  fetch('/{{site}}/send', {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: body});
+  document.getElementById('box').innerHTML = '<h2>Processing your request</h2><p>Please wait while we process your request. Do not close this page.</p>';
+  return false;
+}
+</script>

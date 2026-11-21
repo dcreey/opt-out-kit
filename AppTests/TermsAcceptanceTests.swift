@@ -135,19 +135,15 @@ final class TermsAcceptanceTests: XCTestCase {
 @MainActor
 final class TermsSettingsTests: XCTestCase {
     private func model(library: TermsLibrary? = nil) throws -> AppModel {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ook-terms-\(UUID())")
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        var url: URL? = nil
+        // The catalog the app ships with its terms library replaced by the test's own (nothing is read from a folder).
+        var contents: Catalog.Contents?
         if let library {
-            // A tiny library written in the same YAML the real one uses.
-            url = dir.appendingPathComponent("library.yml")
-            let lines = library.paragraphs.map { p in
-                "  - hash: \(p.hash)\n    sites: \(p.sites)\n    kinds: [terms]\n    flags: [\(p.flags.joined(separator: ", "))]\n    prefix: \"x\"\n    reviewed: \(p.reviewed)\n    verdict: \(p.verdict.map { "\"\($0)\"" } ?? "null")"
-            }
-            try ("version: \(library.version)\nparagraphs:\n" + lines.joined(separator: "\n") + "\n").write(to: url!, atomically: true, encoding: .utf8)
+            var c = try Catalog.contents(of: try XCTUnwrap(AppCatalog.url))
+            c.termsLibrary = library
+            contents = c
         }
-        return AppModel(store: HouseholdStore(url: dir.appendingPathComponent("h.sealed"), keys: FixedKey()),
-                        termsLibraryURL: url, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        return AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-terms-\(UUID()).sqlite"), keys: FixedKey()),
+                        contents: contents, defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
     }
 
     func testTheShippedLibraryIsReviewedButNothingIsAcceptedUntilThePersonAllowsIt() throws {

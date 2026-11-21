@@ -1,4 +1,5 @@
 import Foundation
+import CatalogSource
 import OptOutKitCore
 
 // Compiles the repository's data (YAML and the registry summary) into the app's Catalog.sqlite. Run by the CatalogPlugin build tool at every build
@@ -12,15 +13,13 @@ guard args.count == 3 else {
 let root = URL(fileURLWithPath: args[1]), out = URL(fileURLWithPath: args[2])
 do {
     let start = Date()
-    let contents = try Catalog.load(repository: root)
+    let source = try Catalog.load(repository: root)
     try FileManager.default.createDirectory(at: out.deletingLastPathComponent(), withIntermediateDirectories: true)
-    try Catalog.write(contents, to: out)
-    let back = try Catalog.contents(of: out, includeExcluded: true)
-    guard back == contents else {
-        FileHandle.standardError.write(Data("error: the catalog read back differs from the data it was built from\n".utf8)); exit(1)
-    }
+    try Catalog.write(source, to: out)
+    try Catalog.verify(source, at: out)
     let size = (try? FileManager.default.attributesOfItem(atPath: out.path)[.size] as? Int) ?? 0
-    print("catalog: \(contents.sites.count) sites, \(contents.brokers.count) flows, \(contents.platforms.count) platforms, \(contents.jurisdictions.count) jurisdictions, \(size / 1024) KB, \(Int(Date().timeIntervalSince(start) * 1000)) ms")
+    let c = source.contents
+    print("catalog: \(c.sites.count) sites, \(c.brokers.count) flows, \(c.platforms.count) platforms, \(c.jurisdictions.count) jurisdictions, \(source.scripts.count) page scripts, \(source.zips.count) ZIP codes, \(size / 1024) KB, \(Int(Date().timeIntervalSince(start) * 1000)) ms")
 } catch {
     FileHandle.standardError.write(Data("error: \(error)\n".utf8)); exit(1)
 }

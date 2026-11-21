@@ -92,11 +92,11 @@ walled people-search sites; non-US sends. Brokers re-list people, so check back 
 
 ## Data credits
 
-ZIP code places come from the GeoNames postal code data (geonames.org, Creative Commons Attribution 4.0), bundled as `Packages/OptOutKitCore/Sources/OptOutKitCore/Resources/zips-us.tsv`.
+ZIP code places come from the GeoNames postal code data (geonames.org, Creative Commons Attribution 4.0), in `data/zips-us.tsv`, compiled into the app's catalog.
 
 ## More
 
-[docs/DESIGN.md](docs/DESIGN.md) (design), [docs/AUTOMATION.md](docs/AUTOMATION.md) (what is automatic and why), [docs/DIRECTORY.md](docs/DIRECTORY.md) (directory format),
+[docs/DESIGN.md](docs/DESIGN.md) (design), [docs/AUTOMATION.md](docs/AUTOMATION.md) (what is automatic and why), [docs/DIRECTORY.md](docs/DIRECTORY.md) (directory format), [docs/STORAGE.md](docs/STORAGE.md) (how the app keeps its data: a compiled catalog and one database, no loose files),
 [docs/VERIFICATION.md](docs/VERIFICATION.md), [docs/EXCLUDED_SITES.md](docs/EXCLUDED_SITES.md), [CLOSED_SITES.md](CLOSED_SITES.md), [docs/PERSISTENCE.md](docs/PERSISTENCE.md),
 [docs/LOCALIZATION.md](docs/LOCALIZATION.md).
 

@@ -14,27 +14,20 @@ public struct ProfileDraft: Codable, Equatable, Sendable {
 }
 
 public struct ProfileDraftStore {
-    public let url: URL
+    private let database: UserDatabase
     private let keys: KeyProviding
-    public init(url: URL, keys: KeyProviding) { self.url = url; self.keys = keys }
+    public init(database: UserDatabase, keys: KeyProviding) { self.database = database; self.keys = keys }
 
+    /// Readable after the first unlock (the database's data protection), so a write as the phone locks still lands.
     public func save(_ draft: ProfileDraft) throws {
-        let sealed = try SealedStore.seal(JSONEncoder().encode(draft), key: keys.key())
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        #if os(iOS)
-        // Readable after the first unlock, so a write as the phone locks still lands.
-        try sealed.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
-        #else
-        try sealed.write(to: url, options: [.atomic])
-        #endif
+        try database.put(.draft, try SealedStore.seal(JSONEncoder().encode(draft), key: keys.key()))
     }
 
     /// The saved draft, or nil when there is none or it cannot be read (a draft is never worth stopping the app for).
     public func load() -> ProfileDraft? {
-        guard FileManager.default.fileExists(atPath: url.path),
-              let plain = try? SealedStore.open(Data(contentsOf: url), key: keys.key()) else { return nil }
+        guard let sealed = (try? database.get(.draft)) ?? nil, let plain = try? SealedStore.open(sealed, key: keys.key()) else { return nil }
         return try? JSONDecoder().decode(ProfileDraft.self, from: plain)
     }
 
-    public func clear() { try? FileManager.default.removeItem(at: url) }
+    public func clear() { try? database.delete(.draft) }
 }

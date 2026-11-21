@@ -1,0 +1,17 @@
+# A fixture guide for the end-to-end tests (fixtures/pages/guide.html): a hand-written walkthrough of a broker whose page the app guides the person through.
+id: 'fxguide'
+name: 'Fixture guide'
+tier: 'B'
+covers: ['guide-1.fixture.test']
+signals: []
+fields: ['email', 'full_name']
+steps:
+  - open: 'http://127.0.0.1:8765/fx_guide_1/optout'
+  - copy: 'email'
+  - say: 'Enter your email on the page.'
+  - say: 'Check the details, then press the page''s own Submit button.'
+    confirm: true
+  - say: 'Wait for the page to say your request was received.'
+    confirm: true
+recheck_days: 30
+verified: null

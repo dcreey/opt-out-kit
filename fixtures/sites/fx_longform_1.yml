@@ -1,0 +1,24 @@
+# A fixture broker for the end-to-end tests: a very long page with its request form at the very end (fixtures/pages/longform.html), to test scrolling while the app fills it. docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_longform_1'
+domain: 'longform-1.fixture.test'
+name: 'Fixture longform 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_longform_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_longform_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_longform_1/send'
+  fields:
+    - type: 'text'
+      name: 'name'
+      label: 'Full name'
+    - type: 'email'
+      name: 'email'
+      label: 'Email address'
+    - type: 'textarea'
+      name: 'message'
+      label: 'Message'
+  hops: 0

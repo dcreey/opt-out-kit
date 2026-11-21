@@ -1,0 +1,7 @@
+<h1>Remove my record from {{site}}</h1>
+<p>Paste the link to your listing, which you get by searching for yourself on this site.</p>
+<form method="POST" action="/{{site}}/send">
+  <label>Link to your listing <input type="text" name="listing" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <button type="submit">Remove this listing</button>
+</form>

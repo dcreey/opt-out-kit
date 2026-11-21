@@ -1,0 +1,17 @@
+# A fixture broker for the end-to-end tests: only its name search is served (fixtures/server.py, kind 'unlisted'), so the exposure scan has something to look at. docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_unlisted_1'
+domain: 'unlisted-1.fixture.test'
+name: 'Fixture unlisted 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'guided'
+confidence: 'high'
+search_check:
+  status: 'calibrated'
+  search_url: 'http://127.0.0.1:8765/fx_unlisted_1/search?q={first}+{last}'
+  valid_page: ['Search results']
+  no_results: ['No records found']
+  ignore_location: true
+  calibration:
+    listed_name: 'Pat Example'
+  checked: '2026-11-20'

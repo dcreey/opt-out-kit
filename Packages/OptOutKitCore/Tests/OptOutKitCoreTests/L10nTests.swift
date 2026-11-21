@@ -1,4 +1,5 @@
 import XCTest
+import CatalogSource
 @testable import OptOutKitCore
 
 final class L10nTests: XCTestCase {

@@ -2,12 +2,14 @@ import XCTest
 import JavaScriptCore
 @testable import OptOutKit
 
-/// The page scripts load from the app bundle and are valid JavaScript, and a value passed to one arrives exactly as given, whatever it holds.
+/// The page scripts load from the compiled catalog and are valid JavaScript, and a value passed to one arrives exactly as given, whatever it holds.
 /// (What each script does to a page is tested in tools/pagescripts, in a headless DOM; docs/TESTING.md, "Page scripts".)
 final class PageScriptTests: XCTestCase {
-    func testEveryScriptInTheBundleLoadsAndIsValidJavaScript() {
+    override func setUp() { AppCatalog.ensureOpen() }
+
+    func testEveryScriptInTheCatalogLoadsAndIsValidJavaScript() {
         let names = PageScript.names
-        XCTAssertGreaterThanOrEqual(names.count, 50, "the scripts are in the bundle: \(names.count)")
+        XCTAssertGreaterThanOrEqual(names.count, 50, "the scripts are in the catalog: \(names.count)")
         for name in names {
             let source = PageScript.source(name)
             XCTAssertFalse(source.isEmpty || source == "null", "\(name) loaded")

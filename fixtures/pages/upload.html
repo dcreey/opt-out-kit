@@ -1,0 +1,7 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send" enctype="multipart/form-data">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Upload a photo of your government ID <input type="file" name="id_upload" required></label><br>
+  <button type="submit">Submit request</button>
+</form>

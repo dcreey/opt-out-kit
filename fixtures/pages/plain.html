@@ -1,0 +1,7 @@
+<h1>Opt out of {{site}}</h1><p>Fill in the form to have your listing removed.</p>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <label>Message <textarea name="message"></textarea></label><br>
+  <button type="submit">Submit request</button>
+</form>

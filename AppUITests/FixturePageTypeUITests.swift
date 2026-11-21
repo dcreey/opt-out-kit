@@ -1,0 +1,198 @@
+import XCTest
+
+/// Kinds of opt-out page seen in the recorded sites (docs/PAGE-TYPES.md), each as a fixture broker the real engine fills and sends in Solve and send: the broker's own
+/// record of what it received says what the app chose and typed. docs/TESTING.md, "End-to-end tests against fixture pages".
+final class FixturePageTypeUITests: XCTestCase {
+    private var server: FixtureBrokers!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        server = try FixtureBrokers.start()
+    }
+
+    private func solveAndSend(_ domain: String, extra: [String] = []) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + extra + server.launchArguments + ["-semi-domains", "\(domain).fixture.test"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 30), "the Solve-and-send screen opened")
+        return app
+    }
+
+    /// Waits for the broker to receive the form, and returns the fields it got.
+    private func sent(_ site: String, timeout: TimeInterval = 60) -> [String: String] {
+        XCTAssertTrue(server.waitForSent(timeout: timeout) { $0.contains(site) }, "the form was sent: \(server.requests)")
+        return server.requests.last { $0.site == site && $0.path == "send" }?.fields ?? [:]
+    }
+
+    // MARK: Search opt out
+
+    /// A site whose removal form asks for the link to my listing (92 of the recorded sites ask for it, 67 more say "search first"): the app searches the site for me,
+    /// I tap my own profile in the results and say "This is me", and the form is filled with the link to that profile and sent.
+    func testASearchFirstSiteIsSearchedForMeAndTheListingIPickGoesIntoItsForm() {
+        let app = solveAndSend("search-1")
+        let me = app.webViews.links["Pat Example, 34, Springfield IL"]
+        XCTAssertTrue(me.waitForExistence(timeout: 30), "the site's results for my name are shown")
+        XCTAssertTrue(server.requests.contains { $0.site == "fx_search_1" && $0.path == "search" && $0.fields["q"]?.contains("Pat") == true }, "the app searched the site for my name: \(server.requests)")
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent before I pick my listing")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "search-results"; shot.lifetime = .keepAlways; add(shot)
+        me.tap()
+        let mine = app.buttons["assisted-my-profile"]
+        XCTAssertTrue(mine.waitForExistence(timeout: 10), "This is me is offered")
+        mine.tap()
+        let fields = sent("fx_search_1")
+        XCTAssertEqual(fields["listing"], "http://127.0.0.1:8765/fx_search_1/profile-pat-example-il", "the form got the link to the listing I picked")
+        XCTAssertEqual(fields["email"], "pat@example.com")
+    }
+
+    /// The same site when I am not in the results: "Not listed" sends nothing.
+    func testNotBeingListedOnASearchFirstSiteSendsNothing() {
+        let app = solveAndSend("search-1")
+        XCTAssertTrue(app.webViews.links["Pat Example, 34, Springfield IL"].waitForExistence(timeout: 30))
+        app.buttons["assisted-not-listed"].tap()
+        Thread.sleep(forTimeInterval: 8)
+        XCTAssertTrue(server.sentSites.isEmpty, "I am not listed there, so nothing was sent: \(server.requests)")
+    }
+
+    // MARK: Several addresses, emails, phones and names
+
+    /// A page with boxes for previous addresses, a second email and phone, and other names (47 recorded forms have boxes for other addresses, 50 for a second email,
+    /// 14 for a second phone): each box gets the right one of the person's, never the same value twice.
+    func testAPageWithBoxesForPreviousAddressesAndASecondEmailAndPhoneGetsEachOne() {
+        let app = solveAndSend("multi-1", extra: ["-uitest-seed-multi"])
+        let f = sent("fx_multi_1")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "multi-sent"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertEqual(f["name"], "Pat Example")
+        XCTAssertEqual(f["street"], "1 Main St"); XCTAssertEqual(f["city"], "Springfield"); XCTAssertEqual(f["state"], "IL"); XCTAssertEqual(f["zip"], "62701")
+        XCTAssertEqual(f["prev_street"], "22 Oak Ave", "the previous address box got the person's previous address: \(f)")
+        XCTAssertEqual(f["prev_city"], "Portland"); XCTAssertEqual(f["prev_zip"], "97201")
+        XCTAssertEqual(f["prev2_street"], "9 Pine Rd", "the second previous address box got the next one: \(f)")
+        XCTAssertEqual(f["prev2_city"], "Austin"); XCTAssertEqual(f["prev2_zip"], "78701")
+        XCTAssertTrue(f["email"]?.contains("@") == true && f["email2"]?.contains("@") == true && f["email"] != f["email2"], "two different emails: \(f)")
+        XCTAssertTrue(f["phone"]?.range(of: "^\\d{10}$", options: .regularExpression) != nil && f["phone2"]?.range(of: "^\\d{10}$", options: .regularExpression) != nil && f["phone"] != f["phone2"], "two different plain-digit phones: \(f)")
+        XCTAssertTrue(f["other_names"]?.contains("Patricia") == true, "the box for other names has the other names: \(f)")
+    }
+
+    /// A page with one email box and one phone box and "Add another" buttons: the app presses them for the person's further emails and phones, and fills the new boxes.
+    func testAddAnotherButtonsArePressedForTheFurtherEmailsAndPhones() {
+        _ = solveAndSend("multiadd-1", extra: ["-uitest-seed-multi"])
+        let f = sent("fx_multiadd_1")
+        let emails = f.filter { $0.key.hasPrefix("email") && !$0.value.isEmpty }.values.sorted()
+        let phones = f.filter { $0.key.hasPrefix("phone") && !$0.value.isEmpty }.values.sorted()
+        XCTAssertGreaterThanOrEqual(emails.count, 3, "a box was added for each of the person's emails: \(f)")
+        XCTAssertEqual(Set(emails).count, emails.count, "no email twice: \(f)")
+        XCTAssertGreaterThanOrEqual(phones.count, 2, "a box was added for the second phone: \(f)")
+        XCTAssertEqual(Set(phones).count, phones.count, "no phone twice: \(f)")
+    }
+
+    // MARK: Choose exactly one request
+
+    /// Radio buttons: know, correct, delete, opt out of sale (only one may be chosen): the app chooses to delete, which removes the data and so covers the sale.
+    func testWhenOnlyOneOfKnowCorrectDeleteAndOptOutCanBeChosenItChoosesDelete() {
+        _ = solveAndSend("choose-1")
+        let f = sent("fx_choose_1")
+        XCTAssertEqual(f["request_type"], "delete", "\(f)")
+    }
+
+    /// Radio buttons with no delete among them: it chooses to opt out of the sale, never "know", and not the sensitive-information limit.
+    func testWhenThereIsNoDeleteChoiceItChoosesOptOutOfTheSale() {
+        _ = solveAndSend("chooseoptout-1")
+        let f = sent("fx_chooseoptout_1")
+        XCTAssertEqual(f["request_type"], "optout", "\(f)")
+    }
+
+    /// A request-type menu: the app picks the right entry (never "know" or "correct").
+    func testARequestTypeMenuIsSetToARemovingChoice() {
+        _ = solveAndSend("chooseselect-1")
+        let f = sent("fx_chooseselect_1")
+        XCTAssertTrue(["optout", "delete"].contains(f["request_type"] ?? ""), "a menu of requests is set to opt out or delete: \(f)")
+    }
+
+    /// Checkboxes ("select all that apply"): the removing ones are ticked and "know" and "correct" are not.
+    func testCheckboxesTickTheRemovingRequestsAndNotKnowOrCorrect() {
+        let app = solveAndSend("checkboxes-1")
+        let box = XCTAttachment(screenshot: app.screenshot()); box.name = "checkboxes"; box.lifetime = .keepAlways; add(box)
+        let f = sent("fx_checkboxes_1")
+        let ticked = f["requests"] ?? ""
+        XCTAssertFalse(ticked.contains("know") || ticked.contains("correct"), "know and correct were not ticked: \(f)")
+        XCTAssertTrue(ticked.contains("delete") || ticked.contains("optout"), "a removing request was ticked: \(f)")
+    }
+
+    // MARK: Checks, certifications, scripted and multi-step forms
+
+    /// A real-shaped reCAPTCHA checkbox (274 recorded sites show one): the app fills the form and waits; when I tick the box in its frame, it sends, and the broker
+    /// receives the response token.
+    func testAReCaptchaCheckboxWaitsForMeAndTheFormIsSentWhenITickIt() {
+        let app = solveAndSend("recaptcha-1")
+        let box = app.webViews.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'not a robot'")).firstMatch
+        XCTAssertTrue(box.waitForExistence(timeout: 40), "the page shows its reCAPTCHA checkbox")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Solve the check'")).firstMatch.waitForExistence(timeout: 30), "the app says it waits for my check")
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent while the check is open")
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 8 {
+            let f = box.frame
+            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 28, dy: f.midY)).tap()          // the tick box at the left of its label
+            Thread.sleep(forTimeInterval: 3); taps += 1
+        }
+        let f = sent("fx_recaptcha_1", timeout: 20)
+        XCTAssertEqual(f["g-recaptcha-response"], "token", "the broker received the check's response: \(f)")
+    }
+
+    /// A box certifying under penalty of perjury (about 10 recorded sites): the app never ticks it. It fills the rest and waits; I read it and tick it; it is then sent.
+    func testACertificationBoxIsLeftForMeToTickAndTheFormIsSentWhenIHaveTickedIt() {
+        let app = solveAndSend("certify-1")
+        let certify = app.webViews.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'penalty of perjury'")).firstMatch
+        XCTAssertTrue(certify.waitForExistence(timeout: 40), "the page shows its certification")
+        Thread.sleep(forTimeInterval: 8)
+        XCTAssertTrue(server.sentSites.isEmpty, "the app did not tick the certification or send: \(server.requests)")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'tick a confirmation yourself'")).firstMatch.exists, "it says the certification is mine to tick")
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 8 {
+            let f = certify.frame
+            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 20, dy: f.minY + 20)).tap()
+            Thread.sleep(forTimeInterval: 3); taps += 1
+        }
+        let f = sent("fx_certify_1", timeout: 20)
+        XCTAssertEqual(f["certify"], "yes", "the broker saw the box ticked: \(f)")
+    }
+
+    /// A form the page builds with script a moment after it loads (69 recorded sites are script-built): the app waits for it, finds it, fills it and sends it.
+    func testAFormBuiltByScriptAfterTheLoadIsFoundFilledAndSent() {
+        _ = solveAndSend("jsform-1")
+        let f = sent("fx_jsform_1")
+        XCTAssertEqual(f["email"], "pat@example.com"); XCTAssertEqual(f["name"], "Pat Example")
+    }
+
+    /// A two-step form (email, Next; then name, Submit): the app fills the first step, presses Next, fills the second and sends.
+    func testATwoStepFormIsWalkedThroughAndSent() {
+        _ = solveAndSend("steps-1")
+        let f = sent("fx_steps_1")
+        XCTAssertEqual(f["email"], "pat@example.com", "the first step's box: \(f)"); XCTAssertEqual(f["name"], "Pat Example", "the second step's box: \(f)")
+    }
+
+    // MARK: Pages the person has to do something about
+
+    /// A form that wants a photo of an ID (59 recorded sites ask for ID or a file): the app has none to give, so it fills what it can, sends nothing, and says so.
+    func testAFormThatWantsAFileUploadIsNotSentWithoutIt() {
+        let app = solveAndSend("upload-1")
+        XCTAssertTrue(app.webViews.staticTexts["Opt out of fx_upload_1"].waitForExistence(timeout: 40), "the page loaded")
+        Thread.sleep(forTimeInterval: 10)
+        XCTAssertTrue(server.sentSites.isEmpty, "a form that needs an ID photo is never sent without it: \(server.requests)")
+        XCTAssertFalse(app.buttons["finish-done"].exists, "and is not counted as done")
+    }
+
+    /// "Are you an authorized agent acting on behalf of someone?": the person is asking for themselves, so the app answers No and sends.
+    func testAnAuthorizedAgentQuestionIsAnsweredNo() {
+        _ = solveAndSend("agent-1")
+        let f = sent("fx_agent_1")
+        XCTAssertEqual(f["agent"], "no", "\(f)")
+    }
+
+    /// A page that only offers a sign-in (58 recorded sites need an account): nothing is typed into the sign-in form and nothing is sent.
+    func testASignInPageIsNeverFilledOrSent() {
+        let app = solveAndSend("login-1")
+        XCTAssertTrue(app.webViews.staticTexts["Sign in to fx_login_1"].waitForExistence(timeout: 40), "the page loaded")
+        Thread.sleep(forTimeInterval: 10)
+        XCTAssertTrue(server.requests.isEmpty, "nothing was sent to a sign-in form: \(server.requests)")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "sign-in"; shot.lifetime = .keepAlways; add(shot)
+    }
+}
