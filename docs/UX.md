@@ -188,3 +188,8 @@ Many sites send people to the same address: privacy-portal providers (OneTrust a
 ## Reviewing what a site said and showed
 
 A site's page (from the review of the last run, or the Sites tab) shows, when its form was sent, "What the page said" and the screenshot taken then; a tap on the screenshot opens it full size on a page of its own (a row of the page's list with a button that presented a full-screen cover never opened it, and the screenshot itself never appeared on the site's page, because its loader sat on a view that was empty until the picture arrived: it now shows a spinner meanwhile). Covered end to end by `FixtureJourneyUITests` (docs/TESTING.md).
+
+## The keyboard
+
+One control for the keyboard, everywhere: a keyboard-down symbol above it (never the word "Done"), over every screen and over a site's page in the guide. A web page's own bar of
+previous / next / done controls is hidden. Tests: `testEveryKeyboardHasOnlyTheKeyboardDownButtonThatPutsItAway`, and the check in every UI test (docs/TESTING.md, "The keyboard in every UI test").

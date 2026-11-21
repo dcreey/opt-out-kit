@@ -5,7 +5,7 @@ import XCTest
 ///   TEST_RUNNER_OPTOUT_NAME="First Last" TEST_RUNNER_OPTOUT_STREET="..." TEST_RUNNER_OPTOUT_CITY=... TEST_RUNNER_OPTOUT_STATE=XX
 /// It types the profile into the app, scans Spokeo for a listing, and opens the opt-out flow. It never taps
 /// "Mark done" on a step that would send data, and never submits anything on the broker's site.
-final class DryRunUITests: XCTestCase {
+final class DryRunUITests: UITestCase {
     func testDryRunForRealPerson() throws {
         let env = ProcessInfo.processInfo.environment
         guard let name = env["OPTOUT_NAME"], let city = env["OPTOUT_CITY"], let state = env["OPTOUT_STATE"] else {

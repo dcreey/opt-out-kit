@@ -2,7 +2,7 @@ import XCTest
 
 /// Kinds of opt-out page seen in the recorded sites (docs/PAGE-TYPES.md), each as a fixture broker the real engine fills and sends in Solve and send: the broker's own
 /// record of what it received says what the app chose and typed. docs/TESTING.md, "End-to-end tests against fixture pages".
-final class FixturePageTypeUITests: XCTestCase {
+final class FixturePageTypeUITests: UITestCase {
     private var server: FixtureBrokers!
 
     override func setUpWithError() throws {

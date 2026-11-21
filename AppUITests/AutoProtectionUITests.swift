@@ -1,6 +1,6 @@
 import XCTest
 
-final class AutoProtectionUITests: XCTestCase {
+final class AutoProtectionUITests: UITestCase {
     /// Settings, then the automatic opt-out page.
     private func openAutomaticPage(_ app: XCUIApplication) {
         app.tabBars.buttons["Settings"].tap()

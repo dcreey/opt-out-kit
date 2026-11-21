@@ -2,7 +2,7 @@ import XCTest
 
 /// Minor and public-figure flags: off by default, saved, and they switch searching off for that profile. (Family profiles are switched off,
 /// `Features.otherProfiles`; the rules for them and for minors are Mac tests: `CoreTests` on `canBeSearched` and the relationships.)
-final class SafetyFlagsUITests: XCTestCase {
+final class SafetyFlagsUITests: UITestCase {
     private var brokers: FixtureBrokers!
 
     override func setUpWithError() throws { brokers = try FixtureBrokers.start() }

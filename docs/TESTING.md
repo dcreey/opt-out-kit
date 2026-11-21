@@ -70,7 +70,7 @@ site runs there too, and weekly.
 
 **Every rule an integration test checks has a unit test.** A UI test is the end-to-end proof that the screens are wired to the rules; the rule itself is
 proved by a unit test, so a push that breaks a rule fails at once, not at the next release. A test that only checks layout (where something sits on the
-screen, that a sheet stays open, that a keyboard has a Done button) has no rule behind it and is integration only. When a UI test is added, the unit test
+screen, that a sheet stays open, that a keyboard has its one keyboard-down button) has no rule behind it and is integration only. When a UI test is added, the unit test
 for its rule is added with it, and both go in the table below.
 
 **Releasing (the gate). The release workflow is for releasing the app on the App Store (iOS), not for TestFlight.** A GitHub release, and the
@@ -95,7 +95,7 @@ hours.
 | `…testTheDeviceLanguageIsUsedAndTheWalkthroughCanSwitchLanguage` | `PlatformAppTests.testTheAppSpeaksTheChosenLanguageEverywhereItBuildsWords`, `testAnUnsupportedLanguageIsIgnoredAndTheChoiceIsRemembered`, `L10nTests` |
 | `…testFirstVisitsShowAShortGuideOnceInsteadOfWalkthroughPages` | `PlatformAppTests.testAGuideIsShownOnceAndOnlyForTasksAPersonTakesPartIn` |
 | `…testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`, `testSitesTabSearchAndStatus`, `DirectoryUITests.*` | `SiteFilterTests`, `CoreTests.testEachFilterNarrowsAndTextMatchesAddressOrName`; the site page's shared opt-out: `DirectoryTests.testTheCourtRecordsSitesShareOneOptOutThatSubmitsToTheMembersHost` |
-| `…testAboutTabReplaysWalkthrough`, `testThePageDotsSitBelowTheContentNotOnTopOfIt`, `testEveryKeyboardHasADoneButtonThatPutsItAway`, `SiteViewLayoutUITests.*`, `GuidedFlowUITests.testTheGuideSitsOnTopInAColouredFrameAndShowsTheWholeStep`, `AutoProtectionUITests.testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Layout and navigation only |
+| `…testAboutTabReplaysWalkthrough`, `testThePageDotsSitBelowTheContentNotOnTopOfIt`, `testEveryKeyboardHasOnlyTheKeyboardDownButtonThatPutsItAway`, `SiteViewLayoutUITests.*`, `GuidedFlowUITests.testTheGuideSitsOnTopInAColouredFrameAndShowsTheWholeStep`, `AutoProtectionUITests.testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Layout and navigation only |
 | `AutoProtectionUITests.testDecliningAtFirstRunTurnsItOffAndTheQueueBannerDisappears`, `testSkippingTheWalkthroughLeavesAQueueBannerThatOffersToTurnItOn` | `AutoProtectionTests.testNothingRunsUntilThePersonSaysYes`, `testSayingYesTurnsOnBothAndNoTurnsBothOff`, `CoreTests.testDecliningTurnsEverythingOffButRemembersTheAnswer` |
 | `AutoProtectionUITests.testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet`, `testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt`, `DryRunUITests.testDryRunForRealPerson` | `AutoProtectionTests.testOptOutRunSendsToSitesWithAFormAndRecordsOnlyWhatWasSent`, `testPreviewFillsFormsButRecordsNothingAndKeepsTheClockStopped`, `AutomaticRunAppTests`, `BackgroundPassesAppTests`, `ResumeAppTests`, `ActivityPageSpeedTests`, `CoreTests.testDryRunFillsButNeverSends` |
 | `AutoProtectionUITests.testBlockedByPaymentIsAnAnswerInQuickChecks`, `QuickCheckUITests.testLookingAtASiteEarnsPoints` | `CoreTests.testBlockedByPaymentEarnsPointsButIsNeverAVerdict`, `testAPaywalledLookCannotVerifyOrRelistAnOptOut` |
@@ -108,6 +108,14 @@ hours.
 | `SolveAndSendUITests.testAConfirmationNobodyPressedAnythingForAsksWasThisSent` | `PageFlowTests` (the "Was this sent?" question) |
 | `SolveAndSendUITests.testTheFirstGuidedFlowOpensWithAWalkthroughThatCanBePagedThroughOrSkipped`, `testTheGuidedWalkthroughIsReplayedFromAbout` | `PeopleTests.testTheGuidedWalkthroughIsShownOnceThenRemembered`; paging: layout |
 | `BrokerListUITests.testBrokerListShowsQueue` | `CoreTests.testEveryTaskIsInExactlyOneBandOfTheRealQueue` |
+
+## The keyboard in every UI test
+
+Whenever a keyboard is on screen the app shows one control for it: a keyboard-down symbol (`keyboard-hide`, `App/Sources/Keyboard.swift`), over every screen. There is no
+"Done" for a keyboard, and no bar of the system's own (previous / next / done) over a web page's boxes (`NoAccessoryWebView`). Every UI test class inherits `UITestCase`
+(`AppUITests/UITestCase.swift`): `typeTextChecked` types and then checks it, and so does the end of every test, so it is asserted in every journey: the keyboard-down
+button exists, there is no `keyboard-done`, no toolbar is attached to the keyboard, and no Done / Next / Previous button sits just above it. A new UI test class extends
+`UITestCase`, and types with `typeTextChecked`, never `typeText`.
 
 ## End-to-end tests against fixture pages
 
@@ -239,7 +247,7 @@ room for slower CI machines.
 **UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). The weekly job's test of a whole automatic
 run over the real catalog (sending faked: `-uitest-fake-submit`, the only fake left) uses `-uitest-sites 25` (`XCUIApplication.fewSites`) outside that job: the first 25 sites with a known form, so the run finishes in seconds and the test checks the
 finished run and its report. Every other UI test runs against the fixture brokers (below). Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
-profile editor's own Done is `editor-done` (the keyboard has a Done too); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
+profile editor's own Done is `editor-done` (the keyboard has its own keyboard-down button, `keyboard-hide`, never a Done); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
 `-uitest` flag a run never asks iOS for the advertising ID: on a fresh simulator (as in CI) the tracking prompt came up at an unpredictable moment and the
 run waited for it for ever. The walkthrough's advertising-ID page has its own test (`testWalkthroughOffersTheAdvertisingIDAndLetsYouPassIt`). `-uitest-reset` also marks the first-visit guide cards and the once-only explainers (email links, follow-ups) as seen unless a test asks for them
 (`-uitest-coach`, `-uitest-explainers`), so a fresh simulator, as in CI, behaves like a used one: on CI the email-links explainer covered the run report.
@@ -359,7 +367,7 @@ Notes about how a test works live in the test file itself. This is the list of w
 | A phone is shown as (773) 633-1564 while typed; the state menu lists 51 states | `PhoneFormatTests` | Mac |
 | Minor or public figure is never searched | `SafetyFlagsUITests` | Sim |
 | Sites tab: search, grouping, status page, scan | `OnboardingAndSitesUITests`, `BrokerListUITests` | Sim |
-| Sites tab shows ten per group (Done, Skipped, Up next); See all opens the search screen with that status chosen; the chips narrow the list; the tab's search field opens it focused | `SiteFilterTests` (status rules, every filter, clearing keeps the text); `OnboardingAndSitesUITests.testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`, `testEveryKeyboardHasADoneButtonThatPutsItAway` | Mac + Sim |
+| Sites tab shows ten per group (Done, Skipped, Up next); See all opens the search screen with that status chosen; the chips narrow the list; the tab's search field opens it focused | `SiteFilterTests` (status rules, every filter, clearing keeps the text); `OnboardingAndSitesUITests.testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`, `testEveryKeyboardHasOnlyTheKeyboardDownButtonThatPutsItAway` | Mac + Sim |
 | Hand-written walkthrough flow (semi-automatic since the guided method was removed): steps advance, Cancel, Not working, site view links | `GuidedFlowUITests`, `GuidedRunnerTests` | Sim |
 | Run now shows what was sent and what needs you, with no network | `AutoProtectionUITests`, `DryRunUITests` | Sim |
 | A site the run's rules leave alone (DROP hold) is not counted as tried, never sent, kept on the page with its reason, and counted in the report; Re-test all really re-sends to sites sent this period | `AutomaticRunAppTests.testSitesTheRunLeavesAloneAreNotCountedAsTriedAndKeepTheirReason`, `BackgroundPassesAppTests` (re-test checks the pages sent) | Sim |

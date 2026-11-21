@@ -2,7 +2,7 @@ import XCTest
 
 /// Journeys that run the real engine against broker fixture pages served by the test itself (`FixtureServer`): nothing in the app is faked, so what the
 /// screen says is what really happened on a page. docs/TESTING.md, "End-to-end tests against fixture pages"; the list of journeys is docs/JOURNEYS.md.
-final class FixtureJourneyUITests: XCTestCase {
+final class FixtureJourneyUITests: UITestCase {
     private var server: FixtureBrokers!
 
     /// The fixture brokers whose pages the app completes by itself: plain forms, request-type tiles, a choice that reveals the form, a cookie banner over the
@@ -172,7 +172,7 @@ final class FixtureJourneyUITests: XCTestCase {
         XCTAssertTrue(server.sentSites.isEmpty, "still nothing sent while the code is not entered")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "code-step"; shot.lifetime = .keepAlways; add(shot)
         field.tap()
-        field.typeText("750439")
+        field.typeTextChecked("750439")
         XCTAssertTrue(server.waitForSent(timeout: 40) { $0 == ["fx_code_1"] }, "the request was accepted once the code was entered: \(server.requests)")
         XCTAssertEqual(server.requests.last?.fields["code"], "750439")
         XCTAssertFalse(server.requests.contains { $0.path == "rejected" }, "the site never saw a wrong code")
@@ -380,7 +380,7 @@ final class FixtureJourneyUITests: XCTestCase {
         let field = app.webViews.textFields["Verification code"]
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         field.tap()
-        field.typeText("000000")
+        field.typeTextChecked("000000")
         let start = Date()
         while !server.requests.contains(where: { $0.path == "rejected" }) && Date().timeIntervalSince(start) < 40 { Thread.sleep(forTimeInterval: 1) }
         XCTAssertTrue(server.requests.contains { $0.path == "rejected" }, "the app sent the form with the wrong code: \(server.requests)")

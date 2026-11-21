@@ -120,7 +120,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
             config.userContentController.add(activityReporter, contentWorld: .page, name: "ookActivity")
             config.userContentController.addUserScript(WKUserScript(source: Self.activityScript, injectionTime: .atDocumentStart, forMainFrameOnly: false))
         }
-        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
+        webView = NoAccessoryWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 800), configuration: config)
         super.init()
         reporter.session = self
         activityReporter.session = self
@@ -699,4 +699,10 @@ private final class FrameReporter: NSObject, WKScriptMessageHandler {
 
 extension WebViewSession {
     @MainActor func noteFrameFromReporter(_ info: WKFrameInfo, href: String) { frames.removeAll { $0.href == href }; frames.append((info, href)) }
+}
+
+/// A web view that shows no bar of its own above the keyboard (the system's previous / next / done controls for the page's boxes): the one keyboard-down button
+/// (`Keyboard.swift`) is the only control there, over a page as over every other screen.
+final class NoAccessoryWebView: WKWebView {
+    override var inputAccessoryView: UIView? { nil }
 }

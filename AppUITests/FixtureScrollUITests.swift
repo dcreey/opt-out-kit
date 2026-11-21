@@ -3,7 +3,7 @@ import XCTest
 /// A very long page with its request form at the very end, opened in Solve and send while the person scrolls: does the app, filling the form and moving the page,
 /// fight the person's scrolling? The fixture pages (`longform`, `longneeds`) report every scroll position to the server with whether a finger was moving it
 /// (fixtures/server.py, `/__scroll`), so the test can tell the person's scrolling from the app's. docs/TESTING.md, "End-to-end tests against fixture pages".
-final class FixtureScrollUITests: XCTestCase {
+final class FixtureScrollUITests: UITestCase {
     private var server: FixtureBrokers!
     /// When the page's web view first showed on screen (seconds since 1970), and how long after the app was launched.
     private var visibleAt: TimeInterval = 0

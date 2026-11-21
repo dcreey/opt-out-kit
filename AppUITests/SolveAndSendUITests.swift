@@ -2,7 +2,7 @@ import XCTest
 
 /// The Solve-and-send screen on fixture brokers that hold for the person (a page with no form, a page that is down): the real engine and web view, nothing
 /// faked. docs/TESTING.md, "End-to-end tests against fixture pages".
-final class SolveAndSendUITests: XCTestCase {
+final class SolveAndSendUITests: UITestCase {
     private var server: FixtureBrokers!
 
     override func setUpWithError() throws {

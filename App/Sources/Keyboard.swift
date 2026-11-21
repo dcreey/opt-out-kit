@@ -7,7 +7,7 @@ enum Keyboard {
 
     private static var installed = false
 
-    /// Shows a Done button just above the keyboard whenever it is up, over every screen (sheets and full-screen covers included) and
+    /// Shows one keyboard-down button (the symbol, no word: "Done" is not shown for a keyboard anywhere) just above the keyboard whenever it is up, over every screen (sheets and full-screen covers included) and
     /// for every kind of input, including the text fields of a site in the guide's browser. It is drawn on the app's window by UIKit
     /// instead of using SwiftUI's keyboard toolbar or an input accessory view: those depend on each field's configuration, and the
     /// toolbar made the keyboard flicker.
@@ -21,25 +21,25 @@ enum Keyboard {
         observers = [center.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: .main) { note in
             guard let end = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
             let screen = UIScreen.main.bounds
-            if end.minY >= screen.height - 1 || end.height < 100 { DoneOverlay.shared.hide() } else { DoneOverlay.shared.show(above: end.minY) }
+            if end.minY >= screen.height - 1 || end.height < 100 { HideKeyboardButton.shared.hide() } else { HideKeyboardButton.shared.show(above: end.minY) }
         },
-        center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in DoneOverlay.shared.hide() }]
+        center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in HideKeyboardButton.shared.hide() }]
     }
 }
 
 @MainActor
-private final class DoneOverlay {
-    static let shared = DoneOverlay()
+private final class HideKeyboardButton {
+    static let shared = HideKeyboardButton()
     private let button = UIButton(type: .system)
 
     private init() {
         var config = UIButton.Configuration.filled()
-        config.title = Loc.t("Done")
+        config.image = UIImage(systemName: "keyboard.chevron.compact.down")
         config.cornerStyle = .capsule
-        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 18, bottom: 10, trailing: 18)
         button.configuration = config
-        button.accessibilityIdentifier = "keyboard-done"
-        button.accessibilityLabel = Loc.t("Done")
+        button.accessibilityIdentifier = "keyboard-hide"
+        button.accessibilityLabel = Loc.t("Hide keyboard")
         button.addAction(UIAction { _ in Keyboard.hide() }, for: .touchUpInside)
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.2; button.layer.shadowRadius = 4; button.layer.shadowOffset = CGSize(width: 0, height: 1)
@@ -52,7 +52,6 @@ private final class DoneOverlay {
 
     func show(above keyboardTop: CGFloat) {
         guard let window else { return }
-        button.configuration?.title = Loc.t("Done")
         if button.superview !== window { window.addSubview(button) }
         window.bringSubviewToFront(button)
         let size = button.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)

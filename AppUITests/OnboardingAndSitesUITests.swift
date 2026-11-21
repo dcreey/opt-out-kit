@@ -1,6 +1,6 @@
 import XCTest
 
-final class OnboardingAndSitesUITests: XCTestCase {
+final class OnboardingAndSitesUITests: UITestCase {
     /// The whole first run, in one walk (each page must be scrolled to its end, so walking it is slow): the first page is automatic removal, the advertising
     /// ID page can be passed without sharing it, automatic opt-out is on by default with no scan switch, the profile is asked for next, the queue starts
     /// with the automatic pass, Settings shows it on, and the walkthrough does not come back at the next launch. Each rule behind these is also a unit
@@ -40,7 +40,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
         for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
-        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeTextChecked("pat@example.com")
         app.buttons["onboarding-next"].tap()
         let state = app.descendants(matching: .any)["onboarding-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5))
@@ -100,7 +100,8 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertFalse(app.buttons["coach-done"].waitForExistence(timeout: 2), "and only the first time")
     }
 
-    func testEveryKeyboardHasADoneButtonThatPutsItAway() {
+    /// Every keyboard has one control above it: the keyboard-down symbol, which puts it away. No word "Done" (checked in every UI test: `UITestCase`).
+    func testEveryKeyboardHasOnlyTheKeyboardDownButtonThatPutsItAway() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
@@ -110,9 +111,10 @@ final class OnboardingAndSitesUITests: XCTestCase {
         open.tap()
         XCTAssertTrue(app.textFields["site-search-field"].waitForExistence(timeout: 5), "the search field opens the search screen")
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3), "with its field focused")
-        app.textFields["site-search-field"].typeText("spo")
-        XCTAssertTrue(app.buttons["keyboard-done"].waitForExistence(timeout: 3), "a Done button sits above the keyboard")
-        app.buttons["keyboard-done"].tap()
+        app.textFields["site-search-field"].typeTextChecked("spo")
+        XCTAssertTrue(app.buttons["keyboard-hide"].waitForExistence(timeout: 3), "a keyboard-down button sits above the keyboard")
+        XCTAssertFalse(app.buttons["keyboard-done"].exists, "and there is no Done button")
+        app.buttons["keyboard-hide"].tap()
         XCTAssertFalse(app.keyboards.firstMatch.waitForExistence(timeout: 1), "and puts the keyboard away")
     }
 
@@ -149,7 +151,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
         for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
-        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeTextChecked("pat@example.com")
         app.buttons["onboarding-next"].tap()
         let state = app.descendants(matching: .any)["onboarding-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5)); state.tap()
@@ -182,7 +184,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 10))
         for _ in 0..<3 { app.buttons["onboarding-next"].tap() }
         let field = app.textFields["onboarding-email"]
-        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("pat@example.com")
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeTextChecked("pat@example.com")
         app.buttons["onboarding-next"].tap()
         let country = app.buttons["onboarding-country"]
         XCTAssertTrue(country.waitForExistence(timeout: 5))
@@ -231,7 +233,7 @@ final class OnboardingAndSitesUITests: XCTestCase {
     }
 }
 
-final class DirectoryUITests: XCTestCase {
+final class DirectoryUITests: UITestCase {
     /// The Sites tab never shows a site's tier (an internal measure). Its groups (Done, Skipped, Up next) have their own test,
     /// `testTheSitesTabShowsTenPerGroupAndSeeAllOpensTheSearchWithThatStatus`.
     func testTheSitesTabShowsNoTiers() {
@@ -267,7 +269,7 @@ final class DirectoryUITests: XCTestCase {
     }
 }
 
-final class ExposureScanUITests: XCTestCase {
+final class ExposureScanUITests: UITestCase {
     /// As a user I want to check where I am listed: the app searches each site that can be checked for my name, and says which ones list me and which do not.
     /// Three fixture brokers answer a name search (two list anyone named Pat, one lists nobody); nothing else is contacted.
     func testScanSearchesEachSiteForMyNameAndSaysWhichListMe() throws {
@@ -289,7 +291,7 @@ final class ExposureScanUITests: XCTestCase {
     }
 }
 
-final class QuickCheckUITests: XCTestCase {
+final class QuickCheckUITests: UITestCase {
     func testLookingAtASiteEarnsPoints() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // looking a site up needs a complete profile

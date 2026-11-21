@@ -10535,6 +10535,29 @@
     }
    }
   },
+  "Hide keyboard": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Masquer le clavier"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ocultar el teclado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tastatur ausblenden"
+     }
+    }
+   }
+  },
   "High priority": {
    "extractionState": "manual",
    "localizations": {

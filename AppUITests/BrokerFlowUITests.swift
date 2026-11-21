@@ -2,7 +2,7 @@ import XCTest
 
 /// Walks every bundled broker flow by tapping through its step cards, the way a user would.
 /// It never taps "Open in Safari", so no live broker site is contacted.
-final class BrokerFlowUITests: XCTestCase {
+final class BrokerFlowUITests: UITestCase {
     private func launch() -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]

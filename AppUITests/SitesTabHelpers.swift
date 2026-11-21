@@ -4,12 +4,14 @@ extension XCUIApplication {
     /// The Sites tab shows only a few sites, so find one by search: the tab's search field opens the search screen, whose field takes the text.
     func searchSites(_ text: String) {
         let open = buttons["sites-search"]
+        // Right after another screen was put away the tab can still be showing it: tapping the tab again brings its first screen back.
+        if !open.waitForExistence(timeout: 5) { tabBars.buttons["Sites"].tap() }
         XCTAssertTrue(open.waitForExistence(timeout: 10))
         open.tap()
         let search = textFields["site-search-field"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         search.tap()
-        search.typeText(text)
+        search.typeTextChecked(text)
     }
 }
 
@@ -24,7 +26,7 @@ extension XCUIApplication {
             while !f.exists && tries < 10 { swipeDown(); tries += 1 }       // the form may be scrolled down
             XCTAssertTrue(f.waitForExistence(timeout: 5), id)
             if (f.value as? String) == text { return }
-            f.tap(); f.typeText(text)
+            f.tap(); f.typeTextChecked(text)
         }
         type("legal-first", first); type("legal-last", last)
         type("current-street", street); type("current-city", city); chooseState(state); type("current-zip", zip)
@@ -55,7 +57,7 @@ extension XCUIApplication {
         let field = textFields["onboarding-email"]
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         XCTAssertFalse(buttons["onboarding-next"].isEnabled, "cannot go on without an email address")
-        field.tap(); field.typeText(email)
+        field.tap(); field.typeTextChecked(email)
         XCTAssertTrue(buttons["onboarding-next"].isEnabled)
         tapNextOnboarding()
         // The next page asks where the person lives (optional; the state is asked only for the United States); move past it.

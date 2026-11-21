@@ -2,7 +2,7 @@ import XCTest
 
 /// The guided screen against a fixture broker with a hand-written guide (fixtures/flows/fxguide.yml, page kind `guide`): the real guide engine, a real page
 /// in a real web view, nothing faked. docs/TESTING.md, "End-to-end tests against fixture pages".
-final class FixtureGuideUITests: XCTestCase {
+final class FixtureGuideUITests: UITestCase {
     private var server: FixtureBrokers!
 
     override func setUpWithError() throws {
@@ -84,7 +84,7 @@ final class FixtureGuideUITests: XCTestCase {
         // I enter my email on the page (the guide copied it for me to paste) and press the page's own Submit; the broker receives the request.
         let box = app.webViews.textFields["Email address"]
         XCTAssertTrue(box.waitForExistence(timeout: 10))
-        box.tap(); box.typeText("pat@example.com")
+        box.tap(); box.typeTextChecked("pat@example.com")
         let submit = app.webViews.buttons["Submit"]
         XCTAssertTrue(submit.waitForExistence(timeout: 10))
         var taps = 0

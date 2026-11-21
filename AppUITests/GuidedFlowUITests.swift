@@ -1,6 +1,6 @@
 import XCTest
 
-final class SiteViewLayoutUITests: XCTestCase {
+final class SiteViewLayoutUITests: UITestCase {
     private func scrollToBottom(_ app: XCUIApplication) {
         for _ in 0..<8 { app.swipeUp() }
     }

@@ -1,7 +1,7 @@
 import XCTest
 
 /// The profile editor. (Adding family profiles is switched off, `Features.otherProfiles`, so it has no UI test; its rules are Mac tests.)
-final class ProfileEditorUITests: XCTestCase {
+final class ProfileEditorUITests: UITestCase {
     private func launch(reset: Bool) -> XCUIApplication {
         let app = XCUIApplication()
         // Without a reset it still opens as a test run (`-uitest-relaunch` keeps the data): a bare launch resumed the first-run setup over the
@@ -55,7 +55,7 @@ final class ProfileEditorUITests: XCTestCase {
         let name = app.textFields["legal-first"]
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.tap()
-        name.typeText("Pat")
+        name.typeTextChecked("Pat")
         XCUIDevice.shared.press(.home)          // leaving the app saves what is typed (nothing is written while typing)
         sleep(5)                                // the save is written in the background; CI machines are slow
         app.terminate()

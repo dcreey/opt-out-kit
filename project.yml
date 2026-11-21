@@ -37,7 +37,7 @@ targets:
       properties:
         CFBundleDisplayName: 'Exnay'
         CFBundleShortVersionString: '1.0'
-        CFBundleVersion: '52'
+        CFBundleVersion: '53'
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         CFBundleURLTypes:
@@ -63,7 +63,7 @@ targets:
       properties:
         CFBundleDisplayName: 'Exnay'
         CFBundleShortVersionString: '1.0'
-        CFBundleVersion: '52'
+        CFBundleVersion: '53'
         NSExtension:
           NSExtensionPointIdentifier: 'com.apple.share-services'
           NSExtensionPrincipalClass: '$(PRODUCT_MODULE_NAME).ShareViewController'
