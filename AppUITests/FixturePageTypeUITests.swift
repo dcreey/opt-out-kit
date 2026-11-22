@@ -289,6 +289,17 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(server.sentSites.isEmpty, "no self-statement was ticked for a family profile: \(server.requests)")
     }
 
+    /// A page with two opt-out forms (one for the sale, one for Mobile ID; the page stays when one is sent, as many sites do): the app sends each and says there are two.
+    func testASecondOptOutFormOnThePageIsSentToo() {
+        let app = solveAndSend("twoforms-1")
+        let both = server.waitForSent(timeout: 40) { $0.filter { $0 == "fx_twoforms_1" }.count >= 2 }
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "twoforms"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertTrue(both, "both forms were sent: \(server.requests)")
+        let forms = Set(server.requests.filter { $0.site == "fx_twoforms_1" && $0.path == "send" }.compactMap { $0.fields["form"] })
+        XCTAssertEqual(forms, ["main", "mobileid"], "each form was sent once: \(server.requests)")
+        _ = app
+    }
+
     /// A page with no form but an email address to write to: nothing is sent, and the app offers to email instead.
     func testAPageThatOnlyGivesAnEmailAddressOffersToSendAnEmail() {
         let app = solveAndSend("noformemail-1")

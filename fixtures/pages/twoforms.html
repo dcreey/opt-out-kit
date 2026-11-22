@@ -1,0 +1,23 @@
+<h1>Opt-Out Information</h1>
+<h2>Opt out of the sale of your information</h2>
+<form id="f1" method="POST" action="/{{site}}/send"><input type="hidden" name="form" value="main">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <button type="submit">Submit request</button>
+</form>
+<form id="f2" method="POST" action="/{{site}}/send"><input type="hidden" name="form" value="mobileid">
+  <h2>Opt out of Mobile ID</h2>
+  <label>Full name <input type="text" name="fullname" required></label><br>
+  <label>Email address <input type="email" name="emailaddr" required></label><br>
+  <button type="submit">Opt me out</button>
+</form>
+<script>
+// Each form is sent in the background and the page says so, as many sites do: the page stays, so the other form is still there for the app.
+document.querySelectorAll('form').forEach(function (f) {
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    fetch(f.action, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(f)).toString() })
+      .then(function () { f.innerHTML = '<p>Thank you. Your request has been received.</p>'; });
+  });
+});
+</script>
