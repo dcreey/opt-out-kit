@@ -205,7 +205,8 @@ jobs:
           python3 fixtures/server.py 8765 > fixture-server.log 2>&1 &
           trap 'kill $! 2>/dev/null || true' EXIT
           export TEST_RUNNER_OPTOUT_FIXTURE_CATALOG="$PWD/DerivedData/Build/Products/FixtureCatalog.sqlite" TEST_RUNNER_OPTOUT_FIXTURE_URL="http://127.0.0.1:8765"
-          for _ in $(seq 1 50); do curl -sf http://127.0.0.1:8765/__ready >/dev/null && break; sleep 0.1; done
+          for _ in $(seq 1 300); do curl -sf http://127.0.0.1:8765/__ready >/dev/null && break; sleep 0.1; done
+          curl -sf http://127.0.0.1:8765/__ready >/dev/null || { echo "::error::the fixture server did not start"; cat fixture-server.log; exit 1; }
           set -o pipefail
           xcodebuild test-without-building -xctestrun "$XCTESTRUN" -destination "id=$SIM_UDID" \
             -resultBundlePath "Results-${{ matrix.index }}.xcresult" "${ARGS[@]}" 2>&1 | tee xcodebuild.log \

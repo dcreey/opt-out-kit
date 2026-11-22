@@ -123,16 +123,20 @@ final class FixtureGuideUITests: UITestCase {
         let notWorking = app.buttons["Not working"], first = app.buttons["The page or link is broken"]
         XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
         for _ in 0..<3 where !first.exists {
-            expectation(for: NSPredicate(format: "hittable == true"), evaluatedWith: notWorking); waitForExpectations(timeout: 10)
-            notWorking.tap()
+            notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine
             _ = first.waitForExistence(timeout: 5)
         }
         shot(app, "guide-not-working-menu")
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
         }
-        app.buttons["The site blocked me"].tapWhenHittable()
-        XCTAssertTrue(app.descendants(matching: .any)["reported-issue"].waitForExistence(timeout: 10), "the site now shows it was reported")
+        // A submenu that opened late can swallow the first tap on its item while it settles: tap again while the item is still offered.
+        let blocked = app.buttons["The site blocked me"], reported = app.descendants(matching: .any)["reported-issue"]
+        for _ in 0..<3 where !reported.exists && blocked.exists {
+            blocked.tapWhenHittable()
+            _ = reported.waitForExistence(timeout: 5)
+        }
+        XCTAssertTrue(reported.waitForExistence(timeout: 10), "the site now shows it was reported")
     }
 
     /// As a user I want a guide whose page or link is broken to say so and look for the new page, rather than leave me stuck on it.
@@ -144,8 +148,7 @@ final class FixtureGuideUITests: UITestCase {
         let notWorking = app.buttons["Not working"], first = app.buttons["The page or link is broken"]
         XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
         for _ in 0..<3 where !first.exists {
-            expectation(for: NSPredicate(format: "hittable == true"), evaluatedWith: notWorking); waitForExpectations(timeout: 10)
-            notWorking.tap()
+            notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine
             _ = first.waitForExistence(timeout: 5)
         }
         first.tapWhenHittable()

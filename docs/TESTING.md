@@ -155,7 +155,9 @@ real ones, and the engine, web view and page scripts do the same work they do on
 - `fixtures/sites/*.yml`: the fixture brokers, in the directory's own format (so the same loader reads them), each with its opt-out page on
   `http://127.0.0.1:8765`. A site's id names its page kind: `fx_<kind>_<n>` is shown `fixtures/pages/<kind>.html`.
 - `fixtures/server.py`: the web server (Python's standard library, nothing to install). It serves the pages, records what each form posted, and tells the
-  tests (`GET /__received`, `POST /__reset`).
+  tests (`GET /__received`, `POST /__reset`). It keeps a backlog of 128 waiting connections (the standard 5 overflows when a
+  web view loads a page while a test asks what was received, and macOS refuses the rest); a test asks for it for up to 10 seconds before saying it is gone,
+  and the Integration shard stops at once if it never comes up.
 - `fixtures/build_catalog.sh`: compiles a catalog from the app's real laws, platforms, terms, page scripts and ZIP table with the fixture sites in place of
   the directory, using the same `catalog-builder` as the app's build.
 - `tools/run_e2e.sh`: builds that catalog, starts the server, runs `FixtureJourneyUITests` (or the tests named in its arguments) and stops the server. `OPTOUT_FIXTURE_PORT` (default 8765) puts the server on another port, with a catalog pointing there, so two runs on two simulators do not share one server.

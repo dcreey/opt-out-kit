@@ -169,15 +169,17 @@ extension XCUIElement {
     /// `isHittable` then fails the test too, on GitHub's slower runner): this waits for the item to have a place on screen and come to rest, then taps it.
     func tapWhenHittable(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
         let end = Date().addingTimeInterval(timeout)
+        var last: CGRect?
         while Date() < end {
             if exists {
                 let f = frame
                 if !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
-                    Thread.sleep(forTimeInterval: 0.3)          // a menu still sliding in moves its items: let it come to rest
-                    tap(); return
-                }
-            }
-            Thread.sleep(forTimeInterval: 0.3)
+                    // A menu still sliding in moves its items: tap only once the item sits in the same place twice in a row.
+                    if let l = last, l.equalTo(f) { tap(); return }
+                    last = f
+                } else { last = nil }
+            } else { last = nil }
+            Thread.sleep(forTimeInterval: 0.25)
         }
         XCTFail("\(self) never became tappable", file: file, line: line)
     }

@@ -24,7 +24,11 @@ struct FixtureBrokers {
             XCTFail("the fixture brokers are not set up: run these tests with tools/run_e2e.sh", file: file, line: line); throw URLError(.cannotConnectToHost)
         }
         let brokers = FixtureBrokers(url: url, catalog: catalog)
-        guard brokers.get("__ready") != nil else {
+        // A busy machine can refuse a connection for a moment; ask for up to 10 seconds before calling the server gone.
+        let until = Date().addingTimeInterval(10)
+        var ready = brokers.get("__ready") != nil
+        while !ready && Date() < until { Thread.sleep(forTimeInterval: 0.5); ready = brokers.get("__ready") != nil }
+        guard ready else {
             XCTFail("the fixture server is not answering at \(url): tools/run_e2e.sh starts it (python3 fixtures/server.py)", file: file, line: line); throw URLError(.cannotConnectToHost)
         }
         _ = brokers.send("POST", "__reset")

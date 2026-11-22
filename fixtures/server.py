@@ -158,6 +158,10 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
+    # The default backlog (5) overflows when a web view loads a page while a test asks what was received; macOS then refuses the connection (the
+    # app reads a send that never arrived as "nothing changed", a test as "the server is not answering").
+    ThreadingHTTPServer.request_queue_size = 128
+    ThreadingHTTPServer.daemon_threads = True
     server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
     print(f'fixture brokers on http://127.0.0.1:{port}', flush=True)
     server.serve_forever()
