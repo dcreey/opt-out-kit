@@ -106,7 +106,10 @@ extension WebViewSession {
     /// Opens a privacy request that hides behind a link or button on the page ("Submit a privacy request", "Your Privacy Choices") when no form shows,
     /// then looks again. Only a link that opens something in the page (no address, `#` or a script) is clicked, never one that writes an email.
     func discoverFormsDeep() async -> [LiveForm] {
-        let first = await discoverForms()
+        var first = await discoverForms()
+        if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
+        // A form the page builds a few seconds after it loads (blackbaud.com's OneTrust web form): looked for again for a while before anything is clicked.
+        first = await formsAppearing(upTo: 6)
         if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
         if let opened = await openFoldedForms() { return opened }
         // Each click is followed by looking for the form until it shows (at most the pause each used to wait in full).

@@ -106,3 +106,10 @@ test('a "know" choice that says "me" is not read as the person answering "myself
   const who = choose(radio('w', 'a', 'Myself') + radio('w', 'b', 'Authorized agent'));
   assert.equal(who.$('#a').checked, true, 'the real self-answer still wins');
 });
+
+test('"I am a (an)": Customer / Authorized Agent takes the one answer that is not someone acting for another (blueaction.io)', () => {
+  const r = choose('<label for=t>I am a (an) *</label><select id=t name=typeCode required><option hidden value=""></option><option value=customer>Customer</option><option value=authorized_agent>Authorized Agent</option></select>');
+  assert.equal(r.$('#t').value, 'customer');
+  const two = choose('<label for=t>I am a</label><select id=t><option value=""></option><option value=c>Customer</option><option value=e>Employee</option><option value=a>Agent</option></select>');
+  assert.equal(two.$('#t').value, '', 'two answers of the person\'s own kind: not guessed');
+});

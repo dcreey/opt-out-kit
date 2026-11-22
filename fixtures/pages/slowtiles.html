@@ -1,0 +1,19 @@
+<h1>Privacy Web Form</h1>
+<div id="app">Loading...</div>
+<script>
+// As blackbaud.com's OneTrust web form: the form is built a few seconds after the page loads, and its questions are rows of tiles.
+setTimeout(function () {
+  var tiles = function (q, name, opts) {
+    return '<div><p>* ' + q + '</p><div>' + opts.map(function (o) { return '<button type="button" data-n="' + name + '" data-v="' + o + '">' + o + '</button>'; }).join('') + '</div></div>';
+  };
+  document.getElementById('app').innerHTML = '<form method="POST" action="/{{site}}/send"><p>Please tell us about yourself.</p>' +
+    tiles('Are you an authorized agent submitting a request on the behalf of someone else?', 'agent', ['No', 'Yes']) +
+    tiles('Select a Requestor Type', 'requestor', ['Consumer']) +
+    tiles('Select a Request Type', 'request', ['Data Subject Opt-out Request', 'Data Subject Deletion Request']) +
+    '<label>First Name * <input type="text" name="firstname" required></label><br><label>Email * <input type="email" name="email" required></label><br>' +
+    '<input type="hidden" name="agent"><input type="hidden" name="requestor"><input type="hidden" name="request"><button type="submit">Submit</button></form>';
+  document.querySelectorAll('[data-n]').forEach(function (b) {
+    b.addEventListener('click', function () { document.querySelector('[name=' + b.dataset.n + ']').value = b.dataset.v; b.setAttribute('aria-pressed', 'true'); });
+  });
+}, 3000);
+</script>

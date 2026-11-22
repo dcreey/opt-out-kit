@@ -1,0 +1,26 @@
+<h1>Data Subject Request Form ({{site}})</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>First name * <input type="text" name="firstname" required></label><br>
+  <label>Email * <input type="email" name="email" required></label><br>
+  <!-- Type-to-search menus as TrustArc draws them (react-select): an input with role=combobox; the list of role=option appears on mousedown or the down arrow. -->
+  <div class="menu" data-name="iam" data-options="Agent|Individual"><label id="iam-l">I am *</label><div class="shown"></div><input role="combobox" aria-labelledby="iam-l" aria-autocomplete="list" style="width:2px"></div>
+  <div class="menu" data-name="reqtype" data-options="Access My Information|Delete My Information|Opt-out or Unsubscribe|Do not Sell or Share My Personal Information|Withdraw My Consent|Correct or Update My Information"><label id="rt-l">Type of Request *</label><div class="shown"></div><input role="combobox" aria-labelledby="rt-l" aria-autocomplete="list" style="width:2px"></div>
+  <input type="hidden" name="iam" id="iam"><input type="hidden" name="reqtype" id="reqtype">
+  <button type="submit">Submit Request</button>
+</form>
+<script>
+document.querySelectorAll('.menu').forEach(function (m) {
+  var input = m.querySelector('input'), open = function () {
+    if (m.querySelector('[role=listbox]')) return;
+    var list = document.createElement('div'); list.setAttribute('role', 'listbox');
+    m.dataset.options.split('|').forEach(function (o) {
+      var d = document.createElement('div'); d.setAttribute('role', 'option'); d.textContent = o;
+      d.addEventListener('click', function () { document.getElementById(m.dataset.name).value = o; m.querySelector('.shown').textContent = o; list.remove(); });
+      list.appendChild(d);
+    });
+    m.appendChild(list);
+  };
+  input.addEventListener('mousedown', open);
+  input.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') open(); });
+});
+</script>

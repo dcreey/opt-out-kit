@@ -136,7 +136,10 @@ jobs:
           (cd Packages/AssistedRunLogic && swift test --disable-automatic-resolution 2>&1 | tee ../../run-tests.log)
       - name: 'Each failure as an annotation (reading the job log needs a GitHub sign-in; annotations do not)'
         if: 'failure()'
-        run: 'grep -hE "error: |error -\[|failed \(" core-tests.log run-tests.log 2>/dev/null | head -40 | sed "s/^/::error::/" || true'
+        run: |
+          grep -hE "error: |error -\[|failed \(" core-tests.log run-tests.log 2>/dev/null | head -40 | sed "s/^/::error::/" || true
+          # A crash (a signal) ends the log mid-test: the last test that started is the one.
+          for f in core-tests.log run-tests.log; do [ -f "$f" ] && grep -E "Test Case .* started" "$f" | tail -1 | sed "s/^/::error title=Last test started ($f)::/"; done || true
 
   build:
     name: 'App builds'

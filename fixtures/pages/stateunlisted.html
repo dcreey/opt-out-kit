@@ -1,0 +1,9 @@
+<h1>Personal Information ({{site}})</h1>
+<form method="POST" action="/{{site}}/send">
+  <!-- As on becausal.com: the state list holds only the states with privacy laws, and Illinois is not one of them. -->
+  <label for="Opt-Out-State">Please select the state in which you currently reside (required):</label>
+  <select id="Opt-Out-State" name="state" required><option value="">Select your state</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Oregon</option><option>Texas</option><option>Virginia</option></select><br>
+  <label>First name <input type="text" name="firstname" required></label><br>
+  <label>Email Address <input type="email" name="email" required></label><br>
+  <button type="submit">Submit</button>
+</form>

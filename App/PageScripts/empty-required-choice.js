@@ -8,8 +8,10 @@
   var label=function(e){return own(e).replace(/\s+/g,' ').replace(/\*|\(required\)/gi,'').trim().slice(0,60);};
   var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea,[contenteditable=""],[contenteditable="true"]'));
   for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
-    var req=e.required||e.getAttribute('aria-required')==='true'||/\*/.test(own(e));
+    var req=e.required||e.getAttribute('aria-required')==='true'||/\*|\(required\)/i.test(own(e));
     if(!req) continue;
     var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!((('value' in e)?e.value:e.innerText)||'').trim();
+    // A state menu still empty after the fill does not list the person's state (becausal.com lists only the 19 states with privacy laws): said so.
+    if(empty&&e.tagName==='SELECT'&&/state|reside|province/i.test(own(e)+' '+(e.name||'')+' '+(e.id||''))&&e.options.length>5) return (label(e)||'State')+': your state is not on its list';
     if(empty && !/captcha|code/i.test(label(e))) return label(e)||'a required choice';}
   return '';})

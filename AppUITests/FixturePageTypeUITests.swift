@@ -198,6 +198,35 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["authorizedAgent"], "no", "\(f)")
     }
 
+    /// Type-to-search menus (TrustArc's react-select, azira.com): "I am" gets Individual, and "Type of Request" gets Delete, never "Correct or Update", the last option.
+    func testTypeToSearchMenusGetIndividualAndDeleteNotCorrect() {
+        _ = solveAndSend("requestmenu-1")
+        let f = sent("fx_requestmenu_1")
+        XCTAssertEqual(f["iam"], "Individual", "\(f)"); XCTAssertEqual(f["reqtype"], "Delete My Information", "\(f)")
+    }
+
+    /// "I am a (an)": Customer / Authorized Agent (blueaction.io): the person is the one answer that is not an agent.
+    func testAnIAmMenuOfCustomerOrAgentGetsCustomer() {
+        _ = solveAndSend("customeronly-1")
+        let f = sent("fx_customeronly_1")
+        XCTAssertEqual(f["typeCode"], "customer", "\(f)")
+    }
+
+    /// A form built seconds after the page loads, with tile questions (blackbaud.com's OneTrust web form): found, the agent question answered No, the requestor
+    /// Consumer, the request Deletion, and sent.
+    func testAFormBuiltLateWithTileQuestionsIsFoundAnsweredAndSent() {
+        _ = solveAndSend("slowtiles-1")
+        let f = sent("fx_slowtiles_1")
+        XCTAssertEqual(f["agent"], "No", "\(f)"); XCTAssertEqual(f["requestor"], "Consumer", "\(f)"); XCTAssertEqual(f["request"], "Data Subject Deletion Request", "\(f)")
+    }
+
+    /// A state list without the person's state (becausal.com lists only the states with privacy laws): nothing false is chosen, nothing is sent, and the app says why.
+    func testAStateListWithoutMyStateIsLeftForMeAndSaysSo() {
+        let app = solveAndSend("stateunlisted-1")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'not on its list'")).firstMatch.waitForExistence(timeout: 40), "the app says my state is not on the site's list")
+        XCTAssertTrue(server.sentSites.isEmpty, "\(server.requests)")
+    }
+
     /// A page that only offers a sign-in (58 recorded sites need an account): nothing is typed into the sign-in form and nothing is sent.
     func testASignInPageIsNeverFilledOrSent() {
         let app = solveAndSend("login-1")

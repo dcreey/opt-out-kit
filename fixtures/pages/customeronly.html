@@ -1,0 +1,9 @@
+<h1>Delete your data ({{site}})</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>First Name * <input type="text" name="firstname" required></label><br>
+  <label>Email * <input type="email" name="email" required></label><br>
+  <!-- As on blueaction.io: "I am a (an)" offers only Customer or Authorized Agent. -->
+  <label for="select-field-typeCode">I am a (an) *</label>
+  <div><select id="select-field-typeCode" name="typeCode" aria-label="I am a (an)" required><option hidden value=""></option><option value="customer">Customer</option><option value="authorized_agent">Authorized Agent</option></select></div>
+  <button type="submit">Submit</button>
+</form>

@@ -120,6 +120,12 @@ test('the first required box still empty is named; filled ones, optional ones an
   assert.equal(call(done, 'empty-required-choice', 'f0'), '');
 });
 
+test('a state menu still empty after the fill says the person\'s state is not on its list (becausal.com lists only the 19 states with privacy laws)', () => {
+  const w = page(`<form data-ook-form="f0"><label for=s>Please select the state in which you currently reside (required):</label>
+    <select id=s name=Opt-Out-State><option value="">Select your state</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Indiana</option><option>Iowa</option></select></form>`);
+  assert.match(call(w, 'empty-required-choice', 'f0'), /your state is not on its list/);
+});
+
 // ---- choose-tile-buttons.js: "I am a(n)" and "Select request type" rows of buttons get the plain consumer answer and the removal request
 
 test('request-type tiles take deletion, and "I am a" tiles take Other or Consumer; access and employee are never chosen', () => {
@@ -139,4 +145,16 @@ test('tiles the person tapped, a tile already selected, or a group handled once 
   const once = page('<div><p>Select request type</p><div><button type=button>Access</button><button type=button id=del>Delete</button></div></div>');
   assert.equal(run(once, 'choose-tile-buttons'), 1);
   assert.equal(run(once, 'choose-tile-buttons'), 0, 'handled once per page, so a toggle is not switched back off');
+});
+
+test('OneTrust tiles: "Are you an authorized agent ...?" gets No and "Select a Requestor Type" gets Consumer (blackbaud.com)', () => {
+  const w = page(`<div><p>* Are you an authorized agent submitting a request on the behalf of someone else?</p><div><button type=button id=no>No</button><button type=button id=yes>Yes</button></div></div>
+    <div><p>* Select a Requestor Type</p><div><button type=button id=con>Consumer</button></div></div>
+    <div><p>* Select a Request Type</p><div><button type=button id=oo>Data Subject Opt-out Request</button><button type=button id=del>Data Subject Deletion Request</button></div></div>`);
+  const clicked = []; for (const id of ['no', 'yes', 'con', 'oo', 'del']) w.document.getElementById(id).addEventListener('click', () => clicked.push(id));
+  assert.equal(run(w, 'choose-tile-buttons'), 3);
+  assert.deepEqual(clicked.sort(), ['con', 'del', 'no'], 'a group of one tile (Consumer) is chosen too');
+  const lone = page('<div><p>I am a</p><div><button type=button id=emp>Employee</button></div></div>');
+  const hit = []; lone.document.getElementById('emp').addEventListener('click', () => hit.push(1));
+  assert.equal(run(lone, 'choose-tile-buttons'), 0, 'a lone tile that is not the person\'s answer is not tapped');
 });

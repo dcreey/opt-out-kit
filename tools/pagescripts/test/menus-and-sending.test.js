@@ -47,6 +47,27 @@ test('a home-made menu showing only "Choose state" over a hidden list is opened,
   assert.equal(run(real, 'custom-menus-open'), '', 'a real menu is not one of these');
 });
 
+test('a request-type menu takes deletion, then opting out; never access, correct or update, even as the last option (azira.com\'s TrustArc form)', () => {
+  const opts = ['Access My Information', 'Delete My Information', 'Opt-out or Unsubscribe', 'Do not Sell or Share My Personal Information', 'Withdraw My Consent', 'Correct or Update My Information'];
+  const w = page('<ul role=listbox>' + opts.map((o, i) => `<li role=option id=o${i}>${o}</li>`).join('') + '</ul>');
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Delete My Information');
+  const noDelete = page('<ul role=listbox><li role=option>Access My Information</li><li role=option>Opt-out or Unsubscribe</li><li role=option>Correct or Update My Information</li></ul>');
+  assert.equal(call(noDelete, 'custom-menus-pick', ''), 'Opt-out or Unsubscribe');
+  const onlyBad = page('<ul role=listbox><li role=option>Access My Information</li><li role=option>Correct or Update My Information</li></ul>');
+  assert.equal(call(onlyBad, 'custom-menus-pick', ''), '', 'nothing suitable: left for the person, not the last option');
+  const who = page('<div role=listbox><div role=option>Agent</div><div role=option>Individual</div></div>');
+  assert.equal(call(who, 'custom-menus-pick', ''), 'Individual');
+});
+
+test('a menu that did not open on the first press is pressed once more, and only once', () => {
+  const w = page('<div><span>Type of Request</span><input role=combobox id=m></div>');
+  assert.notEqual(run(w, 'custom-menus-open'), '');
+  assert.equal(call(w, 'custom-menus-pick', ''), '', 'no options showed');
+  assert.notEqual(run(w, 'custom-menus-open'), '', 'pressed again');
+  assert.equal(call(w, 'custom-menus-pick', ''), '');
+  assert.equal(run(w, 'custom-menus-open'), '', 'not a third time');
+});
+
 test('a state with regex characters in its name is matched as written', () => {
   const w = page('<ul role=listbox><li role=option>Other</li><li role=option>St. (Saint) Kitts</li></ul>');
   assert.equal(call(w, 'custom-menus-pick', 'St. (Saint) Kitts'), 'St. (Saint) Kitts');

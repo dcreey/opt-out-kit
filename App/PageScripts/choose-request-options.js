@@ -54,7 +54,8 @@
     if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
     if(yesOrOptOut(t)||isDecl(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
   f.querySelectorAll('select').forEach(function(s){
-    var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')).toLowerCase();
+    var lf=s.id?document.querySelector('label[for="'+s.id+'"]'):null;
+    var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')+' '+(lf?lf.innerText:'')).toLowerCase();
     var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);
     // A menu of states or countries is filled by value; a request-type menu that merely sits near the word "state" is not one.
     if(/state|country|province|region/.test(l)||s.options.length>=40) return;
@@ -71,6 +72,10 @@
       if(/relationship|how do we know|are you a|i am/i.test(l+' '+near)&&/\b(consumer|individual|none of the above|not a (customer|client|user)|no relationship|general public|just a consumer|other)\b/i.test(t)&&!/business|agent|employee|partner|client of|vendor/i.test(t)) sc=Math.max(sc,1);
       if(/access|know|correct|update|portab/i.test(t)) sc=0;
       if(sc>bestScore){bestScore=sc;best=i;}}
+    // "I am a (an)": Customer / Authorized Agent (blueaction.io). When every answer but one is someone acting for another person, the one left is the person's own.
+    if(best<0&&/\b(i am|are you|requester|requestor|who (is|are))\b/i.test(l+' '+near)){
+      var own=[]; for(var k2=0;k2<s.options.length;k2++){var tk=(s.options[k2].text||'').trim(); if(tk&&s.options[k2].value!==''&&!/agent|behalf|represent|deceased|parent|guardian|attorney|business/i.test(tk)) own.push(k2);}
+      if(own.length===1) best=own[0];}
     var placeholder=s.selectedIndex<=0;
     if(best>=0&&placeholder){markAuto(s); s.selectedIndex=best; s.dispatchEvent(new Event('change',{bubbles:true})); s.dispatchEvent(new Event('input',{bubbles:true})); chosen++;}
     else if(s.required&&placeholder) unresolved.push((near.split('\n')[0]||l||'a menu').slice(0,60));});
