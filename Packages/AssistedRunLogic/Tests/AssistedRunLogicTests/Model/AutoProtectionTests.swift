@@ -27,6 +27,44 @@ final class AutoProtectionTests: XCTestCase {
         return me
     }
 
+    /// The automatic page shows the current run only: what an earlier run sent or failed is not in its groups once a new run has started. "Every site, all runs"
+    /// combines them: a site sent in any run is sent there, one that was tried and never sent needs the person.
+    func testTheAutomaticPageShowsOnlyTheCurrentRunAndAllRunsCombinesThem() throws {
+        let m = model()
+        let me = try withProfile(m)
+        let ids = m.automaticSites(for: me).prefix(3).map(\.id)
+        XCTAssertEqual(ids.count, 3)
+        let (a, b, c) = (ids[0], ids[1], ids[2])
+        let earlier = Date().addingTimeInterval(-3 * 86_400), started = Date().addingTimeInterval(-3600), now = Date().addingTimeInterval(-60)
+        m.recordAttemptForTesting(OptOutAttempt(date: earlier, outcome: "submitted"), site: a)          // the last run sent a
+        m.recordAttemptForTesting(OptOutAttempt(date: earlier, outcome: "challenged", detail: "a check"), site: b)
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "failed", detail: "no form"), site: c)          // this run: c did not go through
+        m.setRunStartedForTesting(started)
+        let current = Dictionary(m.activityRows(for: me).map { ($0.id, $0.group) }, uniquingKeysWith: { x, _ in x })
+        XCTAssertEqual(current[c], .needsYou, "this run's result is shown")
+        XCTAssertNotEqual(current[a], .sent, "the earlier run's send is not this run's")
+        XCTAssertNotEqual(current[b], .needsYou, "nor its check")
+        XCTAssertEqual(current.values.filter { $0 == .sent }.count, 0, "nothing was sent in this run yet")
+
+        let all = Dictionary(m.allRunsRows(for: me).map { ($0.id, $0) }, uniquingKeysWith: { x, _ in x })
+        XCTAssertEqual(all[a]?.group, .sent); XCTAssertEqual(all[b]?.group, .needsYou); XCTAssertEqual(all[c]?.group, .needsYou)
+        XCTAssertTrue(all[a]?.line.contains("once") == true, "\(all[a]?.line ?? "")")
+        XCTAssertTrue(m.allRunsRows(for: me).contains { $0.group == .notTried }, "sites no run has reached are listed as never tried")
+    }
+
+    /// A new run starts the page afresh; a run that is stopped and carried on, or a Re-test all of a pass under way, is the same run.
+    func testANewRunStartsThePageAfreshAndACarriedOnRunDoesNot() {
+        var s = AutoSettings()
+        let t0 = Date(timeIntervalSince1970: 1_000_000)
+        s.startFullRetest(now: t0)
+        XCTAssertEqual(s.runStarted, t0)
+        s.startFullRetest(now: t0.addingTimeInterval(600))
+        XCTAssertEqual(s.runStarted, t0, "a full pass under way carries on")
+        s.passStarted = nil; s.passKind = nil
+        s.startFullRetest(now: t0.addingTimeInterval(86_400))
+        XCTAssertEqual(s.runStarted, t0.addingTimeInterval(86_400), "a new pass is a new run")
+    }
+
     func testNothingRunsUntilThePersonSaysYes() async throws {
         let m = model()
         XCTAssertFalse(m.autoSettings.hasDecided)

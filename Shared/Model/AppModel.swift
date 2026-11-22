@@ -769,7 +769,7 @@ final class AppModel: ObservableObject {
         if household.autoSettings.periodAnchor == nil { household.updateAuto { $0.periodAnchor = min(earliest ?? Date(), Date()) } }
         household.updateAuto {
             $0.optOutResumePending = true
-            if $0.passStarted == nil { $0.passStarted = Date(); $0.passKind = $0.nextRunKind(now: Date()) }
+            if $0.passStarted == nil { $0.passStarted = Date(); $0.passKind = $0.nextRunKind(now: Date()); $0.runStarted = $0.passStarted }
         }
         save()
         if useContinued {
@@ -880,6 +880,26 @@ final class AppModel: ObservableObject {
     /// would try, and any site the run tried this period that did not go through (it has moved to the semi-automated queue, so it is in neither of the others).
     func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] { Self.activityPage(activityInputs(for: person, now: now)).rows }
 
+    /// Every site any run has dealt with, and every site the automatic run takes on, with its standing over all runs combined: how often it was sent and
+    /// tried, and its latest result. For the "Every site, all runs" page.
+    func allRunsRows(for person: Person) -> [ActivityRow] {
+        let attempts = household.progress(for: person.id).optOutAttempts
+        var ids = Set(automaticSites(for: person).map(\.id)).union(autoSettings.periodTargetIDs(person: person.id.uuidString))
+        for (id, list) in attempts where list.contains(where: { !$0.wasEmailed }) { ids.insert(id) }
+        return RunPeriods.allRuns(siteIDs: Array(ids), attempts: attempts).compactMap { s -> ActivityRow? in
+            guard let e = sites[id: s.id] else { return nil }
+            let line: String
+            switch s.group {
+            case .sent: line = s.sends == 1 ? Loc.f("Sent once, on %@", Loc.date(s.lastSent ?? Date())) : Loc.f("Sent %lld times, last on %@", s.sends, Loc.date(s.lastSent ?? Date()))
+            case .needsYou:
+                let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
+                line = Loc.f("Never went through (tried %lld times): %@", s.tries, last)
+            case .notTried: line = Loc.t("No run has tried it yet")
+            }
+            return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
+        }.sorted { $0.domain < $1.domain }
+    }
+
     /// Everything the automatic opt-out page shows, as plain values taken on the main thread (quick); `activityPage` does the slow part anywhere.
     struct ActivityInputs: @unchecked Sendable {
         let entries: [DirectoryEntry]          // resolved (healed links, regional pages)
@@ -891,19 +911,23 @@ final class AppModel: ObservableObject {
         let automaticIDs: Set<String>
         let lastRun: [String: AutoOptOutResult]
         let now: Date
+        /// When the current run began: the page shows that run only (nil before the first run: the period instead).
+        var since: Date? = nil
     }
 
     func activityInputs(for person: Person, now: Date = Date()) -> ActivityInputs {
         ActivityInputs(entries: directory.map(resolved), plans: fillPlans(for: person), progress: household.progress(for: person.id), holds: holds(for: person, now: now),
                        period: runPeriod(now: now), nextKind: autoSettings.nextRunKind(now: now), automaticIDs: Set(automaticSites(for: person, now: now).map(\.id)),
-                       lastRun: Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b }), now: now)
+                       lastRun: Dictionary((optOutRun[person.id] ?? []).map { ($0.id, $0.result) }, uniquingKeysWith: { _, b in b }), now: now,
+                       since: autoSettings.runStarted)
     }
 
     /// The page's groups and the number "Run now" would try, each site's form checked once. The same rules as `runDomains`, `remainingDomains`,
     /// `willTry` and `skipReason` (a test holds them equal); build 47 worked the page out on the main thread in seconds, after every site of a run.
     nonisolated static func activityPage(_ i: ActivityInputs) -> (rows: [ActivityRow], runNow: Int) {
         let now = i.now, progress = i.progress, period = i.period
-        let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && (period?.contains($0.date) ?? true) }
+        let inWindow: (OptOutAttempt) -> Bool = { a in i.since.map { a.date >= $0 } ?? (period?.contains(a.date) ?? true) }
+        let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && inWindow($0) }
         // Every site a full pass covers, whatever kind the next run is: a repeat period must not make the others vanish from the page.
         let fullSites = AutoOptOut.backgroundSites(.full, entries: i.entries, person: i.plans.person, progress: progress, now: now, plans: i.plans)
         let pass = Set(fullSites.map(\.domain))
@@ -919,7 +943,7 @@ final class AppModel: ObservableObject {
         var ids = i.automaticIDs
         for e in i.entries where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
         let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period).compactMap { s -> ActivityRow? in
+        let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period, since: i.since).compactMap { s -> ActivityRow? in
             guard let e = byID[s.id] else { return nil }
             let line: String
             switch s.group {
@@ -931,7 +955,7 @@ final class AppModel: ObservableObject {
                 else if let why = reason(e) { line = why }
                 else if !nextPass.contains(e.domain) { line = Loc.t("Waits for the next full re-test") }
                 else if let r = i.lastRun[e.id] { line = r.label }
-                else { line = Loc.t("Not tried yet this period") }
+                else { line = i.since == nil ? Loc.t("Not tried yet this period") : Loc.t("Not tried yet in this run") }
             }
             return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
         }.sorted { $0.domain < $1.domain }
@@ -1108,6 +1132,7 @@ final class AppModel: ObservableObject {
 
     #if DEBUG
     func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
+    func setRunStartedForTesting(_ date: Date) { household.updateAuto { $0.runStarted = date } }
     func startPeriodForTesting() { household.updateAuto { $0.periodAnchor = Date().addingTimeInterval(-86_400) } }
         func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif

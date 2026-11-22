@@ -161,6 +161,10 @@ struct AutoActivityView: View {
                         ProgressView().accessibilityIdentifier("auto-working")
                     }
                 }
+                if let started = model.autoSettings.runStarted {
+                    // The groups above are this run's only: a new run starts them afresh. Every run together is "Every site, all runs" below.
+                    Text(Loc.f("This run started %@", Loc.date(started))).accessibilityIdentifier("run-started")
+                }
                 if let period = model.runPeriod() {
                     Text(Loc.f("This period: %@ to %@", Loc.date(period.start), Loc.date(period.end.addingTimeInterval(-1))))
                         .accessibilityIdentifier("period-summary")
@@ -262,16 +266,16 @@ struct AutoActivityView: View {
         }
     }
 
-    /// The screenshots of the last run and the earlier periods, folded away.
+    /// Every run combined (each site's page has its screenshot), and the earlier periods, folded away.
     @ViewBuilder private func moreSection(for person: Person) -> some View {
         let history = model.periodHistory(for: person)
-        if model.autoSettings.lastAttempted != nil || history.count > 1 {
+        if model.autoSettings.lastAttempted != nil || model.autoSettings.runStarted != nil || history.count > 1 {
             Section {
-                if model.autoSettings.lastAttempted != nil {
-                    NavigationLink { RunReviewView(person: person) } label: {
-                        Label("Screenshots of the last run", systemImage: "photo.on.rectangle.angled")
+                if model.autoSettings.lastAttempted != nil || model.autoSettings.runStarted != nil {
+                    NavigationLink { AllRunsView(person: person) } label: {
+                        Label("Every site, all runs", systemImage: "square.stack.3d.up")
                     }
-                    .accessibilityIdentifier("review-last-run")
+                    .accessibilityIdentifier("all-runs")
                 }
                 if history.count > 1 {
                     DisclosureGroup("Earlier periods") {
@@ -308,4 +312,61 @@ struct AutoActivityView: View {
         }
     }
 
+}
+
+/// Every run there has been, combined: each site the automatic run has dealt with or takes on, grouped by its whole history (sent at least once, tried and never
+/// sent, never tried), with how often it was sent or tried. A site opens its page, which has the screenshot of its latest result.
+struct AllRunsView: View {
+    @EnvironmentObject var model: AppModel
+    let person: Person
+    @State private var search = ""
+    @State private var rows: [AppModel.ActivityRow] = []
+
+    var body: some View {
+        let shown = search.isEmpty ? rows : rows.filter { $0.domain.localizedCaseInsensitiveContains(search) }
+        List {
+            Section {
+                HStack(spacing: 8) {
+                    ForEach(ActivityGroup.allCases, id: \.self) { g in
+                        VStack(spacing: 2) {
+                            Text(verbatim: "\(rows.filter { $0.group == g }.count)").font(.title2.bold()).foregroundStyle(color(g))
+                            Text(title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
+                        }
+                        .frame(maxWidth: .infinity).padding(.vertical, 8)
+                        .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                        .accessibilityIdentifier("all-runs-count-\(g.rawValue)")
+                    }
+                }
+            } footer: { Text("Every automatic run together, since the first. The automatic opt-out page shows only the current run.") }
+            ForEach(ActivityGroup.allCases, id: \.self) { g in
+                let items = shown.filter { $0.group == g }
+                if !items.isEmpty {
+                    Section {
+                        ForEach(items) { r in
+                            if let entry = model.sites[id: r.id] {
+                                NavigationLink { DirectoryInfoView(entry: entry) } label: { row(r) }.accessibilityIdentifier("all-runs-site-\(r.domain)")
+                            } else { row(r) }
+                        }
+                    } header: { Label(title(g), systemImage: icon(g)).foregroundStyle(color(g)).textCase(nil) }
+                }
+            }
+        }
+        .navigationTitle("Every site, all runs")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $search, prompt: Text("Find a site"))
+        .accessibilityIdentifier("all-runs-page")
+        .task { rows = model.allRunsRows(for: person) }
+    }
+
+    private func row(_ r: AppModel.ActivityRow) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(r.domain).font(.subheadline)
+            Text(r.line).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+    private func title(_ g: ActivityGroup) -> String {
+        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notTried: return Loc.t("Never tried") }
+    }
+    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notTried: return .secondary } }
+    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notTried: return "circle.dashed" } }
 }

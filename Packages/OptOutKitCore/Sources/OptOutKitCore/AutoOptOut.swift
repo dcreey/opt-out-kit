@@ -517,6 +517,9 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     /// The pass under way is a "Re-test all": carried on after a Stop or a cut-off, it still sends again to the sites sent earlier in the period,
     /// not only to the ones never sent.
     public var passEverySite: Bool?
+    /// When the run the automatic page shows began: the page lists only what this run did, so a new run never shows the last one's results. A run that is
+    /// stopped or cut off and carried on is the same run. Nil before the first run (the page then shows the period, as before build 54).
+    public var runStarted: Date?
 
     public static let scanEvery: TimeInterval = 86_400            // daily
     public static let optOutEvery: TimeInterval = 91 * 86_400     // every three months
@@ -564,7 +567,7 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     /// The person asked to re-test every site now. A full pass already under way just carries on; anything else (nothing running, or a repeat pass) becomes a fresh full pass.
     public mutating func startFullRetest(now: Date = Date()) {
         if passStarted != nil, passKind == .full { passEverySite = true; return }
-        passStarted = now; passKind = .full; optOutResumePending = true; passEverySite = true
+        passStarted = now; passKind = .full; optOutResumePending = true; passEverySite = true; runStarted = now
     }
     /// The kind of the run due on `date` (the next period's start), for saying what is coming.
     public func kindOfRun(on date: Date) -> RunKind { nextRunKind(now: date) }
