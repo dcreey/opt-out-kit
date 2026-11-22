@@ -99,8 +99,8 @@ final class SemiAutomatedFlowTests: XCTestCase {
             let page = Page(blockers: [[blocker], [blocker], [blocker], []]); let sink = Sink()
             let r = make([item("a.example")], Driver(["a.example": page]), sink)
             var seen: [AssistedRunner.Phase] = []
-            let watcher = Task { @MainActor in while !r.finished { seen.append(r.phase); try? await Task.sleep(nanoseconds: 1_000_000) } }
-            await finish(start(r), r); watcher.cancel()
+            r.phaseChanged = { seen.append($0) }
+            await finish(start(r), r)
             XCTAssertTrue(seen.contains(phase), "\(blocker) shows \(phase)")
             XCTAssertEqual(page.sends, 1, "sent once, after it cleared"); XCTAssertGreaterThanOrEqual(page.polls, 4)
         }
@@ -110,8 +110,8 @@ final class SemiAutomatedFlowTests: XCTestCase {
         let page = Page(blockers: [[.check("c"), .choose("x"), .certify("y"), .terms], [.check("c"), .choose("x"), .certify("y")], [.check("c"), .choose("x")], [.check("c")], []])
         let r = make([item("a.example")], Driver(["a.example": page]), Sink())
         var seen: [AssistedRunner.Phase] = []
-        let watcher = Task { @MainActor in while !r.finished { if seen.last != r.phase { seen.append(r.phase) }; try? await Task.sleep(nanoseconds: 1_000_000) } }
-        await finish(start(r), r); watcher.cancel()
+        r.phaseChanged = { seen.append($0) }          // every change, in order (a timer that sampled the phase missed the last one on CI's slower machine)
+        await finish(start(r), r)
         let order = seen.filter { [.waitingForTerms, .waitingForCertification, .waitingForCheck].contains($0) || { if case .waitingForChoice = $0 { return true } else { return false } }($0) }
         XCTAssertEqual(order.first, .waitingForTerms); XCTAssertTrue(order.contains(.waitingForCertification)); XCTAssertEqual(order.last, .waitingForCheck)
     }
