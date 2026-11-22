@@ -16,9 +16,9 @@ Every change to behavior updates the docs in the same piece of work, before it i
 
 ## Tests
 
-- Every behavior gets a Mac test where it can (`swift test --package-path Packages/OptOutKitCore`, `Packages/AssistedRunLogic`: the model, `Shared/Model`, runs there on `HeadlessPlatform`); only what needs UIKit, WebKit, the Keychain or the bundle is a simulator test.
+- Every behavior gets a Mac test where it can (`swift test --package-path Packages/OptOutKitCore`, `Packages/AssistedRunLogic`: the model, `Shared/Model`, runs there on `HeadlessPlatform`); only what needs UIKit, WebKit, the Keychain or the bundle is an integration test (`AppTests` for a rule on a real web view or UIKit, `AppUITests` for a screen, a fixture broker in `fixtures/` for a page type), which runs for a release, never on a push.
 - The semi-automated "Solve and send" flow is the most trusted: do not break it. Share logic and UI across flows instead of copying it.
-- Unit tests (the Swift packages and `AppTests`) run on every push (`ci.yml`); integration tests (the UI tests in `AppUITests`) run for a GitHub release
+- Unit tests (the two Swift packages, on the Mac) run on every push (`ci.yml`, which also builds the app and every test target); integration tests (`AppTests` and the UI tests in `AppUITests`, on a simulator) run for a GitHub release
   (`integration.yml`). Every rule a UI test checks also has a unit test, listed in `docs/TESTING.md` ("Unit and integration tests"); add both together.
 - A GitHub release (and Integration) is for releasing the app on the App Store, not for TestFlight. A TestFlight upload needs only CI to pass for its
   commit (`tools/release_gate.py --for testflight`, run by `tools/release_testflight.sh`); App Store review needs CI and Integration (`release_gate.py`).

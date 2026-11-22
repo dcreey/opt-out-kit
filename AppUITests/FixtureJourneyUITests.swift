@@ -101,8 +101,8 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Solve the check'")).firstMatch.waitForExistence(timeout: 30), "the app says it is waiting for my check")
         XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent while the box is unticked: \(server.requests)")
         var taps = 0
+        let f = box.frame          // read once: after the tick the label reads "Verified" and no element matches "not a robot" any more
         while server.sentSites.isEmpty && taps < 8 {
-            let f = box.frame
             app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 24, dy: f.midY)).tap()          // the tick box at the left of its label
             Thread.sleep(forTimeInterval: 3); taps += 1
         }

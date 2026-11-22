@@ -130,8 +130,8 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Solve the check'")).firstMatch.waitForExistence(timeout: 30), "the app says it waits for my check")
         XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent while the check is open")
         var taps = 0
+        let f = box.frame
         while server.sentSites.isEmpty && taps < 8 {
-            let f = box.frame
             app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 28, dy: f.midY)).tap()          // the tick box at the left of its label
             Thread.sleep(forTimeInterval: 3); taps += 1
         }
@@ -148,8 +148,8 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(server.sentSites.isEmpty, "the app did not tick the certification or send: \(server.requests)")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'tick a confirmation yourself'")).firstMatch.exists, "it says the certification is mine to tick")
         var taps = 0
+        let f = certify.frame
         while server.sentSites.isEmpty && taps < 8 {
-            let f = certify.frame
             app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 20, dy: f.minY + 20)).tap()
             Thread.sleep(forTimeInterval: 3); taps += 1
         }

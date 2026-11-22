@@ -7,7 +7,7 @@ Layers, cheapest first:
 | Broker and directory YAML vs `schema/*.schema.json`, the Python tools, translations | check | CI `checks` job | every push |
 | Core logic (decode, queue, plan, rules) | **unit** | `Packages/OptOutKitCore/Tests` | `swift test` in that folder (Mac, no simulator); every push |
 | Assisted run logic and the app model (the runner, email handoff, page-text reading; `AppModel`: its queue, plan, skipping, runs, language, terms settings, the guided runner; the catalog) | **unit** | `Packages/AssistedRunLogic/Tests` (`Model/` for the model), on the app's own sources in `Shared/AssistedRun` and `Shared/Model` | `swift test --package-path Packages/AssistedRunLogic` (Mac, no simulator); every push |
-| App unit tests that need the phone itself (web views on local pages, the Keychain, the app bundle, a screen's own helpers) | **unit** | `AppTests` (target `OptOutKitTests`) | `xcodebuild test` on a simulator; every push |
+| Tests that need the phone itself (a real web view on local pages, the Keychain, UIImage, the app bundle) | **integration** | `AppTests` (target `OptOutKitTests`) | `xcodebuild test` on a simulator, for an App Store release (`.github/workflows/integration.yml`); every push only *builds* them |
 | Page scripts (the JavaScript the app runs in web pages) | **unit** | `tools/pagescripts` (headless DOM) | `npm test` in that folder; every push |
 | UI tests (the real app driven on a simulator) | **integration** | `AppUITests` (target `OptOutKitUITests`) | for an App Store release (`.github/workflows/integration.yml`); not needed for TestFlight |
 | The automatic run over every site, sending faked | **integration** | `AutoProtectionUITests` with `OPTOUT_ALL_SITES=1` | for an App Store release, and weekly |
@@ -23,7 +23,7 @@ app and, through links, into `Packages/AssistedRunLogic` (one module with `Share
 seconds on a Mac. The catalog those tests read is built from the repository's own data on the first test (`MacCatalog`). A new model test goes in
 `Packages/AssistedRunLogic/Tests/AssistedRunLogicTests/Model`; only a test that needs UIKit, WebKit, the Keychain or the app bundle goes in `AppTests`.
 
-260 Mac tests (404 in `OptOutKitCore`) cover what 206 simulator tests did: 115 moved, and 11 more were removed because a fixture end-to-end test now drives the same rule (the identity-confirmation page rules, terms, bot trap, phone and date shapes, `aria-labelledby`, a bare Continue, the reCAPTCHA error, add-another buttons, choose-from-a-menu, a bot check or certification stopping the run). 80 stay on the simulator, because they drive a real web view, the Keychain, UIImage or the app's
+260 Mac tests (404 in `OptOutKitCore`) cover what 206 simulator tests did: 115 moved, and 11 more were removed because a fixture end-to-end test now drives the same rule (the identity-confirmation page rules, terms, bot trap, phone and date shapes, `aria-labelledby`, a bare Continue, the reCAPTCHA error, add-another buttons, choose-from-a-menu, a bot check or certification stopping the run). 80 stay as integration tests (`AppTests`, run in `integration.yml` with the UI tests, never on a push), because they drive a real web view, the Keychain, UIImage or the app's
 bundle:
 
 | Simulator tests that stay (count) | What they check | Covered end to end by a fixture test? |
@@ -85,9 +85,8 @@ layout, input masks and real taps stays covered by the WebKit tests (`LiveFormTe
 
 For what a person can do and which UI test walks it (the journeys, the gaps, the plan), see `docs/JOURNEYS.md`.
 
-**Unit tests run on every push (and gate TestFlight); integration tests run for an App Store release.** Unit tests are everything in the two Swift packages and the app's
-`OptOutKitTests`: they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
-they run in `.github/workflows/ci.yml` on every push and pull request. Integration tests are the UI tests in `OptOutKitUITests`: they drive the real app
+**Unit tests run on every push (and gate TestFlight); integration tests run for an App Store release.** Unit tests are everything in the two Swift packages (Mac, no simulator, a minute): they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
+they run in `.github/workflows/ci.yml` on every push and pull request, which also builds the whole app and every test target (no simulator is booted). Integration tests are everything that needs a simulator: `OptOutKitTests` (`AppTests`: real web views, the Keychain, UIImage, the bundle) and the UI tests in `OptOutKitUITests`, which drive the real app
 on a simulator, tap through its screens and check what a person sees. They take far longer (a UI test walks every screen in its way), so they run in
 `.github/workflows/integration.yml` when a GitHub release is published, and by hand from the Actions tab (Integration, Run workflow). The run over every
 site runs there too, and weekly.
@@ -200,14 +199,14 @@ may read the fixture server's loopback address in a debug build only (`URLSessio
 Two workflows (and the lint jobs in the first), on GitHub's hosted runners (free for a public repository). Neither contacts a real broker site: the live tests skip unless `OPTOUT_LIVE=1`,
 and the UI tests use the app's fake sites.
 
-**`.github/workflows/ci.yml`: the unit tests, on every push to `main` and every pull request.**
+**`.github/workflows/ci.yml`: the unit tests and the build, on every push to `main` and every pull request.**
 
 | Job | Machine | What it runs |
 |---|---|---|
 | `lint-actions`, `lint-swift`, `lint-yaml`, `lint-json`, `lint-python`, `lint-shell` | Linux, one each | The linters (below, "Lint"); seconds each |
 | `checks` | Linux | Broker and directory files against their schemas; `tools/tests` (the Python tools); `tools/l10n.py check`; the page-script unit tests (`tools/pagescripts`); the shard split |
 | `packages` | macOS | `swift test` in `Packages/OptOutKitCore` and `Packages/AssistedRunLogic` |
-| `test` (2 at once) | macOS, one each | The app's unit tests that need the phone (`OptOutKitTests`, the 92 above). Shards 1 to 3 check out only what they read (`tools`, `AppTests`, `AppUITests`: about 1 MB, shallow; no test reads the repository's data, the app tests read the catalog in the app) before starting to boot their simulator (checked out after the boot had started, the whole tree took 104 to 119 s, because a booting simulator starves the machine). Shard 0 checks out the whole tree, builds the app and both test targets once (`build-for-testing`, from the cached build folder) and hands the build to the others as an artifact, then boots its own simulator; shards 1 to 3 compile nothing: they boot, wait for that build (`actions: read`, polling this run's artifacts) and download it. Every shard then runs its share (`test-without-building`), once the boot started in the background has finished (up to 10 minutes; asking for the boot status while that boot was still going raced with it and failed shard 0 twice). Tried on 2026-11-20 and undone: every shard building for itself while its simulator booted. The run took 15.1 minutes instead of about 11: building beside a booting simulator took 162 to 355 s (85 s alone), the boot itself slowed, and four shards downloading the 740 MB build cache at once took up to 2 minutes each. A notice says when the simulator was ready and when the tests started |
+| `build` | macOS | `xcodebuild build-for-testing` for the app and every test target (`OptOutKitTests`, `OptOutKitUITests`), cached by source hash. Nothing is run and no simulator is booted, so a compile error in the app or a simulator test still fails the push |
 
 **Lint** (jobs `lint-*` in `ci.yml`, each on its own Linux machine, versions pinned so a new release of a linter never fails a push by itself; part
 of CI, so the TestFlight gate needs them too). They look for what is wrong, not for style: the code's own style (one-line statements, flow-style YAML,
