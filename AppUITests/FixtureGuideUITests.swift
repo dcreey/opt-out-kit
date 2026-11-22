@@ -108,8 +108,8 @@ final class FixtureGuideUITests: UITestCase {
         openGuide(app)
         XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
         app.buttons["guided-more"].tap()
-        XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 3))
-        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 10))
+        app.buttons["Cancel"].tapWhenHittable()          // a menu item, still opening on a slow machine
         XCTAssertTrue(app.buttons["guide-me"].waitForExistence(timeout: 5), "back on the site's page")
         XCTAssertFalse(app.staticTexts["reported-issue"].exists, "cancelling is not a report")
     }
