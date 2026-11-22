@@ -140,6 +140,8 @@ jobs:
           grep -hE "error: |error -\[|failed \(" core-tests.log run-tests.log 2>/dev/null | head -40 | sed "s/^/::error::/" || true
           # A crash (a signal) ends the log mid-test: the last test that started is the one.
           for f in core-tests.log run-tests.log; do [ -f "$f" ] && grep -E "Test Case .* started" "$f" | tail -1 | sed "s/^/::error title=Last test started ($f)::/"; done || true
+          # And the end of each log as one annotation (a crash before the first test leaves only the build and the loader's words).
+          for f in core-tests.log run-tests.log; do [ -f "$f" ] && echo "::error title=End of $f::$(tail -25 "$f" | cut -c1-200 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"; done || true
 
   build:
     name: 'App builds'
