@@ -51,6 +51,9 @@
     var shown=(el.tagName==='SELECT'?((el.options[el.selectedIndex]||{}).text||'')+'|'+el.value:getVal(el)).toLowerCase();
     var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});});
     var pageDefault=stateish&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
+    // Already showing what the person's value is: nothing is set again. Setting it again fires the page's change event, and a page that rebuilds the boxes after
+    // it (adagio.io builds its State menu on Country's change) loses the State menu the app is about to fill.
+    if(agrees){filled++; return;}
     // An email box that ships holding something that is not an address (a page's own "opt-out" or "your email") is not the person's: their address replaces it.
     var wantsAt=v.candidates.length&&v.candidates[0]!==null&&String(v.candidates[0]).indexOf('@')>0;
     var junkEmail=wantsAt&&el.tagName!=='SELECT'&&(el.type==='email'||/e-?mail/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||'')))&&getVal(el).trim()!==''&&getVal(el).indexOf('@')<0;

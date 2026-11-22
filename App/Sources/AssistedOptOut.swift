@@ -267,8 +267,12 @@ final class WebAssistedPage: AssistedPage {
             _ = await session.chooseCustomMenus(state: stateName)
             let typedAhead = await session.chooseAutocomplete(state: stateName)          // a "State of Residence" that only counts a picked option
             _ = await session.chooseTileButtons()
-            // Choosing "remove my information" (or a state) can reveal more boxes (name, birth year): read the form again and fill those too.
-            if options.chosen > 0 || typedAhead > 0 { _ = await adoptNewForm(force: true) }
+            // Choosing "remove my information" (or a state) can reveal more boxes (name, birth year), and so can a filled box: the State menu that appears only once
+            // Country is set (adagio.io). Read the form again and fill those too.
+            if options.chosen > 0 || typedAhead > 0 || lastFill.filled > 0 {
+                if options.chosen == 0 && typedAhead == 0 { try? await Task.sleep(nanoseconds: 400_000_000) }          // a box that appears on its own takes a moment
+                _ = await adoptNewForm(force: true)
+            }
             // More emails or phones than boxes: press the page's own "Add another email" / "+ Add phone" button, then read the form again and fill the new boxes (the first
             // read of a form never did this: only a form that appeared later was given its extra boxes).
             if let person, await session.addAnotherBoxes(form: liveForm, emails: person.emails.count, phones: person.phones.count) > 0 { _ = await adoptNewForm(force: true) }

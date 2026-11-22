@@ -42,7 +42,7 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(mine.waitForExistence(timeout: 10), "This is me is offered")
         mine.tap()
         let fields = sent("fx_search_1")
-        XCTAssertEqual(fields["listing"], "http://127.0.0.1:8765/fx_search_1/profile-pat-example-il", "the form got the link to the listing I picked")
+        XCTAssertEqual(fields["listing"], server.url.appendingPathComponent("fx_search_1/profile-pat-example-il").absoluteString, "the form got the link to the listing I picked")
         XCTAssertEqual(fields["email"], "pat@example.com")
     }
 
@@ -258,6 +258,14 @@ final class FixturePageTypeUITests: UITestCase {
         _ = solveAndSend("customstate-1")
         let f = sent("fx_customstate_1")
         XCTAssertEqual(f["state"], "Illinois", "\(f)")
+    }
+
+    /// A State menu that is built only once Country is set (adagio.io): the app reads the form again after filling, so the new menu gets the person's state and
+    /// the form is sent, rather than "the form needs a choice we cannot make for you (State)".
+    func testAStateMenuThatAppearsOnceCountryIsSetGetsThePersonsState() {
+        _ = solveAndSend("dependentstate-1")
+        let f = sent("fx_dependentstate_1")
+        XCTAssertEqual(f["country"], "US", "\(f)"); XCTAssertEqual(f["state"], "IL", "\(f)")
     }
 
     /// A privacy page whose only way on is a "Submit a Privacy Request" link that opens a new tab (01advertising.com, to its Termly form): the app opens it in the

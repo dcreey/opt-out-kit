@@ -128,3 +128,14 @@ test('a value with no candidates or a token not on the page is skipped without e
   const { out } = fill('<form><input data-ook=a></form>', [{ name: 'a', candidates: [null], label: '' }, v('missing', 'x')]);
   assert.deepEqual(out, { filled: 0, unmatched: [] });
 });
+
+test('a box or menu already showing the person\'s value is not set again, so a page that rebuilds its boxes on change keeps the ones the app fills next (adagio.io)', () => {
+  const w = page('<form><select id=c data-ook=c><option value="">--</option><option value=US>United States</option></select><input id=n data-ook=n value="Pat Example"></form>');
+  w.document.getElementById('c').value = 'US';
+  let changes = 0; w.document.getElementById('c').addEventListener('change', () => changes++);
+  let inputs = 0; w.document.getElementById('n').addEventListener('input', () => inputs++);
+  const r = JSON.parse(callJSON(w, 'fill-live', JSON.stringify([{ name: 'c', candidates: ['US', 'United States'], label: 'Country', type: 'select' }, { name: 'n', candidates: ['Pat Example'], label: 'Full name', type: 'text' }]), 'true'));
+  assert.equal(r.filled, 2, 'both count as filled');
+  assert.equal(changes, 0, 'no change event for a menu already on the person\'s country');
+  assert.equal(inputs, 0, 'nor an input event for a box already holding their name');
+});

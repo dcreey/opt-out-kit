@@ -81,6 +81,10 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
      colour boxes are never filled.
+   - *A box that appears once another is filled* (adagio.io builds its State menu when Country is set): every fill reads the form again after filling and fills
+     the new boxes (`WebAssistedPage.refill`). A box or menu that already shows the person's value is never set again (`fill-live`), because setting it again fires
+     the page's change event and such a page rebuilds the box the app is about to fill. Protected by `fill-live.test.js` and
+     `FixturePageTypeUITests.testAStateMenuThatAppearsOnceCountryIsSetGetsThePersonsState`.
    - *Home-made menus* that show only a placeholder ("Choose state", "Select …") over a list of options hidden until pressed (saymine's portals, 360mediadirect.com) are pressed and the person's state (or consumer / none / other) is picked, like an ARIA combobox (`custom-menus-open`, `custom-menus-pick`). Before this the State box stayed on "Choose state" and the page said "This field is mandatory". When a page still says that under a box after a send, the result names the box ("the site says a required box was left empty: State", `FormRun.requiredBoxLeftEmpty`, `testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage`), not "no success message was shown". Protected by `menus-and-sending.test.js` and `FixturePageTypeUITests.testAHomeMadeStateMenuIsOpenedAndGetsThePersonsState`.
    - *Age range or group* menus get the age as a number, and the page's own bracket ("18-34", "35 - 49", "50+", "under 18") that holds it is picked; a text box asking for a range is left empty.
 8. **A box's own limit is respected.** A box with `maxlength` gets the first candidate that fits: the message box takes the short request
