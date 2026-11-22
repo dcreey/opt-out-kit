@@ -7,7 +7,7 @@ extension XCUIApplication {
         // Right after another screen was put away the tab can still be showing it: tapping the tab again brings its first screen back.
         // On a slow machine that can take more than one tap and a while: a run's report may still be closing, or a pushed screen still covering the tab.
         for _ in 0..<4 where !open.waitForExistence(timeout: 8) {
-            if tabBars.buttons["Sites"].exists { tabBars.buttons["Sites"].tap() }
+            tab("Sites", 1).tap()
         }
         if !open.exists { let shot = XCTAttachment(screenshot: screenshot()); shot.name = "no-sites-search"; shot.lifetime = .keepAlways; XCTContext.runActivity(named: "no search") { $0.add(shot) } }
         // What was on screen instead, in the failure itself (CI's screenshots need a sign-in to download; its annotations do not).
@@ -99,7 +99,7 @@ extension XCUIApplication {
 extension XCUIApplication {
     /// Goes to the Sites tab, searches, and opens the task of a hand-written flow (spokeo, peopleconnect...).
     func openFlowTask(_ id: String, search: String? = nil) {
-        tabBars.buttons["Sites"].tap()
+        tab("Sites", 1).tap()
         searchSites(search ?? id)
         let row = buttons["task-flow-\(id)"]
         XCTAssertTrue(row.waitForExistence(timeout: 10), "\(id) missing from the queue")
@@ -165,15 +165,29 @@ extension XCUIApplication {
 }
 
 extension XCUIElement {
-    /// Taps once the element can be tapped. A menu's items exist while the menu is still opening and have no tap point yet ("Activation point invalid"), most often on a
-    /// slow machine; this waits for one instead of failing.
+    /// Taps once the element can be tapped. A menu's items exist while the menu is still opening and have no tap point yet ("Activation point invalid"; asking
+    /// `isHittable` then fails the test too, on GitHub's slower runner): this waits for the item to have a place on screen and come to rest, then taps it.
     func tapWhenHittable(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
         let end = Date().addingTimeInterval(timeout)
         while Date() < end {
-            if exists && isHittable { tap(); return }
+            if exists {
+                let f = frame
+                if !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
+                    Thread.sleep(forTimeInterval: 0.3)          // a menu still sliding in moves its items: let it come to rest
+                    tap(); return
+                }
+            }
             Thread.sleep(forTimeInterval: 0.3)
         }
         XCTFail("\(self) never became tappable", file: file, line: line)
+    }
+}
+
+extension XCUIApplication {
+    /// A tab by its name, or by its place when the tab bar names its buttons by their icons (GitHub's simulator showed "list.bullet", "magnifyingglass", ...).
+    func tab(_ name: String, _ index: Int) -> XCUIElement {
+        let named = tabBars.buttons[name]
+        return named.exists ? named : tabBars.buttons.element(boundBy: index)
     }
 }
 

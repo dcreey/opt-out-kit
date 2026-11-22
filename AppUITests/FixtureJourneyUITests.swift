@@ -26,7 +26,7 @@ final class FixtureJourneyUITests: UITestCase {
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
         app.buttons["editor-done"].tap()
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
@@ -237,7 +237,7 @@ final class FixtureJourneyUITests: UITestCase {
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
         app.buttons["editor-done"].tap()
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
@@ -298,7 +298,7 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(done.waitForExistence(timeout: 30), "with nothing left, Solve and send ends with its summary")
         let sumShot = XCTAttachment(screenshot: app.screenshot()); sumShot.name = "summary-after-skip"; sumShot.lifetime = .keepAlways; add(sumShot)
         done.tap()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("noform-1")
         let row = app.buttons.matching(NSPredicate(format: "label CONTAINS 'noform-1.fixture.test'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10), "the site is found")
@@ -314,7 +314,7 @@ final class FixtureJourneyUITests: UITestCase {
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
         app.buttons["editor-done"].tap()
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
@@ -335,7 +335,7 @@ final class FixtureJourneyUITests: UITestCase {
         start.tap()
 
         // The report sends me to my queue; the site the run left for my check is found by its name and opened.
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("turnstile-1")
         let row = app.buttons.matching(NSPredicate(format: "label CONTAINS 'turnstile-1.fixture.test'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 15), "the site the run could not send is found")

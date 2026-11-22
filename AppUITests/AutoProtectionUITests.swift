@@ -3,7 +3,7 @@ import XCTest
 final class AutoProtectionUITests: UITestCase {
     /// Settings, then the automatic opt-out page.
     private func openAutomaticPage(_ app: XCUIApplication) {
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         let status = app.buttons["auto-activity"]
         XCTAssertTrue(app.scrollUntilExists(status), "Settings opens the automatic opt-out page")
         status.tap()
@@ -25,7 +25,7 @@ final class AutoProtectionUITests: UITestCase {
         app.setSwitch(opt, on: false)
         app.finishOnboarding()
         XCTAssertFalse(app.buttons["auto-banner"].exists, "an answer, even no, was given")
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         let setting = app.switches["settings-optout-toggle"]
         XCTAssertTrue(app.scrollUntilExists(setting))
         XCTAssertEqual(setting.value as? String, "0", "Settings shows it off")
@@ -51,7 +51,7 @@ final class AutoProtectionUITests: UITestCase {
         app.buttons["profile-button"].tap()
         app.fillRequiredProfile()
         app.buttons["editor-done"].tap()
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         var scrolls = 0
         while !app.buttons["auto-activity"].isHittable && scrolls < 8 { app.swipeUp(); scrolls += 1 }
         app.buttons["auto-activity"].tap()
@@ -75,7 +75,7 @@ final class AutoProtectionUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // searching needs a complete profile; typing one is tested elsewhere
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-paywalled"].waitForExistence(timeout: 5))

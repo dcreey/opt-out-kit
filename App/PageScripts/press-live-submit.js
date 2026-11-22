@@ -10,6 +10,6 @@
   for(var i=0;i<bs.length&&!pick;i++){if(/submit|send|opt|continue|request|go|confirm|remove|delete/i.test((bs[i].innerText||bs[i].value||''))) pick=bs[i];}
   if(!pick&&bs.length) pick=bs[bs.length-1];
   if(pick&&refuse(pick)) return false;
-  if(pick){pick.scrollIntoView({block:'center'}); pick.click(); return true;}
+  if(pick){window.__ookUserAt||pick.scrollIntoView({block:'center'}); pick.click(); return true;}
   if([].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).some(refuse)) return false;
   if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})

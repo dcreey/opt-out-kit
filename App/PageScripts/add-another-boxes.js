@@ -31,7 +31,7 @@
     var rank=function(c){return (c.tagName==='BUTTON'||c.tagName==='A'||c.tagName==='INPUT'||c.getAttribute('role')==='button')?0:1;};
     cands.sort(function(a,b){return rank(a)-rank(b);});
     if(!cands.length) return false; var b=cands[0];
-    b.setAttribute('data-ook-added',String((+(b.getAttribute('data-ook-added')||0))+1)); b.scrollIntoView({block:'center'}); b.click(); return true;}
+    b.setAttribute('data-ook-added',String((+(b.getAttribute('data-ook-added')||0))+1)); window.__ookUserAt||b.scrollIntoView({block:'center'}); b.click(); return true;}
   // A page can cap its boxes (two extra emails at most) while the button stays: a press that added no box of its kind ends the pressing for that kind.
   var st=window.__ookAdd=window.__ookAdd||{};
   function go(k,want,kw){var n=boxes(k).length; if(!(n>0&&n<want)) return false; if(st[token+k]!==undefined&&n<=st[token+k]) return false; var ok=press(k,kw); if(ok) st[token+k]=n; return ok;}

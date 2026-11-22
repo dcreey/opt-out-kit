@@ -56,7 +56,7 @@ final class SafetyFlagsUITests: UITestCase {
         let again = XCUIApplication()
         again.launchArguments = brokers.launchArguments        // no reset: it must have been saved
         again.launch()
-        again.tabBars.buttons["Sites"].tap()
+        again.tab("Sites", 1).tap()
         XCTAssertTrue(again.scrollUntilExists(again.staticTexts["search-blocked"]), "searching is off, with the reason")      // low on the Sites tab
         XCTAssertFalse(again.buttons["scan-exposure"].isEnabled)
     }

@@ -1,1 +1,1 @@
-(function(h){if(window.__ookUserAt) return false; var fs=[].slice.call(document.querySelectorAll('iframe')); var f=fs.filter(function(x){return x.src&&(h.indexOf(x.src)===0||x.src.indexOf(h)===0);})[0]||fs[0]; if(f) f.scrollIntoView({block:'center'});})
+(function(h){if(window.__ookUserAt) return false; var fs=[].slice.call(document.querySelectorAll('iframe')); var f=fs.filter(function(x){return x.src&&(h.indexOf(x.src)===0||x.src.indexOf(h)===0);})[0]||fs[0]; if(f) window.__ookUserAt||f.scrollIntoView({block:'center'});})

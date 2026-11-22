@@ -18,6 +18,6 @@
     if(btns.some(touched)||btns.some(autoDone)||btns.some(function(b){return b.getAttribute('aria-pressed')==='true'||/selected|active|checked/.test(b.className||'');})) return;
     var bad=/employee|customer|client|vendor|partner|contractor|applicant|agent|representative|prospect|access|know|correct|updat|edit|transfer|portab|appeal/i;
     var prefs=agentQ?[/^no\b/i]:who?[/^other$/i,/consumer|individual|myself|general public|member of the public/i]:[/delet|remov|erase/i,/opt.?out|do not sell|do not share/i];
-    for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){btns[i].scrollIntoView({block:'center'}); markAuto(btns[i]); btns[i].click(); n++; return;}}}
+    for(var p=0;p<prefs.length;p++){for(var i=0;i<btns.length;i++){var bt=(btns[i].innerText||'').trim(); if(prefs[p].test(bt)&&!bad.test(bt)){window.__ookUserAt||btns[i].scrollIntoView({block:'center'}); markAuto(btns[i]); btns[i].click(); n++; return;}}}
   });
   return n;})();

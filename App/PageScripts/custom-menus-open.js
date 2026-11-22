@@ -14,7 +14,7 @@
     els=cands.filter(function(e){return !cands.some(function(o){return o!==e&&e.contains(o);});});
   }
   if(!els.length) return '';
-  var e=els[0]; e.setAttribute('data-ook-menu','1'); e.scrollIntoView({block:'center'});
+  var e=els[0]; e.setAttribute('data-ook-menu','1'); window.__ookUserAt||e.scrollIntoView({block:'center'});
   ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
   // A type-to-search menu (react-select, as on TrustArc's forms) opens from its input: focus it and press the down arrow too.
   if(e.tagName==='INPUT'){try{e.focus();}catch(x){} e.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',keyCode:40,bubbles:true}));}

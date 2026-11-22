@@ -400,7 +400,7 @@ final class FixturePageTypeUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]))
         app.buttons["scan-exposure"].tap()
         app.buttons["start-scan"].tap()

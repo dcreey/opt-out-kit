@@ -9,7 +9,7 @@ final class SiteViewLayoutUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("peopleconnect")
         XCTAssertTrue(app.buttons["task-flow-peopleconnect"].waitForExistence(timeout: 10))
         app.buttons["task-flow-peopleconnect"].tap()
@@ -29,7 +29,7 @@ final class SiteViewLayoutUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("texascourtrecords")
         let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
@@ -46,7 +46,7 @@ final class SiteViewLayoutUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // a guide needs a complete profile
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("peopleconnect")
         app.buttons["task-flow-peopleconnect"].tap()
         app.buttons["guide-me"].tap()

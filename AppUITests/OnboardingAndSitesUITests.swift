@@ -21,7 +21,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         app.finishOnboarding()
         app.completeProfileGate()               // turned on, it needs the legal name and current address next
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].waitForExistence(timeout: 10), "the queue starts with the automatic pass")
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         let setting = app.switches["settings-optout-toggle"]
         XCTAssertTrue(app.scrollUntilExists(setting))
         XCTAssertEqual(setting.value as? String, "1", "Settings shows it on")
@@ -67,7 +67,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         // In California the first step is the DROP request, then the automatic pass.
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-platform"].waitForExistence(timeout: 10), "the queue leads with California DROP")
         XCTAssertTrue(app.descendants(matching: .any)["first-pass-step2"].exists, "then the automatic pass")
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Up next'")).firstMatch.waitForExistence(timeout: 5), "the Sites page lists the sites up next, not every task")
         app.searchSites("spokeo")
         XCTAssertTrue(app.buttons["task-platform-ca-drop"].waitForExistence(timeout: 5), "Spokeo is part of the DROP task, not a separate one")
@@ -91,12 +91,12 @@ final class OnboardingAndSitesUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-coach"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.buttons["coach-done"].waitForExistence(timeout: 5), "the first visit to Sites explains the queue")
         app.buttons["coach-done"].tap()
         XCTAssertFalse(app.buttons["coach-done"].waitForExistence(timeout: 1))
-        app.tabBars.buttons["Queue"].tap()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Queue", 0).tap()
+        app.tab("Sites", 1).tap()
         XCTAssertFalse(app.buttons["coach-done"].waitForExistence(timeout: 2), "and only the first time")
     }
 
@@ -105,7 +105,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         let open = app.buttons["sites-search"]
         XCTAssertTrue(open.waitForExistence(timeout: 5))
         open.tap()
@@ -122,7 +122,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         let all = app.buttons["all-todo-sites"]
         XCTAssertTrue(app.scrollUntilExists(all, maxSwipes: 8), "more than ten sites to do: a link to see them all")
         all.tap()
@@ -211,7 +211,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
 
         // Search finds a brand covered by PeopleConnect.
         app.searchSites("truthfinder")
@@ -227,7 +227,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Settings"].tap()
+        app.tab("Settings", 3).tap()
         app.buttons["show-walkthrough"].tap()
         XCTAssertTrue(app.buttons["onboarding-next"].waitForExistence(timeout: 5))
     }
@@ -240,7 +240,7 @@ final class DirectoryUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.collectionViews["sites-list"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'tier'")).count, 0, "tiers are not shown")
     }
@@ -249,7 +249,7 @@ final class DirectoryUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset"]
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         app.searchSites("texascourtrecords")
         // A site that leads a group sharing one opt-out is listed as its task, any other by its domain.
         let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'task-site-' OR identifier BEGINSWITH 'site-texascourtrecords'")).firstMatch
@@ -279,7 +279,7 @@ final class ExposureScanUITests: UITestCase {
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
         app.launch()
 
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]), "the scan is low on the Sites tab")
         app.buttons["scan-exposure"].tap()
         app.buttons["start-scan"].tap()
@@ -296,7 +296,7 @@ final class QuickCheckUITests: UITestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // looking a site up needs a complete profile
         app.launch()
-        app.tabBars.buttons["Sites"].tap()
+        app.tab("Sites", 1).tap()
         XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-clean"].waitForExistence(timeout: 5))

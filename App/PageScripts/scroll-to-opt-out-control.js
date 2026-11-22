@@ -3,4 +3,4 @@
     if(!re.test(t)||t.length>60) return false; var r=e.getBoundingClientRect(); return r.width>0&&r.height>0&&!(e.closest&&e.closest('nav,header,footer'));});
   if(!els.length) return false;
   if(els.some(function(e){var r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;})) return false;
-  els[0].scrollIntoView({block:'center',behavior:'smooth'}); return true;})();
+  window.__ookUserAt||els[0].scrollIntoView({block:'center',behavior:'smooth'}); return true;})();

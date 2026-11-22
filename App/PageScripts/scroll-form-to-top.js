@@ -1,1 +1,1 @@
-(function(t){if(window.__ookUserAt) return false; var f=document.querySelector('[data-ook-form="'+t+'"]'); if(f){f.scrollIntoView({block:'start',behavior:'instant'}); window.scrollBy(0,-12); return true;} return false;})
+(function(t){if(window.__ookUserAt) return false; var f=document.querySelector('[data-ook-form="'+t+'"]'); if(f){window.__ookUserAt||f.scrollIntoView({block:'start',behavior:'instant'}); window.scrollBy(0,-12); return true;} return false;})
