@@ -252,6 +252,22 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["cc"], "us", "the menu was left on its own choice")
     }
 
+    /// A home-made state menu (a box showing "Choose state" over a list that opens when it is pressed, as saymine's portals draw it; 360mediadirect.com): the app
+    /// opens it and picks the person's state, so the form is not left waiting on "This field is mandatory".
+    func testAHomeMadeStateMenuIsOpenedAndGetsThePersonsState() {
+        _ = solveAndSend("customstate-1")
+        let f = sent("fx_customstate_1")
+        XCTAssertEqual(f["state"], "Illinois", "\(f)")
+    }
+
+    /// A privacy page whose only way on is a "Submit a Privacy Request" link that opens a new tab (01advertising.com, to its Termly form): the app opens it in the
+    /// same page, fills the form there and sends it.
+    func testARequestLinkThatOpensANewTabIsFollowedAndItsFormSent() {
+        _ = solveAndSend("blanklink-1")
+        let f = sent("fx_blanklink_1")
+        XCTAssertEqual(f["email"], "pat@example.com", "\(f)")
+    }
+
     /// A date-of-birth box that wants yyyy-mm-dd: the app types the date in the shape the box accepts.
     func testADateBoxThatWantsYearMonthDayGetsTheBirthDateInThatShape() {
         _ = solveAndSend("dateformat-1")

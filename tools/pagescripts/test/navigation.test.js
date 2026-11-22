@@ -107,11 +107,22 @@ test('a "Submit a privacy request" link that opens in the page is clicked, never
   assert.equal(run(page('<a href="mailto:x@y.example">Your privacy choices</a>'), 'open-request-links'), null);
 });
 
+test('a "Submit a Privacy Request" link that opens a new tab is opened in place, not clicked (the app\'s page has no tabs)', () => {
+  const w = page('<a id=b href="https://app.termly.io/dsar/abc" target="_blank" rel="noopener">Submit a Privacy Request</a>', { url: 'https://www.broker.example/legal/dsar/' });
+  const seen = clicks(w, ['b']);
+  assert.equal(run(w, 'open-request-links'), 'Submit a Privacy Request');
+  assert.deepEqual(seen, [], 'not clicked: a click would ask for a new tab, which the app\'s page ignores');
+});
+
 test('the clearest opt-out link is followed only when it stays on the site (or a known privacy-request service)', () => {
   const same = page('<a href="https://www.broker.example/optout-form">Opt out of the sale</a>', { url: 'https://broker.example/privacy' });
   assert.equal(run(same, 'open-request-links-follow'), 'https://www.broker.example/optout-form');
   const portal = page('<a href="https://privacyportal.onetrust.com/webform/abc">Do not sell my personal information</a>', { url: 'https://broker.example/privacy' });
   assert.equal(run(portal, 'open-request-links-follow'), 'https://privacyportal.onetrust.com/webform/abc');
+  for (const svc of ['https://app.termly.io/dsar/abc', 'https://broker.privacy.saymine.io/Broker']) {
+    const w = page(`<a href="${svc}">Submit a privacy request</a>`, { url: 'https://broker.example/privacy' });
+    assert.equal(run(w, 'open-request-links-follow'), svc, 'Termly and saymine host request forms for many brokers');
+  }
   const other = page('<a href="https://other-company.example/opt-out">Opt out</a>', { url: 'https://broker.example/privacy' });
   assert.equal(run(other, 'open-request-links-follow'), '', 'another company\'s page is not followed');
   const mail = page('<a href="mailto:privacy@broker.example">Opt out</a>', { url: 'https://broker.example/privacy' });

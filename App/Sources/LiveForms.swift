@@ -111,9 +111,19 @@ extension WebViewSession {
         if let opened = await openFoldedForms() { return opened }
         // Each click is followed by looking for the form until it shows (at most the pause each used to wait in full).
         let js = PageScript.source("open-request-links")
+        let startURL = webView.url, startMark = await pageMark()
         if let clicked = (try? await evaluate(js)) as? String, !clicked.isEmpty {
-            let after = await formsAppearing(upTo: 2.5)
-            if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+            // A link that opens a new tab is opened in place (open-request-links): that loads another page, so it is waited for like a followed link.
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if webView.isLoading || webView.url != startURL {
+                await waitForChange(from: startMark, upTo: 4)
+                await settlePage(maxWait: 6)
+                let after = await discoverForms()
+                if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+            } else {
+                let after = await formsAppearing(upTo: 2.5)
+                if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
+            }
         }
         // A choice of requests or a "who is asking" step in front of the form.
         if await advanceToRequestForm(loose: true) != nil {

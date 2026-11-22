@@ -7,14 +7,15 @@ bucket: 'registry'
 tier: 'A'
 automation: 'scriptable'
 confidence: 'medium'
-opt_out_url: 'https://www.01advertising.com/'
+opt_out_url: 'https://www.01advertising.com/legal/dsar/'
 registered_in: ['CA', 'OR', 'TX']
 signals: ['email_contact', 'email_input', 'name_input']
 profiled: '2026-10-22'
 live_form:
-  checked: '2026-10-23'
+  # Fixed by hand 2026-11-22: the home page's form is a sales contact form. The request form is Termly's, behind "Submit a Privacy Request" on /legal/dsar/.
+  checked: '2026-11-22'
   found: true
-  page: 'https://www.01advertising.com/'
+  page: 'https://app.termly.io/dsar/d1321341-0e82-4d8c-afaf-c4940d46c171'
   blockers: []
 about:
   category: 'adtech'

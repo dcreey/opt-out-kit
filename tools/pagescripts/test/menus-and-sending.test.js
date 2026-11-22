@@ -28,6 +28,25 @@ test('an open menu takes the person\'s own state first, then consumer / none / o
   assert.equal(call(none, 'custom-menus-pick', ''), 'No relationship');
 });
 
+test('a home-made menu showing only "Choose state" over a hidden list is opened, and its state option is taken (saymine)', () => {
+  const html = '<div id=w><input type=checkbox id=t style="display:none"><label id=l for=t><span>Choose state</span></label>' +
+    '<ul id=p style="display:none"><li class="dropdown__option" data-label=Alabama>Alabama</li><li class="dropdown__option" data-label=Alaska>Alaska</li>' +
+    '<li class="dropdown__option" data-label=Illinois id=il>Illinois</li></ul></div><div><span>Choose a colour</span></div>';
+  const w = page(html);
+  w.document.getElementById('l').addEventListener('click', () => { w.document.getElementById('p').style.display = 'block'; });
+  assert.notEqual(run(w, 'custom-menus-open'), '', 'the placeholder box was pressed');
+  assert.equal(w.document.getElementById('p').style.display, 'block', 'the press reached the box (the innermost one, the placeholder, inside its label) and opened the list');
+  assert.equal(w.document.querySelectorAll('[data-ook-menu]').length, 1, 'one box pressed and marked');
+  const picked = clicks(w, ['il']);
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Illinois');
+  assert.deepEqual(picked, ['il']);
+  assert.equal(run(w, 'custom-menus-open'), '', 'not pressed again; "Choose a colour" has no list of options beside it');
+  const chosen = page('<div><label>Illinois</label><ul style="display:none"><li>Alabama</li><li>Alaska</li><li>Illinois</li></ul></div>');
+  assert.equal(run(chosen, 'custom-menus-open'), '', 'a box already showing a choice is left alone');
+  const real = page('<select><option>Choose state</option><option>Alabama</option></select>');
+  assert.equal(run(real, 'custom-menus-open'), '', 'a real menu is not one of these');
+});
+
 test('a state with regex characters in its name is matched as written', () => {
   const w = page('<ul role=listbox><li role=option>Other</li><li role=option>St. (Saint) Kitts</li></ul>');
   assert.equal(call(w, 'custom-menus-pick', 'St. (Saint) Kitts'), 'St. (Saint) Kitts');

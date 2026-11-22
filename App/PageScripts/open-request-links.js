@@ -6,5 +6,8 @@
     var a=e.closest('a'); var h=a?(a.getAttribute('href')||''):''; return !/^mailto:/i.test(h);});
   els.sort(function(a,b){var ha=(a.closest('a')||a).getAttribute('href')||'', hb=(b.closest('a')||b).getAttribute('href')||''; var ma=(ha===''||ha==='#'||/^javascript:/i.test(ha))?0:1, mb=(hb===''||hb==='#'||/^javascript:/i.test(hb))?0:1; return ma-mb;});
   if(!els.length) return null; var e=els[0]; e.scrollIntoView({block:'center'});
+  // A link that opens in a new tab (target=_blank, as 01advertising.com's "Submit a Privacy Request" to its Termly form): the app's page has no tabs, so it is
+  // opened in place.
+  var a=e.closest('a'); if(a&&/^_blank$/i.test(a.getAttribute('target')||'')&&/^https?:/i.test(a.href)){location.href=a.href; return (e.innerText||'').trim();}
   ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
   return (e.innerText||'').trim();})();

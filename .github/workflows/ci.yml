@@ -131,8 +131,12 @@ jobs:
           restore-keys: 'spm-${{ env.CACHE_VERSION }}-${{ steps.xcode.outputs.version }}-'
       - name: 'Package tests (OptOutKitCore, and AssistedRunLogic, the assisted run''s state machine)'
         run: |
-          (cd Packages/OptOutKitCore && swift test --disable-automatic-resolution)
-          (cd Packages/AssistedRunLogic && swift test --disable-automatic-resolution)
+          set -o pipefail
+          (cd Packages/OptOutKitCore && swift test --disable-automatic-resolution 2>&1 | tee ../../core-tests.log)
+          (cd Packages/AssistedRunLogic && swift test --disable-automatic-resolution 2>&1 | tee ../../run-tests.log)
+      - name: 'Each failure as an annotation (reading the job log needs a GitHub sign-in; annotations do not)'
+        if: 'failure()'
+        run: 'grep -hE "error: |error -\[|failed \(" core-tests.log run-tests.log 2>/dev/null | head -40 | sed "s/^/::error::/" || true'
 
   build:
     name: 'App builds'

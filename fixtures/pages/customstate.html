@@ -1,0 +1,25 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send" onsubmit="if(!document.getElementById('st').value){document.getElementById('m').textContent='This field is mandatory';return false}">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <!-- A home-made state menu, as saymine's privacy portals draw it: a hidden checkbox, a label showing "Choose state", and a list shown while the box is ticked. -->
+  <div class="dropdown"><label class="dropdown__header">State *</label>
+    <input type="checkbox" id="dd" style="display:none" onchange="document.getElementById('panel').style.display=this.checked?'block':'none'">
+    <label for="dd" class="dropdown__label"><span id="shown">Choose state</span></label>
+    <ul id="panel" style="display:none">
+      <li class="dropdown__option" data-label="Alabama">Alabama</li><li class="dropdown__option" data-label="Alaska">Alaska</li>
+      <li class="dropdown__option" data-label="Illinois">Illinois</li><li class="dropdown__option" data-label="Oregon">Oregon</li>
+    </ul>
+    <input type="hidden" name="state" id="st" value="">
+  </div>
+  <p id="m"></p>
+  <button type="submit">Submit request</button>
+</form>
+<script>
+document.querySelectorAll('#panel li').forEach(function (li) {
+  li.addEventListener('click', function () {
+    document.getElementById('st').value = li.dataset.label; document.getElementById('shown').textContent = li.dataset.label;
+    document.getElementById('dd').checked = false; document.getElementById('panel').style.display = 'none';
+  });
+});
+</script>
