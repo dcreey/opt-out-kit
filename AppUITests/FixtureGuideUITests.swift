@@ -149,7 +149,7 @@ final class FixtureGuideUITests: UITestCase {
             _ = first.waitForExistence(timeout: 5)
         }
         first.tapWhenHittable()
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch.waitForExistence(timeout: 10), "the guide says it will look for the new page")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch.waitForExistence(timeout: 30), "the guide says it will look for the new page")
         shot(app, "guide-broken-link")
     }
 }

@@ -422,6 +422,15 @@ final class PrematureDoneTests: XCTestCase {
     }
 
     /// 360mediadirect.com: the State box was left on "Choose state" and the page said "This field is mandatory" under it. The run says which box, not "no success message".
+    /// A page that replaced its form with "Processing your request. Please wait ... Do not close this page" is still working: sent, not confirmed. A finished page is not.
+    func testAPageSayingItIsStillWorkingIsNotAConfirmation() {
+        XCTAssertTrue(FormRun.saysStillWorking("Processing your request\nPlease wait while we process your request. Do not close this page."))
+        XCTAssertTrue(FormRun.saysStillWorking("Your submission is being processed."))
+        XCTAssertFalse(FormRun.saysStillWorking("Thank you. Your request has been received."))
+        XCTAssertFalse(FormRun.saysStillWorking("Please wait ... Your opt-out request is complete."), "a page that also says it is complete is finished")
+        if case .submitted = FormRun.classify("Processing your request. Please wait while we process your request.") { XCTFail("not a confirmation") }
+    }
+
     func testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage() {
         let page = "Country *\nUnited States\nState *\nChoose state\nThis field is mandatory\nI would like to:*\nGet a copy of my data"
         XCTAssertEqual(FormRun.classify(page), .rejected("the site says a required box was left empty: State"))

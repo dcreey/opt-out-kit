@@ -289,9 +289,13 @@ final class WebAssistedPage: AssistedPage {
         let stepBefore = await formSignature()
         var stateBefore: (visible: Bool, url: String)?
         if let liveForm { stateBefore = await session.formState(liveForm) }
+        let markBefore = await session.pageMark()
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed("no submit button found") }
+        // The page's answer can take a moment to start (a slow phone, a slow site): until something changes (a few seconds at most), then until it settles. Read too
+        // soon, a sent form looked like "nothing on the page changed after sending" (GitHub's slower runner, the plain fixture site).
+        _ = await session.waitForChange(from: markBefore, upTo: SiteRun.wait(upTo: 4))
         // In a background run the waits end in time to read the page and take its picture (`SiteRun.deadline`); elsewhere they are as before.
         await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait))
         if await session.pressConfirmStep() { await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait)) }
@@ -307,6 +311,9 @@ final class WebAssistedPage: AssistedPage {
             let newText = FormRun.newText(before: before, after: after)
             // The page asking for a code, or saying the code was wrong, is not the site taking the request.
             let errorSeen = FormRun.classify(newText) != .failed("no success message was shown") || FormRun.rejectsCode(newText) || FormRun.asksForCode(newText)
+            // A page that replaced the form with "Processing your request, please wait" has not said it took it: sent, not confirmed. (Before, this depended on
+            // timing: a run that waited long enough gave up on the site, one that did not counted the vanished form as a confirmation.)
+            if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen, FormRun.saysStillWorking(newText) { return .failed(AutoOptOut.sentUnconfirmed) }
             if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen { return .submitted(awaitingEmail: false) }
         }
         if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged(PageFlow.nextStepMarker) }

@@ -7,6 +7,7 @@
 </form>
 </div>
 <script>
-// The page says the request was received by itself, with nobody having pressed anything (a form that sends itself, or a page left open from before).
-setTimeout(function () { document.getElementById('box').innerHTML = '<h2>Thank you</h2><p>Your request has been received. We will remove your information within 30 days.</p>'; }, 6000);
+// The page says the request was received by itself, well after anything was pressed (a form that sends itself, or a page left open from before): 15 s, past
+// the few seconds the app waits for a page to answer its own press of send.
+setTimeout(function () { document.getElementById('box').innerHTML = '<h2>Thank you</h2><p>Your request has been received. We will remove your information within 30 days.</p>'; }, 15000);
 </script>

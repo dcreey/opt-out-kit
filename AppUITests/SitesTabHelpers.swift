@@ -10,7 +10,9 @@ extension XCUIApplication {
             if tabBars.buttons["Sites"].exists { tabBars.buttons["Sites"].tap() }
         }
         if !open.exists { let shot = XCTAttachment(screenshot: screenshot()); shot.name = "no-sites-search"; shot.lifetime = .keepAlways; XCTContext.runActivity(named: "no search") { $0.add(shot) } }
-        XCTAssertTrue(open.waitForExistence(timeout: 10), "the Sites tab shows its search")
+        // What was on screen instead, in the failure itself (CI's screenshots need a sign-in to download; its annotations do not).
+        let onScreen = open.waitForExistence(timeout: 10) ? "" : "selected tab: \(tabBars.buttons.allElementsBoundByIndex.filter(\.isSelected).map(\.label)); buttons: \(buttons.allElementsBoundByIndex.prefix(25).map { $0.identifier.isEmpty ? $0.label : $0.identifier }); texts: \(staticTexts.allElementsBoundByIndex.prefix(12).map(\.label))"
+        XCTAssertTrue(open.exists, "the Sites tab shows its search. \(onScreen)")
         open.tap()
         let search = textFields["site-search-field"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))

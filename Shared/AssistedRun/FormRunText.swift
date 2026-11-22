@@ -58,7 +58,13 @@ enum FormRun {
                    options: [.regularExpression, .caseInsensitive]) != nil
     }
 
-    /// New text on the page that offers an opt-out or removal (a listing's "Opt out" button after a search).
+    /// A page that says it is still working on the request ("Processing your request", "Please wait", "Do not close this page"): sent, but not confirmed.
+    nonisolated static func saysStillWorking(_ text: String) -> Bool {
+        text.range(of: "processing your (request|submission)|being processed|please wait|do not (close|leave|refresh) (this|the) (page|window)|still (working|processing)", options: [.regularExpression, .caseInsensitive]) != nil
+            && !looksFinished(text)
+    }
+
+        /// New text on the page that offers an opt-out or removal (a listing's "Opt out" button after a search).
     nonisolated static func mentionsOptOutControl(_ text: String) -> Bool {
         text.range(of: "opt.?(me.?)?out|remove (me|my|this)|do not sell", options: [.regularExpression, .caseInsensitive]) != nil
     }
