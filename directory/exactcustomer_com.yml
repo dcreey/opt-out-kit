@@ -12,10 +12,9 @@ registered_in: ['CA', 'OR', 'TX']
 signals: ['captcha_turnstile', 'email_input', 'phone_input', 'phone_verify']
 profiled: '2026-10-22'
 live_form:
-  checked: '2026-10-23'
-  found: true
-  page: 'https://exactcustomer.com/'
-  blockers: ['check:a bot check']
+  checked: '2026-11-22'
+  found: false
+  blockers: []
 about:
   category: 'marketing_services'
   summary: 'Exact Opco, LLC is a marketing and direct-mail services company. Exact Customer is a software-enabled, digital performance marketing agency, focused on providing high-value purchase sales leads of high intent consumers to. Its policy names these buyers or recipients: business customers and sales teams.'
@@ -35,3 +34,5 @@ languages:
   list: ['en']
   pages: {}
   checked: '2026-10-26'
+contact_email: 'info@exactcustomer.com'
+contact_email_source: 'policy'

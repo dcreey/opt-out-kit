@@ -7,17 +7,17 @@ bucket: 'registry'
 tier: 'C'
 automation: 'guided'
 confidence: 'medium'
-opt_out_url: 'https://meettie.com/'
+opt_out_url: 'https://app.termly.io/dsar/ee5088c4-5eb2-475c-a9ea-9376f1b70eb6'
 registered_in: ['CA']
 signals: ['phone_verify']
 profiled: '2026-10-22'
 contact_email: 'legal@meettie.com'
 contact_email_source: 'browser'
 live_form:
-  checked: '2026-10-27'
+  checked: '2026-11-22'
   found: true
-  page: 'https://meettie.com/'
-  blockers: ['certify: Under penalty of perjury, I declare all the above informatio']
+  page: 'https://app.termly.io/dsar/ee5088c4-5eb2-475c-a9ea-9376f1b70eb6'
+  blockers: []
 about:
   category: 'adtech'
   summary: 'Revenue Roll Inc. is an advertising technology company. Tie (formerly Revenue Roll) is the AI shopper intelligence platform for ecommerce brands. Identify anonymous visitors, predict buyer intent, boost email deliverability & revenue. Its own pages mention devices and online activity, credit and financial accounts. Its policy does not name who it sells to.'

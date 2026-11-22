@@ -14,10 +14,9 @@ registered_in: ['CA', 'OR', 'TX']
 signals: ['email_input', 'email_only_wording', 'name_input']
 profiled: '2026-10-22'
 live_form:
-  checked: '2026-10-23'
-  found: true
-  page: 'https://redmob.io/'
-  blockers: ['other']
+  checked: '2026-11-22'
+  found: false
+  blockers: []
 about:
   category: 'adtech'
   summary: 'Redmob LLC is an advertising technology company. We connect in-app publishers directly with advertisers. Publishers earn more per request. Buyers pay only for real people in real apps. Its own pages mention devices and online activity, social media profiles. Its policy does not name who it sells to.'

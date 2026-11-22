@@ -223,3 +223,11 @@ others) were recorded as each site's page (guided). Left out as not the site's o
 ## find_later
 
 `find_later: true` marks a site (the "Later, no route yet" group; `OptOutMethods` returns manual for exactly these, `testEverySiteWithNoRouteYetIsMarkedToFindLater…` checks it) with no usable page and no email after the email scan (`tools/find_any_emails.py`): its page or address is to be found by hand later. It changes nothing in the app (the site stays manual); `tools/build_site_review.py --hide-later` leaves these out of the review page.
+
+### A home page is never the opt-out form (2026-11-22)
+
+Nine entries had their home page's sales or contact form recorded as the opt-out form (`live_form.page` = the bare home page), so the app filled a sales form
+and said "no opt-out form was found". Each was checked by hand: meettie.com now points at its Termly request form and newmexicodatainsights.com at its
+"Remove My Information" search page; americantreasurytaxsolutions.com, beeswax.com, decide.co, exactcustomer.com (its DoNotSell.aspx answers 403),
+exlservice.com (its portal needs an account), optable.co and redmob.io take requests by email, and their entries are email-only. 01advertising.com and
+agile-ed.com were fixed the same day. `tools/tests/test_directory_no_home_page_forms.py` fails on a new one.
