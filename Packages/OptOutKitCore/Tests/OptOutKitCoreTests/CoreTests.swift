@@ -1522,6 +1522,20 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertEqual(rows["f"]?.group, .notTried)
     }
 
+    func testActivityWithASinceCountsOnlyThatRunsAttemptsAndAllRunsCountsEveryOne() {
+        let t = Date(timeIntervalSince1970: 2_000_000)
+        let attempts = ["a": [OptOutAttempt(date: t, outcome: "submitted"), OptOutAttempt(date: t.addingTimeInterval(100), outcome: "submitted")],
+                        "b": [OptOutAttempt(date: t, outcome: "challenged"), OptOutAttempt(date: t.addingTimeInterval(200), outcome: "failed")],
+                        "c": [OptOutAttempt(date: t, outcome: "emailed")]]
+        let run = Dictionary(uniqueKeysWithValues: RunPeriods.activity(siteIDs: ["a", "b", "c", "d"], attempts: attempts, period: nil, since: t.addingTimeInterval(150)).map { ($0.id, $0.group) })
+        XCTAssertEqual(run, ["a": .notTried, "b": .needsYou, "c": .notTried, "d": .notTried], "only what the run since then did")
+        let all = Dictionary(uniqueKeysWithValues: RunPeriods.allRuns(siteIDs: ["a", "b", "c", "d"], attempts: attempts).map { ($0.id, $0) })
+        XCTAssertEqual(all["a"]?.group, .sent); XCTAssertEqual(all["a"]?.sends, 2); XCTAssertEqual(all["a"]?.lastSent, t.addingTimeInterval(100))
+        XCTAssertEqual(all["b"]?.group, .needsYou); XCTAssertEqual(all["b"]?.tries, 2); XCTAssertEqual(all["b"]?.last?.outcome, "failed")
+        XCTAssertEqual(all["c"]?.group, .notTried, "an email the person sent is theirs, not a run's")
+        XCTAssertEqual(all["d"]?.group, .notTried)
+    }
+
     // MARK: field mapping
 
     func testMapsAProfileOntoACommonOptOutForm() {

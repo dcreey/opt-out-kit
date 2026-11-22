@@ -204,6 +204,29 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(finished, "now the app asks whether it is completely done: \(app.staticTexts.allElementsBoundByIndex.prefix(10).map(\.label))")
     }
 
+    /// As a user I want the automatic page to show the run I just started, and a button that shows every site over all runs together: after a run the page says
+    /// when this run started, and "Every site, all runs" lists the site the run sent, with how often it was sent; the site opens its page.
+    func testTheAutomaticPageShowsThisRunAndEverySiteAllRunsCombinesThem() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "plain-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 120), "the run finished and reported")
+        done.tap()
+        XCTAssertTrue(app.staticTexts["run-started"].waitForExistence(timeout: 10), "the page says when this run started")
+        XCTAssertFalse(app.buttons["review-last-run"].exists, "the screenshots of the last run are no longer on this page")
+        let all = app.buttons["all-runs"]
+        XCTAssertTrue(app.scrollUntilExists(all), "the page offers every site over all runs")
+        all.tap()
+        let row = app.buttons["all-runs-site-plain-1.fixture.test"]
+        XCTAssertTrue(app.scrollUntilExists(row), "the site the run sent is listed")
+        XCTAssertTrue(row.label.contains("Sent once"), "with how often it was sent: \(row.label)")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "every-site-all-runs"; shot.lifetime = .keepAlways; add(shot)
+        row.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["site-state"].waitForExistence(timeout: 10), "the site's page opens")
+    }
+
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run says it was sent but not confirmed, and for that
     /// site I can see what its page said and a screenshot of how the page looked, so I can judge it myself.
     func testRunNowShowsWhatAPageSaidAndItsScreenshotWhenTheSiteDidNotConfirmInTime() {
@@ -227,12 +250,9 @@ final class FixtureJourneyUITests: UITestCase {
         shot("2-run-report")
         let title = app.staticTexts["run-report-title"].label
         XCTAssertEqual(server.sentSites, ["fx_slow_1"], "the request was posted to the site once: \(server.requests)")
-        done.tap()
-        shot("3-after-the-run")
-
-        // Review of the last run: the site is listed as sent but not confirmed, and says why.
-        let review = app.buttons["review-last-run"]
-        XCTAssertTrue(app.scrollUntilExists(review), "the review of the last run is offered")
+        // Review of the run, from its report: the site is listed as sent but not confirmed, and says why.
+        let review = app.buttons["run-report-review"]
+        XCTAssertTrue(app.scrollUntilExists(review), "the report offers the review of every site and its screenshot")
         review.tap()
         let row = app.buttons["review-fx_slow_1"]
         XCTAssertTrue(row.waitForExistence(timeout: 10), "the site is in the review (\(title))")
@@ -253,7 +273,8 @@ final class FixtureJourneyUITests: UITestCase {
         let opened = full.waitForExistence(timeout: 5)
         shot("6-the-screenshot-full-size")
         XCTAssertTrue(opened, "the screenshot opens full size")
-        app.buttons["BackButton"].tap()
+        // The review is opened from the run report's own sheet, so two back buttons exist: the one on the screenshot's bar goes back.
+        app.navigationBars["slow-1.fixture.test"].buttons["BackButton"].tap()
         XCTAssertTrue(picture.waitForExistence(timeout: 5), "and I am back on the site's page")
     }
 
@@ -378,8 +399,7 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(app.buttons["run-report-done"].waitForExistence(timeout: 120), "the run finished and reported")
         XCTAssertEqual(server.sentSites, ["fx_errorpage_1"], "the form was posted: \(server.requests)")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "run-report-for-an-error"; shot.lifetime = .keepAlways; add(shot)
-        app.buttons["run-report-done"].tap()
-        let review = app.buttons["review-last-run"]
+        let review = app.buttons["run-report-review"]
         XCTAssertTrue(app.scrollUntilExists(review))
         review.tap()
         let row = app.buttons["review-fx_errorpage_1"]

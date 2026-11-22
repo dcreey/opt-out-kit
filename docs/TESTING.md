@@ -152,7 +152,7 @@ real ones, and the engine, web view and page scripts do the same work they do on
   tests (`GET /__received`, `POST /__reset`).
 - `fixtures/build_catalog.sh`: compiles a catalog from the app's real laws, platforms, terms, page scripts and ZIP table with the fixture sites in place of
   the directory, using the same `catalog-builder` as the app's build.
-- `tools/run_e2e.sh`: builds that catalog, starts the server, runs `FixtureJourneyUITests` (or the tests named in its arguments) and stops the server.
+- `tools/run_e2e.sh`: builds that catalog, starts the server, runs `FixtureJourneyUITests` (or the tests named in its arguments) and stops the server. `OPTOUT_FIXTURE_PORT` (default 8765) puts the server on another port, with a catalog pointing there, so two runs on two simulators do not share one server.
   Run it with the usual `-destination`; it passes the catalog and server address to the tests. In the Integration workflow (`integration.yml`) shard 0 compiles
   the catalog into the build it hands over, and every shard starts the server before its tests.
 - `App/Sources/Fixtures.swift` (debug builds only): `-uitest-catalog <path>` opens that catalog in place of the bundled one, and lets the web view load the
@@ -422,6 +422,7 @@ Notes about how a test works live in the test file itself. This is the list of w
 | Run now leaves out the sites already sent this period; Re-test all tries them again | `CoreTests.testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod`, `BackgroundPassesAppTests` (second run and re-test) | Mac, Sim |
 | A new person gets the automatic pass first; the semi-automated queue waits for it and opens after; the report leads to it | `CoreTests.testTheSemiAutomatedQueueWaitsOnlyForTheVeryFirstAutomaticPass`, `BackgroundPassesAppTests` (`waitingForFirstPass`), `AutoProtectionUITests.testANewPersonGetsTheAutomaticPassFirstAndTheSemiAutomatedQueueAfterIt` | Mac, Sim |
 | The automatic opt-out page sorts each site into need you, sent or not tried by this period's attempts; groups fold, counts open them, a site opens its page | `CoreTests.testTheActivityPageSortsEachSite...`, `AutoProtectionUITests.testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere`, `testRunNowShows...` (the counts move during a run) | Mac, Sim |
+| The automatic opt-out page shows the current run only (`AutoSettings.runStarted`: set when a new pass starts; a stopped or cut-off run carried on is the same run); "Every site, all runs" combines every run (sent at least once / never went through / never tried, with how often), and each site opens its page with its screenshot | `CoreTests.testActivityWithASinceCountsOnlyThatRunsAttemptsAndAllRunsCountsEveryOne`, `AutoProtectionTests.testTheAutomaticPageShowsOnlyTheCurrentRunAndAllRunsCombinesThem`, `testANewRunStartsThePageAfreshAndACarriedOnRunDoesNot`, `FixtureJourneyUITests.testTheAutomaticPageShowsThisRunAndEverySiteAllRunsCombinesThem` | Mac, Sim |
 | Spokeo, FastPeopleSearch, PeopleConnect flows | `BrokerFlowUITests` | Sim |
 
 ## Workflow audit (2026-11-01)

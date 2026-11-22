@@ -75,14 +75,39 @@ public struct ActivitySite: Equatable, Sendable {
 public extension RunPeriods {
     /// Sorts the run's sites into the three groups by their attempts in `period` (every attempt when there is no period yet). A site sent this period is
     /// "sent" even if a later try failed, because the request stands; an emailed request is the person's and does not count either way.
-    static func activity(siteIDs: [String], attempts: [String: [OptOutAttempt]], period: RunPeriod?) -> [ActivitySite] {
+    /// `since`: only the attempts of the run that began then (the automatic page shows the current run only); otherwise the period's.
+    static func activity(siteIDs: [String], attempts: [String: [OptOutAttempt]], period: RunPeriod?, since: Date? = nil) -> [ActivitySite] {
         siteIDs.map { id in
-            let list = (attempts[id] ?? []).filter { period?.contains($0.date) ?? true }
+            let list = (attempts[id] ?? []).filter { a in since.map { a.date >= $0 } ?? (period?.contains(a.date) ?? true) }
             if let sent = list.filter(\.wasSubmitted).map(\.date).max() { return ActivitySite(id: id, group: .sent, date: sent) }
             if let last = list.filter({ !$0.wasEmailed }).max(by: { $0.date < $1.date }) {
                 return ActivitySite(id: id, group: .needsYou, date: last.date, outcome: last.outcome, detail: last.detail)
             }
             return ActivitySite(id: id, group: .notTried)
+        }
+    }
+}
+
+/// One site's standing over every run there has been, for the page that combines them all.
+public struct AllRunsSite: Equatable, Sendable {
+    public var id: String
+    /// Sent: a request went through at least once. Needs you: tried, never sent. Not tried: no run has reached it.
+    public var group: ActivityGroup
+    public var sends: Int
+    public var tries: Int
+    public var lastSent: Date?
+    /// The latest attempt of any outcome (an emailed request is the person's and is left out).
+    public var last: OptOutAttempt?
+}
+
+public extension RunPeriods {
+    /// Every run combined: each site's sends and tries over all time, and the group its whole history puts it in.
+    static func allRuns(siteIDs: [String], attempts: [String: [OptOutAttempt]]) -> [AllRunsSite] {
+        siteIDs.map { id in
+            let list = (attempts[id] ?? []).filter { !$0.wasEmailed }
+            let sent = list.filter(\.wasSubmitted)
+            let group: ActivityGroup = !sent.isEmpty ? .sent : (list.isEmpty ? .notTried : .needsYou)
+            return AllRunsSite(id: id, group: group, sends: sent.count, tries: list.count, lastSent: sent.map(\.date).max(), last: list.max { $0.date < $1.date })
         }
     }
 }

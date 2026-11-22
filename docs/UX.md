@@ -185,9 +185,18 @@ Many sites send people to the same address: privacy-portal providers (OneTrust a
 
 **A site already marked finished:** the link no longer just says so. The app asks "*Site* is already marked finished. Does this link ask for more: a confirmation, another form or another step?" with **Yes, it needs more: open it** (the site goes back on the waiting list until that step is done, and the page opens as usual), **It is a different site** (the screen above) and **No, it is finished** (nothing opens).
 
+## The automatic opt-out page
+
+It shows **the current run only**: the three counts (moved to semi-automatic, sent, not tried) and their lists are what the run under way, or the last one, did since
+it started ("This run started ..."). A new run (Run now after a run has finished, Re-test all, the scheduled run) starts them afresh; a run that was stopped or cut
+off and is carried on is the same run. Before the first run of build 54, which records when a run starts, the page shows the period instead. At the bottom,
+**Every site, all runs** opens every run combined: each site the automatic run has dealt with or takes on, grouped as sent at least once, never went through (tried,
+never sent) and never tried, with how often it was sent or tried; a site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
+the run report still has "Review every site and its screenshot".)
+
 ## Reviewing what a site said and showed
 
-A site's page (from the review of the last run, or the Sites tab) shows, when its form was sent, "What the page said" and the screenshot taken then; a tap on the screenshot opens it full size on a page of its own (a row of the page's list with a button that presented a full-screen cover never opened it, and the screenshot itself never appeared on the site's page, because its loader sat on a view that was empty until the picture arrived: it now shows a spinner meanwhile). Covered end to end by `FixtureJourneyUITests` (docs/TESTING.md).
+A site's page (from the run report's review of every site, from "Every site, all runs" on the automatic opt-out page, or the Sites tab) shows, when its form was sent, "What the page said" and the screenshot taken then; a tap on the screenshot opens it full size on a page of its own (a row of the page's list with a button that presented a full-screen cover never opened it, and the screenshot itself never appeared on the site's page, because its loader sat on a view that was empty until the picture arrived: it now shows a spinner meanwhile). Covered end to end by `FixtureJourneyUITests` (docs/TESTING.md).
 
 ## The keyboard
 

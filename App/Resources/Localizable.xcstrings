@@ -8557,6 +8557,29 @@
     }
    }
   },
+  "Every automatic run together, since the first. The automatic opt-out page shows only the current run.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les passages automatiques réunis, depuis le premier. La page du retrait automatique ne montre que le passage en cours."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todas las ejecuciones automáticas juntas, desde la primera. La página de la baja automática muestra solo la ejecución actual."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle automatischen Läufe zusammen, seit dem ersten. Die Seite des automatischen Widerspruchs zeigt nur den aktuellen Lauf."
+     }
+    }
+   }
+  },
   "Every day it checks the sites it can for you": {
    "extractionState": "manual",
    "localizations": {
@@ -8668,6 +8691,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Alle Seiten bleiben in der Liste. Das rückt nur Datenhändler nach oben und markiert sie, die dort registriert sind, wo Sie wohnen oder gewohnt haben, denn jeder Händler irgendwo kann Sie führen."
+     }
+    }
+   }
+  },
+  "Every site, all runs": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Tous les sites, tous les passages"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Todos los sitios, todas las ejecuciones"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Alle Seiten, alle Läufe"
      }
     }
    }
@@ -14468,6 +14514,75 @@
     }
    }
   },
+  "Never tried": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jamais essayé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nunca probado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nie versucht"
+     }
+    }
+   }
+  },
+  "Never went through": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jamais passé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nunca se envió"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nie durchgegangen"
+     }
+    }
+   }
+  },
+  "Never went through (tried %lld times): %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Jamais passé (%lld essais) : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nunca se envió (%lld intentos): %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nie durchgegangen (%lld Versuche): %@"
+     }
+    }
+   }
+  },
   "New Hampshire": {
    "extractionState": "manual",
    "localizations": {
@@ -15043,6 +15158,29 @@
     }
    }
   },
+  "No run has tried it yet": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aucun passage ne l'a encore essayé"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ninguna ejecución lo ha probado aún"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch von keinem Lauf versucht"
+     }
+    }
+   }
+  },
   "No screenshot": {
    "extractionState": "manual",
    "localizations": {
@@ -15522,6 +15660,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nicht versucht oder übersprungen"
+     }
+    }
+   }
+  },
+  "Not tried yet in this run": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas encore essayé dans ce passage"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Aún sin probar en esta ejecución"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "In diesem Lauf noch nicht versucht"
      }
     }
    }
@@ -20172,29 +20333,6 @@
     }
    }
   },
-  "Screenshots of the last run": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Captures du dernier passage"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Capturas de la última ejecución"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Bildschirmfotos des letzten Laufs"
-     }
-    }
-   }
-  },
   "Scroll to the bottom to continue.": {
    "extractionState": "manual",
    "localizations": {
@@ -20977,6 +21115,29 @@
     }
    }
   },
+  "Sent %lld times, last on %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé %lld fois, dernière le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado %lld veces, la última el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld-mal gesendet, zuletzt am %@"
+     }
+    }
+   }
+  },
   "Sent (%lld)": {
    "extractionState": "manual",
    "localizations": {
@@ -20996,6 +21157,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesendet (%lld)"
+     }
+    }
+   }
+  },
+  "Sent once, on %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé une fois, le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado una vez, el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einmal gesendet, am %@"
      }
     }
    }
@@ -26447,6 +26631,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Dieser Zeitraum: %@ bis %@"
+     }
+    }
+   }
+  },
+  "This run started %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ce passage a commencé le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta ejecución empezó el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Lauf begann am %@"
      }
     }
    }
