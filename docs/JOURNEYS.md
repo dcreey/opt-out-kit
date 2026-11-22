@@ -90,7 +90,7 @@ Each line: the story, the test, what it proves.
 
 | Journey | Test | What it proves |
 |---|---|---|
-| **I press Run now and see what was sent and what needs me** | `AutoProtectionUITests.testRunNowShowsWhatWasSent...` | A 25-site run (every site in the weekly job) finishes, reports, and the counts move |
+| **I press Run now and see what was sent and what needs me** | `AutoProtectionUITests.testRunNowShowsWhatWasSent...` | A run over a representative sample of 40 sites (every site in the weekly job) finishes, reports, and the counts move |
 | **As a new person, the automatic pass runs first and the semi-automated queue opens after it** | `testANewPersonGetsTheAutomaticPassFirst...` | Step 2 waits for step 1; the queue opens with the sites that need me |
 | **I open a site from the status page and stay on it** | `testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Regression of a navigation bug (the push bounced back) |
 

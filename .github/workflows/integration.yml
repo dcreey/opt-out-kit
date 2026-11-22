@@ -9,8 +9,13 @@ on:
   release:
     types: ['published']
   workflow_dispatch:
+    inputs:
+      every_site:
+        description: 'Also run the automatic run over every site (sending faked), as the weekly job does'
+        type: 'boolean'
+        default: false
   schedule:
-    - cron: '0 9 * * 1'          # Mondays, 09:00 UTC: only the run over every site (the UI tests run for a release)
+    - cron: '0 9 * * 1'          # Mondays, 09:00 UTC: the run over every site (the UI tests run for a release, over a sample of 40 sites)
 
 concurrency:
   group: 'integration-${{ github.ref }}'
@@ -222,6 +227,8 @@ jobs:
 
   all-sites:
     name: 'Automatic run over every site (sending faked)'
+    # The weekly job (and a manual run that asks for it). A release runs the same test over a representative sample of 40 sites, inside the UI shards.
+    if: 'github.event_name == ''schedule'' || inputs.every_site'
     runs-on: 'macos-26'
     timeout-minutes: 120
     steps:
@@ -247,7 +254,7 @@ jobs:
             -disableAutomaticPackageResolution -skipPackagePluginValidation -skipMacroValidation \
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tail -20
       - run: 'xcrun simctl bootstatus "$SIM_UDID" -b'
-      - name: 'Every site (TEST_RUNNER_OPTOUT_ALL_SITES=1 lifts the 25-site limit)'
+      - name: 'Every site (TEST_RUNNER_OPTOUT_ALL_SITES=1 lifts the 40-site sample)'
         env:
           TEST_RUNNER_OPTOUT_ALL_SITES: '1'
         run: |

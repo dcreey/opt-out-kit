@@ -41,10 +41,9 @@ final class AutoProtectionUITests: UITestCase {
         XCTAssertFalse(app.buttons["auto-banner"].waitForExistence(timeout: 2))
     }
 
-    /// The weekly job's check that every real site's page and form read in a run, with sending faked (no broker is contacted). The run against fixture brokers
-    /// that sends for real is `FixtureJourneyUITests.testRunNowFillsAndSendsTheFormOnEachBrokerPage`.
+    /// A run over the real catalog with sending faked (no broker is contacted): a representative sample of 40 sites for a release, every site in the weekly job
+    /// (OPTOUT_ALL_SITES=1). The run against fixture brokers that sends for real is `FixtureJourneyUITests.testRunNowFillsAndSendsTheFormOnEachBrokerPage`.
     func testRunNowShowsWhatWasSentAndWhatNeedsYouWithoutTouchingTheInternet() throws {
-        try XCTSkipUnless(ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1", "the weekly run over every real site; the fixture journeys cover Run now otherwise")
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-fake-submit", "-uitest-fake-scan"] + XCUIApplication.fewSites
         app.launch()
@@ -58,10 +57,10 @@ final class AutoProtectionUITests: UITestCase {
         app.buttons["auto-activity"].tap()
         XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 5), "one button runs everything")
         app.buttons["auto-run-now"].tap()
-        // The run finishes and reports: 25 sites in CI (`fewSites`), every site in the weekly end-to-end job.
+        // The run finishes and reports: a sample of 40 sites for a release (`fewSites`), every site in the weekly end-to-end job.
         let everySite = ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1"
         let done = app.buttons["run-report-done"]
-        XCTAssertTrue(done.waitForExistence(timeout: everySite ? 5400 : 120), "the run finished and reported")
+        XCTAssertTrue(done.waitForExistence(timeout: everySite ? 5400 : 300), "the run finished and reported")
         shot(app, "3a-run-report")
         done.tap()
         let sent = app.buttons["activity-count-sent"]
@@ -112,7 +111,8 @@ final class AutoProtectionUITests: UITestCase {
         shot(app, "5a-activity-page-folded")
         // The groups are folded except "Need you"; tapping a count opens its list.
         app.buttons["activity-count-sent"].tap()
-        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'period-site-'")).firstMatch
+        // One named row, not a query over every row: on a slow machine that query timed out ("Timed out while evaluating UI query") in the first 25 sites' list.
+        let row = everySite ? app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'period-site-'")).firstMatch : app.buttons["period-site-plain-1.fixture.test"]
         XCTAssertTrue(app.scrollUntilExists(row), "the opened group lists its sites")
         shot(app, "5b-activity-page-sent-open")
         row.tap()

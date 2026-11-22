@@ -268,7 +268,7 @@ Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the w
 room for slower CI machines.
 
 **UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). The weekly job's test of a whole automatic
-run over the real catalog (sending faked: `-uitest-fake-submit`, the only fake left) uses `-uitest-sites 25` (`XCUIApplication.fewSites`) outside that job: the first 25 sites with a known form, so the run finishes in seconds and the test checks the
+run over the real catalog (sending faked: `-uitest-fake-submit`, the only fake left) uses `-uitest-sites 40` (`XCUIApplication.fewSites`) outside that job: a representative sample of 40 sites (`SiteSample`: some of every kind of site, the same every time; `SiteSampleTests`) with a known form, so the run finishes in seconds and the test checks the
 finished run and its report. Every other UI test runs against the fixture brokers (below). Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the
 profile editor's own Done is `editor-done` (the keyboard has its own keyboard-down button, `keyboard-hide`, never a Done); the profile gate after the walkthrough is `completeProfileGate`; a toggle is set with `setSwitch` (where its switch sits depends on the phone). Under a
 `-uitest` flag a run never asks iOS for the advertising ID: on a fresh simulator (as in CI) the tracking prompt came up at an unpredictable moment and the
@@ -279,7 +279,7 @@ A test that relaunches the app to check what was kept opens it again with `-uite
 a real one, so it resumed the first-run setup over the half-typed profile and started the automatic run, and on CI the profile editor never showed.
 
 **The run over every site** (`integration.yml`, job `all-sites`: on a release, Mondays and by hand): the same automatic-run UI tests over every site
-(`TEST_RUNNER_OPTOUT_ALL_SITES=1` lifts the 25-site limit), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
+(`TEST_RUNNER_OPTOUT_ALL_SITES=1` lifts the 40-site sample), waiting for the whole run to finish. Sending is faked; no broker site is contacted.
 
 Family profiles are switched off (`Features.otherProfiles`), so they have no UI test (the tests that added relatives were removed on 2026-11-18); their
 rules (relationships, minors and public figures are never searched) are Mac tests in `CoreTests`. No test is left out of CI (`KNOWN_FAILING` is empty).

@@ -157,6 +157,17 @@ test('the scroll helpers bring the chosen form, the check or the opt-out control
   assert.ok(w.__scrolls.some((s) => s.el && s.el.tagName === 'IFRAME'));
 });
 
+test('no scroll helper moves a page the person has touched (a slow machine finishes its fill after the person began to scroll)', () => {
+  const w = page('<form data-ook-form="f0"><input name="a"></form><iframe src="https://www.google.com/recaptcha/api2/anchor?k=1"></iframe><button>Opt me out</button>');
+  w.__ookUserAt = Date.now();          // set by the touch tracker on the person's first touch of the page
+  assert.equal(call(w, 'scroll-form-to-top', 'f0'), false);
+  call(w, 'scroll-form-into-view', 'f0');
+  call(w, 'scroll-frame-into-view', 'https://www.google.com/recaptcha/api2/anchor?k=1');
+  assert.equal(run(w, 'scroll-challenge-into-view'), false);
+  assert.equal(run(w, 'scroll-to-opt-out-control'), false);
+  assert.equal((w.__scrolls || []).length, 0, 'nothing was scrolled');
+});
+
 test('scroll-to-opt-out-control does nothing when the button is already on screen, and ignores menus in the header', () => {
   const on = page('<button>Opt out</button>');
   assert.equal(run(on, 'scroll-to-opt-out-control'), false, 'already on screen');

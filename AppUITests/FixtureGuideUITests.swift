@@ -131,7 +131,7 @@ final class FixtureGuideUITests: UITestCase {
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
         }
-        app.buttons["The site blocked me"].tap()
+        app.buttons["The site blocked me"].tapWhenHittable()
         XCTAssertTrue(app.descendants(matching: .any)["reported-issue"].waitForExistence(timeout: 10), "the site now shows it was reported")
     }
 
@@ -148,7 +148,7 @@ final class FixtureGuideUITests: UITestCase {
             notWorking.tap()
             _ = first.waitForExistence(timeout: 5)
         }
-        first.tap()
+        first.tapWhenHittable()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch.waitForExistence(timeout: 10), "the guide says it will look for the new page")
         shot(app, "guide-broken-link")
     }

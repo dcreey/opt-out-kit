@@ -5,8 +5,12 @@ extension XCUIApplication {
     func searchSites(_ text: String) {
         let open = buttons["sites-search"]
         // Right after another screen was put away the tab can still be showing it: tapping the tab again brings its first screen back.
-        if !open.waitForExistence(timeout: 5) { tabBars.buttons["Sites"].tap() }
-        XCTAssertTrue(open.waitForExistence(timeout: 10))
+        // On a slow machine that can take more than one tap and a while: a run's report may still be closing, or a pushed screen still covering the tab.
+        for _ in 0..<4 where !open.waitForExistence(timeout: 8) {
+            if tabBars.buttons["Sites"].exists { tabBars.buttons["Sites"].tap() }
+        }
+        if !open.exists { let shot = XCTAttachment(screenshot: screenshot()); shot.name = "no-sites-search"; shot.lifetime = .keepAlways; XCTContext.runActivity(named: "no search") { $0.add(shot) } }
+        XCTAssertTrue(open.waitForExistence(timeout: 10), "the Sites tab shows its search")
         open.tap()
         let search = textFields["site-search-field"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -153,7 +157,20 @@ extension XCUIApplication {
 }
 
 extension XCUIApplication {
-    /// Launch arguments that keep a whole automatic run small in CI: the first 25 sites with a known form. The weekly end-to-end job sets
-    /// OPTOUT_ALL_SITES=1 (TEST_RUNNER_OPTOUT_ALL_SITES for xcodebuild) to run the same tests over every site.
-    static var fewSites: [String] { ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1" ? [] : ["-uitest-sites", "25"] }
+    /// Launch arguments that keep a whole automatic run small for a release: a representative sample of 40 sites with a known form (some of every kind of site:
+    /// `SiteSample`). The weekly end-to-end job sets OPTOUT_ALL_SITES=1 (TEST_RUNNER_OPTOUT_ALL_SITES for xcodebuild) to run the same tests over every site.
+    static var fewSites: [String] { ProcessInfo.processInfo.environment["OPTOUT_ALL_SITES"] == "1" ? [] : ["-uitest-sites", "40"] }
+}
+
+extension XCUIElement {
+    /// Taps once the element can be tapped. A menu's items exist while the menu is still opening and have no tap point yet ("Activation point invalid"), most often on a
+    /// slow machine; this waits for one instead of failing.
+    func tapWhenHittable(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
+        let end = Date().addingTimeInterval(timeout)
+        while Date() < end {
+            if exists && isHittable { tap(); return }
+            Thread.sleep(forTimeInterval: 0.3)
+        }
+        XCTFail("\(self) never became tappable", file: file, line: line)
+    }
 }

@@ -1,0 +1,1 @@
+../../../../Shared/Model/SiteSample.swift

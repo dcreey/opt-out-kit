@@ -215,10 +215,10 @@ final class AppModel: ObservableObject {
             loadError = Loc.f("Could not load the broker registry: %@", error)
         }
         #if DEBUG
-        // UI tests: `-uitest-sites N` keeps only the first N sites that have a known form, so a test of a whole automatic run takes seconds, not minutes.
-        // The weekly end-to-end job (.github/workflows/e2e.yml) runs the same tests over every site.
+        // UI tests: `-uitest-sites N` keeps a representative sample of N sites that have a known form (`SiteSample`: some of every kind of site), so a test of a whole
+        // automatic run takes minutes, not an hour. The weekly end-to-end job (.github/workflows/integration.yml) runs the same tests over every site.
         if let i = args.firstIndex(of: "-uitest-sites"), args.indices.contains(i + 1), let n = Int(args[i + 1]) {
-            directory = Array(directory.filter { $0.optOutForm != nil || $0.liveForm?.found == true }.prefix(n))
+            directory = SiteSample.pick(directory, count: n)
         }
         // Simulator work: `-reset-daily` forgets today's choice and the once-a-day screens, as if it were a new day.
         if args.contains("-reset-daily") { for k in ["daily.themes", "daily.day", "daily.batches", "summary.day", "followup.explained", "emaillinks.explained"] { defaults.removeObject(forKey: k) } }
