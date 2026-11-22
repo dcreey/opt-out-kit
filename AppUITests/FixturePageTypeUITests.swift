@@ -117,6 +117,7 @@ final class FixturePageTypeUITests: UITestCase {
         let ticked = f["requests"] ?? ""
         XCTAssertFalse(ticked.contains("know") || ticked.contains("correct"), "know and correct were not ticked: \(f)")
         XCTAssertTrue(ticked.contains("delete") || ticked.contains("optout"), "a removing request was ticked: \(f)")
+        // The page also has "To withdraw consent" and a hidden EU section with a consent box (affinityanswers.com): neither held the form as a certification, so it was sent.
     }
 
     // MARK: Checks, certifications, scripted and multi-step forms

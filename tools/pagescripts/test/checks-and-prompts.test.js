@@ -46,6 +46,14 @@ test('a ticked box, an agent option and an ordinary box are not pending certific
   assert.equal(run(page('<label><input type=checkbox> Send me a copy</label>'), 'pending-certification'), null);
 });
 
+test('a request option ("To withdraw consent", "To opt out of the sale") and a box in a hidden section are not certifications (affinityanswers.com)', () => {
+  assert.equal(run(page('<label><input type=checkbox> To withdraw consent. You can withdraw consent for our use of cookies at any time.</label>'), 'pending-certification'), null);
+  assert.equal(run(page('<label><input type=checkbox> I want to opt out of the sale of my personal data, and I consent to being contacted</label>'), 'pending-certification'), null);
+  assert.equal(run(page('<div style="display:none"><label><input type=checkbox> I certify under penalty of perjury that this is true</label></div>'), 'pending-certification'), null, 'hidden: not asked of the person');
+  // A styled box: the input itself is hidden, its label is what shows.
+  assert.match(run(page('<input type=checkbox id=c style="display:none"><label for=c>I certify under penalty of perjury that this is true</label>'), 'pending-certification'), /certify/);
+});
+
 // ---- tick-identity-boxes.js
 
 test('the plain "I confirm I am the person whose email this is" box is ticked; legal and marketing boxes are not', () => {

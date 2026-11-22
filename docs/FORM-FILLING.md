@@ -81,6 +81,11 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
      colour boxes are never filled.
+   - *Certification boxes* ("I certify under penalty of perjury", "I acknowledge", "I consent") are never ticked: the form waits for the person (`pending-certification`).
+     Only a box the person can see counts (a styled box hides the input and shows its label), and a request option is never one: "To withdraw consent" or "To opt out
+     of the sale" is a request the app chooses or leaves. affinityanswers.com was held on "a certification box that you must tick yourself" by its "To withdraw
+     consent" option in an EU section the page hides from US visitors. Protected by `checks-and-prompts.test.js` and
+     `FixturePageTypeUITests.testCheckboxesTickTheRemovingRequestsAndNotKnowOrCorrect` (its page has both).
    - *A box that appears once another is filled* (adagio.io builds its State menu when Country is set): every fill reads the form again after filling and fills
      the new boxes (`WebAssistedPage.refill`). A box or menu that already shows the person's value is never set again (`fill-live`), because setting it again fires
      the page's change event and such a page rebuilds the box the app is about to fill. Protected by `fill-live.test.js` and
