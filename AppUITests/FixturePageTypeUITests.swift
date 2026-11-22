@@ -130,9 +130,9 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Solve the check'")).firstMatch.waitForExistence(timeout: 30), "the app says it waits for my check")
         XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent while the check is open")
         var taps = 0
-        let f = box.frame
+        let frame = box.frame
         while server.sentSites.isEmpty && taps < 8 {
-            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 28, dy: f.midY)).tap()          // the tick box at the left of its label
+            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: frame.minX + 28, dy: frame.midY)).tap()          // the tick box at the left of its label
             Thread.sleep(forTimeInterval: 3); taps += 1
         }
         let f = sent("fx_recaptcha_1", timeout: 20)
@@ -148,9 +148,9 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(server.sentSites.isEmpty, "the app did not tick the certification or send: \(server.requests)")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'tick a confirmation yourself'")).firstMatch.exists, "it says the certification is mine to tick")
         var taps = 0
-        let f = certify.frame
+        let frame = certify.frame
         while server.sentSites.isEmpty && taps < 8 {
-            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.minX + 20, dy: f.minY + 20)).tap()
+            app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: frame.minX + 20, dy: frame.minY + 20)).tap()
             Thread.sleep(forTimeInterval: 3); taps += 1
         }
         let f = sent("fx_certify_1", timeout: 20)
