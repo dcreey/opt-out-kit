@@ -147,7 +147,7 @@ jobs:
           B=Packages/AssistedRunLogic/.build/arm64-apple-macosx/debug/AssistedRunLogicPackageTests.xctest
           if [ -d "$B" ] && grep -q "signal code" run-tests.log 2>/dev/null; then
             lldb --batch -o run -o 'bt 30' -- "$(xcrun -f xctest)" "$B" > lldb.log 2>&1 || true
-            echo "::error title=Where it crashed (lldb)::$(grep -A32 -E 'stop reason|EXC_' lldb.log | head -40 | cut -c1-220 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
+            echo "::error title=Where it crashed (lldb)::$(sed -n '/(lldb) bt/,$p' lldb.log | grep -E '^ *[*]? *frame #' | head -30 | cut -c1-240 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
           fi
           find ~/Library/Logs/DiagnosticReports /Library/Logs/DiagnosticReports -name 'xctest*.ips' 2>/dev/null | while read -r r; do
             echo "::error title=Crash report $(basename "$r")::$(python3 tools/ci_crash_frames.py "$r" | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
