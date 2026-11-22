@@ -18,7 +18,7 @@ Layers, cheapest first:
 `AppModel` (the household, queue, plan, runs, skipping, language, terms, scans) no longer touches UIKit, UserNotifications, WebKit or the Keychain itself. Everything it
 needs from the phone goes through `AppPlatform` (`Shared/Model/AppPlatform.swift`): the screen's idle timer, background time, notifications and reminders, the advertising
 ID, the Keychain key, the clipboard, and the web views that fill and send forms. The app gives it the real one at launch (`IOSPlatform`, `App/Sources`); the Mac tests run it on
-`HeadlessPlatform`, which does nothing and sends nothing (a test that needs a site hands the run its own submitter). The model's sources live in `Shared/Model`, compiled into the
+`HeadlessPlatform`, which does nothing and sends nothing (a test that needs a site hands the run its own submitter). Code in `Shared/` names no UIKit or WebKit type (`tools/tests/test_shared_has_no_platform_types.py`): a `WKWebView` in a published property of `GuidedRunner` crashed the whole Mac test process on GitHub's Xcode 26 as XCTest read the classes. The model's sources live in `Shared/Model`, compiled into the
 app and, through links, into `Packages/AssistedRunLogic` (one module with `Shared/AssistedRun`), so `swift test --package-path Packages/AssistedRunLogic` runs them in a few
 seconds on a Mac. The catalog those tests read is built from the repository's own data on the first test (`MacCatalog`). A new rule's test goes on the Mac
 (`Packages/AssistedRunLogic/Tests/AssistedRunLogicTests/Model`, or the core package, or `tools/pagescripts` for a page script); what only a real web view, the Keychain or the
