@@ -1,5 +1,4 @@
 import XCTest
-import WebKit
 import OptOutKitCore
 @testable import AssistedRunLogic
 

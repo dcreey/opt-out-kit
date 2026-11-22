@@ -12,7 +12,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
     final class NoSendPage: GuidedPage {
         let inner = WebGuidedPage()
         private(set) var sendAttempts = 0
-        var webView: WKWebView? { inner.webView }
+        var webView: AnyObject? { inner.webView }
         func load(_ url: URL) async { await inner.load(url) }
         func currentURL() -> URL? { inner.currentURL() }
         func visibleText() async -> String { await inner.visibleText() }
@@ -59,7 +59,7 @@ final class LiveSpokeoFlowTests: XCTestCase {
 
         // 1. The app searched Spokeo for the person.
         _ = await waitUntil(40) { page.currentURL()?.host?.contains("spokeo.com") == true }
-        let web = try XCTUnwrap(page.webView)
+        let web = try XCTUnwrap(page.webView as? WKWebView)
         try await Task.sleep(nanoseconds: 4_000_000_000)
         let searchURL = try XCTUnwrap(page.currentURL())
         print("LIVESPOKEO search page: \(searchURL.absoluteString)")

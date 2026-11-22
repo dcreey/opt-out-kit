@@ -1,5 +1,4 @@
 import Foundation
-import WebKit
 import OptOutKitCore
 
 /// Everything `AppModel` needs from the phone itself: the screen's idle timer, background time, notifications and reminders, the advertising ID, the Keychain, the clipboard,
@@ -124,7 +123,7 @@ private struct NoWebGuidedPageMaker: GuidedPageMaker { func make() -> GuidedPage
 /// A guided page with no browser behind it: loads nothing, shows nothing, sends nothing.
 @MainActor
 private final class NoWebGuidedPage: GuidedPage {
-    var webView: WKWebView? { nil }
+    var webView: AnyObject? { nil }
     func load(_ url: URL) async {}
     func currentURL() -> URL? { nil }
     func visibleText() async -> String { "" }

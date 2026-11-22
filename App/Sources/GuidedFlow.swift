@@ -11,7 +11,7 @@ final class WebGuidedPage: GuidedPage {
     private var live: WebAssistedPage?
     private var liveFor: URL?
 
-    var webView: WKWebView? { shown ?? { shown = session.presentable(); return shown }() }
+    var webView: AnyObject? { shown ?? { shown = session.presentable(); return shown }() }
 
     func use(person: Person) { self.person = person }
 
@@ -100,7 +100,7 @@ struct GuidedFlowView: View {
                 GuidedPanel(runner: runner, topInset: geo.safeAreaInsets.top, maxStepHeight: geo.size.height * 0.2)
                 // The site's own page sits below the guide, clearly a different thing.
                 Group {
-                    if let web = runner.webView { WebViewHost(webView: web) }
+                    if let web = runner.webView as? WKWebView { WebViewHost(webView: web) }
                     else { ProgressView("Loading…").frame(maxWidth: .infinity, maxHeight: .infinity) }
                 }
                 .frame(maxHeight: .infinity)
@@ -141,7 +141,7 @@ struct GuidedPanel: View {
             GuideSurface(topInset: topInset, collapsed: $guideCollapsed) {
                 HStack(spacing: 10) {
                     Menu {
-                        PageMenu.items(web: runner.webView, idPrefix: "guided", details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { runner.flagEmailStep(); model.addFollowUpStep(runner.siteID) }) { runner.fillAgain() }
+                        PageMenu.items(web: runner.webView as? WKWebView, idPrefix: "guided", details: model.pageDetails, browser: browserHandoff, anotherEmailStep: { runner.flagEmailStep(); model.addFollowUpStep(runner.siteID) }) { runner.fillAgain() }
                         Menu {
                             ForEach(IssueKind.allCases, id: \.self) { kind in
                                 Button(kind.label) { runner.report(kind) }.accessibilityIdentifier("guided-issue-\(kind.rawValue)")

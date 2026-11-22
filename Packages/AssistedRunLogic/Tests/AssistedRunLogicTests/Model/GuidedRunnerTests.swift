@@ -1,5 +1,4 @@
 import XCTest
-import WebKit
 import OptOutKitCore
 @testable import AssistedRunLogic
 
@@ -13,7 +12,7 @@ private final class ScriptedGuidedPage: GuidedPage {
     var scanCount = 1
     private(set) var scans = 0
     private(set) var loaded: [URL] = [], fills = 0, sends = 0, polls = 0, closed = false
-    var webView: WKWebView? { nil }
+    var webView: AnyObject? { nil }
     var whileLoading: (() -> Void)?
     func load(_ url: URL) async { loaded.append(url); self.url = url; whileLoading?() }
     func currentURL() -> URL? { url }
@@ -254,7 +253,7 @@ final class GuidedHealingTests: XCTestCase {
         var url: URL? = URL(string: "https://x.example/optout")
         var broken = true
         private(set) var loaded: [URL] = []
-        var webView: WKWebView? { nil }
+        var webView: AnyObject? { nil }
         func load(_ u: URL) async { loaded.append(u); url = u }
         func currentURL() -> URL? { url }
         func visibleText() async -> String { broken && url?.path == "/optout" ? "Page not found\nOops! That page can't be found." : "Request Portal. Opt out here." }
@@ -343,7 +342,7 @@ final class ListingGuideTests: XCTestCase {
         var url: URL? = URL(string: "about:blank")
         private(set) var loaded: [URL] = []
         private(set) var filled: [[FieldValue]] = []
-        var webView: WKWebView? { nil }
+        var webView: AnyObject? { nil }
         func load(_ u: URL) async { loaded.append(u); url = u }
         func currentURL() -> URL? { url }
         func visibleText() async -> String { "A page" }

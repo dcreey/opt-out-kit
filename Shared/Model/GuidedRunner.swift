@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 import OptOutKitCore
 
 
@@ -8,7 +7,9 @@ import OptOutKitCore
 /// What the guided runner needs from a browser page. The real one wraps the web view; tests script it.
 @MainActor
 protocol GuidedPage: AnyObject {
-    var webView: WKWebView? { get }
+    /// The page's view (a WKWebView in the app). Typed loosely so the model names no WebKit type: the Mac tests load this code, and on Xcode 26 a WebKit type
+    /// in a published property crashed the test process as XCTest read the classes (`Published<WKWebView?>` metadata).
+    var webView: AnyObject? { get }
     func load(_ url: URL) async
     func currentURL() -> URL?
     func visibleText() async -> String
@@ -41,7 +42,7 @@ final class GuidedRunner: ObservableObject {
     /// The same line is set on every tick while a step waits; only a different one redraws the screen (an open menu blinked otherwise).
     private(set) var status: String? { willSet { if newValue != status { objectWillChange.send() } } }
     @Published private(set) var ending: Ending?
-    @Published private(set) var webView: WKWebView?
+    @Published private(set) var webView: AnyObject?
 
     let siteName: String
     /// "Is it completely done?" after a send the page did not call finished; asked only where a person is on screen (the guided screen sets `asksAboutFollowUp`).
