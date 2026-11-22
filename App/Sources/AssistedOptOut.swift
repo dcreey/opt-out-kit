@@ -212,6 +212,9 @@ final class WebAssistedPage: AssistedPage {
 
     var webView: WKWebView? { shown }
     func present() { if shown == nil { shown = session.presentable() } }
+    func waitUntilShown() async {
+        for _ in 0..<80 where session.webView.window == nil { try? await Task.sleep(nanoseconds: 50_000_000) }          // up to 4 s; a page that never shows is judged as it is
+    }
 
     func blockers() async -> [AssistedBlocker] {
         var out: [AssistedBlocker] = []

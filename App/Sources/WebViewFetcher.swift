@@ -162,7 +162,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// presses "I agree" and logs it. Anything else leaves the prompt for them. True when the button was pressed.
     func acceptTermsIfAllowed(policy: TermsPolicy?, domain: String) async -> Bool {
         guard let policy, let gate = await findTermsGate() else { return false }
-        guard case .accept(let paragraphs, let version) = await policy.decide(domain: domain, prompt: gate.prompt, documentLinks: gate.links), await clickAgree() else { return false }
+        let decision = await policy.decide(domain: domain, prompt: gate.prompt, documentLinks: gate.links)
+        guard case .accept(let paragraphs, let version) = decision, await clickAgree() else { return false }
         await policy.accepted(domain: domain, paragraphs: paragraphs, libraryVersion: version)
         await settle(maxWait: 8)
         return true
@@ -174,7 +175,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// to. Nothing is clicked here.
     private func findTermsGate() async -> (prompt: String, links: [URL])? {
         let js = PageScript.call("find-terms-gate", Self.gatePattern)
-        guard let json = (try? await webView.evaluateJavaScript(js)) as? String,
+        let raw = try? await webView.evaluateJavaScript(js)
+        guard let json = raw as? String,
               let data = json.data(using: .utf8),
               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let prompt = object["prompt"] as? String else { return nil }

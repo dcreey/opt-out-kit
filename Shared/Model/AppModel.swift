@@ -247,6 +247,8 @@ final class AppModel: ObservableObject {
             mom.id = UUID(); mom.displayName = "Mom"; mom.relationship = .parent
             household.add(mom); selectedID = mom.id
         }
+        // UI tests: `-uitest-approve-terms` is the person having allowed "accept site terms for me" (Settings), for the current terms library.
+        if args.contains("-uitest-approve-terms") { household.approveTerms(libraryVersion: termsLibrary?.version ?? 0) }
         // UI tests: automatic protection on, as a new person who said yes at first use (the first pass then starts when the app is open).
         if args.contains("-uitest-auto-on") { household.updateAuto { $0.turnOnBoth(now: Date()) } }
         #endif

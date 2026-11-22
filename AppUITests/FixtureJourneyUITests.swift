@@ -111,6 +111,29 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(app.buttons.matching(identifier: "finish-done").firstMatch.waitForExistence(timeout: 30), "the app asks whether it is completely done")
     }
 
+    /// As a user I want what I typed to stay: the app fills the form and waits for my check; I change the name it typed; and when I clear the check the form is sent with
+    /// my name, not the app's (a refill never undoes the person's edit).
+    func testAWordIChangeInTheFormIsNotUndoneWhenTheAppFillsAgainAndSends() {
+        let app = solveAndSend("turnstile-1")
+        let name = app.webViews.textFields["Full name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 40), "the page shows the name box")
+        let filled = NSPredicate(format: "value == 'Pat Example'")
+        expectation(for: filled, evaluatedWith: name); waitForExpectations(timeout: 40)
+        name.tap()
+        name.typeTextChecked("Patricia Edited ")          // typed where the cursor was put, before the app's words
+        if app.buttons["keyboard-hide"].exists { app.buttons["keyboard-hide"].tap() }
+        Thread.sleep(forTimeInterval: 6)          // the app watches the page and may fill again: it must leave my words
+        let verify = app.webViews.buttons["Verify you are human"]
+        XCTAssertTrue(verify.waitForExistence(timeout: 30), "the check is waiting for me")
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 8 {
+            if verify.isHittable { verify.tap() }
+            Thread.sleep(forTimeInterval: 3); taps += 1
+        }
+        XCTAssertTrue(server.waitForSent(timeout: 60) { $0.contains("fx_turnstile_1") }, "the form was sent: \(server.requests)")
+        XCTAssertEqual(server.requests.last { $0.site == "fx_turnstile_1" }?.fields["name"], "Patricia Edited Pat Example", "my words were kept, and the app did not type its own over them")
+    }
+
     /// As a user I want a site whose confirmation says it will email me a link to be told so: the app sees the promise in the page, does not ask, and lists the
     /// site as sent with the email still to confirm.
     func testSolveAndSendSeesThatASitePromisesAnEmailAndListsItForTheFollowUp() {

@@ -8,6 +8,7 @@ OUT="${1:-$ROOT/.build/fixtures/Catalog.sqlite}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 for d in platforms jurisdictions terms registries data; do cp -R "$ROOT/$d" "$WORK/$d"; done
+python3 "$ROOT/fixtures/add_terms.py" "$WORK/terms/library.yml"          # the fixture terms prompts, reviewed, for the terms-accepted journey
 mkdir -p "$WORK/App"; cp -R "$ROOT/App/PageScripts" "$WORK/App/PageScripts"
 cp -R "$ROOT/fixtures/sites" "$WORK/directory"
 cp -R "$ROOT/fixtures/flows" "$WORK/brokers"

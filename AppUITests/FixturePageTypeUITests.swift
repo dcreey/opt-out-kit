@@ -219,11 +219,37 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["name"], "Pat Example")
     }
 
+    /// I allowed the app to accept site terms for me, and every paragraph of this prompt was read by a person and passed: the app presses I Agree itself, fills the form and
+    /// sends it, with nothing left for me.
+    func testAPromptWhoseParagraphsWereReviewedIsAcceptedForMeWhenIAllowedIt() {
+        _ = solveAndSend("termsok-1", extra: ["-uitest-approve-terms"])
+        let f = sent("fx_termsok_1")
+        XCTAssertEqual(f["name"], "Pat Example", "\(f)")
+    }
+
+    /// The same allowance does not cover a prompt no person has reviewed: it is left for me, as without the allowance.
+    func testAnUnreviewedPromptIsLeftForMeEvenWhenIAllowedTermsInGeneral() {
+        let app = solveAndSend("terms-1", extra: ["-uitest-approve-terms"])
+        Thread.sleep(forTimeInterval: 15)
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "terms-unreviewed"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'accept its terms'")).firstMatch.waitForExistence(timeout: 40), "the app says the terms are mine to accept; sent so far: \(server.requests)")
+        Thread.sleep(forTimeInterval: 5)
+        XCTAssertTrue(server.sentSites.isEmpty, "nothing was accepted or sent for me: \(server.requests)")
+    }
+
     /// A phone box that only takes "(123) 456-7890": the app retypes the number in the shape the box asks for.
     func testAPhoneBoxThatWantsParenthesesAndADashGetsThePhoneInThatShape() {
         _ = solveAndSend("phoneformat-1", extra: ["-uitest-seed-multi"])
         let f = sent("fx_phoneformat_1")
         XCTAssertNotNil(f["phone"]?.range(of: "^\\(\\d{3}\\) \\d{3}-\\d{4}$", options: .regularExpression), "the phone is in the box's shape: \(f)")
+    }
+
+    /// A country-code menu beside the phone box already says +1, so the box takes the number alone (digits only), and the menu is left as it is.
+    func testAPhoneBoxBesideACountryCodeMenuTakesTheNumberAlone() {
+        _ = solveAndSend("phonecountry-1", extra: ["-uitest-seed-multi"])
+        let f = sent("fx_phonecountry_1")
+        XCTAssertEqual(f["phone"], "7735550101", "digits only, no +1, spaces or punctuation: \(f)")
+        XCTAssertEqual(f["cc"], "us", "the menu was left on its own choice")
     }
 
     /// A date-of-birth box that wants yyyy-mm-dd: the app types the date in the shape the box accepts.

@@ -36,9 +36,12 @@ protocol AssistedPage: AnyObject {
     func close()
     /// Moves the page's web view out of its hidden window so a screen can show it. Called by the runner, never while a view is drawing.
     func present()
+    /// Waits until the page is on screen. A page that is not in a window is not laid out: its text reads empty and its boxes have no size, so a terms prompt, a check or a certification
+    /// on it would not be seen, and the form would be sent behind it.
+    func waitUntilShown() async
 }
 
-extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; func userIsTyping() async -> Bool { false }; func pressesSinceFill() async -> Int? { nil }; var formsRemaining: Int { 0 } }
+extension AssistedPage { func scrollToOptOut() async -> Bool { false }; func present() {}; func waitUntilShown() async {}; func pageText() async -> String { "" }; func adoptNewForm() async -> Bool { false }; func changed() async -> Bool { false }; func moreForms() async -> Bool { false }; func awaitingCode() async -> Bool { false }; func userIsTyping() async -> Bool { false }; func pressesSinceFill() async -> Int? { nil }; var formsRemaining: Int { 0 } }
 
 @MainActor
 protocol AssistedDriver {
@@ -463,6 +466,7 @@ final class AssistedRunner: ObservableObject {
             }
             ready.present()         // here, not while the screen is drawing: moving a web view during a draw crashed the app
             page = ready; goingBack = false
+            await ready.waitUntilShown()          // the screen mounts the page's web view once it is set; nothing is judged until it is in its window (`AssistedPage.waitUntilShown`)
             pageForms = (1, 1 + ready.formsRemaining)
             prepare(i + 1)      // load the next one while the person works on this one
 

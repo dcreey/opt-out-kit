@@ -1536,6 +1536,21 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertNil(plan.values.first { $0.name == "token" }, "hidden fields are left as the site set them")
     }
 
+    /// forewarn.com: the "which law gives you this right" box gets the plain statement of the privacy laws; the basis checkbox (the person's claim) and the box about a
+    /// threat of harm are never filled.
+    func testTheLawBoxGetsTheApplicableLawAndTheBasisAndThreatBoxesAreNeverFilled() {
+        let f = form([("text", "First Name", "Name*"), ("email", "Email", "Email Address*"),
+                      ("checkbox", "legalRight", "I am an individual afforded a legal right to non-disclosure/opt-out due to a risk of harm or similar threat."),
+                      ("textarea", "legalInfo", "Please cite the particular, applicable law that affords you protection"),
+                      ("checkbox", "personlRisk", "I am an individual otherwise subject to a serious risk of physical harm."),
+                      ("textarea", "threatInfo", "Please describe the threat against you, and any supporting documentation you possess substantiating the threat")])
+        let plan = FormFiller.plan(for: f, signals: nil, person: pat)
+        XCTAssertEqual(plan.values.first { $0.name == "legalInfo" }?.candidates, [FormFiller.legalBasis(for: pat)])
+        XCTAssertGreaterThan(FormFiller.legalBasis(for: pat).count, 50)
+        XCTAssertNil(plan.values.first { $0.name == "threatInfo" }, "the box about a threat of harm is never filled")
+        XCTAssertNil(plan.values.first { $0.name == "legalRight" || $0.name == "personlRisk" }, "the person's own claims are never ticked for them")
+    }
+
     func testAStateBoxWhoseHintNamesTheCountryGetsTheStateNotTheCountry() {
         let f = form([("text", "country", "Country*"), ("text", "state", "State (select country first)*"), ("text", "city", "City")])
         let plan = FormFiller.plan(for: f, signals: nil, person: pat)

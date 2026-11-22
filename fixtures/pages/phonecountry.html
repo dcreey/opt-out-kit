@@ -1,0 +1,8 @@
+<h1>Opt out of {{site}}</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <div><select name="cc"><option value="us" selected>United States (+1)</option><option value="mx">Mexico (+52)</option></select>
+  <input type="tel" name="phone" placeholder="Phone number" required></div>
+  <button type="submit">Submit request</button>
+</form>

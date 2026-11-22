@@ -1,0 +1,24 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'phonecountry'). docs/TESTING.md, 'End-to-end tests against fixture pages'; docs/PAGE-TYPES.md says which recorded sites it stands for.
+id: 'fx_phonecountry_1'
+domain: 'phonecountry-1.fixture.test'
+name: 'Fixture phonecountry 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_phonecountry_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_phonecountry_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_phonecountry_1/send'
+  fields:
+    - type: 'text'
+      name: 'name'
+      label: 'Full name'
+    - type: 'email'
+      name: 'email'
+      label: 'Email address'
+    - type: 'tel'
+      name: 'phone'
+      label: 'Phone number'
+  hops: 0
