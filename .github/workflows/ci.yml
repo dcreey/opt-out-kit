@@ -1,8 +1,8 @@
 name: 'CI'
 
 # Unit tests, on every push to main and every pull request: the Mac package tests (the model, the engine, the catalog: no simulator), the lint jobs, the
-# data and tool checks, and one job that only BUILDS the app and its tests (no simulator is booted). Everything that needs a simulator (the web-view tests in
-# AppTests and the UI tests in AppUITests) is an integration test: .github/workflows/integration.yml, run for a release. The repository is public, so GitHub's
+# data and tool checks, and one job that only BUILDS the app and its tests (no simulator is booted). Everything that needs a simulator (the UI tests in
+# AppUITests) is an integration test: .github/workflows/integration.yml, run for a release. The repository is public, so GitHub's
 # hosted runners are free. No job contacts a real broker site. What runs where: docs/TESTING.md ("Unit and integration tests", "Continuous integration").
 on:
   push:
@@ -208,6 +208,8 @@ jobs:
             COMPILER_INDEX_STORE_ENABLE=NO CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO 2>&1 | tee build.log | tail -20
           # No app icon in the test build: rendering its variants took over three minutes on these machines (CI only; release builds keep it).
           python3 tools/ci_shards.py --build-summary build.log --cache "$CACHE" --folder DerivedData
+      - name: 'The built app holds the compiled catalog and no data files'
+        run: 'python3 tools/check_bundle.py DerivedData/Build/Products/Debug-iphonesimulator/OptOutKit.app'
       - name: 'Leave the logs out of the build folder the post step saves (so the cache does not grow)'
         if: 'always()'
         run: 'rm -rf DerivedData/Logs DerivedData/Index.noindex && du -sh DerivedData'

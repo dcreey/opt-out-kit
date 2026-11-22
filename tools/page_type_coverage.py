@@ -85,7 +85,8 @@ KINDS = [
     ('A form that needs ID or a file upload', has_signal('id_required', 'file_upload'), ['upload'], ['testAFormThatWantsAFileUploadIsNotSentWithoutIt'], 'covered'),
     ('A third-party privacy portal (Osano, OneTrust, TrustArc)', has_signal('portal_osano', 'portal_onetrust', 'portal_trustarc'), [], [], 'none'),
     ('A bot check on the site\'s home page, before its form', has_signal('bot_check_on_home'), [], [], 'none'),
-    ('A terms prompt to accept before the form', has_blocker('terms'), ['terms'], ['testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed'], 'covered'),
+    ('A terms prompt to accept before the form', has_blocker('terms'), ['terms', 'termsok'],
+     ['testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed', 'testAPromptWhoseParagraphsWereReviewedIsAcceptedForMeWhenIAllowedIt', 'testAnUnreviewedPromptIsLeftForMeEvenWhenIAllowedTermsInGeneral'], 'covered'),
     ('A form for an agent, a business or another person', lambda d: any(has_blocker(p)(d) for p in ('agent', 'business', 'other')), ['agent'], ['testAnAuthorizedAgentQuestionIsAnsweredNo'], 'partial'),
 ]
 

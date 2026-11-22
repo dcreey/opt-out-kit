@@ -28,7 +28,7 @@ form when it was loaded for real, and the boxes of its form where one was read).
 | A form that needs ID or a file upload | 59 | `upload` | `testAFormThatWantsAFileUploadIsNotSentWithoutIt` | covered |
 | A third-party privacy portal (Osano, OneTrust, TrustArc) | 33 | (none yet) |  | not covered |
 | A bot check on the site's home page, before its form | 45 | (none yet) |  | not covered |
-| A terms prompt to accept before the form | 2 | `terms` | `testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed` | covered |
+| A terms prompt to accept before the form | 2 | `terms`, `termsok` | `testATermsGateIsNeverAcceptedByTheAppAndTheFormIsSentOnceIHaveAgreed`<br>`testAPromptWhoseParagraphsWereReviewedIsAcceptedForMeWhenIAllowedIt`<br>`testAnUnreviewedPromptIsLeftForMeEvenWhenIAllowedTermsInGeneral` | covered |
 | A form for an agent, a business or another person | 32 | `agent` | `testAnAuthorizedAgentQuestionIsAnsweredNo` | partly |
 
 The count of a kind that has no fixture is the work still to do. Sites counted per kind overlap, so the column does not add up to the number of sites.

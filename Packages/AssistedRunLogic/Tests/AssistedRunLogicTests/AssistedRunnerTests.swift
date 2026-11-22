@@ -9,12 +9,15 @@ private final class ScriptedPage: AssistedPage {
     var blockerScript: [[AssistedBlocker]]          // what blockers() returns on each call; the last entry repeats
     var outcomes: [SubmitOutcome]                   // what send() returns on each call
     private(set) var refills = 0, sends = 0, polls = 0, closed = false
+    private(set) var events: [String] = []          // present, shown, blockers, send: in the order the runner asked
     init(blockers: [[AssistedBlocker]] = [[]], outcomes: [SubmitOutcome] = [.submitted(awaitingEmail: false)]) {
         self.blockerScript = blockers; self.outcomes = outcomes
     }
-    func blockers() async -> [AssistedBlocker] { defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
+    func blockers() async -> [AssistedBlocker] { events.append("blockers"); defer { polls += 1 }; return blockerScript[min(polls, blockerScript.count - 1)] }
     func refill() async { refills += 1 }
-    func send() async -> SubmitOutcome { defer { sends += 1 }; return outcomes[min(sends, outcomes.count - 1)] }
+    func send() async -> SubmitOutcome { events.append("send"); defer { sends += 1 }; return outcomes[min(sends, outcomes.count - 1)] }
+    func present() { events.append("present") }
+    func waitUntilShown() async { events.append("shown") }
     func close() { closed = true }
 }
 
@@ -74,6 +77,19 @@ final class AssistedRunnerTests: XCTestCase {
         XCTAssertEqual(page.refills, 1)
         XCTAssertTrue(page.closed)
         XCTAssertTrue(r.finished)
+    }
+
+    /// A page that is not yet in a window is not laid out: its text reads empty, so a terms prompt or a check on it is not seen and the form would be sent behind
+    /// it (found by the terms fixture: 1 run in 3 sent behind an unaccepted prompt). The runner shows the page and waits until it is on screen before it asks
+    /// for blockers or sends anything.
+    func testNothingIsJudgedOrSentUntilThePageIsOnScreen() async {
+        let page = ScriptedPage()
+        let r = runner(["a.example"], ScriptedDriver(["a.example": page]), Sink())
+        await r.run()
+        let first = { (e: String) in page.events.firstIndex(of: e) ?? Int.max }
+        XCTAssertLessThan(first("present"), first("shown"), "\(page.events)")
+        XCTAssertLessThan(first("shown"), first("blockers"), "the page is on screen before any blocker is looked for: \(page.events)")
+        XCTAssertLessThan(first("shown"), first("send"), "\(page.events)")
     }
 
     func testItWaitsForTheCheckThenRefillsAndSendsOnlyAfterItClears() async {

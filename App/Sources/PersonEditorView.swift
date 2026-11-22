@@ -32,19 +32,8 @@ struct PersonEditorView: View {
         _last = State(initialValue: person.legalLast)
     }
 
-    /// A name, phone, email or earlier address that was added and left empty is dropped when saving, so an accidental tap on "Add" leaves nothing behind.
-    static func pruned(_ person: Person) -> Person {
-        var p = person
-        func blank(_ s: String?) -> Bool { (s ?? "").trimmingCharacters(in: .whitespaces).isEmpty }
-        p.names.removeAll { $0.kind != .legal && blank($0.name) }
-        p.phones.removeAll { blank($0) }
-        p.emails.removeAll { blank($0) }
-        if blank(p.linkedIn) { p.linkedIn = nil }
-        if p.addresses.count > 1 {
-            p.addresses = [p.addresses[0]] + p.addresses.dropFirst().filter { !(blank($0.street) && blank($0.city) && blank($0.state) && blank($0.zip)) }
-        }
-        return p
-    }
+    /// A name, phone, email or earlier address that was added and left empty is dropped when saving (`Person.prunedForSave`).
+    static func pruned(_ person: Person) -> Person { person.prunedForSave() }
 
     /// The one write: the profile and, on the owner's profile, the email, in a single save. Does nothing when nothing changed. Once it is written the kept draft is not needed.
     private func commit() {
@@ -449,17 +438,6 @@ struct StatePicker: View {
         }
         .pickerStyle(.menu).labelsHidden().fixedSize()
         .accessibilityLabel("State")
-    }
-}
-
-
-/// A binding to one field of the row at index `i` of a list that survives the row being deleted. SwiftUI can still ask a row it is about to remove for its
-/// value (or hand it one to store) after the array has already shrunk, and `list[i]` then traps ("Index out of range") and ends the app; this gives the
-/// default and ignores the store instead.
-enum RowField {
-    static func binding<E, T>(_ list: Binding<[E]>, _ i: Int, _ kp: WritableKeyPath<E, T>, default d: T) -> Binding<T> {
-        Binding(get: { list.wrappedValue.indices.contains(i) ? list.wrappedValue[i][keyPath: kp] : d },
-                set: { if list.wrappedValue.indices.contains(i) { list.wrappedValue[i][keyPath: kp] = $0 } })
     }
 }
 

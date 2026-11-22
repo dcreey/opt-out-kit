@@ -1,11 +1,11 @@
 <h1>Opt out of {{site}}</h1>
-<div id="gate">
+<div id="gate" style="position:fixed;left:0;right:0;top:0;bottom:0;background:#fff;padding:16px;z-index:10">
   <p>ACCEPTABLE USE POLICY AND TERMS. This website is a private site that is not affiliated with any government agency or official source.</p>
   <p>You agree to use the information on this site for lawful purposes only and not to harass or stalk anyone at any time whatsoever.</p>
-  <button type="button" id="agree" onclick="document.getElementById('gate').remove(); document.getElementById('f').style.display='block'">I Agree</button>
+  <button type="button" id="agree" onclick="document.getElementById('gate').remove()">I Agree</button>
   <button type="button" id="no">I Don't Agree</button>
 </div>
-<form id="f" style="display:none" method="POST" action="/{{site}}/send">
+<form method="POST" action="/{{site}}/send" onsubmit="if(document.getElementById('gate')){return false}">
   <label>Full name <input type="text" name="name" required></label><br>
   <label>Email address <input type="email" name="email" required></label><br>
   <button type="submit">Submit request</button>

@@ -10,6 +10,7 @@ for its confirmation, 503 for kind 'down'; kind 'code' takes POST /<site>/code t
     GET  /<site>/optout     the form        POST /<site>/send   what the form posts (recorded), answered with a confirmation
     GET  /__received        every request recorded so far, as JSON ([{site, path, fields}])
     POST /__scroll          a page's scroll report (y, time, whether a finger moved it); GET /__scrolls lists them (the long pages report them)
+    GET  /__ping?site=      an open page saying it is still running (the slow page, every half second); GET /__pings counts them per site
     POST /__reset           forget them
     GET  /__ready           200 when the server is up
 docs/TESTING.md, "End-to-end tests against fixture pages".
@@ -26,6 +27,7 @@ from urllib.parse import parse_qs, urlsplit
 HERE = os.path.dirname(os.path.abspath(__file__))
 RECEIVED = []
 SCROLLS = []
+PINGS = {}
 CODE = '750439'          # the verification code the 'code' pages say they emailed
 LOCK = threading.Lock()
 SHELL = ('<html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>{title}</title></head>'
@@ -68,6 +70,14 @@ class Handler(BaseHTTPRequestHandler):
             with LOCK:
                 SCROLLS.append({**fields, 'at': str(time.time())})
             return self.send(200, 'ok', 'text/plain')
+        if parts == ['__ping']:
+            site = parse_qs(urlsplit(self.path).query).get('site', [''])[0]
+            with LOCK:
+                PINGS[site] = PINGS.get(site, 0) + 1
+            return self.send(200, 'ok', 'text/plain')
+        if parts == ['__pings']:
+            with LOCK:
+                return self.send(200, json.dumps(PINGS), 'application/json')
         if parts == ['__scrolls']:
             with LOCK:
                 return self.send(200, json.dumps(SCROLLS), 'application/json')
@@ -75,6 +85,7 @@ class Handler(BaseHTTPRequestHandler):
             with LOCK:
                 RECEIVED.clear()
                 SCROLLS.clear()
+                PINGS.clear()
             return self.send(200, 'ok', 'text/plain')
         # The reCAPTCHA checkbox's frame, at the path shape the page script looks for (kind 'recaptcha').
         if len(parts) == 4 and parts[0].startswith('fx_recaptcha_') and parts[1:] == ['recaptcha', 'api2', 'anchor']:

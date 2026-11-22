@@ -227,6 +227,11 @@ final class FixtureJourneyUITests: UITestCase {
         shot("2-run-report")
         let title = app.staticTexts["run-report-title"].label
         XCTAssertEqual(server.sentSites, ["fx_slow_1"], "the request was posted to the site once: \(server.requests)")
+        // The run gave up on the site: its page is ended, not left running hidden (it pinged every half second while it was open).
+        let pingedBefore = server.pings["fx_slow_1"] ?? 0
+        Thread.sleep(forTimeInterval: 3)
+        XCTAssertGreaterThan(pingedBefore, 0, "the page was open and running while the run waited for it")
+        XCTAssertEqual(server.pings["fx_slow_1"] ?? 0, pingedBefore, "a page the run gave up on stops running")
         done.tap()
         shot("3-after-the-run")
 
@@ -253,6 +258,7 @@ final class FixtureJourneyUITests: UITestCase {
         let opened = full.waitForExistence(timeout: 5)
         shot("6-the-screenshot-full-size")
         XCTAssertTrue(opened, "the screenshot opens full size")
+        XCTAssertTrue(full.screenshot().image.showsSomething, "the screenshot shows the page, not a blank or black picture")
         app.buttons["BackButton"].tap()
         XCTAssertTrue(picture.waitForExistence(timeout: 5), "and I am back on the site's page")
     }

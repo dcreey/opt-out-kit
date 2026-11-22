@@ -57,6 +57,12 @@ struct FixtureBrokers {
         return list.map { Scroll(site: $0["site"] ?? "", y: Int($0["y"] ?? "") ?? 0, ms: Int($0["t"] ?? "") ?? 0, user: $0["user"] == "1", kind: $0["kind"] ?? "", max: Int($0["max"] ?? "") ?? 0, at: TimeInterval($0["at"] ?? "") ?? 0) }
     }
 
+    /// How many times each open page said it was still running (the slow page pings every half second): a count that stops growing means the page was ended.
+    var pings: [String: Int] {
+        guard let data = get("__pings") else { return [:] }
+        return (try? JSONSerialization.jsonObject(with: data)) as? [String: Int] ?? [:]
+    }
+
     /// The sites whose request form was sent, in the order they were sent.
     var sentSites: [String] { requests.filter { $0.path == "send" }.map(\.site) }
 

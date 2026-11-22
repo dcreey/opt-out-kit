@@ -174,3 +174,15 @@ extension XCUIElement {
         XCTFail("\(self) never became tappable", file: file, line: line)
     }
 }
+
+extension UIImage {
+    /// True when the picture has more than one colour in it: a page, not a blank (all white) or black one.
+    var showsSomething: Bool {
+        guard let cg = cgImage, let data = cg.dataProvider?.data, let bytes = CFDataGetBytePtr(data) else { return false }
+        let n = CFDataGetLength(data), step = max(4, (n / 4 / 2000) * 4)
+        var seen = Set<UInt32>()
+        var i = 0
+        while i + 3 < n { seen.insert(UInt32(bytes[i]) << 16 | UInt32(bytes[i + 1]) << 8 | (UInt32(bytes[i + 2]) & 0xF0)); i += step }
+        return seen.count > 8
+    }
+}

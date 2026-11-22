@@ -8,6 +8,9 @@
 </form>
 </div>
 <script>
+// While the page is open it pings the server every half second, so a test can tell when the app has ended it (a site the run gave up on). An image request, not
+// fetch: the app counts a fetch or a change on the page as a sign of life, and this page must look as quiet as before.
+setInterval(function () { new Image().src = '/__ping?site={{site}}&t=' + Date.now(); }, 500);
 // The request is posted, then the page says it is working on it and never says it is done (a site that does not confirm in time).
 function go(form) {
   var body = new URLSearchParams(new FormData(form)).toString();

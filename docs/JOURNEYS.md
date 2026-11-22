@@ -16,17 +16,17 @@ about **what a person can do and whether a test walks it**.
 - **Of 54 user stories, 16 are walked end to end, 16 are walked in part, and 22 are not walked at all** by a UI test (counts at the end of the matrix). Most of the
   untested ones have strong Mac or simulator unit tests behind them; what they lack is a test that proves the *screens are wired to the rules*.
 - **The engine is faked in the UI tests** (`-uitest-fake-submit`, `-fake-hold`, `-fake-guided`, `-fake-scan`, `-demo-run`). So the UI tests prove the screens and
-  the navigation, and none proves that a form is really filled, a check is cleared, a send is confirmed and the next site comes up. That is covered in pieces
-  by `AppTests` (real WebKit against local pages: `LiveFormTests`, `WebAssistedDriverTests`) and the Mac suites, but never as one journey.
+  the navigation, and none proves that a form is really filled, a check is cleared, a send is confirmed and the next site comes up. The fixture journeys now prove
+  it against real pages served on the test machine (`FixtureJourneyUITests`, `FixturePageTypeUITests`: docs/TESTING.md, "End-to-end tests against fixture pages").
 - **The biggest gaps** are the whole Email links tab, the email opt-out, the end of the semi-automated send (check, send, confirmation, "is it completely
   done?"), skipping and bringing sites back, reviewing what the automatic run did, and an upgrade test for the new database.
 
 ## 0. Now end to end against fixture pages
 
 See docs/TESTING.md, "End-to-end tests against fixture pages". These run the real engine against a local web server of fixture brokers, nothing faked (run only
-for a release): `FixtureJourneyUITests` (Run now over every kind of page; stopping a run and carrying on; a site that never confirms; a site that answers with an
+for a release): `FixtureJourneyUITests` (Run now over every kind of page; stopping a run and carrying on; a site that never confirms, its page ended once given up and its screenshot not blank; a site that answers with an
 error; the run's report leading to the semi-automated sites; Solve and send through a plain form, a Cloudflare box, an "I'm not a robot" box, a choice that reveals
-the form, an email promise, an emailed code and a wrong one, a page with no form and a page that is down; skipping a site and bringing it back; marking a site done
+the form, an email promise, an emailed code and a wrong one, a page with no form and a page that is down; a word I change in the form that the app does not undo; skipping a site and bringing it back; marking a site done
 by hand), `FixtureGuideUITests` (a hand-written guide, to the end), `SolveAndSendUITests`, `ExposureScanUITests` and the first-pass / status-page tests of
 `AutoProtectionUITests`. The only fake left is the weekly job's sending over the real catalog (`-uitest-fake-submit`). This covers stories 11 (part), 12, 14, 15, 16,
 20, 21, 24, 25 (part), 26, 29, 30 (part), 31, 32, 38, 39 and 40 (part); stories 43 to 47 (follow-ups, email opt-out, Email links, GPC, mail app), 49 and 50
@@ -42,8 +42,9 @@ to trigger it). What is left unproved is the guard: `scrollToOptOutControl` (up 
 screen) is held back only while the person is typing, not while they scroll.
 
 Against the recorded sites (docs/PAGE-TYPES.md): the pages with a search first, several addresses, and exactly one request to choose each have a fixture and an end-to-end
-test, and driving them found three bugs (below). Still without a fixture: an hCaptcha, a third-party privacy portal, a bot check on the home page, a terms prompt, and a
-business form; the table lists their counts.
+test, and driving them found three bugs (below). A terms prompt now has two (`terms`: never accepted for me unless reviewed; `termsok`: accepted
+for me when I allowed it), and driving them found a fourth bug: a form could be sent behind a terms prompt that was missed because the page was not yet on screen (fixed:
+nothing is judged until it is). Still without a fixture: an hCaptcha, a third-party privacy portal, a bot check on the home page, and a business form; the table lists their counts.
 
 Things the fixtures showed that the fakes could not (all fixed; the tests that pin them are named in docs/TESTING.md):
 - A group of radios with no "delete" choice (know / opt out / limit) had **"Know what personal information you hold about me"** chosen instead of the opt-out: the rule for answering "who is this
@@ -158,7 +159,7 @@ Key: ✅ walked end to end by a UI test · 🟡 walked in part (what is missing 
 |---|---|---|---|
 | 1 | learn what the app promises and choose my language | ✅ | first run; device language; switch on page one |
 | 2 | give my email and place, and read what the law gives me before continuing | ✅ | California, a country, a state with no law |
-| 3 | decide whether the app may accept site terms for me | 🟡 | the page and its status are shown; Allow, Review and Turn off are never tapped (`terms-*`) |
+| 3 | decide whether the app may accept site terms for me | 🟡 | the page and its status are shown; Allow, Review and Turn off are never tapped (`terms-*`); what the allowance does on a page is end to end (`termsok`, `terms` with `-uitest-approve-terms`) |
 | 4 | decide whether to share my advertising ID | 🟡 | only "pass without sharing"; sharing, refusing and Open Settings are not driven (iOS owns the prompt) |
 | 5 | turn automatic opt-out on or off at the start, and later from the banner | ✅ | |
 | 6 | create my profile and be unable to finish it incomplete | ✅ | |
@@ -186,7 +187,7 @@ Key: ✅ walked end to end by a UI test · 🟡 walked in part (what is missing 
 | # | As a user I want to... | | Notes |
 |---|---|---|---|
 | 20 | go through the sites that need me: skip, go back, come forward | ✅ | |
-| 21 | have a site's form filled, clear its check, have it sent, see the confirmation, and move on | ❌ | the core of the app: only pieces are tested (`AssistedRunnerTests` on the Mac, `WebAssistedDriverTests` on real WebKit) |
+| 21 | have a site's form filled, clear its check, have it sent, see the confirmation, and move on | ❌ | the core of the app: the rules are `AssistedRunnerTests` on the Mac; end to end, `FixtureJourneyUITests.testSolveAndSendFillsTheFormWaitsForMyCheckThenSendsAndMovesOn` against fixture brokers |
 | 22 | turn "Send it for me" off for a session, and for good in Settings | 🟡 | session toggle ✅; Settings default ❌ |
 | 23 | copy my details when a form needs them | ✅ | |
 | 24 | be asked "Was this sent?" and answer yes or no | 🟡 | the alert and No; Yes (saves the site) ❌ |
@@ -226,7 +227,7 @@ Key: ✅ walked end to end by a UI test · 🟡 walked in part (what is missing 
 | 43 | come back to finish the email follow-ups | ❌ | `followup-*`; `OverdueFollowUpAppTests` |
 | 44 | set up Global Privacy Control | ❌ | `gpc-*` |
 | 45 | opt out by email: prepare messages, open my mail app (or another), confirm I sent them | ❌ | `email-open-*`; `EmailHandoffTests` (Mac) |
-| 46 | paste a link from a confirmation email, have the site recognised, fill my details and send | ❌ | the whole Email links tab (`link-*`, 14 controls); `LinkCheckTests`, `WebAssistedDriverTests` |
+| 46 | paste a link from a confirmation email, have the site recognised, fill my details and send | ❌ | the whole Email links tab (`link-*`, 14 controls); `LinkCheckTests` |
 | 47 | choose which mail app opens | ❌ | `mail-app-picker` |
 
 ### Settings, privacy and robustness

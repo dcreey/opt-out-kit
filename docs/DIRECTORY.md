@@ -198,7 +198,7 @@ The same review can be done inside the app, in a debug build (the simulator): la
 the site's page under the guide, "This is the page" records the page on screen (and moves on), a Kind menu says what it is (a form on the page, search for my record first, email only, needs login/ID/phone,
 no online opt-out, site gone), with optional email and note boxes; the … menu has quick "No online opt-out" and "Site gone", Skip, Previous site, the site's home page, a search for its opt-out page, and the export:
 Copy all tags as JSON, Share, or read `Documents/site-review.json` in the app's container (`xcrun simctl get_app_container booted dev.optoutkit.app data`). "Import tags from the clipboard" takes the JSON copied from the web
-review page, so sites already tagged there are skipped. Both use the same fields: `d`, `tag`, `url`, `email`, `note`, `at`. Covered by `SiteReviewTests`.
+review page, so sites already tagged there are skipped. Both use the same fields: `d`, `tag`, `url`, `email`, `note`, `at`. Covered by `ScreenHelperTests` (Mac: `SiteReviewQueue`).
 
 ## The policy crawl and its regression set
 

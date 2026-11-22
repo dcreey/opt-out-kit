@@ -9,22 +9,9 @@ import OptOutKitCore
 /// The same fields as the web review page (`tools/site_review_template.html`), so the two can be merged: d, tag, url, email, note, at.
 @MainActor
 final class SiteReview: ObservableObject {
-    struct Row: Identifiable, Equatable {
-        let id: String
-        let domain: String
-        let name: String
-        let url: URL?
-        let email: String?
-        let why: String
-    }
-    struct Tag: Codable, Equatable {
-        var d: String
-        var tag: String            // ok | other-page | search-first | email | account | none | dead | skip
-        var url: String?
-        var email: String?
-        var note: String?
-        var at: String
-    }
+    typealias Row = SiteReviewQueue.Row
+    typealias Tag = SiteReviewQueue.Tag
+
     enum Kind: String, CaseIterable, Identifiable {
         case form, searchFirst, email, account, none, dead
         var id: String { rawValue }
@@ -55,20 +42,7 @@ final class SiteReview: ObservableObject {
         index = rows.firstIndex { !isDone($0) } ?? 0
     }
 
-    /// The sites to go through: no readable form (or one that asks for business details), most important first.
-    static func rows(from entries: [DirectoryEntry]) -> [Row] {
-        entries.filter { e in
-            guard e.excluded == nil, e.closed == nil, e.optOutForm == nil else { return false }
-            if let live = e.liveForm, live.found, !live.blockers.contains("business") { return false }
-            return true
-        }
-        .sorted { ($0.priority ?? 0) > ($1.priority ?? 0) }
-        .map { e in
-            let business = e.liveForm?.blockers.contains("business") ?? false
-            let why = business ? "A form on its page asks for business details" : (e.optOutURL != nil ? "Its page has no form the app can read" : "No opt-out page on file")
-            return Row(id: e.id, domain: e.domain, name: e.name, url: e.optOutURL, email: e.contactEmail, why: why)
-        }
-    }
+    static func rows(from entries: [DirectoryEntry]) -> [Row] { SiteReviewQueue.rows(from: entries) }
 
     var current: Row? { rows.indices.contains(index) ? rows[index] : nil }
     func isDone(_ r: Row) -> Bool { if let t = tags[r.domain] { return t.tag != "skip" } else { return false } }
@@ -98,8 +72,7 @@ final class SiteReview: ObservableObject {
     /// Merges tags from the web review page ("Copy all tags as JSON"), so sites already tagged there are not asked about again. The newer one of two wins.
     @discardableResult func importJSON(_ text: String) -> Int {
         guard let data = text.data(using: .utf8), let incoming = try? JSONDecoder().decode([Tag].self, from: data) else { return 0 }
-        var n = 0
-        for t in incoming where tags[t.d] == nil || (tags[t.d]?.at ?? "") < t.at { tags[t.d] = t; n += 1 }
+        let n = SiteReviewQueue.merge(&tags, incoming)
         save()
         if let c = current, isDone(c) { next() }
         return n

@@ -3,7 +3,7 @@
 same time.
 
   ci_shards.py --shards 5 --index 0          the -only-testing: arguments for shard 0, one per line
-  ci_shards.py --suite OptOutKitTests --suite OptOutKitUITests ...    both test targets (the integration workflow runs both: every test that needs a simulator)
+  ci_shards.py --suite OptOutKitUITests ...  only the UI tests (the integration workflow; OptOutKitTests holds only the by-hand live probes)
   ci_shards.py --shards 5 --list             every shard, its classes and its expected seconds
   ci_shards.py --timings-from-log LOG        the seconds each class took in an xcodebuild log, as one line of JSON (CI prints it as a notice)
   ci_shards.py --failures-from-log LOG      each failed test and its message, as annotations (CI prints them)
