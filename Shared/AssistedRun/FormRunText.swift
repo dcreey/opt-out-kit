@@ -75,10 +75,25 @@ enum FormRun {
         looksFinished(text) && !mentionsEmailFollowUp(text)
     }
 
+    /// "This field is mandatory" / "This field is required" / "Required field" under a box: the reason, naming the box (the nearest line above that is not
+    /// the box's placeholder, "Choose state"), or nil when the page says no such thing.
+    nonisolated static func requiredBoxLeftEmpty(_ text: String) -> String? {
+        let lines = text.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        let says = try! NSRegularExpression(pattern: "^(this (field|question) is (mandatory|required)|(this )?field (is )?(mandatory|required)|required field|(this )?(field )?cannot be (empty|blank)|please (fill in|complete) this field)\\.?$", options: .caseInsensitive)
+        guard let i = lines.firstIndex(where: { says.firstMatch(in: $0, range: NSRange($0.startIndex..., in: $0)) != nil }) else { return nil }
+        let placeholder = try! NSRegularExpression(pattern: "^(choose|select|pick|please (choose|select)|enter|type)\\b|^-+", options: .caseInsensitive)
+        let name = lines[..<i].reversed().prefix(3).first { $0.count <= 40 && placeholder.firstMatch(in: $0, range: NSRange($0.startIndex..., in: $0)) == nil }
+            .map { $0.replacingOccurrences(of: "*", with: "").trimmingCharacters(in: .whitespaces) }
+        if let name, !name.isEmpty { return "the site says a required box was left empty: \(name)" }
+        return "the site says a required box was left empty"
+    }
+
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
         let t = text.lowercased()
         // A bare "Too many requests" page: the site is limiting us, which says nothing about the form. Reported as that, not as a failed attempt.
         if t.range(of: "too many requests|rate.?limit(ed)?|error 429|429 too many", options: .regularExpression) != nil { return .failed(AutoOptOut.rateLimited) }
+        // A required box left empty ("This field is mandatory" under "State"): said as that, with the box's name when the page shows it above the message.
+        if let missing = requiredBoxLeftEmpty(text) { return .rejected(missing) }
         // An error comes first: "problem with your submission" pages often also contain the word "request".
         if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
             return .rejected("the site showed an error after sending")

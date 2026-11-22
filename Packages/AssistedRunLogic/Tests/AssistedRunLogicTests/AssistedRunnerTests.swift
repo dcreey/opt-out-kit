@@ -421,6 +421,15 @@ final class PrematureDoneTests: XCTestCase {
         }
     }
 
+    /// 360mediadirect.com: the State box was left on "Choose state" and the page said "This field is mandatory" under it. The run says which box, not "no success message".
+    func testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage() {
+        let page = "Country *\nUnited States\nState *\nChoose state\nThis field is mandatory\nI would like to:*\nGet a copy of my data"
+        XCTAssertEqual(FormRun.classify(page), .rejected("the site says a required box was left empty: State"))
+        XCTAssertEqual(FormRun.classify("Email\nThis field is required."), .rejected("the site says a required box was left empty: Email"))
+        XCTAssertEqual(FormRun.classify("Thank you. Your request has been received."), .submitted(awaitingEmail: false), "a confirmation is still a confirmation")
+        XCTAssertNil(FormRun.requiredBoxLeftEmpty("All fields are required for us to process your request."), "a page's instructions are not an error under a box")
+    }
+
     func testRealConfirmationsStillCount() {
         XCTAssertEqual(FormRun.classifyConfirmed("Thank you. Your request has been received."), .submitted(awaitingEmail: false))
         XCTAssertEqual(FormRun.classifyConfirmed("Your request was submitted successfully."), .submitted(awaitingEmail: false))
