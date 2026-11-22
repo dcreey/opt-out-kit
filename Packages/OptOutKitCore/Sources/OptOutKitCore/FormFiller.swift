@@ -174,7 +174,11 @@ public enum FormFiller {
             switch field.type {
             case "hidden", "submit", "button", "image", "reset", "password", "range", "color", "time", "week": continue
             case "checkbox", "radio":
-                if attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") || isSelfIdentityBox(key) {
+                // "Authorized agent? No / Yes" (astoriacompany.com) is a question, not a statement to certify: the page's own No is chosen for a person asking for
+                // themselves (choose-request-options), so it never holds the form. Only as radios (a question with answers): a box saying "I am an authorized agent" is
+                // a statement, and still waits for the person.
+                let agentQuestion = field.type == "radio" && key.range(of: "authori[sz]ed.?agent|\\bagent\\b|on behalf", options: [.regularExpression, .caseInsensitive]) != nil
+                if !agentQuestion, attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") || isSelfIdentityBox(key) {
                     if isSelfIdentityBox(key), person.mayConfirmOwnIdentity() {
                         // The owner allowed this one plain statement about themselves; the sentinel below ticks it on the live page.
                     } else if isSelfIdentityBox(key) {

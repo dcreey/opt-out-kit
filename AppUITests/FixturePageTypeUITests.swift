@@ -190,6 +190,14 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["agent"], "no", "\(f)")
     }
 
+    /// A required "Authorized agent? No / Yes" asked with radios (astoriacompany.com): a question the app answers No for a person asking for themselves, not a
+    /// statement only the person may certify, so the form is sent.
+    func testARequiredAuthorizedAgentRadioQuestionIsAnsweredNoAndTheFormSent() {
+        _ = solveAndSend("agentradio-1")
+        let f = sent("fx_agentradio_1")
+        XCTAssertEqual(f["authorizedAgent"], "no", "\(f)")
+    }
+
     /// A page that only offers a sign-in (58 recorded sites need an account): nothing is typed into the sign-in form and nothing is sent.
     func testASignInPageIsNeverFilledOrSent() {
         let app = solveAndSend("login-1")

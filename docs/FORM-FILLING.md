@@ -86,6 +86,9 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
      of the sale" is a request the app chooses or leaves. affinityanswers.com was held on "a certification box that you must tick yourself" by its "To withdraw
      consent" option in an EU section the page hides from US visitors. Protected by `checks-and-prompts.test.js` and
      `FixturePageTypeUITests.testCheckboxesTickTheRemovingRequestsAndNotKnowOrCorrect` (its page has both).
+   - *"Authorized agent? No / Yes" as radios* is a question, not a certification: the page's No is chosen for a person asking for themselves, and the form is sent
+     (astoriacompany.com was held on "No * | authorizedAgent"). A box that states "I am an authorized agent" is still a statement and waits for the person.
+     Protected by `CoreTests.testARequiredAuthorizedAgentQuestionDoesNotHoldTheForm` and `FixturePageTypeUITests.testARequiredAuthorizedAgentRadioQuestionIsAnsweredNoAndTheFormSent`.
    - *A box that appears once another is filled* (adagio.io builds its State menu when Country is set): every fill reads the form again after filling and fills
      the new boxes (`WebAssistedPage.refill`). A box or menu that already shows the person's value is never set again (`fill-live`), because setting it again fires
      the page's change event and such a page rebuilds the box the app is about to fill. Protected by `fill-live.test.js` and

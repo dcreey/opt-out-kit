@@ -1552,6 +1552,15 @@ final class AutoOptOutTests: XCTestCase {
 
     /// forewarn.com: the "which law gives you this right" box gets the plain statement of the privacy laws; the basis checkbox (the person's claim) and the box about a
     /// threat of harm are never filled.
+    /// astoriacompany.com: a required "Authorized agent? No / Yes" (radios named authorizedAgent, labelled "No *" and "Yes") is a question the page answers No to for
+    /// a person asking for themselves, not a statement only the person may certify, so the form is not held for it. A real certification still is.
+    func testARequiredAuthorizedAgentQuestionDoesNotHoldTheForm() {
+        let f = form([("text", "firstname", "First name"), ("email", "email", "Email address"), ("radio", "authorizedAgent", "No *"), ("radio", "authorizedAgent", "Yes")])
+        XCTAssertEqual(FormFiller.plan(for: f, signals: nil, person: pat).verdict, .ready)
+        let cert = form([("email", "email", "Email address"), ("checkbox", "certify", "I certify under penalty of perjury *")])
+        if case .needsYou = FormFiller.plan(for: cert, signals: nil, person: pat).verdict {} else { XCTFail("a certification still waits for the person") }
+    }
+
     func testTheLawBoxGetsTheApplicableLawAndTheBasisAndThreatBoxesAreNeverFilled() {
         let f = form([("text", "First Name", "Name*"), ("email", "Email", "Email Address*"),
                       ("checkbox", "legalRight", "I am an individual afforded a legal right to non-disclosure/opt-out due to a risk of harm or similar threat."),

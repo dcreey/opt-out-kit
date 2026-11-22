@@ -1,0 +1,11 @@
+<h1>Do not sell or share my information ({{site}})</h1>
+<form method="POST" action="/{{site}}/send">
+  <label>First name <input type="text" name="firstname" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <!-- As on astoriacompany.com: a required question answered with radios, labelled only "No *" and "Yes". -->
+  <fieldset><legend>Authorized agent? *</legend>
+    <label><input type="radio" name="authorizedAgent" value="no" required> No</label><br>
+    <label><input type="radio" name="authorizedAgent" value="yes"> Yes</label>
+  </fieldset>
+  <button type="submit">Submit request</button>
+</form>
