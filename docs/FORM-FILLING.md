@@ -116,6 +116,11 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 Every change to these rules is checked against all the forms the directory recorded (`opt_out_form` in `directory/*.yml`, about 2400 boxes): fill each with a test person
 before and after and compare. The multi-value comparison (a person with three emails, two phones, three addresses and a maiden name and nickname) changed 10 boxes across the recorded forms, all of them improvements: alternate phone, nickname/maiden name, "Emails"/"Phone Numbers" lists, and one hash box that used to get an email now stays empty. The one before changed 17 boxes, all of them corrections (the two it first got wrong, "Confirm Email" and a textarea saying "handle your request", were fixed and have a test).
 
+- **After pressing send**, the app waits for the page to start answering (a few seconds at most) before reading it, then lets it settle. Read too soon, a form that
+  was sent looked like "nothing on the page changed after sending" on a slow machine (GitHub's runner). A page that replaced the form with "Processing your
+  request... Please wait... Do not close this page" has not confirmed anything: it is recorded as sent but not confirmed (`FormRun.saysStillWorking`,
+  `testAPageSayingItIsStillWorkingIsNotAConfirmation`), where before the result depended on how long the run happened to wait.
+
 ## One form, one submission
 
 A form is sent once, however many emails, phones, addresses or names the profile holds. The app never submits the same form again to cover another value: repeat
