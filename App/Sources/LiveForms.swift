@@ -108,9 +108,12 @@ extension WebViewSession {
     func discoverFormsDeep() async -> [LiveForm] {
         var first = await discoverForms()
         if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
-        // A form the page builds a few seconds after it loads (blackbaud.com's OneTrust web form): looked for again for a while before anything is clicked.
-        first = await formsAppearing(upTo: 6)
-        if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
+        // A form the page builds a few seconds after it loads (blackbaud.com's OneTrust web form): looked for again for a while before anything is clicked. Only on a
+        // page that looks unfinished (a privacy portal's host, or "Loading..."): every other page would wait for nothing, and a run's sites have a time limit.
+        if await pageLooksUnbuilt() {
+            first = await formsAppearing(upTo: 6)
+            if LiveFormPicker.pick(first, pageContext: await pageContext()) != nil { return first }
+        }
         if let opened = await openFoldedForms() { return opened }
         // Each click is followed by looking for the form until it shows (at most the pause each used to wait in full).
         let js = PageScript.source("open-request-links")
@@ -143,6 +146,12 @@ extension WebViewSession {
         let after = await discoverForms()
         if LiveFormPicker.pick(after, pageContext: await pageContext()) != nil { return after }
         return await openFoldedForms() ?? first
+    }
+
+    /// A privacy portal's page (OneTrust, TrustArc, Securiti, saymine, ...), or a short page that says it is loading: it may still be building its form.
+    func pageLooksUnbuilt() async -> Bool {
+        let js = "(function(){var t=(document.body&&document.body.innerText||'').replace(/\\s+/g,' ').trim(); return /onetrust|trustarc|securiti|saymine|osano|ketch|transcend|datagrail|termly/i.test(location.hostname)||(t.length<300&&/loading|please wait|one moment/i.test(t));})()"
+        return ((try? await evaluate(js)) as? Bool) ?? false
     }
 
     /// Every visible form with its fields. Each form and field gets a `data-ook` token so later steps find the same element.
