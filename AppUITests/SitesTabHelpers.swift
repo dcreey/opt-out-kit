@@ -174,15 +174,33 @@ extension XCUIElement {
     func restingFrame(within timeout: TimeInterval) -> CGRect? {
         let end = Date().addingTimeInterval(timeout)
         var last: CGRect?
-        while Date() < end {
-            let f = exists ? frame : .null
-            if !f.isNull, !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
+        var reads = 0
+        // At least two reads however long they take: on GitHub's simulator one read can take a second, and a short window that allowed only one never found
+        // anything at rest.
+        while Date() < end || reads < 2 {
+            let f = currentFrame
+            reads += 1
+            if let f {
                 if let l = last, l.equalTo(f) { return f }
                 last = f
             } else { last = nil }
             Thread.sleep(forTimeInterval: 0.25)
         }
         return nil
+    }
+
+    /// Its frame when it has a real place on screen (a closed menu's items exist with none), else nil. One read.
+    var currentFrame: CGRect? {
+        guard exists else { return nil }
+        let f = frame
+        return !f.isNull && !f.isEmpty && f.minX.isFinite && f.minY.isFinite && f.width > 1 && f.height > 1 ? f : nil
+    }
+
+    /// Whether it shows on screen within `timeout` (one read is enough).
+    func appearsOnScreen(within timeout: TimeInterval) -> Bool {
+        let end = Date().addingTimeInterval(timeout)
+        repeat { if currentFrame != nil { return true }; Thread.sleep(forTimeInterval: 0.25) } while Date() < end
+        return false
     }
 
     /// Taps the element where it came to rest. The spot, not the element: asking the element again can find it gone mid-animation, and XCTest's own hit
@@ -207,7 +225,8 @@ extension XCUIApplication {
     func chooseMenuItem(_ menu: XCUIElement, _ item: XCUIElement, until done: (() -> Bool)? = nil, file: StaticString = #filePath, line: UInt = #line) {
         for _ in 0..<3 {
             if done?() == true { return }
-            if item.restingFrame(within: 1) == nil { _ = menu.tapWhenResting(within: 10) }
+            // The menu is opened only when its item is not on screen after a moment's wait: tapping the menu while it is open closes it again.
+            if !item.appearsOnScreen(within: 2) { _ = menu.tapWhenResting(within: 10) }
             if item.tapWhenResting(within: 6) {
                 guard let done else { return }
                 let end = Date().addingTimeInterval(5)

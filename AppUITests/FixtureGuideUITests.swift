@@ -119,9 +119,9 @@ final class FixtureGuideUITests: UITestCase {
         openGuide(app)
         let more = app.buttons["guided-more"]
         XCTAssertTrue(more.waitForExistence(timeout: 10))
-        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason has come to rest on screen.
+        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason is on screen.
         let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]
-        app.chooseMenuItem(more, notWorking, until: { first.restingFrame(within: 0.6) != nil })
+        app.chooseMenuItem(more, notWorking, until: { first.currentFrame != nil })
         shot(app, "guide-not-working-menu")
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
@@ -138,9 +138,9 @@ final class FixtureGuideUITests: UITestCase {
         openGuide(app)
         let more = app.buttons["guided-more"]
         XCTAssertTrue(more.waitForExistence(timeout: 10))
-        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason has come to rest on screen.
+        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason is on screen.
         let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]
-        app.chooseMenuItem(more, notWorking, until: { first.restingFrame(within: 0.6) != nil })
+        app.chooseMenuItem(more, notWorking, until: { first.currentFrame != nil })
         let says = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch
         app.chooseMenuItem(notWorking, first, until: { says.exists || !first.exists })
         XCTAssertTrue(says.waitForExistence(timeout: 30), "the guide says it will look for the new page")
