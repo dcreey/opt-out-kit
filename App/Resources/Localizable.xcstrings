@@ -11478,6 +11478,29 @@
     }
    }
   },
+  "It carried on after a pause, with only the sites it had not done; nothing is sent twice.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'envoi a repris après une pause, avec seulement les sites qui restaient ; rien n'est envoyé deux fois."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuó tras una pausa, solo con los sitios que le faltaban; nada se envía dos veces."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Er wurde nach einer Pause fortgesetzt, nur mit den noch offenen Websites; nichts wird doppelt gesendet."
+     }
+    }
+   }
+  },
   "It does not delete anything, and it does not reach data brokers that already hold your details, because those never see your browser. It is a good habit next to the opt-outs in this app, not a replacement.": {
    "extractionState": "manual",
    "localizations": {

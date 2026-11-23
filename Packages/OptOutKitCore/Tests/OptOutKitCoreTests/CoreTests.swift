@@ -1361,6 +1361,30 @@ final class AutoOptOutTests: XCTestCase {
     /// and a screenshot over as it is cancelled, and the run records them with the "sent but not confirmed" result. One given up before sending keeps neither.
     /// quad.com: given up after sending, with neither what its page said nor a screenshot. A real page is closed by the cancelled work before a cancel handler
     /// can read it, so the run reads it first (`GiveUpCapture.whenGivingUp`), then cancels.
+    /// A page whose answer is still loading may not be readable until the load ends (a site that never answers its form's post): the reading is given at most its
+    /// time, and the run goes on without waiting for it (a task group waited for it, and held the run 150 s on one site).
+    func testAPageThatCannotBeReadWhenGivenUpDoesNotHoldTheRun() async {
+        struct Stuck: FormSubmitter {
+            var reportsActivity: Bool { true }
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+                await submitCapturing(form, plan: plan, dryRun: dryRun, activity: activity, giveUp: GiveUpCapture())
+            }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
+                giveUp.whenGivingUp { await withCheckedContinuation { (_: CheckedContinuation<SubmitEvidence?, Never>) in } }          // never answers
+                activity(); SiteRun.markSent?()
+                await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in }
+                return SubmitEvidence(outcome: .submitted(awaitingEmail: false))
+            }
+        }
+        var f = form([("text", "firstname", "First Name*"), ("email", "email", "Email")]); f.page = URL(string: "https://hang.example/optout")!
+        let entry = DirectoryEntry(id: "h", domain: "hang.example", name: "h", bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        let start = Date()
+        let results = await AutoOptOut(submitter: Stuck(), spacing: 0, siteLimit: 30, idleLimit: 0.3).run(entries: [entry], person: pat, progress: OptOutKitCore.Progress())
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.sentUnconfirmed))
+        XCTAssertLessThan(Date().timeIntervalSince(start), 15, "given up after its quiet limit and at most the reading's 6 s (and the run's 5 s wait for it)")
+    }
+
     func testAPageThatClosesWhenCancelledIsStillReadBeforeTheSiteIsGivenUp() async {
         final class Page: @unchecked Sendable { private let l = NSLock(); private var open = true
             func close() { l.lock(); open = false; l.unlock() }; var isOpen: Bool { l.lock(); defer { l.unlock() }; return open } }

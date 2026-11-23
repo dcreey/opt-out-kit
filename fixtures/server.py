@@ -6,7 +6,7 @@ broker's page, so a journey runs through the same engine, web view and page scri
     python3 fixtures/server.py [port]       default 8765 (the port written in fixtures/sites/*.yml)
 
 A site's id says which page it shows: fx_<kind>_<n> serves fixtures/pages/<kind>.html (<kind>-frame.html for a form in a frame; /<site>/search?q= for kinds 'listed' and 'unlisted' (the exposure scan's name search) and 'search' (results, with /<site>/profile-... pages, then the removal form asking for the listing's link), received-<kind>.html
-for its confirmation, 503 for kind 'down'; kind 'code' takes POST /<site>/code to "email" a code and accepts the request only with 750439). Every page is wrapped in a phone-sized shell.
+for its confirmation, 503 for kind 'down', no answer for 150 s to kind 'hang''s post; kind 'code' takes POST /<site>/code to "email" a code and accepts the request only with 750439). Every page is wrapped in a phone-sized shell.
     GET  /<site>/optout     the form        POST /<site>/send   what the form posts (recorded), answered with a confirmation
     GET  /__received        every request recorded so far, as JSON ([{site, path, fields}])
     POST /__scroll          a page's scroll report (y, time, whether a finger moved it); GET /__scrolls lists them (the long pages report them)
@@ -136,6 +136,10 @@ class Handler(BaseHTTPRequestHandler):
                 RECEIVED.append({'site': site, 'path': what, 'fields': fields, 'at': time.time()})
         if kind == 'down':
             return self.send(503, 'Service unavailable')
+        # Kind 'hang': the form is received, and the answer never comes (the page stays loading, as a slow site's does after its form is posted).
+        if kind == 'hang' and what == 'send':
+            time.sleep(150)
+            return self.send(200, SHELL.format(title=site, body='<h1>Too late</h1>'))
         if what == 'rejected':
             body = page('rejected-code')
         elif what == 'code':

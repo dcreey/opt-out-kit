@@ -157,6 +157,9 @@ struct AutoActivityView: View {
                     if let p = model.autoProgress {
                         ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
                         Text("Working in the background: \(p.done) of \(p.total) sites. You can leave this screen.").font(.caption).accessibilityIdentifier("auto-working")
+                        if model.autoCarriedOn {
+                            Text("It carried on after a pause, with only the sites it had not done; nothing is sent twice.").font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-carried-on")
+                        }
                     } else {
                         ProgressView().accessibilityIdentifier("auto-working")
                     }

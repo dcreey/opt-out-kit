@@ -82,6 +82,8 @@ final class AppModel: ObservableObject {
     private var continuedGranted: Bool { continuedRun?.isGranted ?? false }
     /// While the weekly opt-out is running: how many sites it has been through, of how many.
     @Published private(set) var autoProgress: (done: Int, total: Int)?
+    /// The run under way carried on after a pause (Stop, the app suspended or closed): its count includes the sites done before the pause.
+    @Published private(set) var autoCarriedOn = false
     /// Set when an opt-out run finishes, so the result is shown right away: all sent, or which sites need the person.
     @Published var runReport: RunReport?
     /// Latest "where am I listed" scan per person. Kept in memory only: it is a snapshot, not a record.
@@ -1077,16 +1079,21 @@ final class AppModel: ObservableObject {
         let toRun = directory.filter { (runnable?.contains($0.domain) ?? true) && !triedThisPass($0) }.map(resolved)
         // The count shown is what this run really has left, from the start: a run carried on after it was cut off showed "0 of" every site in the
         // directory until its first site was done, and looked as if it had started again from scratch.
+        // A run carried on after a pause counts on from the sites it already did: it read "0 of 32" after "2 of 35", and looked as if it had started again
+        // (2026-11-23). `autoCarriedOn` says so on the automatic opt-out page.
+        // Every site this pass already did (sent ones are no longer in `runnable`, which holds only what is left).
+        let alreadyDone = dryRun ? 0 : directory.filter { triedThisPass($0) && AutoOptOut.standIn(resolved($0)).optOutForm != nil }.count
+        autoCarriedOn = alreadyDone > 0
         if !dryRun, autoBusy == "optout" {
-            let total = toRun.filter { AutoOptOut.standIn($0).optOutForm != nil }.count
-            autoProgress = (0, total)
-            continuedRun?.report(done: 0, total: total)
+            let total = alreadyDone + toRun.filter { AutoOptOut.standIn($0).optOutForm != nil }.count
+            autoProgress = (alreadyDone, total)
+            continuedRun?.report(done: alreadyDone, total: total)
         }
         var results = await engine.run(entries: toRun.filter { automatic.contains($0.domain) } + toRun.filter { !automatic.contains($0.domain) }, person: person, progress: household.progress(for: person.id), now: now, dryRun: dryRun, holds: holds(for: person, now: now),
                                    progressCallback: { done, total in Task { @MainActor in
                                        // A count that arrives after the run ended must not bring back a progress bar that then never moves.
                                        guard self.autoBusy != nil else { return }
-                                       self.autoProgress = (done, total); self.continuedRun?.report(done: done, total: total) } },
+                                       self.autoProgress = (alreadyDone + done, alreadyDone + total); self.continuedRun?.report(done: alreadyDone + done, total: alreadyDone + total) } },
                                    evidence: { [evidence, personID = original.id] entry, shot in
                                        try? evidence.save(shot, person: personID, site: entry.id)
                                        Self.exportForReview(entry.domain, shot)

@@ -306,6 +306,10 @@ final class WebAssistedPage: AssistedPage {
         var stateBefore: (visible: Bool, url: String)?
         if let liveForm { stateBefore = await session.formState(liveForm) }
         let markBefore = await session.pageMark()
+        // In a background run, the page as it is now (filled in) is kept, in case its answer never arrives and it cannot be read when the site is given up.
+        if PageActivity.bin != nil {
+            session.beforePress = SubmitEvidence(outcome: .failed(AutoOptOut.sentUnconfirmed), screenshot: await session.screenshotJPEG(aroundForm: liveForm), pageText: before)
+        }
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed(session.pressHeldForEmptyBox ? "a required box is still empty" : "no submit button found") }

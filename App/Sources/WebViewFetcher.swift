@@ -50,6 +50,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     var pressHeldForEmptyBox = false
     /// A menu of states on the page does not list the person's (`custom-menus-pick`): the site takes requests only from the states it lists.
     var stateNotOffered: String?
+    /// The page as it was just before send was pressed (its words and a picture), in a background run: kept for a site given up while its answer is still
+    /// loading, when the page cannot be read at all.
+    var beforePress: SubmitEvidence?
     private let reporter = FrameReporter()
     /// Set only for a background run's site (`PageActivity.report`): told of every sign of life from the page, so a page that goes quiet is given up.
     /// Nil for every screen a person uses (Solve and send, guides), which are left exactly as they were.
@@ -694,8 +697,22 @@ final class SessionBin {
     /// What the site's latest page shows now: its text and a screenshot (for a site given up after its form was sent).
     func snapshot() async -> SubmitEvidence? {
         guard let session = sessions.last?.value else { return nil }
-        let text = await session.viewportText()
-        return SubmitEvidence(outcome: .failed(AutoOptOut.sentUnconfirmed), screenshot: await session.screenshotJPEG(aroundForm: session.chosenForm), pageText: text)
+        // Read now, for at most 4 seconds: a page whose answer is still loading may not answer until the load ends. Then the page as it was just before send was
+        // pressed is what the person sees (a site that never answered its form's post kept no screenshot at all).
+        let done = Once()
+        let live: SubmitEvidence? = await withCheckedContinuation { (c: CheckedContinuation<SubmitEvidence?, Never>) in
+            Task { @MainActor in
+                let text = await session.viewportText()
+                let shot = await session.screenshotJPEG(aroundForm: session.chosenForm)
+                if done.claim() { c.resume(returning: shot == nil && text.isEmpty ? nil : SubmitEvidence(outcome: .failed(AutoOptOut.sentUnconfirmed), screenshot: shot, pageText: text)) }
+            }
+            Task { try? await Task.sleep(nanoseconds: 4_000_000_000); if done.claim() { c.resume(returning: nil) } }
+        }
+        return live ?? session.beforePress
+    }
+    private final class Once: @unchecked Sendable {
+        private let lock = NSLock(); private var taken = false
+        func claim() -> Bool { lock.lock(); defer { lock.unlock() }; if taken { return false }; taken = true; return true }
     }
     func abandonAll() {
         ended = true

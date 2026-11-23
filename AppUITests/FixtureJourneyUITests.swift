@@ -440,6 +440,25 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(picture.waitForExistence(timeout: 5), "and I am back on the site's page")
     }
 
+    /// As a user I want a screenshot even of a site whose answer never comes: its form is posted the ordinary way and its server does not reply (the page is
+    /// still loading when the run gives up), as many real sites did on a phone ("sent, but the site did not confirm it in time", with no screenshot).
+    func testASiteWhoseAnswerNeverArrivesStillKeepsAScreenshot() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "hang-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 150), "the run finished and reported")
+        XCTAssertEqual(server.sentSites, ["fx_hang_1"], "the form was posted")
+        let review = app.buttons["run-report-review"]
+        XCTAssertTrue(app.scrollUntilExists(review)); review.tap()
+        let row = app.buttons["review-fx_hang_1"]
+        XCTAssertTrue(row.waitForExistence(timeout: 10)); row.tap()
+        let picture = app.buttons["site-screenshot"]
+        XCTAssertTrue(app.scrollUntilExists(picture), "a screenshot was kept although the page was still loading")
+        add(XCTAttachment(screenshot: app.screenshot()))
+    }
+
     /// As a user I want to skip a site for now and bring it back later: it goes to my skipped list, and bringing it back puts it in my queue again.
     func testISkipASiteForNowAndBringItBackFromTheSkippedList() {
         let app = solveAndSend("noform-1")

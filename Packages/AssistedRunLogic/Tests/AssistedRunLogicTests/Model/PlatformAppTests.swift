@@ -248,11 +248,14 @@ final class AutomaticRunAppTests: XCTestCase {
         var on = m.autoSettings; on.optOutEnabled = true
         XCTAssertFalse(on.startsByItself(now: Date()), "a stopped run does not start again by itself, even with automatic opt-out on")
         XCTAssertTrue(m.runStoppedByPerson, "the page says it is stopped")
-        // Run now carries on with only the sites left, and counts only those from the start.
+        // Run now carries on with only the sites left, and counts on from the ones already done, out of the whole run (2026-11-23: it restarted at "0 of" the
+        // sites left, which looked like a new run).
         let left = Task { await m.runAutoOptOut(for: me, submitter: Slow()) }
         waited = 0
         while m.autoProgress == nil && waited < 100 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
-        XCTAssertEqual(m.autoProgress?.total, total - tried, "the count is the sites left, not every site")
+        XCTAssertEqual(m.autoProgress?.total, total, "one total for the whole run")
+        XCTAssertGreaterThanOrEqual(m.autoProgress?.done ?? 0, tried, "counting on from the sites already done")
+        XCTAssertTrue(m.autoCarriedOn)
         XCTAssertNil(m.autoSettings.stoppedByPerson, "starting a run clears Stop")
         m.stopAutoOptOut(); await left.value
     }
@@ -683,6 +686,23 @@ final class ResumeAppTests: XCTestCase {
         await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: third))
         XCTAssertTrue(third.pages.isEmpty, "with everything sent this period, Run now has nothing left")
         XCTAssertEqual(Set(first.pages + second.pages).count, first.pages.count + second.pages.count, "no page sent twice")
+    }
+
+    /// A run carried on after a pause counts on from the sites it already did, out of the whole run (it restarted at "0 of" the sites left, 2026-11-23).
+    func testARunCarriedOnCountsFromTheSitesItAlreadyDid() async throws {
+        let (m, me) = readyModel()
+        try await runAndStop(m, me, after: 3, tally: Tally())
+        let run = Task { await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: Tally())) }
+        var seen: [(Int, Int)] = [], waited = 0
+        while waited < 800 {
+            if let p = m.autoProgress { seen.append((p.done, p.total)) }
+            if m.autoBusy == nil && !seen.isEmpty { break }
+            try await Task.sleep(nanoseconds: 5_000_000); waited += 1
+        }
+        await run.value
+        XCTAssertTrue(m.autoCarriedOn, "the page says the run carried on")
+        XCTAssertGreaterThanOrEqual(seen.first?.0 ?? 0, 3, "it counts on from the sites done before the pause: \(seen.prefix(3))")
+        XCTAssertTrue(seen.allSatisfy { $0.1 == seen[0].1 }, "out of one total for the whole run: \(Set(seen.map(\.1)))")
     }
 
     /// A Re-test all that is stopped carries on as a re-test: the sites it had not reached are sent again, even though they were sent earlier in the period.

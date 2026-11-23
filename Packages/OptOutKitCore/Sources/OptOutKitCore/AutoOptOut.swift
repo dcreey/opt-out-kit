@@ -40,12 +40,12 @@ public final class GiveUpCapture: @unchecked Sendable {
     func takeNow(within seconds: TimeInterval) async {
         lock.lock(); let take = taker; lock.unlock()
         guard let take else { return }
-        let got: SubmitEvidence? = await withTaskGroup(of: SubmitEvidence?.self) { group in
-            group.addTask { await take() }
-            group.addTask { try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)); return nil }
-            let first = await group.next() ?? nil
-            group.cancelAll()
-            return first
+        // A race that never waits for the loser: reading a page that is still loading can hang until the load ends (a site that never answers its form's post),
+        // and a task group would wait for it anyway, holding the whole run on that site (the run waited 150 s for such a site in a test).
+        let once = FirstOnce()
+        let got: SubmitEvidence? = await withCheckedContinuation { (c: CheckedContinuation<SubmitEvidence?, Never>) in
+            Task { let e = await take(); if once.claim() { c.resume(returning: e) } }
+            Task { try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)); if once.claim() { c.resume(returning: nil) } }
         }
         if let got { set(got) }
     }

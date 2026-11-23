@@ -502,6 +502,7 @@
  "Iowa": "Iowa",
  "Is it completely done?": "Est-ce entièrement terminé ?",
  "It applies only to very large platforms, so it rarely reaches data brokers.": "Elle ne s'applique qu'à de très grandes plateformes ; elle touche donc rarement les courtiers en données.",
+ "It carried on after a pause, with only the sites it had not done; nothing is sent twice.": "L'envoi a repris après une pause, avec seulement les sites qui restaient ; rien n'est envoyé deux fois.",
  "It does not delete anything, and it does not reach data brokers that already hold your details, because those never see your browser. It is a good habit next to the opt-outs in this app, not a replacement.": "Il ne supprime rien et n'atteint pas les courtiers qui détiennent déjà vos données, car ils ne voient jamais votre navigateur. C'est une bonne habitude en plus des retraits de cette app, pas un remplacement.",
  "It fills in and sends each form in the background, with no website opened. A site that does not go through moves to your semi-automated queue, and you are asked about it there.": "Elle remplit et envoie chaque formulaire en arrière-plan, sans ouvrir de site. Un site qui n'aboutit pas passe dans votre file semi-automatique, où elle vous demande de vous en occuper.",
  "It is a different site": "C'est un autre site",
