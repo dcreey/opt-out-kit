@@ -93,6 +93,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     func presentable() -> WKWebView {
         webView.removeFromSuperview()
         webView.alpha = 1
+        webView.accessibilityElementsHidden = false
         return webView
     }
 
@@ -123,6 +124,9 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         bin?.add(self)
         // Some pages only run timers while attached to a window, so park it invisibly in the key window.
         webView.alpha = 0.01
+        // Parked, it is no one's to read: VoiceOver would otherwise read a page that cannot be seen, and every accessibility query (a UI test's included)
+        // would wait on the page's own process for its tree, which timed out on a busy machine during a run. Shown again in `presentable()`.
+        webView.accessibilityElementsHidden = true
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
         // Behind everything else in the window, so even a moment of full opacity is covered by the app.
         (scene?.keyWindow ?? scene?.windows.first)?.insertSubview(webView, at: 0)

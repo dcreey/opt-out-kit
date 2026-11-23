@@ -34,9 +34,9 @@ SHELL = ('<html><head><meta name="viewport" content="width=device-width, initial
          '<body style="font-family:-apple-system;padding:16px">{body}</body></html>')
 
 
-def page(kind):
-    path = os.path.join(HERE, 'pages', kind + '.html')
-    if not re.fullmatch(r'[a-z0-9-]+', kind) or not os.path.exists(path):
+def page(kind, ext='html'):
+    path = os.path.join(HERE, 'pages', kind + '.' + ext)
+    if not re.fullmatch(r'_?[a-z0-9-]+', kind) or not os.path.exists(path):
         return None
     with open(path, encoding='utf-8') as f:
         return f.read()
@@ -63,6 +63,9 @@ class Handler(BaseHTTPRequestHandler):
             fields = {k: v[0] for k, v in parse_qs(raw, keep_blank_values=True).items()}
         if parts == ['__ready']:
             return self.send(200, 'ready', 'text/plain')
+        if parts == ['__scroll-report.js']:
+            # The long pages' shared scroll reporter (fixtures/pages/_scroll-report.js).
+            return self.send(200, page('_scroll-report', 'js') or '', 'application/javascript')
         if parts == ['__received']:
             with LOCK:
                 return self.send(200, json.dumps(RECEIVED), 'application/json')

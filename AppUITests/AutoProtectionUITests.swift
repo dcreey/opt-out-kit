@@ -149,6 +149,8 @@ final class AutoProtectionUITests: UITestCase {
         shot(app, "6a-new-person-step-1")
         // UI tests do not start runs by themselves (`-uitest-reset`), so the test starts it the way a person can.
         app.buttons["first-pass-start"].tap()
+        // The run's pages work out of sight: none is offered to VoiceOver (or to an accessibility query, which waited on the busy page and timed out on GitHub).
+        for _ in 0..<6 { XCTAssertFalse(app.webViews.firstMatch.exists, "no hidden page is in the accessibility tree during the run"); Thread.sleep(forTimeInterval: 0.5) }
         let later = app.buttons["run-report-done"]
         XCTAssertTrue(later.waitForExistence(timeout: 120), "the first pass finishes and says what it did")
         shot(app, "6b-first-pass-report")

@@ -68,22 +68,7 @@
   <label>Message <textarea name="message"></textarea></label><br>
   <button type="submit">Submit request</button>
 </form>
-<script>
-// Reports where the page is scrolled to, and whether a finger or wheel was moving it, so a test can tell the person's scrolling from the app's (fixtures/server.py, /__scroll).
-(function () {
-  var t0 = Date.now(), touching = false, lastTouch = 0, lastY = -1;
-  function user() { return touching || Date.now() - lastTouch < 2500 ? 1 : 0; }
-  function send(kind) {
-    var y = Math.round(window.scrollY);
-    navigator.sendBeacon('/__scroll', new URLSearchParams({site: '{{site}}', y: y, t: Date.now() - t0, user: user(), kind: kind, max: Math.round(document.documentElement.scrollHeight - window.innerHeight)}));
-  }
-  window.addEventListener('touchstart', function () { touching = true; lastTouch = Date.now(); send('touchstart'); }, {passive: true});
-  window.addEventListener('touchend', function () { touching = false; lastTouch = Date.now(); send('touchend'); }, {passive: true});
-  window.addEventListener('wheel', function () { lastTouch = Date.now(); }, {passive: true});
-  window.addEventListener('scroll', function () { if (Math.round(window.scrollY) !== lastY) { lastY = Math.round(window.scrollY); send('scroll'); } }, {passive: true});
-  window.addEventListener('load', function () { send('load'); });
-})();
-</script>
+<script src="/__scroll-report.js" data-site="{{site}}"></script>
 <script>
 // Late content: a banner fixed to the top of the screen, as cookie and privacy banners are, whose words mention opting out while the link it speaks of is further up the page.
 setTimeout(function () {

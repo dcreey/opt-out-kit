@@ -39,8 +39,7 @@ final class FixtureScrollUITests: UITestCase {
     }
 
     /// A readable timeline, relative to the moment the person could first see the page (negative: before, while the page was loading out of sight), with the
-    /// broker's receipts, and the moves the app made by itself after the person first touched the page: a scroll with no finger on it, or one far bigger than a
-    /// flick (a smooth scroll to a link is the second kind).
+    /// broker's receipts, and the moves the app made by itself after the person first touched the page: a call that moves the page, or a scroll with no finger on it.
     private func timeline(_ site: String) -> (text: String, appMovesAfterTouch: [FixtureBrokers.Scroll]) {
         let events = server.scrolls.filter { $0.site == site }
         var rows: [(at: TimeInterval, line: String)] = []
@@ -50,7 +49,9 @@ final class FixtureScrollUITests: UITestCase {
         for e in events {
             if e.kind == "touchstart" { touched = true }
             let delta = e.y - prev
-            if e.kind == "scroll", touched, (!e.user && abs(delta) > 30) || abs(delta) > 200 { moves.append(e) }
+            // A call that moves the page (scrollIntoView, focus, scrollTo, a refused form's scroll to its empty box: fixtures/pages/_scroll-report.js), or a
+            // sizeable scroll with no finger anywhere near. Not "a big jump while the person scrolls": a fast flick on a slow machine jumps that far too.
+            if touched, e.kind.hasPrefix("call:") || (e.kind == "scroll" && !e.user && abs(delta) > 30) { moves.append(e) }
             rows.append((e.at, String(format: "%+7.2f s  y=%5d  Δ=%+5d  %@  %@", e.at - visibleAt, e.y, delta, e.user ? "PERSON" : "app   ", e.kind)))
             if e.kind == "scroll" { prev = e.y }
         }
@@ -61,7 +62,7 @@ final class FixtureScrollUITests: UITestCase {
 
     /// The app's moves on one line (CI's annotations keep only a failure's first line): when, where to, by how much, and whether a finger was near.
     private func brief(_ moves: [FixtureBrokers.Scroll]) -> String {
-        moves.map { String(format: "%+.2fs y=%d %@", $0.at - visibleAt, $0.y, $0.user ? "person-window" : "no-finger") }.joined(separator: "; ")
+        moves.map { String(format: "%+.2fs y=%d %@ %@", $0.at - visibleAt, $0.y, $0.kind, $0.user ? "person-window" : "no-finger") }.joined(separator: "; ")
     }
 
     private func attach(_ text: String, _ name: String) {
