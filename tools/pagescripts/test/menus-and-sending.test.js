@@ -17,6 +17,25 @@ test('an empty custom menu is opened once and marked; one that already shows a c
   assert.equal(run(w, 'custom-menus-open'), '', 'not opened a second time');
 });
 
+test('a script that focuses a box never lets the browser scroll to it (a person reading the page would be moved)', () => {
+  const watch = (w) => { const calls = []; const f = w.HTMLElement.prototype.focus; w.HTMLElement.prototype.focus = function (o) { calls.push(o); return f.call(this, o); }; return calls; };
+  const menu = page('<div><span>State</span><input role=combobox id=m></div>');
+  const menuCalls = watch(menu);
+  assert.notEqual(run(menu, 'custom-menus-open'), '');
+  const rich = page('<form><div contenteditable="true" data-ook=m></div></form>');
+  const richCalls = watch(rich);
+  callJSON(rich, 'fill-live', JSON.stringify([{ name: 'm', candidates: ['Please delete my data.'], label: '' }]), 'false');
+  for (const calls of [menuCalls, richCalls]) {
+    assert.ok(calls.length > 0, 'the box was focused');
+    for (const o of calls) assert.equal(o && o.preventScroll, true);
+  }
+  // And every focus in every page script says so, so a new one cannot forget.
+  const fs = require('fs'); const path = require('path'); const dir = path.join(__dirname, '..', '..', '..', 'App', 'PageScripts');
+  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.js'))) {
+    for (const m of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/\.focus\(([^)]*)\)/g)) assert.match(m[1], /preventScroll\s*:\s*true/, `${f}: ${m[0]}`);
+  }
+});
+
 test('an open menu takes the person\'s own state first, then consumer / none / other; never employee or partner', () => {
   const w = page('<ul role=listbox><li role=option id=a>Employee</li><li role=option id=b>Illinois</li><li role=option id=c>Consumer</li></ul>');
   const seen = clicks(w, ['a', 'b', 'c']);
