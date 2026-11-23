@@ -300,7 +300,11 @@ final class FixtureJourneyUITests: UITestCase {
         let done = app.buttons["run-report-done"]
         XCTAssertTrue(done.waitForExistence(timeout: 180), "the run finished and reported")
         add(XCTAttachment(screenshot: app.screenshot()))
-        XCTAssertTrue(server.sentSites.contains("fx_turnstilepass_1"), "the check passed by itself and the form was sent: \(server.sentSites)")
+        if !server.sentSites.contains("fx_turnstilepass_1") {
+            // What the app recorded for the site, in the failure message (GitHub's runner shows only that): open the automatic page and read its row.
+            if done.exists { done.tap() }
+            XCTFail("the check passed by itself and the form was sent: \(server.sentSites); the app says: \(siteLine(app, "turnstilepass-1.fixture.test"))")
+        }
         XCTAssertFalse(server.sentSites.contains("fx_turnstile_1"), "a check that needs a person is never solved for them")
     }
 
@@ -459,6 +463,24 @@ final class FixtureJourneyUITests: UITestCase {
         let before = XCTAttachment(screenshot: app.screenshot()); before.name = "skipped-site"; before.lifetime = .keepAlways; add(before)
         bring.tap()
         XCTAssertFalse(app.buttons["site-bring-back"].waitForExistence(timeout: 3), "once brought back it is no longer set aside")
+    }
+
+    /// The line the automatic page shows for a site after a run (its result), or what could be found instead.
+    private func siteLine(_ app: XCUIApplication, _ domain: String) -> String {
+        if !app.buttons["activity-count-sent"].exists {
+            app.tab("Settings", 3).tap()
+            let activity = app.buttons["auto-activity"]
+            if app.scrollUntilExists(activity) { activity.tap() }
+        }
+        for g in ["needsYou", "notTried", "sent", "notListed"] {
+            let count = app.buttons["activity-count-\(g)"]
+            guard count.waitForExistence(timeout: 5) else { continue }
+            count.tap()
+            let row = app.buttons["period-site-\(domain)"]
+            if row.waitForExistence(timeout: 3) { return "\(g): \(row.label)" }
+            count.tap()
+        }
+        return "no row for \(domain)"
     }
 
     private func startRunNow(_ app: XCUIApplication) {

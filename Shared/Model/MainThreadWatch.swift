@@ -40,7 +40,8 @@ enum MainThreadWatch {
                 let ms = Int(gap * 1000)
                 if ms > 250 {
                     NSLog("OOK main stall %dms during %@", ms, during)
-                    lock.lock(); if ms > worst.ms { worst = (ms, during) }; lock.unlock()
+                    // Only stalls once a run has begun count: launching the app stalls too (1.7 s on GitHub's runner), and that is not the run's doing.
+                    lock.lock(); if during != "idle", ms > worst.ms { worst = (ms, during) }; lock.unlock()
                 }
             }
         }
