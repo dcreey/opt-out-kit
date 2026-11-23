@@ -98,7 +98,7 @@ def failures_from_log(text):
     seen = {}
     for path, line, target, cls, test, msg in FAIL.findall(text):
         where = f"{os.path.basename(path)}:{line}: " if path else ""          # which assertion, so a failure can be found without the log
-        seen.setdefault(f"{target}/{cls}/{test}", []).append(where + msg.strip()[:300])
+        seen.setdefault(f"{target}/{cls}/{test}", []).append(where + msg.strip()[:800])
     lines = [f"::error title={k}::{' | '.join(v)}" for k, v in seen.items()]
     if seen: lines.append("::notice title=Failed tests::" + " || ".join(f"{k}: {' | '.join(v)}" for k, v in seen.items())[:60000])
     return lines

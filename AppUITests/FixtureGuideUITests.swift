@@ -120,7 +120,7 @@ final class FixtureGuideUITests: UITestCase {
         openGuide(app)
         XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
         app.buttons["guided-more"].tap()
-        let notWorking = app.buttons["Not working"], first = app.buttons["The page or link is broken"]
+        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]          // by id: the open submenu's header is also "Not working"
         XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
         for _ in 0..<3 where !first.exists {
             notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine
@@ -131,7 +131,7 @@ final class FixtureGuideUITests: UITestCase {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
         }
         // A submenu that opened late can swallow the first tap on its item while it settles: tap again while the item is still offered.
-        let blocked = app.buttons["The site blocked me"], reported = app.descendants(matching: .any)["reported-issue"]
+        let blocked = app.buttons["guided-issue-blockedMe"], reported = app.descendants(matching: .any)["reported-issue"]
         for _ in 0..<3 where !reported.exists && blocked.exists {
             blocked.tapWhenHittable()
             _ = reported.waitForExistence(timeout: 5)
@@ -145,7 +145,7 @@ final class FixtureGuideUITests: UITestCase {
         openGuide(app)
         XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
         app.buttons["guided-more"].tap()
-        let notWorking = app.buttons["Not working"], first = app.buttons["The page or link is broken"]
+        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]          // by id: the open submenu's header is also "Not working"
         XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
         for _ in 0..<3 where !first.exists {
             notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine

@@ -292,7 +292,7 @@ final class WebAssistedPage: AssistedPage {
         let markBefore = await session.pageMark()
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
-        guard pressed else { return .failed("no submit button found") }
+        guard pressed else { return .failed(session.pressHeldForEmptyBox ? "a required box is still empty" : "no submit button found") }
         // The page's answer can take a moment to start (a slow phone, a slow site): until something changes (a few seconds at most), then until it settles. Read too
         // soon, a sent form looked like "nothing on the page changed after sending" (GitHub's slower runner, the plain fixture site).
         _ = await session.waitForChange(from: markBefore, upTo: SiteRun.wait(upTo: 4))

@@ -27,10 +27,14 @@ final class SolveAndSendUITests: UITestCase {
         let box = app.buttons["auto-submit-toggle"]
         XCTAssertTrue(box.waitForExistence(timeout: 10))
         XCTAssertEqual(box.value as? String, "on")
+        // The switch's value follows a tap a moment later on a slow machine: wait for it.
+        func becomes(_ v: String) -> Bool {
+            XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", v), object: box)], timeout: 5) == .completed
+        }
         box.tap()
-        XCTAssertEqual(box.value as? String, "off")
+        XCTAssertTrue(becomes("off"), "Send it for me turns off")
         box.tap()
-        XCTAssertEqual(box.value as? String, "on")
+        XCTAssertTrue(becomes("on"), "and on again")
 
         // The first site has nothing before it.
         app.buttons["assisted-more"].tap()

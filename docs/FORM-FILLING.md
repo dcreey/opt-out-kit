@@ -119,7 +119,10 @@ before and after and compare. The multi-value comparison (a person with three em
 - **A page the person has touched is never scrolled by the app.** The touch tracker marks the page on the person's first touch (`window.__ookUserAt`); from then on
   no page script scrolls (the form, the check, a tile, a menu, an "Add another" button, a confirm button): each of their `scrollIntoView` calls checks it.
   Before this only the scroll helpers did, and a fill that pressed a tile or opened a menu could still move a long page the person was reading
-  (`FixtureScrollUITests`; failed on GitHub's slower runner).
+  (`FixtureScrollUITests`; failed on GitHub's slower runner). A script that focuses a box (a rich-text box it types into, a search-style menu it opens) uses
+  `focus({preventScroll: true})`, since a plain focus scrolls the box into view. And once the page is touched, send is not pressed on a form whose required box
+  is still empty (`press-live-submit`, `press-submit` answer `invalid`): the browser would only scroll to that box under the person's finger and send nothing.
+  The app says "a required box is still empty" and leaves the page to the person.
 
 - **After pressing send**, the app waits for the page to start answering (a few seconds at most) before reading it, then lets it settle. Read too soon, a form that
   was sent looked like "nothing on the page changed after sending" on a slow machine (GitHub's runner). A page that replaced the form with "Processing your

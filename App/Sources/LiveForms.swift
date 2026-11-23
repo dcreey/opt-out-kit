@@ -441,7 +441,9 @@ extension WebViewSession {
     /// Presses the chosen form's own send button, whatever it says ("Opt me out", "Submit request"); never one that says agree, accept or cancel.
     func pressLiveSubmit(form token: String) async -> Bool {
         let js = PageScript.call("press-live-submit", token)
-        let pressed = ((await evalLive(js)) as? Bool) ?? false
+        let answer = await evalLive(js)
+        pressHeldForEmptyBox = (answer as? String) == "invalid"
+        let pressed = (answer as? Bool) ?? false
         if pressed { SiteRun.markSent?() }          // a background run's watchdog now knows the form went to the site (`SiteRun`)
         return pressed
     }

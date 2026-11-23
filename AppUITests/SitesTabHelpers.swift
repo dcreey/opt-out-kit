@@ -7,6 +7,9 @@ extension XCUIApplication {
         // Right after another screen was put away the tab can still be showing it: tapping the tab again brings its first screen back.
         // On a slow machine that can take more than one tap and a while: a run's report may still be closing, or a pushed screen still covering the tab.
         for _ in 0..<4 where !open.waitForExistence(timeout: 8) {
+            // A run's summary sheet covers the tab bar (a tap on a tab does nothing then): close it first.
+            let summary = buttons["summary-continue"]
+            if summary.exists { summary.tapWhenHittable(); _ = summary.waitForNonExistence(timeout: 5) }
             tab("Sites", 1).tap()
         }
         if !open.exists { let shot = XCTAttachment(screenshot: screenshot()); shot.name = "no-sites-search"; shot.lifetime = .keepAlways; XCTContext.runActivity(named: "no search") { $0.add(shot) } }
@@ -175,7 +178,10 @@ extension XCUIElement {
                 let f = frame
                 if !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
                     // A menu still sliding in moves its items: tap only once the item sits in the same place twice in a row.
-                    if let l = last, l.equalTo(f) { tap(); return }
+                    // Tap the spot rather than the element: XCTest's own hit point is "invalid" for a menu item on GitHub's slower simulator.
+                    if let l = last, l.equalTo(f) {          // at the place it was seen to rest (asking the element again can find it gone mid-animation)
+                        XCUIApplication().coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap(); return
+                    }
                     last = f
                 } else { last = nil }
             } else { last = nil }

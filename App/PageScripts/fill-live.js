@@ -10,7 +10,7 @@
     for(var i=1;i<c.length;i++){var ci=String(c[i]); if(ci.length<=ml) return ci;}
     var cut=c0.slice(0,ml), k=cut.lastIndexOf('. '); return k>20?cut.slice(0,k+1):cut.trim();}
   function setValue(el,v){
-    if(isCE(el)){el.focus(); try{document.execCommand('selectAll',false,null); if(!document.execCommand('insertText',false,v)) el.textContent=v;}catch(e){el.textContent=v;}
+    if(isCE(el)){el.focus({preventScroll:true}); try{document.execCommand('selectAll',false,null); if(!document.execCommand('insertText',false,v)) el.textContent=v;}catch(e){el.textContent=v;}
       ['input','change','blur'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); return;}
     var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
     var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}

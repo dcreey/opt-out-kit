@@ -117,6 +117,22 @@ test('a form with no button is sent with requestSubmit', () => {
   assert.equal(call(page('<form></form>'), 'press-live-submit', 'missing'), false);
 });
 
+test('once the person has touched the page, a form with a required box still empty is not pressed (the browser would scroll to it); before, it is', () => {
+  const html = '<form data-ook-form="f0"><input name=e value=a><input name=case required><button type=submit id=go>Submit</button></form>';
+  const w = page(html);
+  w.__ookUserAt = Date.now();
+  const seen = clicks(w, ['go']);
+  assert.equal(call(w, 'press-live-submit', 'f0'), 'invalid');
+  assert.deepEqual(seen, [], 'not pressed');
+  w.document.querySelector('[name=case]').value = '123';
+  assert.equal(call(w, 'press-live-submit', 'f0'), true, 'filled: pressed');
+  const untouched = page(html);
+  assert.equal(call(untouched, 'press-live-submit', 'f0'), true, 'not touched: pressed as before');
+  const stored = page('<form><input name=email value=a><input name=case required><button id=go>Send</button></form>');
+  stored.__ookUserAt = Date.now();
+  assert.equal(call(stored, 'press-submit', 'email'), 'invalid', 'the stored-plan press too');
+});
+
 // ---- fill-fields.js and press-submit.js (the stored-plan path)
 
 test('fill-fields types by name or id, and sets a menu by value or text', () => {

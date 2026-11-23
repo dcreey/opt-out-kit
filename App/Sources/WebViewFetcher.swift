@@ -46,6 +46,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     /// Frames (pages inside the page) that reported forms or fields, and the one the chosen form lives in, when it is not the page itself.
     var frames: [(info: WKFrameInfo, href: String)] = []
     var activeFrame: WKFrameInfo?
+    /// The last press of send was held back because a required box is still empty and the person is on the page (`press-live-submit`, `press-submit`).
+    var pressHeldForEmptyBox = false
     private let reporter = FrameReporter()
     /// Set only for a background run's site (`PageActivity.report`): told of every sign of life from the page, so a page that goes quiet is given up.
     /// Nil for every screen a person uses (Solve and send, guides), which are left exactly as they were.
@@ -578,7 +580,9 @@ extension WebViewSession {
     func pressSubmit(for values: [FieldValue]) async -> Bool {
         let first = values.first?.name ?? ""
         let js = PageScript.call("press-submit", first)
-        let pressed = ((try? await webView.evaluateJavaScript(js)) as? Bool) ?? false
+        let answer = try? await webView.evaluateJavaScript(js)
+        pressHeldForEmptyBox = (answer as? String) == "invalid"
+        let pressed = (answer as? Bool) ?? false
         if pressed { SiteRun.markSent?() }          // a background run's watchdog now knows the form went to the site (`SiteRun`)
         return pressed
     }

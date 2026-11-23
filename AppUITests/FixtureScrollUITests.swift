@@ -59,6 +59,11 @@ final class FixtureScrollUITests: UITestCase {
         return (header + rows.sorted { $0.at < $1.at }.map(\.line).joined(separator: "\n"), moves)
     }
 
+    /// The app's moves on one line (CI's annotations keep only a failure's first line): when, where to, by how much, and whether a finger was near.
+    private func brief(_ moves: [FixtureBrokers.Scroll]) -> String {
+        moves.map { String(format: "%+.2fs y=%d %@", $0.at - visibleAt, $0.y, $0.user ? "person-window" : "no-finger") }.joined(separator: "; ")
+    }
+
     private func attach(_ text: String, _ name: String) {
         let a = XCTAttachment(string: text); a.name = name; a.lifetime = .keepAlways; add(a)
     }
@@ -73,7 +78,7 @@ final class FixtureScrollUITests: UITestCase {
         attach(text, "scroll-timeline-auto-sent")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "after"; shot.lifetime = .keepAlways; add(shot)
         XCTAssertEqual(server.sentSites, ["fx_longform_1"], "the form at the end of the page was still filled and sent: \(server.requests)")
-        XCTAssertTrue(moves.isEmpty, "the app moved the page \(moves.count) times by itself after the person touched it:\n\(text)")
+        XCTAssertTrue(moves.isEmpty, "the app moved the page \(moves.count) times by itself after the person touched it: \(brief(moves))\n\(text)")
     }
 
     /// A form that needs details the app does not have (a case number), at the end of a very long page, while the person scrolls: the app fills what it can and
@@ -85,7 +90,7 @@ final class FixtureScrollUITests: UITestCase {
         attach(text, "scroll-timeline-needs-details")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "after"; shot.lifetime = .keepAlways; add(shot)
         XCTAssertTrue(server.sentSites.isEmpty, "nothing is sent while a required detail is missing: \(server.requests)")
-        XCTAssertTrue(moves.isEmpty, "the app moved the page \(moves.count) times by itself after the person touched it:\n\(text)")
+        XCTAssertTrue(moves.isEmpty, "the app moved the page \(moves.count) times by itself after the person touched it: \(brief(moves))\n\(text)")
     }
 
     /// A long page that gets new content while the person reads it (a banner fixed to the top of the screen, as cookie and privacy banners are, that mentions opting out) and a form

@@ -17,5 +17,5 @@
   var e=els[0]; e.setAttribute('data-ook-menu','1'); window.__ookUserAt||e.scrollIntoView({block:'center'});
   ['mousedown','mouseup','click'].forEach(function(t){e.dispatchEvent(new MouseEvent(t,{bubbles:true,cancelable:true}));});
   // A type-to-search menu (react-select, as on TrustArc's forms) opens from its input: focus it and press the down arrow too.
-  if(e.tagName==='INPUT'){try{e.focus();}catch(x){} e.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',keyCode:40,bubbles:true}));}
+  if(e.tagName==='INPUT'){try{e.focus({preventScroll:true});}catch(x){} e.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',keyCode:40,bubbles:true}));}
   return ((e.closest('div[class*=FormControl],div')||e).innerText||'').replace(/\s+/g,' ').slice(0,120)||'menu';})();

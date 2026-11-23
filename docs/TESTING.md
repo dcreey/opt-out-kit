@@ -275,6 +275,16 @@ folder's size and its slowest kinds of step (`-showBuildTimingSummary`, read by 
 Xcode starts clean; one shard saves each cache. Raising `CACHE_VERSION` in the workflow throws every cached build away. Timings that a test checks have
 room for slower CI machines.
 
+**Habits for GitHub's slower simulator** (each one a failure seen there and never locally):
+- Tabs by `tab(name, index)`: there the tab buttons are named after their icons ("magnifyingglass").
+- `searchSites` closes a run's summary sheet first, because it covers the tab bar.
+- Menu items by `tapWhenHittable`. It taps where the item was seen to rest twice in a row, because XCTest's own hit point is "invalid" while a menu slides in.
+  It also finds a menu item by its identifier, since an open submenu's header shares its label.
+- A value that changes after a tap (a switch) is waited for, not read at once.
+- A queried element gets its type (`staticTexts[...]`), not `descendants(matching: .any)`, where the type is known: a query over every element timed out.
+- The fixture server keeps a backlog of 128 connections.
+- A scroll test's failure lists the app's moves on its first line, which is the only line an annotation keeps (`ci_shards.py` keeps 800 characters of it).
+
 **UI tests are quick on purpose.** The app turns animations off when launched with a `-uitest` flag (debug builds only). The weekly job's test of a whole automatic
 run over the real catalog (sending faked: `-uitest-fake-submit`, the only fake left) uses `-uitest-sites 40` (`XCUIApplication.fewSites`) outside that job: a representative sample of 40 sites (`SiteSample`: some of every kind of site, the same every time; `SiteSampleTests`) with a known form, so the run finishes in seconds and the test checks the
 finished run and its report. Every other UI test runs against the fixture brokers (below). Long lists build their rows only as they scroll into view, so a test scrolls to what it needs (`scrollUntilExists`); the

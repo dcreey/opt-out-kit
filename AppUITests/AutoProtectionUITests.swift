@@ -116,7 +116,8 @@ final class AutoProtectionUITests: UITestCase {
         XCTAssertTrue(app.scrollUntilExists(row), "the opened group lists its sites")
         shot(app, "5b-activity-page-sent-open")
         row.tap()
-        let state = app.descendants(matching: .any)["site-state"]
+        // A typed query: a query over every element timed out ("Timed out while evaluating UI query") on GitHub's slower simulator.
+        let state = app.staticTexts["site-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 5), "the site's page opened")
         Thread.sleep(forTimeInterval: 2.5)
         XCTAssertTrue(state.exists, "and it stayed: the push did not bounce back")
