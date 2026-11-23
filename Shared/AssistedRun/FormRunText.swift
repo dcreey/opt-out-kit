@@ -18,7 +18,7 @@ enum FormRun {
         // A page the person just navigated to (or the next step of a form) is all "new text", and its instructions and consent wording talk about submitting
         // ("your request is submitted only after you enter the code", "you state that this request has been submitted by the individual"). Lines that explain
         // or ask are not a confirmation of what happened.
-        let kept = text.split(whereSeparator: \.isNewline).map(String.init).filter { !isInstruction($0) }.joined(separator: "\n")
+        let kept = text.split(whereSeparator: \.isNewline).map(String.init).filter { !isInstruction($0) && !isCheckStatus($0) }.joined(separator: "\n")
         if text.isEmpty { return .failed("") }
         // A sub-form that sends a code to the person's email ("Verify Email") is a step, not the end: the page says a code was sent, or asks for it, and the person types it in.
         // Only what the page reports counts; a form's standing instructions ("submitted only after you enter the code") are already left out of `kept`.
@@ -38,6 +38,13 @@ enum FormRun {
     nonisolated static func rejectsCode(_ text: String) -> Bool {
         text.range(of: "(code|otp|passcode)[^.\\n]{0,40}(not (right|correct|valid|accepted)|incorrect|invalid|did not match|does not match|doesn.t match|didn.t match|expired|wrong)|(incorrect|invalid|wrong|expired) (verification |security |one[- ]?time |confirmation )?(code|otp|passcode)",
                    options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    /// A human check's own status line ("Success!" when a Cloudflare check passes, "Verified", "You are verified"): it says the check passed, not that the request
+    /// was received. A check that passed by itself while the run waited was read as a confirmation, and the site recorded as sent with nothing pressed.
+    nonisolated static func isCheckStatus(_ line: String) -> Bool {
+        line.trimmingCharacters(in: .whitespaces).range(of: "^(success!?|verified!?|verification (complete|successful)!?|you are verified!?|you('re| are) (a )?human!?|i'?m not a robot|verifying\\.*)$",
+                                                        options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// A line that tells the person what to do or what will happen, or asks for their consent, with no sign that it already did.

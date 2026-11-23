@@ -433,6 +433,16 @@ final class PrematureDoneTests: XCTestCase {
 
     /// georgiacourtrecords.us and the other courtrecords.us sites: the form searches first and answered "No data was found, try other criteria", which the run
     /// took as the form's next step and pressed again until time ran out. It is the site saying the person is not listed.
+    /// A Cloudflare check that passed by itself shows "Success!": that is the check, not the site taking the request (GitHub's slower runner had the check pass
+    /// after the fill, and the site was recorded as sent with its form never pressed).
+    func testAHumanCheckSayingSuccessIsNotAConfirmation() {
+        for said in ["Success!", "Verified", "You are verified", "Verifying..."] {
+            if case .submitted = FormRun.classifyConfirmed(said) { XCTFail(said) }
+        }
+        if case .submitted = FormRun.classifyConfirmed("Success!\nThank you, your request has been received.") {} else { XCTFail("a real confirmation beside it still counts") }
+        if case .submitted = FormRun.classifyConfirmed("Your opt-out was successful.") {} else { XCTFail("success in a sentence about the request counts") }
+    }
+
     func testASearchThatFindsNoRecordIsReadAsNotListed() {
         let courtRecords = "Please fix the following input errors:\nNo data was found, try other criteria..."
         XCTAssertEqual(FormRun.classifyConfirmed(courtRecords), .notListed, "read before the error wording")

@@ -173,7 +173,9 @@ before and after and compare. The multi-value comparison (a person with three em
   (`FormFiller.plan`, `testAnAgentBoxBesideAForMyselfBoxIsAnOptionNotACertification`).
 - **A Cloudflare check that passes by itself is waited for.** A managed Turnstile shows "Verifying..." and, for most visitors, passes on its own in a few
   seconds; nothing is clicked or solved. Before judging the page, the background run waits for it (up to 12 seconds, within the site's time), and sends once
-  its token is there. A check that asks for a person is still theirs (`LiveForms.liveSteps`; fixtures `turnstilepass` and `turnstile`).
+  its token is there. A check that asks for a person is still theirs (`LiveForms.liveSteps`; fixtures `turnstilepass` and `turnstile`). A check's own status line ("Success!",
+  "Verified") is never a confirmation (`FormRun.isCheckStatus`): on GitHub's slower runner the check passed after the fill, its "Success!" was read as the site
+  taking the request, and the site was recorded as sent with its form never pressed (`testAHumanCheckSayingSuccessIsNotAConfirmation`).
 - **A typed box gets focus and blur events too**, as events only: nothing takes real focus, so no keyboard comes up and nothing scrolls. A page that floats a
   box's label out of the way on them (comscore.com's "First Name *") otherwise showed its label over what was typed.
 - **A State menu is filled again after a Country is chosen.** A page may clear or rebuild its State menu from its own Country change handler, after the pass

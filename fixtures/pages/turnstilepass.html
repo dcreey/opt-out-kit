@@ -1,5 +1,5 @@
 <h1>Opt out of {{site}}</h1><p>Fill in the form to have your listing removed.</p>
-<!-- A Cloudflare check in its managed mode, as coloradoarrests.org's: "Verifying..." for a few seconds, then it passes by itself (its token is written) with
+<!-- A Cloudflare check in its managed mode, as coloradoarrests.org's: "Verifying..." for a few seconds, then it passes by itself 8 seconds after loading (its token is written, and the widget says "Success!", which is not a confirmation) with
      nothing clicked. The run waits for it and sends; a check that needs a person is the 'turnstile' page. -->
 <form method="POST" action="/{{site}}/send" onsubmit="if(!document.querySelector('[name=cf-turnstile-response]').value){document.getElementById('m').textContent='Please complete the check.';return false}">
   <label>Full name <input type="text" name="name" required></label><br>
@@ -9,4 +9,4 @@
   <p id="m"></p>
   <button type="submit">Submit</button>
 </form>
-<script>setTimeout(function () { document.querySelector('[name=cf-turnstile-response]').value = 'token'; document.getElementById('cf').textContent = 'Success!'; }, 4000);</script>
+<script>setTimeout(function () { document.querySelector('[name=cf-turnstile-response]').value = 'token'; document.getElementById('cf').textContent = 'Success!'; }, 8000);</script>
