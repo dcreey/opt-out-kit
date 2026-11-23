@@ -282,7 +282,9 @@ room for slower CI machines.
 - Menu items by `chooseMenuItem(menu, item, until:)`. It opens the menu again when the item never comes to rest on screen, because a tap that opens a menu
   can be lost. It taps where the item was seen to rest twice in a row (`tapWhenResting`), because XCTest's own hit point is "invalid" while a menu slides in.
   It also finds a menu item by its identifier, since an open submenu's header shares its label.
-- A value that changes after a tap (a switch) is waited for, not read at once.
+- What a tap changes (a switch's value, a button's label or whether it is enabled, a box that goes away) is waited for with `becomes(predicate)` or
+  `waitForNonExistence`, never read at once. Where a lost tap must be retried, the test taps again only while the change has not shown, so nothing is tapped
+  twice (`BrokerFlowUITests`, the auto-send switch).
 - A queried element gets its type (`staticTexts[...]`), not `descendants(matching: .any)`, where the type is known: a query over every element timed out.
 - The fixture server keeps a backlog of 128 connections.
 - A scroll test's failure lists the app's moves on its first line, which is the only line an annotation keeps (`ci_shards.py` keeps 800 characters of it).

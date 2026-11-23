@@ -67,7 +67,7 @@ extension XCUIApplication {
         XCTAssertTrue(field.waitForExistence(timeout: 5))
         XCTAssertFalse(buttons["onboarding-next"].isEnabled, "cannot go on without an email address")
         field.tap(); field.typeTextChecked(email)
-        XCTAssertTrue(buttons["onboarding-next"].isEnabled)
+        XCTAssertTrue(buttons["onboarding-next"].becomes("enabled == true"), "an email address lets the walkthrough go on")
         tapNextOnboarding()
         // The next page asks where the person lives (optional; the state is asked only for the United States); move past it.
         XCTAssertTrue(descendants(matching: .any)["onboarding-country"].waitForExistence(timeout: 5))
@@ -156,8 +156,8 @@ extension XCUIApplication {
         if (toggle.value as? String) == want { return }
         let inner = toggle.switches.firstMatch
         (inner.exists ? inner : toggle).tap()
-        if (toggle.value as? String) != want { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap() }
-        XCTAssertEqual(toggle.value as? String, want, file: file, line: line)
+        if !toggle.becomes("value == '\(want)'", within: 3) { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap() }
+        XCTAssertTrue(toggle.becomes("value == '\(want)'"), "the switch is \(on ? "on" : "off")", file: file, line: line)
     }
 }
 
@@ -168,6 +168,12 @@ extension XCUIApplication {
 }
 
 extension XCUIElement {
+    /// Whether the element comes to match `predicate` ("enabled == true", "label == 'Done'", "value == '1'") within `timeout`. What a tap changes shows a moment
+    /// later on a slow machine: a test waits for it, never reads it at once.
+    func becomes(_ predicate: String, within timeout: TimeInterval = 8) -> Bool {
+        XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: predicate), object: self)], timeout: timeout) == .completed
+    }
+
     /// Where the element came to rest on screen: the same valid frame twice in a row, a quarter second apart, within `timeout`; nil if it never did. A menu's items
     /// exist while the menu is closed or still opening, with no place on screen or a moving one ("Activation point invalid"; asking `isHittable` then fails
     /// the test too, on GitHub's slower runner).

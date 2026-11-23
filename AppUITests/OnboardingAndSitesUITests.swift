@@ -139,7 +139,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         let choice = app.buttons["Not in your area"]
         XCTAssertTrue(choice.waitForExistence(timeout: 3))
         choice.tap()
-        XCTAssertTrue(app.buttons["filter-region"].label.contains("Not in your area"), "the chip shows the choice: \(app.buttons["filter-region"].label)")
+        XCTAssertTrue(app.buttons["filter-region"].becomes("label CONTAINS 'Not in your area'"), "the chip shows the choice: \(app.buttons["filter-region"].label)")
         XCTAssertTrue(app.buttons["filter-status"].label.contains("Up next"), "and the status stays chosen")
         XCTAssertNotEqual(app.staticTexts["site-search-count"].label, count, "the list narrows")
     }
@@ -191,7 +191,7 @@ final class OnboardingAndSitesUITests: UITestCase {
         XCTAssertTrue(app.buttons["onboarding-state"].exists, "the United States is the default here, so its states are offered")
         country.tap()
         app.buttons["Uruguay"].tap()             // the menu opens scrolled to the selected United States, so pick a country in view
-        XCTAssertFalse(app.buttons["onboarding-state"].exists, "only the US has states")
+        XCTAssertTrue(app.buttons["onboarding-state"].waitForNonExistence(timeout: 5), "only the US has states")
         let law = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Uruguay has a data protection law'")).firstMatch
         XCTAssertTrue(law.waitForExistence(timeout: 5))
         let regulator = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'gub.uy'")).firstMatch

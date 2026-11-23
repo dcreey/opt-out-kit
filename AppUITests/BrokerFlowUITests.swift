@@ -29,15 +29,22 @@ final class BrokerFlowUITests: UITestCase {
             let button = app.buttons["done-\(i)"]
             var scrolls = 0
             while !button.isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }     // the screen is taller now, so scroll until it can be tapped
-            XCTAssertTrue(button.isEnabled, "step \(i + 1) of \(id) should be unlocked")
-            button.tap()
+            // The step unlocks when the one before is done, a moment later on a slow machine: wait for it, never read it at once.
+            XCTAssertTrue(button.becomes("enabled == true"), "step \(i + 1) of \(id) should be unlocked")
+            // Done once it says so (the button then reads "Done" and is disabled). A tap can be lost on GitHub's slower simulator: tap again only while it
+            // does not say so, so a step is never tapped twice.
+            for _ in 0..<3 where button.label != "Done" {
+                button.tap()
+                if button.becomes("label == 'Done'") { break }
+            }
+            XCTAssertEqual(button.label, "Done", "step \(i + 1) of \(id) is marked done")
         }
 
         app.navigationBars.buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let done = app.buttons["task-flow-\(id)"]
         XCTAssertTrue(done.waitForExistence(timeout: 5))
-        XCTAssertTrue(done.images["checkmark.circle.fill"].exists || done.label.contains("checkmark"),
+        XCTAssertTrue(done.images["checkmark.circle.fill"].waitForExistence(timeout: 5) || done.label.contains("checkmark"),
                       "\(id) should show as done")
     }
 
