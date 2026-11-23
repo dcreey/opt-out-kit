@@ -32,7 +32,7 @@ Ask once, store only on the phone. Collect what brokers match on, because a miss
 | Birthdate | Some forms require it | Optional; sent only to brokers whose YAML lists it |
 
 **When edits are saved.** Nothing is written while the profile is being edited, not even on leaving a field. The edits (including the household email) stay in the
-editor and are written once, in one save, when the person taps Done or Continue, closes the editor, or leaves or closes the app (home, the app switcher; the scene is no longer active) (`AppModel.saveProfile`). The write is wrapped in a background task so iOS lets it finish as the app closes.
+editor and are written once, in one save, when the person taps Done or Continue, closes the editor, or leaves or closes the app (home, the app switcher; the scene is no longer active) (`AppModel.saveProfile`). The write is wrapped in a background task so iOS lets it finish as the app closes. Leaving the app ends typing first, so the box hands over its last keystroke, and then saves (a name typed right before leaving was saved without its last letter on a slow simulator; `ProfileEditorUITests.testProfileSurvivesRelaunch`).
 
 Relatives are not a field: add a relative as another person (with a relationship) and they get their own profile and
 queue.

@@ -133,7 +133,14 @@ struct PersonEditorView: View {
         .onAppear { restoreDraft(); onDraft?(person); if person.relationship == .me { onEmailDraft?(email) } }
         .onDisappear { commit() }
         // Closing or leaving the app (home, the app switcher, a call) saves what is typed, so a first profile is never lost to the app being closed.
-        .onChange(of: scenePhase) { _, phase in if phase != .active { commit() } }
+        // Typing is ended first, so the box hands over its last keystroke, and the save comes on the next turn of the run loop, once it has arrived: a name typed
+        // right before leaving was saved without its last letter ("Pa" for "Pat", on GitHub's slower simulator).
+        .onChange(of: scenePhase) { _, phase in
+            guard phase != .active else { return }
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            commit()
+            DispatchQueue.main.async { commit() }
+        }
         .confirmationDialog(Loc.f("Delete %@?", person.displayName), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { model.remove(person.id); dismiss() }
         }

@@ -229,18 +229,23 @@ extension XCUIApplication {
     /// opened again, up to three times. `until`, when given, says the item's tap took (a submenu opened, a screen changed); without it, one tap of the item is
     /// enough.
     func chooseMenuItem(_ menu: XCUIElement, _ item: XCUIElement, until done: (() -> Bool)? = nil, file: StaticString = #filePath, line: UInt = #line) {
-        for _ in 0..<3 {
+        // Four tries, each waiting up to 10 s for the choice to take: on GitHub's slower simulator a submenu took longer than 5 s to open (2026-11-23).
+        for _ in 0..<4 {
             if done?() == true { return }
             // The menu is opened only when its item is not on screen after a moment's wait: tapping the menu while it is open closes it again.
             if !item.appearsOnScreen(within: 2) { _ = menu.tapWhenResting(within: 10) }
             if item.tapWhenResting(within: 6) {
                 guard let done else { return }
-                let end = Date().addingTimeInterval(5)
+                let end = Date().addingTimeInterval(10)
                 while Date() < end { if done() { return }; Thread.sleep(forTimeInterval: 0.25) }
             }
         }
         if done?() == true { return }
-        XCTFail("could not choose \(item) from \(menu)", file: file, line: line)
+        // What was on screen, in the message (GitHub's runner shows only that) and as a picture.
+        let shown = buttons.allElementsBoundByIndex.prefix(40).map { $0.identifier.isEmpty ? $0.label : $0.identifier }.joined(separator: ", ")
+        let shot = XCTAttachment(screenshot: screenshot()); shot.name = "could-not-choose"; shot.lifetime = .keepAlways
+        XCTContext.runActivity(named: "could not choose") { $0.add(shot) }
+        XCTFail("could not choose \(item) from \(menu); buttons on screen: \(shown)", file: file, line: line)
     }
 }
 
