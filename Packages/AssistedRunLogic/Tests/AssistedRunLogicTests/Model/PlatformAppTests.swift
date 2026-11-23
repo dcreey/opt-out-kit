@@ -623,7 +623,9 @@ final class ActivityPageSpeedTests: XCTestCase {
         XCTAssertEqual(page.runNow, m.runNowCount(for: p), "the page counts what Run now really tries")
         XCTAssertEqual(page.rows, m.activityRows(for: p))
         XCTAssertLessThan(again, 0.5, "with each form's fill worked out once, the page takes \(again) s")
-        XCTAssertLessThan(rows, 6, "even the first time (build 47 took about 5 s every time)")
+        // The first time works out every site's form (about 1.6 s on a Mac); GitHub's runner took 6.5 s once (2026-11-23), so the ceiling leaves room for a slow
+        // machine. The guard against build 47's slowness (about 5 s every time) is `again` above: every later time must take under half a second.
+        XCTAssertLessThan(rows, 10, "even the first time")
         // A change to the progress rebuilds the plan (once a run is over): it must be quick. It took about a second in build 47.
         _ = m.plan
         m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: "submitted"), site: m.directory[0].id)
