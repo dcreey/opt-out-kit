@@ -22,6 +22,15 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 - A code step that the page reveals only after a button that emails the code ("Email me a verification code"; the box is hidden, a person has not asked for the code yet) is a code to type: `empty-code-field` reports it until the box has a value, so the app never sends before the person has the code and types it in, and the site is not counted done until then.
 - **Previous-address boxes of a live form are read by their label, not by the app's box tokens.** A live form's boxes are named `f0-9` and so on; those digits were read as "previous address 9" (so a box labelled "Previous street address" got no address) or "2" (so "Previous ZIP code" got the second previous address's). The tokens are now left out of what the rules read (`FormFiller.plan`; `testThePreviousAddressBoxesOfALiveFormAreNotMisreadFromTheirTokenNumbers`).
 - **"Add another email" / "+ Add phone" is pressed on the first fill too** (Solve and send and the automatic run), not only for a form that appeared later: `WebAssistedPage.refill` presses it once per extra email or phone and fills the new boxes (`testAddAnotherButtonsArePressedForTheFurtherEmailsAndPhones`).
+- **"Myself" is the person's answer, never "Another Individual".** "Individual" in "Another Individual" no longer reads as the person, and radios with no
+  `name` that share a box are one question (HubSpot's newer forms): judged one by one, both were chosen and the last click, "Another Individual", won, which
+  brought up an agent's certification box on datatowin.com (`choose-request-options.js`).
+- **A long box label is shortened, never replaced by the box's token** ("f0-18"), in what the app tells the person (`FormField.display`).
+- **A box is named by the words beside it before its placeholder.** A placeholder is often an example ("John", "john@doe.com"): it now comes after the label,
+  never instead of it. With no label of its own, a box is named by the element just before it, or by a short title beside a wrapper that holds only this box
+  (klear.com, Meltwater's opt-out: `<div>First Name</div><div><div><input placeholder="John"></div></div>`, read as "John", "Doe" and "john@doe.com", which
+  match nothing in a profile: "We could not match any of this form's fields to your profile"). `discover-forms.js`.
+- **A cookie banner in a shadow root is answered too** (Usercentrics, on the same page): `deny-cookies` searches open shadow roots and presses Deny, never Accept.
 - **A request choice is never taken for "myself".** In a group of radios the answer "myself / me / individual / consumer" is the self-answer to "who is this for?", and used to match any option that said "me" ("Know what personal information you hold about **me**" was chosen ahead of the opt-out beside it). A label that is itself a request (opt out, delete, know, correct...) is no longer read that way (`choose-request-options.js`, `testWhenThereIsNoDeleteChoiceItChoosesOptOutOfTheSale`).
 - A page that says the emailed code was wrong ("That code is not right", "invalid code", "the code expired") is a refusal (`FormRun.rejectsCode`, `.rejected("the site did not accept the code")`), never a send, even when the form has vanished and nothing else on the page looks like an error.
 - A form the page shows only once a choice is made ("Who is this request for? Myself") is found by the automatic run too: when the form on screen has nothing to fill, the fill runs again (it answers the choice and adopts the form that appeared) before the form is judged.
@@ -34,7 +43,11 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
 `FormFiller.plan` chooses a value for each field from the person's profile; `fillLive` types them into the page. Rules that must keep holding:
 
 1. **Phone numbers are plain digits.** No spaces, dashes, brackets or `+`: `7736331564`. A country-code menu beside the box ("United States (+1)") already
-   supplies the code, so the box gets the 10 digits and nothing else. The only exception is a box whose `pattern` attribute rejects digits.
+   supplies the code, so the box gets the 10 digits and nothing else. The only exception is a box whose `pattern` attribute rejects digits. The menu itself
+   gets the United States: by name, by its flag (HubSpot's US entry is "🇺🇸 [placeholder for all other country codes]", with no name), or by a whole "+1"
+   (never the "1" inside "+213" or "+1684": that pattern, unescaped, could pick another country; datatowin.com showed Mexico +52). A box that holds only the
+   dial code its menu wrote there ("+1") is still empty of a number: it gets the number after the code (`+1 7736331564`), where before it was left as it was.
+   A box already ending in the person's number is not typed again (a second pass typed bare digits over `+1 7736331564` and lost the code).
 2. **An error is detected and resolved with other formats.** After filling, `tryPhoneFormats` looks at each phone box it typed into. A box is in error when
    its own validity check fails, it is marked `aria-invalid`, its class or its parent's class says invalid or error, or a visible error message sits next to it.
    It then tries other shapes one at a time (`1` + digits, `+1` + digits, `773-633-1564`, `(773) 633-1564`, dotted, spaced), waiting a moment for the page to
@@ -83,9 +96,18 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
      colour boxes are never filled.
    - *Certification boxes* ("I certify under penalty of perjury", "I acknowledge", "I consent") are never ticked: the form waits for the person (`pending-certification`).
+     The one exception (docs/PRINCIPLES.md, decided 2026-11-23): on the account owner's own profile, a certification about the owner themselves ("I certify under
+     penalty of perjury that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and
+     accurate", missionwired.com) is ticked with the "I am this person" boxes (`FormFiller.selfCertification`, `tick-identity-boxes`). An agent-only box ("written
+     proof of authorization ... on behalf of the data subject"), terms and marketing never are; a family member's profile still waits for that person; and a
+     box with no label of its own, or a bot trap, is never ticked.
      Only a box the person can see counts (a styled box hides the input and shows its label), and a request option is never one: "To withdraw consent" or "To opt out
      of the sale" is a request the app chooses or leaves. affinityanswers.com was held on "a certification box that you must tick yourself" by its "To withdraw
-     consent" option in an EU section the page hides from US visitors. Protected by `checks-and-prompts.test.js` and
+     consent" option in an EU section the page hides from US visitors. Only a box of a form the app is filling counts (`data-ook-form`), and a cookie toggle
+     never does: focus-usa.com's opt-out page (the Complianz plugin) lists every cookie service below the form with an unticked "Consent to service
+     google-adsense", and the run stopped there on "a certification box that you must tick yourself" with a form ready to send. A bot trap is never one either: a box
+     moved off the page or hidden from assistive tech, with no visible label (cashmereai.com's honeypot "botcheck", 9,999 pixels to the left), and a box with no
+     label of its own no longer borrows the words of a container that holds other fields (it read its whole form's wording as a certification). Protected by `checks-and-prompts.test.js` and
      `FixturePageTypeUITests.testCheckboxesTickTheRemovingRequestsAndNotKnowOrCorrect` (its page has both).
    - *"Authorized agent? No / Yes" as radios* is a question, not a certification: the page's No is chosen for a person asking for themselves, and the form is sent
      (astoriacompany.com was held on "No * | authorizedAgent"). A box that states "I am an authorized agent" is still a statement and waits for the person.
@@ -131,6 +153,50 @@ before and after and compare. The multi-value comparison (a person with three em
   page counted a sent site as not sent. A page that replaced the form with "Processing your
   request... Please wait... Do not close this page" has not confirmed anything: it is recorded as sent but not confirmed (`FormRun.saysStillWorking`,
   `testAPageSayingItIsStillWorkingIsNotAConfirmation`), where before the result depended on how long the run happened to wait.
+
+- **A type-to-search menu for where the person lives gets their state picked from its list.** The fill types the state into a box it reads as a state
+  ("IL"), which in a type-to-search menu only filters the list; the type-ahead step then types the full name and chooses the option that is exactly it
+  (`type-ahead-open`, `type-ahead-choose`). It finds a box by its label, `aria-label`, its group's label or the text its `aria-labelledby` points to (TrustArc names
+  its menus only that way: dnb.com's required "Resident of", whose list has the US states and no "United States", was left on "IL" and the run stopped on "a
+  required choice"). A box about a company ("Country / Territory of Registration of Company 1") is never the person's and is left alone.
+
+- **A portal whose form appears only after its menus is answered.** When a page has no form yet but has empty menus that open one ("select your country of
+  residence", then "select your state", then request links: choreograph.com), the menus are answered (a menu of countries takes the United States, a menu
+  of states the person's), the request is chosen ("delete and opt out" is pressed over "opt out" and "do not sell"), and the page is read again. A menu of US
+  states that does not list the person's state (a portal for states with a privacy law only) gets nothing: never another state by the menu's
+  last-option rule, which would have chosen "virginia" for a person in Illinois. The site then says its form "takes requests only from the states it lists"
+  and offers the email (`custom-menus-pick` answers `not-offered:`; `WebViewSession.stateNotOffered`). A menu about a company ("Country / Territory of
+  Registration of Company 1", dnb.com) is never opened (`custom-menus-open`).
+- **An agent's box beside a "for myself" box is an option, not a certification.** "Submission Authorization *" as two boxes, "I am submitting this request for
+  myself" and "I am an authorized agent ... on behalf of someone else" (coloradoarrests.org): "for myself" is ticked and the agent's box left unticked, where
+  the agent's box used to hold the form as something to certify. A lone "I am an authorized agent" statement still waits for the person
+  (`FormFiller.plan`, `testAnAgentBoxBesideAForMyselfBoxIsAnOptionNotACertification`).
+- **A Cloudflare check that passes by itself is waited for.** A managed Turnstile shows "Verifying..." and, for most visitors, passes on its own in a few
+  seconds; nothing is clicked or solved. Before judging the page, the background run waits for it (up to 12 seconds, within the site's time), and sends once
+  its token is there. A check that asks for a person is still theirs (`LiveForms.liveSteps`; fixtures `turnstilepass` and `turnstile`).
+- **A typed box gets focus and blur events too**, as events only: nothing takes real focus, so no keyboard comes up and nothing scrolls. A page that floats a
+  box's label out of the way on them (comscore.com's "First Name *") otherwise showed its label over what was typed.
+- **A State menu is filled again after a Country is chosen.** A page may clear or rebuild its State menu from its own Country change handler, after the pass
+  that chose the country (comscore.com was left on "Please make a selection"). The fill says when it chose a country, and one more pass fills what that left
+  empty a moment later (`fill-live` returns `again`; `fillLive`). A menu already showing an option that holds the person's value ("United States of America"
+  for "United States") is not set again, since setting it fires the handler once more.
+
+- **A request wizard is answered step by step.** A step of only choices with Next ("What would you like to do?", "Who is submitting this request? Myself";
+  the choices may be screen-reader-only radios behind cards) is not a form "we could not match to your profile": its choices are made and Next is pressed
+  (`LiveFormPicker.isChoiceStep`). A press of a form whose only way forward is Next or Continue (`movesToNextStep`) is always the next step, never a send,
+  even when the step it leaves vanishes (which otherwise reads as the site taking the request); the step that appears is adopted, filled and pressed in turn,
+  up to its Submit. privacy.datarate.ai stopped on its second step with "We could not match any of this form's fields to your profile."
+
+- **A search that finds nobody is an answer.** A form that searches before it removes can answer "No data was found" (or "No records found", "We could not
+  find any records"): the site has nothing to opt out of. That answer, read in what appeared after pressing and before any error wording, ends the site as not
+  listed (`FormRun.saysNoRecordFound`, `SubmitOutcome.notListed`); the form is not pressed again. A line that only explains ("If no records are found, ...") does
+  not count. What it means for the site's status: docs/AUTOMATION.md.
+
+- **A page working out of sight never takes the keyboard.** A background run's page is parked invisibly in the app's window, and many brokers' pages put the
+  cursor in their first box (`autofocus`, or their own script), as do the app's own scripts that focus a box. Parked, the web view refuses to become first
+  responder (`NoAccessoryWebView.parked`), so no keyboard comes up over the screen the person is using and a box they are typing in keeps it. The page's own
+  focus still moves, so filling is unchanged. A page handed to the person (`presentable()`) takes the keyboard as usual
+  (`FixtureJourneyUITests.testARunNeverBringsUpTheKeyboardWhenItsPagesFocusABox`, fixture `autofocus`).
 
 ## One form, one submission
 

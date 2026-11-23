@@ -18,7 +18,7 @@ test('a text box gets the first value, with input and change events so the page 
   const out = JSON.parse(callJSON(w, 'fill-live', JSON.stringify([v('a', 'Pat', 'Patricia')]), 'false'));
   assert.equal(w.document.querySelector('[data-ook=a]').value, 'Pat');
   assert.deepEqual(seen, ['input', 'change']);
-  assert.deepEqual(out, { filled: 1, unmatched: [] });
+  assert.deepEqual(out, { filled: 1, unmatched: [], again: false });
 });
 
 test('a value with quotes, an apostrophe or accents is typed exactly as given', () => {
@@ -119,6 +119,48 @@ test('a birthdate in a text box takes the shape its placeholder or the text near
   assert.equal(fill('<form><input type=date data-ook=d name=dob></form>', [v('d', '1985-03-14')]).$('[data-ook=d]').value, '1985-03-14', 'a real date box takes the ISO date');
 });
 
+test('a phone country menu: the US entry by its flag when it has no name; "+1" never matches the 1 of another code (HubSpot, datatowin.com)', () => {
+  const menu = '<select data-ook=c><option value="">-</option><option value=DZ>🇩🇿 Algeria (‫الجزائر‬‎) +213</option><option value=AS>🇦🇸 American Samoa +1684</option>' +
+    '<option value=MX>🇲🇽 Mexico (México) +52</option><option value=US>🇺🇸 [placeholder for all other country codes]</option></select>';
+  assert.equal(fill(`<form>${menu}</form>`, [v('c', 'United States', 'United States (+1)', '🇺🇸', '+1', 'US', 'USA')]).$('[data-ook=c]').value, 'US');
+  const noFlag = '<select data-ook=c><option value="">-</option><option value=DZ>Algeria +213</option><option value=AS>American Samoa +1684</option><option value=CA>Canada +1</option></select>';
+  assert.equal(fill(`<form>${noFlag}</form>`, [v('c', '+1')]).$('[data-ook=c]').value, 'CA', 'a whole "+1", not the 1 inside +213 or +1684');
+});
+
+test('a phone box holding only the dial code its country menu wrote ("+1") is still empty of a number: it gets the number after the code', () => {
+  const { $ } = fill('<form><input type=tel data-ook=p value="+1"></form>', [v('p', '7736331564')]);
+  assert.equal($('[data-ook=p]').value, '+1 7736331564');
+  assert.equal(fill('<form><input type=tel data-ook=p value="+1 312 555 0100"></form>', [v('p', '7736331564')]).$('[data-ook=p]').value, '+1 312 555 0100', 'a whole number is kept');
+  const w = page('<form><input type=tel data-ook=p value="+1"></form>');
+  callJSON(w, 'fill-live', JSON.stringify([v('p', '7736331564')]), 'false');
+  callJSON(w, 'fill-live', JSON.stringify([v('p', '7736331564')]), 'false');
+  assert.equal(w.document.querySelector('[data-ook=p]').value, '+1 7736331564', 'a second pass keeps the dial code (it was typed again as bare digits)');
+});
+
+test('a typed box also gets focus and blur events, without taking real focus, so a floating label moves out of the way (comscore.com)', () => {
+  const w = page('<form><div class=g><label for=fn>First Name *</label><input id=fn data-ook=a></div></form>');
+  const box = w.document.getElementById('fn'), seen = [];
+  for (const t of ['focus', 'focusin', 'input', 'change', 'blur', 'focusout']) box.addEventListener(t, () => seen.push(t));
+  box.addEventListener('blur', () => { if (box.value) box.previousElementSibling.className = 'top'; });          // the page's own floating label
+  JSON.parse(callJSON(w, 'fill-live', JSON.stringify([v('a', 'Pat')]), 'false'));
+  assert.deepEqual(seen, ['focus', 'focusin', 'input', 'change', 'blur', 'focusout']);
+  assert.equal(w.document.querySelector('label').className, 'top', 'the label floated');
+  assert.notEqual(w.document.activeElement, box, 'nothing really took focus (no keyboard)');
+});
+
+test('choosing a country says so, so the caller fills once more after the page rebuilds its State menu (comscore.com)', () => {
+  const html = '<form><select data-ook=c name=C_Country><option value="">Please make a selection</option><option>United States of America</option></select>' +
+    '<select data-ook=s name=C_State_Prov><option value="">Please make a selection</option><option>Illinois</option></select></form>';
+  const first = fill(html, [{ name: 'c', candidates: ['United States'], label: 'Country *' }, { name: 's', candidates: ['IL', 'Illinois'], label: 'State or Province *' }]);
+  assert.equal(first.out.again, true);
+  assert.equal(first.$('[data-ook=s]').value, 'Illinois');
+  first.$('[data-ook=s]').value = '';          // the page's change handler cleared it afterwards
+  const again = JSON.parse(callJSON(first.w, 'fill-live', JSON.stringify([{ name: 'c', candidates: ['United States'], label: 'Country *' }, { name: 's', candidates: ['IL', 'Illinois'], label: 'State or Province *' }]), 'false'));
+  assert.equal(first.$('[data-ook=s]').value, 'Illinois', 'the second pass puts the state back');
+  assert.equal(again.again, false, 'the country already shows the person\'s: not set again, no further pass');
+  assert.equal(fill('<form><input data-ook=a></form>', [v('a', 'Pat')]).out.again, false);
+});
+
 test('a rich-text box (contenteditable) is filled as text', () => {
   const { $ } = fill('<form><div contenteditable="true" data-ook=m></div></form>', [v('m', 'Please delete my data.')]);
   assert.equal($('[data-ook=m]').textContent, 'Please delete my data.');
@@ -126,7 +168,7 @@ test('a rich-text box (contenteditable) is filled as text', () => {
 
 test('a value with no candidates or a token not on the page is skipped without error', () => {
   const { out } = fill('<form><input data-ook=a></form>', [{ name: 'a', candidates: [null], label: '' }, v('missing', 'x')]);
-  assert.deepEqual(out, { filled: 0, unmatched: [] });
+  assert.deepEqual(out, { filled: 0, unmatched: [], again: false });
 });
 
 test('a box or menu already showing the person\'s value is not set again, so a page that rebuilds its boxes on change keeps the ones the app fills next (adagio.io)', () => {

@@ -8,6 +8,15 @@ const clicks = (w, ids) => { const seen = []; for (const id of ids) w.document.g
 
 // ---- custom-menus-open.js and custom-menus-pick.js
 
+test('a menu about a company (dnb.com: "Country / Territory of Registration of Company 1") is never opened; the person\'s own is', () => {
+  const w = page('<div><span id=c>Select in Country / Territory of Registration of Company 1</span><input role=combobox id=co aria-labelledby=c></div>' +
+    '<div><span id=r>Select in Resident of</span><input role=combobox id=res aria-labelledby=r></div>');
+  const seen = clicks(w, ['co', 'res']);
+  assert.notEqual(run(w, 'custom-menus-open'), '');
+  assert.deepEqual(seen, ['res']);
+  assert.equal(run(w, 'custom-menus-open'), '', 'and the company menu is not opened after it');
+});
+
 test('an empty custom menu is opened once and marked; one that already shows a choice is not', () => {
   const w = page('<div><span>Relationship</span><div role=combobox id=m></div></div><div role=combobox id=set>Consumer</div>');
   const seen = clicks(w, ['m', 'set']);
@@ -34,6 +43,22 @@ test('a script that focuses a box never lets the browser scroll to it (a person 
   for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.js'))) {
     for (const m of fs.readFileSync(path.join(dir, f), 'utf8').matchAll(/\.focus\(([^)]*)\)/g)) assert.match(m[1], /preventScroll\s*:\s*true/, `${f}: ${m[0]}`);
   }
+});
+
+test('a country menu takes the United States; a state menu that does not list the person\'s state chooses nothing and says so (choreograph.com)', () => {
+  const opts = (ids) => '<div role=listbox>' + ids.map((t, i) => `<div role=option id=o${i}>${t}</div>`).join('') + '</div>';
+  const countries = page(opts(['anguilla', 'united states', 'canada']));
+  const seen = clicks(countries, ['o0', 'o1', 'o2']);
+  assert.equal(call(countries, 'custom-menus-pick', 'Illinois'), 'united states');
+  assert.deepEqual(seen, ['o1']);
+  const lawStates = page(opts(['california', 'colorado', 'connecticut', 'oregon', 'texas', 'virginia']));
+  const none = clicks(lawStates, ['o0', 'o1', 'o2', 'o3', 'o4', 'o5']);
+  assert.equal(call(lawStates, 'custom-menus-pick', 'Illinois'), 'not-offered:Illinois');
+  assert.deepEqual(none, [], 'never another state (the last-option rule picked "virginia")');
+  const withIL = page(opts(['california', 'illinois', 'texas']));
+  const il = clicks(withIL, ['o0', 'o1', 'o2']);
+  assert.equal(call(withIL, 'custom-menus-pick', 'Illinois'), 'illinois');
+  assert.deepEqual(il, ['o1']);
 });
 
 test('an open menu takes the person\'s own state first, then consumer / none / other; never employee or partner', () => {
@@ -106,6 +131,15 @@ test('a state type-ahead gets the state typed in (once), a country one the count
   const seen = clicks(list, ['a', 'b']);
   assert.equal(call(list, 'type-ahead-choose', 'Illinois'), true);
   assert.deepEqual(seen, ['b'], 'the exact name, not one that starts with it');
+});
+
+test('a type-ahead named only by aria-labelledby is found; "Resident of" takes the state; a company\'s country box is left alone (dnb.com, TrustArc)', () => {
+  const w = page('<span id=r>Select in Resident of</span><input id=res role=combobox aria-autocomplete=list aria-labelledby=r value=IL>' +
+    '<span id=c>Select in Country / Territory of Registration of Company 1</span><input id=co role=combobox aria-autocomplete=list aria-labelledby=c>');
+  assert.equal(call(w, 'type-ahead-open', 'country', 'United States'), false, 'the company\'s country is not the person\'s');
+  assert.equal(w.document.getElementById('co').value, '');
+  assert.equal(call(w, 'type-ahead-open', 'state', 'Illinois'), true);
+  assert.equal(w.document.getElementById('res').value, 'Illinois', 'the full name replaces the "IL" the fill typed, so the list shows Illinois to choose');
 });
 
 // ---- press-live-submit.js

@@ -28,6 +28,15 @@ test('otherwise a button that says reject, decline or only necessary is pressed,
   assert.deepEqual(seen, [], 'nothing pressed when the only choice is to accept');
 });
 
+test('a banner in a shadow root (Usercentrics, klear.com) has its Deny pressed, never Accept All', () => {
+  const w = page('<div id=usercentrics-root></div><form><input name=n></form>');
+  const root = w.document.getElementById('usercentrics-root').attachShadow({ mode: 'open' });
+  root.innerHTML = '<div><button data-testid=uc-more-button>More Information</button><button data-testid=uc-deny-all-button id=deny>Deny</button><button data-testid=uc-accept-all-button id=acc>Accept All</button></div>';
+  const seen = []; for (const id of ['deny', 'acc']) root.getElementById(id).addEventListener('click', () => seen.push(id));
+  assert.notEqual(run(w, 'deny-cookies'), null);
+  assert.deepEqual(seen, ['deny']);
+});
+
 test('a hidden reject button is not pressed by deny-cookies', () => {
   const w = page('<div style="display:none"><button id=rej>Reject all</button></div>');
   assert.equal(run(w, 'deny-cookies'), null);
@@ -81,6 +90,13 @@ test('"Start Deletion Request" is pressed over "Start Access Request"', () => {
   const w = page('<button id=acc>Start Access Request</button><button id=del>Start Deletion Request</button><button id=oo>Start Opt Out Request</button>');
   const seen = clicks(w, ['acc', 'del', 'oo']);
   assert.equal(call(w, 'advance-to-request-form', false), 'Start Deletion Request');
+  assert.deepEqual(seen, ['del']);
+});
+
+test('choreograph.com\'s request links: "delete and opt out" is pressed over "opt out" and "do not sell my personal information"', () => {
+  const w = page('<a id=dns>do not sell my personal information</a><a id=oo>opt out</a><a id=lim>limit use of sensitive data</a><a id=del>delete and opt out</a>');
+  const seen = clicks(w, ['dns', 'oo', 'lim', 'del']);
+  assert.equal(call(w, 'advance-to-request-form', false), 'delete and opt out');
   assert.deepEqual(seen, ['del']);
 });
 

@@ -1,0 +1,24 @@
+<h1>Data Subject Rights ({{site}})</h1>
+<!-- comscore.com's shape: choosing a Country makes the page rebuild its State menu a moment later, which clears a state chosen right after. Labels float out of
+     the box only on focus and blur (class "top"). -->
+<style>.g{position:relative;margin:10px 0}.g label{position:absolute;top:18px;left:10px;color:#888}.g label.top{top:0;font-size:11px}</style>
+<form method="POST" action="/{{site}}/send">
+  <div class="g"><label for="C_FirstName" class="field-name">First Name *</label><input id="C_FirstName" name="C_FirstName" type="text"></div>
+  <div class="g"><label for="C_EmailAddress" class="field-name">Email *</label><input id="C_EmailAddress" name="C_EmailAddress" type="text"></div>
+  <div class="g"><label for="C_Country">Country *</label><select id="C_Country" name="C_Country"><option value="">Please make a selection</option><option>Canada</option><option>United States of America</option></select></div>
+  <div class="g"><label for="C_State_Prov">State or Province *</label><select id="C_State_Prov" name="C_State_Prov"></select></div>
+  <button type="submit">Submit</button>
+</form>
+<script>
+var states = ['Alabama', 'Alberta', 'California', 'Illinois', 'Ontario', 'Texas'];
+function build() { var s = document.getElementById('C_State_Prov'); s.innerHTML = '<option value="">Please make a selection</option>' + states.map(function (x) { return '<option>' + x + '</option>'; }).join(''); }
+build();
+document.getElementById('C_Country').addEventListener('change', function () { setTimeout(build, 300); });
+document.querySelectorAll('.g input').forEach(function (i) {
+  i.addEventListener('blur', function () { var l = document.querySelector('label[for="' + i.id + '"]'); if (i.value) l.classList.add('top'); });
+});
+document.querySelector('form').addEventListener('submit', function (e) {
+  var floated = [].every.call(document.querySelectorAll('.g input'), function (i) { return !i.value || document.querySelector('label[for="' + i.id + '"]').classList.contains('top'); });
+  var h = document.createElement('input'); h.type = 'hidden'; h.name = 'labelsFloated'; h.value = floated ? 'yes' : 'no'; this.appendChild(h);
+});
+</script>

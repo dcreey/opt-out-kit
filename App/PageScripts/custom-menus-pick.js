@@ -8,6 +8,13 @@
   bad=new RegExp(bad.source+'|'+neverRequest.source,'i');
   // The person's own state first, when the menu lists places (the name escaped so it is matched as written).
   if(state) good.unshift(new RegExp('^\\s*'+state.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')+'\\b','i'));
+  // A menu of countries ("select your country of residence", choreograph.com): the person's state is a US state, so the United States.
+  if(state) good.unshift(/^\s*(united states( of america)?|usa|u\.s\.a?\.?)\s*$/i);
+  // A menu of US states that does not list the person's (a portal that takes requests only from states with a privacy law): nothing is chosen, never another
+  // state by the last-option rule below, and the caller is told, so it can say so and offer the email instead.
+  var usStates=/^\s*(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|district of columbia|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming)\s*$/i;
+  var places=opts.filter(function(o){return usStates.test(o.innerText||'');}).length;
+  if(state&&places>=3&&!opts.some(function(o){return good[1].test((o.innerText||'').trim());})){document.body.click(); return 'not-offered:'+state;}
   for(var g=0;g<good.length;g++){for(var i=0;i<opts.length;i++){var t=(opts[i].innerText||'').trim(); if(good[g].test(t)&&!bad.test(t)){opts[i].click(); return t;}}}
   if(opts.length&&opts.length<40){var last=opts[opts.length-1]; if(!bad.test(last.innerText||'')){last.click(); return (last.innerText||'').trim();}}
   // Nothing showed (the menu did not open on the first press): let the opener try it once more.

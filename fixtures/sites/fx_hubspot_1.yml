@@ -1,0 +1,24 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'hubspot', radios with no name, a phone country menu whose US entry has only its flag: datatowin.com). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_hubspot_1'
+domain: 'hubspot-1.fixture.test'
+name: 'Fixture hubspot 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_hubspot_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_hubspot_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_hubspot_1/send'
+  fields:
+    - type: 'text'
+      name: 'firstname'
+      label: 'First name*'
+    - type: 'email'
+      name: 'email'
+      label: 'Email*'
+    - type: 'tel'
+      name: 'phone'
+      label: 'Phone number*'
+  hops: 0

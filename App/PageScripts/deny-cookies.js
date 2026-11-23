@@ -1,7 +1,9 @@
 (function(){
   var docs=[document]; document.querySelectorAll('iframe').forEach(function(f){try{if(f.contentDocument) docs.push(f.contentDocument);}catch(e){}});
+  // A banner drawn in a shadow root (Usercentrics' #usercentrics-root, klear.com) is searched too: its Deny button is not in the page's own document.
+  document.querySelectorAll('*').forEach(function(e){if(e.shadowRoot) docs.push(e.shadowRoot);});
   var known=['#onetrust-reject-all-handler','#axeptio_btn_dismiss','#axeptio_btn_dismiss_all','#CybotCookiebotDialogBodyButtonDecline','button#truste-consent-required','.cc-deny','[data-cookiefirst-action=reject]',
-             '.osano-cm-denyAll','#didomi-notice-disagree-button','button[aria-label*="Reject" i]','.cookie-reject','#cookie-reject','.ot-pc-refuse-all-handler'];
+             '.osano-cm-denyAll','[data-testid=uc-deny-all-button]','#didomi-notice-disagree-button','button[aria-label*="Reject" i]','.cookie-reject','#cookie-reject','.ot-pc-refuse-all-handler'];
   for(var di=0;di<docs.length;di++){for(var i=0;i<known.length;i++){var e=docs[di].querySelector(known[i]); if(e&&e.offsetParent!==null){e.click();return known[i];}}}
   var re=/^\s*(reject( all)?( cookies| non-essential( cookies)?)?|deny( all)?|decline( all)?|i do not accept( cookies)?|only (necessary|essential)( cookies)?|necessary( cookies)? only|no,? thanks|disagree|refuse( all)?|do not accept|tout refuser|rechazar todo|alle ablehnen)\s*$/i;
   for(var dj=0;dj<docs.length;dj++){

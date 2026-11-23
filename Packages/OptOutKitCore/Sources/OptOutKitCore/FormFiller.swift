@@ -48,9 +48,20 @@ public enum FormFiller {
     static let requestAcknowledgement = try! NSRegularExpression(pattern: "may be required to verify my identity.{0,200}authori[sz]e .{0,60} to contact me", options: .caseInsensitive)
     static let notAcknowledgement = try! NSRegularExpression(pattern: "terms|privacy policy|\\bsell|market|newsletter|advertis|share my|third part", options: .caseInsensitive)
 
+    /// A certification about the person themselves: that they are the individual the request is about, or that the details they gave are true ("I certify under
+    /// penalty of perjury that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and
+    /// accurate", missionwired.com). True of the account owner asking for themselves, so the owner's own profile ticks it (decided 2026-11-23). Never a box only for
+    /// an agent ("written proof of authorization ... on behalf of the data subject"), and never terms, marketing or a sale.
+    static let selfCertification = try! NSRegularExpression(pattern: "\\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\\b.{0,300}(\\bi am (the|a) (individual|person|consumer|data subject|resident)\\b|\\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\\b(is|are) (true|accurate|correct))", options: .caseInsensitive)
+    static let agentOnly = try! NSRegularExpression(pattern: "written proof|power of attorney|on behalf of (the|a) (data subject|consumer|individual)|authori[sz]ed agent", options: .caseInsensitive)
+    static let selfAsAnswer = try! NSRegularExpression(pattern: "\\bi am (the|a) (individual|person|consumer|data subject)\\b", options: .caseInsensitive)
+
     public static func isSelfIdentityBox(_ text: String) -> Bool {
         let r = NSRange(text.startIndex..., in: text)
         if requestAcknowledgement.firstMatch(in: text, range: r) != nil && notAcknowledgement.firstMatch(in: text, range: r) == nil { return true }
+        // An agent's wording beside "I am the individual" ("I am the individual, or authorized agent of the individual") still covers the person; an agent-only box does not.
+        if selfCertification.firstMatch(in: text, range: r) != nil, notAcknowledgement.firstMatch(in: text, range: r) == nil,
+           agentOnly.firstMatch(in: text, range: r) == nil || selfAsAnswer.firstMatch(in: text, range: r) != nil { return true }
         return selfIdentity.firstMatch(in: text, range: r) != nil && notSelfIdentity.firstMatch(in: text, range: r) == nil
     }
 
@@ -98,6 +109,8 @@ public enum FormFiller {
         var seenEmailLabels = Set<String>(), seenPhoneLabels = Set<String>(), seenEmailNames = Set<String>(), seenPhoneNames = Set<String>(), emailBoxes = 0
         var usedEmails = Set<String>(), usedPhones = Set<String>(), usedAddresses = Set<Int>(), usedNames = Set<UUID>()
         var messageSlots: [Int] = []
+        // A form whose request is "for myself" as a box: an agent's box beside it is an option, not a statement the person must make.
+        let hasMyselfBox = form.fields.contains { $0.type == "checkbox" && $0.label.range(of: "\\b(for )?myself\\b|\\bmy own\\b", options: [.regularExpression, .caseInsensitive]) != nil && $0.label.range(of: "agent|behalf", options: [.regularExpression, .caseInsensitive]) == nil }
         for field in form.fields {
             // A hint in brackets tells the person what to do, not what the box is: "State (select country first)" is the state, not the country or a first name.
             let hint = "\\s*\\(((select|choose|pick|enter|type|please)|[^)]*(country code|area code|including|include|e\\.g|example|format|dashes|digits))[^)]*\\)"
@@ -177,7 +190,10 @@ public enum FormFiller {
                 // "Authorized agent? No / Yes" (astoriacompany.com) is a question, not a statement to certify: the page's own No is chosen for a person asking for
                 // themselves (choose-request-options), so it never holds the form. Only as radios (a question with answers): a box saying "I am an authorized agent" is
                 // a statement, and still waits for the person.
-                let agentQuestion = field.type == "radio" && key.range(of: "authori[sz]ed.?agent|\\bagent\\b|on behalf", options: [.regularExpression, .caseInsensitive]) != nil
+                let agentWords = key.range(of: "authori[sz]ed.?agent|\\bagent\\b|on behalf", options: [.regularExpression, .caseInsensitive]) != nil
+                // As boxes too, when a box beside it is the person's own answer ("I am submitting this request for myself" / "I am an authorized agent submitting
+                // this request on behalf of someone else", coloradoarrests.org): the agent's box is an option left unticked, and "for myself" is ticked.
+                let agentQuestion = agentWords && (field.type == "radio" || hasMyselfBox)
                 if !agentQuestion, attestation.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) != nil, required || key.contains("acknowledg") || key.contains("certif") || isSelfIdentityBox(key) {
                     if isSelfIdentityBox(key), person.mayConfirmOwnIdentity() {
                         // The owner allowed this one plain statement about themselves; the sentinel below ticks it on the live page.
@@ -336,8 +352,9 @@ public enum FormFiller {
                 put([address?.zip], L10n.noun("Zip code")); continue
             }
             // A menu beside a phone box is its country-code list ("United States +1"), not the number.
+            // By its flag too: HubSpot's US entry is "🇺🇸 [placeholder for all other country codes]", with no name or +1 (datatowin.com).
             if field.type == "select", has("phone|mobile|tel\\b|ph.?ext|t[ée]l[ée]phone") {
-                put(person.countryCode == "US" || person.countryCode == nil ? ["United States", "United States (+1)", "+1", "US", "USA"] : [Regions.englishName(person.countryCode ?? "")], L10n.noun("Country code")); continue
+                put(person.countryCode == "US" || person.countryCode == nil ? ["United States", "United States (+1)", "🇺🇸", "+1", "US", "USA"] : [Regions.englishName(person.countryCode ?? "")], L10n.noun("Country code")); continue
             }
             // One box for the whole address ("Full Address", "Complete address"): "full" there is not the full name.
             if has("(full|complete|entire|whole).{0,6}address|address.{0,6}(in full|complete)") && !labelEmail && field.type != "email" {

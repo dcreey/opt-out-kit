@@ -535,11 +535,13 @@ final class AssistedRunner: ObservableObject {
                 case .nextStep, .checkAppeared:
                     continue      // a check appeared after sending (or the next step of the form came up): go round again
                 case .notConfirmed(let answer):
-                    let why: String = { switch answer { case .rejected(let w), .failed(let w), .challenged(let w): return w; default: return "no confirmation" } }()
+                    let why: String = { switch answer { case .rejected(let w), .failed(let w), .challenged(let w): return w; case .notListed: return AutoOptOut.noRecordFound; default: return "no confirmation" } }()
                     phase = revisiting ? .reviewing : manual ? .manualSend : .needsMore(why)
                     // A site the person is sending themselves is not failed when they move on without a confirmation: it just is not done yet.
                     // One form of the page went through and a later one did not: the site is sent, and the person can finish the rest in the page.
                     outcome = sentForms > 0 ? .submitted(awaitingEmail: sentEmail) : why == AutoOptOut.rateLimited || manual ? .needsYou(manual ? "you sent it yourself and we saw no confirmation" : why) : .failed(why)         // a rate limit is not the form's fault
+                    // The site's search found no record of the person: nothing to opt out of. The page stays on screen until they move on, and the site is recorded as not listed.
+                    if answer == .notListed, sentForms == 0 { outcome = .notListed }
                     // The person finishes this one, then taps Next or Mark as done; meanwhile the screen is read every few seconds in case a confirmation appears.
                     var watched = await ready.pageText()
                     let watcher = Task { @MainActor [weak self] in

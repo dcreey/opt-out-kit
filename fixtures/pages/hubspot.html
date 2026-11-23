@@ -1,0 +1,25 @@
+<h1>Privacy Requests ({{site}})</h1>
+<!-- datatowin.com's HubSpot form: radios with no name ("Myself" / "Another Individual", the second brings up an agent's certification), a phone country menu whose
+     US entry has only its flag, and a phone box the menu rewrites to the dial code alone. -->
+<form method="POST" action="/{{site}}/send" id="f">
+  <label>First name* <input name="firstname" required></label><br>
+  <label>Email* <input name="email" type="email" required></label><br>
+  <div>Phone number*<br>
+    <select id="cc" aria-label="Phone country"><option value="">-</option><option value="DZ">🇩🇿 Algeria (‫الجزائر‬‎) +213</option><option value="AS">🇦🇸 American Samoa +1684</option>
+      <option value="MX">🇲🇽 Mexico (México) +52</option><option value="US">🇺🇸 [placeholder for all other country codes]</option></select>
+    <input id="phone" type="tel" name="phone" required></div>
+  <div id="who"><span>DTW Privacy Request Submitted For*</span>
+    <label><input type="radio" value="Myself"> Myself</label><label><input type="radio" value="Another Individual"> Another Individual</label></div>
+  <div id="agent" style="display:none"><label><input type="checkbox" id="agentcert" required> I certify that I am authorized by the individual exercising their privacy rights to submit this request on their behalf.*</label></div>
+  <input type="hidden" name="submittedFor" id="sf"><input type="hidden" name="phoneCountry" id="pc">
+  <button type="submit">Submit</button>
+</form>
+<script>
+var codes = { DZ: '+213', AS: '+1684', MX: '+52', US: '+1' };
+document.getElementById('cc').addEventListener('change', function () { document.getElementById('phone').value = codes[this.value] || ''; document.getElementById('pc').value = this.value; });
+document.querySelectorAll('#who input').forEach(function (r) { r.addEventListener('change', function () {
+  document.querySelectorAll('#who input').forEach(function (o) { if (o !== r) o.checked = false; });
+  document.getElementById('sf').value = r.value;
+  var agent = r.value === 'Another Individual'; document.getElementById('agent').style.display = agent ? 'block' : 'none'; document.getElementById('agentcert').required = agent;
+}); });
+</script>

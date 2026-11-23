@@ -4,6 +4,25 @@ import OptOutKitCore
 
 /// Which form on a page is the opt-out: the picking rules for live pages, tested on plain descriptions of forms, no web view.
 final class LiveFormPickerTests: XCTestCase {
+    /// privacy.datarate.ai: "Who is submitting this request? Myself / Authorized Agent / Parent", Back and Next. A step of only choices is not a form we "could not
+    /// match"; its Next only moves on and never counts as sending, whatever happens to the page. A step with boxes and Next moves on too; a Submit sends.
+    func testAWizardStepOfOnlyChoicesIsAnsweredAndItsNextOnlyMovesOn() {
+        func f(_ fields: [(String, Bool)], buttons: [String]) -> LiveForm {
+            LiveForm(token: "w", action: "", method: "get", visible: true,
+                     fields: fields.enumerated().map { LiveField(token: "w-\($0.offset)", name: "", type: $0.element.0, label: "", required: false, visible: $0.element.1) },
+                     buttons: buttons, text: "Who is submitting this request?")
+        }
+        let who = f([("radio", false), ("radio", false), ("radio", false)], buttons: ["Back", "Next"])
+        XCTAssertTrue(LiveFormPicker.isChoiceStep(who), "screen-reader-only radios still count")
+        XCTAssertTrue(LiveFormPicker.movesToNextStep(who))
+        let boxes = f([("text", true), ("email", true), ("radio", true)], buttons: ["Back", "Next"])
+        XCTAssertFalse(LiveFormPicker.isChoiceStep(boxes), "a step with boxes to type is filled as usual")
+        XCTAssertTrue(LiveFormPicker.movesToNextStep(boxes), "and its Next still only moves on")
+        XCTAssertFalse(LiveFormPicker.movesToNextStep(f([("text", true)], buttons: ["Back", "Submit request"])), "Submit sends")
+        XCTAssertFalse(LiveFormPicker.movesToNextStep(f([("radio", true)], buttons: ["Next", "Submit"])), "a form that can also send is not only a step")
+        XCTAssertFalse(LiveFormPicker.isChoiceStep(f([("radio", true)], buttons: ["Submit"])), "choices sent at once are not a step")
+    }
+
     func testTheOptOutFormIsPickedOverMarketingForms() {
         func f(_ token: String, _ fields: [(String, String)], buttons: [String], text: String) -> LiveForm {
             LiveForm(token: token, action: "", method: "get", visible: true,

@@ -1,4 +1,4 @@
-(function(values,keepExisting){var filled=0, unmatched=[];
+(function(values,keepExisting){var filled=0, unmatched=[], countrySet=false;
   // A box or menu the person changed themselves is theirs: later passes leave it alone. Only real input counts, never our own events.
   if(!window.__ookUserWatch){window.__ookUserWatch=true;
     ['input','change'].forEach(function(t){document.addEventListener(t,function(e){if(e.isTrusted&&e.target&&e.target.setAttribute) e.target.setAttribute('data-ook-user','1');},true);});}
@@ -13,8 +13,12 @@
     if(isCE(el)){el.focus({preventScroll:true}); try{document.execCommand('selectAll',false,null); if(!document.execCommand('insertText',false,v)) el.textContent=v;}catch(e){el.textContent=v;}
       ['input','change','blur'].forEach(function(t){el.dispatchEvent(new Event(t,{bubbles:true}));}); return;}
     var proto=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+    // Focus and blur as events only (nothing takes real focus, so no keyboard and no scrolling): a page that floats a box's label out of the way on them
+    // (comscore.com) otherwise shows the label over what was typed.
+    el.dispatchEvent(new FocusEvent('focus')); el.dispatchEvent(new FocusEvent('focusin',{bubbles:true}));
     var d=Object.getOwnPropertyDescriptor(proto,'value'); if(d&&d.set){d.set.call(el,v);}else{el.value=v;}
-    el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
+    el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));
+    el.dispatchEvent(new FocusEvent('blur')); el.dispatchEvent(new FocusEvent('focusout',{bubbles:true}));}
   // A phone number is typed as plain digits, with no spaces or punctuation (a country-code menu beside the box supplies the code; the box gets the number
   // alone). Only a box that shows an error gets other shapes (see tryPhoneFormats).
   function fmtPhone(el,raw){var d=String(raw||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1);
@@ -49,8 +53,15 @@
     // The one exception: a State or Country the page ships with (a default such as "CA") gives way to the person's own, since a page default is not the person's choice.
     var stateish=/\b(state|province|country)\b/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''))&&!/birth|born|issu|licen|incorporat|e-?mail|phone/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''));
     var shown=(el.tagName==='SELECT'?((el.options[el.selectedIndex]||{}).text||'')+'|'+el.value:getVal(el)).toLowerCase();
-    var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});});
-    var pageDefault=stateish&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
+    var agrees=v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c&&shown.split('|').some(function(x){return x.trim()===c;});})
+      // A menu showing an option that holds the person's value ("United States of America" for "United States") agrees too: set again, its change handler
+      // would clear the State menu once more (comscore.com).
+      // A phone box already ending in the person's number ("+1 7735550101" after the dial code its menu wrote) agrees: typed again, the code was lost.
+      ||(isPhoneBox(el)&&v.candidates.some(function(c){var d=String(c||'').replace(/\D/g,''); if(d.length===11&&d[0]==='1') d=d.slice(1); return d.length>=7&&getVal(el).replace(/\D/g,'').slice(-d.length)===d;}))
+      ||(el.tagName==='SELECT'&&el.selectedIndex>0&&v.candidates.some(function(c){c=(c||'').toLowerCase().trim(); return c.length>2&&!/^\+\d/.test(c)&&shown.split('|')[0].indexOf(c)>=0&&!/other|not listed|outside/.test(shown);}));
+    // A phone box that holds only a dial code ("+1", "+52"): the page wrote it there when its country menu was set (HubSpot), so it is still empty of a number.
+    var dialOnly=isPhoneBox(el)&&/^\s*\+\d{1,4}\s*$/.test(getVal(el));
+    var pageDefault=(stateish||dialOnly)&&v.candidates.length&&v.candidates[0]!==null&&!agrees;
     // Already showing what the person's value is: nothing is set again. Setting it again fires the page's change event, and a page that rebuilds the boxes after
     // it (adagio.io builds its State menu on Country's change) loses the State menu the app is about to fill.
     if(agrees){filled++; return;}
@@ -67,7 +78,8 @@
       // Options such as "IL - Illinois" or "Illinois (IL)": a state name inside the text, or the two-letter code as a whole word.
       for(var c2=0;c2<v.candidates.length&&!done;c2++){var w2=(v.candidates[c2]||'').toLowerCase(); if(!w2) continue;
         for(var i2=0;i2<el.options.length;i2++){var o2=el.options[i2], tx=o2.text.trim().toLowerCase(); if(!o2.value&&!tx) continue;
-          var hit=w2.length>2?tx.indexOf(w2)>=0:new RegExp('(^|[^a-z])'+w2+'([^a-z]|$)').test(tx);
+          // A short answer ("IL", "+1") is a whole word, escaped and not part of a longer number: "+1" was a pattern that matched the "1" of "+213" or "+1684".
+          var hit=w2.length>2&&!/^\+\d/.test(w2)?tx.indexOf(w2)>=0:new RegExp('(^|[^a-z0-9])'+w2.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')+'([^a-z0-9]|$)').test(tx);
           if(hit&&!/other|not listed|outside/.test(tx)){el.value=o2.value;done=true;break;}}}
       // An age (or any number) against a menu of brackets: "18-24", "65+", "under 18".
       if(!done&&/^\d{1,3}$/.test(String(v.candidates[0]||''))){var n3=+v.candidates[0];
@@ -80,8 +92,10 @@
         // No match for the person's state: take "Other US state" / "Other" / "Not listed" when the menu has one.
         for(var k=0;k<el.options.length&&!done;k++){var tx=el.options[k].text.trim();
           if(/^(other( u\.?s\.?( state)?s?)?|other state|not listed|outside (the )?u\.?s)/i.test(tx)){el.value=el.options[k].value;done=true;}}}
-      if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;}
+      if(done){el.dispatchEvent(new Event('change',{bubbles:true}));el.dispatchEvent(new FocusEvent('blur'));el.dispatchEvent(new FocusEvent('focusout',{bubbles:true}));el.setAttribute('data-ook-last',el.value);filled++;
+        // A page may rebuild or clear its State menu once Country changes, after this pass: the caller fills once more a moment later (comscore.com).
+        if(/country/i.test((v.label||'')+' '+(el.name||'')+' '+(el.id||''))) countrySet=true;}
       else if(el.required||/\*|required/i.test((el.getAttribute('aria-label')||'')+(el.closest('label')?el.closest('label').innerText:'')+(el.id&&document.querySelector('label[for="'+el.id+'"]')?document.querySelector('label[for="'+el.id+'"]').innerText:''))) unmatched.push((v.candidates[0]||'')+'');
     } else if(keepExisting&&!pageDefault&&!junkEmail&&getVal(el).trim()!==''){filled++;}
-    else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); var seg=ph?splitSeg(el,v):null; setValue(el,seg!==null?seg:ph?fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph&&seg===null) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
-  return JSON.stringify({filled:filled,unmatched:unmatched});})
+    else if(v.candidates.length&&v.candidates[0]!==null){var ph=!/[,;\n]/.test(String(v.candidates[0]))&&isPhoneBox(el), dob=!ph&&isDobBox(el)&&/^\d{4}-\d{2}-\d{2}$/.test(v.candidates[0]); var seg=ph?splitSeg(el,v):null; setValue(el,seg!==null?seg:ph?(dialOnly?getVal(el).trim()+' ':'')+fmtPhone(el,v.candidates[0]):dob?fmtDob(el,v.candidates[0]):fit(el,v.candidates)); if(dob) el.setAttribute('data-ook-dob',v.candidates[0]); el.setAttribute('data-ook-last',getVal(el)); if(ph&&seg===null) el.setAttribute('data-ook-phone',String(v.candidates[0]).replace(/\D/g,'')); filled++;}});
+  return JSON.stringify({filled:filled,unmatched:unmatched,again:countrySet});})

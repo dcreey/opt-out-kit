@@ -249,6 +249,7 @@ final class GuidedRunner: ObservableObject {
             case .rejected(let why), .failed(let why):
                 status = Loc.f("We could not confirm it was sent (%@). Finish it yourself in the page, then tap Next step.", why)
             case .filledNotSubmitted: break
+            case .notListed: status = Loc.t("The site found no record of you, so there is nothing to opt out of here. Tap Next step.")
             }
         default: break
         }

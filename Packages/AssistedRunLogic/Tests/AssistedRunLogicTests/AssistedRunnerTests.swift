@@ -431,6 +431,23 @@ final class PrematureDoneTests: XCTestCase {
         if case .submitted = FormRun.classify("Processing your request. Please wait while we process your request.") { XCTFail("not a confirmation") }
     }
 
+    /// georgiacourtrecords.us and the other courtrecords.us sites: the form searches first and answered "No data was found, try other criteria", which the run
+    /// took as the form's next step and pressed again until time ran out. It is the site saying the person is not listed.
+    func testASearchThatFindsNoRecordIsReadAsNotListed() {
+        let courtRecords = "Please fix the following input errors:\nNo data was found, try other criteria..."
+        XCTAssertEqual(FormRun.classifyConfirmed(courtRecords), .notListed, "read before the error wording")
+        for said in ["No records found.", "No results were found for your search. Please try again.", "We could not find any records matching your information.",
+                     "We couldn't find a record for that name", "Sorry, we were unable to locate any data", "0 results found", "No matching records found",
+                     "We found no records for Pat Example"] {
+            XCTAssertTrue(FormRun.saysNoRecordFound(said), said)
+        }
+        for said in ["If no records are found, we will email you.", "When no results are found, try a different spelling.", "Thank you. Your request has been received.",
+                     "Records found: 3", "Your data was found and will be removed.", "No personal data is sold. Submit your request below."] {
+            XCTAssertFalse(FormRun.saysNoRecordFound(said), said)
+        }
+        if case .notListed = FormRun.classifyConfirmed("Thank you. Your opt-out request has been received.") { XCTFail("a confirmation is not a not-listed answer") }
+    }
+
     func testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage() {
         let page = "Country *\nUnited States\nState *\nChoose state\nThis field is mandatory\nI would like to:*\nGet a copy of my data"
         XCTAssertEqual(FormRun.classify(page), .rejected("the site says a required box was left empty: State"))

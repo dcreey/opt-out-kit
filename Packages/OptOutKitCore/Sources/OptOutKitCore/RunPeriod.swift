@@ -59,6 +59,7 @@ public enum RunPeriods {
 public enum ActivityGroup: String, CaseIterable, Sendable {
     case needsYou      // the latest attempt this period did not go through (a check, a refusal, an error): it is in the semi-automated queue
     case sent          // a request went through this period
+    case notListed     // the site's own search found no record of the person: nothing to opt out of (done until it is searched again)
     case notTried      // nothing this period yet: not reached, held back by the run's own rules, or set aside by the person
 }
 
@@ -81,6 +82,7 @@ public extension RunPeriods {
             let list = (attempts[id] ?? []).filter { a in since.map { a.date >= $0 } ?? (period?.contains(a.date) ?? true) }
             if let sent = list.filter(\.wasSubmitted).map(\.date).max() { return ActivitySite(id: id, group: .sent, date: sent) }
             if let last = list.filter({ !$0.wasEmailed }).max(by: { $0.date < $1.date }) {
+                if last.wasNotListed { return ActivitySite(id: id, group: .notListed, date: last.date) }
                 return ActivitySite(id: id, group: .needsYou, date: last.date, outcome: last.outcome, detail: last.detail)
             }
             return ActivitySite(id: id, group: .notTried)
@@ -106,7 +108,8 @@ public extension RunPeriods {
         siteIDs.map { id in
             let list = (attempts[id] ?? []).filter { !$0.wasEmailed }
             let sent = list.filter(\.wasSubmitted)
-            let group: ActivityGroup = !sent.isEmpty ? .sent : (list.isEmpty ? .notTried : .needsYou)
+            let latest = list.max { $0.date < $1.date }
+            let group: ActivityGroup = !sent.isEmpty ? .sent : list.isEmpty ? .notTried : latest?.wasNotListed == true ? .notListed : .needsYou
             return AllRunsSite(id: id, group: group, sends: sent.count, tries: list.count, lastSent: sent.map(\.date).max(), last: list.max { $0.date < $1.date })
         }
     }

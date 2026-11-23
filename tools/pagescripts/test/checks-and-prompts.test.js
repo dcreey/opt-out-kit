@@ -26,6 +26,7 @@ test('a reCAPTCHA that refused the send is reported, so only the person\'s own p
 
 test('a solved check, the reCAPTCHA badge in the corner, a tiny frame and a plain page are not checks', () => {
   assert.equal(run(page('<iframe src="https://www.google.com/recaptcha/api2/anchor?k=x"></iframe><textarea name="g-recaptcha-response">token</textarea>'), 'visible-challenge'), null, 'solved');
+  assert.equal(run(page('<div class="cf-turnstile">Success!</div><input type=hidden name="cf-turnstile-response" value="token">'), 'visible-challenge'), null, 'a Cloudflare check that passed by itself');
   assert.equal(run(page('<div class="grecaptcha-badge"><iframe src="https://www.google.com/recaptcha/api2/anchor?k=x"></iframe></div>'), 'visible-challenge'), null, 'the badge');
   assert.equal(run(page('<p>Thank you, your request was received.</p>'), 'visible-challenge'), null, 'a plain page');
   assert.equal(run(page('<p>Please wait for the anti-spam check.</p><input name="cf-turnstile-response" value="done">'), 'visible-challenge'), null,
@@ -38,6 +39,25 @@ test('an unticked certification or consent box is returned with its wording, in 
   assert.match(run(page('<label><input type=checkbox> I certify under penalty of perjury that this is true</label>'), 'pending-certification'), /certify under penalty/);
   assert.match(run(page('<label><input type=checkbox> Je certifie que ces informations sont exactes</label>'), 'pending-certification'), /Je certifie/);
   assert.match(run(page('<label><input type=checkbox> Ich bestätige die Richtigkeit</label>'), 'pending-certification'), /Ich bestätige/);
+});
+
+test('a bot trap (honeypot) is not a certification: off the page or hidden from assistive tech, with no label, and its form\'s words are not its own (cashmereai.com)', () => {
+  const trap = '<form data-ook-form="f0"><input type=checkbox name=botcheck tabindex=-1 aria-hidden=true class=dns-hp style="position:absolute;left:-9999px">' +
+    '<fieldset>By submitting you certify and consent that this is your information.<label><input type=radio name=t checked> Opt out</label></fieldset><input name=n></form>';
+  assert.equal(run(page(trap), 'pending-certification'), null);
+  assert.match(run(page('<form data-ook-form="f0"><label><input type=checkbox> I certify under penalty of perjury</label><input name=n></form>'), 'pending-certification'), /certify/,
+    'a real certification box still stops the run');
+});
+
+test('a box outside the forms the app is filling, and a cookie toggle, are not certifications (focus-usa.com: the cookie policy below the form)', () => {
+  const cookies = '<details><summary><h3>Google Adsense</h3><label for=ga><span>Consent to service google-adsense</span></label><input type=checkbox id=ga class="cmplz-accept-service"></summary></details>';
+  const form = '<form data-ook-form="f0"><input name=name><label><input type=checkbox checked> Global opt-out from selling and sharing</label><label><input type=checkbox> Request for access</label><button>Send</button></form>';
+  assert.equal(run(page(form + cookies), 'pending-certification'), null, 'the opt-out form has nothing to certify');
+  assert.equal(run(page(cookies), 'pending-certification'), null, 'a cookie toggle is never one, even with no form marked');
+  assert.equal(run(page('<form data-ook-form="f0"><input name=n></form><div><label><input type=checkbox> I certify under penalty of perjury</label></div>'), 'pending-certification'), null,
+    'a box outside the marked form is not part of the request');
+  assert.match(run(page('<form data-ook-form="f0"><input name=n><label><input type=checkbox> I certify under penalty of perjury</label></form>'), 'pending-certification'), /certify/,
+    'inside the form it still stops the run');
 });
 
 test('a ticked box, an agent option and an ordinary box are not pending certifications', () => {
@@ -56,13 +76,22 @@ test('a request option ("To withdraw consent", "To opt out of the sale") and a b
 
 // ---- tick-identity-boxes.js
 
-test('the plain "I confirm I am the person whose email this is" box is ticked; legal and marketing boxes are not', () => {
+// The script runs only for the account owner's own profile (Person.mayConfirmOwnIdentity): what it ticks is true of them.
+test('"I confirm I am the person whose email this is" and a certification about the person themselves are ticked; terms and agent boxes are not', () => {
   const w = page(`<label><input type=checkbox id=me> I confirm that I am the person associated with this email address</label>
-    <label><input type=checkbox id=perj> I declare under penalty of perjury that I am the person</label>
+    <label><input type=checkbox id=perj> I declare under penalty of perjury that I am the person whose information is the subject of this request</label>
     <label><input type=checkbox id=terms> I confirm I am the account owner and accept the terms</label>
     <label><input type=checkbox id=agent> I am an authorized agent acting on behalf of the person</label>`);
+  assert.equal(run(w, 'tick-identity-boxes'), 2);
+  assert.deepEqual(['me', 'perj', 'terms', 'agent'].map((i) => w.document.getElementById(i).checked), [true, true, false, false]);
+});
+
+test('missionwired.com: the perjury certification ("I am the individual, or authorized agent of the individual ... true and accurate") is ticked; the agent\'s written-proof box and a bot trap are not', () => {
+  const w = page(`<form><label><input type=checkbox id=proof> Check this box to confirm that you can provide written proof of authorization to request information on behalf of the data subject.</label>
+    <label><input type=checkbox id=cert> I certify under penalty of perjury that, I am the individual, or authorized agent of the individual, whose information is the subject of this request; that I am a resident of the state identified above, and that all information I have submitted is true and accurate.*</label>
+    <input type=checkbox id=trap aria-hidden=true style="position:absolute;left:-9999px"> <input name=n></form>`);
   assert.equal(run(w, 'tick-identity-boxes'), 1);
-  assert.deepEqual(['me', 'perj', 'terms', 'agent'].map((i) => w.document.getElementById(i).checked), [true, false, false, false]);
+  assert.deepEqual(['proof', 'cert', 'trap'].map((i) => w.document.getElementById(i).checked), [false, true, false]);
 });
 
 test('"I understand I may be required to verify my identity and authorize them to contact me" is ticked, unless it is about selling or marketing', () => {

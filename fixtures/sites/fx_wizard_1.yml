@@ -1,0 +1,24 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'wizard', a request wizard with no form: choices, then details). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_wizard_1'
+domain: 'wizard-1.fixture.test'
+name: 'Fixture wizard 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_wizard_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_wizard_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_wizard_1/send'
+  fields:
+    - type: 'text'
+      name: 'firstName'
+      label: 'First Name'
+    - type: 'text'
+      name: 'lastName'
+      label: 'Last Name'
+    - type: 'email'
+      name: 'email'
+      label: 'Email Address'
+  hops: 0

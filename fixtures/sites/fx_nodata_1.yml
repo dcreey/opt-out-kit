@@ -1,0 +1,27 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'nodata', a form that searches first and finds nobody). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_nodata_1'
+domain: 'nodata-1.fixture.test'
+name: 'Fixture nodata 1'
+bucket: 'direct'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_nodata_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_nodata_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_nodata_1/send'
+  fields:
+    - type: 'text'
+      name: 'fname'
+      label: 'First Name *'
+    - type: 'text'
+      name: 'lname'
+      label: 'Last Name *'
+    - type: 'text'
+      name: 'state'
+      label: 'State *'
+    - type: 'text'
+      name: 'city'
+      label: 'City'
+  hops: 0

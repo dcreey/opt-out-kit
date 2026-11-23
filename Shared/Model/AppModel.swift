@@ -540,7 +540,7 @@ final class AppModel: ObservableObject {
         switch task.kind {
         case .platform(let id): return progress.isDone(id)
         case .flow(let id): return brokers.first { $0.id == id }.map { household.summary(for: $0).isFinished } ?? false
-        case .site(let id): return sites[id: id]?.isCurrent(attempts: progress.optOutAttempts) ?? (progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false)
+        case .site(let id): return sites[id: id]?.isHandled(progress) ?? (progress.optOutAttempts[id]?.contains(where: \.wasSubmitted) ?? false)
         case .verify:
             let ids = Set(sites.entries(domains: task.domains).map(\.id))
             return !ids.isEmpty && ids.allSatisfy { progress.optOutAttempts[$0]?.contains(where: \.wasSubmitted) ?? false }
@@ -895,6 +895,7 @@ final class AppModel: ObservableObject {
                 let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
                 line = Loc.f("Never went through (tried %lld times): %@", s.tries, last)
             case .notTried: line = Loc.t("No run has tried it yet")
+            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(s.last?.date ?? Date()))
             }
             return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
         }.sorted { $0.domain < $1.domain }
@@ -945,9 +946,13 @@ final class AppModel: ObservableObject {
         let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period, since: i.since).compactMap { s -> ActivityRow? in
             guard let e = byID[s.id] else { return nil }
+            // Not listed in an earlier run, and still inside its window: the run leaves it alone, and it counts as not listed, not as untried.
+            var group = s.group, date = s.date
+            if group == .notTried, progress.notListedRecently(e.id, now: now), !progress.isParked(e.id, now: now) { group = .notListed; date = progress.latestSiteCheck(e.id)?.date }
             let line: String
-            switch s.group {
-            case .sent: line = Loc.f("Sent %@", Loc.date(s.date ?? now))
+            switch group {
+            case .sent: line = Loc.f("Sent %@", Loc.date(date ?? now))
+            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(date ?? now))
             case .needsYou: line = ReviewItem(id: e.id, domain: e.domain, outcome: s.outcome ?? "failed", detail: s.detail, date: s.date ?? now, hasScreenshot: false).label
             case .notTried:
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
@@ -957,7 +962,7 @@ final class AppModel: ObservableObject {
                 else if let r = i.lastRun[e.id] { line = r.label }
                 else { line = i.since == nil ? Loc.t("Not tried yet this period") : Loc.t("Not tried yet in this run") }
             }
-            return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
+            return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
         }.sorted { $0.domain < $1.domain }
         let remaining = AutoOptOut.notSent(in: period, i.entries.filter { nextPass.contains($0.domain) }, progress: progress)
         let runNow = Set(remaining.filter { reason($0) == nil }.map(\.domain)).count
@@ -966,6 +971,8 @@ final class AppModel: ObservableObject {
 
     /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
     func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, pageSaid: String? = nil, for personID: UUID, dryRun: Bool) {
+        MainThreadWatch.note("recording a result")
+        defer { MainThreadWatch.note("after recording a result") }
         guard !dryRun else { return }
         if let attempt = AutoOptOut.attempt(for: result, now: Date(), pageSaid: pageSaid) { household.mutateProgress(for: personID) { $0.recordOptOutAttempt(attempt, site: entry.id) } }
         var rows = optOutRun[personID] ?? []
@@ -1185,7 +1192,7 @@ final class AppModel: ObservableObject {
 
     /// How many sites still wait in each kind of broker, for the person to choose from.
     var remainingKinds: [(kind: String, count: Int)] {
-        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts, parked: progress.parkedSites())
+        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts, parked: progress.parkedSites().union(progress.notListedSites()))
     }
 
     // MARK: Daily summary
@@ -1315,7 +1322,8 @@ final class AppModel: ObservableObject {
     /// Today's goals for the selected person: the next batch of semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
         let queue = OptOutPlan.verifyQueue(plan, entries: directory)
-        let attempts = progress.optOutAttempts, parked = progress.parkedSites()
+        // A site a recent look found no listing on has nothing to do, so it is left out like one set aside.
+        let attempts = progress.optOutAttempts, parked = progress.parkedSites().union(progress.notListedSites())
         // Nothing finished today means only the first batch can be real: a second one is taken only after finishing the first. A saved count or list of
         // kinds that says otherwise is left over from a bug (a new day's pick inherited an earlier day's batches) and would fill the day with other kinds.
         let first = DailyGoals.build(queue: queue, entries: directory, attempts: attempts, batches: 1, chosen: Array(dailyThemes.prefix(1)), parked: parked)
@@ -1325,8 +1333,8 @@ final class AppModel: ObservableObject {
 
     /// Sites still waiting for the semi-automated step, and so how many days at one batch a day.
     var verifyRemaining: Int {
-        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites(); let ids = Set(sites.entries(domains: queued).filter { !parked.contains($0.id) }.map(\.id))
-        let byID = sites.byID; return ids.filter { !(byID[$0]?.isCurrent(attempts: progress.optOutAttempts) ?? false) }.count
+        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites().union(progress.notListedSites()); let ids = Set(sites.entries(domains: queued).filter { !parked.contains($0.id) }.map(\.id))
+        let byID = sites.byID; return ids.filter { !(byID[$0]?.isHandled(progress) ?? false) }.count
     }
 
     // MARK: Opt-out emails

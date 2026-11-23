@@ -1,0 +1,32 @@
+<!-- A privacy portal with no form at first, as choreograph.com's: type-to-search menus (role=combobox, options on the down arrow, as react-select draws them)
+     for the country of residence, then the state (gatemenus: the person's state is listed), then request links; "delete and opt out" opens the form. -->
+<h1>Manage Your Data ({{site}})</h1><p>Control how your data is used by selecting from the below options.</p>
+<div id="gate"></div>
+<script>
+(function () {
+  var site = '{{site}}', gate = document.getElementById('gate');
+  function menu(placeholder, options, chosen) {
+    var box = document.createElement('div'); box.className = 'menu';
+    box.innerHTML = '<div class="ph">' + placeholder + '</div><input role="combobox" aria-autocomplete="list" aria-haspopup="true" style="width:2px">';
+    var input = box.querySelector('input'), open = function () {
+      if (box.querySelector('[role=listbox]')) return;
+      var list = document.createElement('div'); list.setAttribute('role', 'listbox');
+      options.forEach(function (o) { var d = document.createElement('div'); d.setAttribute('role', 'option'); d.textContent = o;
+        d.addEventListener('click', function () { box.querySelector('.ph').textContent = o; list.remove(); input.disabled = true; chosen(o); }); list.appendChild(d); });
+      box.appendChild(list);
+    };
+    input.addEventListener('mousedown', open); input.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') open(); });
+    gate.appendChild(box);
+  }
+  menu('select your country of residence', ['united states', 'anguilla', 'canada', 'mexico'], function () {
+    menu('select your state', ['california', 'colorado', 'illinois', 'texas', 'virginia'], function () {
+      var links = document.createElement('div');
+      links.innerHTML = '<a href="#" id="dns">do not sell my personal information</a><br><a href="#" id="oo">opt out</a><br><a href="#" id="del">delete and opt out</a>';
+      gate.appendChild(links);
+      links.querySelector('#del').addEventListener('click', function (e) { e.preventDefault();
+        gate.innerHTML = '<form method="POST" action="/' + site + '/send"><label>First name <input name="firstname" required></label><br><label>Last name <input name="lastname" required></label><br>' +
+          '<label>Email <input name="email" type="email" required></label><br><button type="submit">submit</button></form>'; });
+    });
+  });
+})();
+</script>

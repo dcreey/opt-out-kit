@@ -1,0 +1,21 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'cmplz', a bot trap in the form and cookie-service toggles below it: focus-usa.com, cashmereai.com). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_cmplz_1'
+domain: 'cmplz-1.fixture.test'
+name: 'Fixture cmplz 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_cmplz_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_cmplz_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_cmplz_1/send'
+  fields:
+    - type: 'text'
+      name: 'name'
+      label: 'Name'
+    - type: 'email'
+      name: 'email'
+      label: 'Email'
+  hops: 0

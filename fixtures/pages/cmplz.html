@@ -1,0 +1,15 @@
+<h1>Opt-out preferences ({{site}})</h1>
+<!-- focus-usa.com (Complianz) and cashmereai.com: a bot trap in the form (off the page, hidden from assistive tech, no label), and below the form a cookie policy
+     that lists each cookie service with an unticked "Consent to service ..." toggle. Neither is the person's to tick or to be stopped by. -->
+<form method="POST" action="/{{site}}/send">
+  <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0">
+  <p>By submitting you certify and consent that this is your information.</p>
+  <label>Name <input name="name" required></label><br>
+  <label>Email <input name="email" type="email" required></label><br>
+  <label><input type="checkbox" name="global_optout" value="1"> Global opt-out from selling and sharing my personal information</label><br>
+  <label><input type="checkbox" name="access" value="1"> Request for access</label><br>
+  <button type="submit">Send</button>
+</form>
+<h2>2. Cookies</h2>
+<details><summary><h3>Google Adsense</h3><label for="ga"><span>Consent to service google-adsense</span></label><input type="checkbox" id="ga" class="cmplz-accept-service"></summary></details>
+<details><summary><h3>Google Analytics</h3><label for="gan"><span>Consent to service google-analytics</span></label><input type="checkbox" id="gan" class="cmplz-accept-service"></summary></details>

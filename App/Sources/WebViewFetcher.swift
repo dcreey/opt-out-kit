@@ -48,6 +48,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
     var activeFrame: WKFrameInfo?
     /// The last press of send was held back because a required box is still empty and the person is on the page (`press-live-submit`, `press-submit`).
     var pressHeldForEmptyBox = false
+    /// A menu of states on the page does not list the person's (`custom-menus-pick`): the site takes requests only from the states it lists.
+    var stateNotOffered: String?
     private let reporter = FrameReporter()
     /// Set only for a background run's site (`PageActivity.report`): told of every sign of life from the page, so a page that goes quiet is given up.
     /// Nil for every screen a person uses (Solve and send, guides), which are left exactly as they were.
@@ -94,10 +96,12 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         webView.removeFromSuperview()
         webView.alpha = 1
         webView.accessibilityElementsHidden = false
+        (webView as? NoAccessoryWebView)?.parked = false
         return webView
     }
 
     private override init() {
+        MainThreadWatch.note("making a page")
         let bin = PageActivity.bin
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
@@ -127,6 +131,8 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         // Parked, it is no one's to read: VoiceOver would otherwise read a page that cannot be seen, and every accessibility query (a UI test's included)
         // would wait on the page's own process for its tree, which timed out on a busy machine during a run. Shown again in `presentable()`.
         webView.accessibilityElementsHidden = true
+        // Nor does it take the keyboard when a page focuses one of its boxes.
+        (webView as? NoAccessoryWebView)?.parked = true
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
         // Behind everything else in the window, so even a moment of full opacity is covered by the app.
         (scene?.keyWindow ?? scene?.windows.first)?.insertSubview(webView, at: 0)
@@ -377,6 +383,8 @@ struct WebFormSubmitter: FormSubmitter {
     /// `giveUp`: a site that goes quiet after sending ("Processing your request...") then still shows the person what it said.
     func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
         let bin = await MainActor.run { SessionBin() }
+        // Read before the run cancels the work (`AutoOptOut.watched`); the cancel handler below stays as a second chance.
+        giveUp.whenGivingUp { await bin.snapshot() }
         let sent = SentFlag(), outer = SiteRun.markSent
         return await withTaskCancellationHandler {
             await PageActivity.$bin.withValue(bin) {
@@ -473,6 +481,8 @@ extension WebViewSession {
     /// A picture of the page as it is now, as a compressed JPEG. The web view is kept at phone size, so the picture reads like a
     /// phone screen.
     func screenshotJPEG(quality: CGFloat = 0.6, aroundForm token: String? = nil) async -> Data? {
+        MainThreadWatch.note("screenshot")
+        defer { MainThreadWatch.note("after screenshot") }
         if webView.frame.isEmpty { webView.frame = CGRect(x: 0, y: 0, width: 390, height: 800) }
         // The web view is kept almost invisible in a hidden window; a snapshot would inherit that and come out nearly transparent.
         let previousAlpha = webView.alpha
@@ -497,12 +507,16 @@ extension WebViewSession {
         let taken: UIImage?
         do { taken = try await webView.takeSnapshot(configuration: config) } catch { NSLog("OptOutRun: snapshot failed: \(error) frame=\(webView.frame) bounds=\(webView.bounds) rect=\(config.rect)"); taken = nil }
         guard let image = taken else { return nil }
-        // A page without its own background snapshots with transparency, which a JPEG shows as black: paint it on white first.
-        let flat = UIGraphicsImageRenderer(size: image.size).image { ctx in
-            UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: image.size))
-            image.draw(at: .zero)
-        }
-        return flat.jpegData(compressionQuality: quality)
+        // A page without its own background snapshots with transparency, which a JPEG shows as black: paint it on white first. Done off the main thread, at 2x:
+        // a long page at the screen's 3x is some 8 million pixels, and painting and encoding it on the main thread froze the app for every site of a run.
+        return await Task.detached(priority: .utility) { () -> Data? in
+            let format = UIGraphicsImageRendererFormat(); format.scale = min(2, image.scale); format.opaque = true
+            let flat = UIGraphicsImageRenderer(size: image.size, format: format).image { ctx in
+                UIColor.white.setFill(); ctx.fill(CGRect(origin: .zero, size: image.size))
+                image.draw(at: .zero)
+            }
+            return flat.jpegData(compressionQuality: quality)
+        }.value
     }
 
     /// True when the page just loaded is an error page, which means the recorded link has moved or died.
@@ -722,4 +736,13 @@ extension WebViewSession {
 /// (`Keyboard.swift`) is the only control there, over a page as over every other screen.
 final class NoAccessoryWebView: WKWebView {
     override var inputAccessoryView: UIView? { nil }
+
+    /// Parked out of sight (a run working in the background): a box the page focuses, by `autofocus`, its own script or a page script, must not take the
+    /// keyboard, nor take it from a box the person is typing in elsewhere in the app. The page's own focus still moves, so filling is unchanged. WebKit's
+    /// content view asks the web view to become first responder, so refusing here covers both. Cleared in `WebViewSession.presentable()`.
+    var parked = false {
+        didSet { if parked, isFirstResponder || subviews.contains(where: { $0.isFirstResponder }) { endEditing(true) } }
+    }
+    override var canBecomeFirstResponder: Bool { parked ? false : super.canBecomeFirstResponder }
+    override func becomeFirstResponder() -> Bool { parked ? false : super.becomeFirstResponder() }
 }

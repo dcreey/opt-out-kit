@@ -1,0 +1,27 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'countryreset', a State menu rebuilt after Country changes, and labels that float only on focus and blur: comscore.com). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_countryreset_1'
+domain: 'countryreset-1.fixture.test'
+name: 'Fixture countryreset 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_countryreset_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_countryreset_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_countryreset_1/send'
+  fields:
+    - type: 'text'
+      name: 'C_FirstName'
+      label: 'First Name *'
+    - type: 'text'
+      name: 'C_EmailAddress'
+      label: 'Email *'
+    - type: 'select'
+      name: 'C_Country'
+      label: 'Country *'
+    - type: 'select'
+      name: 'C_State_Prov'
+      label: 'State or Province *'
+  hops: 0

@@ -5,11 +5,18 @@
     if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
     // Form builders (Tally, Typeform) put the question in a heading and point the box at it: aria-labelledby="label_<id>".
     if(!t){var lb=e.getAttribute('aria-labelledby'); if(lb) t=lb.split(/\s+/).map(function(id){var n=document.getElementById(id); return n?n.innerText:'';}).join(' ');}
-    if(!t) t=e.getAttribute('aria-label')||e.placeholder||e.getAttribute('title')||'';
+    if(!t) t=e.getAttribute('aria-label')||e.getAttribute('title')||'';
     // The element just before the box (<span>Street</span><input>), unless it belongs to another box: a <label> holding a box of its own, or one for another
     // box on the page (a label pointing at an id that does not exist is usually this box's, with the page's own mistake in it).
-    var pv=e.previousElementSibling;
-    if(!t&&pv&&!/^(INPUT|SELECT|TEXTAREA)$/.test(pv.tagName)&&!(pv.tagName==='LABEL'&&(pv.querySelector('input,select,textarea')||(pv.htmlFor&&pv.htmlFor!==e.id&&document.getElementById(pv.htmlFor))))) t=pv.innerText||'';
+    var pv=e.previousElementSibling, near='';
+    if(!t&&pv&&!/^(INPUT|SELECT|TEXTAREA)$/.test(pv.tagName)&&!(pv.tagName==='LABEL'&&(pv.querySelector('input,select,textarea')||(pv.htmlFor&&pv.htmlFor!==e.id&&document.getElementById(pv.htmlFor))))) near=pv.innerText||'';
+    // Or a short title beside a wrapper that holds only this box (klear.com: <div>First Name</div><div><div><input placeholder="John"></div></div>).
+    if(!t&&!near){for(var a=e.parentElement,k=0;a&&k<3&&a.tagName!=='FORM';a=a.parentElement,k++){
+      if(a.querySelectorAll('input:not([type=hidden]),select,textarea').length>1) break;
+      var ps=a.previousElementSibling, pt=ps&&!ps.querySelector('input,select,textarea')?(ps.innerText||'').replace(/\s+/g,' ').trim():'';
+      if(pt&&pt.length<=60){near=pt;break;}}}
+    // A placeholder is often an example ("John", "john@doe.com"), not the box's name: it comes after the words beside the box, never instead of them.
+    if(!t) t=[near,e.placeholder||''].filter(function(x){return x;}).join(' ');
     // Its parent's text, unless the parent holds other boxes too (then that text is theirs as much as this one's).
     if(!t&&e.parentElement&&e.parentElement.querySelectorAll('input:not([type=hidden]),select,textarea').length<=1) t=(e.parentElement.innerText||'').slice(0,60);
     return t.replace(/\s+/g,' ').trim().slice(0,90);};

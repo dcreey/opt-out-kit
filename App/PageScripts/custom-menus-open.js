@@ -1,7 +1,11 @@
 (function(){
   var shown=function(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0;};
+  // A menu about a company ("Country / Territory of Registration of Company 1", dnb.com) is not the person's: it is left alone, as the type-ahead step does.
+  var aboutCompany=function(e){var t=(e.getAttribute('aria-label')||'')+' '+(e.getAttribute('aria-labelledby')||'').split(/\s+/).map(function(id){var n=id&&document.getElementById(id); return n?n.innerText:'';}).join(' ');
+    var p=e.parentElement; for(var i=0;i<3&&p;i++,p=p.parentElement){if(p.querySelectorAll('input,select,[role=combobox]').length>1) break; t+=' '+(p.innerText||'').slice(0,120);}
+    return /\b(company|business|employer|organi[sz]ation)\b/i.test(t);};
   var els=[].slice.call(document.querySelectorAll('[role=combobox],[aria-haspopup=listbox],.MuiSelect-select')).filter(function(e){
-    return shown(e)&&e.getAttribute('data-ook-menu')!=='1'&&((e.innerText||e.value||'').replace(/[​\s]/g,'')==='');});
+    return shown(e)&&e.getAttribute('data-ook-menu')!=='1'&&((e.innerText||e.value||'').replace(/[​\s]/g,'')==='')&&!aboutCompany(e);});
   // A home-made menu (saymine and others): a box that shows only a placeholder ("Choose state", "Select...") beside a list of options that is hidden until the box is
   // pressed. The innermost such box is pressed; one already showing a choice is not, and nothing inside a real <select> is.
   if(!els.length){

@@ -10,7 +10,7 @@
     return t.replace(/\s+/g,' ').trim();};
   var title=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
     if(!t){var p=e.closest('label'); if(p) t=p.innerText;} return (t||'').split(/\n/)[0].trim().slice(0,80);};
-  var self=/\b(myself|me|my own|individual|consumer|resident|myself)\b/i, notSelf=/deceased|authori[sz]ed|agent|behalf|represent|business|company|employee|minor|child/i;
+  var self=/\b(myself|me|my own|individual|consumer|resident|myself)\b/i, notSelf=/deceased|authori[sz]ed|agent|behalf|represent|business|company|employee|minor|child|another|someone else|other (person|individual|people)|third.party/i;
   var yes=/opt.?out|do not sell|don.?t sell|do not share|targeted advertis|cross-context|profil|delete|deletion|remove|erase|unsubscribe|limit the use/i;
   var no=/opt.?in|\baccess\b|know|correct|portab|copy of|subscribe\b(?!.*(out|unsub))|newsletter|receive/i;
   var optOutWord=/opt.?out|unsubscribe|do not sell|do not share/i, optInWord=/opt.?in|receive|sign me up/i;
@@ -20,7 +20,12 @@
   var isDecl=function(t){return ownerOK&&selfDecl.test(t)&&!notDecl.test(t);};
   var chosen=0, unresolved=[];
   var groups={};
-  f.querySelectorAll('input[type=radio]').forEach(function(r){(groups[r.name||('g'+Math.random())]=groups[r.name||'']||[]).push(r);});
+  // Radios with no name (HubSpot's newer forms: datatowin.com's "Myself / Another Individual") are one question when they share a box: judged one by one,
+  // each was chosen and the last one clicked ("Another Individual") won.
+  var gi=0, keyOf=function(r){if(r.name) return 'n:'+r.name; var p=r.parentElement;
+    while(p&&p!==f&&p.querySelectorAll('input[type=radio]').length<2) p=p.parentElement;
+    if(!p) return 'g'+(gi++); if(!p.getAttribute('data-ook-rg')) p.setAttribute('data-ook-rg',String(gi++)); return 'c:'+p.getAttribute('data-ook-rg');};
+  f.querySelectorAll('input[type=radio]').forEach(function(r){var k=keyOf(r); (groups[k]=groups[k]||[]).push(r);});
   var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
   // "Are you submitting this request for yourself?" is the opposite question: Yes is the person's answer.
   var selfQ=/for (yourself|myself)|request for (yourself|yourself or)|are you (the )?(person|individual|consumer) (whose|this)/i;

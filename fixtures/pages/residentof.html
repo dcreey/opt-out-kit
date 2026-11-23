@@ -1,0 +1,30 @@
+<h1>Data Subject Request Form ({{site}})</h1>
+<!-- dnb.com's TrustArc form: type-to-search menus named only by aria-labelledby. "Resident of" lists countries and US states (no "United States"); a company's
+     country menu is not the person's. Typing filters the list (as react-select does); an option is chosen by clicking it. -->
+<form method="POST" action="/{{site}}/send">
+  <label>First Name * <input name="firstname" required></label><br>
+  <label>Email * <input name="email" type="email" required></label><br>
+  <div class="menu" data-name="resident" data-options="Afghanistan|Anguilla|Brazil|California|Chile|Illinois|Israel|United Kingdom|United States Virgin Islands">
+    <span id="r-l">Select in Resident of</span><div class="shown"></div><input role="combobox" aria-autocomplete="list" aria-labelledby="r-l"></div>
+  <div class="menu" data-name="companyCountry" data-options="Canada|United States|Mexico">
+    <span id="c-l">Select in Country / Territory of Registration of Company 1</span><div class="shown"></div><input role="combobox" aria-autocomplete="list" aria-labelledby="c-l"></div>
+  <input type="hidden" name="resident" id="resident"><input type="hidden" name="companyCountry" id="companyCountry">
+  <button type="submit">Submit Request</button>
+</form>
+<script>
+document.querySelectorAll('.menu').forEach(function (m) {
+  var input = m.querySelector('input'), render = function () {
+    var old = m.querySelector('[role=listbox]'); if (old) old.remove();
+    var q = input.value.toLowerCase(), list = document.createElement('div'); list.setAttribute('role', 'listbox');
+    m.dataset.options.split('|').filter(function (o) { return o.toLowerCase().indexOf(q) >= 0; }).forEach(function (o) {
+      var d = document.createElement('div'); d.setAttribute('role', 'option'); d.textContent = o;
+      d.addEventListener('click', function () { document.getElementById(m.dataset.name).value = o; m.querySelector('.shown').textContent = o; input.value = ''; list.remove(); });
+      list.appendChild(d);
+    });
+    m.appendChild(list);
+  };
+  ['input', 'mousedown'].forEach(function (t) { input.addEventListener(t, render); });
+  input.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') render(); });
+});
+document.querySelector('form').addEventListener('submit', function (e) { if (!document.getElementById('resident').value) { e.preventDefault(); document.body.insertAdjacentHTML('beforeend', '<p>Resident of is required</p>'); } });
+</script>

@@ -11,6 +11,7 @@ struct OptOutKitApp: App {
     init() {
         AppPlatformHolder.current = IOSPlatform()          // before the model is made
         Keyboard.install()
+        MainThreadWatch.startIfAsked()
         #if DEBUG
         // UI tests run without animations: every screen change otherwise waits for its animation, and the tests are slower and flakier for it.
         if ProcessInfo.processInfo.arguments.contains(where: { $0.hasPrefix("-uitest") }) || ProcessInfo.processInfo.environment["UITEST_NO_ANIMATIONS"] == "1" {
@@ -22,6 +23,7 @@ struct OptOutKitApp: App {
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(model)
+                .overlay(alignment: .topLeading) { if ProcessInfo.processInfo.arguments.contains("-uitest-watch-main") { MainStallsLabel() } }
                 .onOpenURL { if let link = AppModel.sharedLink(in: $0) { model.incomingLink = link } }
                 .task { CheckScheduler.register(model: model) }
         }

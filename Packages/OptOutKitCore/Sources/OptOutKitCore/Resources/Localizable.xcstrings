@@ -6234,6 +6234,29 @@
     }
    }
   },
+  "Not listed: the site found no record of you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non répertorié : le site n'a trouvé aucune fiche à votre nom"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No figura: el sitio no encontró ningún registro suyo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht gelistet: Die Website hat keinen Eintrag zu Ihnen gefunden"
+     }
+    }
+   }
+  },
   "Not started": {
    "extractionState": "manual",
    "localizations": {

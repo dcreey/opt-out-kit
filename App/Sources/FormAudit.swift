@@ -86,6 +86,7 @@ enum FormAudit {
             case .rejected(let why): label = "rejected: \(why)"; stored = "rejected"
             case .failed(let why): label = "failed: \(why)"; stored = "failed"
             case .filledNotSubmitted: label = "filled, not sent"; stored = nil
+            case .notListed: label = "not listed: the site found no record"; stored = OptOutAttempt.notListedOutcome
             }
             if let stored { model.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: stored, detail: label), site: entry.id) }
             rows.append(["domain": d, "kind": entry.about?.category ?? "other", "page": page.absoluteString, "result": label])

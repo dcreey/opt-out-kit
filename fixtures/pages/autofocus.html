@@ -1,0 +1,12 @@
+<h1>Opt out of {{site}}</h1><p>Fill in the form to have your listing removed.</p>
+<!-- A page that puts the cursor in its first box by itself, as many brokers' pages do: the box has autofocus, and the page's script focuses it again on
+     load and a moment later. Behind a background run nothing it focuses may bring up the keyboard. -->
+<form method="POST" action="/{{site}}/send">
+  <label>Full name <input type="text" name="name" id="name" autofocus required></label><br>
+  <label>Email address <input type="email" name="email" id="email" required></label><br>
+  <button type="submit">Submit request</button>
+</form>
+<script>
+window.addEventListener('load', function () { document.getElementById('name').focus(); });
+setTimeout(function () { document.getElementById('email').focus(); }, 1500);
+</script>

@@ -227,6 +227,157 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(app.descendants(matching: .any)["site-state"].waitForExistence(timeout: 10), "the site's page opens")
     }
 
+    /// As a user I want a run to work out of sight while I use the app: a page that puts the cursor in its own boxes (autofocus, and again a moment later),
+    /// and a menu the app opens by focusing its box, never bring up the keyboard, and the run still sends the form.
+    func testARunNeverBringsUpTheKeyboardWhenItsPagesFocusABox() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "autofocus-1.fixture.test,requestmenu-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        var keyboardSeen = false
+        let deadline = Date().addingTimeInterval(120)
+        while !done.exists && Date() < deadline {
+            if app.keyboards.firstMatch.exists { keyboardSeen = true; add(XCTAttachment(screenshot: app.screenshot())); break }
+            Thread.sleep(forTimeInterval: 0.3)
+        }
+        XCTAssertFalse(keyboardSeen, "no keyboard came up while the run worked on pages that focus their boxes")
+        XCTAssertTrue(done.waitForExistence(timeout: 120), "the run finished and reported")
+        XCTAssertTrue(server.sentSites.contains("fx_autofocus_1"), "the page that focuses its boxes was still filled and sent: \(server.sentSites)")
+    }
+
+    /// As a user I want a site whose form searches for me and finds nothing to count as done: there is nothing there to opt out of. The run presses its
+    /// Submit once (before, it pressed again and again until the time ran out and said "the form had more steps than the time allowed"), the automatic page
+    /// counts it as not listed, and the site's page says so.
+    func testASiteWhoseSearchFindsNoRecordOfMeIsMarkedNotListedAndDone() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "nodata-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 120), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        done.tap()
+        XCTAssertEqual(server.sentSites.filter { $0 == "fx_nodata_1" }.count, 1, "the search was pressed once, not again and again")
+        let count = app.buttons["activity-count-notListed"]
+        XCTAssertTrue(count.waitForExistence(timeout: 10), "the automatic page counts sites that are not listed")
+        XCTAssertTrue(count.becomes("label BEGINSWITH '1'"), "one: \(count.label)")
+        count.tap()
+        let row = app.buttons["period-site-nodata-1.fixture.test"]
+        XCTAssertTrue(app.scrollUntilExists(row), "the site is in the not-listed group")
+        row.tap()
+        let state = app.staticTexts["site-state"]
+        XCTAssertTrue(state.waitForExistence(timeout: 10), "the site's page opened")
+        XCTAssertTrue(state.label.contains("Not listed"), "the site's page says it is not listed: \(state.label)")
+        add(XCTAttachment(screenshot: app.screenshot()))
+    }
+
+    /// As a user I want a request wizard with no form (privacy.datarate.ai: what to do, then who is asking, then my details, then Submit) completed for me: each
+    /// step of choices is answered (deletion, myself) and its Next pressed, my details are filled on the step that asks, and the request is sent once.
+    func testARequestWizardIsAnsweredStepByStepAndSent() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "wizard-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 120), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        let sent = server.requests.filter { $0.site == "fx_wizard_1" && $0.path == "send" }
+        XCTAssertEqual(sent.count, 1, "the wizard was sent once: \(server.requests.map { "\($0.site) \($0.path)" })")
+        XCTAssertEqual(sent.first?.fields["requestType"], "deletion")
+        XCTAssertEqual(sent.first?.fields["submitterType"], "self", "Myself, not an agent")
+        XCTAssertFalse(sent.first?.fields["firstName"]?.isEmpty ?? true, "the details step was filled")
+        XCTAssertTrue(sent.first?.fields["email"]?.contains("@") ?? false)
+    }
+
+    /// As a user I want the run to wait for a Cloudflare check that passes by itself ("Verifying..." then done, nothing clicked) and send the form, while a check
+    /// that asks for a person is still left for me (coloradoarrests.org).
+    func testARunWaitsForACloudflareCheckThatPassesByItselfAndLeavesOneThatNeedsMe() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "turnstilepass-1.fixture.test,turnstile-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 180), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        XCTAssertTrue(server.sentSites.contains("fx_turnstilepass_1"), "the check passed by itself and the form was sent: \(server.sentSites)")
+        XCTAssertFalse(server.sentSites.contains("fx_turnstile_1"), "a check that needs a person is never solved for them")
+    }
+
+    /// As a user I want a portal whose form appears only after its menus (country of residence, then state, then "delete and opt out": choreograph.com) answered
+    /// for me and sent; and one whose state menu does not list my state left unsent, never claiming another state.
+    func testAPortalWhoseFormAppearsAfterCountryAndStateMenusIsAnsweredAndSent() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-only-domains", "gatemenus-1.fixture.test,gatelaw-1.fixture.test"] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 180), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        let sent = server.requests.filter { $0.site == "fx_gatemenus_1" && $0.path == "send" }
+        XCTAssertEqual(sent.count, 1, "the form behind the menus was sent: \(server.requests.map { "\($0.site) \($0.path)" })")
+        XCTAssertEqual(sent.first?.fields["firstname"], "Pat")
+        XCTAssertFalse(server.sentSites.contains("fx_gatelaw_1"), "a portal that does not take the person's state is not sent, and no other state is claimed")
+    }
+
+    /// As a user I want to keep using the app while a run works: the screen never stops answering for long (reported: "I can't scroll; it's stuck for 5 seconds or
+    /// so"). The app's debug watchdog (`MainThreadWatch`, `-uitest-watch-main`) records every stall of the main thread and the step the run was on.
+    func testTheScreenKeepsAnsweringWhileARunWorks() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset", "-uitest-watch-main", "-only-domains", Self.runNowDomains] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        // A person scrolling while the run works, until every form the run can send has arrived (scrolling may close the report sheet, so it is not waited for).
+        let deadline = Date().addingTimeInterval(300)
+        while Set(server.sentSites).intersection(Self.sendable).count < Self.sendable.count && Date() < deadline { app.swipeUp(); app.swipeDown() }
+        XCTAssertEqual(Set(server.sentSites).intersection(Self.sendable), Self.sendable, "the run sent every form it can while the person scrolled")
+        Thread.sleep(forTimeInterval: 3)
+        if app.buttons["run-report-done"].exists { app.buttons["run-report-done"].tap() }          // the report is a sheet over the label
+        let label = app.staticTexts["main-stalls"]
+        XCTAssertTrue(label.waitForExistence(timeout: 10))
+        Thread.sleep(forTimeInterval: 1.5)          // refreshed every second
+        let stalls = label.label
+        let ms = Int(stalls.split(separator: "m").first ?? "") ?? 0
+        let note = XCTAttachment(string: "worst main-thread stall: \(stalls)"); note.lifetime = .keepAlways; add(note)
+        XCTAssertLessThan(ms, 1000, "the screen stopped answering for \(stalls)")
+    }
+
+    /// The pages reported on 2026-11-23, in the app's real web view, sent by the background run with what each must receive:
+    /// - comscore.com (`countryreset`): the State menu the page rebuilds after Country is filled again (Illinois); the floating labels moved out of the boxes.
+    /// - datatowin.com (`hubspot`): "Myself", never "Another Individual"; the phone country is the US entry (its flag only), and the number follows the dial code.
+    /// - klear.com (`klear`): boxes named by a title beside them get the person's name and email, not the example placeholders; the shadow-root banner is denied.
+    /// - focus-usa.com, cashmereai.com (`cmplz`): the bot trap and the cookie-service toggles neither stop the run nor are ticked; the opt-out box is.
+    /// - dnb.com (`residentof`): "Resident of", named by aria-labelledby, is Illinois; the company's country menu is left alone.
+    func testTheFormsReportedOnTheNovember23rdRunAreFilledAndSentCorrectly() {
+        let app = XCUIApplication()
+        let sites = ["countryreset", "hubspot", "klear", "cmplz", "residentof"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-seed-multi", "-only-domains", sites.map { "\($0)-1.fixture.test" }.joined(separator: ",")] + server.launchArguments
+        app.launch()
+        app.tab("Settings", 3).tap()
+        let activity = app.buttons["auto-activity"]
+        XCTAssertTrue(app.scrollUntilExists(activity)); activity.tap()
+        XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 10)); app.buttons["auto-run-now"].tap()
+        XCTAssertTrue(app.buttons["run-report-done"].waitForExistence(timeout: 400), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        func got(_ kind: String) -> [String: String] {
+            let all = server.requests.filter { $0.site == "fx_\(kind)_1" && $0.path == "send" }
+            XCTAssertEqual(all.count, 1, "\(kind) was sent once: \(server.requests.map { "\($0.site) \($0.path)" })")
+            return all.first?.fields ?? [:]
+        }
+        let comscore = got("countryreset")
+        XCTAssertEqual(comscore["C_Country"], "United States of America"); XCTAssertEqual(comscore["C_State_Prov"], "Illinois", "the rebuilt State menu was filled again")
+        XCTAssertEqual(comscore["C_FirstName"], "Pat"); XCTAssertEqual(comscore["labelsFloated"], "yes", "every filled box's label moved out of the way")
+        let hubspot = got("hubspot")
+        XCTAssertEqual(hubspot["submittedFor"], "Myself"); XCTAssertEqual(hubspot["phoneCountry"], "US", "the US entry, by its flag")
+        XCTAssertEqual(hubspot["phone"], "+1 7735550101", "the number after the dial code the menu wrote")
+        let klear = got("klear")
+        XCTAssertEqual(klear["first"], "Pat"); XCTAssertEqual(klear["email"], "pat@example.com"); XCTAssertEqual(klear["consent"], "denied", "the banner was denied, never accepted")
+        let cmplz = got("cmplz")
+        XCTAssertNil(cmplz["botcheck"], "the bot trap was never ticked"); XCTAssertEqual(cmplz["global_optout"], "1"); XCTAssertNil(cmplz["access"], "an access request is never chosen")
+        let dnb = got("residentof")
+        XCTAssertEqual(dnb["resident"], "Illinois"); XCTAssertEqual(dnb["companyCountry"], "", "the company's country is not the person's")
+    }
+
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run says it was sent but not confirmed, and for that
     /// site I can see what its page said and a screenshot of how the page looked, so I can judge it myself.
     func testRunNowShowsWhatAPageSaidAndItsScreenshotWhenTheSiteDidNotConfirmInTime() {

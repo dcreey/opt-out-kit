@@ -400,11 +400,14 @@ struct DirectoryInfoView: View {
 
     private var sentDate: Date? { entry.lastSent(in: model.progress.optOutAttempts) }
     private var isDone: Bool { entry.isCurrent(attempts: model.progress.optOutAttempts) }
+    /// A recent look (the site's own search, a scan, the person's) found no listing: nothing to opt out of until it is searched again.
+    private var notListedOn: Date? { model.progress.notListedRecently(entry.id) ? model.progress.latestSiteCheck(entry.id)?.date : nil }
     private static func day(_ d: Date) -> String { d.formatted(date: .abbreviated, time: .omitted) }
 
     /// Where the site stands, in a word or three, and its colour.
     private var statusText: (String, Color) {
         if isDone { return (sentDate.map { Loc.f("Done %@", $0.formatted(.dateTime.month(.abbreviated).day())) } ?? Loc.t("Done"), .green) }
+        if let d = notListedOn { return (Loc.f("Not listed %@", d.formatted(.dateTime.month(.abbreviated).day())), .green) }
         if model.progress.isParked(entry.id) {
             if model.isSkippedForever(entry.id) { return (Loc.t("Skipped for good"), .secondary) }
             if let back = model.progress.skipReturns(entry.id) { return (Loc.f("Skipped until %@", Self.day(back)), .orange) }

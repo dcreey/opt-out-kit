@@ -42,6 +42,8 @@ will receive" screen shows them before anything is sent.
 
 ## Family: many people, one app
 
+**Switched off for now** (`Features.otherProfiles = false`): the person menu and "Add person…" are hidden, so the app has one profile, the owner's. What follows is how it works when they are switched back on; the code and its tests (`-uitest-seed-family`) are kept.
+
 The app runs opt-outs for a family, not only for the owner (family only for now; no friends). Each person has their own profile (above) and their own
 progress, queue position, re-check dates and rewards. A person menu on the main screen switches between them.
 
@@ -131,7 +133,7 @@ Short by default, with the whole list one tap away:
 
 Built to be read without tapping and, for most sites, without scrolling:
 
-1. **Title header**: the site's name, and one line under it: its status (Done with its date, Not done yet, Due again, Skipped until a date). Top right: a link button that copies the opt-out page's address, and a circle that marks the site done by hand; it turns into a green check, and tapping that undoes a hand mark (a send the app made cannot be undone).
+1. **Title header**: the site's name, and one line under it: its status (Done with its date, Not listed with its date, Not done yet, Due again, Skipped until a date). Top right: a link button that copies the opt-out page's address, and a circle that marks the site done by hand; it turns into a green check, and tapping that undoes a hand mark (a send the app made cannot be undone).
 2. **The action on its own**: one button, "Opt out", or "Opt out again" when the opt-out is current, with no subtitle. Under it, the email link when the site takes one and a small note: "Did it yourself? Tap the circle at the top right to mark it done."
 3. **Who they are**, shown in full (no category or priority line): one sentence about the company beside its kind's icon (one icon per kind, `BrokerCategory.symbol`), then on its own row between dividers whether the broker reaches this person and where it operates (`Regions.summary`): a tracking icon, red and broadcasting when it reaches them and grey and struck through when not, then in bold "In your state (CA)" when it is on the registry of a state they live or lived in, "In your area" when its region tags cover their country (or it works worldwide), else "Not in your area", followed by where it works and how we know ("In your area: Worldwide. How we know: registered as a data broker in California; on the UK ICO register…"). Then what it tracks (eye icon) and who it sells to (dollar icon), each on its own row with its icon in the same column. "More about them" folds the rest of the summary, the policy quote, what this kind of company does and the policy link.
 4. **How long an opt-out lasts**: one line (lasts, or repeat every N months and why), and once done the done date and the repeat date on one line.
@@ -187,10 +189,10 @@ Many sites send people to the same address: privacy-portal providers (OneTrust a
 
 ## The automatic opt-out page
 
-It shows **the current run only**: the three counts (moved to semi-automatic, sent, not tried) and their lists are what the run under way, or the last one, did since
+It shows **the current run only**: the four counts (moved to semi-automatic, sent, not listed, not tried) and their lists are what the run under way, or the last one, did since
 it started ("This run started ..."). A new run (Run now after a run has finished, Re-test all, the scheduled run) starts them afresh; a run that was stopped or cut
 off and is carried on is the same run. Before the first run of build 54, which records when a run starts, the page shows the period instead. At the bottom,
-**Every site, all runs** opens every run combined: each site the automatic run has dealt with or takes on, grouped as sent at least once, never went through (tried,
+**Every site, all runs** opens every run combined: each site the automatic run has dealt with or takes on, grouped as sent at least once, not listed (the latest try found no record of the person), never went through (tried,
 never sent) and never tried, with how often it was sent or tried; a site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
 the run report still has "Review every site and its screenshot".)
 

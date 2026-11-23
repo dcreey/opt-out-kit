@@ -94,6 +94,11 @@ Each line: the story, the test, what it proves.
 | **I press Run now and see what was sent and what needs me** | `AutoProtectionUITests.testRunNowShowsWhatWasSent...` | A run over a representative sample of 40 sites (every site in the weekly job) finishes, reports, and the counts move |
 | **As a new person, the automatic pass runs first and the semi-automated queue opens after it** | `testANewPersonGetsTheAutomaticPassFirst...` | Step 2 waits for step 1; the queue opens with the sites that need me |
 | **The automatic page shows this run; every site over all runs is one tap away** | `FixtureJourneyUITests.testTheAutomaticPageShowsThisRunAndEverySiteAllRunsCombinesThem` | After a run the page says when the run started; "Every site, all runs" lists the site sent, with how often, and opens it |
+| **A portal's country and state menus are answered for me** | `FixtureJourneyUITests.testAPortalWhoseFormAppearsAfterCountryAndStateMenusIsAnsweredAndSent` | Country, state, "delete and opt out", then the form is sent; a portal without my state is left, never another state claimed |
+| **A Cloudflare check that passes by itself is waited for** | `FixtureJourneyUITests.testARunWaitsForACloudflareCheckThatPassesByItselfAndLeavesOneThatNeedsMe` | Sent after the check passes on its own; a check that needs me is left for me |
+| **A request wizard is completed for me** | `FixtureJourneyUITests.testARequestWizardIsAnsweredStepByStepAndSent` | What to do (delete), who is asking (myself), my details, Submit: sent once |
+| **A site whose search finds no record of me counts as done** | `FixtureJourneyUITests.testASiteWhoseSearchFindsNoRecordOfMeIsMarkedNotListedAndDone` | The form is pressed once; the automatic page counts it under Not listed; the site's page says Not listed |
+| **A run working out of sight never brings up the keyboard** | `FixtureJourneyUITests.testARunNeverBringsUpTheKeyboardWhenItsPagesFocusABox` | Pages that focus their own boxes, and menus the app opens by focus, bring up no keyboard; the form is still sent |
 | **I open a site from the status page and stay on it** | `testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Regression of a navigation bug (the push bounced back) |
 
 ### Solve and send (the semi-automated queue)

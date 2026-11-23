@@ -1,0 +1,12 @@
+<h1>Opt out of {{site}}</h1><p>Fill in the form to have your listing removed.</p>
+<!-- A Cloudflare check in its managed mode, as coloradoarrests.org's: "Verifying..." for a few seconds, then it passes by itself (its token is written) with
+     nothing clicked. The run waits for it and sends; a check that needs a person is the 'turnstile' page. -->
+<form method="POST" action="/{{site}}/send" onsubmit="if(!document.querySelector('[name=cf-turnstile-response]').value){document.getElementById('m').textContent='Please complete the check.';return false}">
+  <label>Full name <input type="text" name="name" required></label><br>
+  <label>Email address <input type="email" name="email" required></label><br>
+  <div class="cf-turnstile" id="cf" style="width:280px;height:70px;border:1px solid #888;padding:8px">Verifying...</div>
+  <input type="hidden" name="cf-turnstile-response" value="">
+  <p id="m"></p>
+  <button type="submit">Submit</button>
+</form>
+<script>setTimeout(function () { document.querySelector('[name=cf-turnstile-response]').value = 'token'; document.getElementById('cf').textContent = 'Success!'; }, 4000);</script>

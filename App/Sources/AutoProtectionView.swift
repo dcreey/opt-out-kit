@@ -123,18 +123,18 @@ struct AutoActivityView: View {
     }
 
     private func title(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return Loc.t("Moved to semi-automatic"); case .sent: return Loc.t("Sent"); case .notTried: return Loc.t("Not tried or skipped") }
+        switch g { case .needsYou: return Loc.t("Moved to semi-automatic"); case .sent: return Loc.t("Sent"); case .notListed: return Loc.t("Not listed"); case .notTried: return Loc.t("Not tried or skipped") }
     }
     private func color(_ g: ActivityGroup) -> Color {
-        switch g { case .needsYou: return .blue; case .sent: return .green; case .notTried: return .secondary }
+        switch g { case .needsYou: return .blue; case .sent: return .green; case .notListed: return .teal; case .notTried: return .secondary }
     }
     private func icon(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return "hand.point.up.left.fill"; case .sent: return "checkmark.circle.fill"; case .notTried: return "circle.dashed" }
+        switch g { case .needsYou: return "hand.point.up.left.fill"; case .sent: return "checkmark.circle.fill"; case .notListed: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" }
     }
     private func isOpen(_ g: ActivityGroup) -> Bool { !search.isEmpty || open.contains(g) }
     private func toggle(_ g: ActivityGroup) { withAnimation { if open.contains(g) { open.remove(g) } else { open.insert(g) } } }
 
-    /// Everything at a glance: the three counts (each opens its list), the period, the last and next run, and the two buttons.
+    /// Everything at a glance: the four counts (each opens its list), the period, the last and next run, and the two buttons.
     @ViewBuilder private func statusSection(for person: Person) -> some View {
         Section {
             HStack(spacing: 8) {
@@ -365,8 +365,8 @@ struct AllRunsView: View {
         }
     }
     private func title(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notTried: return Loc.t("Never tried") }
+        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notListed: return Loc.t("Not listed"); case .notTried: return Loc.t("Never tried") }
     }
-    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notTried: return .secondary } }
-    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notTried: return "circle.dashed" } }
+    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notListed: return .teal; case .notTried: return .secondary } }
+    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notListed: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" } }
 }

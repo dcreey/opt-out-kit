@@ -1,0 +1,21 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'klear', boxes named by a title beside them with example placeholders, and a consent banner in a shadow root: klear.com). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_klear_1'
+domain: 'klear-1.fixture.test'
+name: 'Fixture klear 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_klear_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_klear_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_klear_1/send'
+  fields:
+    - type: 'text'
+      name: 'first'
+      label: 'First Name'
+    - type: 'text'
+      name: 'email'
+      label: 'Email Address'
+  hops: 0

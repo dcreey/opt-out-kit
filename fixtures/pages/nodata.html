@@ -1,0 +1,10 @@
+<h1>Remove Your Data ({{site}})</h1>
+<p>Don't want your data in our databases? Please enter your information in the form below to find the data to remove.</p>
+<!-- A form that searches before it removes, as the courtrecords.us sites' is: it finds nobody and answers with received-nodata.html. -->
+<form method="POST" action="/{{site}}/send">
+  <label>First Name * <input type="text" name="fname" required></label><br>
+  <label>Last Name * <input type="text" name="lname" required></label><br>
+  <label>State * <input type="text" name="state" required></label><br>
+  <label>City <input type="text" name="city"></label><br>
+  <button type="submit">Submit</button>
+</form>

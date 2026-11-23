@@ -85,6 +85,14 @@ struct WebAssistedDriver: AssistedDriver {
             if await session.chooseNameTab() { try? await Task.sleep(nanoseconds: 600_000_000) }
             if await session.chooseRightsPicker() { try? await Task.sleep(nanoseconds: 800_000_000) }
             var found = await session.discoverFormsDeep()
+            // No form yet, only menus that open it ("select your country of residence", then "select your state", then the request buttons: choreograph.com):
+            // they are answered (the person's country and state), the request is chosen ("delete and opt out"), and the page is read again.
+            if LiveFormPicker.pick(found, pageContext: await session.pageContext()) == nil,
+               await session.chooseCustomMenus(state: USStates.name(for: person.currentAddress?.state ?? "")) > 0 {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if session.stateNotOffered == nil, await session.advanceToRequestForm() != nil { await session.settlePage(maxWait: 8) }
+                found = await session.discoverFormsDeep()
+            }
             // Only a form for a later step is showing (its email box is switched off): the page's intro button opens the real one.
             if LiveFormPicker.pick(found, pageContext: await session.pageContext()) == nil, found.contains(where: { $0.fields.contains { $0.type == "email" && $0.disabled == true } }),
                await session.pressIntroNext() { found = await session.discoverFormsDeep() }
@@ -101,7 +109,10 @@ struct WebAssistedDriver: AssistedDriver {
             let liveForm = live.asOptOutForm(page: form.page)
             var adID = advertisingID
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
-            let livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
+            var livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
+            // A step of only choices has nothing to type: its choices are made below and Next opens the step with the boxes.
+            if LiveFormPicker.isChoiceStep(live) { livePlan = FillPlan(values: [], verdict: .ready) }
+            page.noteStep(live)
             // Whatever the plan says the person must do (tick a consent box, type a missing detail), the page is shown with everything else filled in:
             // the runner waits for them at that step. Closing the page here made such sites look like they "would not load".
             page.useLive(form: live.token, plan: livePlan, ownerMayConfirm: person.mayConfirmOwnIdentity(), stateName: USStates.name(for: person.currentAddress?.state ?? ""))
@@ -173,6 +184,10 @@ final class WebAssistedPage: AssistedPage {
 
     func useLive(form token: String, plan: FillPlan, ownerMayConfirm: Bool, stateName: String? = nil) { liveForm = token; session.chosenForm = token; planVerdict = plan.verdict; self.plan = plan; self.ownerMayConfirm = ownerMayConfirm; self.stateName = stateName }
 
+    /// The current form is a wizard step whose button only moves on (Next), and whether it has only choices (nothing to type).
+    private var stepOnly = false, choiceStep = false
+    func noteStep(_ form: LiveForm) { stepOnly = LiveFormPicker.movesToNextStep(form); choiceStep = LiveFormPicker.isChoiceStep(form) }
+
     func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
     func adoptNewForm() async -> Bool { await adoptNewForm(force: false) }
@@ -192,13 +207,14 @@ final class WebAssistedPage: AssistedPage {
         let sig = WebAssistedDriver.signature(new)
         if knownSignatures.contains(sig) { liveForm = new.token; return false }       // the same form, with its marks put on again
         let form = new.asOptOutForm(page: pageURL)
-        let livePlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: advertisingID)
+        var livePlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: advertisingID)
+        if LiveFormPicker.isChoiceStep(new) { livePlan = FillPlan(values: [], verdict: .ready) }
         // A detail the profile lacks (a birth date) is left for the person to type; what the profile has is still filled in.
         switch livePlan.verdict {
         case .ready, .needsData: break
         case .needsYou: session.activeFrame = frameBefore; return false
         }
-        liveForm = new.token; session.chosenForm = new.token; plan = livePlan; planVerdict = livePlan.verdict; knownSignatures.insert(sig)
+        liveForm = new.token; session.chosenForm = new.token; plan = livePlan; planVerdict = livePlan.verdict; knownSignatures.insert(sig); noteStep(new)
         // What the person already typed is kept; only empty boxes of the new form are filled.
         _ = await session.fillLive(plan.values, keepExisting: true)
         _ = await session.chooseRequestOptions(form: new.token, ownerMayConfirm: ownerMayConfirm)
@@ -240,7 +256,7 @@ final class WebAssistedPage: AssistedPage {
         case .needsData(let what): return "the form asks for \(what.joined(separator: ", ")), which we do not hold"
         case .needsYou(let why): return why
         }
-        if lastFill.filled == 0 { return "the form's fields could not be filled in" }
+        if lastFill.filled == 0, !choiceStep { return "the form's fields could not be filled in" }
         if let miss = lastFill.unmatchedRequired.first { return "the form's menu does not offer \(miss.isEmpty ? "your details" : miss), so this form does not apply to you" }
         if let missing = unresolvedChoices.first { return "the form needs a choice we cannot make for you (\(missing))" }
         return nil
@@ -303,6 +319,10 @@ final class WebAssistedPage: AssistedPage {
         let outcome = WebFormSubmitter.classifyAfterSending(before: before, after: after)
         // A multi-step form (Next, then Submit): the same form is still there with other boxes. That is its next step, not a result; the run fills it and presses again.
         if case .submitted = outcome { return outcome }
+        // The site's search found no record of the person: the answer, not a next step to press again (that searched again until the time ran out).
+        if case .notListed = outcome { return outcome }
+        // A wizard's Next only moves on: the step it leaves vanishing is not the site taking the request (that read as sent). The next step is filled and pressed in turn.
+        if stepOnly { return .challenged(PageFlow.nextStepMarker) }
         // No confirmation wording, but the form is gone or the page moved on, and nothing on the page says it went wrong: the site took it.
         if case .failed = outcome, let liveForm, let was = stateBefore {
             let now = await session.formState(liveForm)
@@ -627,6 +647,8 @@ struct AssistedOptOutView: View {
         case .sent(let email): return email ? Loc.t("Sent. Check your email for a link to confirm.") : Loc.t("Sent.")
         case .needsMore(let why) where why == AssistedRunner.heldForPerson:
             return Loc.t("We could not find a form to fill in on this page, so nothing was sent. If it asks you to do something, do it here and tap Mark as done; otherwise tap Next site.")
+        case .needsMore(let why) where why == AutoOptOut.noRecordFound:
+            return Loc.t("The site searched for you and found no record, so there is nothing to opt out of here. It counts as done, and we will look again next month. Tap Next site.")
         case .needsMore(let why): return why == AutoOptOut.rateLimited
             ? Loc.t("The site said \"too many requests\". It limits how fast it takes them, and this company runs several of these sites. Wait a few minutes and try it again later; tap Next site to carry on.")
             : Loc.f("We pressed Send on this page but saw no confirmation (%@). If it needs one more step, do it here, then tap Next site.", why)

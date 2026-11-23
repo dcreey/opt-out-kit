@@ -1,0 +1,25 @@
+<!-- klear.com's (Meltwater) opt-out: boxes with no name or label, named by a title beside their wrapper, with examples as placeholders; a consent banner in a
+     shadow root (Usercentrics) covers the page until it is answered. -->
+<h2>OPT OUT FORM ({{site}})</h2>
+<form method="POST" action="/{{site}}/send" id="f">
+  <div><div class="t"><div>First Name</div></div><div><div class="w"><input type="string" placeholder="John"></div></div></div>
+  <div><div class="t"><div>Last Name</div></div><div><div class="w"><input type="string" placeholder="Doe"></div></div></div>
+  <div><div class="t"><div>Email Address</div></div><div><div class="w"><input type="string" placeholder="john@doe.com"></div></div></div>
+  <div><div class="t"><div>Confirm Email Address</div></div><div><div class="w"><input type="string" placeholder="john@doe.com"></div></div></div>
+  <button type="submit">Submit</button>
+</form>
+<div id="usercentrics-root"></div>
+<script>
+var root = document.getElementById('usercentrics-root').attachShadow({ mode: 'open' });
+root.innerHTML = '<div id="cover" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9"><div style="position:absolute;bottom:0;left:0;right:0;background:#fff;padding:16px">' +
+  '<p>Privacy Settings. I agree and may revoke or change my consent at any time.</p><button data-testid="uc-accept-all-button" id="acc">Accept All</button> ' +
+  '<button data-testid="uc-deny-all-button" id="deny">Deny</button> <button data-testid="uc-more-button">More Information</button></div></div>';
+var answer = '';
+root.getElementById('acc').addEventListener('click', function () { answer = 'accepted'; root.getElementById('cover').remove(); });
+root.getElementById('deny').addEventListener('click', function () { answer = 'denied'; root.getElementById('cover').remove(); });
+document.getElementById('f').addEventListener('submit', function () {
+  var names = ['first', 'last', 'email', 'email2'], f = this;
+  f.querySelectorAll('input[type=string],input:not([name])').forEach(function (i, n) { if (names[n]) { var h = document.createElement('input'); h.type = 'hidden'; h.name = names[n]; h.value = i.value; f.appendChild(h); } });
+  var c = document.createElement('input'); c.type = 'hidden'; c.name = 'consent'; c.value = answer || 'unanswered'; f.appendChild(c);
+});
+</script>

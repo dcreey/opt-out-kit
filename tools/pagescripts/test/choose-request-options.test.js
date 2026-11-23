@@ -40,6 +40,16 @@ test('"Myself" is chosen over "Authorized agent" or "Deceased person"', () => {
   assert.equal(r.$('#b').checked, true);
 });
 
+test('"Myself" over "Another Individual", also when the radios have no name (HubSpot, datatowin.com: both were chosen and the last won)', () => {
+  const unnamed = choose('<div><span>DTW Privacy Request Submitted For*</span><label><input type=radio id=me value=Myself> Myself</label>' +
+    '<label><input type=radio id=other value="Another Individual"> Another Individual</label></div>');
+  assert.deepEqual([unnamed.$('#me').checked, unnamed.$('#other').checked], [true, false]);
+  assert.equal(unnamed.out.chosen, 1, 'one question, one answer');
+  const reversed = choose(radio('w', 'o', 'Another Individual') + radio('w', 'm', 'Myself'));
+  assert.equal(reversed.$('#m').checked, true, '"individual" in "Another Individual" is not the person');
+  assert.equal(reversed.$('#o').checked, false);
+});
+
 test('a choice of device ID types takes IDFA (this is an iPhone)', () => {
   const r = choose(radio('dev', 'g', 'GAID (Android)') + radio('dev', 'i', 'IDFA (Apple)'));
   assert.equal(r.$('#i').checked, true);

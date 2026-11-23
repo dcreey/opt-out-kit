@@ -10,6 +10,7 @@ public enum SubmitOutcome: Equatable, Sendable {
     case challenged(String)               // a visible human check, terms prompt or similar stopped the run; never solved or accepted
     case rejected(String)                 // the site refused or flagged a field
     case failed(String)                   // no success message was seen, so nothing is claimed
+    case notListed                        // the site's own search, run by its form, found no record of the person: nothing there to opt out of
 }
 
 /// Fills in and sends one site's opt-out form. The app backs it with its hidden web view; tests use fakes.
@@ -29,9 +30,25 @@ public protocol FormSubmitter: Sendable {
 
 /// What a site's page showed when the run gave the site up after sending its form: filled in by the submitter as it is cancelled, read by the run.
 public final class GiveUpCapture: @unchecked Sendable {
-    private let lock = NSLock(); private var evidence: SubmitEvidence?
+    private let lock = NSLock(); private var evidence: SubmitEvidence?, taker: (@Sendable () async -> SubmitEvidence?)?
     public init() {}
-    public func set(_ e: SubmitEvidence) { lock.lock(); evidence = e; lock.unlock() }
+    public func set(_ e: SubmitEvidence) { lock.lock(); if evidence == nil { evidence = e }; lock.unlock() }
+    /// How the submitter reads its page now (text and screenshot). The run calls it before it cancels the site's work: once cancelled, the work closes its page
+    /// and nothing is left to read (quad.com was given up after sending with neither its words nor a screenshot).
+    public func whenGivingUp(_ take: @escaping @Sendable () async -> SubmitEvidence?) { lock.lock(); taker = take; lock.unlock() }
+    /// Reads the page with `whenGivingUp`'s reader, for at most `seconds`.
+    func takeNow(within seconds: TimeInterval) async {
+        lock.lock(); let take = taker; lock.unlock()
+        guard let take else { return }
+        let got: SubmitEvidence? = await withTaskGroup(of: SubmitEvidence?.self) { group in
+            group.addTask { await take() }
+            group.addTask { try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)); return nil }
+            let first = await group.next() ?? nil
+            group.cancelAll()
+            return first
+        }
+        if let got { set(got) }
+    }
     /// What was captured, waiting up to `seconds` for it (the page is read and photographed while the site is being given up).
     public func wait(upTo seconds: TimeInterval) async -> SubmitEvidence? {
         let start = Date()
@@ -136,6 +153,7 @@ public enum AutoOptOutResult: Equatable, Sendable {
     case rejected(String)
     case failed(String)
     case emailed                       // this site did not take the form; the person emailed their opt-out to it instead
+    case notListed                     // the site's form searched for the person and found no record: done until `notListedWindow` ends, then searched again
 
     public var label: String {
         switch self {
@@ -152,6 +170,7 @@ public enum AutoOptOutResult: Equatable, Sendable {
         case .rejected(let why): return L10n.f("The site refused: %@", why)
         case .failed(let why): return L10n.f("No confirmation: %@", why)
         case .emailed: return L10n.t("Asked by email instead")
+        case .notListed: return L10n.t("Not listed: the site found no record of you")
         }
     }
 }
@@ -167,6 +186,9 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
     /// A form was sent to the site. Emailing a request is tracked separately (`outcome == "emailed"`), so one never stands in for the other.
     public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" }
     public var wasEmailed: Bool { outcome == "emailed" }
+    /// The site's form searched for the person and found no record (`SubmitOutcome.notListed`). Not a send.
+    public static let notListedOutcome = "not_listed"
+    public var wasNotListed: Bool { outcome == Self.notListedOutcome }
 }
 
 /// Sends opt-out requests automatically for the sites whose form we found, and says plainly what it could not do.
@@ -206,6 +228,7 @@ public struct AutoOptOut: Sendable {
     /// when it sees the cancel) but not waited for: a step stuck waiting on a page may not notice, so the run must not wait for it. Left running, given-up
     /// pages piled up in memory until iOS closed the app.
     public static func watched<T: Sendable>(idle: TimeInterval?, cap: TimeInterval,
+                                            capture: GiveUpCapture? = nil,
                                             _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool, sent: Bool) {
         let once = FirstOnce(), clock = ActivityClock(), start = Date()
         return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool, sent: Bool), Never>) in
@@ -218,8 +241,9 @@ public struct AutoOptOut: Sendable {
             Task {
                 while true {
                     try? await Task.sleep(nanoseconds: 250_000_000)
-                    if let idle, clock.quietFor >= idle { if once.claim() { worker.cancel(); c.resume(returning: (nil, true, clock.sent)) }; return }
-                    if Date().timeIntervalSince(start) >= cap { if once.claim() { worker.cancel(); c.resume(returning: (nil, false, clock.sent)) }; return }
+                    // Given up after sending: the page is read first (its words and a screenshot), and only then is the work cancelled.
+                    if let idle, clock.quietFor >= idle { if once.claim() { if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, true, clock.sent)) }; return }
+                    if Date().timeIntervalSince(start) >= cap { if once.claim() { if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, false, clock.sent)) }; return }
                 }
             }
         }
@@ -248,11 +272,12 @@ public struct AutoOptOut: Sendable {
     /// the same day is sent again too (a run never sends one page twice: sites that share a page are sent once).
     public static let retestMinInterval: TimeInterval = 0
 
-    /// 28 seconds, so with the 2-second pause between sites a run settles at least one site every 30 seconds (`progressEvery`): it always moves. A site
-    /// that needs longer is given up and moves to semi-automatic. It was two and a half minutes; it can be raised again once runs are reliable.
-    public static let siteLimit: TimeInterval = 28
+    /// 60 seconds (decided 2026-11-23): a slow broker page on a phone's connection has time to load, be filled and show its answer, and the run still settles
+    /// a site at least every 62 seconds (`progressEvery`). A page that is stuck rather than slow is given up sooner by `idleLimit` (no sign of life for 15
+    /// seconds). It was two and a half minutes until build 48, then 28 seconds, which cut off slow pages that were still working ("the site took too long").
+    public static let siteLimit: TimeInterval = 60
     /// The longest a run goes without settling a site: the site limit and the pause after it.
-    public static let progressEvery: TimeInterval = 30
+    public static let progressEvery: TimeInterval = 62
     /// What a site that ran out of time is recorded as. It counts as not gone through, so it moves to the semi-automated queue.
     public static let tooSlow = "the site took too long to answer, so the run moved on"
 
@@ -281,9 +306,7 @@ public struct AutoOptOut: Sendable {
             else if now.timeIntervalSince(last) < minInterval { return (.tooSoon(until: last.addingTimeInterval(minInterval)), nil) }
         }
         // Do not hand details to a site a recent look says does not hold them.
-        if let look = progress.latestSiteCheck(entry.id), look.result == .removed, now.timeIntervalSince(look.date) < 30 * 86_400 {
-            return (.skippedNotListed, nil)
-        }
+        if progress.notListedRecently(entry.id, now: now) { return (.skippedNotListed, nil) }
         if form.fields.isEmpty, entry.liveForm?.found == true { return (nil, FillPlan(values: [], verdict: .ready)) }        // the live page decides what is filled
         let plan = plans?.plan(entry, form) ?? FormFiller.plan(for: form, signals: entry.signals, person: person)
         switch plan.verdict {
@@ -322,7 +345,8 @@ public struct AutoOptOut: Sendable {
     /// The sites a repeat pass (and "Run now" after a full pass) takes on: those whose latest attempt went through, and those whose latest attempt was given up
     /// before anything was sent. Not one stopped by a check, refused, or sent and not confirmed: those wait for the person or the next full pass.
     public static func inRepeatPass(_ entry: DirectoryEntry, progress: Progress) -> Bool {
-        lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress) || sentUnconfirmedOnce(entry, progress: progress)
+        (progress.optOutAttempts[entry.id]?.last?.wasNotListed ?? false)          // searched again once `notListedWindow` is over (`precheck` holds it until then)
+            || lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress) || sentUnconfirmedOnce(entry, progress: progress)
     }
 
     /// The site's latest attempt was sent and not confirmed in time, and the one before was not: it gets one more try, which now reads the page before its time
@@ -376,7 +400,7 @@ public struct AutoOptOut: Sendable {
         func advance() { done += 1; progressCallback?(done, total) }
         let attempt: @Sendable (OptOutForm, FillPlan) async -> SubmitEvidence = { form, plan in
             let capture = GiveUpCapture()
-            let watched = await Self.watched(idle: idle, cap: cap) { touch in
+            let watched = await Self.watched(idle: idle, cap: cap, capture: capture) { touch in
                 await submitter.submitCapturing(form, plan: plan, dryRun: dryRun, activity: touch, giveUp: capture)
             }
             if let value = watched.value { return value }
@@ -442,6 +466,9 @@ public struct AutoOptOut: Sendable {
     }
 
     /// What a site that answers "Too many requests" is reported as: not a failure of the form, so nothing is recorded against the site and it stays to try again.
+    /// The reason shown while a page says the site's search found no record of the person (`SubmitOutcome.notListed`).
+    public static let noRecordFound = "the site found no record of you"
+
     public static let rateLimited = "the site said too many requests; wait a few minutes and try it again"
 
     public static func result(for outcome: SubmitOutcome) -> AutoOptOutResult {
@@ -451,6 +478,7 @@ public struct AutoOptOut: Sendable {
         case .challenged(let why): return .challenged(why)
         case .rejected(let why): return .rejected(why)
         case .failed(let why): return why == rateLimited ? .needsYou(why) : .failed(why)
+        case .notListed: return .notListed
         }
     }
 
@@ -464,6 +492,8 @@ public struct AutoOptOut: Sendable {
         case .challenged(let why): return OptOutAttempt(date: now, outcome: "challenged", detail: why, pageSaid: said)
         case .rejected(let why): return OptOutAttempt(date: now, outcome: "rejected", detail: why, pageSaid: said)
         case .failed(let why): return OptOutAttempt(date: now, outcome: "failed", detail: why, pageSaid: said)
+        // Not a send (never counted as sent), but what the site answered is kept to show on its page.
+        case .notListed: return OptOutAttempt(date: now, outcome: OptOutAttempt.notListedOutcome, pageSaid: said)
         default: return nil
         }
     }
@@ -485,7 +515,11 @@ public struct AutoOptOut: Sendable {
 }
 
 public extension Progress {
-    mutating func recordOptOutAttempt(_ attempt: OptOutAttempt, site: String) { optOutAttempts[site, default: []].append(attempt) }
+    mutating func recordOptOutAttempt(_ attempt: OptOutAttempt, site: String) {
+        optOutAttempts[site, default: []].append(attempt)
+        // The site's own search found nothing: that is a look like a scan's, so the run leaves the site alone and it counts as done (`notListedRecently`).
+        if attempt.wasNotListed { recordSiteCheck(.removed, site: site, source: .automatic, on: attempt.date) }
+    }
 }
 
 /// When the background jobs are due, and what the person agreed to. Stored with the household.

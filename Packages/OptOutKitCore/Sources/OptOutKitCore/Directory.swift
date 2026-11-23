@@ -35,6 +35,12 @@ public struct FormField: Codable, Equatable, Hashable, Sendable {
     public var display: String {
         let t = label.trimmingCharacters(in: CharacterSet(charactersIn: " *:"))
         if !t.isEmpty, t.count < 100 { return t }
+        // A long label is cut, not swapped for the box's name: a live form's boxes are named by token ("f0-18"), which says nothing to the person (datatowin.com's
+        // "I certify that I am authorized by the individual ... on their behalf" was shown as "F0-18").
+        if !t.isEmpty {
+            let cut = t.prefix(90)
+            return (cut.lastIndex(of: " ").map { String(cut[..<$0]) } ?? String(cut)) + "…"
+        }
         let base = name.split(separator: "[").last.map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "]")) } ?? name
         return base.replacingOccurrences(of: "_", with: " ").capitalized
     }

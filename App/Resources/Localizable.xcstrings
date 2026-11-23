@@ -15526,6 +15526,75 @@
     }
    }
   },
+  "Not listed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non répertorié"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No figura"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht gelistet"
+     }
+    }
+   }
+  },
+  "Not listed %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non répertorié %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No figura %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht gelistet %@"
+     }
+    }
+   }
+  },
+  "Not listed: the site found no record of you on %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Non répertorié : le site n'a trouvé aucune fiche à votre nom le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No figura: el sitio no encontró ningún registro suyo el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht gelistet: Die Website hat am %@ keinen Eintrag zu Ihnen gefunden"
+     }
+    }
+   }
+  },
   "Not now": {
    "extractionState": "manual",
    "localizations": {
@@ -25094,6 +25163,29 @@
     }
    }
   },
+  "The site found no record of you, so there is nothing to opt out of here. Tap Next step.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site n'a trouvé aucune fiche à votre nom : il n'y a rien à faire retirer ici. Touchez Étape suivante."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio no encontró ningún registro suyo, así que aquí no hay nada de lo que darse de baja. Toque Siguiente paso."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat keinen Eintrag zu Ihnen gefunden, hier gibt es also nichts zu widersprechen. Tippen Sie auf Nächster Schritt."
+     }
+    }
+   }
+  },
   "The site is built so that we could not read it to find the opt-out page.": {
    "extractionState": "manual",
    "localizations": {
@@ -25182,6 +25274,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Website lehnt automatisierte Besuche ab, daher konnten wir ihre Opt-out-Seite nicht finden."
+     }
+    }
+   }
+  },
+  "The site searched for you and found no record, so there is nothing to opt out of here. It counts as done, and we will look again next month. Tap Next site.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le site vous a cherché et n'a trouvé aucune fiche : il n'y a rien à faire retirer ici. Ce site compte comme terminé, et nous chercherons à nouveau le mois prochain. Touchez Site suivant."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "El sitio le buscó y no encontró ningún registro, así que aquí no hay nada de lo que darse de baja. Cuenta como hecho y volveremos a buscar el mes que viene. Toque Siguiente sitio."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die Website hat nach Ihnen gesucht und keinen Eintrag gefunden, hier gibt es also nichts zu widersprechen. Sie gilt als erledigt, und wir sehen nächsten Monat noch einmal nach. Tippen Sie auf Nächste Website."
      }
     }
    }

@@ -36,6 +36,21 @@ struct LiveForm: Decodable, Equatable {
 }
 
 enum LiveFormPicker {
+    /// The form's way forward is a Next or Continue button, with nothing that sends ("Submit", "Send request"): pressing it opens the next step of a wizard,
+    /// it never sends the request, whatever happens to the page.
+    nonisolated static func movesToNextStep(_ f: LiveForm) -> Bool {
+        let forward = f.buttons.filter { $0.range(of: "^\\s*(back|previous|cancel|close)\\s*$", options: [.regularExpression, .caseInsensitive]) == nil }
+        return !forward.isEmpty && forward.allSatisfy { $0.range(of: "^\\s*(next|continue|next step|proceed|continue to next step)\\s*[›>→]?\\s*$", options: [.regularExpression, .caseInsensitive]) != nil }
+    }
+
+    /// A wizard step with only choices to make ("What would you like to do?", "Who is submitting this request? Myself"), and Next: nothing of the person's is typed
+    /// here, so it is not a form we "could not match"; its choices are made and Next is pressed (privacy.datarate.ai).
+    nonisolated static func isChoiceStep(_ f: LiveForm) -> Bool {
+        // Its radios may be hidden behind styled cards (privacy.datarate.ai's are screen-reader-only), so a choice counts shown or not; no box to type may show.
+        let isChoice: (LiveField) -> Bool = { $0.type == "radio" || $0.type == "checkbox" }
+        return movesToNextStep(f) && f.fields.contains(where: isChoice) && !f.fields.contains { $0.visible && !isChoice($0) && $0.type != "hidden" }
+    }
+
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
     private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.

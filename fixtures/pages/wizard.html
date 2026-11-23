@@ -1,0 +1,41 @@
+<!-- A request wizard with no <form>, as privacy.datarate.ai's is: "What would you like to do?", then "Who is submitting this request?" (radios hidden behind
+     cards, Back and Next), then the person's details, then Submit, which posts everything to /send. Next is switched off until a choice is made. -->
+<style>.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)} label.card{display:block;border:1px solid #ccc;border-radius:8px;padding:12px;margin:8px 0}</style>
+<div id="wiz">
+  <div class="step" id="s1"><h2>What would you like to do?</h2>
+    <label class="card"><input class="sr" type="radio" name="requestType" value="opt_out"><span>Opt Out of Sale or Sharing</span></label>
+    <label class="card"><input class="sr" type="radio" name="requestType" value="deletion"><span>Delete My Data</span></label>
+    <label class="card"><input class="sr" type="radio" name="requestType" value="access_know"><span>Access / Know My Data</span></label>
+    <button type="button" class="next" disabled>Next</button></div>
+</div>
+<script>
+(function () {
+  var site = '{{site}}', answers = {}, wiz = document.getElementById('wiz');
+  var steps = [
+    '<div class="step"><h2>Who is submitting this request?</h2>' +
+    '<label class="card"><input class="sr" type="radio" name="submitterType" value="self"><span>Myself</span><p>I am the consumer whose data is the subject of this request</p></label>' +
+    '<label class="card"><input class="sr" type="radio" name="submitterType" value="agent"><span>Authorized Agent</span><p>I am submitting on behalf of a consumer who has authorized me in writing</p></label>' +
+    '<label class="card"><input class="sr" type="radio" name="submitterType" value="parent"><span>Parent / Legal Guardian</span><p>I am the parent or legal guardian of a minor</p></label>' +
+    '<button type="button">Back</button> <button type="button" class="next" disabled>Next</button></div>',
+    '<div class="step"><h2>Your Information</h2>' +
+    '<label>First Name* <input id="firstName" required></label><br><label>Last Name* <input id="lastName" required></label><br>' +
+    '<label>Email Address* <input id="email" type="email" required></label><br>' +
+    '<button type="button">Back</button> <button type="button" class="submit">Submit Request</button></div>'
+  ];
+  function wire() {
+    var next = wiz.querySelector('.next');
+    wiz.querySelectorAll('input[type=radio]').forEach(function (r) {
+      r.addEventListener('change', function () { answers[r.name] = r.value; if (next) next.disabled = false; });
+    });
+    if (next) next.addEventListener('click', function () { wiz.innerHTML = steps.shift(); wire(); });
+    var submit = wiz.querySelector('.submit');
+    if (submit) submit.addEventListener('click', function () {
+      var f = document.createElement('form'); f.method = 'POST'; f.action = '/' + site + '/send';
+      var all = Object.assign({}, answers, { firstName: wiz.querySelector('#firstName').value, lastName: wiz.querySelector('#lastName').value, email: wiz.querySelector('#email').value });
+      Object.keys(all).forEach(function (k) { var i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = all[k]; f.appendChild(i); });
+      document.body.appendChild(f); f.submit();
+    });
+  }
+  wire();
+})();
+</script>

@@ -225,12 +225,19 @@ extension WebViewSession {
     /// Fills the values the plan chose, finding each field by its token.
     /// Fills the form; menus that fill in after another choice (a state list that waits for the country) get a second pass.
     func fillLive(_ values: [FieldValue], keepExisting: Bool = false) async -> (filled: Int, unmatchedRequired: [String]) {
+        MainThreadWatch.note("filling")
         keepExistingValues = keepExisting
         // Filling goes on for as long as it keeps getting somewhere: a choice can reveal more boxes, and each pass fills what the last one uncovered. There is
         // no fixed number of passes; it stops when a pass leaves nothing required unfilled, or fills no more than the one before (the last guard is only against a page that never settles).
         var result = await fillLiveOnce(values)
         var total = result.filled
         var pass = 1
+        // A country was chosen: the page may clear or rebuild its State menu once its own change handler has run, after the pass that chose it. One more
+        // pass a moment later fills what that left empty (it keeps everything already filled).
+        if result.again {
+            try? await Task.sleep(nanoseconds: 900_000_000)
+            let next = await fillLiveOnce(values); pass += 1; total += next.filled; result = next
+        }
         while !result.unmatchedRequired.isEmpty, pass < 25 {
             try? await Task.sleep(nanoseconds: 900_000_000)
             let next = await fillLiveOnce(values)
@@ -249,15 +256,15 @@ extension WebViewSession {
     private static var keep: Bool = false
     private var keepExistingValues: Bool { get { Self.keep } set { Self.keep = newValue } }
 
-    private func fillLiveOnce(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String]) {
+    private func fillLiveOnce(_ values: [FieldValue]) async -> (filled: Int, unmatchedRequired: [String], again: Bool) {
         let normal = values.filter { $0.type != FormFiller.confirmIdentityType }
         if values.contains(where: { $0.type == FormFiller.confirmIdentityType }) { _ = await tickIdentityBoxes() }
         let payload = normal.map { ["name": $0.name, "candidates": $0.candidates, "label": $0.label] as [String: Any] }
-        guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return (0, []) }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload), let json = String(data: data, encoding: .utf8) else { return (0, [], false) }
         let js = PageScript.call("fill-live", json: [json, keepExistingValues ? "true" : "false"])
         guard let out = (await evalLive(js)) as? String, let d = out.data(using: .utf8),
-              let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, []) }
-        return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [])
+              let obj = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return (0, [], false) }
+        return (obj["filled"] as? Int ?? 0, obj["unmatched"] as? [String] ?? [], obj["again"] as? Bool ?? false)
     }
 
     /// A form with one email box or one phone box often has an "Add another email" / "+ Add phone" button. When the profile holds more emails or phones than the
@@ -426,7 +433,9 @@ extension WebViewSession {
             guard let label = (await evalLive(open)) as? String, !label.isEmpty else { break }
             try? await Task.sleep(nanoseconds: 700_000_000)
             let pick = PageScript.call("custom-menus-pick", state ?? "")
-            if let t = (await evalLive(pick)) as? String, !t.isEmpty { set += 1 }
+            if let t = (await evalLive(pick)) as? String, !t.isEmpty {
+                if t.hasPrefix("not-offered:") { stateNotOffered = String(t.dropFirst("not-offered:".count)) } else { set += 1 }
+            }
             try? await Task.sleep(nanoseconds: 400_000_000)
         }
         return set
@@ -530,6 +539,12 @@ extension FormRun {
         return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil, pageText: pageText)
     }
 
+    /// A portal whose state menu lists only some states (those with a privacy law) and not the person's: its form is not for them; the email is.
+    static func stateNotOffered(_ state: String) -> String { "the site's form takes requests only from the states it lists, and \(state) is not one of them; email them instead" }
+
+    /// What `visible-challenge` says of a Cloudflare (Turnstile) check that has not passed yet.
+    static let cloudflareCheck = "a Cloudflare check"
+
     /// A form with more steps than the site's time allowed: the last step was not sent.
     static let moreStepsThanTime = "the form had more steps than the time allowed"
 
@@ -557,6 +572,7 @@ extension FormRun {
         debugForms[page.absoluteString] = found.map { "\($0.token) score=\(LiveFormPicker.score($0, pageContext: context)) text=\($0.text) | buttons=\($0.buttons) fields=\($0.fields.map { "\($0.type):\($0.name):\($0.label):v=\($0.visible)" })" }.joined(separator: "\n")
         #endif
         guard let prepared = await driver.prepareLoaded(session: session, form: stand, plan: FillPlan(values: [], verdict: .ready), keepOpenWithoutForm: true) as? WebAssistedPage else {
+            if let state = session.stateNotOffered { return .failed(Self.stateNotOffered(state)) }
             return .failed("no opt-out form was found on the page")
         }
         prepared.maxWait = maxWait
@@ -578,6 +594,13 @@ extension FormRun {
             debugLastFormPage = page.absoluteString
             #endif
             return .filledNotSubmitted
+        }
+        // A Cloudflare check that is still "Verifying..." usually passes by itself in a few seconds (nothing is clicked or solved): the run waits for it, within the
+        // site's time and short of the quiet limit. A check that asks for a person stays, and the site goes to them as before (coloradoarrests.org).
+        let checkLimit = SiteRun.wait(upTo: 12)
+        var checkWaited: TimeInterval = 0
+        while checkWaited < checkLimit, await session.visibleChallenge() == Self.cloudflareCheck {
+            try? await Task.sleep(nanoseconds: 1_000_000_000); checkWaited += 1
         }
         // Nobody to ask: anything the page needs from a person ends the run for this site, saying what.
         for blocker in await prepared.blockers() {

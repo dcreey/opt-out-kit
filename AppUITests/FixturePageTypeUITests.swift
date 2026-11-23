@@ -140,9 +140,10 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["g-recaptcha-response"], "token", "the broker received the check's response: \(f)")
     }
 
-    /// A box certifying under penalty of perjury (about 10 recorded sites): the app never ticks it. It fills the rest and waits; I read it and tick it; it is then sent.
+    /// A box certifying under penalty of perjury that the person is the one the request is about (about 10 recorded sites): on a family member's profile the app
+    /// never ticks it. It fills the rest and waits; the person reads it and ticks it; it is then sent. (On the owner's own profile it is ticked: the next test.)
     func testACertificationBoxIsLeftForMeToTickAndTheFormIsSentWhenIHaveTickedIt() {
-        let app = solveAndSend("certify-1")
+        let app = solveAndSend("certify-1", extra: ["-uitest-seed-family"])
         let certify = app.webViews.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'penalty of perjury'")).firstMatch
         XCTAssertTrue(certify.waitForExistence(timeout: 40), "the page shows its certification")
         Thread.sleep(forTimeInterval: 8)
@@ -156,6 +157,14 @@ final class FixturePageTypeUITests: UITestCase {
         }
         let f = sent("fx_certify_1", timeout: 20)
         XCTAssertEqual(f["certify"], "yes", "the broker saw the box ticked: \(f)")
+    }
+
+    /// The same certification on the account owner's own profile: it is true of them, so the app ticks it and sends (decided 2026-11-23, docs/PRINCIPLES.md).
+    func testACertificationAboutTheOwnerIsTickedOnTheirOwnProfileAndSent() {
+        _ = solveAndSend("certify-1")
+        let f = sent("fx_certify_1", timeout: 60)
+        XCTAssertEqual(f["certify"], "yes", "the owner's certification was ticked: \(f)")
+        XCTAssertEqual(f["name"], "Pat Example")
     }
 
     /// A form the page builds with script a moment after it loads (69 recorded sites are script-built): the app waits for it, finds it, fills it and sends it.

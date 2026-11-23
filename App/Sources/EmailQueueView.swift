@@ -119,7 +119,7 @@ struct VerifyQueueView: View {
         let byDomain = model.sites.byDomain
         let attempts = model.progress.optOutAttempts
         let entries = domains.compactMap { byDomain[$0] }
-        let finished = Set(entries.filter { $0.isCurrent(attempts: attempts) }.map(\.id))
+        let finished = Set(entries.filter { $0.isHandled(model.progress) }.map(\.id))
         let ordered = entries.filter { !finished.contains($0.id) } + entries.filter { finished.contains($0.id) }
         Section {
             ForEach(ordered, id: \.id) { entry in

@@ -25,6 +25,9 @@ enum FormRun {
         // A code the site did not accept ("That code is not right", "invalid code", "the code expired") is a refusal, even though the page also asks for the code again.
         if rejectsCode(text) { return .rejected(wrongCodeReason) }          // read before the instruction lines are dropped: "Invalid code. Please enter it again." is one
         if asksForCode(kept) { return .failed("the page is waiting for a code from the person") }
+        // A form that searches before it removes ("enter your information to find the data to remove") answering "No data was found": nothing to opt out of.
+        // Read before the error wording, since such pages often add "try again" or "fix the following errors".
+        if saysNoRecordFound(kept) { return .notListed }
         return kept.isEmpty ? .failed("no success message was shown") : classify(kept)
     }
 
@@ -56,6 +59,17 @@ enum FormRun {
     nonisolated static func looksFinished(_ text: String) -> Bool {
         text.range(of: "(removal|opt.?out|deletion|request|verification) (is |has been |was )?(now )?(complete[d]?|confirmed|successful(ly)?|verified|finali[sz]ed)|(has|have) been (removed|deleted|suppressed|opted.?out)|(successfully|now) (removed|deleted|opted.?out|unsubscribed|verified|confirmed)|you (have|'ve) been (removed|opted.?out|unsubscribed)|(record|profile|listing|information)s? (has |have |was |were )?(been )?(removed|deleted|suppressed)|e-?mail (address )?(has been |is )?(verified|confirmed)|you are all set|you're all set",
                    options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    /// New text after a press that says the site's search found no record of the person ("No data was found, try other criteria", "We could not find any records").
+    /// A line that only explains what happens if nothing is found ("If no records are found, ...") does not count.
+    nonisolated static func saysNoRecordFound(_ text: String) -> Bool {
+        let thing = "(matching )?(data|records?|results?|matches|listings?|profiles?|information|people|persons?|entries)"
+        let says = "\\bno \(thing)( (was|were|has been|have been|could be))? found\\b|\\b(could ?n.?t|could not|did ?n.?t|did not|were unable to|was unable to|unable to) (find|locate) (any|a|your) \(thing)|\\bwe found no \(thing)|\\b0 (results|records|matches)( were)? found|\\bno \(thing) (match|matched) your (search|criteria|information)"
+        return text.split(whereSeparator: \.isNewline).contains { line in
+            line.range(of: "^\\s*(if|when|in case)\\b|\\bif (no|we|you)\\b", options: [.regularExpression, .caseInsensitive]) == nil
+                && line.range(of: says, options: [.regularExpression, .caseInsensitive]) != nil
+        }
     }
 
     /// A page that says it is still working on the request ("Processing your request", "Please wait", "Do not close this page"): sent, but not confirmed.

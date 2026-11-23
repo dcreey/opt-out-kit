@@ -4,11 +4,12 @@ import Foundation
 public enum SiteStatus: String, CaseIterable, Sendable {
     case todo, skipped, done
 
-    /// Set aside wins over done (a site skipped after a send that has since run out is skipped, not due); a send that still holds is done.
+    /// Set aside wins over done (a site skipped after a send that has since run out is skipped, not due); a send that still holds is done, and so is a site
+    /// a recent look found no listing on (`Progress.notListedRecently`).
     /// `taskDone` is the task's own answer, for sites finished through a shared task (an official service, an email) with no send of their own.
     public static func of(_ entry: DirectoryEntry?, progress: Progress, taskDone: Bool, now: Date = Date()) -> SiteStatus {
         if let e = entry, progress.isParked(e.id, now: now) { return .skipped }
-        if let e = entry, e.isCurrent(attempts: progress.optOutAttempts, now: now) { return .done }
+        if let e = entry, e.isHandled(progress, now: now) { return .done }          // sent and still holding, or nothing there to opt out of until it is searched again
         if taskDone, entry?.lastSent(in: progress.optOutAttempts) == nil { return .done }
         return .todo
     }

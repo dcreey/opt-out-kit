@@ -1359,6 +1359,38 @@ final class AutoOptOutTests: XCTestCase {
 
     /// A site given up after its form was sent (it went quiet, "Processing your request...") keeps what its page showed then: the submitter hands the page's text
     /// and a screenshot over as it is cancelled, and the run records them with the "sent but not confirmed" result. One given up before sending keeps neither.
+    /// quad.com: given up after sending, with neither what its page said nor a screenshot. A real page is closed by the cancelled work before a cancel handler
+    /// can read it, so the run reads it first (`GiveUpCapture.whenGivingUp`), then cancels.
+    func testAPageThatClosesWhenCancelledIsStillReadBeforeTheSiteIsGivenUp() async {
+        final class Page: @unchecked Sendable { private let l = NSLock(); private var open = true
+            func close() { l.lock(); open = false; l.unlock() }; var isOpen: Bool { l.lock(); defer { l.unlock() }; return open } }
+        struct Closing: FormSubmitter {
+            var reportsActivity: Bool { true }
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .submitted(awaitingEmail: false) }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void) async -> SubmitEvidence {
+                await submitCapturing(form, plan: plan, dryRun: dryRun, activity: activity, giveUp: GiveUpCapture())
+            }
+            func submitCapturing(_ form: OptOutForm, plan: FillPlan, dryRun: Bool, activity: @escaping @Sendable () -> Void, giveUp: GiveUpCapture) async -> SubmitEvidence {
+                let page = Page()
+                giveUp.whenGivingUp { page.isOpen ? SubmitEvidence(outcome: .failed("x"), screenshot: Data([7]), pageText: "Thank you, we received your request") : nil }
+                activity(); SiteRun.markSent?()
+                await withTaskCancellationHandler { await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in } } onCancel: { page.close() }
+                return SubmitEvidence(outcome: .submitted(awaitingEmail: false))
+            }
+        }
+        var f = form([("text", "firstname", "First Name*"), ("email", "email", "Email")]); f.page = URL(string: "https://quad.example/optout")!
+        let entry = DirectoryEntry(id: "q", domain: "quad.example", name: "q", bucket: "direct", tier: .B, automation: .guided, optOutURL: f.page, optOutForm: f, signals: [])
+        final class Got: @unchecked Sendable { private let l = NSLock(); private var v: (Data?, String?) = (nil, nil)
+            func set(_ d: Data?, _ t: String?) { l.lock(); v = (d ?? v.0, t ?? v.1); l.unlock() }; var value: (Data?, String?) { l.lock(); defer { l.unlock() }; return v } }
+        let got = Got()
+        let engine = AutoOptOut(submitter: Closing(), spacing: 0, siteLimit: 30, idleLimit: 0.3)
+        let results = await engine.run(entries: [entry], person: pat, progress: OptOutKitCore.Progress(),
+                                       evidence: { _, shot in got.set(shot, nil) }, onResult: { _, _, said in got.set(nil, said) })
+        XCTAssertEqual(results.first?.1, .failed(AutoOptOut.sentUnconfirmed))
+        XCTAssertEqual(got.value.0, Data([7]), "the screenshot was taken before the page closed")
+        XCTAssertEqual(got.value.1, "Thank you, we received your request", "and its words kept")
+    }
+
     func testASiteGivenUpAfterItsFormWasSentKeepsWhatItsPageShowed() async {
         struct Quiet: FormSubmitter {
             var reportsActivity: Bool { true }
@@ -2152,8 +2184,11 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         if case .needsYou = FormFiller.plan(for: form(box), signals: nil, person: person(.me, minor: true)).verdict {} else { XCTFail("minor") }
     }
 
+    /// A certification about the person themselves is ticked for the owner since 2026-11-23 (`testTheOwnersProfileTicksACertificationAboutThemselvesButNotAnAgentsBox`);
+    /// one that is only an agent's, terms, or an attestation that does not say who the person is, never.
     func testLegalCertificationsAgentStatementsAndTermsAreNeverTicked() {
-        for text in ["I certify under penalty of perjury that I am the person named in this request",
+        XCTAssertTrue(FormFiller.isSelfIdentityBox("I certify under penalty of perjury that I am the person named in this request"), "about the person themselves")
+        for text in ["I certify that I am an authorized agent with written proof of authorization to act on behalf of the consumer",
                      "I am the owner of this email and an authorized agent acting on behalf of the person",
                      "I confirm that I am the person associated with this email and agree to the terms of service",
                      "I acknowledge and attest that the information is true"] {
@@ -3453,6 +3488,56 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         XCTAssertEqual(v(p, "Region-State-Province-2"), ["62701"], "the label says postal code")
         XCTAssertEqual(v(p, "Region-State-Province")?.first, "IL")
         XCTAssertEqual(v(p, "phone_ext-9adf")?.first, "United States", "a menu beside a phone box is its country code")
+        XCTAssertTrue(v(p, "phone_ext-9adf")?.contains("🇺🇸") == true, "and by its flag, before the bare +1: HubSpot's US entry has no name (datatowin.com)")
+        XCTAssertLessThan(v(p, "phone_ext-9adf")?.firstIndex(of: "🇺🇸") ?? 99, v(p, "phone_ext-9adf")?.firstIndex(of: "+1") ?? 0)
+    }
+
+    func testALongBoxLabelIsShortenedNotReplacedByTheBoxsToken() {
+        let long = "I certify that I am authorized by the individual exercising their privacy rights to submit this request on their behalf.*"
+        let shown = FormField(type: "checkbox", name: "f0-18", label: long).display
+        XCTAssertTrue(shown.hasPrefix("I certify that I am authorized"), shown)
+        XCTAssertTrue(shown.hasSuffix("…"))
+        XCTAssertFalse(shown.contains("F0"), "never the live form's token")
+        XCTAssertEqual(FormField(type: "text", name: "infopay[fname]", label: "").display, "Fname", "no label: the box's name, as before")
+    }
+
+    /// coloradoarrests.org: "Submission Authorization *" as two required boxes, "for myself" and "an authorized agent ... on behalf of someone else". The agent's
+    /// box is an option left unticked, not a statement that holds the form; a lone agent statement still waits for the person.
+    /// missionwired.com: "I certify under penalty of perjury that, I am the individual, or authorized agent of the individual, whose information is the subject of
+    /// this request; ... and that all information I have submitted is true and accurate.*" is true of the account owner asking for themselves: their own profile
+    /// ticks it (decided 2026-11-23). A family member's profile still waits for that person; an agent's written-proof box is never theirs.
+    func testTheOwnersProfileTicksACertificationAboutThemselvesButNotAnAgentsBox() {
+        let cert = "I certify under penalty of perjury that, I am the individual, or authorized agent of the individual, whose information is the subject of this request; that I am a resident of the state identified above, and that all information I have submitted is true and accurate.*"
+        let proof = "Check this box to confirm that you can provide written proof of authorization to request information on behalf of the data subject."
+        XCTAssertTrue(FormFiller.isSelfIdentityBox(cert))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox(proof), "an agent's statement")
+        XCTAssertFalse(FormFiller.isSelfIdentityBox("I certify that I have read and accept the Terms of Service and Privacy Policy.*"), "terms are never")
+        let fields = [("checkbox", "f0-9", proof), ("checkbox", "f0-10", cert), ("text", "f0-1", "First Name *"), ("email", "f0-2", "Email *")]
+        if case .needsYou(let why) = plan(fields, person: pat).verdict { XCTFail("the owner's own certification held the form: \(why)") }
+        var family = pat; family.relationship = .otherFamily
+        if case .needsYou = plan(fields, person: family).verdict {} else { XCTFail("a family member's profile waits for that person") }
+    }
+
+    func testAnAgentBoxBesideAForMyselfBoxIsAnOptionNotACertification() {
+        let p = plan([("checkbox", "f0-0", "Submission Authorization: * | I am submitting this request for myself."),
+                      ("checkbox", "f0-1", "Submission Authorization: * | I am an authorized agent submitting this request on behalf of someone else."),
+                      ("text", "f0-7", "First"), ("email", "f0-9", "Email")])
+        if case .needsYou(let why) = p.verdict { XCTFail("the agent's option held the form: \(why)") }
+        let alone = plan([("checkbox", "f0-1", "I am an authorized agent submitting this request on behalf of someone else. *"), ("email", "e", "Email")])
+        if case .needsYou = alone.verdict {} else { XCTFail("a lone agent statement is not ticked for the person") }
+    }
+
+    /// klear.com (Meltwater): boxes named by a title beside them, with an example as the placeholder ("First Name John", "Email Address john@doe.com"). The
+    /// example is not the person's: their own name and email go in; the social-handle boxes take nothing the person did not give.
+    func testBoxesNamedByATitleAndAnExamplePlaceholderGetThePersonsOwnDetails() {
+        let p = plan([("text", "f0-0", "First Name John"), ("text", "f0-1", "Last Name Doe"), ("text", "f0-2", "Email Address john@doe.com"),
+                      ("text", "f0-3", "Confirm Email Address john@doe.com"), ("text", "f0-4", "Instagram @instagram"), ("text", "f0-5", "Twitter @twitter")])
+        XCTAssertEqual(v(p, "f0-0")?.first, "Pat")
+        XCTAssertEqual(v(p, "f0-1")?.first, "Example")
+        XCTAssertEqual(v(p, "f0-2")?.first, pat.emails.first)
+        XCTAssertEqual(v(p, "f0-3")?.first, pat.emails.first)
+        XCTAssertNil(v(p, "f0-4")); XCTAssertNil(v(p, "f0-5"))
+        if case .needsYou(let why) = p.verdict { XCTFail(why) }
     }
 
     func testAStateMenuWhoseCodeNameSaysSubjectIsStillTheState() {
@@ -3464,6 +3549,17 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         let p = plan([("text", "first-name", "* First Name"), ("email", "e", "* Primary Email Address"), ("text", "mobile-device-advertising-id", "* Mobile Device Advertising ID (Not required but strongly recommended)")])
         XCTAssertNotNil(v(p, "first-name")); XCTAssertNotNil(v(p, "e"))
         if case .needsYou = p.verdict { XCTFail("an optional advertising ID must not stop the fill") }
+    }
+
+    /// comscore.com: "Mobile Device Identifier" is the phone's advertising ID, never the phone number ("mobile" is also a phone word).
+    func testAMobileDeviceIdentifierBoxGetsTheAdvertisingIDNeverThePhone() {
+        let fields = [FormField(type: "text", name: "f1-6", label: "Mobile Device Identifier"), FormField(type: "text", name: "f1-1", label: "First Name *")]
+        let form = OptOutForm(page: URL(string: "https://x.example/o")!, method: "post", action: nil, fields: fields, hops: 1)
+        var person = pat; person.phones = ["7736331564"]
+        let with = FormFiller.plan(for: form, signals: nil, person: person, advertisingID: "AAAA-1")
+        XCTAssertEqual(with.values.first { $0.name == "f1-6" }?.candidates.first, "AAAA-1")
+        let without = FormFiller.plan(for: form, signals: nil, person: person)
+        XCTAssertNil(without.values.first { $0.name == "f1-6" }, "no ID to give: the box is left empty, not given the phone")
     }
 
     func testASingleSiteEmailCarriesOnlyWhatThatSiteNeeds() {
@@ -4301,6 +4397,33 @@ final class SiteFilterTests: XCTestCase {
         XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0 + 210 * day), .todo, "back after its week")
         let covered = try entry("b")
         XCTAssertEqual(SiteStatus.of(covered, progress: OptOutKitCore.Progress(), taskDone: true), .done, "finished through a shared task with no send of its own")
+    }
+
+    /// A site whose own search (run by its opt-out form) found no record of the person: done, counted as not listed and never as sent, left alone by the run
+    /// and out of the semi-automated queue for `notListedWindow`; then searched again.
+    func testASiteWhoseSearchFoundNoRecordIsDoneUntilItIsSearchedAgain() throws {
+        var e = try entry("a", category: "arrests")
+        e.optOutForm = OptOutForm(page: URL(string: "https://a.com/remove")!, method: "post", action: nil, fields: [], hops: 0)
+        let t0 = Date()
+        var p = OptOutKitCore.Progress()
+        XCTAssertEqual(AutoOptOut.result(for: .notListed), .notListed)
+        let attempt = try XCTUnwrap(AutoOptOut.attempt(for: .notListed, now: t0, pageSaid: "No data was found, try other criteria..."))
+        XCTAssertFalse(attempt.wasSubmitted, "never counted as sent")
+        XCTAssertEqual(attempt.pageSaid, "No data was found, try other criteria...", "what the site answered is kept")
+        p.recordOptOutAttempt(attempt, site: "a")
+        XCTAssertTrue(p.notListedRecently("a", now: t0 + day))
+        XCTAssertEqual(p.notListedSites(now: t0 + day), ["a"], "left out of the semi-automated queue")
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: t0 + day), .done)
+        XCTAssertTrue(e.isHandled(p, now: t0 + day))
+        XCTAssertEqual(AutoOptOut.precheck(entry: e, person: Person(displayName: "Pat"), progress: p, now: t0 + day).result, .skippedNotListed, "the run leaves it alone")
+        XCTAssertEqual(RunPeriods.activity(siteIDs: ["a"], attempts: p.optOutAttempts, period: nil).first?.group, .notListed, "its own group, not needs you")
+        XCTAssertEqual(RunPeriods.allRuns(siteIDs: ["a"], attempts: p.optOutAttempts).first?.group, .notListed)
+        XCTAssertTrue(AutoOptOut.inRepeatPass(e, progress: p), "a repeat pass searches it again once the window is over")
+        let later = t0 + OptOutKitCore.Progress.notListedWindow + day
+        XCTAssertEqual(SiteStatus.of(e, progress: p, taskDone: false, now: later), .todo, "brokers add records: after the window it is to do again")
+        XCTAssertNotEqual(AutoOptOut.precheck(entry: e, person: Person(displayName: "Pat"), progress: p, now: later).result, .skippedNotListed)
+        p.recordSiteCheck(.stillListed, site: "a", source: .selfReported, on: t0 + 2 * day)
+        XCTAssertFalse(p.notListedRecently("a", now: t0 + 3 * day), "a later look that found a listing wins")
     }
 
     func testEachFilterNarrowsAndTextMatchesAddressOrName() throws {

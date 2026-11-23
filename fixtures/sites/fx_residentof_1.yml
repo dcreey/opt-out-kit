@@ -1,0 +1,21 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'residentof', type-to-search menus named only by aria-labelledby; Resident of lists US states: dnb.com). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_residentof_1'
+domain: 'residentof-1.fixture.test'
+name: 'Fixture residentof 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_residentof_1/optout'
+opt_out_form:
+  page: 'http://127.0.0.1:8765/fx_residentof_1/optout'
+  method: 'post'
+  action: 'http://127.0.0.1:8765/fx_residentof_1/send'
+  fields:
+    - type: 'text'
+      name: 'firstname'
+      label: 'First Name *'
+    - type: 'email'
+      name: 'email'
+      label: 'Email *'
+  hops: 0

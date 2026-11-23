@@ -36,6 +36,12 @@ test('a label is read from label[for], a wrapping label, aria-labelledby, aria-l
   assert.equal(field(f, 'l8').label, 'State of residence', "its parent's text");
 });
 
+test('a title beside the box\'s wrapper names it, before an example placeholder (klear.com: "First Name" over a box whose placeholder is "John")', () => {
+  const row = (title, ph) => `<div><div class=t><div>${title}</div></div><div><div class=w><input type=string placeholder="${ph}"></div></div></div>`;
+  const { out } = forms(`<form>${row('First Name', 'John')}${row('Last Name', 'Doe')}${row('Email Address', 'john@doe.com')}${row('Confirm Email Address', 'john@doe.com')}<button>Submit</button></form>`);
+  assert.deepEqual(out[0].fields.map((x) => x.label), ['First Name John', 'Last Name Doe', 'Email Address john@doe.com', 'Confirm Email Address john@doe.com']);
+});
+
 test('a box with no label of its own does not borrow the label of the box before it', () => {
   const { out } = forms('<form><label>Email *<input name=email></label><input name=nick><span>Street</span><input name=street></form>');
   const f = out[0];

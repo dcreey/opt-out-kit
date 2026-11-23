@@ -65,7 +65,20 @@ public struct Progress: Codable, Equatable, Sendable {
         siteChecks[site]?.filter { $0.result != .inconclusive }.max { $0.date < $1.date }
     }
 
-    public mutating func record(_ result: CheckResult, for brokerID: String, on date: Date = Date()) {
+    /// How long a look that found no listing holds: the run leaves the site alone and the Sites tab counts it as done. After it the site is searched again,
+    /// since brokers add records.
+    public static let notListedWindow: TimeInterval = 30 * 86_400
+
+    /// The latest real look at the site (a scan, the person's own look, or the site's own search run by its opt-out form) found no listing, within `notListedWindow`.
+    public func notListedRecently(_ site: String, now: Date = Date()) -> Bool {
+        guard let look = latestSiteCheck(site), look.result == .removed else { return false }
+        return now.timeIntervalSince(look.date) < Self.notListedWindow
+    }
+
+    /// Every site `notListedRecently` holds for: left out of the semi-automated queue like a site set aside, since there is nothing there to do.
+    public func notListedSites(now: Date = Date()) -> Set<String> { Set(siteChecks.keys.filter { notListedRecently($0, now: now) }) }
+
+        public mutating func record(_ result: CheckResult, for brokerID: String, on date: Date = Date()) {
         checks[brokerID, default: []].append(CheckRecord(date: date, result: result))
     }
 

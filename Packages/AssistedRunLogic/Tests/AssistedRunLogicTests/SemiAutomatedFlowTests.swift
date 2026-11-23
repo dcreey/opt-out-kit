@@ -178,6 +178,17 @@ final class SemiAutomatedFlowTests: XCTestCase {
         XCTAssertEqual(sink.results, [.needsYou(AutoOptOut.rateLimited)], "no failed attempt is recorded against the site")
     }
 
+    /// A form that searches before it removes answered "No data was found": the site is recorded as not listed (done), not as a failed send, and the page
+    /// stays for the person until they move on.
+    func testASiteWhoseSearchFindsNoRecordIsRecordedAsNotListed() async {
+        let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": Page(sends: [.notListed])]), sink)
+        let run = start(r)
+        await until({ if case .needsMore(let why) = r.phase { return why == AutoOptOut.noRecordFound } else { return false } }())
+        r.next(); await finish(run, r)
+        XCTAssertEqual(sink.results, [.notListed])
+    }
+
     func testACheckThatAppearsAfterSendingIsWaitedForAgainThenSentAgain() async {
         let page = Page(sends: [.challenged("a human check"), .challenged("a human check"), .submitted(awaitingEmail: false)]); let sink = Sink()
         let r = make([item("a.example")], Driver(["a.example": page]), sink)
