@@ -22,6 +22,7 @@ extension WebViewSession {
         let deadline = Date().addingTimeInterval(seconds)
         while Date() < deadline, !abandoned, !Task.isCancelled {
             try? await Task.sleep(nanoseconds: 250_000_000)
+            if webView.isLoading { return true }          // a load under way is the answer starting
             if await pageMark() != mark { return true }
         }
         return false

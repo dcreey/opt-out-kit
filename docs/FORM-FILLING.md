@@ -124,8 +124,11 @@ before and after and compare. The multi-value comparison (a person with three em
   is still empty (`press-live-submit`, `press-submit` answer `invalid`): the browser would only scroll to that box under the person's finger and send nothing.
   The app says "a required box is still empty" and leaves the page to the person.
 
-- **After pressing send**, the app waits for the page to start answering (a few seconds at most) before reading it, then lets it settle. Read too soon, a form that
-  was sent looked like "nothing on the page changed after sending" on a slow machine (GitHub's runner). A page that replaced the form with "Processing your
+- **After pressing send**, the app waits for the page to start answering before reading it: the page changes or a load begins, at most six seconds. Then it
+  lets the page settle, and a page is never settled while a load is under way (`PageSettle.quietLook`, `testAPageIsNotSettledWhileANavigationIsUnderWay`).
+  Every press of send waits this way (`settleAfterPress`): the background run, Solve and send and the guided flow. Read too soon, a form that was sent looked like
+  "nothing on the page changed after sending" on a slow machine (GitHub's runner). The background run's own press had no such wait at all, so the status
+  page counted a sent site as not sent. A page that replaced the form with "Processing your
   request... Please wait... Do not close this page" has not confirmed anything: it is recorded as sent but not confirmed (`FormRun.saysStillWorking`,
   `testAPageSayingItIsStillWorkingIsNotAConfirmation`), where before the result depended on how long the run happened to wait.
 

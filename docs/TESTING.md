@@ -279,7 +279,8 @@ room for slower CI machines.
 **Habits for GitHub's slower simulator** (each one a failure seen there and never locally):
 - Tabs by `tab(name, index)`: there the tab buttons are named after their icons ("magnifyingglass").
 - `searchSites` closes a run's summary sheet first, because it covers the tab bar.
-- Menu items by `tapWhenHittable`. It taps where the item was seen to rest twice in a row, because XCTest's own hit point is "invalid" while a menu slides in.
+- Menu items by `chooseMenuItem(menu, item, until:)`. It opens the menu again when the item never comes to rest on screen, because a tap that opens a menu
+  can be lost. It taps where the item was seen to rest twice in a row (`tapWhenResting`), because XCTest's own hit point is "invalid" while a menu slides in.
   It also finds a menu item by its identifier, since an open submenu's header shares its label.
 - A value that changes after a tap (a switch) is waited for, not read at once.
 - A queried element gets its type (`staticTexts[...]`), not `descendants(matching: .any)`, where the type is known: a query over every element timed out.

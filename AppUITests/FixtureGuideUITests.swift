@@ -106,10 +106,9 @@ final class FixtureGuideUITests: UITestCase {
     func testCancelLeavesTheGuideAndGoesBackToTheSite() {
         let app = XCUIApplication()
         openGuide(app)
-        XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
-        app.buttons["guided-more"].tap()
-        XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 10))
-        app.buttons["Cancel"].tapWhenHittable()          // a menu item, still opening on a slow machine
+        let more = app.buttons["guided-more"]
+        XCTAssertTrue(more.waitForExistence(timeout: 10))
+        app.chooseMenuItem(more, app.buttons["guided-cancel"], until: { app.buttons["guide-me"].exists })
         XCTAssertTrue(app.buttons["guide-me"].waitForExistence(timeout: 5), "back on the site's page")
         XCTAssertFalse(app.staticTexts["reported-issue"].exists, "cancelling is not a report")
     }
@@ -118,24 +117,18 @@ final class FixtureGuideUITests: UITestCase {
     func testNotWorkingOffersTheReasonsAndRecordsOne() {
         let app = XCUIApplication()
         openGuide(app)
-        XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
-        app.buttons["guided-more"].tap()
-        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]          // by id: the open submenu's header is also "Not working"
-        XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
-        for _ in 0..<3 where !first.exists {
-            notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine
-            _ = first.waitForExistence(timeout: 5)
-        }
+        let more = app.buttons["guided-more"]
+        XCTAssertTrue(more.waitForExistence(timeout: 10))
+        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason has come to rest on screen.
+        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]
+        app.chooseMenuItem(more, notWorking, until: { first.restingFrame(within: 0.6) != nil })
         shot(app, "guide-not-working-menu")
         for label in ["The page or link is broken", "It needs something else (login, payment, ID or a phone call)", "The site blocked me"] {
             XCTAssertTrue(app.buttons[label].waitForExistence(timeout: 5), "\(label) is offered")
         }
         // A submenu that opened late can swallow the first tap on its item while it settles: tap again while the item is still offered.
         let blocked = app.buttons["guided-issue-blockedMe"], reported = app.descendants(matching: .any)["reported-issue"]
-        for _ in 0..<3 where !reported.exists && blocked.exists {
-            blocked.tapWhenHittable()
-            _ = reported.waitForExistence(timeout: 5)
-        }
+        app.chooseMenuItem(notWorking, blocked, until: { reported.exists })
         XCTAssertTrue(reported.waitForExistence(timeout: 10), "the site now shows it was reported")
     }
 
@@ -143,16 +136,14 @@ final class FixtureGuideUITests: UITestCase {
     func testAGuideToldTheLinkIsBrokenLooksForTheNewPage() {
         let app = XCUIApplication()
         openGuide(app)
-        XCTAssertTrue(app.buttons["guided-more"].waitForExistence(timeout: 10))
-        app.buttons["guided-more"].tap()
-        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]          // by id: the open submenu's header is also "Not working"
-        XCTAssertTrue(notWorking.waitForExistence(timeout: 10))
-        for _ in 0..<3 where !first.exists {
-            notWorking.tapWhenHittable()          // a submenu item, still opening on a slow machine
-            _ = first.waitForExistence(timeout: 5)
-        }
-        first.tapWhenHittable()
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch.waitForExistence(timeout: 30), "the guide says it will look for the new page")
+        let more = app.buttons["guided-more"]
+        XCTAssertTrue(more.waitForExistence(timeout: 10))
+        // By id: the open submenu's header is also "Not working". The submenu is open once its first reason has come to rest on screen.
+        let notWorking = app.buttons["guided-not-working"], first = app.buttons["guided-issue-brokenLink"]
+        app.chooseMenuItem(more, notWorking, until: { first.restingFrame(within: 0.6) != nil })
+        let says = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'looks broken'")).firstMatch
+        app.chooseMenuItem(notWorking, first, until: { says.exists || !first.exists })
+        XCTAssertTrue(says.waitForExistence(timeout: 30), "the guide says it will look for the new page")
         shot(app, "guide-broken-link")
     }
 }

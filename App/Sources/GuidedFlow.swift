@@ -73,8 +73,9 @@ final class WebGuidedPage: GuidedPage {
             }
             return sent ? .submitted(awaitingEmail: sentEmail) : .failed("the form did not finish")
         }
+        let mark = await session.pageMark()
         guard await session.pressSubmit(for: values) else { return .failed("no submit button found") }
-        await session.settlePage(maxWait: 20)
+        await session.settleAfterPress(from: mark, changeWithin: 6, maxWait: 20)
         if let why = await session.visibleChallenge() { return .challenged(why) }
         return FormRun.classify(await session.visibleText())
     }

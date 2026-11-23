@@ -297,8 +297,7 @@ final class WebViewSession: NSObject, WKNavigationDelegate, WKUIDelegate {
         while Date() < deadline, !abandoned, !Task.isCancelled {
             try? await Task.sleep(nanoseconds: UInt64(PageSettle.pollEvery * 1_000_000_000))
             let probe = (try? await webView.evaluateJavaScript("(document.readyState||'') + '|' + (document.body ? document.body.innerText : '')")) as? String ?? ""
-            let ready = probe.hasPrefix("complete|")
-            if ready && probe.count == last && !PageSettle.stillLoading(probe) { stable += 1 } else { stable = 0 }
+            if PageSettle.quietLook(ready: probe.hasPrefix("complete|"), navigating: webView.isLoading, sameText: probe.count == last, text: probe) { stable += 1 } else { stable = 0 }
             last = probe.count
             if PageSettle.settled(sameFor: stable) { return }
         }
@@ -412,8 +411,9 @@ struct WebFormSubmitter: FormSubmitter {
         guard (try? await session.loadHTML(html)) != nil else { return "" }
         await session.settlePage(maxWait: 5)
         _ = await session.fillFields(plan.values)
+        let mark = await session.pageMark()
         _ = await session.pressSubmit(for: plan.values)
-        await session.settlePage(maxWait: 6)
+        await session.settleAfterPress(from: mark, changeWithin: 4, maxWait: 6)
         return await session.pageTitle()
     }
 }
@@ -449,8 +449,9 @@ extension FormRun {
         if await session.pendingCertification() != nil { return .challenged("a certification box that you must tick yourself") }
 
         let before = await session.visibleText()
+        let mark = await session.pageMark()
         guard await session.pressSubmit(for: plan.values) else { return .failed("no submit button found") }
-        await session.settlePage(maxWait: maxWait)
+        await session.settleAfterPress(from: mark, changeWithin: SiteRun.wait(upTo: 6), maxWait: maxWait)
         if let why = await session.visibleChallenge() { return .challenged(why) }
         // Only what appeared after sending counts: a page that already said "request received" somewhere (hidden templates, footers,
         // policy text) is not a confirmation.
@@ -460,6 +461,14 @@ extension FormRun {
 
 extension WebViewSession {
     func settlePage(maxWait: TimeInterval) async { await settle(maxWait: maxWait) }
+
+    /// After a press of send: first the page's answer must start (the page changes or a load begins; a slow phone or site can take seconds), at most
+    /// `changeWithin`; then the page settles. Every press of send waits this way (`FormRun.steps`, `WebAssistedPage.send`), never a bare settle: right after a
+    /// press the old page is still loaded and unchanged, and a settle alone called it done before the answer arrived.
+    func settleAfterPress(from mark: String, changeWithin: TimeInterval, maxWait: TimeInterval) async {
+        _ = await waitForChange(from: mark, upTo: changeWithin)
+        await settle(maxWait: maxWait)
+    }
 
     /// A picture of the page as it is now, as a compressed JPEG. The web view is kept at phone size, so the picture reads like a
     /// phone screen.

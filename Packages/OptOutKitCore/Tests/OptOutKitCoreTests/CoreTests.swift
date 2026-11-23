@@ -1322,6 +1322,16 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertLessThan(PageSettle.quietFor, 2, "quicker than the two seconds it was")
     }
 
+    /// A look at the page counts toward "settled" only when nothing is on its way: right after send is pressed the old page is loaded and unchanged while the
+    /// answer loads, and on a slow machine that read as "nothing changed after sending" for a form the site took (the Run-now journey on GitHub).
+    func testAPageIsNotSettledWhileANavigationIsUnderWay() {
+        XCTAssertTrue(PageSettle.quietLook(ready: true, navigating: false, sameText: true, text: "complete|Opt out"))
+        XCTAssertFalse(PageSettle.quietLook(ready: true, navigating: true, sameText: true, text: "complete|Opt out"), "the answer is still loading")
+        XCTAssertFalse(PageSettle.quietLook(ready: false, navigating: false, sameText: true, text: "loading|Opt out"))
+        XCTAssertFalse(PageSettle.quietLook(ready: true, navigating: false, sameText: false, text: "complete|Opt out"))
+        XCTAssertFalse(PageSettle.quietLook(ready: true, navigating: false, sameText: true, text: "complete|Please wait"))
+    }
+
     /// A page that goes quiet (no load, no change, no request coming back) for the idle limit is given up and moved to semi-automatic; a page that keeps
     /// showing signs of life is waited for, even past the idle limit in all.
     func testASiteWhosePageGoesQuietIsMovedToSemiAutomaticAndABusyOneIsWaitedFor() async {

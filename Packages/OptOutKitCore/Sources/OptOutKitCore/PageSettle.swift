@@ -16,6 +16,13 @@ public enum PageSettle {
         loadingWords.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil
     }
 
+    /// Whether one look at the page counts toward "settled": loaded, its text the same as the last look, no "Loading…" showing, and no navigation under way.
+    /// The last is what makes a sent form's answer count: right after send is pressed the old page is still loaded and unchanged while the answer is on its way,
+    /// and on a slow machine it looked settled before the answer arrived ("nothing on the page changed after sending" for a form the site had taken).
+    public static func quietLook(ready: Bool, navigating: Bool, sameText: Bool, text: String) -> Bool {
+        ready && !navigating && sameText && !stillLoading(text)
+    }
+
     /// Whether a page probed as `(readyState, text)` is settled, given how many probes in a row it has looked the same.
     public static func settled(sameFor probes: Int) -> Bool { Double(probes) * pollEvery >= quietFor }
 }

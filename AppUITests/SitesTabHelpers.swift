@@ -168,26 +168,54 @@ extension XCUIApplication {
 }
 
 extension XCUIElement {
-    /// Taps once the element can be tapped. A menu's items exist while the menu is still opening and have no tap point yet ("Activation point invalid"; asking
-    /// `isHittable` then fails the test too, on GitHub's slower runner): this waits for the item to have a place on screen and come to rest, then taps it.
-    func tapWhenHittable(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
+    /// Where the element came to rest on screen: the same valid frame twice in a row, a quarter second apart, within `timeout`; nil if it never did. A menu's items
+    /// exist while the menu is closed or still opening, with no place on screen or a moving one ("Activation point invalid"; asking `isHittable` then fails
+    /// the test too, on GitHub's slower runner).
+    func restingFrame(within timeout: TimeInterval) -> CGRect? {
         let end = Date().addingTimeInterval(timeout)
         var last: CGRect?
         while Date() < end {
-            if exists {
-                let f = frame
-                if !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
-                    // A menu still sliding in moves its items: tap only once the item sits in the same place twice in a row.
-                    // Tap the spot rather than the element: XCTest's own hit point is "invalid" for a menu item on GitHub's slower simulator.
-                    if let l = last, l.equalTo(f) {          // at the place it was seen to rest (asking the element again can find it gone mid-animation)
-                        XCUIApplication().coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap(); return
-                    }
-                    last = f
-                } else { last = nil }
+            let f = exists ? frame : .null
+            if !f.isNull, !f.isEmpty, f.minX.isFinite, f.minY.isFinite, f.width > 1, f.height > 1 {
+                if let l = last, l.equalTo(f) { return f }
+                last = f
             } else { last = nil }
             Thread.sleep(forTimeInterval: 0.25)
         }
-        XCTFail("\(self) never became tappable", file: file, line: line)
+        return nil
+    }
+
+    /// Taps the element where it came to rest. The spot, not the element: asking the element again can find it gone mid-animation, and XCTest's own hit
+    /// point is "invalid" for a menu item on GitHub's slower simulator.
+    @discardableResult
+    func tapWhenResting(within timeout: TimeInterval) -> Bool {
+        guard let f = restingFrame(within: timeout) else { return false }
+        XCUIApplication().coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap()
+        return true
+    }
+
+    /// Taps once the element can be tapped (`tapWhenResting`); fails the test if it never can.
+    func tapWhenHittable(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) {
+        if !tapWhenResting(within: timeout) { XCTFail("\(self) never became tappable", file: file, line: line) }
+    }
+}
+
+extension XCUIApplication {
+    /// Opens `menu` and taps `item` in it. A tap that opens a menu can be lost on a slow machine (the item then never comes to rest on screen): the menu is
+    /// opened again, up to three times. `until`, when given, says the item's tap took (a submenu opened, a screen changed); without it, one tap of the item is
+    /// enough.
+    func chooseMenuItem(_ menu: XCUIElement, _ item: XCUIElement, until done: (() -> Bool)? = nil, file: StaticString = #filePath, line: UInt = #line) {
+        for _ in 0..<3 {
+            if done?() == true { return }
+            if item.restingFrame(within: 1) == nil { _ = menu.tapWhenResting(within: 10) }
+            if item.tapWhenResting(within: 6) {
+                guard let done else { return }
+                let end = Date().addingTimeInterval(5)
+                while Date() < end { if done() { return }; Thread.sleep(forTimeInterval: 0.25) }
+            }
+        }
+        if done?() == true { return }
+        XCTFail("could not choose \(item) from \(menu)", file: file, line: line)
     }
 }
 

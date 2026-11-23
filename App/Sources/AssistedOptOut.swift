@@ -293,11 +293,9 @@ final class WebAssistedPage: AssistedPage {
         let pressed: Bool
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed(session.pressHeldForEmptyBox ? "a required box is still empty" : "no submit button found") }
-        // The page's answer can take a moment to start (a slow phone, a slow site): until something changes (a few seconds at most), then until it settles. Read too
-        // soon, a sent form looked like "nothing on the page changed after sending" (GitHub's slower runner, the plain fixture site).
-        _ = await session.waitForChange(from: markBefore, upTo: SiteRun.wait(upTo: 4))
-        // In a background run the waits end in time to read the page and take its picture (`SiteRun.deadline`); elsewhere they are as before.
-        await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait))
+        // The page's answer can take a moment to start (a slow phone, a slow site): until something changes or a load begins, then until it settles
+        // (`settleAfterPress`). In a background run the waits end in time to read the page and take its picture (`SiteRun.deadline`).
+        await session.settleAfterPress(from: markBefore, changeWithin: SiteRun.wait(upTo: 6), maxWait: SiteRun.wait(upTo: maxWait))
         if await session.pressConfirmStep() { await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait)) }
         let after = await session.visibleText()
         lastSaid = FormRun.newText(before: before, after: after)          // what appeared after sending: the confirmation, the error
