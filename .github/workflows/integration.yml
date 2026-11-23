@@ -42,7 +42,7 @@ jobs:
     name: 'UI tests ${{ matrix.index }}'
     if: 'github.event_name != ''schedule'''
     runs-on: 'macos-26'
-    timeout-minutes: 45
+    timeout-minutes: 75          # up to 45 waiting for shard 0's build when machines are short, then the tests
     permissions:
       contents: 'read'
       actions: 'read'        # shards 1 to 4 look up shard 0's build in this run
@@ -171,14 +171,16 @@ jobs:
           GH_TOKEN: '${{ github.token }}'
         run: |
           API="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          for _ in $(seq 1 180); do
+          # Up to 45 minutes: when GitHub is short of macOS machines, shard 0 can start long after this one (2026-11-23: shards 2 and 3 gave up at 15 minutes
+          # and ran no tests). A shard 0 that ends without a build still stops this at once (below).
+          for _ in $(seq 1 540); do
             n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/artifacts?name=ui-test-products" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("total_count", 0))' || echo 0)
             [ "$n" -gt 0 ] && { echo "the build arrived after $(( $(date +%s) - JOB_START )) s"; exit 0; }
             gone=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "$API/jobs?per_page=30" | python3 -c 'import json,sys; print(any(j["name"] == "UI tests 0" and j["status"] == "completed" for j in json.load(sys.stdin)["jobs"]))' || echo False)
             [ "$gone" = True ] && { echo "::error::shard 0 ended without handing over its build"; exit 1; }
             sleep 5
           done
-          echo "::error::no build from shard 0 after 15 minutes"; exit 1
+          echo "::error::no build from shard 0 after 45 minutes"; exit 1
       - name: 'Download the build'
         if: 'matrix.index != 0'
         uses: 'actions/download-artifact@v4'

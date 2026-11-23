@@ -163,7 +163,8 @@ real ones, and the engine, web view and page scripts do the same work they do on
   the directory, using the same `catalog-builder` as the app's build.
 - `tools/run_e2e.sh`: builds that catalog, starts the server, runs `FixtureJourneyUITests` (or the tests named in its arguments) and stops the server. `OPTOUT_FIXTURE_PORT` (default 8765) puts the server on another port, with a catalog pointing there, so two runs on two simulators do not share one server.
   Run it with the usual `-destination`; it passes the catalog and server address to the tests. In the Integration workflow (`integration.yml`) shard 0 compiles
-  the catalog into the build it hands over, and every shard starts the server before its tests.
+  the catalog into the build it hands over, and every shard starts the server before its tests. The other shards wait up to 45 minutes for that build (the job
+  allows 75): when GitHub is short of macOS machines shard 0 can start long after them, and at 15 minutes two shards gave up and ran no tests (2026-11-23).
 - `App/Sources/Fixtures.swift` (debug builds only): `-uitest-catalog <path>` opens that catalog in place of the bundled one, and lets the web view load the
   loopback server (`URL.isSecureWebPage`; a loopback IP address is outside App Transport Security). The shipped app opens only its bundled catalog.
 - `AppUITests/FixtureBrokers.swift`: the tests' side: the launch arguments, and what the server received (`sentSites`, `requests`).
