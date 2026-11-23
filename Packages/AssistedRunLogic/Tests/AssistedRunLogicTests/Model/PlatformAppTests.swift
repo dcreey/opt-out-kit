@@ -434,6 +434,21 @@ final class BackgroundPassesAppTests: XCTestCase {
         }
     }
 
+    /// The automatic page and "Every site, all runs" put a site a recent look found no listing on in the same group (they showed 3 not listed and 0).
+    func testBothPagesCountASiteNotListedTheSameWay() throws {
+        let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
+                         defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
+        var me = m.people.first { $0.relationship == .me }!
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"
+        me.addresses = [Address(street: "1 Main St", city: "Somewhere", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        let p = m.selectedPerson!
+        let site = try XCTUnwrap(m.directory.first { m.automaticDomains(for: p).contains($0.domain) })
+        m.recordSelfCheck(.removed, site: site)
+        XCTAssertEqual(m.activityRows(for: p).first { $0.id == site.id }?.group, .notListed)
+        XCTAssertEqual(m.allRunsRows(for: p).first { $0.id == site.id }?.group, .notListed, "the same on every-site page")
+    }
+
     func testTheFirstRunIsAFullPassAndASiteThatDoesNotGoThroughIsLeftWithThePerson() async throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
@@ -468,14 +483,17 @@ final class BackgroundPassesAppTests: XCTestCase {
         for d in sent { XCTAssertTrue(byDomain[d]?.isCurrent(attempts: m.progress.optOutAttempts) ?? false, "\(d) counts as done") }
         XCTAssertNotNil(m.autoSettings.lastFullRun, "the full pass is finished"); XCTAssertNil(m.autoSettings.passStarted)
         XCTAssertEqual(m.autoSettings.nextRunKind(), .repeatSent, "the next run, three months on, repeats what went through")
-        XCTAssertEqual(m.backgroundDomains(for: me, kind: .repeatSent), sent.intersection(full), "the repeat pass is exactly the sites that went through")
+        XCTAssertEqual(m.backgroundDomains(for: me, kind: .repeatSent), sent.union(lost).intersection(full), "the repeat pass sends again what went through and tries again what did not")
         XCTAssertEqual(try XCTUnwrap(m.periodHistory(for: me).first).total, automaticBefore, "only the automatic sites are counted in the period, so the full pass's lost sites never hold it open")
-        // Run now again in the same period: nothing left. The sites that went through are not sent twice and the ones that did not are in the semi-automated
-        // queue; Re-test all is the way to try every site again.
-        XCTAssertEqual(m.runNowCount(for: me), 0)
+        // Run now again in the same period tries again every site that did not go through (decided 2026-11-23), and never sends twice to one that did; Re-test
+        // all is the way to send again to every site.
+        let lostWithForm = lost.intersection(full)
+        XCTAssertEqual(m.runNowCount(for: me), lostWithForm.count)
         let again = Tally()
         await m.runAutoOptOut(for: me, submitter: Alternating(tally: again))
-        XCTAssertTrue(again.pages.isEmpty, "Run now sent nothing twice in the same period")
+        let sentBefore = Set(m.directory.filter { sent.contains($0.domain) }.compactMap { m.resolved($0).optOutForm?.page.absoluteString })
+        XCTAssertTrue(Set(again.pages).isDisjoint(with: sentBefore), "Run now sent nothing twice in the same period")
+        XCTAssertFalse(again.pages.isEmpty, "and it tried again the sites that did not go through")
         let retest = Tally()
         m.runFullRetestNow(submitter: Alternating(tally: retest))
         try await Task.sleep(nanoseconds: 300_000_000)
@@ -686,6 +704,55 @@ final class ResumeAppTests: XCTestCase {
         await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: third))
         XCTAssertTrue(third.pages.isEmpty, "with everything sent this period, Run now has nothing left")
         XCTAssertEqual(Set(first.pages + second.pages).count, first.pages.count + second.pages.count, "no page sent twice")
+    }
+
+    /// Each page answers as scripted (default: it went through), and every page sent to is recorded.
+    private struct Scripted: FormSubmitter {
+        let answers: [String: SubmitOutcome]; let tally: Tally
+        func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+            tally.add(form.page.absoluteString); return answers[form.page.absoluteString] ?? .submitted(awaitingEmail: false)
+        }
+    }
+
+    /// The north star (docs/PRINCIPLES.md): the automatic run takes as many sites off the person's hands as it can. After a full pass where sites fail in every way,
+    /// Run now (a "fixed build": every form now goes through) tries again each failure the app might fix, never a site already sent this period, and leaves to the
+    /// person only a human check and a field no profile can fill; then nothing is left to try. Decided 2026-11-23.
+    func testRunNowRetriesWhatAFixCouldReachAndLeavesOnlyHumanChecksAndUnknownFieldsToThePerson() async throws {
+        let (m, me) = readyModel()
+        let full = m.backgroundDomains(for: me, kind: .full)
+        var pages: [String] = [], seen = Set<String>(), byPage: [String: DirectoryEntry] = [:]
+        for e in m.directory where full.contains(e.domain) {
+            guard let page = AutoOptOut.standIn(m.resolved(e)).optOutForm?.page.absoluteString, !seen.contains(page) else { continue }
+            seen.insert(page); pages.append(page); byPage[page] = e
+        }
+        try XCTSkipIf(pages.count < 7, "the small catalog has \(pages.count) sites with their own page")
+        let wentThrough = pages[0], recaptcha = pages[1], unknownField = pages[2], noForm = pages[3], noConfirmation = pages[4], unconfirmed = pages[5], certification = pages[6]
+        let first: [String: SubmitOutcome] = [
+            recaptcha: .challenged("a reCAPTCHA checkbox"),
+            unknownField: .failed(L10n.f("This form asks for something only you can supply (\"%@\").", "Case number")),
+            noForm: .failed("no opt-out form was found on the page"),
+            noConfirmation: .failed("no success message was shown"),
+            unconfirmed: .failed(AutoOptOut.sentUnconfirmed),
+            certification: .challenged("a certification box that you must tick yourself")]
+        await m.runAutoOptOut(for: me, submitter: Scripted(answers: first, tally: Tally()))          // the full pass
+        XCTAssertEqual(m.autoSettings.nextRunKind(), .repeatSent, "the full pass finished")
+        let retried = Set([noForm, noConfirmation, unconfirmed, certification])
+        XCTAssertEqual(m.runNowCount(for: me), retried.count, "Run now would try again exactly the failures a fix could reach")
+
+        let fixed = Tally()
+        await m.runAutoOptOut(for: me, submitter: Scripted(answers: [:], tally: fixed))          // Run now, with a build that fixes them
+        XCTAssertEqual(Set(fixed.pages), retried, "tried again: no form found, no confirmation, sent once unconfirmed, a certification box")
+        XCTAssertFalse(fixed.pages.contains(wentThrough), "a site sent this period is never sent twice")
+        XCTAssertFalse(fixed.pages.contains(recaptcha), "a human check is the person's")
+        XCTAssertFalse(fixed.pages.contains(unknownField), "a field no profile can fill is the person's")
+        for page in retried { XCTAssertTrue(try XCTUnwrap(byPage[page]).isHandled(m.progress), "\(page) is off the person's hands now") }
+        for page in [recaptcha, unknownField] {
+            XCTAssertEqual(m.method(for: try XCTUnwrap(byPage[page]), person: me).method, .semiAutomatic, "\(page) is left in the semi-automated queue")
+        }
+
+        let again = Tally()
+        await m.runAutoOptOut(for: me, submitter: Scripted(answers: [:], tally: again))
+        XCTAssertTrue(again.pages.isEmpty, "then nothing is left to try this period: \(again.pages)")
     }
 
     /// A run carried on after a pause counts on from the sites it already did, out of the whole run (it restarted at "0 of" the sites left, 2026-11-23).

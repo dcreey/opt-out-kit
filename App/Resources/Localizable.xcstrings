@@ -8465,25 +8465,25 @@
     }
    }
   },
-  "Every 3 months, it sends again to the sites that went through, because brokers add people back.": {
+  "Every 3 months, it sends again to the sites that went through, because brokers add people back, and tries again the ones that did not.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Tous les 3 mois, elle renvoie la demande aux sites où elle a abouti, car les courtiers réajoutent des gens."
+      "value": "Tous les 3 mois, il renvoie la demande aux sites où elle est passée, car les courtiers réinscrivent les gens, et réessaie ceux où elle n'est pas passée."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cada 3 meses vuelve a enviar a los sitios donde se completó, porque los intermediarios vuelven a añadir personas."
+      "value": "Cada 3 meses vuelve a enviarla a los sitios donde se completó, porque los corredores vuelven a añadir a las personas, y reintenta los que no."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Alle 3 Monate sendet sie erneut an die Seiten, bei denen es geklappt hat, denn Datenhändler nehmen Menschen wieder auf."
+      "value": "Alle 3 Monate sendet er erneut an die Websites, bei denen es geklappt hat, weil Datenhändler Menschen wieder aufnehmen, und versucht die anderen erneut."
      }
     }
    }
@@ -14767,25 +14767,25 @@
     }
    }
   },
-  "Next run %@: sends again to the sites that went through": {
+  "Next run %@: sends again to the sites that went through and tries again the ones that did not": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Prochain passage le %@ : renvoi aux sites où cela a abouti"
+      "value": "Prochain passage le %@ : renvoie aux sites où la demande est passée et réessaie les autres"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Próxima pasada el %@: vuelve a enviar a los sitios donde se completó"
+      "value": "Próxima ejecución %@: vuelve a enviar a los sitios donde se completó y reintenta los demás"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nächster Durchgang am %@: erneutes Senden an die Seiten, bei denen es geklappt hat"
+      "value": "Nächster Durchlauf %@: sendet erneut an die Websites, bei denen es geklappt hat, und versucht die anderen erneut"
      }
     }
    }

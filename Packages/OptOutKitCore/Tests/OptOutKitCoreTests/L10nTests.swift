@@ -16,6 +16,15 @@ final class L10nTests: XCTestCase {
         L10n.language = "de"; XCTAssertEqual(OptOutMethod.automatic.title, "Automatischer Opt-out")
     }
 
+    /// A reason stored in the person's language ("only you can supply", in French: a field no profile can fill) is still recognized, so Run now leaves it to them.
+    func testAReasonStoredInAnotherLanguageIsStillSeenAsNeedingThePerson() {
+        L10n.language = "fr"; defer { L10n.language = "en" }
+        let stored = L10n.f("This form asks for something only you can supply (\"%@\").", "Case number")
+        XCTAssertNotEqual(stored, "This form asks for something only you can supply (\"Case number\").", "stored in French")
+        XCTAssertTrue(AutoOptOut.lastAttemptNeedsPerson(OptOutAttempt(date: Date(), outcome: "failed", detail: stored)))
+        XCTAssertFalse(AutoOptOut.lastAttemptNeedsPerson(OptOutAttempt(date: Date(), outcome: "failed", detail: "no success message was shown")))
+    }
+
     func testAnUnknownLanguageFallsBackToEnglish() {
         L10n.language = "xx"
         XCTAssertEqual(OptOutMethod.automatic.title, "Automatic opt-out")

@@ -8,7 +8,7 @@ struct AutoExplainer: View {
         let n = model.fullPassSize
         VStack(alignment: .leading, spacing: 8) {
             Label(Loc.f("First, it tries about %lld sites: every site where we found the opt-out form and it can be filled in and sent without you. It fills in only what the form asks for (like name, email and city) and sends what it can. If a recent look found you are not listed on a site, it sends nothing there.", n), systemImage: "paperplane")
-            Label("Every 3 months, it sends again to the sites that went through, because brokers add people back.", systemImage: "arrow.clockwise")
+            Label("Every 3 months, it sends again to the sites that went through, because brokers add people back, and tries again the ones that did not.", systemImage: "arrow.clockwise")
             Label(Loc.f("Every 6 months, it re-tests all %lld sites from the start, because forms and checks change.", n), systemImage: "checklist")
             Label("On any pass, a site that does not go through is never marked done. It moves to your semi-automated queue, with the reason, and you finish it in the app.", systemImage: "arrow.uturn.forward")
             Label("It never solves a CAPTCHA, never makes an account or pays, and leaves anything that needs a login, ID, a phone call or a certification to you. Some sites email you a link to confirm; that click is yours.", systemImage: "hand.raised")
@@ -188,7 +188,7 @@ struct AutoActivityView: View {
                 if let next = model.autoSettings.nextOptOutDate() {
                     Group {
                         if model.autoSettings.kindOfRun(on: next) == .full { Text(Loc.f("Next run %@: a full re-test of every site", Loc.date(next))) }
-                        else { Text(Loc.f("Next run %@: sends again to the sites that went through", Loc.date(next))) }
+                        else { Text(Loc.f("Next run %@: sends again to the sites that went through and tries again the ones that did not", Loc.date(next))) }
                     }
                     .accessibilityIdentifier("auto-next-run")
                 }

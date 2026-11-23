@@ -1138,15 +1138,16 @@ final class AutoOptOutTests: XCTestCase {
         progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed"), site: "sent")       // an old failure ...
         progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "sent") // ... then it went through: the latest counts
         progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed"), site: "lost")
-        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "challenged"), site: "challenged")
+        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "challenged", detail: "a reCAPTCHA checkbox"), site: "challenged")
         let all = [sent, lost, fresh, challenged]
         func ids(_ kind: RunKind) -> [String] { AutoOptOut.backgroundSites(kind, entries: all, person: pat, progress: progress, now: t0 + 100 * day).map(\.id) }
         XCTAssertEqual(ids(.full), ["sent", "lost", "fresh", "challenged"], "a full pass re-tests every site, the lost ones too")
-        XCTAssertEqual(ids(.repeatSent), ["sent"], "a repeat pass sends again only where the last send went through")
+        XCTAssertEqual(ids(.repeatSent), ["sent", "lost"], "a repeat pass sends again where it went through, tries again what did not, and leaves a human check to the person")
     }
 
-    /// A site the run gave up on before anything was sent (it went quiet or ran out of time) was never really tried: the repeat pass, and so Run now after a full
-    /// pass, takes it again. One stopped by a check or refused does not come back by itself. Build 48 left some 300 such sites for six months.
+    /// Every site that did not go through comes back in the repeat pass, and so in Run now after a full pass (decided 2026-11-23: they waited six months, and a fix
+    /// in a new build never reached them), except one stopped by something only the person can do: a human check, a code, a detail they must supply. A send not
+    /// confirmed in time gets one more try, not more.
     func testARepeatPassTakesBackTheSitesGivenUpBeforeAnythingWasSent() {
         let ok = form([("text", "first", "First name"), ("email", "email", "Email")])
         var progress = OptOutKitCore.Progress()
@@ -1156,7 +1157,16 @@ final class AutoOptOutTests: XCTestCase {
         for (id, outcome, detail) in cases { progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: outcome, detail: detail), site: id) }
         let all = cases.map { entry($0.0, form: ok) }
         let repeatIDs = AutoOptOut.backgroundSites(.repeatSent, entries: all, person: pat, progress: progress, now: t0 + day).map(\.id)
-        XCTAssertEqual(repeatIDs, ["slow", "quiet", "unconfirmed"], "and a send not confirmed in time gets one more try (testASiteSentAndNotConfirmedGetsOneMoreTryNotMore)")
+        XCTAssertEqual(repeatIDs, ["slow", "quiet", "unconfirmed", "refused", "noform"], "every failure the app might fix is tried again; a human check is not")
+        for (outcome, detail) in [("challenged", "a reCAPTCHA checkbox"), ("challenged", "a Cloudflare check"), ("challenged", "an hCaptcha"), ("challenged", "a human check"),
+                                  ("failed", "the page is waiting for a code from the person"), ("failed", "This form asks for something only you can supply (\"Case number\").")] {
+            XCTAssertTrue(AutoOptOut.lastAttemptNeedsPerson(OptOutAttempt(date: t0, outcome: outcome, detail: detail)), "sure it cannot: \(detail)")
+        }
+        for (outcome, detail) in [("failed", "no opt-out form was found on the page"), ("failed", "the form needs a choice we cannot make for you (State)"),
+                                  ("failed", "We could not match any of this form's fields to your profile."), ("challenged", "a certification box that you must tick yourself"),
+                                  ("failed", "the form's menu does not offer IL, so this form does not apply to you"), ("failed", AutoOptOut.tooSlow), ("failed", "no success message was shown")] {
+            XCTAssertFalse(AutoOptOut.lastAttemptNeedsPerson(OptOutAttempt(date: t0, outcome: outcome, detail: detail)), "may be fixed in a later build: \(detail)")
+        }
         // Once it goes through on that second chance, it is an ordinary sent site.
         progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "submitted"), site: "slow")
         XCTAssertTrue(AutoOptOut.inRepeatPass(all[0], progress: progress))

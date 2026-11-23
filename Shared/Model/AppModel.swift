@@ -888,18 +888,23 @@ final class AppModel: ObservableObject {
         let attempts = household.progress(for: person.id).optOutAttempts
         var ids = Set(automaticSites(for: person).map(\.id)).union(autoSettings.periodTargetIDs(person: person.id.uuidString))
         for (id, list) in attempts where list.contains(where: { !$0.wasEmailed }) { ids.insert(id) }
+        let progress = household.progress(for: person.id)
         return RunPeriods.allRuns(siteIDs: Array(ids), attempts: attempts).compactMap { s -> ActivityRow? in
             guard let e = sites[id: s.id] else { return nil }
+            // The same rule as the automatic page: a site a recent look found no listing on is not listed here too, unless a request went through (the two pages
+            // disagreed: 3 not listed on one, 0 on the other).
+            var group = s.group
+            if group != .sent, progress.notListedRecently(e.id) { group = .notListed }
             let line: String
-            switch s.group {
+            switch group {
             case .sent: line = s.sends == 1 ? Loc.f("Sent once, on %@", Loc.date(s.lastSent ?? Date())) : Loc.f("Sent %lld times, last on %@", s.sends, Loc.date(s.lastSent ?? Date()))
             case .needsYou:
                 let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
                 line = Loc.f("Never went through (tried %lld times): %@", s.tries, last)
             case .notTried: line = Loc.t("No run has tried it yet")
-            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(s.last?.date ?? Date()))
+            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(progress.latestSiteCheck(e.id)?.date ?? s.last?.date ?? Date()))
             }
-            return ActivityRow(id: e.id, domain: e.domain, group: s.group, line: line)
+            return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
         }.sorted { $0.domain < $1.domain }
     }
 
@@ -1030,7 +1035,7 @@ final class AppModel: ObservableObject {
         guard storageProblem == nil, isReady(original) else { return }
         // A run only starts by itself when the person has not stopped it (`AutoSettings.startsByItself`), so a run starting means it may go on.
         if !dryRun, household.autoSettings.stoppedByPerson == true { household.updateAuto { $0.stoppedByPerson = nil } }
-        // A full pass (the first run, then every six months) tries every site that can be tried; the pass in between repeats the sites that went through. The "done for you"
+        // A full pass (the first run, then every six months) tries every site that can be tried; the pass in between repeats the sites that went through and tries again the ones that did not. The "done for you"
         // sites go first. A site that does not go through is never marked done: it is left in the person's semi-automated queue, with what happened as the reason.
         let automatic = automaticDomains(for: original)
         let kind = household.autoSettings.nextRunKind(now: Date())

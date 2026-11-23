@@ -3,6 +3,14 @@
 What Exnay is and will stay. These are commitments, not preferences: a change that breaks one needs this file changed first, in the open, with the reason.
 Where a principle is enforced by a test or a build rule, the enforcement is named, so the rule cannot drift quietly.
 
+## North star for the automatic run
+
+The automatic run exists to take as many sites as possible off the person's hands: each site should end either done for them (the form sent and confirmed)
+or known to need nothing (they are not listed there). Every change to the run is judged by that: does it leave the person fewer sites to do themselves?
+Within the other principles (no human check solved for them, nothing certified that is not true of them, nothing sent twice in a period), a site the app
+could not do is tried again once a later build might do it; only a site it is sure it cannot do (a human check, a code sent to the person, a field no profile
+can fill) is left to them (decided 2026-11-23; `AutoOptOut.inRepeatPass`, docs/AUTOMATION.md).
+
 ## 1. Always free
 
 - The app is free to download and free to use, all of it. No paid tier, no subscription, no "pro" broker list, no limit on sites, re-ups or languages.

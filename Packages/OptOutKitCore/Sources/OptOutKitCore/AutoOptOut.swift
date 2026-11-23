@@ -342,12 +342,36 @@ public struct AutoOptOut: Sendable {
         return last.detail == wentQuiet || last.detail == tooSlow
     }
 
-    /// The sites a repeat pass (and "Run now" after a full pass) takes on: those whose latest attempt went through, and those whose latest attempt was given up
-    /// before anything was sent. Not one stopped by a check, refused, or sent and not confirmed: those wait for the person or the next full pass.
+    /// The sites a repeat pass (and "Run now" after a full pass) takes on. Those whose latest attempt went through: sent again in the next period (`precheck`
+    /// leaves a site sent this period alone, so Run now never sends twice in a period). Every one that did not go through is tried again with the build installed
+    /// now (decided 2026-11-23: they waited for the next full pass, six months on, so a fix in a new build never reached them; 300 sites sat that way), except:
+    /// one whose form it could not fill or whose human check it could not pass (`lastAttemptNeedsPerson`: semi-automatic only, in the person's queue), one sent and not confirmed twice
+    /// (never sent over and over), and one the person emailed instead. A site not listed is searched again once `notListedWindow` is over.
     public static func inRepeatPass(_ entry: DirectoryEntry, progress: Progress) -> Bool {
-        (progress.optOutAttempts[entry.id]?.last?.wasNotListed ?? false)          // searched again once `notListedWindow` is over (`precheck` holds it until then)
-            || lastAttemptWentThrough(entry, progress: progress) || lastAttemptGaveUpBeforeSending(entry, progress: progress) || sentUnconfirmedOnce(entry, progress: progress)
+        guard let last = progress.optOutAttempts[entry.id]?.last else { return false }          // never tried: the run takes it anyway (`AppModel.runDomains`)
+        if last.wasEmailed || lastAttemptNeedsPerson(last) { return false }
+        if last.outcome == "failed", last.detail == sentUnconfirmed { return sentUnconfirmedOnce(entry, progress: progress) }
+        return true
     }
+
+    /// An attempt the run is sure it cannot do (decided 2026-11-23): a human check (reCAPTCHA, hCaptcha, a Cloudflare check that did not pass by itself, a bot
+    /// check), a code sent to the person to type, or a field the app can never fill from a profile ("something only you can supply", "something we do not have").
+    /// Such a site is semi-automatic only, and runs do not try it again. Every other failure (no form found, boxes it could not match, a choice it could not make,
+    /// a certification box, no confirmation...) may be the app's own shortcoming, so it is tried again: a fix in a later build then reaches it.
+    public static func lastAttemptNeedsPerson(_ a: OptOutAttempt) -> Bool {
+        let d = (a.detail ?? "").lowercased()
+        if a.outcome == "challenged", ["captcha", "cloudflare", "human check", "bot check", "robot", "rejected the automatic send"].contains(where: { d.contains($0) }) { return true }
+        if ["waiting for a code", "did not accept the code", "a code to type", "a code you are typing"].contains(where: { d.contains($0) }) { return true }
+        // The form planner's own reasons are stored in the person's language: each is matched by its opening words, in English and in the app's language.
+        return personReasons.contains { key in
+            [key, L10n.t(key)].contains { t in
+                let opening = t.prefix { $0 != "(" && $0 != "%" && $0 != "\"" && $0 != "\u{201C}" && $0 != "\u{00AB}" }.trimmingCharacters(in: .whitespaces).lowercased()
+                return opening.count >= 12 && d.hasPrefix(opening)
+            }
+        }
+    }
+    /// `FormFiller.plan`'s reasons for a field no profile can fill.
+    static let personReasons = ["This form asks for something only you can supply (\"%@\").", "This form asks for something we do not have (\"%@\")."]
 
     /// The site's latest attempt was sent and not confirmed in time, and the one before was not: it gets one more try, which now reads the page before its time
     /// is up (`SiteRun.deadline`). Sending an opt-out a second time does no harm; a second unconfirmed send is left for the person, so it is never sent over and over.
