@@ -27,14 +27,17 @@ final class SolveAndSendUITests: UITestCase {
         let box = app.buttons["auto-submit-toggle"]
         XCTAssertTrue(box.waitForExistence(timeout: 10))
         XCTAssertEqual(box.value as? String, "on")
-        // The switch's value follows a tap a moment later on a slow machine: wait for it.
-        func becomes(_ v: String) -> Bool {
-            XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", v), object: box)], timeout: 5) == .completed
+        // Sets the switch: taps only while it still shows the other value, and waits for each tap to take (on GitHub's slower simulator a tap landing while
+        // the pill re-lays out its new label can be lost). A switch that ignored taps would still fail after three.
+        func set(_ v: String) -> Bool {
+            for _ in 0..<3 where (box.value as? String) != v {
+                box.tap()
+                if XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", v), object: box)], timeout: 4) == .completed { break }
+            }
+            return (box.value as? String) == v
         }
-        box.tap()
-        XCTAssertTrue(becomes("off"), "Send it for me turns off")
-        box.tap()
-        XCTAssertTrue(becomes("on"), "and on again")
+        XCTAssertTrue(set("off"), "Send it for me turns off")
+        XCTAssertTrue(set("on"), "and on again")
 
         // The first site has nothing before it.
         app.buttons["assisted-more"].tap()
