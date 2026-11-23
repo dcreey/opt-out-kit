@@ -3,11 +3,15 @@ name: 'Integration'
 # The integration tests: the app's UI tests (AppUITests), which drive the real app on a simulator, mostly against fixture brokers (the Mac unit tests run on
 # every push: ci.yml; AppTests holds only the by-hand live probes). They run when a GitHub release
 # is published (a release is the app going to the App Store; TestFlight needs only ci.yml), when started by hand from the Actions tab, and the run over
-# every site also weekly. They never run on a push and never gate TestFlight; only the App Store gate (tools/release_gate.py) needs them. The end-to-end
+# every site also weekly, and on a push to an `integration/...` branch (never to main). They never gate TestFlight; only the App Store gate (tools/release_gate.py) needs them. The end-to-end
 # tests send to fixture brokers on this machine (fixtures/server.py), never to a real site. docs/TESTING.md, "Unit and integration tests".
 on:
   release:
     types: ['published']
+  # A push to an `integration/...` branch runs the UI tests too: the way to check a fix to a test (or the app) on GitHub's slower machines without a release
+  # or a click. Pushes to main never do.
+  push:
+    branches: ['integration/**']
   workflow_dispatch:
     inputs:
       every_site:

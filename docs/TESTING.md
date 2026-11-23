@@ -94,8 +94,9 @@ For what a person can do and which UI test walks it (the journeys, the gaps, the
 **Unit tests run on every push (and gate TestFlight); integration tests run for an App Store release.** Unit tests are everything in the two Swift packages (Mac, no simulator, a minute): they check a rule (what is sent, what is skipped, what is saved, what a screen is given to show) without driving the app's screens, and
 they run in `.github/workflows/ci.yml` on every push and pull request, which also builds the whole app and every test target (no simulator is booted). Integration tests are the UI tests in `OptOutKitUITests`: they drive the real app
 on a simulator, tap through its screens and check what a person sees, mostly against fixture brokers; everything that needs a real web view, the Keychain or the bundle is proved there, end to end. They take far longer (a UI test walks every screen in its way), so they run in
-`.github/workflows/integration.yml` when a GitHub release is published, and by hand from the Actions tab (Integration, Run workflow). The run over every
-site runs there too, and weekly.
+`.github/workflows/integration.yml` when a GitHub release is published, by hand from the Actions tab (Integration, Run workflow), and on a push to a branch named
+`integration/...` (never main): `git push -f origin HEAD:integration/check` checks a fix on GitHub's slower machines without a release or a click, and a
+run there counts for the release gate when its commit is the one released. The run over every site runs there too, and weekly.
 
 **Every rule an integration test checks has a unit test.** A UI test is the end-to-end proof that the screens are wired to the rules; the rule itself is
 proved by a unit test, so a push that breaks a rule fails at once, not at the next release. A test that only checks layout (where something sits on the
