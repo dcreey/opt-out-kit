@@ -417,9 +417,14 @@ extension WebViewSession {
         var chosen = 0
         for _ in 0..<4 {
             guard (await evalLive(open)) as? Bool == true else { break }
-            try? await Task.sleep(nanoseconds: 700_000_000)
+            // The match is taken as soon as it shows: TrustArc's "Resident of" (azira.com) listed "Illinois" for under half a second and closed its list, and the
+            // app, looking once after 0.7 s, left the box holding the typed text (scrolled to "linois") with nothing chosen. A list that closed is opened again
+            // (`type-ahead-choose` presses the down arrow in the box), for up to 5 s.
             let pick = PageScript.call("type-ahead-choose", name)
-            if (await evalLive(pick)) as? Bool == true { chosen += 1 }
+            for _ in 0..<33 {
+                if (await evalLive(pick)) as? Bool == true { chosen += 1; break }
+                try? await Task.sleep(nanoseconds: 150_000_000)
+            }
             try? await Task.sleep(nanoseconds: 400_000_000)
         }
         return chosen
@@ -586,7 +591,12 @@ extension FormRun {
         // A form the page shows only once a choice is made ("Who is this request for? Myself") appears when the choices are answered, which the fill does: the form on
         // screen has nothing to fill until then, so it is filled again (as Solve and send does, which adopts the form that appeared) before it is judged.
         if prepared.problem != nil { await prepared.refill() }
-        if let problem = prepared.problem { return .failed(problem) }
+        if let problem = prepared.problem {
+            // A form behind a visible human check (LiveRamp's device opt-out, which adprime.com uses: an ad-ID box and a reCAPTCHA) is the person's for the check,
+            // whatever else held it: said as the check, so the site's line is "Blocked by a human check".
+            if let why = await session.visibleChallenge(), why != Self.cloudflareCheck { return .challenged(why) }
+            return .failed(problem)
+        }
         // Some forms send themselves the moment a choice is made: then the page already shows the result.
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         if !dryRun, let early = await prepared.earlyConfirmation() { return early }

@@ -1,4 +1,4 @@
-(function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|consent|under penalty|on behalf|je certifie|j'atteste|je reconnais|j'accepte|consentement|certifico|atesto|reconozco|acepto|consentimiento|ich best[äa]tige|ich versichere|einwilligung|zustimmung|ich stimme/i,out=null;
+(function(){var re=/acknowledg|certif|attest|authori[sz]e|i agree|i accept|\bconsent(s|ed|ing)?\b|under penalty|on behalf|je certifie|j'atteste|je reconnais|j'accepte|consentement|certifico|atesto|reconozco|acepto|consentimiento|ich best[äa]tige|ich versichere|einwilligung|zustimmung|ich stimme/i,out=null;
   var marked=[].slice.call(document.querySelectorAll('[data-ook-form]'));
   var cookie=/\bcookies?\b|consent to service|\bconsent per service\b/i;
     var shown=function(e){if(!e) return false; var r=e.getBoundingClientRect(); return r.width>0&&r.height>0;};
@@ -19,6 +19,8 @@
     var r=c.getBoundingClientRect(), off=r.right<=0||r.bottom<=0||r.left>=window.innerWidth+1000||c.closest('[aria-hidden=true]');
     if(off&&!shown(lab)&&!shown(c.closest('label'))) return;
     if(choice.test(t)) return;
+    // A box named only by a web address is a choice from a list ("Websites used: ConsentCompliance.com", astoriacompany.com), never a statement.
+    if(/^\s*[\w-]+(\.[\w-]+)+\s*$/.test(t)) return;
     // Only a box of a form the app is filling (`data-ook-form`, set when the forms are found): the rest of the page is not part of the request. A cookie
     // toggle is never one either: focus-usa.com's opt-out page (Complianz) lists every cookie service with an unticked "Consent to service google-adsense".
     if(marked.length&&!marked.some(function(f){return f.contains(c);})) return;

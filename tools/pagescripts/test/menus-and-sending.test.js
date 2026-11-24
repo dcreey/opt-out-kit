@@ -91,6 +91,28 @@ test('a home-made menu showing only "Choose state" over a hidden list is opened,
   assert.equal(run(real, 'custom-menus-open'), '', 'a real menu is not one of these');
 });
 
+test('saymine as it really is (360mediadirect.com): closed lists keep their size, hidden by visibility and opacity; State is opened and Illinois taken, never the closed Country list\'s "United States"', () => {
+  const dd = (id, shown, items) => `<div class=dropdown__wrapper id=${id}w><input type=checkbox class=dropdown__checkbox id=dropdown-${id}><label class=dropdown__label for=dropdown-${id} id=${id}l>` +
+    `<span class=dropdown__symbol></span><span class=${shown ? 'dropdown__selected-value' : 'dropdown__placeholder'}>${shown || 'Choose state'}</span></label>` +
+    `<ul class=dropdown__panel id=${id}p style="visibility:hidden;opacity:0">` + items.map((t) => `<li class=dropdown__option data-label="${t}" id="${id}-${t.replace(/ /g, '')}">${t}</li>`).join('') + '</ul></div>';
+  const html = '<form><label>Country *</label>' + dd('country', 'United States', ['Anguilla', 'Canada', 'United States']) +
+    '<label>State *</label>' + dd('state', '', ['Alabama', 'Alaska', 'Illinois', 'Oregon']) + '</form>';
+  const w = page(html, { webkitBoxes: true });
+  w.document.getElementById('statel').addEventListener('click', () => { const p = w.document.getElementById('statep'); p.style.visibility = 'visible'; p.style.opacity = '1'; });
+  const seen = clicks(w, ['country-UnitedStates', 'state-Illinois']);
+  assert.notEqual(run(w, 'custom-menus-open'), '', 'the State placeholder was pressed, though its closed options keep their size');
+  assert.equal(w.document.getElementById('statep').style.visibility, 'visible', 'and its list opened');
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Illinois');
+  assert.deepEqual(seen, ['state-Illinois'], 'the hidden Country list\'s "United States" was never clicked');
+});
+
+test('"I am a": "Data subject making a request" is taken, never the authorized agent (dnb.com, eyeota.com, netwisedata.com: TrustArc)', () => {
+  const w = page('<div role=listbox><div role=option id=s>Data subject making a request</div><div role=option id=a>Authorized Agent making a request on behalf of a data subject</div></div>');
+  const seen = clicks(w, ['s', 'a']);
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Data subject making a request');
+  assert.deepEqual(seen, ['s']);
+});
+
 test('a request-type menu takes deletion, then opting out; never access, correct or update, even as the last option (azira.com\'s TrustArc form)', () => {
   const opts = ['Access My Information', 'Delete My Information', 'Opt-out or Unsubscribe', 'Do not Sell or Share My Personal Information', 'Withdraw My Consent', 'Correct or Update My Information'];
   const w = page('<ul role=listbox>' + opts.map((o, i) => `<li role=option id=o${i}>${o}</li>`).join('') + '</ul>');
@@ -140,6 +162,21 @@ test('a type-ahead named only by aria-labelledby is found; "Resident of" takes t
   assert.equal(w.document.getElementById('co').value, '');
   assert.equal(call(w, 'type-ahead-open', 'state', 'Illinois'), true);
   assert.equal(w.document.getElementById('res').value, 'Illinois', 'the full name replaces the "IL" the fill typed, so the list shows Illinois to choose');
+});
+
+test('a type-ahead whose list closed again (TrustArc on a phone: "Illinois" listed for under half a second) gets the down arrow in its box, which opens it again', () => {
+  const w = page('<span id=r>Select in Resident of</span><input id=res role=combobox aria-autocomplete=list aria-labelledby=r>');
+  const box = w.document.getElementById('res');
+  call(w, 'type-ahead-open', 'state', 'Illinois');
+  box.focus();
+  const keys = []; box.addEventListener('keydown', (e) => keys.push(e.key));
+  assert.equal(call(w, 'type-ahead-choose', 'Illinois'), false, 'no list showing: nothing chosen yet');
+  assert.deepEqual(keys, ['ArrowDown'], 'the list is asked to open again');
+  const shut = page('<input id=x aria-autocomplete=list>');
+  const none = []; shut.document.getElementById('x').addEventListener('keydown', (e) => none.push(e.key));
+  shut.document.getElementById('x').focus();
+  call(shut, 'type-ahead-choose', 'Illinois');
+  assert.deepEqual(none, [], 'a box with nothing typed in is left alone');
 });
 
 // ---- press-live-submit.js

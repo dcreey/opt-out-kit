@@ -35,6 +35,16 @@ test('a solved check, the reCAPTCHA badge in the corner, a tiny frame and a plai
 
 // ---- pending-certification.js
 
+test('a box named by a website ("Websites used: ConsentCompliance.com", astoriacompany.com) is not a certification; "consent" counts only as a word, and the real certification still does', () => {
+  const w = page(`<form data-ook-form="f0"><p>Websites used</p><label><input type=checkbox id=site> ConsentCompliance.com</label>
+    <label><input type=checkbox id=cert checked> I certify the information provided is accurate and that I am the individual identified.</label><input name=n></form>`);
+  assert.equal(run(w, 'pending-certification'), null, 'the ticked certification is done, and the website option is not one');
+  w.document.getElementById('cert').checked = false;
+  assert.match(run(w, 'pending-certification'), /I certify the information/);
+  assert.equal(run(page('<form data-ook-form="f0"><label><input type=checkbox> ConsentManager settings</label></form>'), 'pending-certification'), null, '"Consent" inside a longer name is not consent');
+  assert.match(run(page('<form data-ook-form="f0"><label><input type=checkbox> I consent to the processing of my request</label></form>'), 'pending-certification'), /I consent/);
+});
+
 test('an unticked certification or consent box is returned with its wording, in any of the app\'s languages', () => {
   assert.match(run(page('<label><input type=checkbox> I certify under penalty of perjury that this is true</label>'), 'pending-certification'), /certify under penalty/);
   assert.match(run(page('<label><input type=checkbox> Je certifie que ces informations sont exactes</label>'), 'pending-certification'), /Je certifie/);

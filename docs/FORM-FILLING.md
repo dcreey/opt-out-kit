@@ -95,6 +95,8 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
    - *Dates*: only "today's date", "date of request", "date signed", "Date" alone and similar get today. "Date you were contacted", "Effective date" and the rest are left
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
      colour boxes are never filled.
+   - A box named only by a web address is an option from a list ("Websites used: ConsentCompliance.com", astoriacompany.com), never a certification, and
+     "consent" counts only as a word (`pending-certification`): that option held Astoria's form as "a confirmation to tick yourself".
    - *Certification boxes* ("I certify under penalty of perjury", "I acknowledge", "I consent") are never ticked: the form waits for the person (`pending-certification`).
      The one exception (docs/PRINCIPLES.md, decided 2026-11-23): on the account owner's own profile, a certification about the owner themselves ("I certify
      that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and accurate") is
@@ -129,7 +131,7 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
      form). Protected by `fill-helpers.test.js` and `testAFormBuiltLateWithTileQuestionsIsFoundAnsweredAndSent`.
    - *A state list without the person's state* (becausal.com lists only the 19 states with privacy laws) is never answered with another state: the form waits, and the
      app says "your state is not on its list". Protected by `fill-helpers.test.js` and `testAStateListWithoutMyStateIsLeftForMeAndSaysSo`.
-   - *Home-made menus* that show only a placeholder ("Choose state", "Select …") over a list of options hidden until pressed (saymine's portals, 360mediadirect.com) are pressed and the person's state (or consumer / none / other) is picked, like an ARIA combobox (`custom-menus-open`, `custom-menus-pick`). Before this the State box stayed on "Choose state" and the page said "This field is mandatory". When a page still says that under a box after a send, the result names the box ("the site says a required box was left empty: State", `FormRun.requiredBoxLeftEmpty`, `testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage`), not "no success message was shown". Protected by `menus-and-sending.test.js` and `FixturePageTypeUITests.testAHomeMadeStateMenuIsOpenedAndGetsThePersonsState`.
+   - *Home-made menus* that show only a placeholder ("Choose state", "Select …") over a list of options hidden until pressed (saymine's portals, 360mediadirect.com) are pressed and the person's state (or consumer / none / other) is picked, like an ARIA combobox (`custom-menus-open`, `custom-menus-pick`). A closed list is hidden by `visibility` and `opacity`, not `display`, so its options keep their size: only an option that shows counts (2026-11-24: the opener took State's closed list for open and never pressed it, and the picker could click the closed Country list's hidden "United States"). Before this the State box stayed on "Choose state" and the page said "This field is mandatory". When a page still says that under a box after a send, the result names the box ("the site says a required box was left empty: State", `FormRun.requiredBoxLeftEmpty`, `testARequiredBoxLeftEmptyIsNamedNotReportedAsNoSuccessMessage`), not "no success message was shown". Protected by `menus-and-sending.test.js` and `FixturePageTypeUITests.testAHomeMadeStateMenuIsOpenedAndGetsThePersonsState`.
    - *Age range or group* menus get the age as a number, and the page's own bracket ("18-34", "35 - 49", "50+", "under 18") that holds it is picked; a text box asking for a range is left empty.
 8. **A box's own limit is respected.** A box with `maxlength` gets the first candidate that fits: the message box takes the short request
    ("Please delete my personal information and stop selling or sharing it.") when the long one does not fit, and anything else is cut at a sentence end.
@@ -162,6 +164,11 @@ before and after and compare. The multi-value comparison (a person with three em
   (`type-ahead-open`, `type-ahead-choose`). It finds a box by its label, `aria-label`, its group's label or the text its `aria-labelledby` points to (TrustArc names
   its menus only that way: dnb.com's required "Resident of", whose list has the US states and no "United States", was left on "IL" and the run stopped on "a
   required choice"). A box about a company ("Country / Territory of Registration of Company 1") is never the person's and is left alone.
+  The match is taken as soon as it shows, looked for every 0.15 s for up to 5 s, and a list that closed is opened again with the down arrow in the box
+  (2026-11-24: TrustArc's "Resident of" on azira.com listed "Illinois" for under half a second on a phone; the app looked once after 0.7 s and left the box
+  holding the typed text, scrolled to "linois"). Once chosen, such a box empties its own text and shows the choice beside it (in a hidden field named after
+  the box): `empty-required-choice` counts it as answered, where it read as "a required choice" and held the form. "I am a" takes "Data subject making a
+  request", never the authorized agent (dnb.com, eyeota.com, netwisedata.com).
 
 - **A portal whose form appears only after its menus is answered.** When a page has no form yet but has empty menus that open one ("select your country of
   residence", then "select your state", then request links: choreograph.com), the menus are answered (a menu of countries takes the United States, a menu
@@ -202,7 +209,9 @@ before and after and compare. The multi-value comparison (a person with three em
   gsdsi, fourleaf, gather analytics, graph8), "Please complete the security verification" (jmr-media.com), "Please complete the security check" (instantly.ai),
   "Verify you are human" or "Captcha is required" is a human check the person clears (`FormRun.asksForHumanCheck`, "a human check the page asked for after
   sending"), not an error or "no success message". A page whose form cannot be used until a visible check is passed (allwebleads.com's reCAPTCHA with Submit
-  off) is that check, not "no opt-out form was found". Such a site's line says "Blocked by a human check" (docs/UX.md).
+  off) is that check, not "no opt-out form was found", and so is a form whose boxes the app could not fill when a check shows on the page (LiveRamp's device
+  opt-out, which adprime.com uses: an ad-ID box and a reCAPTCHA; it said "We could not match any of this form's fields to your profile"). Such a site's line
+  says "Blocked by a human check" (docs/UX.md).
 
 - **A page working out of sight never takes the keyboard.** A background run's page is parked invisibly in the app's window, and many brokers' pages put the
   cursor in their first box (`autofocus`, or their own script), as do the app's own scripts that focus a box. Parked, the web view refuses to become first

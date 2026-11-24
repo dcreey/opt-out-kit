@@ -3,6 +3,8 @@
 //
 // jsdom has no layout, so the few things the scripts read from layout are stood in for here, from the page's own markup:
 //   - getBoundingClientRect / offsetParent: zero size for an element (or an ancestor) that is display:none, visibility:hidden, [hidden], or has an
+//     (with `page(html, { webkitBoxes: true })`, as WebKit really does: visibility:hidden and opacity:0 keep their size, only display:none and the rest lose it;
+//     saymine's closed lists are hidden that way, and a script reading size alone took them for open)
 //     inline width or height of 0, or sits inside a box of no height that clips its overflow (a bot trap); an element placed off screen (an inline left or top below -1000, as bot traps are) gets that position.
 //     A frame is 300 x 150 (or its width and height attributes); everything else is 200 x 30 at the top left.
 //   - innerText: the text of what is shown (hidden elements, <script> and <style> left out), with blocks on their own lines.
@@ -31,12 +33,12 @@ function names() {
 
 const BLOCK = /^(ADDRESS|ARTICLE|ASIDE|BLOCKQUOTE|DIV|DL|DT|DD|FIELDSET|FIGURE|FOOTER|FORM|H[1-6]|HEADER|HR|LI|MAIN|NAV|OL|P|PRE|SECTION|TABLE|TR|UL|BR|LABEL|BUTTON|OPTION|SELECT|LEGEND|DETAILS|SUMMARY)$/;
 
-function install(window) {
+function install(window, { webkitBoxes = false } = {}) {
   const doc = window.document;
-  const hidden = (el) => {
+  const hidden = (el, forBox) => {
     for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
       const cs = window.getComputedStyle(e);
-      if (e.hidden || cs.display === 'none' || cs.visibility === 'hidden') return true;
+      if (e.hidden || cs.display === 'none' || (cs.visibility === 'hidden' && !(forBox && webkitBoxes))) return true;
       if (e.tagName === 'DETAILS' && !e.open && e !== el && !(el.closest('summary') && el.closest('details') === e)) return true;
       if (e.tagName === 'INPUT' && e.type === 'hidden') return true;
       // Inside a box of no height that clips what overflows it (a bot trap): nothing of it shows, as in WebKit.
@@ -53,7 +55,7 @@ function install(window) {
     return { x: 0, y: 0 };
   };
   window.Element.prototype.getBoundingClientRect = function () {
-    if (hidden(this)) return { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+    if (hidden(this, true)) return { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
     const o = offset(this);
     // A frame is 300 x 150 unless told otherwise, as in a browser (the scripts ignore frames under 40 pixels: tracking pixels, the badge).
     const st = this.style || {};
@@ -94,10 +96,10 @@ function install(window) {
 }
 
 // A page to run scripts in. `url` sets location (some scripts read the page's address).
-function page(html, { url = 'https://broker.example/privacy/opt-out', title } = {}) {
+function page(html, { url = 'https://broker.example/privacy/opt-out', title, webkitBoxes = false } = {}) {
   const dom = new JSDOM(html, { url, runScripts: 'outside-only', pretendToBeVisual: true });
   if (title !== undefined) dom.window.document.title = title;
-  install(dom.window);
+  install(dom.window, { webkitBoxes });
   return dom.window;
 }
 

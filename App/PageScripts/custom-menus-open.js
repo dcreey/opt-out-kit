@@ -1,5 +1,7 @@
 (function(){
-  var shown=function(e){var r=e.getBoundingClientRect(); return r.width>0&&r.height>0;};
+  // Shown: a size, and not hidden by visibility or a see-through box (saymine's closed lists keep their size, hidden with visibility and opacity).
+  var shown=function(e){var r=e.getBoundingClientRect(); if(!(r.width>0&&r.height>0)||getComputedStyle(e).visibility==='hidden') return false;
+    for(var p=e,i=0;p&&i<8;p=p.parentElement,i++){if(getComputedStyle(p).opacity==='0') return false;} return true;};
   // A menu about a company ("Country / Territory of Registration of Company 1", dnb.com) is not the person's: it is left alone, as the type-ahead step does.
   var aboutCompany=function(e){var t=(e.getAttribute('aria-label')||'')+' '+(e.getAttribute('aria-labelledby')||'').split(/\s+/).map(function(id){var n=id&&document.getElementById(id); return n?n.innerText:'';}).join(' ');
     var p=e.parentElement; for(var i=0;i<3&&p;i++,p=p.parentElement){if(p.querySelectorAll('input,select,[role=combobox]').length>1) break; t+=' '+(p.innerText||'').slice(0,120);}

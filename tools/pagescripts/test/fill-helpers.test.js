@@ -120,6 +120,17 @@ test('the first required box still empty is named; filled ones, optional ones an
   assert.equal(call(done, 'empty-required-choice', 'f0'), '');
 });
 
+test('a type-ahead that has a choice (TrustArc on azira.com: the box empties, the choice shows beside it and sits in a hidden field) is not "a required choice"; one with none is', () => {
+  const box = (chosen) => `<form data-ook-form="f0"><div class="ta-select"><div class="ta__control"><div class="ta__value-container">` +
+    (chosen ? '<div class="ta__single-value">Illinois</div>' : '<div class="ta__placeholder">Select...</div>') +
+    `<input id=res role=combobox aria-autocomplete=list aria-required=true value=""></div></div>` +
+    `<input type=hidden name=res value="${chosen ? 'NA_US_IL' : ''}"></div></form>`;
+  assert.equal(call(page(box(true)), 'empty-required-choice', 'f0'), '', 'the choice shows: answered');
+  assert.equal(call(page(box(false)), 'empty-required-choice', 'f0'), 'a required choice', 'nothing chosen: still the person\'s');
+  const heldOnly = page('<form data-ook-form="f0"><input id=x role=combobox aria-autocomplete=list aria-required=true><input type=hidden name=x value=NA_US_IL></form>');
+  assert.equal(call(heldOnly, 'empty-required-choice', 'f0'), '', 'the hidden field named after the box holds the choice');
+});
+
 test('a state menu still empty after the fill says the person\'s state is not on its list (becausal.com lists only the 19 states with privacy laws)', () => {
   const w = page(`<form data-ook-form="f0"><label for=s>Please select the state in which you currently reside (required):</label>
     <select id=s name=Opt-Out-State><option value="">Select your state</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Indiana</option><option>Iowa</option></select></form>`);
