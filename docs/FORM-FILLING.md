@@ -192,7 +192,8 @@ before and after and compare. The multi-value comparison (a person with three em
 - **A search that finds nobody is an answer.** A form that searches before it removes can answer "No data was found" (or "No records found", "We could not
   find any records"): the site has nothing to opt out of. That answer, read in what appeared after pressing and before any error wording, ends the site as not
   listed (`FormRun.saysNoRecordFound`, `SubmitOutcome.notListed`); the form is not pressed again. A line that only explains ("If no records are found, ...") does
-  not count. What it means for the site's status: docs/AUTOMATION.md.
+  not count. The answer counts the same when the person pressed the page's own Submit (after ticking a human check), read by `PageFlow.watch` while it
+  watches the page. What it means for the site's status: docs/AUTOMATION.md.
 
 - **A page working out of sight never takes the keyboard.** A background run's page is parked invisibly in the app's window, and many brokers' pages put the
   cursor in their first box (`autofocus`, or their own script), as do the app's own scripts that focus a box. Parked, the web view refuses to become first

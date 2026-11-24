@@ -221,6 +221,27 @@ final class SemiAutomatedFlowTests: XCTestCase {
         XCTAssertEqual(sink.results, [.submitted(awaitingEmail: false)])
     }
 
+    /// courtrecords.us and its 50 state sites: a Cloudflare box the person ticks, then the page's own Submit (theirs to press), and the site's search answers
+    /// "No data was found, try other criteria...". That is the site's answer: not listed and done, not a page still waiting for a confirmation.
+    func testNoRecordFoundAfterThePersonTicksTheCheckAndPressesSubmitIsRecordedAsNotListed() async {
+        let page = Page(blockers: [[.check("a Cloudflare check")]])
+        page.texts = ["Remove Your Data\nFirst Name\nLast Name", "Remove Your Data\nFirst Name\nLast Name",
+                      "Remove Your Data\nPlease fix the following input errors:\nNo data was found, try other criteria...\nFirst Name\nLast Name"]
+        let sink = Sink()
+        let r = make([item("a.example")], Driver(["a.example": page]), sink)
+        await finish(start(r), r)
+        XCTAssertEqual(page.sends, 0, "they pressed the page's own button; the app did not")
+        XCTAssertEqual(sink.results, [.notListed])
+    }
+
+    /// The same answer when the app's own press was not confirmed and the person sent it again themselves.
+    func testNoRecordFoundAfterAFailedSendIsNoticedAndRecordedAsNotListed() async {
+        let page = Page(sends: [.failed("no success message was shown")]); page.texts = ["form", "form", "No data was found, try other criteria..."]; let sink = Sink()
+        let r = make([item("a.example"), item("b.example")], Driver(["a.example": page, "b.example": Page()]), sink)
+        await finish(start(r), r)
+        XCTAssertEqual(sink.results.first, .notListed); XCTAssertEqual(sink.rows.count, 2, "and it went on to the next site")
+    }
+
     func testAConfirmationAfterAFailedSendIsNoticedAndFinishesTheSite() async {
         let page = Page(sends: [.failed("no success message was shown")]); page.texts = ["form", "form", "Thank you. Your request has been submitted."]; let sink = Sink()
         let r = make([item("a.example"), item("b.example")], Driver(["a.example": page, "b.example": Page()]), sink)

@@ -98,6 +98,7 @@ Each line: the story, the test, what it proves.
 | **A Cloudflare check that passes by itself is waited for** | `FixtureJourneyUITests.testARunWaitsForACloudflareCheckThatPassesByItselfAndLeavesOneThatNeedsMe` | Sent after the check passes on its own; a check that needs me is left for me |
 | **A request wizard is completed for me** | `FixtureJourneyUITests.testARequestWizardIsAnsweredStepByStepAndSent` | What to do (delete), who is asking (myself), my details, Submit: sent once |
 | **A site whose search finds no record of me counts as done** | `FixtureJourneyUITests.testASiteWhoseSearchFindsNoRecordOfMeIsMarkedNotListedAndDone` | The form is pressed once; the automatic page counts it under Not listed; the site's page says Not listed |
+| **A search I run myself behind a human check counts as done when it finds nothing** | `FixtureJourneyUITests.testASearchIRunMyselfBehindACheckThatFindsNoRecordOfMeIsMarkedNotListed` | I tick the check and press Submit; the app says the site found no record; the site's page says Not listed |
 | **A run working out of sight never brings up the keyboard** | `FixtureJourneyUITests.testARunNeverBringsUpTheKeyboardWhenItsPagesFocusABox` | Pages that focus their own boxes, and menus the app opens by focus, bring up no keyboard; the form is still sent |
 | **I open a site from the status page and stay on it** | `testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere` | Regression of a navigation bug (the push bounced back) |
 

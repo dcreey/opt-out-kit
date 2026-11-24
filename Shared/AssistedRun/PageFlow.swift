@@ -44,7 +44,8 @@ enum PageFlow {
     }
 
     /// What reading the page found since the last look.
-    enum Watched: Equatable { case confirmed(awaitingEmail: Bool), newFormFilled, nothing }
+    /// `notListed`: the site's search, which the person ran by pressing the page's own button (after ticking its human check), found no record of them.
+    enum Watched: Equatable { case confirmed(awaitingEmail: Bool), notListed, newFormFilled, nothing }
 
     /// Reads what is on screen. A confirmation the person caused (they pressed the page's own button) is the result. Otherwise the screen changed: a new privacy form
     /// may have appeared (a window opened, the next step), which is filled in; or an opt-out button came into view, which is scrolled to (at most twice per site, and
@@ -57,7 +58,10 @@ enum PageFlow {
         guard !now.isEmpty, now != baseline || force else { return .nothing }
         let added = FormRun.newText(before: baseline, after: now)
         baseline = now
-        if case .submitted(let email) = FormRun.classifyConfirmed(added) {
+        let read = FormRun.classifyConfirmed(added)
+        // "No data was found, try other criteria": nothing to opt out of. Only a search shows it, so it follows a press (the person's own, often after a human check).
+        if read == .notListed { return .notListed }
+        if case .submitted(let email) = read {
             // A verification code still to type is the next step of the form, not the end of it.
             if await page.awaitingCode() { return .nothing }
             // Nothing the person pressed since the fill: the site may have shown this by itself, so they are asked rather than assumed to have sent it.

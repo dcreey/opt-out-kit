@@ -51,7 +51,8 @@ struct RootView: View {
             // Simulator work: `-semi-domains a.com,b.com` opens the Solve-and-send screen on those sites for the owner's profile.
             if let i = args.firstIndex(of: "-semi-domains"), args.indices.contains(i + 1), let me = model.people.first(where: { args.contains("-uitest-seed-family") ? $0.relationship == .parent : $0.relationship == .me }) {
                 let items = model.verifyItems(domains: args[i + 1].split(separator: ",").map(String.init), for: me)
-                debugSemi = DebugSemi(runner: AssistedRunner(items: items, driver: model.makeAssistedDriver()) { _, _ in })
+                // Results are saved as the Tap to verify screen saves them, so a test can look at a site's state afterwards.
+                debugSemi = DebugSemi(runner: AssistedRunner(items: items, driver: model.makeAssistedDriver()) { [model] entry, result in model.recordAssisted(entry, result, for: me) })
             }
             if args.contains("-site-review") { showSiteReview = true }          // the temporary admin screen: mark each site's opt-out page
             if let i = args.firstIndex(of: "-open-link-filler"), args.indices.contains(i + 1) { debugLink = args[i + 1]; tab = 2 }

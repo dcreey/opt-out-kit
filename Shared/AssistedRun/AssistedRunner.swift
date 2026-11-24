@@ -271,6 +271,7 @@ final class AssistedRunner: ObservableObject {
         autoScrolls = scrolls
         switch seen {
         case .confirmed(let email): return .submitted(awaitingEmail: email)
+        case .notListed: return .notListed
         case .newFormFilled: notice = Loc.t("A new form appeared and we filled it in. Check it."); return nil
         case .nothing: return nil
         }
@@ -498,8 +499,10 @@ final class AssistedRunner: ObservableObject {
                         sinceWatch = 0
                         if let hit = await watch(ready, baseline: &baseline, force: force, domChanged: moved) {
                             outcome = hit
-                            if case .submitted(let email) = hit {
-                                phase = .sent(awaitingEmail: email)
+                            // The person sent it themselves (a human check made the button theirs to press): a confirmation, or the site's search finding no record of them.
+                            let seenResult: Bool = { switch hit { case .submitted, .notListed: return true; default: return false } }()
+                            if seenResult {
+                                if case .submitted(let email) = hit { phase = .sent(awaitingEmail: email) } else { phase = .needsMore(AutoOptOut.noRecordFound) }
                                 if !autoSubmit() {
                                     holdAfterDetected(items[i], hit)
                                     await withCheckedContinuation { nextContinuation = $0 }      // until Next site (or Skip, Previous, Mark as done)
@@ -560,6 +563,10 @@ final class AssistedRunner: ObservableObject {
                                 if case .submitted(let email) = hit {
                                     self.phase = .sent(awaitingEmail: email)
                                     // One rule: Auto-send on moves on by itself, off waits for the person's Next site. The confirmation is noticed and saved either way.
+                                    if self.autoSubmit() { self.resumeNext() } else { self.holdAfterDetected(self.items[i], hit) }
+                                } else if hit == .notListed {
+                                    // The person sent it again themselves and the site's search found no record of them: done, by the same rule as a confirmation.
+                                    self.phase = .needsMore(AutoOptOut.noRecordFound)
                                     if self.autoSubmit() { self.resumeNext() } else { self.holdAfterDetected(self.items[i], hit) }
                                 } else { self.resumeNext() }
                                 return

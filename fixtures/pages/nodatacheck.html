@@ -1,0 +1,15 @@
+<h1>Remove Your Data ({{site}})</h1>
+<p>Don't want your data in our databases? Please enter your information in the form below to find the data to remove.</p>
+<!-- The courtrecords.us sites: a form that searches before it removes, behind a Cloudflare box only a person can tick (Submit stays disabled until then). The
+     search finds nobody and answers with received-nodatacheck.html. -->
+<form method="POST" action="/{{site}}/send">
+  <label>First Name * <input type="text" name="fname" required></label><br>
+  <label>Last Name * <input type="text" name="lname" required></label><br>
+  <label>State * <input type="text" name="state" required></label><br>
+  <label>City <input type="text" name="city"></label><br>
+  <div class="cf-turnstile" style="width:280px;height:70px;border:1px solid #888;padding:8px">
+    <button type="button" onclick="document.querySelector('[name=cf-turnstile-response]').value='token'; document.getElementById('go').disabled=false; this.textContent='Verified'">Verify you are human</button>
+  </div>
+  <input type="hidden" name="cf-turnstile-response" value="">
+  <button type="submit" id="go" disabled>Submit</button>
+</form>

@@ -272,6 +272,48 @@ final class FixtureJourneyUITests: UITestCase {
         add(XCTAttachment(screenshot: app.screenshot()))
     }
 
+    /// As a user I want a site whose search I run myself to be marked not listed when it finds nothing (courtrecords.us and its 50 state sites): its Submit
+    /// stays off until I tick its Cloudflare box, I press Submit myself, and the page answers "No data was found, try other criteria...". The app reads that
+    /// answer, says there is nothing to opt out of, and counts the site as done; it does not sit waiting for a confirmation.
+    func testASearchIRunMyselfBehindACheckThatFindsNoRecordOfMeIsMarkedNotListed() {
+        let app = XCUIApplication()
+        // Auto-send off: the press is mine, as it is on these sites, whose check makes the button the person's to press.
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-autosubmit.default", "NO"] + server.launchArguments + ["-semi-domains", "nodatacheck-1.fixture.test"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["assisted-site"].waitForExistence(timeout: 30), "the Solve-and-send screen opened")
+        let verify = app.webViews.buttons["Verify you are human"]
+        XCTAssertTrue(verify.waitForExistence(timeout: 40), "the page shows its check")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'details are filled in'")).firstMatch.waitForExistence(timeout: 40), "the app filled in my details")
+        verify.tap()
+        let submit = app.webViews.buttons["Submit"]
+        var taps = 0
+        while server.sentSites.isEmpty && taps < 6 {
+            if submit.exists, submit.isEnabled { submit.tap() }
+            Thread.sleep(forTimeInterval: 2); taps += 1
+        }
+        XCTAssertEqual(server.sentSites, ["fx_nodatacheck_1"], "my press sent the search once: \(server.requests)")
+        let said = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'found no record'")).firstMatch
+        XCTAssertTrue(said.waitForExistence(timeout: 30), "the app read the page's answer and says there is nothing to opt out of")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        // With sending for me on it moves on by itself; off, it waits for my Next site.
+        let next = app.buttons["assisted-next"]
+        if next.waitForExistence(timeout: 3) { next.tap() }
+        Thread.sleep(forTimeInterval: 2)
+        XCTAssertEqual(server.sentSites.count, 1, "nothing was sent again")
+        let done = app.buttons["Done"].firstMatch
+        XCTAssertTrue(done.waitForExistence(timeout: 30), "with nothing left, Solve and send ends with its summary")
+        done.tap()
+        // The site's own page says it is not listed.
+        app.tab("Sites", 1).tap()
+        app.searchSites("nodatacheck-1")
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS 'nodatacheck-1.fixture.test'")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "the site is found")
+        row.tap()
+        let state = app.staticTexts["site-state"]
+        XCTAssertTrue(state.waitForExistence(timeout: 10), "the site's page opened")
+        XCTAssertTrue(state.label.contains("Not listed"), "the site's page says it is not listed: \(state.label)")
+    }
+
     /// As a user I want a request wizard with no form (privacy.datarate.ai: what to do, then who is asking, then my details, then Submit) completed for me: each
     /// step of choices is answered (deletion, myself) and its Next pressed, my details are filled on the step that asks, and the request is sent once.
     func testARequestWizardIsAnsweredStepByStepAndSent() {
