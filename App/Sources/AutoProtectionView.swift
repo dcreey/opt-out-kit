@@ -70,7 +70,6 @@ struct AutoActivityView: View {
     @State private var open: Set<ActivityGroup> = []
     @Environment(\.dismiss) private var dismiss
     @State private var activity: [AppModel.ActivityRow] = []
-    @State private var runNowCount: Int?
     /// The groups have been worked out once (the counts show a placeholder until then, a moment after the page opens).
     @State private var loaded = false
     /// Stop was tapped: the run starts no more sites and ends when the ones in progress finish.
@@ -101,7 +100,7 @@ struct AutoActivityView: View {
             let inputs = model.activityInputs(for: p)
             let page = await Task.detached(priority: .userInitiated) { AppModel.activityPage(inputs) }.value
             guard !Task.isCancelled else { return }
-            activity = page.rows; runNowCount = page.runNow; loaded = true
+            activity = page.rows; loaded = true
         }
         .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
             Button("Re-test every site") { model.runFullRetestNow() }
@@ -122,115 +121,118 @@ struct AutoActivityView: View {
         return q.isEmpty ? activity : activity.filter { $0.domain.localizedCaseInsensitiveContains(q) }
     }
 
+    /// The page's five groups, in order (decided 2026-11-24). `notListed` is folded into "No action needed" by `AppModel.activityPage`.
+    static let groups: [ActivityGroup] = [.needsYou, .sent, .noAction, .earlier, .notTried]
+
     private func title(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return Loc.t("Moved to semi-automatic"); case .sent: return Loc.t("Sent"); case .notListed: return Loc.t("Not listed"); case .notTried: return Loc.t("Not tried or skipped") }
+        switch g {
+        case .needsYou: return Loc.t("Moved to semi-automatic")
+        case .sent: return Loc.t("Sent")
+        case .noAction, .notListed: return Loc.t("No action needed")
+        case .earlier: return Loc.t("Handled previously")
+        case .notTried: return Loc.t("Still to do")
+        }
     }
     private func color(_ g: ActivityGroup) -> Color {
-        switch g { case .needsYou: return .blue; case .sent: return .green; case .notListed: return .teal; case .notTried: return .secondary }
+        switch g { case .needsYou: return .blue; case .sent: return .green; case .noAction, .notListed: return .teal; case .earlier: return .mint; case .notTried: return .secondary }
     }
     private func icon(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return "hand.point.up.left.fill"; case .sent: return "checkmark.circle.fill"; case .notListed: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" }
+        switch g {
+        case .needsYou: return "hand.point.up.left.fill"
+        case .sent: return "checkmark.circle.fill"
+        case .noAction, .notListed: return "minus.circle"
+        case .earlier: return "clock.arrow.circlepath"
+        case .notTried: return "circle.dashed"
+        }
+    }
+
+    private func tile(_ g: ActivityGroup, label: String) -> some View {
+        let n = activity.filter { $0.group == g }.count
+        return Button { toggle(g) } label: {
+            VStack(spacing: 2) {
+                Text(verbatim: loaded ? "\(n)" : "–").font(.title2.bold()).foregroundStyle(color(g))
+                Text(label).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, minHeight: 64).padding(.vertical, 6)
+            .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("activity-count-\(g.rawValue)")
     }
     private func isOpen(_ g: ActivityGroup) -> Bool { !search.isEmpty || open.contains(g) }
     private func toggle(_ g: ActivityGroup) { withAnimation { if open.contains(g) { open.remove(g) } else { open.insert(g) } } }
 
-    /// Everything at a glance: the four counts (each opens its list), the period, the last and next run, and the two buttons.
+    /// Everything at a glance (decided 2026-11-24: the lines about when the run started, the period, the last run's count, a pause and what Run now tries were
+    /// taken out): one line with the last and next run dates, the four counts and, while any is left, the sites still to do (each opens its list), the run's
+    /// progress while it works, and the two buttons.
     @ViewBuilder private func statusSection(for person: Person) -> some View {
         Section {
-            HStack(spacing: 8) {
-                ForEach(ActivityGroup.allCases, id: \.self) { g in
-                    let n = activity.filter { $0.group == g }.count
-                    Button { toggle(g) } label: {
-                        VStack(spacing: 2) {
-                            Text(verbatim: loaded ? "\(n)" : "–").font(.title2.bold()).foregroundStyle(color(g))
-                            Text(g == .notTried ? Loc.t("Not tried") : g == .needsYou ? Loc.t("Semi-automatic") : title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
+            // One row, so the card reads as one block with no lines across it (decided 2026-11-24).
+            VStack(alignment: .leading, spacing: 12) {
+                if let dates = model.runDatesLine {
+                    Text(dates).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("run-dates")
+                }
+                HStack(spacing: 8) {
+                    tile(.needsYou, label: Loc.t("Semi-automatic"))
+                    tile(.sent, label: title(.sent))
+                    tile(.noAction, label: title(.noAction))
+                    tile(.earlier, label: title(.earlier))
+                }
+                let left = activity.filter { $0.group == .notTried }.count
+                if loaded, left > 0 {
+                    // The sites still to do: a slim line under the four counts, not a fifth tile (it was the largest thing on the page).
+                    Button { toggle(.notTried) } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: icon(.notTried))
+                            Text(Loc.f("%lld still to do", left))
+                            Spacer()
+                            Image(systemName: isOpen(.notTried) ? "chevron.down" : "chevron.right").font(.caption)
                         }
-                        .frame(maxWidth: .infinity).padding(.vertical, 8)
-                        .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                        .font(.footnote).foregroundStyle(.secondary).contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityIdentifier("activity-count-\(g.rawValue)")
+                    .accessibilityIdentifier("activity-count-notTried")
                 }
-            }
-            VStack(alignment: .leading, spacing: 3) {
                 if busy {
-                    if let p = model.autoProgress {
-                        ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
-                        Text("Working in the background: \(p.done) of \(p.total) sites. You can leave this screen.").font(.caption).accessibilityIdentifier("auto-working")
-                        if model.autoCarriedOn {
-                            Text("It carried on after a pause, with only the sites it had not done; nothing is sent twice.").font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-carried-on")
-                        }
-                    } else {
-                        ProgressView().accessibilityIdentifier("auto-working")
-                    }
-                }
-                if let started = model.autoSettings.runStarted {
-                    // The groups above are this run's only: a new run starts them afresh. Every run together is "Every site, all runs" below.
-                    Text(Loc.f("This run started %@", Loc.date(started))).accessibilityIdentifier("run-started")
-                }
-                if let period = model.runPeriod() {
-                    Text(Loc.f("This period: %@ to %@", Loc.date(period.start), Loc.date(period.end.addingTimeInterval(-1))))
-                        .accessibilityIdentifier("period-summary")
-                }
-                if let last = model.autoSettings.lastOptOut {
-                    // A run recorded before the counts were kept has none: just its date, not "sent 0 of 0".
-                    Group {
-                        if let tried = model.autoSettings.lastAttempted, tried > 0 {
-                            Text(Loc.f("Last run %@: sent %lld of %lld", Loc.date(last), model.autoSettings.lastSent ?? 0, tried))
+                    VStack(alignment: .leading, spacing: 3) {
+                        if let p = model.autoProgress {
+                            ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
+                            Text("Working in the background: \(p.done) of \(p.total) sites. You can leave this screen.").font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-working")
                         } else {
-                            Text(Loc.f("Last run %@", Loc.date(last)))
+                            ProgressView().accessibilityIdentifier("auto-working")
                         }
                     }
-                    .accessibilityIdentifier("auto-summary")
-                } else if !busy {
-                    Text("Nothing has run yet for \(person.displayName).")
                 }
-                if let next = model.autoSettings.nextOptOutDate() {
-                    Group {
-                        if model.autoSettings.kindOfRun(on: next) == .full { Text(Loc.f("Next run %@: a full re-test of every site", Loc.date(next))) }
-                        else { Text(Loc.f("Next run %@: sends again to the sites that went through and tries again the ones that did not", Loc.date(next))) }
+                HStack(spacing: 8) {
+                    Button { model.runAutomaticNow() } label: {
+                        buttonLabel(busy ? Loc.t("Working…") : Loc.t("Run now"), icon: "bolt.fill")
                     }
-                    .accessibilityIdentifier("auto-next-run")
-                }
-            }
-            .font(.footnote).foregroundStyle(.secondary)
-            HStack(spacing: 8) {
-                Button { model.runAutomaticNow() } label: {
-                    buttonLabel(busy ? Loc.t("Working…") : Loc.t("Run now"), icon: "bolt.fill")
-                }
-                .buttonStyle(.borderedProminent).disabled(busy)
-                .accessibilityIdentifier("auto-run-now")
-                if busy {
-                    // While it works, the second button stops it (after the sites in progress, which have a time limit).
-                    Button(role: .destructive) { stopping = true; model.stopAutoOptOut() } label: {
-                        buttonLabel(stopping ? Loc.t("Stopping…") : Loc.t("Stop"), icon: "stop.fill")
+                    .buttonStyle(.borderedProminent).disabled(busy)
+                    .accessibilityIdentifier("auto-run-now")
+                    if busy {
+                        // While it works, the second button stops it (after the sites in progress, which have a time limit).
+                        Button(role: .destructive) { stopping = true; model.stopAutoOptOut() } label: {
+                            buttonLabel(stopping ? Loc.t("Stopping…") : Loc.t("Stop"), icon: "stop.fill")
+                        }
+                        .buttonStyle(.bordered).disabled(stopping)
+                        .accessibilityIdentifier("auto-stop")
+                    } else {
+                        Button { confirmRetest = true } label: {
+                            buttonLabel(Loc.t("Re-test all"), icon: "arrow.triangle.2.circlepath")
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("auto-retest-all")
                     }
-                    .buttonStyle(.bordered).disabled(stopping)
-                    .accessibilityIdentifier("auto-stop")
-                } else {
-                    Button { confirmRetest = true } label: {
-                        buttonLabel(Loc.t("Re-test all"), icon: "arrow.triangle.2.circlepath")
-                    }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("auto-retest-all")
                 }
+                .controlSize(.regular)
             }
-            .controlSize(.regular)
-            if !busy, model.runStoppedByPerson {
-                Text(Loc.t("Stopped. Nothing runs by itself until you press Run now, which carries on with the sites left."))
-                    .font(.caption.bold()).foregroundStyle(.orange).accessibilityIdentifier("auto-stopped")
-            }
-            if !busy, let n = runNowCount {
-                Text(n == 0 ? Loc.t("Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.")
-                            : Loc.f("Run now tries the %lld sites still to do this period. Re-test all tries every site again.", n))
-                    .font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-run-now-scope")
-            }
+            .padding(.vertical, 4)
         } header: { Text(person.displayName) }
     }
 
     /// One section per group, folded until its header or count is tapped (all open while searching). A site that needs you is in the semi-automated queue.
     @ViewBuilder private var groupSections: some View {
-        ForEach(ActivityGroup.allCases, id: \.self) { g in
+        ForEach(Self.groups, id: \.self) { g in
             let items = filtered.filter { $0.group == g }
             if !items.isEmpty {
                 Section {
@@ -254,12 +256,19 @@ struct AutoActivityView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("activity-group-\(g.rawValue)")
                 } footer: {
-                    if g == .needsYou {
+                    // A group's explanation shows only while it is open (decided 2026-11-24).
+                    if !isOpen(g) {
+                        EmptyView()
+                    } else if g == .needsYou {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Nothing to do on this page. These sites need a person for one step, usually a check, so they are in your semi-automated queue: we fill in each form, you clear the check and send.")
                             Button { dismiss(); model.requestedTab = 0 } label: { Label("Go to the semi-automated queue", systemImage: "arrow.right.circle") }
                                 .font(.footnote.bold()).accessibilityIdentifier("activity-open-semi")
                         }
+                    } else if g == .noAction {
+                        Text("Nothing to do for these: the site has no record of you, holds data only on other people, is covered by another request, or you set it aside.")
+                    } else if g == .earlier {
+                        Text("An earlier run this period already sent these. The next period sends them again.")
                     }
                 }
             }
@@ -339,7 +348,7 @@ struct AllRunsView: View {
         List {
             Section {
                 HStack(spacing: 8) {
-                    ForEach(ActivityGroup.allCases, id: \.self) { g in
+                    ForEach(Self.groups, id: \.self) { g in
                         VStack(spacing: 2) {
                             Text(verbatim: "\(rows.filter { $0.group == g }.count)").font(.title2.bold()).foregroundStyle(color(g))
                             Text(title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
@@ -350,7 +359,7 @@ struct AllRunsView: View {
                     }
                 }
             } footer: { Text("Every automatic run together, since the first. The automatic opt-out page shows only the current run.") }
-            ForEach(ActivityGroup.allCases, id: \.self) { g in
+            ForEach(Self.groups, id: \.self) { g in
                 let items = shown.filter { $0.group == g }
                 if !items.isEmpty {
                     Section {
@@ -376,9 +385,11 @@ struct AllRunsView: View {
             Text(r.line).font(.caption).foregroundStyle(.secondary)
         }
     }
+    /// Every run together has four groups (`RunPeriods.allRuns`); the automatic page's own ones never show here.
+    static let groups: [ActivityGroup] = [.needsYou, .sent, .notListed, .notTried]
     private func title(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notListed: return Loc.t("Not listed"); case .notTried: return Loc.t("Never tried") }
+        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notListed, .noAction, .earlier: return Loc.t("Not listed"); case .notTried: return Loc.t("Never tried") }
     }
-    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notListed: return .teal; case .notTried: return .secondary } }
-    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notListed: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" } }
+    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notListed, .noAction, .earlier: return .teal; case .notTried: return .secondary } }
+    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notListed, .noAction, .earlier: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" } }
 }

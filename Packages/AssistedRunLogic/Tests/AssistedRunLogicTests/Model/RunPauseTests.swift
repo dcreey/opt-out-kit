@@ -166,7 +166,9 @@ final class RunPauseTests: XCTestCase {
         XCTAssertEqual(AppModel.humanCheckLine("a human check"), "Blocked by a human check: only you can clear it")
         let cert = AppModel.ReviewItem(id: "x", domain: "x.com", outcome: "challenged", detail: "a certification box that you must tick yourself", date: now, hasScreenshot: false)
         XCTAssertEqual(cert.label, "Stopped: a certification box that you must tick yourself", "a certification box is not a human check")
-        XCTAssertEqual(AppModel.leftForPersonLine(OptOutAttempt(date: now, outcome: "failed", detail: AutoOptOut.sentUnconfirmed)), "Sent twice without a confirmation: check it yourself")
+        let unconfirmed = AppModel.ReviewItem(id: "x", domain: "x.com", outcome: "failed", detail: AutoOptOut.sentUnconfirmed, date: now, hasScreenshot: false)
+        XCTAssertTrue(unconfirmed.worked, "sent and not confirmed counts as sent")
+        XCTAssertEqual(unconfirmed.label, "Sent; the site did not show a confirmation")
         let field = "This form asks for something we do not have (\"Social Media Platform\")."
         XCTAssertEqual(AppModel.leftForPersonLine(OptOutAttempt(date: now, outcome: "failed", detail: field)), "Needs you: " + field)
         XCTAssertEqual(AppModel.leftForPersonLine(nil), "Waits for the next full re-test")

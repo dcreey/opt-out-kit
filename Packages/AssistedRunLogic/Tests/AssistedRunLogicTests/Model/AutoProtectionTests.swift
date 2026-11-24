@@ -52,6 +52,46 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertTrue(m.allRunsRows(for: me).contains { $0.group == .notTried }, "sites no run has reached are listed as never tried")
     }
 
+    /// A second run in a period puts every site in one of five groups (decided 2026-11-24: the first run's sends were among 323 "Not tried"): moved to
+    /// semi-automatic (this run's failures and an earlier run's human check), sent (by this run), no action needed (set aside), handled previously (sent by an
+    /// earlier run this period) and still to do.
+    func testASecondRunInAPeriodSortsEverySiteIntoFiveGroups() throws {
+        let m = model()
+        let me = try withProfile(m)
+        let ids = m.automaticSites(for: me).prefix(5).map(\.id)
+        XCTAssertEqual(ids.count, 5)
+        let (sentBefore, checkBefore, sentNow, setAside, untried) = (ids[0], ids[1], ids[2], ids[3], ids[4])
+        let first = Date().addingTimeInterval(-3600 * 5), started = Date().addingTimeInterval(-3600), now = Date().addingTimeInterval(-60)
+        m.startPeriodForTesting(); m.setLastFullRunForTesting(first)          // the first run, a full pass, finished this period: this one is a repeat
+        m.recordAttemptForTesting(OptOutAttempt(date: first, outcome: "submitted"), site: sentBefore)
+        m.recordAttemptForTesting(OptOutAttempt(date: first, outcome: "challenged", detail: "a reCAPTCHA checkbox"), site: checkBefore)
+        m.setRunStartedForTesting(started)
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "submitted"), site: sentNow)
+        m.skipSite(setAside)
+        let rows = Dictionary(m.activityRows(for: me).map { ($0.id, $0) }, uniquingKeysWith: { x, _ in x })
+        XCTAssertEqual(rows[sentBefore]?.group, .earlier, "handled previously")
+        XCTAssertTrue(rows[sentBefore]?.line.hasSuffix("in an earlier run") == true, rows[sentBefore]?.line ?? "")
+        XCTAssertEqual(rows[checkBefore]?.group, .needsYou, "an earlier run's human check is in the semi-automated queue")
+        XCTAssertTrue(rows[checkBefore]?.line.hasPrefix("Blocked by a human check") == true, rows[checkBefore]?.line ?? "")
+        XCTAssertEqual(rows[sentNow]?.group, .sent)
+        XCTAssertEqual(rows[setAside]?.group, .noAction, "no action needed")
+        XCTAssertEqual(rows[setAside]?.line, "You set it aside")
+        XCTAssertEqual(rows[untried]?.group, .notTried, "still to do")
+        XCTAssertGreaterThan(m.runNowCount(for: me), 0, "and Run now tries the ones still to do")
+    }
+
+    /// One line above the counts gives the last and next run dates (the page's other status lines were taken out, 2026-11-24).
+    func testThePageHasOneLineWithTheLastAndNextRun() async throws {
+        let m = model()
+        let me = try withProfile(m)
+        XCTAssertFalse(m.runDatesLine?.hasPrefix("Last run") ?? false, "nothing has run yet")
+        m.setAuto(scan: false, optOut: true)
+        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: CallBox()))
+        let line = try XCTUnwrap(m.runDatesLine)
+        XCTAssertTrue(line.hasPrefix("Last run " + Loc.date(Date())), line)
+        if m.autoSettings.nextOptOutDate() != nil { XCTAssertTrue(line.contains(" · Next run "), line) }
+    }
+
     /// A new run starts the page afresh; a run that is stopped and carried on, or a Re-test all of a pass under way, is the same run.
     func testANewRunStartsThePageAfreshAndACarriedOnRunDoesNot() {
         var s = AutoSettings()

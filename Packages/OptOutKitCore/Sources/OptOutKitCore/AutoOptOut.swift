@@ -168,10 +168,17 @@ public enum AutoOptOutResult: Equatable, Sendable {
         case .needsYou(let why): return L10n.f("Needs you: %@", why)
         case .challenged(let why): return L10n.f("Stopped: %@", why)
         case .rejected(let why): return L10n.f("The site refused: %@", why)
-        case .failed(let why): return L10n.f("No confirmation: %@", why)
+        case .failed(let why): return why == AutoOptOut.sentUnconfirmed ? L10n.t("Sent; the site did not show a confirmation") : L10n.f("No confirmation: %@", why)
         case .emailed: return L10n.t("Asked by email instead")
         case .notListed: return L10n.t("Not listed: the site found no record of you")
         }
+    }
+
+    /// The request went out: the site confirmed it, or its form was sent and the site showed no confirmation in time (`AutoOptOut.sentUnconfirmed`).
+    /// Both count as sent (decided 2026-11-24): sent once, the site is done for the period and is not the person's to do.
+    public var wentOut: Bool {
+        if case .submitted = self { return true }
+        return self == .failed(AutoOptOut.sentUnconfirmed)
     }
 }
 
@@ -184,7 +191,11 @@ public struct OptOutAttempt: Codable, Equatable, Sendable {
     public var pageSaid: String?
     public init(date: Date, outcome: String, detail: String? = nil, pageSaid: String? = nil) { self.date = date; self.outcome = outcome; self.detail = detail; self.pageSaid = pageSaid }
     /// A form was sent to the site. Emailing a request is tracked separately (`outcome == "emailed"`), so one never stands in for the other.
-    public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" }
+    /// A form sent that the site did not confirm in time counts too (decided 2026-11-24: it went out, so the site is done for the period and is not the person's
+    /// to do; it was left in the person's queue until then, and sent a second time).
+    public var wasSubmitted: Bool { outcome == "submitted" || outcome == "submitted_email" || wasUnconfirmed }
+    /// Sent, and the site showed no confirmation in time (`AutoOptOut.sentUnconfirmed`).
+    public var wasUnconfirmed: Bool { outcome == "failed" && detail == AutoOptOut.sentUnconfirmed }
     public var wasEmailed: Bool { outcome == "emailed" }
     /// The site's form searched for the person and found no record (`SubmitOutcome.notListed`). Not a send.
     public static let notListedOutcome = "not_listed"
@@ -257,7 +268,8 @@ public struct AutoOptOut: Sendable {
         return .failed(quiet ? wentQuiet : tooSlow)
     }
 
-    /// A site given up after its form was sent: the site may have taken it, so it is not sent again by the run; the person checks it in the semi-automated queue.
+    /// A site given up after its form was sent: it went out, so it counts as sent (`OptOutAttempt.wasSubmitted`) and is not sent again in the period. The
+    /// stored words stay as they were, so the history kept on devices still matches.
     public static let sentUnconfirmed = "the form was sent, but the site did not confirm it in time; check it before sending again"
 
     /// Whether a result is a give-up before anything was sent (the page went quiet or ran out of time), which the run tries once more at the end of the pass.
@@ -346,12 +358,11 @@ public struct AutoOptOut: Sendable {
     /// The sites a repeat pass (and "Run now" after a full pass) takes on. Those whose latest attempt went through: sent again in the next period (`precheck`
     /// leaves a site sent this period alone, so Run now never sends twice in a period). Every one that did not go through is tried again with the build installed
     /// now (decided 2026-11-23: they waited for the next full pass, six months on, so a fix in a new build never reached them; 300 sites sat that way), except:
-    /// one whose form it could not fill or whose human check it could not pass (`lastAttemptNeedsPerson`: semi-automatic only, in the person's queue), one sent and not confirmed twice
-    /// (never sent over and over), and one the person emailed instead. A site not listed is searched again once `notListedWindow` is over.
+    /// one whose form it could not fill or whose human check it could not pass (`lastAttemptNeedsPerson`: semi-automatic only, in the person's queue), and one the
+    /// person emailed instead. A site sent and not confirmed counts as sent, so it is sent again in the next period like any other. A site not listed is searched again once `notListedWindow` is over.
     public static func inRepeatPass(_ entry: DirectoryEntry, progress: Progress) -> Bool {
         guard let last = progress.optOutAttempts[entry.id]?.last else { return false }          // never tried: the run takes it anyway (`AppModel.runDomains`)
         if last.wasEmailed || lastAttemptNeedsPerson(last) { return false }
-        if last.outcome == "failed", last.detail == sentUnconfirmed { return sentUnconfirmedOnce(entry, progress: progress) }
         return true
     }
 
@@ -382,15 +393,6 @@ public struct AutoOptOut: Sendable {
 
     /// `FormFiller.plan`'s reasons for a field no profile can fill.
     static let personReasons = ["This form asks for something only you can supply (\"%@\").", "This form asks for something we do not have (\"%@\")."]
-
-    /// The site's latest attempt was sent and not confirmed in time, and the one before was not: it gets one more try, which now reads the page before its time
-    /// is up (`SiteRun.deadline`). Sending an opt-out a second time does no harm; a second unconfirmed send is left for the person, so it is never sent over and over.
-    public static func sentUnconfirmedOnce(_ entry: DirectoryEntry, progress: Progress) -> Bool {
-        let list = progress.optOutAttempts[entry.id] ?? []
-        guard let last = list.last, last.outcome == "failed", last.detail == sentUnconfirmed else { return false }
-        let before = list.dropLast().last
-        return !(before?.outcome == "failed" && before?.detail == sentUnconfirmed)
-    }
 
     /// The sites one kind of background run works through: the full pass tries every site that can be tried; the repeat pass the ones `inRepeatPass` takes.
     public static func backgroundSites(_ kind: RunKind, entries: [DirectoryEntry], person: Person, progress: Progress, now: Date = Date(), plans: FillPlans? = nil) -> [DirectoryEntry] {

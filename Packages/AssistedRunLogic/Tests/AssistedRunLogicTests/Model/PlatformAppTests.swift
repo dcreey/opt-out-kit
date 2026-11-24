@@ -290,7 +290,7 @@ final class AutomaticRunAppTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(report.skippedCount, heldDomains.count, "the report says how many were left alone")
         let rows = m.activityRows(for: me).filter { heldDomains.contains($0.domain) }
         XCTAssertEqual(rows.count, heldDomains.count, "held sites stay on the page")
-        XCTAssertTrue(rows.allSatisfy { $0.group == .notTried && $0.line.localizedCaseInsensitiveContains("covered") }, "with their reason")
+        XCTAssertTrue(rows.allSatisfy { $0.group == .noAction && $0.line.localizedCaseInsensitiveContains("covered") }, "no action needed, with their reason")
     }
 
     /// A run that iOS cut off (the run stopped after the site in progress) and that the person then brought back to the front (which clears that stop, so
@@ -434,7 +434,8 @@ final class BackgroundPassesAppTests: XCTestCase {
         }
     }
 
-    /// The automatic page and "Every site, all runs" put a site a recent look found no listing on in the same group (they showed 3 not listed and 0).
+    /// A site a recent look found no listing on is counted on both pages (they showed 3 not listed and 0): "No action needed" on the automatic page, "Not listed"
+    /// on "Every site, all runs".
     func testBothPagesCountASiteNotListedTheSameWay() throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
@@ -445,8 +446,10 @@ final class BackgroundPassesAppTests: XCTestCase {
         let p = m.selectedPerson!
         let site = try XCTUnwrap(m.directory.first { m.automaticDomains(for: p).contains($0.domain) })
         m.recordSelfCheck(.removed, site: site)
-        XCTAssertEqual(m.activityRows(for: p).first { $0.id == site.id }?.group, .notListed)
-        XCTAssertEqual(m.allRunsRows(for: p).first { $0.id == site.id }?.group, .notListed, "the same on every-site page")
+        let row = try XCTUnwrap(m.activityRows(for: p).first { $0.id == site.id })
+        XCTAssertEqual(row.group, .noAction, "no action needed on the automatic page")
+        XCTAssertTrue(row.line.hasPrefix("Not listed"), row.line)
+        XCTAssertEqual(m.allRunsRows(for: p).first { $0.id == site.id }?.group, .notListed, "not listed on the every-site page")
     }
 
     func testTheFirstRunIsAFullPassAndASiteThatDoesNotGoThroughIsLeftWithThePerson() async throws {
@@ -736,12 +739,14 @@ final class ResumeAppTests: XCTestCase {
             certification: .challenged("a certification box that you must tick yourself")]
         await m.runAutoOptOut(for: me, submitter: Scripted(answers: first, tally: Tally()))          // the full pass
         XCTAssertEqual(m.autoSettings.nextRunKind(), .repeatSent, "the full pass finished")
-        let retried = Set([noForm, noConfirmation, unconfirmed, certification])
+        let retried = Set([noForm, noConfirmation, certification])
         XCTAssertEqual(m.runNowCount(for: me), retried.count, "Run now would try again exactly the failures a fix could reach")
 
         let fixed = Tally()
         await m.runAutoOptOut(for: me, submitter: Scripted(answers: [:], tally: fixed))          // Run now, with a build that fixes them
-        XCTAssertEqual(Set(fixed.pages), retried, "tried again: no form found, no confirmation, sent once unconfirmed, a certification box")
+        XCTAssertEqual(Set(fixed.pages), retried, "tried again: no form found, no confirmation, a certification box")
+        XCTAssertFalse(fixed.pages.contains(unconfirmed), "sent and not confirmed counts as sent: never sent twice in a period")
+        XCTAssertTrue(try XCTUnwrap(byPage[unconfirmed]).isHandled(m.progress), "and it is off the person's hands")
         XCTAssertFalse(fixed.pages.contains(wentThrough), "a site sent this period is never sent twice")
         XCTAssertFalse(fixed.pages.contains(recaptcha), "a human check is the person's")
         XCTAssertFalse(fixed.pages.contains(unknownField), "a field no profile can fill is the person's")
@@ -786,6 +791,24 @@ final class ResumeAppTests: XCTestCase {
         m.stopAutoOptOut(); await run.value
         _ = m.plan
         XCTAssertEqual(m.planBuilds, before + 1, "rebuilt once, when the run ended")
+    }
+
+    /// The Queue tab's values (today's goals, the kinds left, the count left, the reminders) share one semi-automated queue per plan: each worked it out again,
+    /// some 200 ms apiece with a phone's history, and a run redraws the tab after every site, so the app stalled every few seconds (2026-11-24).
+    func testTheQueueTabWorksTheQueueOutOncePerPlanAndKeepsItThroughARun() async throws {
+        let (m, me) = readyModel()
+        let queue = m.semiQueue
+        XCTAssertEqual(queue, OptOutPlan.verifyQueue(m.plan, entries: m.directory), "the same queue as before")
+        let before = m.semiQueueBuilds
+        for _ in 0..<5 { _ = m.dailyGoals; _ = m.remainingKinds; _ = m.verifyRemaining; m.refreshReminders() }
+        XCTAssertEqual(m.semiQueueBuilds, before, "redrawn five times: worked out once")
+        let run = Task { await m.runAutoOptOut(for: me, submitter: SlowRecorder(tally: Tally())) }
+        var waited = 0
+        while (m.autoProgress?.done ?? 0) < 3 && waited < 500 { _ = m.dailyGoals; _ = m.remainingKinds; try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        XCTAssertEqual(m.semiQueueBuilds, before, "three sites done and the tab redrawn throughout: not worked out again")
+        m.stopAutoOptOut(); await run.value
+        _ = m.dailyGoals
+        XCTAssertEqual(m.semiQueueBuilds, before + 1, "worked out again once, with the plan, when the run ended")
     }
 
     func testAStoppedReTestCarriesOnAsAReTest() async throws {

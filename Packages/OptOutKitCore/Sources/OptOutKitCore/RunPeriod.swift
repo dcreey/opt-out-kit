@@ -60,7 +60,10 @@ public enum ActivityGroup: String, CaseIterable, Sendable {
     case needsYou      // the latest attempt this period did not go through (a check, a refusal, an error): it is in the semi-automated queue
     case sent          // a request went through this period
     case notListed     // the site's own search found no record of the person: nothing to opt out of (done until it is searched again)
-    case notTried      // nothing this period yet: not reached, held back by the run's own rules, or set aside by the person
+    case notTried      // nothing this period yet: not reached, held back by the run's own rules, or set aside by the person; on the automatic page, "Still to do"
+    // The automatic page's own groups (decided 2026-11-24: a second run in a period showed the first run's sends as "Not tried"):
+    case noAction      // nothing to do: not listed, only holds data on other people, covered by a platform request, or set aside by the person
+    case earlier       // handled by an earlier run this period: sent (or emailed) before this run started
 }
 
 public struct ActivitySite: Equatable, Sendable {
@@ -71,6 +74,8 @@ public struct ActivitySite: Equatable, Sendable {
     /// The outcome and detail of the attempt that did not go through.
     public var outcome: String?
     public var detail: String?
+    /// Sent, and the latest send was not confirmed by the site in time (it still counts as sent).
+    public var unconfirmed = false
 }
 
 public extension RunPeriods {
@@ -80,7 +85,7 @@ public extension RunPeriods {
     static func activity(siteIDs: [String], attempts: [String: [OptOutAttempt]], period: RunPeriod?, since: Date? = nil) -> [ActivitySite] {
         siteIDs.map { id in
             let list = (attempts[id] ?? []).filter { a in since.map { a.date >= $0 } ?? (period?.contains(a.date) ?? true) }
-            if let sent = list.filter(\.wasSubmitted).map(\.date).max() { return ActivitySite(id: id, group: .sent, date: sent) }
+            if let sent = list.filter(\.wasSubmitted).max(by: { $0.date < $1.date }) { return ActivitySite(id: id, group: .sent, date: sent.date, unconfirmed: sent.wasUnconfirmed) }
             if let last = list.filter({ !$0.wasEmailed }).max(by: { $0.date < $1.date }) {
                 if last.wasNotListed { return ActivitySite(id: id, group: .notListed, date: last.date) }
                 return ActivitySite(id: id, group: .needsYou, date: last.date, outcome: last.outcome, detail: last.detail)

@@ -79,6 +79,7 @@
       }
     },
     "regions": {"type": "object", "required": ["list"], "properties": {"list": {"type": "array", "items": {"type": "string"}}, "evidence": {"type": "string"}, "checked": {"type": "string"}}},
+    "only_for": {"type": "object", "required": ["who", "evidence", "checked"], "additionalProperties": false, "properties": {"who": {"type": "string"}, "evidence": {"type": "string"}, "checked": {"type": "string"}}},
     "persistence": {
       "type": "object",
       "required": ["result"],

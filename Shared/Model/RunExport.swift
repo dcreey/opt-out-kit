@@ -22,7 +22,7 @@ struct RunExport: Codable, Equatable {
         let n: Int
         let id: String
         let domain: String
-        /// The Activity page's group (`ActivityGroup`: needsYou, notListed, sent, notTried) and its line under the site.
+        /// The Activity page's group (`ActivityGroup`: needsYou, sent, noAction, earlier, notTried) and its line under the site.
         let group: String
         let status: String
         let optOutURL: String?
@@ -54,14 +54,15 @@ struct RunExport: Codable, Equatable {
     let log: [RunLogEntry]
 
     static let attemptsKept = 10
-    /// The page's order: what needs the person first, then not listed, sent, and not tried; by domain within each.
-    static let groupOrder: [ActivityGroup] = [.needsYou, .notListed, .sent, .notTried]
+    /// The page's order: moved to semi-automatic, sent, no action needed, handled previously, still to do; by domain within each.
+    static let groupOrder: [ActivityGroup] = [.needsYou, .sent, .noAction, .earlier, .notTried, .notListed]
 
     static let readme = """
     Exnay run export
 
-    run.json lists every site the automatic run deals with, in the order of the Activity page: the sites moved to semi-automatic first, then not listed,
-    sent, and not tried. For each: its group and the line the page shows, its opt-out page, its latest attempts (outcome, detail, and what the page said),
+    run.json lists every site the automatic run deals with, in the order of the Activity page: moved to semi-automatic ("needsYou"), sent by this run
+    ("sent"), no action needed ("noAction": not listed, only for other people, covered by another request, set aside), handled previously ("earlier": sent
+    by an earlier run this period) and still to do ("notTried"). For each: its group and the line the page shows, its opt-out page, its latest attempts (outcome, detail, and what the page said),
     its latest search, and "screenshot", the picture in this archive of what the site showed at the end of an attempt (null when none was kept), with
     "screenshotTaken": an attempt given up before sending keeps no picture, so the one here can be from an earlier attempt.
     "log" is what happened to the run as it went: when it started, paused and ended and why, when the app left the screen and came back, and each site's

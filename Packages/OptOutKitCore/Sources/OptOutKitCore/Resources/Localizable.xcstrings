@@ -7775,6 +7775,29 @@
     }
    }
   },
+  "Sent; the site did not show a confirmation": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé ; le site n'a pas affiché de confirmation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado; el sitio no mostró ninguna confirmación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet; die Website hat keine Bestätigung angezeigt"
+     }
+    }
+   }
+  },
   "Shopping and purchases": {
    "extractionState": "manual",
    "localizations": {

@@ -30,7 +30,7 @@ final class OnlyForTests: XCTestCase {
         m.setRunStartedForTesting(Date().addingTimeInterval(-600))
         m.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-60), outcome: "failed", detail: "no opt-out form was found on the page"), site: agile.id)
         let row = try XCTUnwrap(m.activityRows(for: me).first { $0.id == agile.id })
-        XCTAssertEqual(row.group, .notTried)
+        XCTAssertEqual(row.group, .noAction, "no action needed")
         XCTAssertEqual(row.line, "Only holds data on people who work in US schools or school districts: nothing to do unless that is you")
     }
 

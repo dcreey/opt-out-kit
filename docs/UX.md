@@ -189,15 +189,25 @@ Many sites send people to the same address: privacy-portal providers (OneTrust a
 
 ## The automatic opt-out page
 
-It shows **the current run only**: the four counts (moved to semi-automatic, sent, not listed, not tried) and their lists are what the run under way, or the last one, did since
-it started ("This run started ..."). A new run (Run now after a run has finished, Re-test all, the scheduled run) starts them afresh; a run that was stopped or cut
+It shows **the current run only**, with every site in one of five groups (`AppModel.activityPage`, decided 2026-11-24: a second run in a period showed the
+first run's sends among 323 "Not tried", with 1 sent): **Moved to semi-automatic** (this run's failures, an earlier run's human check, code or field no profile
+fills, and a missing profile detail: all in the semi-automated queue), **Sent** (by this run, a send the site did not confirm included), **No action needed** (not
+listed, only holds data on other people, covered by a platform request, set aside), **Handled previously** (sent or emailed by an earlier run this period: "Sent
+<date>, in an earlier run") and **Still to do** (what Run now would try, and a site waiting for the next full re-test). The first four are the counts at the top;
+"Still to do" is a slim line under them ("489 still to do ›") while any is left. The dates line, the counts, that line, a run's progress and the two buttons are one
+block with no lines across it. Each opens its list; a group's explanation shows only while it is open. The groups are what the run under way, or
+the last one, did since it started. Above the counts, one line gives the dates: "Last run Nov 24, 2026 · Next run Jan 26, 2027" (or the half that is
+known). The lines that were under the counts (when this run started, the period, "Last run ...: sent 0 of 4", what the next run does, "It carried on after a
+pause", "Stopped. Nothing runs by itself ...", "Run now tries the N sites ...") were taken out on 2026-11-24: the counts say it, and a stopped run asks
+"Carry on with the opt-out run?" when the person comes back. While a run works, its progress bar and "Working in the background: N of M sites" show under
+the counts. A new run (Run now after a run has finished, Re-test all, the scheduled run) starts them afresh; a run that was stopped or cut
 off and is carried on is the same run. Before the first run of build 54, which records when a run starts, the page shows the period instead. At the bottom,
 **Every site, all runs** opens every run combined: each site the automatic run has dealt with or takes on, grouped as sent at least once, not listed (the latest try found no record of the person), never went through (tried,
 never sent) and never tried, with how often it was sent or tried; a site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
 the run report still has "Review every site and its screenshot".)
 
 **Export this run, screenshots and all** (below it) gives the run to the system share sheet as one zip, `exnay-run.zip`: `run.json` lists every site of the page in its
-order (semi-automatic first, then not listed, sent, not tried) with its group and the line the page shows, its opt-out page, its last ten attempts (outcome, detail, what
+order (semi-automatic, sent, no action needed, handled previously, still to do: `needsYou`, `sent`, `noAction`, `earlier`, `notTried`) with its group and the line the page shows, its opt-out page, its last ten attempts (outcome, detail, what
 the page said), its latest search and the name of its screenshot; `README.txt` says the same in words; each site that kept a screenshot adds `NNN-domain.jpg`. It is
 built only when the person picks where it goes, in memory (no file is written on the phone), and the footer says it holds their details as the sites showed them and
 goes only where they share it. Made so a run can be handed to whoever is helping and stepped through site by site (`RunExport`, `StoredZip`). `run.json` also
@@ -220,8 +230,8 @@ automatic opt-out page its line is "Only holds data on ...: nothing to do unless
 **A site blocked by a human check says so.** Its line on the automatic opt-out page and on its own page starts "Blocked by a human check" and names the check:
 "Blocked by a human check (a reCAPTCHA checkbox): only you can clear it" (a reCAPTCHA, an hCaptcha, a Cloudflare check, a picture code, or a check the page asked
 for after sending). It said "Stopped: a reCAPTCHA checkbox" in the sites that need the person and "Waits for the next full re-test" in the ones a run leaves to
-them. In that second group, a site sent twice without a confirmation says "Sent twice without a confirmation: check it yourself", and one whose form asks for
-something no profile holds says "Needs you:" and what.
+them. In that second group, a site whose form asks for something no profile holds says "Needs you:" and what. A site sent without a confirmation is not in
+either: it counts as sent (decided 2026-11-24) and says "Sent <date>; the site did not show a confirmation" in the Sent group.
 
 ## Reviewing what a site said and showed
 

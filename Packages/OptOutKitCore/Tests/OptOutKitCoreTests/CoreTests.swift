@@ -1147,7 +1147,7 @@ final class AutoOptOutTests: XCTestCase {
 
     /// Every site that did not go through comes back in the repeat pass, and so in Run now after a full pass (decided 2026-11-23: they waited six months, and a fix
     /// in a new build never reached them), except one stopped by something only the person can do: a human check, a code, a detail they must supply. A send not
-    /// confirmed in time gets one more try, not more.
+    /// confirmed in time counts as sent, so it is sent again in the next period like any sent site.
     func testARepeatPassTakesBackTheSitesGivenUpBeforeAnythingWasSent() {
         let ok = form([("text", "first", "First name"), ("email", "email", "Email")])
         var progress = OptOutKitCore.Progress()
@@ -1303,14 +1303,24 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertNil(old.pageSaid)
     }
 
-    /// A site sent and not confirmed in time gets one more try (which now reads the page in time); a second unconfirmed send is left for the person.
-    func testASiteSentAndNotConfirmedGetsOneMoreTryNotMore() {
+    /// A site sent and not confirmed in time counts as sent, even once (decided 2026-11-24): it is done for the period, not sent again in it, in the sent group,
+    /// off the person's hands, and sent again in the next period like any sent site. A history saved before (the same stored words) reads the same way.
+    func testASiteSentAndNotConfirmedCountsAsSent() {
         let e = entry("unconfirmed", form: form([("text", "first", "First name"), ("email", "email", "Email")]))
         var progress = OptOutKitCore.Progress()
-        progress.recordOptOutAttempt(OptOutAttempt(date: t0, outcome: "failed", detail: AutoOptOut.sentUnconfirmed), site: e.id)
-        XCTAssertTrue(AutoOptOut.inRepeatPass(e, progress: progress), "one more try")
-        progress.recordOptOutAttempt(OptOutAttempt(date: t0 + day, outcome: "failed", detail: AutoOptOut.sentUnconfirmed), site: e.id)
-        XCTAssertFalse(AutoOptOut.inRepeatPass(e, progress: progress), "unconfirmed twice: not sent over and over")
+        let unconfirmed = OptOutAttempt(date: t0, outcome: "failed", detail: AutoOptOut.sentUnconfirmed)
+        XCTAssertTrue(unconfirmed.wasSubmitted); XCTAssertTrue(unconfirmed.wasUnconfirmed)
+        XCTAssertFalse(OptOutAttempt(date: t0, outcome: "failed", detail: "no success message was shown").wasSubmitted, "no send seen: not sent")
+        progress.recordOptOutAttempt(unconfirmed, site: e.id)
+        XCTAssertTrue(e.isHandled(progress, now: t0 + day), "off the person's hands")
+        let period = RunPeriod(start: t0 - day, end: t0 + 90 * day)
+        if case .tooSoon = AutoOptOut.precheck(entry: e, person: pat, progress: progress, now: t0 + day, period: period).result {} else { XCTFail("never sent twice in a period") }
+        XCTAssertTrue(AutoOptOut.inRepeatPass(e, progress: progress), "sent again in the next period, like any sent site")
+        let site = RunPeriods.activity(siteIDs: [e.id], attempts: progress.optOutAttempts, period: period).first
+        XCTAssertEqual(site?.group, .sent); XCTAssertEqual(site?.unconfirmed, true)
+        XCTAssertTrue(AutoOptOutResult.failed(AutoOptOut.sentUnconfirmed).wentOut)
+        XCTAssertFalse(AutoOptOutResult.failed(AutoOptOut.tooSlow).wentOut)
+        XCTAssertEqual(AutoOptOutResult.failed(AutoOptOut.sentUnconfirmed).label, "Sent; the site did not show a confirmation")
     }
 
     private func timedSite(_ host: String) -> DirectoryEntry {
@@ -3242,6 +3252,22 @@ final class VerifyTaskTests: XCTestCase {
         XCTAssertTrue(semi.contains { $0.domains.count > 1 }, "shared-form groups such as data-axle stay one task")
         XCTAssertGreaterThan(OptOutPlan.verifyQueue(steps, entries: entries).count, 50)
         let all = tasks.flatMap(\.domains); XCTAssertEqual(all.count, Set(all).count)
+    }
+    /// The queue looks at each site's form once for a typed code, however many sites there are. Its sort looked at both forms at every comparison: about
+    /// 10,000 looks for 500 sites, 200 ms a time, and the Queue tab works the queue out each time it is drawn, so the app stalled every few seconds during a run
+    /// (2026-11-24). A count, not a time: it holds on any machine.
+    func testTheQueueLooksAtEachFormOnceForATypedCode() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let entries = try Registry.loadDirectory(dir.appendingPathComponent("directory"))
+        let steps = OptOutPlan.build(entries: entries, brokers: [], platforms: [], classifyEntry: { OptOutMethods.classify($0, confirmingIdentity: true) },
+                                     classifyBroker: { OptOutMethods.classify($0) })
+        var looks: [String: Int] = [:]
+        let queue = OptOutPlan.verifyQueue(steps, entries: entries) { e in looks[e.domain, default: 0] += 1; return OptOutPlan.asksForTypedCode(e) }
+        XCTAssertGreaterThan(queue.count, 50, "a queue the size of the catalog's")
+        XCTAssertEqual(queue, OptOutPlan.verifyQueue(steps, entries: entries), "the same queue")
+        XCTAssertEqual(looks.values.max(), 1, "each form looked at once, not at every comparison of the sort")
+        XCTAssertLessThanOrEqual(looks.values.reduce(0, +), queue.count, "at most one look per site in the queue")
     }
 }
 

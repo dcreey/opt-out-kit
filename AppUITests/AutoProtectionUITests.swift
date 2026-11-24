@@ -123,7 +123,7 @@ final class AutoProtectionUITests: UITestCase {
         XCTAssertTrue(state.exists, "and it stayed: the push did not bounce back")
         shot(app, "5-site-opened-from-the-status-page")
         app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["period-summary"].waitForExistence(timeout: 5), "back on the status page")
+        XCTAssertTrue(app.staticTexts["run-dates"].waitForExistence(timeout: 5), "back on the status page")
     }
 
     func testTheBirthdateIsChosenYearThenMonthThenDayAndIsRequired() {

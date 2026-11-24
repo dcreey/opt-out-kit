@@ -156,7 +156,7 @@ before and after and compare. The multi-value comparison (a person with three em
   Every press of send waits this way (`settleAfterPress`): the background run, Solve and send and the guided flow. Read too soon, a form that was sent looked like
   "nothing on the page changed after sending" on a slow machine (GitHub's runner). The background run's own press had no such wait at all, so the status
   page counted a sent site as not sent. A page that replaced the form with "Processing your
-  request... Please wait... Do not close this page" has not confirmed anything: it is recorded as sent but not confirmed (`FormRun.saysStillWorking`,
+  request... Please wait... Do not close this page" has not confirmed anything: it is recorded as sent but not confirmed, which counts as sent (`FormRun.saysStillWorking`,
   `testAPageSayingItIsStillWorkingIsNotAConfirmation`), where before the result depended on how long the run happened to wait.
 
 - **A type-to-search menu for where the person lives gets their state picked from its list.** The fill types the state into a box it reads as a state

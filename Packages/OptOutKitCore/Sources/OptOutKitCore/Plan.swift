@@ -57,16 +57,22 @@ public enum OptOutPlan {
 
     /// The single sites of the semi-automated step that the app fills in and sends for the person (they only tick the check), in the
     /// order the step lists them. Shared-form groups are not in it: they are one task each.
-    public static func verifyQueue(_ steps: [PlanStep], entries: [DirectoryEntry]) -> [String] {
+    /// Whether a site's form asks for a code typed by the person (such forms come last in the queue).
+    public static func asksForTypedCode(_ e: DirectoryEntry) -> Bool {
+        (e.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (e.liveForm?.blockers.contains("code") ?? false)
+    }
+
+    /// `typedCode` is the check above; a test passes one that counts, to hold the queue to one look at each form.
+    public static func verifyQueue(_ steps: [PlanStep], entries: [DirectoryEntry], typedCode: (DirectoryEntry) -> Bool = asksForTypedCode) -> [String] {
         let byDomain = Dictionary(entries.map { ($0.domain, $0) }, uniquingKeysWith: { a, _ in a })
         let eligible: [DirectoryEntry] = steps.filter { $0.kind == .method(.semiAutomatic) }.flatMap(\.tasks).compactMap { t in
             guard case .site = t.kind, t.domains.count == 1, let e = byDomain[t.domains[0]], hasForm(e) else { return nil }
             if let f = e.optOutForm, FormFiller.needsListing(f) { return nil }
             return e
         }
-        // Forms that ask for a typed code come last; otherwise the brokers that matter most come first.
-        func typed(_ e: DirectoryEntry) -> Int { ((e.optOutForm.map(FormFiller.hasTypedCode) ?? false) || (e.liveForm?.blockers.contains("code") ?? false)) ? 1 : 0 }
-        let forms = eligible.sorted { (typed($0), -($0.priority ?? 0), $0.domain) < (typed($1), -($1.priority ?? 0), $1.domain) }.map(\.domain)
+        // Forms that ask for a typed code come last; otherwise the brokers that matter most come first. Each form is looked at once, not at every comparison
+        // of the sort (that was about 10,000 looks for 500 sites, and the Queue tab works the queue out each time it is drawn).
+        let forms = eligible.map { (typedCode($0) ? 1 : 0, -($0.priority ?? 0), $0.domain) }.sorted { $0 < $1 }.map(\.2)
         // Sites with no form, only an email address, come one at a time too, after the form sites: each shows "no form exists, send an email instead".
         let emailOnly = steps.flatMap(\.tasks).filter { $0.kind == .emails }.flatMap(\.domains).compactMap { byDomain[$0] }
             .filter { $0.contactEmail != nil && !hasForm($0) }

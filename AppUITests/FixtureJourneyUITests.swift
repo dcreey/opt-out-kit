@@ -204,8 +204,8 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(finished, "now the app asks whether it is completely done: \(app.staticTexts.allElementsBoundByIndex.prefix(10).map(\.label))")
     }
 
-    /// As a user I want the automatic page to show the run I just started, and a button that shows every site over all runs together: after a run the page says
-    /// when this run started, and "Every site, all runs" lists the site the run sent, with how often it was sent; the site opens its page.
+    /// As a user I want the automatic page to show the run I just started, and a button that shows every site over all runs together: after a run one line
+    /// above the counts gives the last and next run dates, and "Every site, all runs" lists the site the run sent, with how often it was sent; the site opens its page.
     func testTheAutomaticPageShowsThisRunAndEverySiteAllRunsCombinesThem() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-only-domains", "plain-1.fixture.test"] + server.launchArguments
@@ -214,7 +214,10 @@ final class FixtureJourneyUITests: UITestCase {
         let done = app.buttons["run-report-done"]
         XCTAssertTrue(done.waitForExistence(timeout: 120), "the run finished and reported")
         done.tap()
-        XCTAssertTrue(app.staticTexts["run-started"].waitForExistence(timeout: 10), "the page says when this run started")
+        let dates = app.staticTexts["run-dates"]
+        XCTAssertTrue(dates.waitForExistence(timeout: 10), "one line above the counts gives the last and next run")
+        XCTAssertTrue(dates.label.hasPrefix("Last run"), dates.label)
+        XCTAssertFalse(app.staticTexts["run-started"].exists || app.staticTexts["period-summary"].exists, "the run's other lines are gone")
         XCTAssertFalse(app.buttons["review-last-run"].exists, "the screenshots of the last run are no longer on this page")
         let all = app.buttons["all-runs"]
         XCTAssertTrue(app.scrollUntilExists(all), "the page offers every site over all runs")
@@ -259,12 +262,12 @@ final class FixtureJourneyUITests: UITestCase {
         add(XCTAttachment(screenshot: app.screenshot()))
         done.tap()
         XCTAssertEqual(server.sentSites.filter { $0 == "fx_nodata_1" }.count, 1, "the search was pressed once, not again and again")
-        let count = app.buttons["activity-count-notListed"]
-        XCTAssertTrue(count.waitForExistence(timeout: 10), "the automatic page counts sites that are not listed")
+        let count = app.buttons["activity-count-noAction"]
+        XCTAssertTrue(count.waitForExistence(timeout: 10), "the automatic page counts a site that is not listed as no action needed")
         XCTAssertTrue(count.becomes("label BEGINSWITH '1'"), "one: \(count.label)")
         count.tap()
         let row = app.buttons["period-site-nodata-1.fixture.test"]
-        XCTAssertTrue(app.scrollUntilExists(row), "the site is in the not-listed group")
+        XCTAssertTrue(app.scrollUntilExists(row), "the site is in the no-action-needed group")
         row.tap()
         let state = app.staticTexts["site-state"]
         XCTAssertTrue(state.waitForExistence(timeout: 10), "the site's page opened")
@@ -367,10 +370,13 @@ final class FixtureJourneyUITests: UITestCase {
     }
 
     /// As a user I want to keep using the app while a run works: the screen never stops answering for long (reported: "I can't scroll; it's stuck for 5 seconds or
-    /// so"). The app's debug watchdog (`MainThreadWatch`, `-uitest-watch-main`) records every stall of the main thread and the step the run was on.
+    /// so", and on 2026-11-24 "quite slow every few seconds"). The app's debug watchdog (`MainThreadWatch`, `-uitest-watch-main`) records every stall of the main
+    /// thread and the step the run was on. The person has months of history on the sites this run leaves alone and a full run log (`-uitest-seed-history`): the
+    /// stall of 2026-11-24 grew with history and did not show on a blank profile. How the screens' cost grows with the catalog's 800 sites is held on the Mac by
+    /// `PerformanceBudgetTests` (this catalog has only the fixture sites).
     func testTheScreenKeepsAnsweringWhileARunWorks() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-watch-main", "-only-domains", Self.runNowDomains] + server.launchArguments
+        app.launchArguments = ["-uitest-reset", "-uitest-watch-main", "-uitest-seed-history", "-only-domains", Self.runNowDomains] + server.launchArguments
         app.launch()
         startRunNow(app)
         // A person scrolling while the run works, until every form the run can send has arrived (scrolling may close the report sheet, so it is not waited for).
@@ -385,7 +391,9 @@ final class FixtureJourneyUITests: UITestCase {
         let stalls = label.label
         let ms = Int(stalls.split(separator: "m").first ?? "") ?? 0
         let note = XCTAttachment(string: "worst main-thread stall: \(stalls)"); note.lifetime = .keepAlways; add(note)
-        XCTAssertLessThan(ms, 1000, "the screen stopped answering for \(stalls)")
+        print("MainStalls: worst main-thread stall: \(stalls)")
+        // 500 ms (was 1 s until 2026-11-24): the watchdog counts stalls over 250 ms, and a Mac's simulator showed none with this history.
+        XCTAssertLessThan(ms, 500, "the screen stopped answering for \(stalls)")
     }
 
     /// The pages reported on 2026-11-23, in the app's real web view, sent by the background run with what each must receive:
@@ -424,7 +432,8 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertEqual(dnb["resident"], "Illinois"); XCTAssertEqual(dnb["companyCountry"], "", "the company's country is not the person's")
     }
 
-    /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run says it was sent but not confirmed, and for that
+    /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run counts it as sent and says the site showed no
+    /// confirmation (decided 2026-11-24), and for that
     /// site I can see what its page said and a screenshot of how the page looked, so I can judge it myself.
     func testRunNowShowsWhatAPageSaidAndItsScreenshotWhenTheSiteDidNotConfirmInTime() {
         let app = XCUIApplication()
@@ -453,15 +462,15 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertGreaterThan(pingedBefore, 0, "the page was open and running while the run waited for it")
         XCTAssertEqual(server.pings["fx_slow_1"] ?? 0, pingedBefore, "a page the run gave up on stops running")
 
-        // Review of the run, from its report: the site is listed as sent but not confirmed, and says why.
+        // Review of the run, from its report: the site is listed as sent, and says the site showed no confirmation.
         let review = app.buttons["run-report-review"]
         XCTAssertTrue(app.scrollUntilExists(review), "the report offers the review of every site and its screenshot")
         review.tap()
         let row = app.buttons["review-fx_slow_1"]
         XCTAssertTrue(row.waitForExistence(timeout: 10), "the site is in the review (\(title))")
         shot("4-review-list")
-        XCTAssertTrue(row.label.localizedCaseInsensitiveContains("did not confirm") || row.label.localizedCaseInsensitiveContains("not confirmed"),
-                      "the review says the site did not confirm in time: \(row.label)")
+        XCTAssertTrue(row.label.localizedCaseInsensitiveContains("Sent; the site did not show a confirmation"),
+                      "the review counts it as sent and says the site showed no confirmation: \(row.label)")
         row.tap()
 
         // The site's page: what it said at the end, and a screenshot of it.
@@ -533,7 +542,7 @@ final class FixtureJourneyUITests: UITestCase {
             let activity = app.buttons["auto-activity"]
             if app.scrollUntilExists(activity) { activity.tap() }
         }
-        for g in ["needsYou", "notTried", "sent", "notListed"] {
+        for g in ["needsYou", "notTried", "sent", "noAction", "earlier"] {
             let count = app.buttons["activity-count-\(g)"]
             guard count.waitForExistence(timeout: 5) else { continue }
             count.tap()

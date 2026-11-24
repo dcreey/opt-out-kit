@@ -1473,6 +1473,29 @@
     }
    }
   },
+  "%lld still to do": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encore %lld à faire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Quedan %lld por hacer"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch %lld zu tun"
+     }
+    }
+   }
+  },
   "%lld-day streak": {
    "extractionState": "manual",
    "localizations": {
@@ -3792,6 +3815,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Ein automatisches Widerspruchssignal"
+     }
+    }
+   }
+  },
+  "An earlier run this period already sent these. The next period sends them again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution précédente de cette période les a déjà envoyés. La prochaine période les enverra à nouveau."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución anterior de este periodo ya los envió. El próximo periodo los enviará de nuevo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein früherer Durchlauf in diesem Zeitraum hat sie bereits gesendet. Der nächste Zeitraum sendet sie erneut."
      }
     }
    }
@@ -10627,6 +10673,29 @@
     }
    }
   },
+  "Handled previously": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Déjà traité"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ya gestionado"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bereits erledigt"
+     }
+    }
+   }
+  },
   "Harm: safety %lld of 3, money %lld of 3, reputation %lld of 3, annoyance %lld of 3": {
    "extractionState": "manual",
    "localizations": {
@@ -11662,29 +11731,6 @@
     }
    }
   },
-  "It carried on after a pause, with only the sites it had not done; nothing is sent twice.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "L'envoi a repris après une pause, avec seulement les sites qui restaient ; rien n'est envoyé deux fois."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Continuó tras una pausa, solo con los sitios que le faltaban; nada se envía dos veces."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Er wurde nach einer Pause fortgesetzt, nur mit den noch offenen Websites; nichts wird doppelt gesendet."
-     }
-    }
-   }
-  },
   "It does not delete anything, and it does not reach data brokers that already hold your details, because those never see your browser. It is a good habit next to the opt-outs in this app, not a replacement.": {
    "extractionState": "manual",
    "localizations": {
@@ -12421,6 +12467,29 @@
     }
    }
   },
+  "Last run %@ · Next run %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dernier passage %@ · Prochain passage %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Última ejecución %@ · Próxima ejecución %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Letzter Lauf %@ · Nächster Lauf %@"
+     }
+    }
+   }
+  },
   "Last run %@: %lld sent, %lld need you.": {
    "extractionState": "manual",
    "localizations": {
@@ -12440,29 +12509,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Letzter Lauf %@: %lld gesendet, %lld brauchen Sie."
-     }
-    }
-   }
-  },
-  "Last run %@: sent %lld of %lld": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dernier passage %@ : %lld envoyés sur %lld"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Última ejecución %@: %lld enviados de %lld"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Letzter Lauf %@: %lld von %lld gesendet"
      }
     }
    }
@@ -15020,48 +15066,25 @@
     }
    }
   },
-  "Next run %@: a full re-test of every site": {
+  "Next run %@": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Prochain passage le %@ : un nouveau test complet de tous les sites"
+      "value": "Prochain passage %@"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Próxima pasada el %@: una nueva prueba completa de todos los sitios"
+      "value": "Próxima ejecución %@"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Nächster Durchgang am %@: ein vollständiger neuer Test aller Seiten"
-     }
-    }
-   }
-  },
-  "Next run %@: sends again to the sites that went through and tries again the ones that did not": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Prochain passage le %@ : renvoie aux sites où la demande est passée et réessaie les autres"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Próxima ejecución %@: vuelve a enviar a los sitios donde se completó y reintenta los demás"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nächster Durchlauf %@: sendet erneut an die Websites, bei denen es geklappt hat, und versucht die anderen erneut"
+      "value": "Nächster Lauf %@"
      }
     }
    }
@@ -15246,6 +15269,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nein"
+     }
+    }
+   }
+  },
+  "No action needed": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien à faire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No hace falta nada"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nichts zu tun"
      }
     }
    }
@@ -16032,29 +16078,6 @@
     }
    }
   },
-  "Not tried or skipped": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Pas essayés ou ignorés"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sin probar u omitidos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nicht versucht oder übersprungen"
-     }
-    }
-   }
-  },
   "Not tried yet in this run": {
    "extractionState": "manual",
    "localizations": {
@@ -16239,29 +16262,6 @@
     }
    }
   },
-  "Nothing has run yet for %@.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Rien n'a encore été exécuté pour %@."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Aún no se ha ejecutado nada para %@."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Für %@ wurde noch nichts ausgeführt."
-     }
-    }
-   }
-  },
   "Nothing is filled in or marked finished for a link we cannot match to a site. Only open it if you trust where it came from.": {
    "extractionState": "manual",
    "localizations": {
@@ -16281,29 +16281,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Für einen Link, den wir keiner Website zuordnen können, wird nichts ausgefüllt oder als erledigt markiert. Öffnen Sie ihn nur, wenn Sie der Herkunft vertrauen."
-     }
-    }
-   }
-  },
-  "Nothing is left for Run now this period: what went through is done, and what did not is in your semi-automated queue. Re-test all tries every site again.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Plus rien pour Lancer maintenant cette période : ce qui a abouti est fait, et le reste est dans votre file semi-automatique. Tout retester essaie de nouveau chaque site."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "No queda nada para Ejecutar ahora en este periodo: lo que se envió está hecho y lo que no está en tu cola semiautomática. Volver a probar todo prueba de nuevo cada sitio."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Für Jetzt starten bleibt in diesem Zeitraum nichts: Was durchging, ist erledigt, der Rest ist in Ihrer halbautomatischen Warteschlange. Alle erneut testen probiert jede Seite noch einmal."
      }
     }
    }
@@ -16396,6 +16373,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nichts übersprungen. Seiten, die du zurückstellst, erscheinen hier."
+     }
+    }
+   }
+  },
+  "Nothing to do for these: the site has no record of you, holds data only on other people, is covered by another request, or you set it aside.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Rien à faire pour ceux-ci : le site n'a aucune donnée sur vous, ne détient des données que sur d'autres personnes, est couvert par une autre demande, ou vous l'avez mis de côté."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nada que hacer con estos: el sitio no tiene datos tuyos, solo guarda datos de otras personas, está cubierto por otra solicitud o lo dejaste a un lado."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Hier ist nichts zu tun: Die Website hat keine Daten über Sie, speichert nur Daten über andere Personen, ist durch eine andere Anfrage abgedeckt, oder Sie haben sie zurückgestellt."
      }
     }
    }
@@ -20609,29 +20609,6 @@
     }
    }
   },
-  "Run now tries the %lld sites still to do this period. Re-test all tries every site again.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Lancer maintenant essaie les %lld sites qui restent à faire cette période. Tout retester essaie de nouveau chaque site."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ejecutar ahora prueba los %lld sitios que quedan por hacer en este periodo. Volver a probar todo prueba de nuevo cada sitio."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jetzt starten probiert die %lld Seiten, die in diesem Zeitraum noch offen sind. Alle erneut testen probiert jede Seite noch einmal."
-     }
-    }
-   }
-  },
   "Safari has no built-in switch, so use one of those browsers for everyday browsing.": {
    "extractionState": "manual",
    "localizations": {
@@ -21483,6 +21460,29 @@
     }
    }
   },
+  "Sent %@, in an earlier run": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé le %@, lors d'une exécution précédente"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado el %@, en una ejecución anterior"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet am %@, bei einem früheren Durchlauf"
+     }
+    }
+   }
+  },
   "Sent %@; look for their email": {
    "extractionState": "manual",
    "localizations": {
@@ -21502,6 +21502,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesendet am %@; achten Sie auf ihre E-Mail"
+     }
+    }
+   }
+  },
+  "Sent %@; the site did not show a confirmation": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé le %@ ; le site n'a pas affiché de confirmation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado el %@; el sitio no mostró ninguna confirmación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet am %@; die Website hat keine Bestätigung angezeigt"
      }
     }
    }
@@ -21667,29 +21690,6 @@
     }
    }
   },
-  "Sent twice without a confirmation: check it yourself": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Envoyé deux fois sans confirmation : vérifiez-le vous-même"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Enviado dos veces sin confirmación: compruébelo usted mismo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Zweimal ohne Bestätigung gesendet: prüfen Sie es selbst"
-     }
-    }
-   }
-  },
   "Sent, but the site did not confirm (%@). It may need one more step from you here. Tap Next site when you are done.": {
    "extractionState": "manual",
    "localizations": {
@@ -21778,6 +21778,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Gesendet; bestätigen Sie die E-Mail, die man Ihnen geschickt hat"
+     }
+    }
+   }
+  },
+  "Sent; the site did not show a confirmation": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé ; le site n'a pas affiché de confirmation"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado; el sitio no mostró ninguna confirmación"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Gesendet; die Website hat keine Bestätigung angezeigt"
      }
     }
    }
@@ -23852,6 +23875,29 @@
     }
    }
   },
+  "Still to do": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reste à faire"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Por hacer"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Noch zu tun"
+     }
+    }
+   }
+  },
   "Stop": {
    "extractionState": "manual",
    "localizations": {
@@ -23894,29 +23940,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Von einer Bot-Prüfung oder einem Bedingungsfenster gestoppt"
-     }
-    }
-   }
-  },
-  "Stopped. Nothing runs by itself until you press Run now, which carries on with the sites left.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Arrêté. Rien ne se lance tout seul tant que vous n'appuyez pas sur Lancer maintenant, qui reprend avec les sites restants."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Detenido. Nada se inicia solo hasta que pulses Ejecutar ahora, que continúa con los sitios que faltan."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Gestoppt. Nichts startet von selbst, bis Sie auf „Jetzt starten“ tippen; das macht mit den übrigen Websites weiter."
      }
     }
    }
@@ -27160,52 +27183,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Diese Seite braucht nur Ihre Bestätigung. Lesen Sie sie und drücken Sie dann selbst „%@“."
-     }
-    }
-   }
-  },
-  "This period: %@ to %@": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cette période : du %@ au %@"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Este periodo: del %@ al %@"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dieser Zeitraum: %@ bis %@"
-     }
-    }
-   }
-  },
-  "This run started %@": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ce passage a commencé le %@"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Esta ejecución empezó el %@"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dieser Lauf begann am %@"
      }
     }
    }
@@ -31162,6 +31139,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Sie machen die Schritte, aber jede Aufgabe erledigt 10 oder mehr Seiten, der Aufwand lohnt sich."
+     }
+    }
+   }
+  },
+  "You emailed your request on %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Vous avez envoyé votre demande par e-mail le %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviaste tu solicitud por correo el %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Sie haben Ihre Anfrage am %@ per E-Mail gesendet"
      }
     }
    }

@@ -17,6 +17,8 @@ Every change to behavior updates the docs in the same piece of work, before it i
 ## Tests
 
 - Every behavior gets a Mac test where it can (`swift test --package-path Packages/OptOutKitCore`, `Packages/AssistedRunLogic`: the model, `Shared/Model`, runs there on `HeadlessPlatform`); a page script's rule gets a `tools/pagescripts` test; what only a real web view, the Keychain or the phone can show is an end-to-end journey in `AppUITests` (against a fixture broker in `fixtures/` where a page is involved), which runs for a release, never on a push. There are no simulator unit tests (`AppTests` holds only the by-hand live probes).
+- Work done on every redraw or after every site of a run gets a work count or goes into `PerformanceBudgetTests` (a phone's history, five sites sent); see
+  `docs/TESTING.md`, "Performance".
 - The semi-automated "Solve and send" flow is the most trusted: do not break it. Share logic and UI across flows instead of copying it.
 - Unit tests (the two Swift packages, on the Mac) run on every push (`ci.yml`, which also builds the app and every test target); integration tests (the UI tests in `AppUITests`, on a simulator) run for a GitHub release
   (`integration.yml`). Every rule a UI test checks also has a unit test, listed in `docs/TESTING.md` ("Unit and integration tests"); add both together.

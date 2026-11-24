@@ -41,7 +41,7 @@ enum FormAudit {
 
     /// The first `n` sites of each kind, in the order the daily batch would take them (best first).
     static func firstPerKind(_ n: Int, model: AppModel) -> [String] {
-        let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)
+        let queue = model.semiQueue
         let byDomain = model.sites.byDomain
         var out: [String] = []
         for kind in BrokerCategory.ranked {
@@ -132,7 +132,7 @@ enum FormAudit {
 
     /// Sites `from` to `to` (counting from 1) of each kind in the daily order, semi-automated queue only.
     static func range(from: Int, to: Int, model: AppModel) -> [String] {
-        let queue = OptOutPlan.verifyQueue(model.plan, entries: model.directory)
+        let queue = model.semiQueue
         let byDomain = model.sites.byDomain
         var out: [String] = []
         for kind in BrokerCategory.ranked {
@@ -144,7 +144,7 @@ enum FormAudit {
     }
 
     /// Every site in the semi-automated queue.
-    static func semi(model: AppModel) -> [String] { OptOutPlan.verifyQueue(model.plan, entries: model.directory) }
+    static func semi(model: AppModel) -> [String] { model.semiQueue }
 
     static func run(domains: [String], model: AppModel) async {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("audit")

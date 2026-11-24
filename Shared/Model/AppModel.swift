@@ -241,6 +241,12 @@ final class AppModel: ObservableObject {
             household.setContactEmail("pat@example.com")
             household.updateAuto { $0.decidedAt = Date() }
         }
+        // UI tests: `-uitest-seed-history` gives the person months of history (`seedHistoryForTesting`) on every site but the ones the test runs
+        // (`-only-domains`), and a full run log, so a test of how quick the app stays sees a returning person, not a blank one.
+        if args.contains("-uitest-seed-history") {
+            let running = args.firstIndex(of: "-only-domains").flatMap { args.indices.contains($0 + 1) ? Set(args[$0 + 1].split(separator: ",").map(String.init)) : nil } ?? []
+            seedHistoryForTesting(skipping: { running.contains($0.domain) })
+        }
         // UI tests: `-uitest-seed-multi` (with `-uitest-seed-profile`) gives the person several of everything (previous addresses, a second email and phone, a previous name and
         // a nickname), for pages that ask for more than one address, email or phone.
         if args.contains("-uitest-seed-multi"), var me = household.people.first(where: { $0.relationship == .me }) {
@@ -458,6 +464,8 @@ final class AppModel: ObservableObject {
     #if DEBUG
     /// Tests: how many times the plan was built.
     private(set) var planBuilds = 0
+    /// Tests: how many times the semi-automated queue was worked out.
+    private(set) var semiQueueBuilds = 0
     #endif
 
     private func builtPlan() -> (plan: [PlanStep], queue: [QueueBand]) {
@@ -468,7 +476,23 @@ final class AppModel: ObservableObject {
         let plan = buildPlan(for: selectedPerson)
         let built = (plan, OptOutPlan.queue(plan, local: localStates, countryHasRegistries: countryHasRegistries))
         planCache = built
+        semiQueueCache = nil
         return built
+    }
+
+    /// The semi-automated queue's sites in order (`OptOutPlan.verifyQueue`), kept with the plan it comes from. The Queue tab asks for it several times each
+    /// time it is drawn (today's goals, the kinds left, the count left), and a run redraws it every few seconds: worked out each time, that made the app stall
+    /// every few seconds during a run (2026-11-24).
+    private var semiQueueCache: [String]?
+    var semiQueue: [String] {
+        let steps = plan          // rebuilt first if anything it depends on changed, which empties the cache
+        if let semiQueueCache { return semiQueueCache }
+        #if DEBUG
+        semiQueueBuilds += 1
+        #endif
+        let q = OptOutPlan.verifyQueue(steps, entries: directory)
+        semiQueueCache = q
+        return q
     }
 
     // MARK: Regions
@@ -941,6 +965,17 @@ final class AppModel: ObservableObject {
         let line: String
     }
 
+    /// The automatic page's one status line, above its counts (decided 2026-11-24): "Last run Nov 24, 2026 · Next run Jan 26, 2027", or the half that is known.
+    var runDatesLine: String? {
+        let last = autoSettings.lastOptOut.map { Loc.date($0) }, next = autoSettings.nextOptOutDate().map { Loc.date($0) }
+        switch (last, next) {
+        case let (l?, n?): return Loc.f("Last run %@ · Next run %@", l, n)
+        case let (l?, nil): return Loc.f("Last run %@", l)
+        case let (nil, n?): return Loc.f("Next run %@", n)
+        default: return nil
+        }
+    }
+
     /// Every site the automatic run deals with this period, sorted into needs you, sent and not tried: the "done for you" sites, the sites the next pass
     /// would try, and any site the run tried this period that did not go through (it has moved to the semi-automated queue, so it is in neither of the others).
     func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] { Self.activityPage(activityInputs(for: person, now: now)).rows }
@@ -964,7 +999,7 @@ final class AppModel: ObservableObject {
             case .needsYou:
                 let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
                 line = Loc.f("Never went through (tried %lld times): %@", s.tries, last)
-            case .notTried: line = Loc.t("No run has tried it yet")
+            case .notTried, .noAction, .earlier: line = Loc.t("No run has tried it yet")
             case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(progress.latestSiteCheck(e.id)?.date ?? s.last?.date ?? Date()))
             }
             return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
@@ -1005,10 +1040,10 @@ final class AppModel: ObservableObject {
         let neverTried = Set(i.entries.filter { (progress.optOutAttempts[$0.id] ?? []).isEmpty }.map(\.domain))
         let nextPass = i.nextKind == .full ? pass
             : Set(fullSites.filter { AutoOptOut.inRepeatPass($0, progress: progress) }.map(\.domain)).union(pass.intersection(neverTried))
-        var reasons: [String: String?] = [:]
-        func reason(_ e: DirectoryEntry) -> String? {
+        var reasons: [String: AutoOptOutResult?] = [:]
+        func reason(_ e: DirectoryEntry) -> AutoOptOutResult? {
             if let r = reasons[e.id] { return r }
-            let r = skipReason(AutoOptOut.standIn(e), plans: i.plans, progress: progress, everySite: false, hold: i.holds[e.id], period: period, now: now)
+            let r = skipResult(AutoOptOut.standIn(e), plans: i.plans, progress: progress, everySite: false, hold: i.holds[e.id], period: period, now: now)
             reasons[e.id] = r; return r
         }
         var ids = i.automaticIDs
@@ -1016,22 +1051,40 @@ final class AppModel: ObservableObject {
         let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period, since: i.since).compactMap { s -> ActivityRow? in
             guard let e = byID[s.id] else { return nil }
-            // Not listed in an earlier run, and still inside its window: the run leaves it alone, and it counts as not listed, not as untried.
+            // Every site is in one of five groups (decided 2026-11-24: a second run in a period showed the first run's sends among 323 "Not tried"): moved to
+            // semi-automatic, sent (by this run), no action needed, handled previously (by an earlier run this period), and still to do.
             var group = s.group, date = s.date
-            if group == .notTried, progress.notListedRecently(e.id, now: now), !progress.isParked(e.id, now: now) { group = .notListed; date = progress.latestSiteCheck(e.id)?.date }
+            if group == .notListed { group = .noAction }
+            // Not listed in an earlier run, and still inside its window: the run leaves it alone, and there is nothing to do.
+            if group == .notTried, progress.notListedRecently(e.id, now: now), !progress.isParked(e.id, now: now) { group = .noAction; date = progress.latestSiteCheck(e.id)?.date }
             // A site that holds data only on some people (`onlyFor`) is not the run's, whatever an earlier attempt did: it says who it is for.
-            if let only = e.onlyFor, group != .sent { return ActivityRow(id: e.id, domain: e.domain, group: .notTried, line: Loc.f("Only holds data on %@: nothing to do unless that is you", only.who)) }
+            if let only = e.onlyFor, group != .sent { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.f("Only holds data on %@: nothing to do unless that is you", only.who)) }
             let line: String
             switch group {
-            case .sent: line = Loc.f("Sent %@", Loc.date(date ?? now))
-            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(date ?? now))
+            // Sent and not confirmed counts as sent (decided 2026-11-24); its line says the site showed no confirmation.
+            case .sent: line = s.unconfirmed ? Loc.f("Sent %@; the site did not show a confirmation", Loc.date(date ?? now)) : Loc.f("Sent %@", Loc.date(date ?? now))
+            case .notListed, .noAction, .earlier: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(date ?? now))
             case .needsYou: line = ReviewItem(id: e.id, domain: e.domain, outcome: s.outcome ?? "failed", detail: s.detail, date: s.date ?? now, hasScreenshot: false).label
             case .notTried:
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
-                if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
-                else if let why = reason(e) { line = why }
-                else if !nextPass.contains(e.domain) { line = AppModel.leftForPersonLine(progress.optOutAttempts[e.id]?.last) }
-                else if let r = i.lastRun[e.id] { line = r.label }
+                let attempts = progress.optOutAttempts[e.id] ?? []
+                if progress.isParked(e.id, now: now) { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.t("You set it aside")) }
+                if let why = reason(e) {
+                    switch why {
+                    case .tooSoon:
+                        let sent = attempts.filter(\.wasSubmitted).map(\.date).max() ?? now
+                        return ActivityRow(id: e.id, domain: e.domain, group: .earlier, line: Loc.f("Sent %@, in an earlier run", Loc.date(sent)))
+                    case .coveredByPlatform, .skippedNotListed: return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: why.label)
+                    case .needsData, .needsYou: return ActivityRow(id: e.id, domain: e.domain, group: .needsYou, line: why.label)
+                    default: line = why.label
+                    }
+                } else if !nextPass.contains(e.domain) {
+                    let last = attempts.last
+                    if let last, last.wasEmailed { return ActivityRow(id: e.id, domain: e.domain, group: .earlier, line: Loc.f("You emailed your request on %@", Loc.date(last.date))) }
+                    // Stopped before by a check, a code or a field no profile fills: it is in the semi-automated queue.
+                    if let last, AutoOptOut.lastAttemptNeedsPerson(last) { return ActivityRow(id: e.id, domain: e.domain, group: .needsYou, line: AppModel.leftForPersonLine(last)) }
+                    line = AppModel.leftForPersonLine(last)
+                } else if let r = i.lastRun[e.id] { line = r.label }
                 else { line = i.since == nil ? Loc.t("Not tried yet this period") : Loc.t("Not tried yet in this run") }
             }
             return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
@@ -1053,7 +1106,6 @@ final class AppModel: ObservableObject {
     nonisolated static func leftForPersonLine(_ last: OptOutAttempt?) -> String {
         guard let last else { return Loc.t("Waits for the next full re-test") }
         if AutoOptOut.isHumanCheck(outcome: last.outcome, detail: last.detail) { return humanCheckLine(last.detail) }
-        if last.outcome == "failed", last.detail == AutoOptOut.sentUnconfirmed { return Loc.t("Sent twice without a confirmation: check it yourself") }
         if AutoOptOut.lastAttemptNeedsPerson(last), let detail = last.detail, !detail.isEmpty { return Loc.f("Needs you: %@", detail) }
         return Loc.t("Waits for the next full re-test")
     }
@@ -1230,7 +1282,7 @@ final class AppModel: ObservableObject {
         // The count shown is what this run really has left, from the start: a run carried on after it was cut off showed "0 of" every site in the
         // directory until its first site was done, and looked as if it had started again from scratch.
         // A run carried on after a pause counts on from the sites it already did: it read "0 of 32" after "2 of 35", and looked as if it had started again
-        // (2026-11-23). `autoCarriedOn` says so on the automatic opt-out page.
+        // (2026-11-23). `autoCarriedOn` records it (the page no longer shows a line for it, decided 2026-11-24).
         // Every site this pass already did (sent ones are no longer in `runnable`, which holds only what is left).
         let alreadyDone = dryRun ? 0 : directory.filter { triedThisPass($0) && AutoOptOut.standIn(resolved($0)).optOutForm != nil }.count
         autoCarriedOn = alreadyDone > 0
@@ -1290,14 +1342,39 @@ final class AppModel: ObservableObject {
         }
         save()
         refreshReminders()
-        if !dryRun, !interrupted { platform.notifyOptOut(sent: results.filter { if case .submitted = $0.1 { return true } else { return false } }.count,
+        if !dryRun, !interrupted { platform.notifyOptOut(sent: results.filter { $0.1.wentOut }.count,
                                                   needYou: results.filter { if case .needsYou = $0.1 { return true } else { return false } }.count) }
     }
 
     #if DEBUG
+    /// Tests: a history the size of a phone that has run for months (the one that showed the app stalling every few seconds on 2026-11-24 had about 830
+    /// sites): every site tried `attempts` times, the first of each three sent, each with what the page said; and a full run log. Only data, built at once:
+    /// a test that uses it still sends to a handful of sites, because what the screens cost depends on how much the app holds, not on how many it sends.
+    func seedHistoryForTesting(attempts: Int = 10, skipping: (DirectoryEntry) -> Bool = { _ in false }, now: Date = Date()) {
+        let said = String(repeating: "Thank you, your request has been received and will be processed. ", count: 6)
+        let start = now.addingTimeInterval(-200 * 86_400)          // older than a period, so a run still has sites to send
+        let sites = directory.filter { !skipping($0) }
+        household.mutateProgress(for: selectedID) { p in
+            for (i, e) in sites.enumerated() {
+                for k in 0..<attempts {
+                    p.recordOptOutAttempt(OptOutAttempt(date: start.addingTimeInterval(Double(k * 86_400 + i)), outcome: k % 3 == 0 ? "submitted" : "failed",
+                                                        detail: k % 3 == 0 ? nil : "no success message was shown", pageSaid: said), site: e.id)
+                }
+            }
+        }
+        var log = RunLog()
+        for i in 0..<RunLog.kept { log.add(RunLogEntry(date: start.addingTimeInterval(Double(i)), event: RunLog.Event.site.rawValue, site: sites[i % max(1, sites.count)].domain,
+                                                       detail: "failed(\"the site stopped answering\"); given up while waiting for the page", appActive: true, awayFor: nil)) }
+        runLog = log; runLogLoaded = true
+        try? runLogStore.save(log)
+        save()
+    }
+
     func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
     func setRunStartedForTesting(_ date: Date) { household.updateAuto { $0.runStarted = date } }
     func startPeriodForTesting() { household.updateAuto { $0.periodAnchor = Date().addingTimeInterval(-86_400) } }
+    /// A full pass finished then, so the next run is a repeat.
+    func setLastFullRunForTesting(_ date: Date) { household.updateAuto { $0.lastFullRun = date } }
         func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
 
@@ -1349,7 +1426,7 @@ final class AppModel: ObservableObject {
 
     /// How many sites still wait in each kind of broker, for the person to choose from.
     var remainingKinds: [(kind: String, count: Int)] {
-        DailyGoals.remainingByKind(queue: OptOutPlan.verifyQueue(plan, entries: directory), entries: directory, attempts: progress.optOutAttempts, parked: progress.parkedSites().union(progress.notListedSites()))
+        DailyGoals.remainingByKind(queue: semiQueue, entries: directory, attempts: progress.optOutAttempts, parked: progress.parkedSites().union(progress.notListedSites()))
     }
 
     // MARK: Daily summary
@@ -1478,7 +1555,7 @@ final class AppModel: ObservableObject {
 
     /// Today's goals for the selected person: the next batch of semi-automated sites and the email to the same sites.
     var dailyGoals: DailyGoals {
-        let queue = OptOutPlan.verifyQueue(plan, entries: directory)
+        let queue = semiQueue
         // A site a recent look found no listing on has nothing to do, so it is left out like one set aside.
         let attempts = progress.optOutAttempts, parked = progress.parkedSites().union(progress.notListedSites())
         // Nothing finished today means only the first batch can be real: a second one is taken only after finishing the first. A saved count or list of
@@ -1490,7 +1567,7 @@ final class AppModel: ObservableObject {
 
     /// Sites still waiting for the semi-automated step, and so how many days at one batch a day.
     var verifyRemaining: Int {
-        let queued = Set(OptOutPlan.verifyQueue(plan, entries: directory)); let parked = progress.parkedSites().union(progress.notListedSites()); let ids = Set(sites.entries(domains: queued).filter { !parked.contains($0.id) }.map(\.id))
+        let queued = Set(semiQueue); let parked = progress.parkedSites().union(progress.notListedSites()); let ids = Set(sites.entries(domains: queued).filter { !parked.contains($0.id) }.map(\.id))
         let byID = sites.byID; return ids.filter { !(byID[$0]?.isHandled(progress) ?? false) }.count
     }
 
@@ -1563,8 +1640,10 @@ final class AppModel: ObservableObject {
         let hasScreenshot: Bool
         /// What the page said at the end of the attempt (`OptOutAttempt.pageSaid`), shown on the site's screen.
         var pageSaid: String? = nil
-        var worked: Bool { outcome.hasPrefix("submitted") }
+        /// Sent: confirmed by the site, or sent with no confirmation shown in time (that counts as sent too, decided 2026-11-24).
+        var worked: Bool { OptOutAttempt(date: date, outcome: outcome, detail: detail).wasSubmitted }
         var label: String {
+            if outcome == "failed", detail == AutoOptOut.sentUnconfirmed { return Loc.t("Sent; the site did not show a confirmation") }
             switch outcome {
             case "submitted": return Loc.t("Sent")
             case "submitted_email": return Loc.t("Sent; confirm the email they sent you")
@@ -1649,9 +1728,14 @@ final class AppModel: ObservableObject {
 
     /// The same, from values only, so the automatic opt-out page can work it out away from the main thread.
     nonisolated static func skipReason(_ e: DirectoryEntry, plans: FillPlans, progress: OptOutKitCore.Progress, everySite: Bool, hold: PlatformHold?, period: RunPeriod?, now: Date) -> String? {
+        skipResult(e, plans: plans, progress: progress, everySite: everySite, hold: hold, period: period, now: now)?.label
+    }
+
+    /// Why a run would leave the site alone now, as a result (nil: it would try it).
+    nonisolated static func skipResult(_ e: DirectoryEntry, plans: FillPlans, progress: OptOutKitCore.Progress, everySite: Bool, hold: PlatformHold?, period: RunPeriod?, now: Date) -> AutoOptOutResult? {
         AutoOptOut.precheck(entry: e, person: plans.person, progress: progress, now: now,
                             minInterval: everySite ? AutoOptOut.retestMinInterval : AutoOptOut.defaultMinInterval,
-                            hold: hold, period: everySite ? nil : period, plans: plans).result?.label
+                            hold: hold, period: everySite ? nil : period, plans: plans).result
     }
 
     /// Of these sites, the ones a run would really try now.
