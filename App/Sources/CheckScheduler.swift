@@ -26,13 +26,14 @@ enum CheckScheduler {
     /// iOS decides when these actually run, and a background run may not be able to use the hidden web view; the app also
     /// catches up whenever it is opened (see OptOutKitApp), which is the reliable path.
     static func registerAutomation(model: AppModel) {
+        // When iOS ends a scheduled task, a run it started stops after the site in progress and waits for the person ("Carry on?").
         BGTaskScheduler.shared.register(forTaskWithIdentifier: scanTaskID, using: nil) { task in
             let work = Task { @MainActor in await model.runDueAutomation(); task.setTaskCompleted(success: true) }
-            task.expirationHandler = { work.cancel() }
+            task.expirationHandler = { Task { @MainActor in model.scheduledTaskEnded() }; work.cancel() }
         }
         BGTaskScheduler.shared.register(forTaskWithIdentifier: optOutTaskID, using: nil) { task in
             let work = Task { @MainActor in await model.runDueAutomation(); task.setTaskCompleted(success: true) }
-            task.expirationHandler = { work.cancel() }
+            task.expirationHandler = { Task { @MainActor in model.scheduledTaskEnded() }; work.cancel() }
         }
     }
 
@@ -120,6 +121,7 @@ final class ContinuedRun {
     private var done = 0, total = 0
     private var onExpire: () -> Void = {}
     private var completed = false
+    var onGranted: (() -> Void)?
     /// While one site is slow (a page load can take most of a minute), progress still moves a little, so iOS does not take it for a stalled task.
     private var heartbeat: Timer?
     private var lastReport = Date()
@@ -147,6 +149,7 @@ final class ContinuedRun {
     private func attach(_ task: BGContinuedProcessingTask) {
         NSLog("ContinuedRun: granted")
         self.task = task
+        onGranted?()
         task.expirationHandler = { [weak self] in
             Task { @MainActor in NSLog("ContinuedRun: expired"); self?.onExpire(); self?.finish(success: false) }
         }

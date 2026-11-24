@@ -35,6 +35,12 @@ public struct EvidenceStore: Sendable {
         return try? SealedStore.open(data, key: k)
     }
 
+    /// When the screenshot was taken (saved), or nil when there is none: a site whose latest attempt kept no picture still shows an older one.
+    public func taken(person: UUID, site: String) -> Date? {
+        guard let rowKey = try? key(person: person, site: site) else { return nil }
+        return (try? database.saved(.evidence, key: rowKey)) ?? nil
+    }
+
     public func exists(person: UUID, site: String) -> Bool { (try? key(person: person, site: site)).map { database.exists(.evidence, key: $0) } ?? false }
 
     /// Removes one person's screenshots (when they are deleted from the app).

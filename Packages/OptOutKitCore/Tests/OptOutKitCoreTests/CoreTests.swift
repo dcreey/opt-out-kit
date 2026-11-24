@@ -1540,19 +1540,64 @@ final class AutoOptOutTests: XCTestCase {
         XCTAssertFalse(StorageError.isLocked(NSError(domain: NSOSStatusErrorDomain, code: -25300)), "a missing key is not a locked phone")
     }
 
-    /// Stop means stop: a stopped run is not carried on, and a due one is not started, until the person starts a run.
-    func testARunThePersonStoppedDoesNotStartByItself() {
+    /// Stop means stop: a stopped run is not carried on, and a due one is not started, until the person starts a run. A run cut off by iOS or a close is not
+    /// carried on by itself either (decided 2026-11-24): it is `resumable`, and the person is asked.
+    func testARunThatStoppedIsNeverCarriedOnByItself() {
         var s = AutoSettings(); s.optOutEnabled = true
         XCTAssertTrue(s.startsByItself(now: t0), "never run: due")
         s.lastOptOut = t0; s.periodAnchor = t0
         XCTAssertFalse(s.startsByItself(now: t0 + day))
+        XCTAssertFalse(s.resumable, "nothing stopped")
         s.optOutResumePending = true
-        XCTAssertTrue(s.startsByItself(now: t0 + day), "cut off by iOS: carried on")
+        XCTAssertFalse(s.startsByItself(now: t0 + day), "cut off by iOS: not carried on by itself")
+        XCTAssertFalse(s.startsByItself(now: t0 + 200 * day), "not even when the next one is due: the person is asked first")
+        XCTAssertTrue(s.resumable, "the person is asked whether to carry on")
         s.stoppedByPerson = true
-        XCTAssertFalse(s.startsByItself(now: t0 + day), "stopped by the person: not carried on")
+        XCTAssertFalse(s.resumable, "stopped by the person: not even asked")
         XCTAssertFalse(s.startsByItself(now: t0 + 200 * day), "nor started when due")
         s.stoppedByPerson = nil; s.optOutEnabled = false
-        XCTAssertFalse(s.startsByItself(now: t0 + day), "off: nothing starts")
+        XCTAssertTrue(s.resumable, "a run started by hand with the schedule off is still offered")
+        XCTAssertFalse(s.startsByItself(now: t0 + day), "off: nothing starts by itself")
+    }
+
+    /// The run log keeps the newest entries, and an export takes the ones from the run's start.
+    func testTheRunLogKeepsTheNewestEntriesAndGivesThoseOfARun() {
+        var log = RunLog()
+        for i in 0..<(RunLog.kept + 5) { log.add(RunLogEntry(date: t0 + Double(i), event: RunLog.Event.site.rawValue, site: "s\(i).com")) }
+        XCTAssertEqual(log.entries.count, RunLog.kept)
+        XCTAssertEqual(log.entries.first?.site, "s5.com", "the oldest went first")
+        XCTAssertEqual(log.since(t0 + Double(RunLog.kept + 3)).map(\.site), ["s\(RunLog.kept + 3).com", "s\(RunLog.kept + 4).com"])
+        XCTAssertEqual(log.since(nil).count, RunLog.kept)
+    }
+
+    /// The run log is one sealed row of the database: read back whole with the key, and no site name or detail is in the file as text.
+    func testTheRunLogIsSealedInTheDatabase() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("runlog-\(UUID()).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let db = UserDatabase(url: url), keys = FixedKey()
+        var log = RunLog()
+        log.add(RunLogEntry(date: t0, event: RunLog.Event.site.rawValue, site: "secretbroker.example", detail: "failed(the site stopped answering)", appActive: false, awayFor: 12))
+        try RunLogStore(database: db, keys: keys).save(log)
+        XCTAssertEqual(RunLogStore(database: db, keys: keys).load(), log)
+        XCTAssertEqual(RunLogStore(database: db, keys: FixedKey()).load(), RunLog(), "another key reads nothing")
+        let bytes = try Data(contentsOf: url)
+        XCTAssertNil(bytes.range(of: Data("secretbroker".utf8)), "the site's name is not in the file")
+        RunLogStore(database: db, keys: keys).clear()
+        XCTAssertEqual(RunLogStore(database: db, keys: keys).load(), RunLog())
+    }
+
+    /// A human check (any CAPTCHA, a Cloudflare check, a bot check, a picture code, a check asked for after sending) is one the person clears; a certification
+    /// box, a terms prompt or an emailed code is not a human check.
+    func testWhatCountsAsAHumanCheck() {
+        for d in ["a reCAPTCHA checkbox", "a reCAPTCHA puzzle", "an hCaptcha", "a Cloudflare check", "a human check", "a code to type",
+                  "a reCAPTCHA that rejected the automatic send", "a human check the page asked for after sending"] {
+            XCTAssertTrue(AutoOptOut.isHumanCheck(outcome: "challenged", detail: d), d)
+            XCTAssertTrue(AutoOptOut.lastAttemptNeedsPerson(OptOutAttempt(date: t0, outcome: "challenged", detail: d)), d)
+        }
+        for d in ["a certification box that you must tick yourself", "a terms prompt that you need to accept yourself"] {
+            XCTAssertFalse(AutoOptOut.isHumanCheck(outcome: "challenged", detail: d), d)
+        }
+        XCTAssertFalse(AutoOptOut.isHumanCheck(outcome: "failed", detail: "a reCAPTCHA checkbox"), "only a stop by a check")
     }
 
     func testRunNowLeavesOutOnlyTheSitesAlreadySentThisPeriod() {
@@ -2218,11 +2263,12 @@ final class SelfIdentityConfirmationTests: XCTestCase {
         if case .needsYou = FormFiller.plan(for: form(box), signals: nil, person: person(.me, minor: true)).verdict {} else { XCTFail("minor") }
     }
 
-    /// A certification about the person themselves is ticked for the owner since 2026-11-23 (`testTheOwnersProfileTicksACertificationAboutThemselvesButNotAnAgentsBox`);
-    /// one that is only an agent's, terms, or an attestation that does not say who the person is, never.
+    /// A certification about the person themselves is ticked for the owner since 2026-11-23 (`testTheOwnersProfileTicksACertificationAboutThemselvesButNotAnAgentsBox`),
+    /// unless it is sworn as an oath (2026-11-24); one that is only an agent's, terms, or an attestation that does not say who the person is, never.
     func testLegalCertificationsAgentStatementsAndTermsAreNeverTicked() {
-        XCTAssertTrue(FormFiller.isSelfIdentityBox("I certify under penalty of perjury that I am the person named in this request"), "about the person themselves")
-        for text in ["I certify that I am an authorized agent with written proof of authorization to act on behalf of the consumer",
+        XCTAssertTrue(FormFiller.isSelfIdentityBox("I certify that I am the person named in this request"), "about the person themselves")
+        for text in ["I certify under penalty of perjury that I am the person named in this request",
+                     "I certify that I am an authorized agent with written proof of authorization to act on behalf of the consumer",
                      "I am the owner of this email and an authorized agent acting on behalf of the person",
                      "I confirm that I am the person associated with this email and agree to the terms of service",
                      "I acknowledge and attest that the information is true"] {
@@ -3543,11 +3589,19 @@ final class FormFillerMoreFieldsTests: XCTestCase {
     func testTheOwnersProfileTicksACertificationAboutThemselvesButNotAnAgentsBox() {
         let cert = "I certify under penalty of perjury that, I am the individual, or authorized agent of the individual, whose information is the subject of this request; that I am a resident of the state identified above, and that all information I have submitted is true and accurate.*"
         let proof = "Check this box to confirm that you can provide written proof of authorization to request information on behalf of the data subject."
-        XCTAssertTrue(FormFiller.isSelfIdentityBox(cert))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox(cert), "sworn under penalty of perjury: the person reads and ticks it (decided 2026-11-24)")
+        for oath in ["Under penalty of perjury, I declare all the above information to be true and accurate.", "I swear that I am the individual whose information is the subject of this request",
+                     "I confirm under oath that the information I have submitted is true"] {
+            XCTAssertFalse(FormFiller.isSelfIdentityBox(oath), oath)
+        }
+        let plain = "I certify that I am the individual whose information is the subject of this request, and that all information I have submitted is true and accurate."
+        XCTAssertTrue(FormFiller.isSelfIdentityBox(plain), "the same statement without an oath is still ticked on the owner's profile")
         XCTAssertFalse(FormFiller.isSelfIdentityBox(proof), "an agent's statement")
         XCTAssertFalse(FormFiller.isSelfIdentityBox("I certify that I have read and accept the Terms of Service and Privacy Policy.*"), "terms are never")
-        let fields = [("checkbox", "f0-9", proof), ("checkbox", "f0-10", cert), ("text", "f0-1", "First Name *"), ("email", "f0-2", "Email *")]
-        if case .needsYou(let why) = plan(fields, person: pat).verdict { XCTFail("the owner's own certification held the form: \(why)") }
+        let sworn = [("checkbox", "f0-9", proof), ("checkbox", "f0-10", cert), ("text", "f0-1", "First Name *"), ("email", "f0-2", "Email *")]
+        if case .needsYou = plan(sworn, person: pat).verdict {} else { XCTFail("an oath waits for the owner too") }
+        let fields = [("checkbox", "f0-9", proof), ("checkbox", "f0-10", plain), ("text", "f0-1", "First Name *"), ("email", "f0-2", "Email *")]
+        if case .needsYou(let why) = plan(fields, person: pat).verdict { XCTFail("the owner's own plain certification held the form: \(why)") }
         var family = pat; family.relationship = .otherFamily
         if case .needsYou = plan(fields, person: family).verdict {} else { XCTFail("a family member's profile waits for that person") }
     }

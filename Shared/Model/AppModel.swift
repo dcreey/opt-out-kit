@@ -86,6 +86,13 @@ final class AppModel: ObservableObject {
     @Published private(set) var autoCarriedOn = false
     /// Set when an opt-out run finishes, so the result is shown right away: all sent, or which sites need the person.
     @Published var runReport: RunReport?
+    /// A run stopped before finishing (paused, or cut off when the app was closed) and the app is on screen: ask the person whether to carry on. Never carried on
+    /// by itself (decided 2026-11-24).
+    @Published var askToResume = false
+    /// What happened to the run as it went (`RunLog`), for the run export. Loaded once; written after each entry, off the main thread.
+    private(set) var runLog = RunLog()
+    /// When the app last left the screen, for the run log ("away for N seconds").
+    private var leftScreenAt: Date?
     /// Latest "where am I listed" scan per person. Kept in memory only: it is a snapshot, not a record.
     @Published private(set) var exposure: [UUID: [ScanResult]] = [:]
     @Published private(set) var scanProgress: (done: Int, total: Int)?
@@ -175,6 +182,7 @@ final class AppModel: ObservableObject {
         if args.contains("-uitest-reset") {
             try? store.erase()
             evidence.removeEverything()
+            RunLogStore(database: store.database, keys: store.keyProvider).clear()
             // UI tests skip the walkthrough unless a test asks for it.
             if args.contains("-uitest-onboarding") { defaults.removeObject(forKey: Self.seenKey) }
             else { defaults.set(Announcements.newestID(catalog), forKey: Self.seenKey) }
@@ -492,7 +500,7 @@ final class AppModel: ObservableObject {
         let attempts = person.map { household.progress(for: $0.id).optOutAttempts } ?? [:]
         let confirming = person?.mayConfirmOwnIdentity() ?? false
         var verdicts: [String: MethodVerdict] = [:]
-        return OptOutPlan.build(entries: scopedDirectory(for: person).filter { $0.closed == nil }, brokers: brokers, platforms: eligible,
+        return OptOutPlan.build(entries: scopedDirectory(for: person).filter { $0.closed == nil && $0.onlyFor == nil }, brokers: brokers, platforms: eligible,
                                 classifyEntry: { e in
                                     if let v = verdicts[e.id] { return v }
                                     let last = attempts[e.id]?.last?.outcome
@@ -610,6 +618,24 @@ final class AppModel: ObservableObject {
     // MARK: The profile being typed (kept for a crash) and the first-run setup
 
     private var draftStore: ProfileDraftStore { ProfileDraftStore(database: store.database, keys: store.keyProvider) }
+    private var runLogStore: RunLogStore { RunLogStore(database: store.database, keys: store.keyProvider) }
+
+    /// Writes down what just happened to the run (`RunLog`), with whether the app is on screen and how long it has been away.
+    func logRun(_ event: RunLog.Event, site: String? = nil, detail: String? = nil, now: Date = Date()) {
+        if runLog.entries.isEmpty, !runLogLoaded { runLog = runLogStore.load() }
+        runLogLoaded = true
+        let active = platform.appIsActive
+        runLog.add(RunLogEntry(date: now, event: event.rawValue, site: site, detail: detail, appActive: active,
+                               awayFor: active ? nil : leftScreenAt.map { (now.timeIntervalSince($0) * 10).rounded() / 10 }))
+        let log = runLog, logs = runLogStore
+        saveQueue.async { try? logs.save(log) }
+    }
+    private var runLogLoaded = false
+    /// The run log as saved, for the export.
+    func currentRunLog() -> RunLog {
+        if !runLogLoaded { runLog = runLogStore.load(); runLogLoaded = true }
+        return runLog
+    }
 
     /// Keeps what is typed in the profile editor, sealed, off the main thread. Not the profile itself: nothing is rebuilt and the household is not rewritten.
     func saveDraft(_ person: Person, email: String) {
@@ -769,17 +795,31 @@ final class AppModel: ObservableObject {
         // Periods (months) are counted from the first run; an earlier send by hand counts as the start so nothing already done is lost from the tally.
         let earliest = people.compactMap { household.progress(for: $0.id).optOutAttempts.values.flatMap { $0 }.filter(\.wasSubmitted).map(\.date).min() }.min()
         if household.autoSettings.periodAnchor == nil { household.updateAuto { $0.periodAnchor = min(earliest ?? Date(), Date()) } }
+        let carriedOn = household.autoSettings.passStarted != nil
         household.updateAuto {
-            $0.optOutResumePending = true
+            $0.optOutResumePending = true; $0.pausedAt = nil; $0.pauseReason = nil
             if $0.passStarted == nil { $0.passStarted = Date(); $0.passKind = $0.nextRunKind(now: Date()); $0.runStarted = $0.passStarted }
         }
         save()
+        askToResume = false
+        logRun(.runStarted, detail: "\(household.autoSettings.passKind?.rawValue ?? "run")\(carriedOn ? ", carried on" : ""), \(total) sites")
         if useContinued {
             continuedRun = platform.startContinuedRun(total: max(total, 1), onExpire: { [weak self] in
                 guard let self else { return }
                 self.continuedRunExpired(appActive: self.platform.appIsActive)
             })
+            if let continuedRun {
+                logRun(continuedGranted ? .backgroundTimeGranted : .backgroundTimeRequested)
+                continuedRun.onGranted = { [weak self] in self?.logRun(.backgroundTimeGranted) }
+            } else { logRun(.backgroundTimeRefused, detail: "iOS would not take the request, or this iOS has no background time for a run") }
         }
+    }
+
+    /// The run stopped before finishing for a reason that is not the person's: written down for the question "Carry on?" and the run log.
+    private func pauseRun(_ reason: String) {
+        household.updateAuto { $0.pausedAt = Date(); $0.pauseReason = reason }
+        save()
+        logRun(.paused, detail: reason)
     }
 
     /// The person stopped the run: it starts no more sites and ends when the ones in progress finish (at most `AutoOptOut.siteLimit`), keeping everything done so far. The pass is
@@ -791,6 +831,7 @@ final class AppModel: ObservableObject {
         // Re-test all starts it again.
         household.updateAuto { $0.stoppedByPerson = true }
         save()
+        logRun(.stoppedByPerson)
         NSLog("OptOutRun: stopped by the person")
     }
 
@@ -801,13 +842,33 @@ final class AppModel: ObservableObject {
         continuedRun?.finish(success: false)
         continuedRun = nil
         NSLog("OptOutRun: iOS ended the background time (app active=%d)", appActive ? 1 : 0)
+        logRun(.backgroundTimeEnded)
         guard !appActive else { return }
         autoStopRequested = true
+        pauseRun(Self.pausedBackgroundTimeEnded)
         platform.notifyPaused()
     }
 
+    /// iOS ended a scheduled background task while it was running: a run in it stops after the site in progress, and waits for the person.
+    func scheduledTaskEnded() {
+        logRun(.scheduledTaskEnded)
+        guard autoBusy == "optout" else { return }
+        autoStopRequested = true
+        pauseRun(Self.pausedScheduledTaskEnded)
+        platform.notifyPaused()
+    }
+
+    /// iOS said memory is low: written down, since an app in the background can then be ended without another word.
+    func memoryWarning() { if autoBusy != nil || household.autoSettings.optOutResumePending == true { logRun(.memoryWarning) } }
+
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
     private func endOptOutRun(interrupted: Bool) {
+        logRun(.runEnded, detail: interrupted ? "stopped before every site was done" : "every site done")
+        // Stopped early and not by the person, with no pause written down: whatever stopped it, the person is asked, like any other stop.
+        if interrupted, household.autoSettings.stoppedByPerson != true, household.autoSettings.pausedAt == nil, !personStopRequested {
+            household.updateAuto { $0.pausedAt = Date(); $0.pauseReason = Self.pausedEarly }
+            logRun(.stoppedEarly, detail: Self.pausedEarly)
+        }
         autoBusy = nil; autoProgress = nil
         planCache = nil          // the run's results are in the plan now, once
         if !interrupted {
@@ -820,6 +881,8 @@ final class AppModel: ObservableObject {
         continuedRun?.finish(success: !interrupted)
         continuedRun = nil
         save(); endBackgroundTime()
+        // On screen when it stopped (iOS took the time back as the person came back, say): ask now, not at the next return.
+        if interrupted, platform.appIsActive { offerToResume() }
     }
 
     // MARK: Run periods
@@ -956,6 +1019,8 @@ final class AppModel: ObservableObject {
             // Not listed in an earlier run, and still inside its window: the run leaves it alone, and it counts as not listed, not as untried.
             var group = s.group, date = s.date
             if group == .notTried, progress.notListedRecently(e.id, now: now), !progress.isParked(e.id, now: now) { group = .notListed; date = progress.latestSiteCheck(e.id)?.date }
+            // A site that holds data only on some people (`onlyFor`) is not the run's, whatever an earlier attempt did: it says who it is for.
+            if let only = e.onlyFor, group != .sent { return ActivityRow(id: e.id, domain: e.domain, group: .notTried, line: Loc.f("Only holds data on %@: nothing to do unless that is you", only.who)) }
             let line: String
             switch group {
             case .sent: line = Loc.f("Sent %@", Loc.date(date ?? now))
@@ -965,7 +1030,7 @@ final class AppModel: ObservableObject {
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
                 if progress.isParked(e.id, now: now) { line = Loc.t("You set it aside") }
                 else if let why = reason(e) { line = why }
-                else if !nextPass.contains(e.domain) { line = Loc.t("Waits for the next full re-test") }
+                else if !nextPass.contains(e.domain) { line = AppModel.leftForPersonLine(progress.optOutAttempts[e.id]?.last) }
                 else if let r = i.lastRun[e.id] { line = r.label }
                 else { line = i.since == nil ? Loc.t("Not tried yet this period") : Loc.t("Not tried yet in this run") }
             }
@@ -976,12 +1041,30 @@ final class AppModel: ObservableObject {
         return (rows, runNow)
     }
 
+    /// The line of a site a human check stopped: says so first, then which check (decided 2026-11-24: "Stopped: a reCAPTCHA checkbox" and "Waits for the next
+    /// full re-test" did not say it was a check only the person can clear).
+    nonisolated static func humanCheckLine(_ detail: String?) -> String {
+        let what = (detail ?? "").trimmingCharacters(in: .whitespaces)
+        if what.isEmpty || what.lowercased() == "a human check" { return Loc.t("Blocked by a human check: only you can clear it") }
+        return Loc.f("Blocked by a human check (%@): only you can clear it", what)
+    }
+
+    /// The line of a site that a run does not try again (`AutoOptOut.inRepeatPass` leaves it out) and no other reason covers: why, from its latest attempt.
+    nonisolated static func leftForPersonLine(_ last: OptOutAttempt?) -> String {
+        guard let last else { return Loc.t("Waits for the next full re-test") }
+        if AutoOptOut.isHumanCheck(outcome: last.outcome, detail: last.detail) { return humanCheckLine(last.detail) }
+        if last.outcome == "failed", last.detail == AutoOptOut.sentUnconfirmed { return Loc.t("Sent twice without a confirmation: check it yourself") }
+        if AutoOptOut.lastAttemptNeedsPerson(last), let detail = last.detail, !detail.isEmpty { return Loc.f("Needs you: %@", detail) }
+        return Loc.t("Waits for the next full re-test")
+    }
+
     /// One site's result, written down at once (not when the whole run ends), so closing the app never loses a request that was sent.
     func recordAutoResult(_ entry: DirectoryEntry, _ result: AutoOptOutResult, pageSaid: String? = nil, for personID: UUID, dryRun: Bool) {
         MainThreadWatch.note("recording a result")
         defer { MainThreadWatch.note("after recording a result") }
         guard !dryRun else { return }
         if let attempt = AutoOptOut.attempt(for: result, now: Date(), pageSaid: pageSaid) { household.mutateProgress(for: personID) { $0.recordOptOutAttempt(attempt, site: entry.id) } }
+        logRun(.site, site: entry.domain, detail: String(describing: result) + (RunStep.takeFrozen().map { "; given up while \($0)" } ?? ""))
         var rows = optOutRun[personID] ?? []
         rows.removeAll { $0.id == entry.id }
         rows.append(AutoOptOutRow(id: entry.id, domain: entry.domain, result: result))
@@ -997,14 +1080,18 @@ final class AppModel: ObservableObject {
     /// The app left the front: ask iOS for the extra time it gives (about 30 seconds) to finish the site in progress, then stop between sites.
     func appDidEnterBackground() {
         refreshReminders()
+        leftScreenAt = Date()
         guard autoBusy == "optout", backgroundTask == 0 else { return }
+        logRun(.background, detail: continuedGranted ? "the run has its own background time" : "no background time for the run")
         // iOS 26 gave the run its own background time (shown as a Live Activity): carry on, the expiry handler stops it if iOS takes the time back.
         if continuedGranted { return }
         backgroundTask = platform.beginBackgroundTask("optout-finish-site") { [weak self] in
-            Task { @MainActor in self?.autoStopRequested = true; self?.platform.notifyPaused(); self?.endBackgroundTime() }
+            Task { @MainActor in self?.logRun(.finishSiteTimeEnded); self?.autoStopRequested = true; self?.platform.notifyPaused(); self?.endBackgroundTime() }
         }
         // Stop after the current site instead of starting another one that iOS would freeze half-way.
         autoStopRequested = true
+        logRun(.stopAfterSite)
+        pauseRun(Self.pausedLeftScreen)
         NSLog("OptOutRun: background, finishing the current site then stopping")
         platform.scheduleResume()
     }
@@ -1017,8 +1104,66 @@ final class AppModel: ObservableObject {
         endBackgroundTime()
         refreshReminders()
         // A quick glance away: the run was only asked to stop, so let it go on.
-        if autoBusy == "optout" { autoStopRequested = false }
+        if autoBusy == "optout" {
+            autoStopRequested = false
+            logRun(.foreground)
+            household.updateAuto { $0.pausedAt = nil; $0.pauseReason = nil }
+        }
+        leftScreenAt = nil
+        offerToResume()
     }
+
+    /// A run that stopped before finishing, with the app on screen and no run going: ask the person whether to carry on (`askToResume`).
+    func offerToResume() {
+        guard autoBusy == nil, storageProblem == nil, !askToResume, household.autoSettings.resumable, people.contains(where: isReady) else { return }
+        if household.autoSettings.pausedAt == nil {
+            // Nothing wrote down a pause: the app was closed, or ended by iOS, in the middle of the run.
+            household.updateAuto { $0.pausedAt = Date(); $0.pauseReason = Self.pausedAppClosed }
+            save()
+            logRun(.foundCutOff, detail: Self.pausedAppClosed)
+        }
+        askToResume = true
+        logRun(.resumeAsked, detail: household.autoSettings.pauseReason)
+    }
+
+    /// The person said to carry on with the run that stopped. It runs whatever else is in the way: a due-check that does not start it (a first pass waiting on
+    /// California's DROP, the profile screen up) would have answered "Carry on" with nothing.
+    func resumeRun() {
+        askToResume = false
+        logRun(.resumeAccepted)
+        guard autoBusy == nil else { return }
+        Task {
+            beginOptOutRun(total: 0, useContinued: true)
+            for person in people where isReady(person) { await runAutoOptOut(for: person) }
+            endOptOutRun(interrupted: runCutOff)
+        }
+    }
+
+    /// The person said not now: the run waits (Run now on the automatic page carries it on), and they are asked again the next time the app comes to the front.
+    func declineResume() {
+        askToResume = false
+        logRun(.resumeDeclined)
+    }
+
+    /// The words under "Carry on with the opt-out run?": why it stopped, in the person's language.
+    var resumeQuestion: String {
+        let why: String
+        switch household.autoSettings.pauseReason {
+        case Self.pausedBackgroundTimeEnded: why = Loc.t("It stopped when iOS took back its time to run in the background.")
+        case Self.pausedLeftScreen: why = Loc.t("It stopped when you left the app.")
+        case Self.pausedScheduledTaskEnded: why = Loc.t("It stopped when iOS took back its time to run in the background.")
+        case Self.pausedAppClosed: why = Loc.t("It stopped when the app was closed.")
+        default: why = Loc.t("It stopped before it was done.")
+        }
+        return why + " " + Loc.t("Carry on with the sites it has not done yet? Keep the app open while it runs, so iOS does not stop it again.")
+    }
+
+    /// Why a run paused, as the question and the run log say it.
+    static let pausedBackgroundTimeEnded = "iOS took back the run's background time while the app was not on screen"
+    static let pausedLeftScreen = "the app left the screen, and this iOS gives a run no background time"
+    static let pausedAppClosed = "the app was closed, or ended by iOS, during the run"
+    static let pausedScheduledTaskEnded = "iOS ended the scheduled background task the run was in"
+    static let pausedEarly = "the run stopped before every site was done, for no reason it was told"
 
     func endBackgroundTime() {
         guard backgroundTask != 0 else { return }
@@ -1423,6 +1568,7 @@ final class AppModel: ObservableObject {
             switch outcome {
             case "submitted": return Loc.t("Sent")
             case "submitted_email": return Loc.t("Sent; confirm the email they sent you")
+            case "challenged" where AutoOptOut.isHumanCheck(outcome: outcome, detail: detail): return AppModel.humanCheckLine(detail)
             case "challenged": return Loc.f("Stopped: %@", detail ?? "")
             case "rejected": return Loc.f("The site refused: %@", detail ?? "")
             default: return Loc.f("No confirmation: %@", detail ?? "")
@@ -1784,7 +1930,8 @@ final class AppModel: ObservableObject {
     }
 
     /// Runs whatever is due: the daily scan and the weekly opt-out, for everyone in the family. Does nothing until the person has said yes.
-    func runDueAutomation(now: Date = Date()) async {
+    /// `resume`: the person said to carry on with a run that stopped (`resumeRun`); a stopped run never carries on otherwise.
+    func runDueAutomation(now: Date = Date(), resume: Bool = false) async {
         // Not while the person is still filling in their profile: the run would start before they finish adding previous addresses.
         guard storageProblem == nil, autoBusy == nil, !showProfileGate else { return }
         let settings = household.autoSettings
@@ -1798,8 +1945,8 @@ final class AppModel: ObservableObject {
         // Due on schedule, or a run that was cut off (the app was closed or suspended) and still has sites left.
         // A new person in California makes their DROP request first; the first pass starts once it is made (it would hold back every site DROP reaches).
         if firstPassWaitsForPlatform { NSLog("OptOutRun: the first pass waits for the platform request") }
-        else if household.autoSettings.startsByItself(now: now) {
-            NSLog("OptOutRun: resuming a run that was cut off (pending=%d)", household.autoSettings.optOutResumePending == true ? 1 : 0)
+        else if household.autoSettings.startsByItself(now: now) || (resume && household.autoSettings.resumable) {
+            NSLog("OptOutRun: starting a run (carried on=%d)", resume ? 1 : 0)
             beginOptOutRun(total: 0, useContinued: true)
             for person in people where isReady(person) { await runAutoOptOut(for: person) }
             endOptOutRun(interrupted: runCutOff)
@@ -1938,6 +2085,7 @@ final class AppModel: ObservableObject {
     func eraseAndStartOver() {
         try? store.erase()
         evidence.removeEverything()
+        runLogStore.clear(); runLog = RunLog()
         household = Household()
         household.add(Person(displayName: "Me", relationship: .me))
         selectedID = household.people[0].id
@@ -1969,6 +2117,7 @@ final class AppModel: ObservableObject {
             }
         }
         if saveWaitsForUnlock { saveWaitsForUnlock = false; save() }
+        offerToResume()          // the phone was locked when the app came back: the question waited for the profiles to open
     }
 
     #if DEBUG

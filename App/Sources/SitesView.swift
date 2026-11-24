@@ -406,6 +406,7 @@ struct DirectoryInfoView: View {
 
     /// Where the site stands, in a word or three, and its colour.
     private var statusText: (String, Color) {
+        if entry.onlyFor != nil, !isDone { return (Loc.t("Not for you, unless you are in its group"), .green) }
         if isDone { return (sentDate.map { Loc.f("Done %@", $0.formatted(.dateTime.month(.abbreviated).day())) } ?? Loc.t("Done"), .green) }
         if let d = notListedOn { return (Loc.f("Not listed %@", d.formatted(.dateTime.month(.abbreviated).day())), .green) }
         if model.progress.isParked(entry.id) {
@@ -647,6 +648,16 @@ struct DirectoryInfoView: View {
 
     var body: some View {
         List {
+            if let only = entry.onlyFor {
+                // A site that holds data only on some people: nothing to do for anyone else. Opt out stays below, for someone who is in that group.
+                Section {
+                    Label(Loc.f("Only holds data on %@", only.who), systemImage: "person.crop.circle.badge.questionmark").font(.headline)
+                    Text("If that is not you, there is nothing here to opt out of, and it counts as done. If it is you, opt out below; tick its \"this person is\" box yourself.")
+                        .font(.subheadline).fixedSize(horizontal: false, vertical: true)
+                    Text(verbatim: only.evidence).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityIdentifier("only-for")
+            }
             actionSection
             statusExtras
             if let caution = entry.caution {

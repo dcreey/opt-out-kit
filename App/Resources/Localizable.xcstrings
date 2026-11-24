@@ -5061,6 +5061,52 @@
     }
    }
   },
+  "Blocked by a human check (%@): only you can clear it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloqué par une vérification humaine (%@) : vous seul pouvez la passer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloqueado por una verificación humana (%@): solo usted puede superarla"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Durch eine Menschenprüfung blockiert (%@): nur Sie können sie lösen"
+     }
+    }
+   }
+  },
+  "Blocked by a human check: only you can clear it": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloqué par une vérification humaine : vous seul pouvez la passer"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Bloqueado por una verificación humana: solo usted puede superarla"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Durch eine Menschenprüfung blockiert: nur Sie können sie lösen"
+     }
+    }
+   }
+  },
   "Blocked by payment": {
    "extractionState": "manual",
    "localizations": {
@@ -5517,6 +5563,75 @@
      "stringUnit": {
       "state": "translated",
       "value": "Abbrechen"
+     }
+    }
+   }
+  },
+  "Carry on": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reprendre"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Continuar"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Fortsetzen"
+     }
+    }
+   }
+  },
+  "Carry on with the opt-out run?": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reprendre le passage de désinscription ?"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Continuar con la ejecución de exclusión?"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Den Abmeldelauf fortsetzen?"
+     }
+    }
+   }
+  },
+  "Carry on with the sites it has not done yet? Keep the app open while it runs, so iOS does not stop it again.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Reprendre avec les sites qu'il n'a pas encore faits ? Gardez l'app ouverte pendant qu'il tourne, pour qu'iOS ne l'arrête pas de nouveau."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "¿Continuar con los sitios que aún no ha hecho? Mantenga la app abierta mientras se ejecuta, para que iOS no la vuelva a detener."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Mit den Seiten fortfahren, die er noch nicht erledigt hat? Lassen Sie die App geöffnet, solange er läuft, damit iOS ihn nicht wieder anhält."
      }
     }
    }
@@ -11018,6 +11133,29 @@
     }
    }
   },
+  "If that is not you, there is nothing here to opt out of, and it counts as done. If it is you, opt out below; tick its \"this person is\" box yourself.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si ce n'est pas votre cas, il n'y a rien à désinscrire ici, et c'est compté comme fait. Si c'est votre cas, désinscrivez-vous ci-dessous ; cochez vous-même sa case « cette personne est »."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Si no es su caso, aquí no hay nada de lo que darse de baja y cuenta como hecho. Si lo es, dese de baja abajo; marque usted mismo su casilla «esta persona es»."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Wenn das nicht auf Sie zutrifft, gibt es hier nichts abzumelden, und es gilt als erledigt. Wenn doch, melden Sie sich unten ab; kreuzen Sie das Kästchen „diese Person ist“ selbst an."
+     }
+    }
+   }
+  },
   "If you lose your phone without a backup, this data is gone. Back up your phone as usual and it comes with it.": {
    "extractionState": "manual",
    "localizations": {
@@ -11865,6 +12003,98 @@
      "stringUnit": {
       "state": "translated",
       "value": "Es zeigt jeweils einen Schritt. Tippen Sie auf Kopieren, fügen Sie Ihre Angaben auf der Seite ein und tippen Sie dann auf Nächster Schritt."
+     }
+    }
+   }
+  },
+  "It stopped before it was done.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il s'est arrêté avant d'avoir fini."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se detuvo antes de terminar."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Er wurde angehalten, bevor er fertig war."
+     }
+    }
+   }
+  },
+  "It stopped when iOS took back its time to run in the background.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il s'est arrêté quand iOS lui a repris son temps d'exécution en arrière-plan."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se detuvo cuando iOS le retiró el tiempo para ejecutarse en segundo plano."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Er wurde angehalten, als iOS ihm die Zeit für die Ausführung im Hintergrund entzog."
+     }
+    }
+   }
+  },
+  "It stopped when the app was closed.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il s'est arrêté quand l'app a été fermée."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se detuvo cuando se cerró la app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Er wurde angehalten, als die App geschlossen wurde."
+     }
+    }
+   }
+  },
+  "It stopped when you left the app.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Il s'est arrêté quand vous avez quitté l'app."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Se detuvo cuando salió de la app."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Er wurde angehalten, als Sie die App verlassen haben."
      }
     }
    }
@@ -15549,6 +15779,29 @@
     }
    }
   },
+  "Not for you, unless you are in its group": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Pas pour vous, sauf si vous êtes dans ce groupe"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "No es para usted, salvo que pertenezca a ese grupo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Nicht für Sie, außer Sie gehören zu dieser Gruppe"
+     }
+    }
+   }
+  },
   "Not found": {
    "extractionState": "manual",
    "localizations": {
@@ -16971,6 +17224,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nur von Ihnen hinzugefügte Familienmitglieder sind enthalten; Minderjährige und Personen des öffentlichen Lebens werden nie gesucht (Opt-out-Anfragen gehen für sie trotzdem raus)."
+     }
+    }
+   }
+  },
+  "Only holds data on %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne détient des données que sur %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo tiene datos de %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Speichert nur Daten über %@"
+     }
+    }
+   }
+  },
+  "Only holds data on %@: nothing to do unless that is you": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ne détient des données que sur %@ : rien à faire, sauf si c'est votre cas"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Solo tiene datos de %@: no hay nada que hacer, salvo que sea su caso"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Speichert nur Daten über %@: nichts zu tun, außer das trifft auf Sie zu"
      }
     }
    }
@@ -21368,6 +21667,29 @@
     }
    }
   },
+  "Sent twice without a confirmation: check it yourself": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Envoyé deux fois sans confirmation : vérifiez-le vous-même"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Enviado dos veces sin confirmación: compruébelo usted mismo"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Zweimal ohne Bestätigung gesendet: prüfen Sie es selbst"
+     }
+    }
+   }
+  },
   "Sent, but the site did not confirm (%@). It may need one more step from you here. Tap Next site when you are done.": {
    "extractionState": "manual",
    "localizations": {
@@ -24791,6 +25113,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Das Gesetz in %@ verpflichtet Websites, dieses Signal zu beachten."
+     }
+    }
+   }
+  },
+  "The legal wording only means your details must be true. They are your own details, so ticking it puts you at no risk.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette formule juridique veut seulement dire que vos informations doivent être exactes. Ce sont les vôtres : la cocher ne vous fait courir aucun risque."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esa fórmula legal solo significa que sus datos deben ser verdaderos. Son sus propios datos, así que marcarla no le supone ningún riesgo."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Die juristische Formulierung bedeutet nur, dass Ihre Angaben stimmen müssen. Es sind Ihre eigenen Angaben, das Ankreuzen ist für Sie also ohne Risiko."
      }
     }
    }

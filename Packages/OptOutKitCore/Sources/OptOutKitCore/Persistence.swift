@@ -33,9 +33,10 @@ public extension DirectoryEntry {
     /// The date a request sent on `sent` should be repeated, or nil when it lasts.
     func reupDate(after sent: Date, calendar: Calendar = .current) -> Date? { reupMonths.flatMap { calendar.date(byAdding: .month, value: $0, to: sent) } }
 
-    /// Done for now: a request that still holds, or a recent look found no listing here (`Progress.notListedRecently`). Every "is this site done" asks this.
+    /// Done for now: a request that still holds, a recent look found no listing here (`Progress.notListedRecently`), or the site holds data only on a group
+    /// of people (`onlyFor`). Every "is this site done" asks this.
     func isHandled(_ progress: Progress, now: Date = Date(), calendar: Calendar = .current) -> Bool {
-        isCurrent(attempts: progress.optOutAttempts, now: now, calendar: calendar) || progress.notListedRecently(id, now: now)
+        isCurrent(attempts: progress.optOutAttempts, now: now, calendar: calendar) || progress.notListedRecently(id, now: now) || onlyFor != nil
     }
 
     /// Sent before, and now due to be repeated.

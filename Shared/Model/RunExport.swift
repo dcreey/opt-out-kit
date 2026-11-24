@@ -32,6 +32,8 @@ struct RunExport: Codable, Equatable {
         let lastSearch: Search?
         /// The screenshot's file name in the archive, or nil when none was kept.
         let screenshot: String?
+        /// When it was taken. An attempt given up before sending keeps no picture, so the one here may be from an earlier attempt: compare with the attempts.
+        let screenshotTaken: Date?
     }
 
     let app: String
@@ -44,6 +46,12 @@ struct RunExport: Codable, Equatable {
     /// How many sites are in each group.
     let counts: [String: Int]
     let sites: [Site]
+    /// Why the run last paused, when it has not finished (`AutoSettings.pauseReason`).
+    let pausedAt: Date?
+    let pauseReason: String?
+    /// What happened to the run as it went, from its start (`RunLog`): starts and ends, the app leaving and coming back, iOS's background time, pauses, and each
+    /// site's result with whether the app was on screen and, for a site given up, the step it was on.
+    let log: [RunLogEntry]
 
     static let attemptsKept = 10
     /// The page's order: what needs the person first, then not listed, sent, and not tried; by domain within each.
@@ -54,7 +62,10 @@ struct RunExport: Codable, Equatable {
 
     run.json lists every site the automatic run deals with, in the order of the Activity page: the sites moved to semi-automatic first, then not listed,
     sent, and not tried. For each: its group and the line the page shows, its opt-out page, its latest attempts (outcome, detail, and what the page said),
-    its latest search, and "screenshot", the picture in this archive of what the site showed at the end of its latest attempt (null when none was kept).
+    its latest search, and "screenshot", the picture in this archive of what the site showed at the end of an attempt (null when none was kept), with
+    "screenshotTaken": an attempt given up before sending keeps no picture, so the one here can be from an earlier attempt.
+    "log" is what happened to the run as it went: when it started, paused and ended and why, when the app left the screen and came back, and each site's
+    result with whether the app was on screen (and, for a site given up, the step it was on).
 
     This file holds your details as the sites showed them. The app made it only because you asked, and sent it nowhere: it goes only where you share it.
     """
@@ -90,13 +101,15 @@ extension AppModel {
             let search = progress.latestSiteCheck(row.id).map { RunExport.Search(date: $0.date, result: $0.result.rawValue, source: $0.source.rawValue) }
             listed.append(RunExport.Site(n: n, id: row.id, domain: row.domain, group: row.group.rawValue, status: row.line,
                                          optOutURL: entry?.optOutURL?.absoluteString, formPage: entry?.optOutForm?.page.absoluteString,
-                                         attempts: Array(attempts), lastSearch: search, screenshot: shot))
+                                         attempts: Array(attempts), lastSearch: search, screenshot: shot,
+                                         screenshotTaken: shot == nil ? nil : evidence.taken(person: person.id, site: row.id)))
         }
         let period = runPeriod(now: now)
         let counts = Dictionary(grouping: rows, by: \.group.rawValue).mapValues(\.count)
         let export = RunExport(app: "Exnay", build: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "", exported: now,
                                runStarted: autoSettings.runStarted, lastRun: autoSettings.lastOptOut, periodStart: period?.start, periodEnd: period?.end,
-                               counts: counts, sites: listed)
+                               counts: counts, sites: listed, pausedAt: autoSettings.pausedAt, pauseReason: autoSettings.pauseReason,
+                               log: currentRunLog().since(autoSettings.runStarted))
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         encoder.dateEncodingStrategy = .iso8601

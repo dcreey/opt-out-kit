@@ -92,6 +92,12 @@ sends its removals to Spokeo, and yellowbook.com, which has no name search so ru
 step by step (semi-automatic, no separate Guided method): PeopleConnect needs a login-style email step and phone checks, and FastPeopleSearch's form asks who is submitting and
 requires a legal acknowledgement box.
 
+**Only for some people.** An `only_for:` block (`who`, `evidence`, `checked`) says the site holds data only on one group of people, so for anyone else
+there is nothing to opt out of: agile-ed.com ("people who work in US schools or school districts"; its form says it "only maintains information about people
+who are currently employed by schools or school districts", decided 2026-11-24). Such a site counts as done, is left out of the queue and the automatic run,
+and its line and page say who it is for ("Only holds data on ... : nothing to do unless that is you"); its page can still open it for someone in that group,
+who ticks the form's "this person is ..." box themselves (`OnlyForCheck`).
+
 **One site, several names.** A hand-written flow can clear other sites with `covers:` (Spokeo covers FreePeopleDirectory;
 PeopleConnect covers TruthFinder, Instant Checkmate, Intelius and US Search). Covered sites are not listed separately; they appear
 under the flow that clears them, and a scan that finds a listing on any of them shows one row for the flow.

@@ -25,10 +25,22 @@ enum FormRun {
         // A code the site did not accept ("That code is not right", "invalid code", "the code expired") is a refusal, even though the page also asks for the code again.
         if rejectsCode(text) { return .rejected(wrongCodeReason) }          // read before the instruction lines are dropped: "Invalid code. Please enter it again." is one
         if asksForCode(kept) { return .failed("the page is waiting for a code from the person") }
+        // "Please complete the verification challenge" under a Cloudflare box that only appeared, or was only enforced, once the form was sent: a human check.
+        if asksForHumanCheck(text) { return .challenged(humanCheckAfterSending) }
         // A form that searches before it removes ("enter your information to find the data to remove") answering "No data was found": nothing to opt out of.
         // Read before the error wording, since such pages often add "try again" or "fix the following errors".
         if saysNoRecordFound(kept) { return .notListed }
         return kept.isEmpty ? .failed("no success message was shown") : classify(kept)
+    }
+
+    /// What a site that asked for a human check only after the form was sent is reported as (a human check: the person's to clear, `AutoOptOut.isHumanCheck`).
+    nonisolated static let humanCheckAfterSending = "a human check the page asked for after sending"
+
+    /// New text that asks the person to pass a check ("Please complete the verification challenge", "Please complete the security check", "Verify you are
+    /// human"), as the Superset, jmr-media and instantly.ai forms answered a send. A check's own passing status ("Success!") is not this.
+    nonisolated static func asksForHumanCheck(_ text: String) -> Bool {
+        text.range(of: "(complete|finish|pass|solve) the (verification|security|captcha|human|bot|robot) ?(challenge|check|verification|test)?|(verify|confirm|prove) (that )?you('| a)?re (a )?human|(verify|confirm) you are not a (robot|bot)|captcha (is )?(required|failed|missing|not (completed|solved))|(failed|missing) (the )?(captcha|human|security) (check|verification|challenge)",
+                   options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// What a site that did not accept the emailed code is reported as.

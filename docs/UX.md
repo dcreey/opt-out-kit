@@ -200,7 +200,28 @@ the run report still has "Review every site and its screenshot".)
 order (semi-automatic first, then not listed, sent, not tried) with its group and the line the page shows, its opt-out page, its last ten attempts (outcome, detail, what
 the page said), its latest search and the name of its screenshot; `README.txt` says the same in words; each site that kept a screenshot adds `NNN-domain.jpg`. It is
 built only when the person picks where it goes, in memory (no file is written on the phone), and the footer says it holds their details as the sites showed them and
-goes only where they share it. Made so a run can be handed to whoever is helping and stepped through site by site (`RunExport`, `StoredZip`).
+goes only where they share it. Made so a run can be handed to whoever is helping and stepped through site by site (`RunExport`, `StoredZip`). `run.json` also
+carries the run log from the run's start (when it started, paused and why, left the screen and came back, and each site's result with whether the app was on
+screen; docs/AUTOMATION.md, "The run log") and each screenshot's date: an attempt given up before sending keeps no picture, so a site can show an older one.
+
+**Carry on with the opt-out run?** A run that stopped before finishing (iOS took back its background time, the app left the screen, or the app was closed) is
+never carried on by itself. When the app next comes to the front, an alert asks "Carry on with the opt-out run?" and says why it stopped ("It stopped when iOS
+took back its time to run in the background.", "... when you left the app.", "... when the app was closed."), then "Carry on with the sites it has not done yet?
+Keep the app open while it runs, so iOS does not stop it again." **Carry on** (`resume-run`) runs it; **Not now** (`resume-not-now`) leaves it, and Run now on
+the automatic opt-out page still carries it on. The notification that says a run paused still says to open Exnay to carry on.
+
+**A site only for some people.** A site whose `only_for` says it holds data only on one group (agile-ed.com: people who work in US schools) shows "Not for
+you, unless you are in its group" in its header and a card at the top of its page: "Only holds data on ...", what that means, and the site's own words. On the
+automatic opt-out page its line is "Only holds data on ...: nothing to do unless that is you". It counts as done.
+
+**An oath gets plain words.** When Solve and send waits for the person to tick a confirmation sworn as an oath ("under penalty of perjury"), its instruction adds:
+"The legal wording only means your details must be true. They are your own details, so ticking it puts you at no risk."
+
+**A site blocked by a human check says so.** Its line on the automatic opt-out page and on its own page starts "Blocked by a human check" and names the check:
+"Blocked by a human check (a reCAPTCHA checkbox): only you can clear it" (a reCAPTCHA, an hCaptcha, a Cloudflare check, a picture code, or a check the page asked
+for after sending). It said "Stopped: a reCAPTCHA checkbox" in the sites that need the person and "Waits for the next full re-test" in the ones a run leaves to
+them. In that second group, a site sent twice without a confirmation says "Sent twice without a confirmation: check it yourself", and one whose form asks for
+something no profile holds says "Needs you:" and what.
 
 ## Reviewing what a site said and showed
 

@@ -17,6 +17,10 @@ live_form:
   found: true
   page: 'https://personalinforequest.agile-ed.com/'
   blockers: []
+only_for:
+  who: 'people who work in US schools or school districts'
+  evidence: 'Its opt-out form says: "Agile only maintains information about people who are currently employed by schools or school districts in the United States." Its brochures describe 1.5 million+ school personnel and 50,000+ institutions.'
+  checked: '2026-11-24'
 about:
   category: 'b2b'
   summary: 'Agile Education Marketing, LLC is a business-contact and sales-data provider. Find the districts that are ready to buy. Agile Ed gives companies that sell into education the verified data and market intelligence to move first. Its own pages mention job title and employer, education, devices and online activity. Its policy does not name who it sells to.'

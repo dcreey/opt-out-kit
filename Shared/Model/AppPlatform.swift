@@ -57,6 +57,8 @@ protocol AppPlatform: AnyObject {
 @MainActor
 protocol ContinuedRunning: AnyObject {
     var isGranted: Bool { get }
+    /// Called once iOS hands over the run's task (it is submitted at once but granted a moment later, or never).
+    var onGranted: (() -> Void)? { get set }
     func report(done: Int, total: Int)
     func finish(success: Bool)
 }

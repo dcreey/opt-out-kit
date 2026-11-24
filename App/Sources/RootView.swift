@@ -69,6 +69,13 @@ struct RootView: View {
         .onChange(of: model.requestedTab) { _, t in if let t { tab = t; model.requestedTab = nil } }
         .sheet(isPresented: $model.showProfileGate) { ProfileGateView() }
         .sheet(item: $model.runReport) { report in RunReportSheet(report: report) { model.runReport = nil } }
+        // A run that stopped before finishing is carried on only when the person says so (decided 2026-11-24).
+        .alert("Carry on with the opt-out run?", isPresented: $model.askToResume) {
+            Button("Carry on") { model.resumeRun() }.accessibilityIdentifier("resume-run")
+            Button("Not now", role: .cancel) { model.declineResume() }.accessibilityIdentifier("resume-not-now")
+        } message: {
+            Text(model.resumeQuestion)
+        }
         .fullScreenCover(isPresented: Binding(
             get: { model.pending == .walkthrough },
             set: { _ in })) {

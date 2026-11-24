@@ -159,12 +159,15 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertEqual(f["certify"], "yes", "the broker saw the box ticked: \(f)")
     }
 
-    /// The same certification on the account owner's own profile: it is true of them, so the app ticks it and sends (decided 2026-11-23, docs/PRINCIPLES.md).
-    func testACertificationAboutTheOwnerIsTickedOnTheirOwnProfileAndSent() {
-        _ = solveAndSend("certify-1")
-        let f = sent("fx_certify_1", timeout: 60)
-        XCTAssertEqual(f["certify"], "yes", "the owner's certification was ticked: \(f)")
-        XCTAssertEqual(f["name"], "Pat Example")
+    /// The same certification on the account owner's own profile: sworn "under penalty of perjury", it is mine to read and tick (decided 2026-11-24), and the app
+    /// says in plain words what it means.
+    func testACertificationUnderPenaltyOfPerjuryIsLeftForMeEvenOnMyOwnProfile() {
+        let app = solveAndSend("certify-1")
+        let certify = app.webViews.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'penalty of perjury'")).firstMatch
+        XCTAssertTrue(certify.waitForExistence(timeout: 40), "the page shows its certification")
+        Thread.sleep(forTimeInterval: 8)
+        XCTAssertTrue(server.sentSites.isEmpty, "the app did not tick the oath or send: \(server.requests)")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'puts you at no risk'")).firstMatch.exists, "it says in plain words what the oath means")
     }
 
     /// A form the page builds with script a moment after it loads (69 recorded sites are script-built): the app waits for it, finds it, fills it and sends it.

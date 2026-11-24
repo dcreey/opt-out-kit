@@ -22,9 +22,10 @@ One file in the app's Application Support folder, opened through `UserDatabase`.
 | `household` | | Every profile, the progress, the settings | `household.sealed` |
 | `evidence` | opaque, see below | The screenshot of what a site showed after an automatic send | `household.evidence/<person id>/<site id>.jpg.sealed` |
 | `draft` | | What is typed in the profile editor and not yet saved | `profile-draft.sealed` |
+| `runLog` | | The run log (`RunLog`): what happened to the automatic run as it went, the newest 2000 entries, for the run export (docs/AUTOMATION.md) | new in build 60 |
 | `setting` | the preference's name | The small preferences and "has seen this" flags: language, the tours, the day's batches, the guide's collapsed state (`StoredPreferences`, a binary property list per value; not sealed: they hold nothing personal, and the app reads them while the phone is locked, before the Keychain key is available) | the app's `UserDefaults` property list |
 
-- **Encrypted: the values, not the container.** Each household, screenshot and draft `body` is AES-256-GCM (authenticated), with the key in the iOS Keychain
+- **Encrypted: the values, not the container.** Each household, screenshot, draft and run log `body` is AES-256-GCM (authenticated), with the key in the iOS Keychain
   (`SealedStore`, `KeychainKey`): the same bytes the separate files held. The SQLite file itself is an ordinary one: its table layout, the kind of each row,
   the saved times and the sizes of the blobs can be read by anything that can read the file, which is what the separate files showed too (their names and
   modification times). Two things limit that: iOS data protection keeps the file closed until the first unlock and encrypts it at rest, and **the row keys

@@ -234,6 +234,18 @@ public struct ClosedCheck: Codable, Equatable, Hashable, Sendable {
     public init(checked: String, evidence: [String]) { self.checked = checked; self.evidence = evidence }
 }
 
+/// The site holds data only on one group of people (agile-ed.com: people who work in US schools), so for anyone else there is nothing to opt out of
+/// (decided 2026-11-24). It is left out of the queue and the automatic run and counts as done; its page says who it is for and can still open it, for someone
+/// in that group. The app never ticks the form's "this person is ..." box for anyone.
+public struct OnlyForCheck: Codable, Equatable, Hashable, Sendable {
+    /// Who it holds data on, as a phrase that follows "Only holds data on": "people who work in US schools or school districts".
+    public var who: String
+    /// What says so: the site's own words.
+    public var evidence: String
+    public var checked: String
+    public init(who: String, evidence: String, checked: String) { self.who = who; self.evidence = evidence; self.checked = checked }
+}
+
 /// What a real, reviewed run showed: the screenshot of the page after sending either showed a confirmation (`confirmed`) or it did not
 /// (`failed`, with what the page showed instead). This outranks every guess from reading the page.
 public struct RunCheck: Codable, Equatable, Hashable, Sendable {
@@ -269,6 +281,7 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
     public var caution: CautionInfo?      // a warning shown before the opt-out starts (it asks for something sensitive in return)
     public var excluded: ExcludedCheck?   // kept out of the app: its opt-out is for businesses, or it is not a data broker
     public var closed: ClosedCheck?       // evidence that the site no longer responds, so there is nothing to opt out of
+    public var onlyFor: OnlyForCheck?     // it holds data only on one group of people (`OnlyForCheck`)
     public var liveForm: LiveFormCheck?   // an opt-out form found on the live page when the crawl could not read one
     public var contactEmail: String?      // the privacy address found for this site
     public var contactEmailSource: String?   // where it was found: the opt-out page or its privacy policy
@@ -282,17 +295,17 @@ public struct DirectoryEntry: Codable, Equatable, Identifiable, Hashable, Sendab
 
     public init(id: String, domain: String, name: String, bucket: String, tier: Tier?, automation: Automation,
                 confidence: String? = nil, optOutURL: URL? = nil, optOutForm: OptOutForm? = nil, family: String? = nil,
-                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, liveForm: LiveFormCheck? = nil, closed: ClosedCheck? = nil, excluded: ExcludedCheck? = nil, caution: CautionInfo? = nil, persistence: PersistenceInfo? = nil, regions: RegionScope? = nil, languages: SiteLanguages? = nil, regionalSites: [RegionalSite]? = nil, about: BrokerAbout? = nil, priority: Int? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
+                familyParent: String? = nil, template: String? = nil, searchCheck: SearchCheck? = nil, liveCheck: LiveCheck? = nil, runCheck: RunCheck? = nil, liveForm: LiveFormCheck? = nil, closed: ClosedCheck? = nil, onlyFor: OnlyForCheck? = nil, excluded: ExcludedCheck? = nil, caution: CautionInfo? = nil, persistence: PersistenceInfo? = nil, regions: RegionScope? = nil, languages: SiteLanguages? = nil, regionalSites: [RegionalSite]? = nil, about: BrokerAbout? = nil, priority: Int? = nil, contactEmail: String? = nil, registeredIn: [String]? = nil,
                 signals: [String]? = nil, profiled: String? = nil) {
         self.id = id; self.domain = domain; self.name = name; self.bucket = bucket; self.tier = tier; self.automation = automation
         self.confidence = confidence; self.optOutURL = optOutURL; self.optOutForm = optOutForm; self.family = family
-        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.liveForm = liveForm; self.closed = closed; self.excluded = excluded; self.caution = caution; self.persistence = persistence; self.regions = regions; self.languages = languages; self.regionalSites = regionalSites; self.about = about; self.priority = priority; self.contactEmail = contactEmail; self.registeredIn = registeredIn
+        self.familyParent = familyParent; self.template = template; self.searchCheck = searchCheck; self.liveCheck = liveCheck; self.runCheck = runCheck; self.liveForm = liveForm; self.closed = closed; self.onlyFor = onlyFor; self.excluded = excluded; self.caution = caution; self.persistence = persistence; self.regions = regions; self.languages = languages; self.regionalSites = regionalSites; self.about = about; self.priority = priority; self.contactEmail = contactEmail; self.registeredIn = registeredIn
         self.signals = signals; self.profiled = profiled
     }
 
     enum CodingKeys: String, CodingKey {
         case id, domain, name, bucket, tier, automation, confidence, family, template, signals, profiled, contactEmailSource = "contact_email_source"
-        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, excluded, caution, persistence, regions, languages, regionalSites = "regional_sites", about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
+        case searchCheck = "search_check", liveCheck = "live_check", runCheck = "run_check", liveForm = "live_form", closed, onlyFor = "only_for", excluded, caution, persistence, regions, languages, regionalSites = "regional_sites", about, priority, contactEmail = "contact_email", registeredIn = "registered_in"
         case optOutURL = "opt_out_url", optOutForm = "opt_out_form", familyParent = "family_parent", noFill = "no_fill", findLater = "find_later"
     }
 }

@@ -513,6 +513,7 @@ extension FormRun {
     static func runLive(url: URL?, html: String?, person: Person, dryRun: Bool, maxWait: TimeInterval, capture: Bool, advertisingID: String? = nil) async -> SubmitEvidence {
         let session = WebViewSession.make()
         defer { session.close() }
+        RunStep.note("loading the page")
         do {
             if let html { try await session.loadHTML(html) }
             else if let url, url.isSecureWebPage { try await session.load(URLRequest(url: url)) }
@@ -536,6 +537,7 @@ extension FormRun {
         // before sending keeps none; its reason says why.
         var pageText: String?
         if !dryRun, let text = said.text { pageText = text.isEmpty ? await session.viewportText() : text }
+        RunStep.note("taking the screenshot")
         return SubmitEvidence(outcome: outcome, screenshot: capture ? await session.screenshotJPEG(aroundForm: session.chosenForm) : nil, pageText: pageText)
     }
 
@@ -553,7 +555,9 @@ extension FormRun {
 
     @MainActor
     private static func liveSteps(_ session: WebViewSession, page: URL, person: Person, dryRun: Bool, maxWait: TimeInterval, advertisingID: String?, said: SaidBox) async -> SubmitOutcome {
+        RunStep.note("waiting for the page to settle")
         await session.settlePage(maxWait: 10)
+        RunStep.note("answering the cookie prompt")
         // The page has been still for a moment, so a cookie prompt has had time to show. The page settles again only after a prompt was answered (it then
         // reloads or moves); a fixed pause and a second wait for every site cost about four seconds each.
         if await session.denyCookies() != nil { await session.settlePage(maxWait: 4) }
@@ -571,8 +575,11 @@ extension FormRun {
         let context = await session.pageContext()
         debugForms[page.absoluteString] = found.map { "\($0.token) score=\(LiveFormPicker.score($0, pageContext: context)) text=\($0.text) | buttons=\($0.buttons) fields=\($0.fields.map { "\($0.type):\($0.name):\($0.label):v=\($0.visible)" })" }.joined(separator: "\n")
         #endif
+        RunStep.note("finding and filling the form")
         guard let prepared = await driver.prepareLoaded(session: session, form: stand, plan: FillPlan(values: [], verdict: .ready), keepOpenWithoutForm: true) as? WebAssistedPage else {
             if let state = session.stateNotOffered { return .failed(Self.stateNotOffered(state)) }
+            // A form held behind a human check (a reCAPTCHA with Submit off until it is ticked, as allwebleads.com's) is not "no form": it is the person's check.
+            if let why = await session.visibleChallenge() { return .challenged(why) }
             return .failed("no opt-out form was found on the page")
         }
         prepared.maxWait = maxWait
@@ -597,6 +604,7 @@ extension FormRun {
         }
         // A Cloudflare check that is still "Verifying..." usually passes by itself in a few seconds (nothing is clicked or solved): the run waits for it, within the
         // site's time and short of the quiet limit. A check that asks for a person stays, and the site goes to them as before (coloradoarrests.org).
+        RunStep.note("checking for a human check")
         let checkLimit = SiteRun.wait(upTo: 12)
         var checkWaited: TimeInterval = 0
         while checkWaited < checkLimit, await session.visibleChallenge() == Self.cloudflareCheck {

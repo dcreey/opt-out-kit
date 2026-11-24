@@ -308,14 +308,18 @@ final class WebAssistedPage: AssistedPage {
         let markBefore = await session.pageMark()
         // In a background run, the page as it is now (filled in) is kept, in case its answer never arrives and it cannot be read when the site is given up.
         if PageActivity.bin != nil {
+            RunStep.note("picturing the form before sending")
             session.beforePress = SubmitEvidence(outcome: .failed(AutoOptOut.sentUnconfirmed), screenshot: await session.screenshotJPEG(aroundForm: liveForm), pageText: before)
         }
         let pressed: Bool
+        RunStep.note("pressing send")
         if let liveForm { pressed = await session.pressLiveSubmit(form: liveForm) } else { pressed = await session.pressSubmit(for: plan.values) }
         guard pressed else { return .failed(session.pressHeldForEmptyBox ? "a required box is still empty" : "no submit button found") }
         // The page's answer can take a moment to start (a slow phone, a slow site): until something changes or a load begins, then until it settles
         // (`settleAfterPress`). In a background run the waits end in time to read the page and take its picture (`SiteRun.deadline`).
+        RunStep.note("waiting for the answer after sending")
         await session.settleAfterPress(from: markBefore, changeWithin: SiteRun.wait(upTo: 6), maxWait: SiteRun.wait(upTo: maxWait))
+        RunStep.note("reading the answer")
         if await session.pressConfirmStep() { await session.settlePage(maxWait: SiteRun.wait(upTo: maxWait)) }
         let after = await session.visibleText()
         lastSaid = FormRun.newText(before: before, after: after)          // what appeared after sending: the confirmation, the error
@@ -325,6 +329,8 @@ final class WebAssistedPage: AssistedPage {
         if case .submitted = outcome { return outcome }
         // The site's search found no record of the person: the answer, not a next step to press again (that searched again until the time ran out).
         if case .notListed = outcome { return outcome }
+        // The page asked for a human check once the form was sent ("Please complete the verification challenge"): the person's to clear.
+        if case .challenged = outcome { return outcome }
         // A wizard's Next only moves on: the step it leaves vanishing is not the site taking the request (that read as sent). The next step is filled and pressed in turn.
         if stepOnly { return .challenged(PageFlow.nextStepMarker) }
         // No confirmation wording, but the form is gone or the page moved on, and nothing on the page says it went wrong: the site took it.
@@ -643,7 +649,9 @@ struct AssistedOptOutView: View {
         case .loading: return Loc.t("Loading the form and filling in your details…")
         case .pickingListing: return Loc.t("We searched this site for you. Tap your own profile in the results. If you are not in them, tap \"Not listed\". When you are on your profile, tap \"This is me\" and we do the rest.")
         case .waitingForTerms: return Loc.t("Your details are filled in. This site asks you to accept its terms: read them and accept yourself, then solve the check. We will send it after.")
-        case .waitingForCertification: return Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
+        case .waitingForCertification:
+            let base = Loc.t("Your details are filled in. This form asks you to tick a confirmation yourself: read it, tick it if it is true, and solve any check. We will send it after.")
+            return AssistedRunner.certificationNote(runner.certification).map { base + " " + $0 } ?? base
         case .waitingForCheck: return model.autoSubmit ? Loc.t("Your details are filled in. Solve the check below and we will send it.")
                                                         : Loc.t("Your details are filled in. Solve the check below, then press the page's own button yourself.")
         case .waitingForChoice(let what): return what.isEmpty ? Loc.t("Your details are filled in. Pick the option the form asks for below, then we will send it.") : Loc.f("Your details are filled in. Pick \"%@\" in the form below, then we will send it.", what)

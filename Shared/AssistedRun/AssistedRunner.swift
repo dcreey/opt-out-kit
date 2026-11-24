@@ -134,6 +134,16 @@ final class AssistedRunner: ObservableObject {
     private(set) var phase: Phase = .loading { willSet { if newValue != phase { objectWillChange.send() } } didSet { if phase != oldValue { phaseChanged?(phase) } } }
     /// Told of every change of phase, in order (the tests: sampling the phase on a timer missed a short one on a slow machine).
     var phaseChanged: ((Phase) -> Void)?
+    /// The wording of the confirmation the person is asked to tick (`waitingForCertification`), for the plain words under it (`certificationNote`).
+    private(set) var certification: String?
+
+    /// Plain words for a confirmation box that sounds frightening ("Under penalty of perjury, I declare ..."), or nil for any other. The app never ticks it
+    /// (docs/PRINCIPLES.md); the person reads it and decides. A declaration like this binds only someone who states something false, and the details the app
+    /// filled in are the person's own (decided 2026-11-24).
+    nonisolated static func certificationNote(_ text: String?) -> String? {
+        guard let text, text.range(of: "perjur|under oath|\\bsworn\\b|\\bswear\\b|penalt(y|ies)", options: [.regularExpression, .caseInsensitive]) != nil else { return nil }
+        return Loc.t("The legal wording only means your details must be true. They are your own details, so ticking it puts you at no risk.")
+    }
     @Published private(set) var page: AssistedPage?
     @Published private(set) var finished = false
     @Published private(set) var results: [String: AutoOptOutResult] = [:]
@@ -486,7 +496,7 @@ final class AssistedRunner: ObservableObject {
                     let blockers = revisiting || forceManual ? [] : await ready.blockers()        // a site visited again is never sent for the person
                     if blockers.isEmpty { break }
                     if blockers.contains(.terms) { phase = .waitingForTerms }
-                    else if blockers.contains(where: { if case .certify = $0 { return true } else { return false } }) { phase = .waitingForCertification }
+                    else if let said = blockers.compactMap({ if case .certify(let s) = $0 { return s } else { return nil } }).first { certification = said; phase = .waitingForCertification }
                     else if let pick = blockers.compactMap({ if case .choose(let what) = $0 { return what } else { return nil } }).first { phase = .waitingForChoice(pick) }
                     else { phase = .waitingForCheck }
                     try? await Task.sleep(nanoseconds: UInt64(pollInterval * 1_000_000_000))

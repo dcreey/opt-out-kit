@@ -574,7 +574,7 @@ final class FixtureJourneyUITests: UITestCase {
         let row = app.buttons.matching(NSPredicate(format: "label CONTAINS 'turnstile-1.fixture.test'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 15), "the site the run could not send is found")
         row.tap()
-        XCTAssertTrue(app.staticTexts["Stopped: a human check"].waitForExistence(timeout: 10), "the site says why the run left it for me")
+        XCTAssertTrue(app.staticTexts["Blocked by a human check: only you can clear it"].waitForExistence(timeout: 10), "the site says why the run left it for me")
         XCTAssertTrue(app.buttons["site-screenshot"].waitForExistence(timeout: 10), "with a screenshot of the form as far as the run got")
         app.buttons["Opt out"].tap()
         let verify = app.webViews.buttons["Verify you are human"]
@@ -589,6 +589,32 @@ final class FixtureJourneyUITests: UITestCase {
         }
         XCTAssertTrue(server.waitForSent(timeout: 60) { $0 == ["fx_plain_1", "fx_turnstile_1"] }, "the form was sent once I cleared the check: \(server.requests)")
         XCTAssertTrue(app.buttons.matching(identifier: "finish-done").firstMatch.waitForExistence(timeout: 30), "and the app asks whether it is completely done")
+    }
+
+    /// As a user I want a run that stopped while I was away to wait for me: back in the app I am asked "Carry on with the opt-out run?", and Carry on finishes it
+    /// and sends what is left (decided 2026-11-24; until build 59 it carried on by itself, and on the phone it stopped again and again).
+    func testARunThatStoppedWhileIWasAwayAsksMeBeforeCarryingOn() {
+        let app = XCUIApplication()
+        let sites = ["plain-1", "plain-2", "plain-3", "cookie-1", "steps-1"]
+        app.launchArguments = ["-uitest-reset", "-only-domains", sites.map { "\($0).fixture.test" }.joined(separator: ",")] + server.launchArguments
+        app.launch()
+        startRunNow(app)
+        Thread.sleep(forTimeInterval: 2)
+        XCUIDevice.shared.press(.home)
+        Thread.sleep(forTimeInterval: 90)          // the run stops after the site in progress; nothing carries it on
+        let sentWhileAway = server.sentSites.count
+        XCTAssertLessThan(sentWhileAway, sites.count, "the run stopped while I was away: \(server.sentSites)")
+        app.activate()
+        let carryOn = app.alerts.buttons["Carry on"].firstMatch
+        XCTAssertTrue(carryOn.waitForExistence(timeout: 20), "back in the app, I am asked whether to carry on")
+        let asked = XCTAttachment(screenshot: app.screenshot()); asked.name = "asked"; asked.lifetime = .keepAlways; add(asked)
+        XCTAssertEqual(server.sentSites.count, sentWhileAway, "nothing was sent before I answered")
+        carryOn.tap()
+        let done = app.buttons["run-report-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 240), "carried on, the run finished and reported")
+        let report = XCTAttachment(screenshot: app.screenshot()); report.name = "report"; report.lifetime = .keepAlways; add(report)
+        // The site in progress when I left may have been cut off (and is then mine to finish); every other one is sent.
+        XCTAssertGreaterThanOrEqual(Set(server.sentSites).count, sites.count - 1, "carried on, the sites left were sent: \(server.sentSites)")
     }
 
     /// As a user I want to tell the app I did a site by myself: it is marked done, and my list shows it.

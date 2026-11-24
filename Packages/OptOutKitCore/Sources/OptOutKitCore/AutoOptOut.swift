@@ -231,6 +231,7 @@ public struct AutoOptOut: Sendable {
                                             capture: GiveUpCapture? = nil,
                                             _ work: @escaping @Sendable (_ touch: @escaping @Sendable () -> Void) async -> T) async -> (value: T?, quiet: Bool, sent: Bool) {
         let once = FirstOnce(), clock = ActivityClock(), start = Date()
+        RunStep.begin()
         return await withCheckedContinuation { (c: CheckedContinuation<(value: T?, quiet: Bool, sent: Bool), Never>) in
             let worker = Task {
                 let value = await SiteRun.$deadline.withValue(start.addingTimeInterval(cap)) {
@@ -242,8 +243,8 @@ public struct AutoOptOut: Sendable {
                 while true {
                     try? await Task.sleep(nanoseconds: 250_000_000)
                     // Given up after sending: the page is read first (its words and a screenshot), and only then is the work cancelled.
-                    if let idle, clock.quietFor >= idle { if once.claim() { if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, true, clock.sent)) }; return }
-                    if Date().timeIntervalSince(start) >= cap { if once.claim() { if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, false, clock.sent)) }; return }
+                    if let idle, clock.quietFor >= idle { if once.claim() { RunStep.freeze(); if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, true, clock.sent)) }; return }
+                    if Date().timeIntervalSince(start) >= cap { if once.claim() { RunStep.freeze(); if clock.sent { await capture?.takeNow(within: 6) }; worker.cancel(); c.resume(returning: (nil, false, clock.sent)) }; return }
                 }
             }
         }
@@ -321,7 +322,7 @@ public struct AutoOptOut: Sendable {
     /// code, a form that needs the person's own listing, or one that needs something only the person holds; and not a site the person set aside. A human check, terms
     /// prompt or box to certify that a page shows is never solved or ticked: the engine stops there and the site goes to the person's semi-automated queue.
     public static func backgroundAttemptable(_ entry: DirectoryEntry, person: Person, progress: Progress, now: Date = Date(), plans: FillPlans? = nil) -> Bool {
-        guard entry.pageMode == .form else { return false }
+        guard entry.pageMode == .form, entry.onlyFor == nil else { return false }          // a site only for some people is never sent for anyone
         if progress.isParked(entry.id, now: now) { return false }
         if let form = entry.optOutForm {
             if FormFiller.hasTypedCode(form) || FormFiller.needsListing(form) { return false }
@@ -360,8 +361,8 @@ public struct AutoOptOut: Sendable {
     /// a certification box, no confirmation...) may be the app's own shortcoming, so it is tried again: a fix in a later build then reaches it.
     public static func lastAttemptNeedsPerson(_ a: OptOutAttempt) -> Bool {
         let d = (a.detail ?? "").lowercased()
-        if a.outcome == "challenged", ["captcha", "cloudflare", "human check", "bot check", "robot", "rejected the automatic send"].contains(where: { d.contains($0) }) { return true }
-        if ["waiting for a code", "did not accept the code", "a code to type", "a code you are typing"].contains(where: { d.contains($0) }) { return true }
+        if isHumanCheck(outcome: a.outcome, detail: a.detail) { return true }
+        if ["waiting for a code", "did not accept the code", "a code you are typing"].contains(where: { d.contains($0) }) { return true }
         // The form planner's own reasons are stored in the person's language: each is matched by its opening words, in English and in the app's language.
         return personReasons.contains { key in
             [key, L10n.t(key)].contains { t in
@@ -370,6 +371,15 @@ public struct AutoOptOut: Sendable {
             }
         }
     }
+    /// An attempt stopped by a human check only a person can clear: a reCAPTCHA, an hCaptcha, a Cloudflare check that did not pass by itself, a bot check, a
+    /// picture code to type, or a check the page asked for after sending. The activity page and the site's line say "Blocked by a human check" for these
+    /// (decided 2026-11-24), so each one says plainly why the person has to do it.
+    public static func isHumanCheck(outcome: String, detail: String?) -> Bool {
+        guard outcome == "challenged" else { return false }
+        let d = (detail ?? "").lowercased()
+        return ["captcha", "cloudflare", "human check", "bot check", "robot", "rejected the automatic send", "a code to type"].contains { d.contains($0) }
+    }
+
     /// `FormFiller.plan`'s reasons for a field no profile can fill.
     static let personReasons = ["This form asks for something only you can supply (\"%@\").", "This form asks for something we do not have (\"%@\")."]
 
@@ -557,8 +567,13 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public var lastAttempted: Int?          // sites it actually tried
     public var lastSent: Int?
     public var lastNeedYou: Int?
-    /// An opt-out run was started and has not finished (the app was closed or suspended): the next time the app is open it carries on with the sites left.
+    /// An opt-out run was started and has not finished (the app was closed or suspended, or iOS took back its background time). It is carried on only when the
+    /// person says so: the app asks "Carry on?" when it is next on screen (`resumable`, decided 2026-11-24; until build 59 it carried on by itself).
     public var optOutResumePending: Bool?
+    /// When and why the run last paused before finishing (iOS took back its background time, the app left the screen on an older iOS), for the question and the
+    /// run log. Cleared when the run carries on or finishes.
+    public var pausedAt: Date?
+    public var pauseReason: String?
     /// The person pressed Stop. Nothing starts by itself again (not on opening the app, not on schedule) until they press Run now or Re-test all.
     /// Build 47 carried a stopped run on at the next opening, so Stop seemed to do nothing.
     public var stoppedByPerson: Bool?
@@ -587,12 +602,16 @@ public struct AutoSettings: Codable, Equatable, Sendable {
     public init() {}
 
     public func scanDue(now: Date) -> Bool { scanEnabled && (lastScan.map { now.timeIntervalSince($0) >= Self.scanEvery } ?? true) }
-    /// Whether a run starts by itself now: one is due on schedule, or a run was cut off (the app closed or suspended) and has sites left. Never after the
-    /// person stopped it.
+    /// Whether a run starts by itself now: one is due on schedule and no run is waiting to be carried on. Never after the person stopped it. A run that was cut
+    /// off or paused never starts by itself (decided 2026-11-24): the person is asked (`resumable`).
     public func startsByItself(now: Date) -> Bool {
-        guard optOutEnabled, stoppedByPerson != true else { return false }
-        return optOutDue(now: now) || optOutResumePending == true
+        guard optOutEnabled, stoppedByPerson != true, optOutResumePending != true else { return false }
+        return optOutDue(now: now)
     }
+
+    /// A run that stopped before finishing and that the person has not stopped themselves: the app asks whether to carry on with the sites left. Also a run the
+    /// person started with Run now while the automatic schedule is off: they started it, so they are asked too.
+    public var resumable: Bool { stoppedByPerson != true && optOutResumePending == true }
 
     public func optOutDue(now: Date) -> Bool {
         guard optOutEnabled else { return false }

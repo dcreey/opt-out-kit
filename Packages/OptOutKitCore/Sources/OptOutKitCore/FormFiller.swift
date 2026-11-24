@@ -51,13 +51,17 @@ public enum FormFiller {
     /// A certification about the person themselves: that they are the individual the request is about, or that the details they gave are true ("I certify under
     /// penalty of perjury that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and
     /// accurate", missionwired.com). True of the account owner asking for themselves, so the owner's own profile ticks it (decided 2026-11-23). Never a box only for
-    /// an agent ("written proof of authorization ... on behalf of the data subject"), and never terms, marketing or a sale.
+    /// an agent ("written proof of authorization ... on behalf of the data subject"), and never terms, marketing or a sale. Never one sworn as an oath either
+    /// (`legalOath`: "under penalty of perjury", "under oath", "sworn"): the person reads and ticks those themselves, with plain words beside them
+    /// (decided 2026-11-24, reversing the perjury part of 2026-11-23).
     static let selfCertification = try! NSRegularExpression(pattern: "\\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\\b.{0,300}(\\bi am (the|a) (individual|person|consumer|data subject|resident)\\b|\\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\\b(is|are) (true|accurate|correct))", options: .caseInsensitive)
+    static let legalOath = try! NSRegularExpression(pattern: "perjur|under oath|\\bsworn\\b|\\bswear\\b|penalt(y|ies)", options: .caseInsensitive)
     static let agentOnly = try! NSRegularExpression(pattern: "written proof|power of attorney|on behalf of (the|a) (data subject|consumer|individual)|authori[sz]ed agent", options: .caseInsensitive)
     static let selfAsAnswer = try! NSRegularExpression(pattern: "\\bi am (the|a) (individual|person|consumer|data subject)\\b", options: .caseInsensitive)
 
     public static func isSelfIdentityBox(_ text: String) -> Bool {
         let r = NSRange(text.startIndex..., in: text)
+        if legalOath.firstMatch(in: text, range: r) != nil { return false }          // an oath is the person's to read and tick
         if requestAcknowledgement.firstMatch(in: text, range: r) != nil && notAcknowledgement.firstMatch(in: text, range: r) == nil { return true }
         // An agent's wording beside "I am the individual" ("I am the individual, or authorized agent of the individual") still covers the person; an agent-only box does not.
         if selfCertification.firstMatch(in: text, range: r) != nil, notAcknowledgement.firstMatch(in: text, range: r) == nil,

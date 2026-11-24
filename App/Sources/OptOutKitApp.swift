@@ -26,6 +26,8 @@ struct OptOutKitApp: App {
                 .overlay(alignment: .topLeading) { if ProcessInfo.processInfo.arguments.contains("-uitest-watch-main") { MainStallsLabel() } }
                 .onOpenURL { if let link = AppModel.sharedLink(in: $0) { model.incomingLink = link } }
                 .task { CheckScheduler.register(model: model) }
+                // Low memory is how iOS ends an app in the background without a word: the run log says it came, so an export shows a run cut off that way.
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in model.memoryWarning() }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { model.appDidEnterBackground() }

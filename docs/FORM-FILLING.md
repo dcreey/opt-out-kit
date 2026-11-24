@@ -96,9 +96,12 @@ page says afterwards) and `Packages/OptOutKitCore/.../FormFiller.swift` (which v
      empty (required: "needs you"). A **month** picker gets `yyyy-MM` (the birth month for a birthday), a **date and time** picker `yyyy-MM-ddTHH:mm`; time, week, range and
      colour boxes are never filled.
    - *Certification boxes* ("I certify under penalty of perjury", "I acknowledge", "I consent") are never ticked: the form waits for the person (`pending-certification`).
-     The one exception (docs/PRINCIPLES.md, decided 2026-11-23): on the account owner's own profile, a certification about the owner themselves ("I certify under
-     penalty of perjury that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and
-     accurate", missionwired.com) is ticked with the "I am this person" boxes (`FormFiller.selfCertification`, `tick-identity-boxes`). An agent-only box ("written
+     The one exception (docs/PRINCIPLES.md, decided 2026-11-23): on the account owner's own profile, a certification about the owner themselves ("I certify
+     that I am the individual ... whose information is the subject of this request ... and that all information I have submitted is true and accurate") is
+     ticked with the "I am this person" boxes (`FormFiller.selfCertification`, `tick-identity-boxes`). **Never one sworn as an oath** (`FormFiller.legalOath`:
+     "under penalty of perjury", "under oath", "sworn", "swear"; decided 2026-11-24): missionwired.com's, 01advertising.com's and zoominfo.com's wait for the
+     person, and Solve and send adds in plain words that the wording only means their details must be true, which their own details are, so ticking it puts
+     them at no risk (`AssistedRunner.certificationNote`). An agent-only box ("written
      proof of authorization ... on behalf of the data subject"), terms and marketing never are; a family member's profile still waits for that person; and a
      box with no label of its own, or a bot trap, is never ticked.
      Only a box the person can see counts (a styled box hides the input and shows its label), and a request option is never one: "To withdraw consent" or "To opt out
@@ -194,6 +197,12 @@ before and after and compare. The multi-value comparison (a person with three em
   listed (`FormRun.saysNoRecordFound`, `SubmitOutcome.notListed`); the form is not pressed again. A line that only explains ("If no records are found, ...") does
   not count. The answer counts the same when the person pressed the page's own Submit (after ticking a human check), read by `PageFlow.watch` while it
   watches the page. What it means for the site's status: docs/AUTOMATION.md.
+
+- **A check asked for after sending is a human check.** A page that answers a send with "Please complete the verification challenge" (the Superset forms:
+  gsdsi, fourleaf, gather analytics, graph8), "Please complete the security verification" (jmr-media.com), "Please complete the security check" (instantly.ai),
+  "Verify you are human" or "Captcha is required" is a human check the person clears (`FormRun.asksForHumanCheck`, "a human check the page asked for after
+  sending"), not an error or "no success message". A page whose form cannot be used until a visible check is passed (allwebleads.com's reCAPTCHA with Submit
+  off) is that check, not "no opt-out form was found". Such a site's line says "Blocked by a human check" (docs/UX.md).
 
 - **A page working out of sight never takes the keyboard.** A background run's page is parked invisibly in the app's window, and many brokers' pages put the
   cursor in their first box (`autofocus`, or their own script), as do the app's own scripts that focus a box. Parked, the web view refuses to become first

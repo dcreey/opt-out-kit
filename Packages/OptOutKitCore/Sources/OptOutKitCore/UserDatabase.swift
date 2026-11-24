@@ -12,7 +12,7 @@ import SQLite3
 ///   `StorageError.locked`, which callers put off until the unlock, never show as damage and never take for a reason to erase.
 /// - **Erase means erase**: `secure_delete` overwrites what a delete frees, and `auto_vacuum` gives the pages back, so a removed screenshot is not left in the file.
 public final class UserDatabase: @unchecked Sendable {
-    public enum Kind: String, Sendable { case household, draft, evidence, setting }
+    public enum Kind: String, Sendable { case household, draft, evidence, setting, runLog }
 
     public enum DatabaseError: Error, CustomStringConvertible {
         case sqlite(String)

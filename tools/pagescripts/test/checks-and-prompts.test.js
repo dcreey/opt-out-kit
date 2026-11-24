@@ -77,21 +77,22 @@ test('a request option ("To withdraw consent", "To opt out of the sale") and a b
 // ---- tick-identity-boxes.js
 
 // The script runs only for the account owner's own profile (Person.mayConfirmOwnIdentity): what it ticks is true of them.
-test('"I confirm I am the person whose email this is" and a certification about the person themselves are ticked; terms and agent boxes are not', () => {
+test('"I confirm I am the person whose email this is" and a certification about the person themselves are ticked; an oath, terms and agent boxes are not', () => {
   const w = page(`<label><input type=checkbox id=me> I confirm that I am the person associated with this email address</label>
     <label><input type=checkbox id=perj> I declare under penalty of perjury that I am the person whose information is the subject of this request</label>
+    <label><input type=checkbox id=plain> I certify that I am the individual whose information is the subject of this request</label>
     <label><input type=checkbox id=terms> I confirm I am the account owner and accept the terms</label>
     <label><input type=checkbox id=agent> I am an authorized agent acting on behalf of the person</label>`);
   assert.equal(run(w, 'tick-identity-boxes'), 2);
-  assert.deepEqual(['me', 'perj', 'terms', 'agent'].map((i) => w.document.getElementById(i).checked), [true, true, false, false]);
+  assert.deepEqual(['me', 'perj', 'plain', 'terms', 'agent'].map((i) => w.document.getElementById(i).checked), [true, false, true, false, false]);
 });
 
-test('missionwired.com: the perjury certification ("I am the individual, or authorized agent of the individual ... true and accurate") is ticked; the agent\'s written-proof box and a bot trap are not', () => {
+test('missionwired.com: the perjury certification ("I am the individual, or authorized agent of the individual ... true and accurate") is left for the person (an oath, decided 2026-11-24), as are the agent\'s written-proof box and a bot trap', () => {
   const w = page(`<form><label><input type=checkbox id=proof> Check this box to confirm that you can provide written proof of authorization to request information on behalf of the data subject.</label>
     <label><input type=checkbox id=cert> I certify under penalty of perjury that, I am the individual, or authorized agent of the individual, whose information is the subject of this request; that I am a resident of the state identified above, and that all information I have submitted is true and accurate.*</label>
     <input type=checkbox id=trap aria-hidden=true style="position:absolute;left:-9999px"> <input name=n></form>`);
-  assert.equal(run(w, 'tick-identity-boxes'), 1);
-  assert.deepEqual(['proof', 'cert', 'trap'].map((i) => w.document.getElementById(i).checked), [false, true, false]);
+  assert.equal(run(w, 'tick-identity-boxes'), 0);
+  assert.deepEqual(['proof', 'cert', 'trap'].map((i) => w.document.getElementById(i).checked), [false, false, false]);
 });
 
 test('"I understand I may be required to verify my identity and authorize them to contact me" is ticked, unless it is about selling or marketing', () => {

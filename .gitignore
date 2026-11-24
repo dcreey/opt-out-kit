@@ -30,3 +30,6 @@ pipeline/region-pages/
 .live-*/
 .dir-proposed/
 node_modules/
+
+# A run export (Activity page, "Export this run") holds a person's details: never committed.
+exnay-run*.zip
