@@ -33,7 +33,10 @@ can fill) is left to them (decided 2026-11-23; `AutoOptOut.inRepeatPass`, docs/A
   No SDK that phones home goes into the build, including "privacy-friendly" ones. Adding any dependency means checking what it contacts.
 - Because there is no server there is nothing to breach, subpoena or monetize. The accepted trade-off is that nothing can be recovered from us:
   lose the phone and the data goes with it (backups are the person's own).
-- Progress, streaks and scores live on the device. No leaderboards, no friend lists, no sharing of results.
+- Progress, streaks and scores live on the device. No leaderboards, no friend lists, no sharing of results. One exception, the person's own choice (decided
+  2026-11-23): "Export this run" on the automatic opt-out page builds one file (every site's result and screenshot) in memory and hands it to the system share
+  sheet, so the person can give it to whoever is helping them. The app sends it nowhere, writes no file and asks nothing of it; the page says it holds their
+  details as the sites showed them (`RunExport`).
 - Reminders are local notifications. Nothing is scheduled from a server.
 - "Not working" and similar marks stay on the phone. Fixing the directory happens through public pull requests and audits we run ourselves, never through
   reports collected from users' devices.

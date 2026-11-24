@@ -279,6 +279,11 @@ struct AutoActivityView: View {
                         Label("Every site, all runs", systemImage: "square.stack.3d.up")
                     }
                     .accessibilityIdentifier("all-runs")
+                    // The run as one file for whoever is helping: built only when the share sheet asks for it, and sent nowhere by the app (RunExport).
+                    ShareLink(item: RunExportFile(build: { [model] in await model.runExport(for: person) }), preview: SharePreview(Loc.t("Exnay run export"))) {
+                        Label("Export this run, screenshots and all", systemImage: "square.and.arrow.up")
+                    }
+                    .accessibilityIdentifier("export-run")
                 }
                 if history.count > 1 {
                     DisclosureGroup("Earlier periods") {
@@ -291,6 +296,10 @@ struct AutoActivityView: View {
                             }
                         }
                     }
+                }
+            } footer: {
+                if model.autoSettings.lastAttempted != nil || model.autoSettings.runStarted != nil {
+                    Text("The export is one file with every site's result and screenshot, for whoever is helping you. It holds your details as the sites showed them, and goes only where you share it.")
                 }
             }
         }

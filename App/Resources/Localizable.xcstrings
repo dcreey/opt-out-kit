@@ -8925,6 +8925,29 @@
     }
    }
   },
+  "Exnay run export": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Export du passage Exnay"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exportación de la ejecución de Exnay"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exnay-Laufexport"
+     }
+    }
+   }
+  },
   "Exnay scans data brokers for your name and sends opt-out requests on its own, from as many websites as it can. You only step in where a site needs a person.": {
    "extractionState": "manual",
    "localizations": {
@@ -9013,6 +9036,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Exnay: Opt Out Kit"
+     }
+    }
+   }
+  },
+  "Export this run, screenshots and all": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exporter ce passage, captures d'écran comprises"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Exportar esta ejecución, con capturas de pantalla"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Diesen Lauf exportieren, mit allen Bildschirmfotos"
      }
     }
    }
@@ -24538,6 +24584,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Der Link in der E-Mail läuft schnell ab"
+     }
+    }
+   }
+  },
+  "The export is one file with every site's result and screenshot, for whoever is helping you. It holds your details as the sites showed them, and goes only where you share it.": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "L'export est un seul fichier avec le résultat et la capture d'écran de chaque site, pour la personne qui vous aide. Il contient vos informations telles que les sites les ont affichées, et ne va que là où vous le partagez."
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "La exportación es un solo archivo con el resultado y la captura de pantalla de cada sitio, para quien le esté ayudando. Contiene sus datos tal como los mostraron los sitios y solo va adonde usted lo comparta."
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Der Export ist eine einzige Datei mit dem Ergebnis und dem Bildschirmfoto jeder Seite, für die Person, die Ihnen hilft. Sie enthält Ihre Angaben so, wie die Seiten sie gezeigt haben, und geht nur dorthin, wo Sie sie teilen."
      }
     }
    }

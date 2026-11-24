@@ -75,6 +75,8 @@ a deleted screenshot is gone from the file, opening leaves the file as it was.
   (`Preferences`, `@Preference`); the one place that names `UserDefaults` is the one-time move out of it.
 - **Debug builds only** (`#if DEBUG`, absent from a release build): the simulator audit tools write what they find to Documents for offline analysis
   (`FormAudit`, `SiteReviewView`, `-export-evidence`).
+- **The run export** ("Export this run", `RunExport`) is built in memory and handed to the share sheet as data (`DataRepresentation`): the app writes no file for it;
+  where it is saved or sent is the person's choice in the system sheet.
 - **The web view** uses a non-persistent data store, and the network fetcher an ephemeral `URLSession` configuration: no cookies, cache or storage reach the disk.
 
 ## Keeping it that way

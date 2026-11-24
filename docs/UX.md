@@ -196,6 +196,12 @@ off and is carried on is the same run. Before the first run of build 54, which r
 never sent) and never tried, with how often it was sent or tried; a site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
 the run report still has "Review every site and its screenshot".)
 
+**Export this run, screenshots and all** (below it) gives the run to the system share sheet as one zip, `exnay-run.zip`: `run.json` lists every site of the page in its
+order (semi-automatic first, then not listed, sent, not tried) with its group and the line the page shows, its opt-out page, its last ten attempts (outcome, detail, what
+the page said), its latest search and the name of its screenshot; `README.txt` says the same in words; each site that kept a screenshot adds `NNN-domain.jpg`. It is
+built only when the person picks where it goes, in memory (no file is written on the phone), and the footer says it holds their details as the sites showed them and
+goes only where they share it. Made so a run can be handed to whoever is helping and stepped through site by site (`RunExport`, `StoredZip`).
+
 ## Reviewing what a site said and showed
 
 A site's page (from the run report's review of every site, from "Every site, all runs" on the automatic opt-out page, or the Sites tab) shows, when its form was sent, "What the page said" and the screenshot taken then; a tap on the screenshot opens it full size on a page of its own (a row of the page's list with a button that presented a full-screen cover never opened it, and the screenshot itself never appeared on the site's page, because its loader sat on a view that was empty until the picture arrived: it now shows a spinner meanwhile). Covered end to end by `FixtureJourneyUITests` (docs/TESTING.md).
