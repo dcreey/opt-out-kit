@@ -219,6 +219,11 @@ jobs:
             | grep -E "Test Case .*(passed|failed)|error:|Executed [0-9]+ tests|TEST (SUCCEEDED|FAILED)|\*\* "
           # A shard that ran nothing is a broken shard, not a pass.
           if ! grep -qE "Executed [1-9][0-9]* tests" xcodebuild.log; then echo "::error::this shard ran no tests"; exit 1; fi
+      - name: 'Show the end of the fixture server''s log when a test failed (its requests and any error it raised)'
+        if: 'failure()'
+        run: |
+          [ -f fixture-server.log ] || exit 0
+          tail -n 200 fixture-server.log
       - name: 'Report each test''s time (read back by `tools/ci_shards.py --fetch-run` to balance the next split) and each failure'
         if: 'always()'
         run: |

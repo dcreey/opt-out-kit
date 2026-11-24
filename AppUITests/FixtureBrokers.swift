@@ -24,8 +24,9 @@ struct FixtureBrokers {
             XCTFail("the fixture brokers are not set up: run these tests with tools/run_e2e.sh", file: file, line: line); throw URLError(.cannotConnectToHost)
         }
         let brokers = FixtureBrokers(url: url, catalog: catalog)
-        // A busy machine can refuse a connection for a moment; ask for up to 10 seconds before calling the server gone.
-        let until = Date().addingTimeInterval(10)
+        // A busy machine can refuse a connection for a moment; ask for up to 30 seconds before calling the server gone. (On GitHub the first test of a shard
+        // was refused for 10 seconds by a server that answered every later test of the shard: run 45291764351, shard 2.)
+        let until = Date().addingTimeInterval(30)
         var ready = brokers.get("__ready") != nil
         while !ready && Date() < until { Thread.sleep(forTimeInterval: 0.5); ready = brokers.get("__ready") != nil }
         guard ready else {
