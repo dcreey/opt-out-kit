@@ -1,0 +1,10 @@
+<h1>Submit a Request ({{site}})</h1>
+<!-- blueprintaudiences.com: a request form of only choices, with no box to type (its data holds no names), and its own send button. -->
+<form method="POST" action="/{{site}}/send">
+  <p>Type of Request. Select each type of request you are making.</p>
+  <label><input type="checkbox" name="access" value="on"> Access to personal information</label><br>
+  <label><input type="checkbox" name="deletion" value="on"> Deletion of personal information</label><br>
+  <label><input type="checkbox" name="correction" value="on"> Correction of personal information</label><br>
+  <label><input type="checkbox" name="optout" value="on"> Opt out of sale, sharing, or targeted advertising</label><br>
+  <button type="submit">Submit Privacy Request</button>
+</form>

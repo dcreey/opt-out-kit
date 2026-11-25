@@ -1,0 +1,11 @@
+<h1>Your privacy choices ({{site}})</h1>
+<!-- cashmereai.com: pressing send turns the button into "Submitting…"; the form is posted and the answer never shows on the page. -->
+<form id="f" method="POST" action="/{{site}}/send">
+  <label>Email * <input type="email" name="email" required></label><br><label>First name * <input name="first" required></label><br>
+  <label><input type="checkbox" name="optout" value="1"> Do not sell or share my personal information</label><br>
+  <button type="submit" id="go">Submit request</button>
+</form>
+<script>
+document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); var b = document.getElementById('go'); b.textContent = 'Submitting…'; b.disabled = true;
+  fetch(this.action, { method: 'POST', body: new URLSearchParams(new FormData(this)) }); });
+</script>

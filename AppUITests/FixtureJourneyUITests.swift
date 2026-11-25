@@ -432,6 +432,56 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertEqual(dnb["resident"], "Illinois"); XCTAssertEqual(dnb["companyCountry"], "", "the company's country is not the person's")
     }
 
+    /// As a user I want the forms the 2026-11-24 run left undone filled and sent correctly, one fixture page per shape:
+    /// - arrests.org (`wpforms`): the bot traps stay empty, "for myself" is ticked and the agent box is not, a deletion or opt out is chosen, and the form
+    ///   marked novalidate is sent.
+    /// - 360mediadirect.com (`placemenu`): a Country and State menu the page set to Mexico and Zacatecas get the United States and Illinois.
+    /// - blueprintaudiences.com (`choiceonly`): a form of only choices is sent with a deletion or opt out, never access.
+    /// - privacy.sojern.com (`idtype`): the identifier is Email, and of Export, Delete and Opt Out, Delete is pressed.
+    /// - fastbackgroundcheck.com (`subjectcert`): "I certify that I am the subject of the request" is ticked on the owner's profile.
+    /// - blackbaud.com (`captchacode`): a picture code is a human check; nothing is sent.
+    /// - cashmereai.com (`submitting`): a page left at "Submitting…" counts as sent, without a confirmation.
+    func testTheFormsReportedOnTheNovember24thRunAreFilledAndSentCorrectly() {
+        let app = XCUIApplication()
+        let sites = ["wpforms", "placemenu", "choiceonly", "idtype", "subjectcert", "captchacode", "submitting"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-uitest-seed-multi", "-only-domains", sites.map { "\($0)-1.fixture.test" }.joined(separator: ",")] + server.launchArguments
+        app.launch()
+        app.tab("Settings", 3).tap()
+        let activity = app.buttons["auto-activity"]
+        XCTAssertTrue(app.scrollUntilExists(activity)); activity.tap()
+        XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 10)); app.buttons["auto-run-now"].tap()
+        XCTAssertTrue(app.buttons["run-report-done"].waitForExistence(timeout: 400), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        func sends(_ kind: String) -> [[String: String]] { server.requests.filter { $0.site == "fx_\(kind)_1" && $0.path == "send" }.map(\.fields) }
+        func got(_ kind: String) -> [String: String] {
+            let all = sends(kind)
+            XCTAssertEqual(all.count, 1, "\(kind) was sent once: \(server.requests.map { "\($0.site) \($0.path)" })")
+            return all.first ?? [:]
+        }
+        let wp = got("wpforms")
+        XCTAssertEqual(wp["trap1"], "", "a trap hidden from assistive tech stays empty"); XCTAssertEqual(wp["trap2"], "", "a trap in a box one pixel tall stays empty")
+        XCTAssertEqual(wp["self"], "myself"); XCTAssertNil(wp["agent"], "never an authorized agent")
+        XCTAssertTrue(wp["delete"] == "1" || wp["optout"] == "1", "a removing request was chosen: \(wp)"); XCTAssertNil(wp["access"], "an access request is never chosen")
+        XCTAssertEqual(wp["state"], "Illinois")
+        let place = got("placemenu")
+        XCTAssertEqual(place["country"], "United States", "the country the page set is replaced by the person's"); XCTAssertEqual(place["state"], "Illinois")
+        let choice = got("choiceonly")
+        XCTAssertTrue(choice["deletion"] == "on" || choice["optout"] == "on", "a removing request was chosen: \(choice)")
+        XCTAssertNil(choice["access"]); XCTAssertNil(choice["correction"])
+        let id = got("idtype")
+        XCTAssertEqual(id["id_type"], "email"); XCTAssertEqual(id["email_address"], "pat@example.com"); XCTAssertEqual(id["op"], "Delete", "Delete, never Export")
+        XCTAssertTrue(sends("captchacode").isEmpty, "a picture code is left to the person")
+        XCTAssertEqual(got("submitting")["email"], "pat@example.com")
+        app.buttons["run-report-done"].tap()
+        let cert = sends("subjectcert")
+        if cert.isEmpty { XCTFail("subjectcert was not sent; the app says: \(siteLine(app, "subjectcert-1.fixture.test"))") }
+        XCTAssertEqual(cert.first?["legal"], "on", "the owner is the subject of the request")
+        let submitting = siteLine(app, "submitting-1.fixture.test")
+        XCTAssertTrue(submitting.hasPrefix("sent") && submitting.localizedCaseInsensitiveContains("did not show a confirmation"), submitting)
+        let captcha = siteLine(app, "captchacode-1.fixture.test")
+        XCTAssertTrue(captcha.hasPrefix("needsYou") && captcha.localizedCaseInsensitiveContains("human check"), captcha)
+    }
+
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run counts it as sent and says the site showed no
     /// confirmation (decided 2026-11-24), and for that
     /// site I can see what its page said and a screenshot of how the page looked, so I can judge it myself.

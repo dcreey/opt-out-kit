@@ -139,6 +139,19 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertEqual(counts.values.reduce(0, +), m.activityRows(for: me).count, "the same sites as the page")
     }
 
+    /// The card's numbers are worked out again when a run ends (away from the main thread), so the Queue tab shows them without working them out as it draws.
+    func testTheQueueCardsNumbersAreWorkedOutWhenARunEnds() async throws {
+        let m = model()
+        let me = try withProfile(m)
+        m.setAuto(scan: false, optOut: true)
+        XCTAssertNil(m.activityCounts, "nothing worked out yet")
+        await m.runAutoOptOut(for: me, submitter: CountingSubmitter(box: CallBox()))
+        var waited = 0
+        while m.activityCounts == nil && waited < 200 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
+        let counts = try XCTUnwrap(m.activityCounts, "the run's end worked the numbers out")
+        XCTAssertEqual(counts.values.reduce(0, +), m.activityRows(for: me).count, "the same sites as the page")
+    }
+
     /// A new run starts the page afresh; a run that is stopped and carried on, or a Re-test all of a pass under way, is the same run.
     func testANewRunStartsThePageAfreshAndACarriedOnRunDoesNot() {
         var s = AutoSettings()

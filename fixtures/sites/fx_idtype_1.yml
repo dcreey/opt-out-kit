@@ -1,0 +1,14 @@
+# A fixture broker for the end-to-end tests: its page is served by fixtures/server.py (kind 'idtype'; the form kinds of the 2026-11-24 export). docs/TESTING.md, 'End-to-end tests against fixture pages'.
+id: 'fx_idtype_1'
+domain: 'idtype-1.fixture.test'
+name: 'Fixture idtype 1'
+bucket: 'registry'
+tier: 'B'
+automation: 'scriptable'
+confidence: 'high'
+opt_out_url: 'http://127.0.0.1:8765/fx_idtype_1/optout'
+live_form:
+  checked: '2026-11-24'
+  found: true
+  page: 'http://127.0.0.1:8765/fx_idtype_1/optout'
+  blockers: []

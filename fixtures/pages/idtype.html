@@ -1,0 +1,13 @@
+<h1>Manage your data ({{site}})</h1>
+<!-- privacy.sojern.com: which identifier to give (Cookie, Mobile, Email, IP Address); Email shows its box; three send buttons: Export, Delete, Opt Out. -->
+<form method="POST" action="/{{site}}/send">
+  <p>Select ID Type</p>
+  <label><input type="radio" name="id_type" value="cookie"> Cookie</label> <label><input type="radio" name="id_type" value="mobile"> Mobile</label>
+  <label><input type="radio" name="id_type" value="email"> Email</label> <label><input type="radio" name="id_type" value="ip"> IP Address</label>
+  <div id="emailbox" style="display:none"><label>Email Address <input type="email" name="email_address"></label></div>
+  <input type="submit" name="op" value="Export"> <input type="submit" name="op" value="Delete"> <input type="submit" name="op" value="Opt Out">
+</form>
+<script>
+document.querySelectorAll('input[name=id_type]').forEach(function (r) { r.addEventListener('change', function () {
+  document.getElementById('emailbox').style.display = r.value === 'email' && r.checked ? 'block' : 'none'; }); });
+</script>

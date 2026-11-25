@@ -120,6 +120,10 @@ test('a Country or State menu the page set to another place is opened and set to
   assert.equal(w.document.getElementById('countryp').style.visibility, 'visible');
   assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'United States');
   assert.deepEqual(seen, ['country-UnitedStates']);
+  // Then the State menu, which also showed another place, is opened on the next call (only the menu opened is marked as done).
+  assert.notEqual(call(w, 'custom-menus-open', 'Illinois'), '', 'the State menu showing Zacatecas was opened next');
+  assert.equal(w.document.getElementById('statep').style.visibility, 'visible');
+  assert.equal(call(w, 'custom-menus-open', 'Illinois'), '', 'each menu is opened once');
   // The page then shows the US: Country reads United States, State has the person's choices.
   const ok = page('<form>' + dd('country', 'Country', 'United States', ['Canada', 'United States']) + dd('state', 'State', 'Illinois', ['Alabama', 'Illinois']) + '</form>', { webkitBoxes: true });
   assert.equal(call(ok, 'custom-menus-open', 'Illinois'), '', 'a menu already showing the person\'s country and state is left alone');

@@ -26,6 +26,20 @@ final class CatalogAppTests: XCTestCase {
         XCTAssertTrue(m.directory.allSatisfy { $0.excluded == nil }, "excluded sites are left out by the catalog's own query")
     }
 
+    /// The directory corrections from the 2026-11-24 export reach the catalog the app ships: apollo.io's form needs a work email and a code, so it is never
+    /// sent automatically; videoamp.com, socialgist.ai and visitiq.io have no form to fill; rrd.com points at its real request form, behind a reCAPTCHA box.
+    func testTheNovember24thDirectoryCorrectionsAreInTheCatalog() throws {
+        let m = model()
+        func site(_ d: String) throws -> DirectoryEntry { try XCTUnwrap(m.directory.first { $0.domain == d }, d) }
+        let apollo = try site("apollo.io")
+        XCTAssertEqual(apollo.contactEmail, "privacy@apollo.io")
+        XCTAssertEqual(apollo.liveForm?.blockers.sorted(), ["business", "code"])
+        for d in ["videoamp.com", "socialgist.ai", "visitiq.io"] { XCTAssertEqual(try site(d).liveForm?.found, false, "\(d) has no form") }
+        let rrd = try site("rrd.com")
+        XCTAssertTrue(rrd.liveForm?.page?.hasPrefix("https://privacyportal.onetrust.com/webform/") ?? false)
+        XCTAssertEqual(rrd.liveForm?.blockers, ["check: a reCAPTCHA checkbox"])
+    }
+
     /// Every page script comes from the catalog (the same ones the repository holds), includes resolve, and a ZIP code is found by key.
     func testThePageScriptsAndTheZIPTableComeFromTheCatalog() {
         _ = model()

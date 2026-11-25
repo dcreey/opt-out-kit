@@ -20,7 +20,9 @@
     if(!t) t=[near,e.placeholder||''].filter(function(x){return x;}).join(' ');
     // Its parent's text, unless the parent holds other boxes too (then that text is theirs as much as this one's).
     if(!t&&e.parentElement&&e.parentElement.querySelectorAll('input:not([type=hidden]),select,textarea').length<=1) t=(e.parentElement.innerText||'').slice(0,60);
-    return t.replace(/\s+/g,' ').trim().slice(0,90);};
+    // A tick box's words are a statement, and what it certifies can come after a first sentence about something else (fastbackgroundcheck.com: "I authorize
+    // ... to send communications ... I certify that I am the subject of the request ..."): kept whole, up to 400 characters. Other boxes' names stay short.
+    return t.replace(/\s+/g,' ').trim().slice(0,(e.type==='checkbox'||e.type==='radio')?400:90);};
   var ctxEl=function(e){var n=e; for(var i=0;i<8&&n&&n!==document.body;i++,n=n.parentElement){var t=(n.innerText||'').replace(/\s+/g,' ').trim(); if(t.length>=25&&t.length<=700) return n;} return e.parentElement||e;};
   // A rich-text message box (Quill, Draft, a plain contenteditable div) is a box too; it counts as a textarea.
   var ceSel=',[contenteditable=""],[contenteditable="true"],[role=textbox]:not(input):not(textarea)';

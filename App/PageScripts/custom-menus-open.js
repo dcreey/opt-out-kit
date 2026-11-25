@@ -46,8 +46,9 @@
       if(/\bcountry\b/i.test(lab)) return !usa.test(v);
       if(/\b(state|province)\b/i.test(lab)) return !mine.test(v);
       return false;});
-    // The menu's own button is pressed: the value shown sits inside it (saymine's label for its hidden checkbox, react-select's control).
-    els=els.map(function(e){e.setAttribute('data-ook-place','1'); return e.closest('label,[role=combobox],[aria-haspopup=listbox],[class*=control]')||e;});
+    // The menu's own button is pressed: the value shown sits inside it (saymine's label for its hidden checkbox, react-select's control). Only the one opened
+    // is marked, so the next call opens the next one (360mediadirect.com showed Mexico and Zacatecas: both were marked and State was never opened).
+    els=els.slice(0,1).map(function(e){e.setAttribute('data-ook-place','1'); return e.closest('label,[role=combobox],[aria-haspopup=listbox],[class*=control]')||e;});
   }
   if(!els.length) return '';
   var e=els[0]; e.setAttribute('data-ook-menu','1'); window.__ookUserAt||e.scrollIntoView({block:'center'});

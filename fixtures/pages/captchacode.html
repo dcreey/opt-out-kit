@@ -1,0 +1,7 @@
+<h1>Privacy Web Form ({{site}})</h1>
+<!-- OneTrust's webforms (blackbaud.com, marriott.com): a picture code to type beside its box. Only the person can read it. -->
+<form method="POST" action="/{{site}}/send">
+  <label>First Name * <input name="first" required></label><br><label>Email * <input type="email" name="email" required></label><br>
+  <div class="captcha"><img alt="" width="120" height="40" style="width:120px;height:40px;background:#ccc" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="><input id="captchaCode" name="captchaCode" placeholder="Captcha" required></div>
+  <button type="submit">Submit</button>
+</form>

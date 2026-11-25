@@ -36,6 +36,14 @@ test('a label is read from label[for], a wrapping label, aria-labelledby, aria-l
   assert.equal(field(f, 'l8').label, 'State of residence', "its parent's text");
 });
 
+test('a tick box keeps its whole statement, so what it certifies after a first sentence is read (fastbackgroundcheck.com); other boxes\' names stay short', () => {
+  const cert = 'I authorize FastBackgroundCheck.com to send communications relating to my privacy request to the email address(es) provided. I certify that I am the subject of the request, or an agent authorized to act on behalf of the subject of the request.';
+  const long = 'Your full legal name as it appears on your government issued identification documents, including any middle names';
+  const { out } = forms(`<form><label><input type=checkbox name=legal> ${cert}</label><label>${long} <input name=name></label></form>`);
+  assert.equal(field(out[0], 'legal').label, cert);
+  assert.equal(field(out[0], 'name').label.length, 90);
+});
+
 test('a title beside the box\'s wrapper names it, before an example placeholder (klear.com: "First Name" over a box whose placeholder is "John")', () => {
   const row = (title, ph) => `<div><div class=t><div>${title}</div></div><div><div class=w><input type=string placeholder="${ph}"></div></div></div>`;
   const { out } = forms(`<form>${row('First Name', 'John')}${row('Last Name', 'Doe')}${row('Email Address', 'john@doe.com')}${row('Confirm Email Address', 'john@doe.com')}<button>Submit</button></form>`);
