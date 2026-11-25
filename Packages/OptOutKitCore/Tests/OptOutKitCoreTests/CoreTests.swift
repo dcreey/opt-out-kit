@@ -3589,6 +3589,10 @@ final class FormFillerMoreFieldsTests: XCTestCase {
         let plain = "I certify that I am the individual whose information is the subject of this request, and that all information I have submitted is true and accurate."
         XCTAssertTrue(FormFiller.isSelfIdentityBox(plain), "the same statement without an oath is still ticked on the owner's profile")
         XCTAssertFalse(FormFiller.isSelfIdentityBox(proof), "an agent's statement")
+        // fastbackgroundcheck.com: emails about the request, "I am the subject of the request, or an agent authorized ...", and what the details are used for: true of
+        // the owner asking for themselves, with no oath, so their profile ticks it (decided 2026-11-24).
+        XCTAssertTrue(FormFiller.isSelfIdentityBox("I authorize FastBackgroundCheck.com to send communications relating to my privacy request to the email address(es) provided. I certify that I am the subject of the request, or an agent authorized to act on behalf of the subject of the request. I understand that information provided relating to this request will not be used for any purpose other than the processing of this request."))
+        XCTAssertFalse(FormFiller.isSelfIdentityBox("I certify under penalty of perjury that I am the subject of the request."), "still never an oath")
         XCTAssertFalse(FormFiller.isSelfIdentityBox("I certify that I have read and accept the Terms of Service and Privacy Policy.*"), "terms are never")
         let sworn = [("checkbox", "f0-9", proof), ("checkbox", "f0-10", cert), ("text", "f0-1", "First Name *"), ("email", "f0-2", "Email *")]
         if case .needsYou = plan(sworn, person: pat).verdict {} else { XCTFail("an oath waits for the owner too") }

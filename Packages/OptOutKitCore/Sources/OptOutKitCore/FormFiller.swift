@@ -53,11 +53,13 @@ public enum FormFiller {
     /// accurate", missionwired.com). True of the account owner asking for themselves, so the owner's own profile ticks it (decided 2026-11-23). Never a box only for
     /// an agent ("written proof of authorization ... on behalf of the data subject"), and never terms, marketing or a sale. Never one sworn as an oath either
     /// (`legalOath`: "under penalty of perjury", "under oath", "sworn"): the person reads and ticks those themselves, with plain words beside them
-    /// (decided 2026-11-24, reversing the perjury part of 2026-11-23).
-    static let selfCertification = try! NSRegularExpression(pattern: "\\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\\b.{0,300}(\\bi am (the|a) (individual|person|consumer|data subject|resident)\\b|\\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\\b(is|are) (true|accurate|correct))", options: .caseInsensitive)
+    /// (decided 2026-11-24, reversing the perjury part of 2026-11-23). "I am the subject of the request" is the same statement (fastbackgroundcheck.com: "I authorize
+    /// FastBackgroundCheck.com to send communications relating to my privacy request ... I certify that I am the subject of the request, or an agent authorized to
+    /// act on behalf of the subject"; ticked on the owner's own profile, decided 2026-11-24).
+    static let selfCertification = try! NSRegularExpression(pattern: "\\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\\b.{0,300}(\\bi am (the|a) (individual|person|consumer|data subject|resident|subject of (the|this|my) request)\\b|\\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\\b(is|are) (true|accurate|correct))", options: .caseInsensitive)
     static let legalOath = try! NSRegularExpression(pattern: "perjur|under oath|\\bsworn\\b|\\bswear\\b|penalt(y|ies)", options: .caseInsensitive)
     static let agentOnly = try! NSRegularExpression(pattern: "written proof|power of attorney|on behalf of (the|a) (data subject|consumer|individual)|authori[sz]ed agent", options: .caseInsensitive)
-    static let selfAsAnswer = try! NSRegularExpression(pattern: "\\bi am (the|a) (individual|person|consumer|data subject)\\b", options: .caseInsensitive)
+    static let selfAsAnswer = try! NSRegularExpression(pattern: "\\bi am (the|a) (individual|person|consumer|data subject|subject of (the|this|my) request)\\b", options: .caseInsensitive)
 
     public static func isSelfIdentityBox(_ text: String) -> Bool {
         let r = NSRange(text.startIndex..., in: text)

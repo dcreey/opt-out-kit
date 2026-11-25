@@ -51,6 +51,21 @@ enum LiveFormPicker {
         return movesToNextStep(f) && f.fields.contains(where: isChoice) && !f.fields.contains { $0.visible && !isChoice($0) && $0.type != "hidden" }
     }
 
+    /// A request form of only choices, with no box to type and its own send button (blueprintaudiences.com: "Deletion of personal information", "Opt out of
+    /// sale, sharing, or targeted advertising", then "Submit Privacy Request"; its data holds no names, so it asks for none). Its choices are made and it is
+    /// sent, as a step of only choices is (2026-11-24: "We could not match any of this form's fields to your profile").
+    nonisolated static func isChoiceOnlyRequest(_ f: LiveForm) -> Bool {
+        let isChoice: (LiveField) -> Bool = { $0.type == "radio" || $0.type == "checkbox" }
+        let removal = try! NSRegularExpression(pattern: "delet|opt.?out|do not sell|remov|eras", options: .caseInsensitive)
+        // Or a choice of which identifier to give, with Email among them (privacy.sojern.com: Cookie, Mobile, Email, IP Address, then the box for it and Delete).
+        let idKind = try! NSRegularExpression(pattern: "^\\s*(cookie|mobile|e-?mail|ip address|device id|maid)\\b", options: .caseInsensitive)
+        let matches: (NSRegularExpression, String) -> Bool = { $0.firstMatch(in: $1, range: NSRange($1.startIndex..., in: $1)) != nil }
+        let ids = f.fields.filter { isChoice($0) && matches(idKind, $0.label) }
+        let byEmail = ids.count >= 3 && ids.contains { $0.label.lowercased().contains("mail") }
+        return !movesToNextStep(f) && !f.fields.contains { $0.visible && !isChoice($0) && $0.type != "hidden" }
+            && (byEmail || f.fields.contains { isChoice($0) && matches(removal, $0.label) })
+    }
+
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
     private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.

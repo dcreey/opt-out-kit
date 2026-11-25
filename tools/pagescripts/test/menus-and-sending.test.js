@@ -309,3 +309,20 @@ test('submit-form posts the fields as hidden inputs to the action, values exactl
   assert.equal(f.action, 'https://broker.example/optout');
   assert.deepEqual([...f.querySelectorAll('input')].map((i) => [i.type, i.name, i.value]), [['hidden', 'name', "O'Brien \"Pat\""], ['hidden', 'email', 'pat@example.com']]);
 });
+
+test('several send buttons for different requests: Delete is pressed, never Export (privacy.sojern.com: Export, Delete, Opt Out)', () => {
+  const w = page('<form data-ook-form="f0"><input type=email name=email_address value="pat@example.com">' +
+    '<input type=submit name=op value="Export" id=ex><input type=submit name=op value="Delete" id=del><input type=submit name=op value="Opt Out" id=opt></form>');
+  const seen = clicks(w, ['ex', 'del', 'opt']);
+  assert.equal(call(w, 'press-live-submit', 'f0'), true);
+  assert.deepEqual(seen, ['del']);
+  const noDelete = page('<form data-ook-form="f0"><input type=submit value="Export" id=ex><input type=submit value="Opt Out" id=opt></form>');
+  const seen2 = clicks(noDelete, ['ex', 'opt']);
+  call(noDelete, 'press-live-submit', 'f0');
+  assert.deepEqual(seen2, ['opt'], 'then opting out');
+  const one = page('<form data-ook-form="f0"><input type=email value="a@b.c"><button type=submit id=go>Submit</button></form>');
+  const seen3 = clicks(one, ['go']);
+  call(one, 'press-live-submit', 'f0');
+  assert.deepEqual(seen3, ['go'], 'one send button is pressed whatever it says');
+});
+

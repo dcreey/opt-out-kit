@@ -6,7 +6,15 @@
   var bs=[].slice.call(f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]')).filter(function(b){
     var t=((b.innerText||b.value||'')+'').trim(); var r=b.getBoundingClientRect(); return r.width>0&&r.height>0&&!bad.test(t);});
   var pick=null;
-  for(var i=0;i<bs.length&&!pick;i++){var ty=(bs[i].getAttribute('type')||'').toLowerCase(); if(ty==='submit') pick=bs[i];}
+  // Several send buttons for different requests (privacy.sojern.com: Export, Delete, Opt Out): deletion first, then opting out; never one that only shows or
+  // downloads the data. One send button is pressed whatever it says.
+  var txt=function(b){return ((b.innerText||b.value||'')+'').trim();}, viewOnly=/^(export|download|access|view|see)\b/i;
+  var sends=bs.filter(function(b){return (b.getAttribute('type')||'').toLowerCase()==='submit';});
+  if(sends.length>1){
+    [/delet|remov|eras/i,/opt.?out|do not sell|unsubscribe/i].forEach(function(re){for(var i=0;i<sends.length&&!pick;i++){if(re.test(txt(sends[i]))) pick=sends[i];}});
+    for(var i=0;i<sends.length&&!pick;i++){if(!viewOnly.test(txt(sends[i]))) pick=sends[i];}
+  }
+  for(var i=0;i<bs.length&&!pick;i++){var ty=(bs[i].getAttribute('type')||'').toLowerCase(); if(ty==='submit'&&!(sends.length>1&&viewOnly.test(txt(bs[i])))) pick=bs[i];}
   for(var i=0;i<bs.length&&!pick;i++){if(/submit|send|opt|continue|request|go|confirm|remove|delete/i.test((bs[i].innerText||bs[i].value||''))) pick=bs[i];}
   if(!pick&&bs.length) pick=bs[bs.length-1];
   if(pick&&refuse(pick)) return false;

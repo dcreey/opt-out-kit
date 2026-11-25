@@ -23,6 +23,25 @@ final class LiveFormPickerTests: XCTestCase {
         XCTAssertFalse(LiveFormPicker.isChoiceStep(f([("radio", true)], buttons: ["Submit"])), "choices sent at once are not a step")
     }
 
+    /// blueprintaudiences.com: a request form of only choices (access, deletion, correction, ..., opt out) and "Submit Privacy Request", asking for no details
+    /// because its data holds no names: its choices are made and it is sent. Not a form of choices with no removal among them, nor one with a box to type.
+    func testARequestFormOfOnlyChoicesWithARemovalIsSent() {
+        func f(_ labels: [String], extra: [LiveField] = [], buttons: [String] = ["Submit Privacy Request"]) -> LiveForm {
+            LiveForm(token: "b", action: "", method: "get", visible: true,
+                     fields: labels.enumerated().map { LiveField(token: "b-\($0.offset)", name: "requestTypes", type: "checkbox", label: $0.element, required: false, visible: true) } + extra,
+                     buttons: buttons, text: "Submit a Request to Blueprint")
+        }
+        let blueprint = f(["Access to personal information", "Deletion of personal information", "Opt out of sale, sharing, or targeted advertising"])
+        XCTAssertTrue(LiveFormPicker.isChoiceOnlyRequest(blueprint))
+        XCTAssertFalse(LiveFormPicker.isChoiceOnlyRequest(f(["Access to personal information", "Correction of personal information"])), "no removal among the choices")
+        XCTAssertFalse(LiveFormPicker.isChoiceOnlyRequest(f(["Deletion of personal information"], extra: [LiveField(token: "b-9", name: "email", type: "email", label: "Email", required: true, visible: true)])),
+                       "a box to type: filled as usual")
+        XCTAssertFalse(LiveFormPicker.isChoiceOnlyRequest(f(["Delete my data"], buttons: ["Back", "Next"])), "a step that moves on is a choice step, not a request")
+        // privacy.sojern.com: which identifier to give (Email is chosen, its box appears, and Delete is pressed).
+        XCTAssertTrue(LiveFormPicker.isChoiceOnlyRequest(f(["Cookie", "Mobile", "Email", "IP Address"], buttons: ["Export", "Delete", "Opt Out"])))
+        XCTAssertFalse(LiveFormPicker.isChoiceOnlyRequest(f(["Cookie", "Mobile", "IP Address"])), "no email among them: nothing the app can give")
+    }
+
     func testTheOptOutFormIsPickedOverMarketingForms() {
         func f(_ token: String, _ fields: [(String, String)], buttons: [String], text: String) -> LiveForm {
             LiveForm(token: token, action: "", method: "get", visible: true,

@@ -111,7 +111,7 @@ struct WebAssistedDriver: AssistedDriver {
             if adID == nil, AdvertisingID.isAsked(by: liveForm.fields) { adID = await AdvertisingID.current() }
             var livePlan = FormFiller.plan(for: liveForm, signals: nil, person: person, listingURL: listingURL, advertisingID: adID)
             // A step of only choices has nothing to type: its choices are made below and Next opens the step with the boxes.
-            if LiveFormPicker.isChoiceStep(live) { livePlan = FillPlan(values: [], verdict: .ready) }
+            if LiveFormPicker.isChoiceStep(live) || LiveFormPicker.isChoiceOnlyRequest(live) { livePlan = FillPlan(values: [], verdict: .ready) }
             page.noteStep(live)
             // Whatever the plan says the person must do (tick a consent box, type a missing detail), the page is shown with everything else filled in:
             // the runner waits for them at that step. Closing the page here made such sites look like they "would not load".
@@ -186,7 +186,7 @@ final class WebAssistedPage: AssistedPage {
 
     /// The current form is a wizard step whose button only moves on (Next), and whether it has only choices (nothing to type).
     private var stepOnly = false, choiceStep = false
-    func noteStep(_ form: LiveForm) { stepOnly = LiveFormPicker.movesToNextStep(form); choiceStep = LiveFormPicker.isChoiceStep(form) }
+    func noteStep(_ form: LiveForm) { stepOnly = LiveFormPicker.movesToNextStep(form); choiceStep = LiveFormPicker.isChoiceStep(form) || LiveFormPicker.isChoiceOnlyRequest(form) }
 
     func remember(person: Person, advertisingID: String?, listingURL: URL? = nil, page: URL, signature: String) { self.listingURL = listingURL; self.person = person; self.advertisingID = advertisingID; pageURL = page; knownSignatures = [signature] }
 
@@ -208,7 +208,7 @@ final class WebAssistedPage: AssistedPage {
         if knownSignatures.contains(sig) { liveForm = new.token; return false }       // the same form, with its marks put on again
         let form = new.asOptOutForm(page: pageURL)
         var livePlan = FormFiller.plan(for: form, signals: nil, person: person, listingURL: listingURL, advertisingID: advertisingID)
-        if LiveFormPicker.isChoiceStep(new) { livePlan = FillPlan(values: [], verdict: .ready) }
+        if LiveFormPicker.isChoiceStep(new) || LiveFormPicker.isChoiceOnlyRequest(new) { livePlan = FillPlan(values: [], verdict: .ready) }
         // A detail the profile lacks (a birth date) is left for the person to type; what the profile has is still filled in.
         switch livePlan.verdict {
         case .ready, .needsData: break

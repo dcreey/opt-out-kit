@@ -112,6 +112,12 @@ test('missionwired.com: the perjury certification ("I am the individual, or auth
   assert.deepEqual(['proof', 'cert', 'trap'].map((i) => w.document.getElementById(i).checked), [false, false, false]);
 });
 
+test('fastbackgroundcheck.com: "I authorize ... to send communications relating to my privacy request ... I certify that I am the subject of the request" is ticked (decided 2026-11-24)', () => {
+  const w = page(`<form><label><input type=checkbox id=legal required> * I authorize FastBackgroundCheck.com to send communications relating to my privacy request to the email address(es) provided. I certify that I am the subject of the request, or an agent authorized to act on behalf of the subject of the request. I understand that information provided relating to this request will not be used for any purpose other than the processing of this request.</label><input name=email></form>`);
+  assert.equal(run(w, 'tick-identity-boxes'), 1);
+  assert.equal(w.document.getElementById('legal').checked, true);
+});
+
 test('"I understand I may be required to verify my identity and authorize them to contact me" is ticked, unless it is about selling or marketing', () => {
   const w = page(`<label><input type=checkbox id=a> I understand I may be required to verify my identity and I authorize Example to contact me about this request</label>
     <label><input type=checkbox id=b> I understand I may be required to verify my identity and I authorize Example to contact me with marketing offers</label>`);

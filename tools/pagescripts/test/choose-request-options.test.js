@@ -138,3 +138,10 @@ test('"authorizedAgent" named only in code, with plain No / Yes answers, is the 
   assert.equal(r.$('#n').checked, true);
   assert.deepEqual(r.out.unresolved, []);
 });
+
+test('a choice of which identifier to give takes Email, the one the app has (privacy.sojern.com: Cookie, Mobile, Email, IP Address)', () => {
+  const r = choose(radio('id_type', 'c', 'Cookie') + radio('id_type', 'm', 'Mobile') + radio('id_type', 'e', 'Email') + radio('id_type', 'ip', 'IP Address'));
+  assert.equal(r.$('#e').checked, true);
+  assert.equal(r.out.chosen, 1);
+});
+

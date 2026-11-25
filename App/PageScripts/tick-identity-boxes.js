@@ -3,9 +3,9 @@
       ack=/may be required to verify my identity.{0,200}authori[sz]e .{0,60} to contact me/i,notAck=/terms|privacy policy|\bsell|market|newsletter|advertis|share my|third part/i,
       // A certification about the person themselves (FormFiller.selfCertification: the same words): "I certify under penalty of perjury that I am the individual ...
       // and that all information I have submitted is true and accurate" (missionwired.com). Never an agent-only box ("written proof of authorization").
-      cert=/\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\b.{0,300}(\bi am (the|a) (individual|person|consumer|data subject|resident)\b|\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\b(is|are) (true|accurate|correct))/i,
+      cert=/\bi (hereby )?(certify|declare|attest|affirm|confirm|swear)\b.{0,300}(\bi am (the|a) (individual|person|consumer|data subject|resident|subject of (the|this|my) request)\b|\b(individual|person|consumer|data subject) whose (personal )?(information|data)|\b(information|details) (i have |i've )?(submitted|provided|entered|given).{0,30}\b(is|are) (true|accurate|correct))/i,
       oath=/perjur|under oath|\bsworn\b|\bswear\b|penalt(y|ies)/i, // an oath is the person's to read and tick (FormFiller.legalOath, decided 2026-11-24)
-      agentOnly=/written proof|power of attorney|on behalf of (the|a) (data subject|consumer|individual)|authori[sz]ed agent/i, selfAnswer=/\bi am (the|a) (individual|person|consumer|data subject)\b/i;
+      agentOnly=/written proof|power of attorney|on behalf of (the|a) (data subject|consumer|individual)|authori[sz]ed agent/i, selfAnswer=/\bi am (the|a) (individual|person|consumer|data subject|subject of (the|this|my) request)\b/i;
   document.querySelectorAll('input[type=checkbox]').forEach(function(c){
     if(c.checked) return;
     var t='';

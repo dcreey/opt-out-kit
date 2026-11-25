@@ -41,6 +41,10 @@
     // A choice of device ID types (GAID is Android's, IDFA is this phone's): this is an iPhone.
     var idfa=rs.filter(function(r){return /\bidfa\b/i.test(label(r));})[0];
     if(idfa){ if(!idfa.checked){markAuto(idfa); idfa.click(); if(!idfa.checked){idfa.checked=true; idfa.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;} return; }
+    // A choice of which identifier to give (privacy.sojern.com: Cookie, Mobile, Email, IP Address): the email, which the app has; the others belong to a device.
+    var idKinds=rs.filter(function(r){return /^\s*(cookie|mobile|e-?mail|ip address|device id|maid)\b/i.test(label(r));}).length;
+    var byEmail=idKinds>=3&&rs.filter(function(r){return /^\s*e-?mail\b/i.test(label(r));})[0];
+    if(byEmail){ if(!byEmail.checked){markAuto(byEmail); byEmail.click(); if(!byEmail.checked){byEmail.checked=true; byEmail.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;} return; }
     if(rm&&!rm.checked){markAuto(rm); rm.click(); if(!rm.checked){rm.checked=true; rm.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
     if(rs.some(function(r){return r.checked;})) return;
     var pick=null;
