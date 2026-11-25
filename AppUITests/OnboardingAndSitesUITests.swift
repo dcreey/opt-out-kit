@@ -269,18 +269,40 @@ final class DirectoryUITests: UITestCase {
     }
 }
 
-final class QuickCheckUITests: UITestCase {
-    /// Quick checks keep what the person saw, without points (the points card was taken off on 2026-11-24).
-    func testLookingAtASiteIsSaved() {
+/// An update that brings a new terms list asks a person who answered an earlier one, the first time the app opens: Accept or Deny (the rules are
+/// `TermsSettingsTests.testANewTermsListAfterAnUpdateIsAskedOnceWithAcceptOrDeny`).
+final class TermsUpdateUITests: UITestCase {
+    private func launch(_ args: [String]) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // looking a site up needs a complete profile
+        app.launchArguments = args
         app.launch()
-        app.tab("Sites", 1).tap()
-        XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
-        app.buttons["quick-checks"].tap()
-        XCTAssertTrue(app.buttons["answer-clean"].waitForExistence(timeout: 5))
-        app.buttons["answer-clean"].tap()
-        XCTAssertTrue(app.staticTexts["answer-saved"].waitForExistence(timeout: 3), "the answer was kept")
-        XCTAssertFalse(app.staticTexts["quick-points"].exists, "and no points are shown")
+        return app
+    }
+
+    private func termsStatus(_ app: XCUIApplication) -> String {
+        app.tab("Settings", 3).tap()
+        let status = app.staticTexts.matching(identifier: "terms-status").firstMatch
+        XCTAssertTrue(app.scrollUntilExists(status), "the terms row in Settings")
+        return status.label
+    }
+
+    func testANewTermsListIsAskedAboutAndAcceptTurnsItOnForTheNewList() {
+        let app = launch(["-uitest-reset", "-uitest-approved-old-terms"])
+        XCTAssertTrue(app.descendants(matching: .any)["terms-update"].waitForExistence(timeout: 10), "asked the first time the app opens after the update")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "new-terms"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertTrue(app.buttons["terms-deny"].exists, "with Deny beside Accept")
+        app.buttons["terms-allow"].tap()
+        XCTAssertFalse(app.descendants(matching: .any)["terms-update"].waitForExistence(timeout: 2), "answered, the question goes")
+        let on = termsStatus(app); XCTAssertTrue(on.hasPrefix("On"), "on for the new list: \(on)")
+    }
+
+    func testDenyTurnsItOffAndIsNotAskedAgain() {
+        let app = launch(["-uitest-reset", "-uitest-approved-old-terms"])
+        let deny = app.buttons["terms-deny"]
+        XCTAssertTrue(deny.waitForExistence(timeout: 10)); deny.tap()
+        let off = termsStatus(app); XCTAssertTrue(off.hasPrefix("Off"), "off: \(off)")
+        app.terminate()
+        let again = launch([])          // no reset: the answer was saved
+        XCTAssertFalse(again.descendants(matching: .any)["terms-update"].waitForExistence(timeout: 5), "not asked again for the same list")
     }
 }

@@ -25,7 +25,7 @@ final class PerformanceBudgetTests: XCTestCase {
     private func redraw(_ m: AppModel, _ me: Person) -> TimeInterval {
         let start = Date()
         _ = m.dailyGoals; _ = m.remainingKinds; _ = m.verifyRemaining; _ = m.activitySummary; _ = m.pendingFollowUps          // the Queue tab
-        _ = m.siteRows(); _ = m.quickCheckQueue                                                                             // the Sites tab
+        _ = m.siteRows()                                                                                                   // the Sites tab
         _ = m.activityInputs(for: me); _ = m.runDatesLine                                                                   // the automatic page
         return Date().timeIntervalSince(start)
     }

@@ -28,7 +28,6 @@ extension StatusSummary {
 /// field opens the search screen, which lists every site with its filters.
 struct SitesView: View {
     @EnvironmentObject var model: AppModel
-    @State private var showQuick = false
     /// Everything on this tab pushes by value (the search screen, then a site's task from it): mixing a pushed-by-flag screen with
     /// value links made a tapped site's page fail to open.
     @State private var path = NavigationPath()
@@ -79,20 +78,10 @@ struct SitesView: View {
                         Text("These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.")
                     }
                 }
-                // The points card ("Exposed", a level and points) and "Scan for … listings" were taken off (decided 2026-11-24): they did not work well;
-                // an automatic scan belongs with the automatic run (future work). Quick checks stay, without points.
-                Section {
-                    Button { model.requireProfile { showQuick = true } } label: {
-                        Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
-                    }
-                    .disabled(model.searchBlockedReason != nil)
-                    .accessibilityIdentifier("quick-checks")
-                    if let reason = model.searchBlockedReason {
-                        Label(reason, systemImage: "hand.raised").font(.footnote).foregroundStyle(.orange)
-                            .accessibilityIdentifier("search-blocked")
-                    }
-                } footer: {
-                    Text("Look a site up yourself in 20 seconds and mark what you see.")
+                // The points card, "Scan for … listings" and quick checks (look a site up yourself) were taken off (decided 2026-11-24 and 2026-11-25): an
+                // automatic scan belongs with the automatic run (future work). Why searching is off still shows, from the person's safety settings.
+                if let reason = model.searchBlockedReason {
+                    Section { Label(reason, systemImage: "hand.raised").font(.footnote).foregroundStyle(.orange).accessibilityIdentifier("search-blocked") }
                 }
             }
             .accessibilityIdentifier("sites-list")
@@ -107,7 +96,6 @@ struct SitesView: View {
             .navigationDestination(for: SiteSearchRoute.self) { _ in SiteSearchView(state: search) }
             .planDestinations()
             .coach(.sites)
-            .sheet(isPresented: $showQuick) { QuickCheckView() }
         }
     }
 
@@ -696,56 +684,6 @@ struct DirectoryInfoView: View {
     }
 }
 
-
-/// "Where am I listed?": runs the scan for the selected person and groups what it found.
-struct QuickCheckView: View {
-    @EnvironmentObject var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var skipped = Set<String>()
-    @State private var browserURL: URL?
-    /// The site just answered, said under the next one so the person sees the answer was kept.
-    @State private var lastSaved: String?
-
-    private var current: DirectoryEntry? { model.quickCheckQueue.first { !skipped.contains($0.id) } }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                if let lastSaved {
-                    Section { Label(Loc.f("Saved what you saw on %@", lastSaved), systemImage: "checkmark").foregroundStyle(.green).accessibilityIdentifier("answer-saved") }
-                }
-                if let site = current, let person = model.selectedPerson {
-                    Section {
-                        Text(site.domain).font(.title3.bold())
-                        Text("Open the site, search for \(person.displayName), and see if a listing comes up.")
-                        Button("Open \(site.domain)", systemImage: "safari") { browserURL = site.lookupURL(for: person) }
-                            .buttonStyle(.bordered)
-                    }
-                    Section("What did you see?") {
-                        answer(Loc.t("I'm listed here"), .stillListed, site, "exclamationmark.triangle", .red)
-                        answer(Loc.t("Not found"), .removed, site, "checkmark.circle", .green)
-                        answer(Loc.t("Blocked by payment"), .paywalled, site, "creditcard", .orange)
-                        Button("Skip this one") { skipped.insert(site.id); lastSaved = nil }
-                            .accessibilityIdentifier("answer-skip")
-                    }
-                } else {
-                    Section { Text("You're all caught up. Check back later: listings come back.") }
-                }
-            }
-            .navigationTitle("Quick checks")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-            .sheet(item: $browserURL) { SafariView(url: $0).ignoresSafeArea() }
-        }
-    }
-
-    private func answer(_ title: String, _ result: CheckResult, _ site: DirectoryEntry, _ symbol: String, _ color: Color) -> some View {
-        Button { model.recordSelfCheck(result, site: site); lastSaved = site.domain } label: {
-            Label(title, systemImage: symbol).foregroundStyle(color)
-        }
-        .accessibilityIdentifier({ switch result { case .removed: return "answer-clean"; case .paywalled: return "answer-paywalled"; default: return "answer-listed" } }())
-    }
-}
 
 /// A row with a symbol and a title, and lines under the title (docs/UX.md, "Alignment"): every line starts where the title's words start, never under the
 /// symbol, and the symbol sits on the title's first line. A Label followed by Text in a VStack put the details under the symbol (the Queue tab's automatic

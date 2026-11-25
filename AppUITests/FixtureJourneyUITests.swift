@@ -480,6 +480,13 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(submitting.hasPrefix("sent") && submitting.localizedCaseInsensitiveContains("did not show a confirmation"), submitting)
         let captcha = siteLine(app, "captchacode-1.fixture.test")
         XCTAssertTrue(captcha.hasPrefix("needsYou") && captcha.localizedCaseInsensitiveContains("human check"), captcha)
+        // The Queue tab's card says the same sites in short, without crediting the run with the person's work (rules: AutoProtectionTests, the card's numbers).
+        app.tab("Queue", 0).tap()
+        let counts = app.staticTexts["home-auto-counts"]
+        XCTAssertTrue(counts.waitForExistence(timeout: 10), "the card's numbers")
+        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "queue-card"; shot.lifetime = .keepAlways; add(shot)
+        XCTAssertEqual(counts.label, "Scanned 7 sites")
+        XCTAssertTrue(app.staticTexts["6 sites done in all"].exists, "the total in all, below")
     }
 
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run counts it as sent and says the site showed no

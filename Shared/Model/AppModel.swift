@@ -265,6 +265,8 @@ final class AppModel: ObservableObject {
         }
         // UI tests: `-uitest-approve-terms` is the person having allowed "accept site terms for me" (Settings), for the current terms library.
         if args.contains("-uitest-approve-terms") { household.approveTerms(libraryVersion: termsLibrary?.version ?? 0) }
+        // `-uitest-approved-old-terms`: the person allowed an earlier terms list, and the update brought a new one.
+        if args.contains("-uitest-approved-old-terms") { household.approveTerms(libraryVersion: (termsLibrary?.version ?? 0) - 1) }
         // UI tests: automatic protection on, as a new person who said yes at first use (the first pass then starts when the app is open).
         if args.contains("-uitest-auto-on") { household.updateAuto { $0.turnOnBoth(now: Date()) } }
         #endif
@@ -888,8 +890,8 @@ final class AppModel: ObservableObject {
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
     /// How many sites are in each of the automatic page's groups, as last worked out (`activityPage`), for the Queue tab's card: the same numbers as the
     /// page, never worked out while the Queue tab draws (decided 2026-11-24: the card counted only the plan's 34 automatic sites, the page 503).
-    @Published private(set) var activityCounts: [ActivityGroup: Int]?
-    func noteActivity(_ rows: [ActivityRow]) { activityCounts = Dictionary(grouping: rows, by: \.group).mapValues(\.count) }
+    @Published private(set) var activityCounts: ActivityCounts?
+    func noteActivity(_ rows: [ActivityRow]) { activityCounts = ActivityCounts(rows) }
     /// Works the groups out again away from the main thread and keeps the counts.
     func refreshActivityCounts() {
         guard let p = selectedPerson, storageProblem == nil else { return }
@@ -899,15 +901,49 @@ final class AppModel: ObservableObject {
             self?.noteActivity(rows)
         }
     }
-
-    /// The Queue tab card's line under the dates: "308 done · 195 moved to semi-automatic" (done: sent, handled previously, no action needed).
-    static func activityCountsLine(_ c: [ActivityGroup: Int]) -> String {
-        let done = (c[.sent] ?? 0) + (c[.earlier] ?? 0) + (c[.noAction] ?? 0), semi = c[.needsYou] ?? 0, left = c[.notTried] ?? 0
-        var parts = [Loc.f("%lld done", done)]
-        if semi > 0 { parts.append(Loc.f("%lld moved to semi-automatic", semi)) }
-        if left > 0 { parts.append(Loc.f("%lld still to do", left)) }
-        return parts.joined(separator: " · ")
+    /// After a site is done in Solve and send the card is worked out again, once the person pauses (a second), not after every site of a quick streak.
+    private var countsRefresh: Task<Void, Never>?
+    #if DEBUG
+    private(set) var countsRefreshes = 0
+    #endif
+    func refreshActivityCountsSoon() {
+        countsRefresh?.cancel()
+        countsRefresh = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !Task.isCancelled else { return }
+            #if DEBUG
+            self?.countsRefreshes += 1
+            #endif
+            self?.refreshActivityCounts()
+        }
     }
+
+    /// The home card's number and the run's part of the total below it (decided 2026-11-25): the card says only how many sites the run has looked at; the
+    /// total counts every site opted out of in any way plus the sites the run found no work on (not listed, covered by a platform, holding data only on
+    /// others), each once (`doneInAll`).
+    struct ActivityCounts: Equatable {
+        var groups: [ActivityGroup: Int]
+        /// Sites the run found nothing to do on: "No action needed", but not those the person set aside.
+        var noWorkIDs: Set<String>
+        init(_ rows: [ActivityRow]) {
+            groups = Dictionary(grouping: rows, by: \.group).mapValues(\.count)
+            noWorkIDs = Set(rows.filter { $0.group == .noAction && !$0.setAside }.map(\.id))
+        }
+        init(groups: [ActivityGroup: Int], noWorkIDs: Set<String> = []) { self.groups = groups; self.noWorkIDs = noWorkIDs }
+        subscript(_ g: ActivityGroup) -> Int? { groups[g] }
+        var total: Int { groups.values.reduce(0, +) }
+        /// Every site the run has looked at: the page's sites but those still to do.
+        var scanned: Int { total - stillToDo }
+        var needsYou: Int { groups[.needsYou] ?? 0 }
+        var stillToDo: Int { groups[.notTried] ?? 0 }
+        var complete: Bool { needsYou == 0 && stillToDo == 0 }
+    }
+
+    /// The home card's line: "Scanned 598 sites".
+    static func activityCountsLine(_ c: ActivityCounts) -> String { Loc.f("Scanned %lld sites", c.scanned) }
+
+    /// The total under the day's work: every site opted out of in any way, ever, and every site the automatic run found no work on, each once.
+    static func doneInAll(_ summary: ActivitySummary, _ counts: ActivityCounts?) -> Int { summary.optedOutIDs.union(counts?.noWorkIDs ?? []).count }
 
     private func endOptOutRun(interrupted: Bool) {
         refreshActivityCounts()
@@ -987,6 +1023,8 @@ final class AppModel: ObservableObject {
         let domain: String
         let group: ActivityGroup
         let line: String
+        /// The person set the site aside themselves: no work for a run, but not something the run found (`ActivityCounts.noWorkIDs` leaves it out).
+        var setAside = false
     }
 
     /// The automatic page's one status line, above its counts (decided 2026-11-24): "Last run Nov 24, 2026 · Next run Jan 26, 2027", or the half that is known.
@@ -1105,7 +1143,7 @@ final class AppModel: ObservableObject {
             case .notTried:
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
                 let attempts = progress.optOutAttempts[e.id] ?? []
-                if progress.isParked(e.id, now: now) { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.t("You set it aside")) }
+                if progress.isParked(e.id, now: now) { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.t("You set it aside"), setAside: true) }
                 if let why = reason(e) {
                     switch why {
                     case .tooSoon:
@@ -1422,6 +1460,7 @@ final class AppModel: ObservableObject {
     func startPeriodForTesting() { household.updateAuto { $0.periodAnchor = Date().addingTimeInterval(-86_400) } }
     /// A full pass finished then, so the next run is a repeat.
     func setLastFullRunForTesting(_ date: Date) { household.updateAuto { $0.lastFullRun = date } }
+    func recordSiteCheckForTesting(_ result: CheckResult, site: DirectoryEntry) { household.mutateProgress(for: selectedID) { $0.recordSiteCheck(result, site: site.id, source: .selfReported) } }
         func recordAttemptForTesting(_ attempt: OptOutAttempt, site: String) { household.mutateProgress(for: selectedID) { $0.recordOptOutAttempt(attempt, site: site) } }
     #endif
 
@@ -2058,6 +2097,7 @@ final class AppModel: ObservableObject {
         rows.append(AutoOptOutRow(id: entry.id, domain: entry.domain, result: result))
         optOutRun[person.id] = rows
         save()
+        refreshActivityCountsSoon()
     }
 
     /// Runs whatever is due: the daily scan and the weekly opt-out, for everyone in the family. Does nothing until the person has said yes.
@@ -2103,28 +2143,28 @@ final class AppModel: ObservableObject {
 
     func revokeTerms() { household.revokeTermsApproval(); save() }
 
+    /// An update brought a terms list the person has not answered: they allowed or declined an earlier one, so the app asks again the first time it is opened
+    /// after the update (RootView), with Accept and Deny. Someone who never answered is not asked; the switch in Settings stays where it was.
+    var termsNeedAnswer: Bool {
+        guard let lib = termsLibrary, lib.reviewedCount > 0 else { return false }
+        if let a = termsApproval { return a.libraryVersion != lib.version }
+        if let declined = household.termsDeclinedVersion { return declined != lib.version }
+        return false
+    }
+
+    /// No to the list an update brought: off, and not asked again until another list ships.
+    func declineTerms() {
+        guard let lib = termsLibrary else { return }
+        household.declineTerms(libraryVersion: lib.version)
+        save()
+    }
+
     /// The policy handed to the web view, or nil when nothing may be accepted.
     func makeTermsPolicy() -> TermsPolicy? {
         guard termsActive, let lib = termsLibrary else { return nil }
         return platform.makeTermsPolicy(library: lib, approval: termsApproval) { [weak self] entry in
             Task { @MainActor in self?.household.logConsent(entry); self?.save() }
         }
-    }
-
-    /// Directory sites the person can look at themselves, skipping any they looked at in the last 30 days.
-    var quickCheckQueue: [DirectoryEntry] {
-        guard searchBlockedReason == nil else { return [] }
-        let cutoff = Date().addingTimeInterval(-30 * 86_400)
-        return workSites
-            .filter { $0.needsManualCheck && $0.automation != .unreachable && $0.bucket != "registry" }       // marketing and analytics brokers have nothing to look yourself up on
-            .filter { (progress.latestSiteCheck($0.id)?.date ?? .distantPast) < cutoff }
-            .sorted { ($0.optOutForm != nil ? 0 : 1, $0.domain) < ($1.optOutForm != nil ? 0 : 1, $1.domain) }
-    }
-
-    /// The person looked for themselves. Points are paid for looking, whatever they found.
-    func recordSelfCheck(_ result: CheckResult, site: DirectoryEntry) {
-        household.mutateProgress(for: selectedID) { $0.recordSiteCheck(result, site: site.id, source: .selfReported) }
-        save()
     }
 
     /// Searches every directory site that can be checked automatically for one person. Read-only.

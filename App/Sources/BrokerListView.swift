@@ -107,13 +107,14 @@ struct BrokerListView: View {
                 } else if model.autoOptOutStarted, let last = model.autoSettings.lastOptOut {
                     Section {
                         NavigationLink { AutoActivityView() } label: {
-                            // The automatic page's own numbers, in short (decided 2026-11-24): what is done and what moved to the person, then the next run.
-                            // Complete when nothing is left for a run. The lines start under the title's words, not under its symbol (docs/UX.md, "Alignment").
+                            // Only how many sites the run has looked at, then the next run (decided 2026-11-25): what was done, by the run or by the person, is the
+                            // total below the day's work. Complete only when nothing is left for anyone. The lines start under the title's words, not under its
+                            // symbol (docs/UX.md, "Alignment").
                             let counts = model.activityCounts
-                            let complete = counts.map { ($0[.notTried] ?? 0) == 0 } ?? false
+                            let complete = counts?.complete ?? false
                             IconRow(icon: complete ? "checkmark.seal.fill" : "bolt.fill", tint: complete ? .green : .accentColor) {
                                 Text(complete ? "Automatic opt-out: complete" : "Automatic opt-out").font(.headline).foregroundStyle(complete ? Color.green : Color.primary)
-                                if let counts { Text(AppModel.activityCountsLine(counts)).font(.footnote).foregroundStyle(.secondary) }
+                                if let counts { Text(AppModel.activityCountsLine(counts)).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("home-auto-counts") }
                                 if let next = model.autoSettings.nextOptOutDate() { Text(Loc.f("Next run %@", Loc.date(next))).font(.footnote).foregroundStyle(.secondary) }
                                 else if counts == nil { Text(Loc.f("Last run %@", Loc.date(last))).font(.footnote).foregroundStyle(.secondary) }
                             }
@@ -185,7 +186,10 @@ struct BrokerListView: View {
                         }.accessibilityIdentifier("skipped-reminder")
                     }
                 }
-                if !waiting, !model.needsKindChoice, model.activitySummary.sites > 0 { ProgressRow(summary: model.activitySummary) }
+                if !waiting, !model.needsKindChoice {
+                    let summary = model.activitySummary, done = AppModel.doneInAll(summary, model.activityCounts)
+                    if done > 0 || summary.streak > 0 { ProgressRow(streak: summary.streak, done: done) }
+                }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
                     if case .platform = t.kind { return !model.isDone(t) && !waiting }
                     return t.kind == .automatic && !model.isDone(t) && !model.autoOptOutStarted && !waiting
@@ -535,18 +539,22 @@ struct TodayCard: View {
     }
 }
 
-/// Encouragement that only goes up: a streak of days and the number of requests sent so far, never a share of the whole directory.
+/// Encouragement that only goes up: a streak of days and every site done so far, in all: opted out of by the run, in Solve and send or by email, and the
+/// sites the automatic run found no work on (decided 2026-11-25; it said "405 requests sent so far", which read as the run's own work).
 struct ProgressRow: View {
-    let summary: ActivitySummary
+    let streak: Int
+    let done: Int
 
     var body: some View {
         Section {
             HStack {
-                if summary.streak > 0 {
-                    Label(Loc.f("%lld-day streak", summary.streak), systemImage: "flame.fill").foregroundStyle(.orange)
+                if streak > 0 {
+                    Label(Loc.f("%lld-day streak", streak), systemImage: "flame.fill").foregroundStyle(.orange)
                     Spacer()
                 }
-                Label(summary.sites == 1 ? Loc.t("1 request sent so far") : Loc.f("%lld requests sent so far", summary.sites), systemImage: "checkmark.shield.fill").foregroundStyle(.green)
+                if done > 0 {
+                    Label(done == 1 ? Loc.t("1 site done in all") : Loc.f("%lld sites done in all", done), systemImage: "checkmark.shield.fill").foregroundStyle(.green)
+                }
             }
             .font(.subheadline.bold())
             .accessibilityIdentifier("progress-row")

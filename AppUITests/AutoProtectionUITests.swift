@@ -71,19 +71,6 @@ final class AutoProtectionUITests: UITestCase {
         shot(app, "3-activity-after-preview")
     }
 
-    func testBlockedByPaymentIsAnAnswerInQuickChecks() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // searching needs a complete profile; typing one is tested elsewhere
-        app.launch()
-        app.tab("Sites", 1).tap()
-        XCTAssertTrue(app.scrollUntilExists(app.buttons["quick-checks"]), "quick checks are low on the Sites tab")
-        app.buttons["quick-checks"].tap()
-        XCTAssertTrue(app.buttons["answer-paywalled"].waitForExistence(timeout: 5))
-        shot(app, "4-quick-check-blocked-by-payment")
-        app.buttons["answer-paywalled"].tap()
-        XCTAssertTrue(app.staticTexts["answer-saved"].waitForExistence(timeout: 3), "the answer was kept")
-    }
-
     /// A site on the automatic status page must open its page and stay there. (It once bounced straight back: the page declared a navigation destination of
     /// its own while opened by a closure-style link, so SwiftUI built it twice and rejected the push.)
     func testASiteOnTheAutomaticStatusPageOpensItsPageAndStaysThere() throws {

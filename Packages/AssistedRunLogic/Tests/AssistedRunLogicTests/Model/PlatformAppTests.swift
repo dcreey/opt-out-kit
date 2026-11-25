@@ -107,7 +107,6 @@ final class HandledOnceTests: XCTestCase {
         let workIDs = Set(m.workSites.map(\.id)), handledIDs = Set(group.entries.map(\.id))
         XCTAssertTrue(workIDs.isDisjoint(with: handledIDs), "no site is in both lists")
         XCTAssertEqual(workIDs.union(handledIDs), Set(m.unguidedSites.map(\.id)), "and none went missing")
-        XCTAssertTrue(m.quickCheckQueue.allSatisfy { !handledIDs.contains($0.id) }, "quick checks skip them too")
     }
 
     func testEverySiteIsInExactlyOneGroupForEveryPlace() {
@@ -444,7 +443,7 @@ final class BackgroundPassesAppTests: XCTestCase {
         m.update(me); m.setContactEmail("pat@example.com")
         let p = m.selectedPerson!
         let site = try XCTUnwrap(m.directory.first { m.automaticDomains(for: p).contains($0.domain) })
-        m.recordSelfCheck(.removed, site: site)
+        m.recordSiteCheckForTesting(.removed, site: site)
         let row = try XCTUnwrap(m.activityRows(for: p).first { $0.id == site.id })
         XCTAssertEqual(row.group, .noAction, "no action needed on the automatic page")
         XCTAssertTrue(row.line.hasPrefix("Not listed"), row.line)

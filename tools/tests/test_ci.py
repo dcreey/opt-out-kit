@@ -54,7 +54,7 @@ class Balance(unittest.TestCase):
         self.assertEqual(S.work({key: 123.0})[key], 123.0)
 
     def test_a_known_failing_test_is_left_out_wherever_it_lands(self):
-        skip = "OptOutKitUITests/AutoProtectionUITests/testBlockedByPaymentIsAnAnswerInQuickChecks"
+        skip = "OptOutKitUITests/AutoProtectionUITests/testSkippingTheWalkthroughLeavesAQueueBannerThatOffersToTurnItOn"
         out = []
         for i in range(5):
             out += subprocess.run([sys.executable, os.path.join(ROOT, "tools", "ci_shards.py"), "--shards", "5", "--index", str(i), "--skip", skip],

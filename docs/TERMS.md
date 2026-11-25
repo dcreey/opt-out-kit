@@ -38,7 +38,11 @@ Acceptance would be allowed only if **all** hold:
 
 - every substantial paragraph in the prompt and the linked terms pages is in the library with `reviewed: true` and `verdict: ok`;
 - none is flagged as banning or implying automated access (never overridable: the web view is itself automated) or excluded;
-- the person approved this exact library version (any change to the list asks again).
+- the person approved this exact library version. When an update ships another list, a person who answered an earlier one (allowed it or
+  said no) is asked the first time the app opens after the update, once the walkthrough and what's new are done: "New terms to accept", the same
+  summary as Settings, with **Accept** and **Deny** always in view (`TermsApprovalView(afterUpdate:)`, `AppModel.termsNeedAnswer`). Accept allows the new
+  list; Deny turns it off and is kept with the list's version (`termsDeclinedVersion`), so it is asked again only when a later list ships. Until the
+  person answers, nothing is accepted. Someone who never answered is not asked; the switch in Settings is theirs to turn on (decided 2026-11-25).
 
 Otherwise the answer is one of: not approved, unreviewed paragraphs, excluded, nothing to judge. The shipped library has
 **zero reviewed paragraphs**, so the rule never says accept today (a test pins this).

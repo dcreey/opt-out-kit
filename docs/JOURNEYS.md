@@ -127,7 +127,6 @@ Each line: the story, the test, what it proves.
 | **I see ten sites per group (Up next, Done, Skipped), open "See all", and narrow by region** | `testTheSitesTabShowsTenPerGroup...` | Status pre-chosen, chips present, the list narrows |
 | **I search for a brand (TruthFinder) and land on the flow that handles it** | `testSitesTabSearchAndStatus` | The search matches by the handling flow's name |
 | **I search for a site, open it, and read how it is opted out** (shared opt-out, where the form posts) | `DirectoryUITests.testSitesTabListsAndSearches...` | Site page details |
-| **I answer a quick check** (the scan and the points were taken off the Sites tab on 2026-11-24) | `QuickCheckUITests`, `testBlockedByPaymentIsAnAnswer...` | Two quick-check answers are kept ("Saved what you saw on …"), with no points shown |
 | **The queue shows what to tackle and where to start** | `BrokerListUITests` | The list of broker kinds and "Start here" exist |
 
 ### Checks of layout and affordances (not journeys)
@@ -223,7 +222,7 @@ Key: ✅ walked end to end by a UI test · 🟡 walked in part (what is missing 
 | 37 | open a site and understand it: who they are, where they operate, what they hold, whether an opt-out lasts | 🟡 | details and shared opt-out ✅; the who, region, tracks, sells-to and lasts rows (`site-*`) ❌ |
 | 38 | skip a site for now or for good, and bring it back | ❌ | `skipped-*`, `site-bring-back`; `CoreTests` (the skip rules) |
 | 39 | mark a site done by hand and undo it | ❌ | |
-| 40 | check whether I am listed, and answer quick checks | 🟡 | scan shows a summary (fake); two of the quick-check answers |
+| 40 | check whether I am listed | 🟡 | scan shows a summary (fake); quick checks were taken off on 2026-11-25 |
 | 41 | see the sites that no longer respond or unlock later | ❌ | `closed-sites`, `locked-sites` |
 
 ### Queue, follow-ups and email

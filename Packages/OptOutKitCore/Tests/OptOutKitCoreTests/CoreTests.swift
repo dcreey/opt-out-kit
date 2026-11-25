@@ -822,24 +822,10 @@ final class BrowserSpecTests: XCTestCase {
 }
 
 final class SelfCheckTests: XCTestCase {
-    private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
-
     func testOldSavedRecordsWithoutASourceStillDecode() throws {
         let json = Data(#"{"date": 0, "result": "removed"}"#.utf8)
         let r = try JSONDecoder().decode(CheckRecord.self, from: json)
         XCTAssertEqual(r.source, .automatic)
-    }
-
-    func testLookupURLUsesTheSearchWhenItIsAPlainGet() {
-        var e = DirectoryEntry(id: "x_us", domain: "x.us", name: "x.us", bucket: "direct", tier: .B, automation: .guided, confidence: nil,
-                               optOutURL: nil, optOutForm: nil, family: nil, familyParent: nil, template: nil,
-                               searchCheck: SearchCheck(status: .undifferentiated, candidate: .init(method: "GET", url: "https://x.us/find?n={first}+{last}", body: nil)),
-                               signals: nil, profiled: nil)
-        let pat = Person(displayName: "P", names: [NameEntry(kind: .legal, name: "Pat Example")])
-        XCTAssertEqual(e.lookupURL(for: pat).absoluteString, "https://x.us/find?n=Pat+Example")
-        e.searchCheck = SearchCheck(status: .undifferentiated, candidate: .init(method: "POST", url: "https://x.us/s", body: "a={first}"))
-        XCTAssertEqual(e.lookupURL(for: pat).absoluteString, "https://x.us/", "a POST search cannot be linked to; open the home page")
-        XCTAssertTrue(e.needsManualCheck)
     }
 }
 
@@ -3474,6 +3460,22 @@ final class DailyResetAndSummaryTests: XCTestCase {
         // The chooser counts only sites still unfinished.
         let left = DailyGoals.remainingByKind(queue: queue, entries: entries, attempts: today, now: now, calendar: cal)
         XCTAssertEqual(left.first?.kind, "people_search"); XCTAssertEqual(left.first(where: { $0.kind == "adtech" })?.count, 9)
+    }
+
+    /// The home page's total, in all: every site opted out of in any way (a form sent, by a run or by the person, also one the site did not confirm, or a
+    /// request emailed), each once; a failure is not one (decided 2026-11-25).
+    func testTheTotalOptedOutCountsEverySiteOnceInAnyWay() {
+        let entries = (0..<5).map { entry($0, "people_search") }
+        let d = Date().addingTimeInterval(-86_400)
+        let attempts: [String: [OptOutAttempt]] = [
+            "s0": [OptOutAttempt(date: d, outcome: "submitted"), OptOutAttempt(date: d, outcome: "emailed")],
+            "s1": [OptOutAttempt(date: d, outcome: "emailed")],
+            "s2": [OptOutAttempt(date: d, outcome: "failed", detail: AutoOptOut.sentUnconfirmed)],
+            "s3": [OptOutAttempt(date: d, outcome: "failed"), OptOutAttempt(date: d, outcome: "challenged")],
+        ]
+        let s = ActivitySummary.build(entries: entries, attempts: attempts)
+        XCTAssertEqual(s.optedOutIDs, ["s0", "s1", "s2"], "a sent form, an emailed request and an unconfirmed send; never a failure")
+        XCTAssertEqual(s.sites, 2, "requests sent: forms only")
     }
 
     func testTheSummaryCountsSitesEmailsAndTheMostRecentDay() {

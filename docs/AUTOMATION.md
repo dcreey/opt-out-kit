@@ -174,8 +174,8 @@ to remove"); the courtrecords.us sites (about 50 in the catalog) answer "No data
 (`FormRun.saysNoRecordFound`, before the error wording, and only in what appeared after pressing) and records the site as **not listed** (`SubmitOutcome.notListed`,
 an attempt with outcome `not_listed` and a "not listed" look, `Progress.notListedRecently`). It is never counted as sent. For `Progress.notListedWindow` (30 days)
 the site counts as done on the Sites tab and its own page ("Not listed" with the date), is under "Not listed" on the automatic opt-out page, is left out of the
-semi-automated queue and is left alone by the run; then a repeat pass searches it again, since brokers add records. Any look that found no listing (a scan, the
-person's own quick check) counts the same way, and a later look that found one wins. Before this, the run pressed the search again and again until the time ran
+semi-automated queue and is left alone by the run; then a repeat pass searches it again, since brokers add records. Any look that found no listing (a scan, or a
+quick check the person saved before they were taken off) counts the same way, and a later look that found one wins. Before this, the run pressed the search again and again until the time ran
 out, and the site sat in the semi-automated queue as "the form had more steps than the time allowed". In Solve and send the page stays on screen with that
 explanation until the person moves on.
 

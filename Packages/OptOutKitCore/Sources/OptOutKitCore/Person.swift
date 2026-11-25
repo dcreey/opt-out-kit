@@ -229,6 +229,9 @@ public struct Person: Codable, Equatable, Identifiable, Sendable {
 public struct HouseholdSettings: Codable, Equatable, Sendable {
     public var termsApproval: TermsApproval?
     public var consentLog: [ConsentLogEntry] = []
+    /// The terms list version the person said no to when asked again after an update (`TermsApproval` holds a yes). They are asked again only when a later
+    /// update brings another list.
+    public var termsDeclinedVersion: Int?
     public var auto = AutoSettings()
     /// Opt-out links the app found for itself after a recorded one broke. Per site, kept on this device only.
     public var healedLinks: [String: HealedLink] = [:]
@@ -240,11 +243,12 @@ public struct HouseholdSettings: Codable, Equatable, Sendable {
     public var ownerCountry: String?
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, auto, healedLinks, contactEmail, ownerState, ownerCountry }
+    enum CodingKeys: String, CodingKey { case termsApproval, consentLog, termsDeclinedVersion, auto, healedLinks, contactEmail, ownerState, ownerCountry }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         termsApproval = try c.decodeIfPresent(TermsApproval.self, forKey: .termsApproval)
         consentLog = try c.decodeIfPresent([ConsentLogEntry].self, forKey: .consentLog) ?? []
+        termsDeclinedVersion = try c.decodeIfPresent(Int.self, forKey: .termsDeclinedVersion)
         auto = try c.decodeIfPresent(AutoSettings.self, forKey: .auto) ?? AutoSettings()
         healedLinks = try c.decodeIfPresent([String: HealedLink].self, forKey: .healedLinks) ?? [:]
         contactEmail = try c.decodeIfPresent(String.self, forKey: .contactEmail)

@@ -135,10 +135,18 @@ extension AboutView {
 struct TermsApprovalView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
+    /// Shown by itself after an update brought a new list: the person answers, Accept or Deny, rather than putting it off.
+    var afterUpdate = false
 
     var body: some View {
         NavigationStack {
             List {
+                if afterUpdate {
+                    Section {
+                        Label("This update brings a new list of reviewed terms. Until you answer, nothing is accepted for you.", systemImage: "arrow.triangle.2.circlepath")
+                            .accessibilityIdentifier("terms-update")
+                    }
+                }
                 Section {
                     Text("Some people-search sites show an \"I agree to our terms\" prompt before results. If you allow this, Exnay presses that button for you, but only when every paragraph of the prompt and of the terms pages it links to is on a list that a person has read and judged acceptable.")
                     Text("Reviewed paragraphs: \(model.termsReviewedCount) of \(model.termsLibrary?.paragraphs.count ?? 0)").font(.footnote)
@@ -167,15 +175,29 @@ struct TermsApprovalView: View {
                     Label("Turn it off any time", systemImage: "hand.raised")
                 }
                 Section {
-                    Button("Allow") { model.approveTerms(); dismiss() }
-                        .buttonStyle(.borderedProminent).accessibilityIdentifier("terms-allow")
+                    if !afterUpdate {
+                        Button("Allow") { model.approveTerms(); dismiss() }
+                            .buttonStyle(.borderedProminent).accessibilityIdentifier("terms-allow")
+                    }
                 } footer: {
                     Text("You are agreeing to those terms through this app. If you would rather read each site's terms yourself, leave this off.")
                 }
             }
-            .navigationTitle("Accept terms for you?")
+            // After an update the answer is always in view, under the list: Accept or Deny.
+            .safeAreaInset(edge: .bottom) {
+                if afterUpdate {
+                    HStack(spacing: 12) {
+                        Button(role: .destructive) { model.declineTerms(); dismiss() } label: { Text("Deny").frame(maxWidth: .infinity) }
+                            .buttonStyle(.bordered).accessibilityIdentifier("terms-deny")
+                        Button { model.approveTerms(); dismiss() } label: { Text("Accept").frame(maxWidth: .infinity) }
+                            .buttonStyle(.borderedProminent).accessibilityIdentifier("terms-allow")
+                    }
+                    .controlSize(.large).padding().background(.bar)
+                }
+            }
+            .navigationTitle(afterUpdate ? Loc.t("New terms to accept") : Loc.t("Accept terms for you?"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Not now") { dismiss() } } }
+            .toolbar { if !afterUpdate { ToolbarItem(placement: .cancellationAction) { Button("Not now") { dismiss() } } } }
         }
     }
 }
