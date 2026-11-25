@@ -127,37 +127,29 @@ final class AutoProtectionTests: XCTestCase {
         if m.autoSettings.nextOptOutDate() != nil { XCTAssertTrue(line.contains(" · Next run "), line) }
     }
 
-    /// The Queue tab's card says only how many sites the run has looked at (decided 2026-11-25); the total below the day's work counts every site opted out
-    /// of in any way and every site the run found no work on, each once, never one the person set aside.
-    func testTheCardSaysWhatWasScannedAndTheTotalCountsNoWorkSitesAsDone() throws {
+    /// The Queue tab's card says only how many sites the run has looked at (decided 2026-11-25); the total below the day's work is the Sites tab's own
+    /// "Done" count, so the two screens always agree.
+    func testTheCardSaysWhatWasScannedAndTheTotalIsTheSitesTabsDoneCount() throws {
         XCTAssertEqual(AppModel.activityCountsLine(.init(groups: [.sent: 10, .earlier: 334, .noAction: 14, .needsYou: 240])), "Scanned 598 sites")
         XCTAssertEqual(AppModel.activityCountsLine(.init(groups: [.sent: 6, .needsYou: 1, .notTried: 61])), "Scanned 7 sites", "sites still to do were not scanned")
-        XCTAssertFalse(AppModel.ActivityCounts(groups: [.sent: 5, .needsYou: 1]).complete, "not complete while sites wait for the person")
-        XCTAssertTrue(AppModel.ActivityCounts(groups: [.sent: 5, .noAction: 2]).complete)
+        XCTAssertTrue(AppModel.ActivityCounts(groups: [.sent: 10, .earlier: 334, .noAction: 14, .needsYou: 240]).complete, "complete once the run has nothing left to try, whatever moved to the person")
+        XCTAssertFalse(AppModel.ActivityCounts(groups: [.sent: 5, .notTried: 1]).complete, "not while a site is still to do")
 
         let m = model()
         let me = try withProfile(m)
+        XCTAssertEqual(m.doneSiteCount, m.siteRows().done.count)
         let sites = m.activityRows(for: me).map(\.id)
-        XCTAssertGreaterThan(sites.count, 2)
+        XCTAssertGreaterThan(sites.count, 3)
         let site = { (id: String) in try XCTUnwrap(m.directory.first { $0.id == id }) }
-        m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: "submitted"), site: sites[0])          // opted out, in Solve and send
-        m.recordSiteCheckForTesting(.removed, site: try site(sites[1]))                                     // the site had no record of them: no work
-        let rows = m.activityRows(for: me)
-        m.noteActivity(rows)
-        let counts = try XCTUnwrap(m.activityCounts)
-        XCTAssertEqual(counts.total, rows.count, "the same sites as the page")
-        XCTAssertEqual(counts.scanned, rows.filter { $0.group != .notTried }.count, "scanned: all but those still to do")
-        XCTAssertEqual(counts.noWorkIDs, Set(rows.filter { $0.group == .noAction && !$0.setAside }.map(\.id)))
-        XCTAssertTrue(counts.noWorkIDs.contains(sites[1]), "a site with no record of the person is no work")
-        let summary = m.activitySummary
-        XCTAssertTrue(summary.optedOutIDs.contains(sites[0]))
-        XCTAssertEqual(AppModel.doneInAll(summary, counts), summary.optedOutIDs.union(counts.noWorkIDs).count, "each site once, even when both")
-        var both = summary; both.optedOutIDs.insert(sites[1])
-        XCTAssertEqual(AppModel.doneInAll(both, counts), AppModel.doneInAll(summary, counts), "a site both opted out of and with no work counts once")
-        XCTAssertGreaterThanOrEqual(AppModel.doneInAll(summary, counts), 2)
-        XCTAssertEqual(AppModel.doneInAll(summary, nil), summary.optedOut, "before the run's numbers are worked out, the sites opted out of")
-        let aside = AppModel.ActivityCounts([AppModel.ActivityRow(id: "a", domain: "a.com", group: .noAction, line: "You set it aside", setAside: true)])
-        XCTAssertTrue(aside.noWorkIDs.isEmpty, "a site the person set aside is not done")
+        m.recordAttemptForTesting(OptOutAttempt(date: Date(), outcome: "submitted"), site: sites[0])                    // sent, in Solve and send
+        m.recordSiteCheckForTesting(.removed, site: try site(sites[1]))                                               // no record of the person
+        m.recordAttemptForTesting(OptOutAttempt(date: Date().addingTimeInterval(-400 * 86_400), outcome: "submitted"), site: sites[2])   // a send that ran out
+        m.skipSite(sites[3], forever: true)                                                                            // set aside
+        let done = Set(m.siteRows().done.compactMap { $0.entry?.id })
+        XCTAssertEqual(m.doneSiteCount, done.count, "the home total is the Sites tab's Done count")
+        XCTAssertTrue(done.contains(sites[0]) && done.contains(sites[1]), "a send that holds and a site with no record of the person are done")
+        XCTAssertFalse(done.contains(sites[2]), "a send that ran out is due again, not done")
+        XCTAssertFalse(done.contains(sites[3]), "a site set aside is skipped, not done")
     }
 
     /// The card's numbers are worked out again when a run ends (away from the main thread), so the Queue tab shows them without working them out as it draws.
@@ -184,7 +176,7 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertEqual(semi.count, 3)
         for e in semi { m.recordAssisted(e, .submitted(awaitingEmail: false), for: me) }
         var waited = 0
-        let optedOut = { (c: AppModel.ActivityCounts?) in (c?[.sent] ?? 0) + (c?[.earlier] ?? 0) }
+        let optedOut = { (c: AppModel.ActivityCounts?) in (c?[.sent] ?? 0) + (c?[.earlier] ?? 0) }          // the page's Sent and Handled previously
         while optedOut(m.activityCounts) < optedOut(before) + 3 && waited < 300 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
         XCTAssertEqual(optedOut(m.activityCounts), optedOut(before) + 3, "the numbers count them")
         XCTAssertEqual(m.countsRefreshes, 1, "worked out once for the three")

@@ -29,23 +29,33 @@ struct SiteRows {
 }
 
 extension AppModel {
-    func siteRows() -> SiteRows {
-        let byDomain = entryByDomain
-        let p = progress, country = ownerCountry, local = localStates
-        var seen = Set<String>(), out = SiteRows()
+    /// Every site once, in queue order, with where it stands (`SiteStatus.of`): the one rule for "done" on the Sites tab and on the home page.
+    private func eachSiteStatus(_ body: (String, DirectoryEntry?, PlanTask, SiteStatus) -> Void) {
+        let byDomain = entryByDomain, p = progress
+        var seen = Set<String>()
         for band in queue {
             for task in band.tasks {
                 let taskDone = isDone(task)
                 for d in task.domains where seen.insert(d).inserted {
                     let e = byDomain[d]
-                    let status = SiteStatus.of(e, progress: p, taskDone: taskDone)
-                    let reach = e.map { Regions.summary(for: $0, country: country, localStates: local).inRegion } ?? ((country ?? "US") == "US")
-                    switch status {
-                    case .todo: out.todo.append(SiteRow(domain: d, entry: e, task: task, status: status, date: nil, inRegion: reach))
-                    case .skipped: out.skipped.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e.flatMap { p.lastSkip($0.id)?.date }, inRegion: reach))
-                    case .done: out.done.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e?.lastSent(in: p.optOutAttempts), inRegion: reach))
-                    }
+                    body(d, e, task, SiteStatus.of(e, progress: p, taskDone: taskDone))
                 }
+            }
+        }
+    }
+
+    /// How many sites are done: the Sites tab's "Done" count, without building its rows (the home page shows it, and it is drawn after every site of a run).
+    var doneSiteCount: Int { var n = 0; eachSiteStatus { _, _, _, s in if s == .done { n += 1 } }; return n }
+
+    func siteRows() -> SiteRows {
+        let p = progress, country = ownerCountry, local = localStates
+        var out = SiteRows()
+        eachSiteStatus { d, e, task, status in
+            let reach = e.map { Regions.summary(for: $0, country: country, localStates: local).inRegion } ?? ((country ?? "US") == "US")
+            switch status {
+            case .todo: out.todo.append(SiteRow(domain: d, entry: e, task: task, status: status, date: nil, inRegion: reach))
+            case .skipped: out.skipped.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e.flatMap { p.lastSkip($0.id)?.date }, inRegion: reach))
+            case .done: out.done.append(SiteRow(domain: d, entry: e, task: task, status: status, date: e?.lastSent(in: p.optOutAttempts), inRegion: reach))
             }
         }
         // Done sites with no date of their own (covered by an official service, or emailed) come last.

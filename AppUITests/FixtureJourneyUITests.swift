@@ -486,7 +486,11 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(counts.waitForExistence(timeout: 10), "the card's numbers")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "queue-card"; shot.lifetime = .keepAlways; add(shot)
         XCTAssertEqual(counts.label, "Scanned 7 sites")
-        XCTAssertTrue(app.staticTexts["6 sites done in all"].exists, "the total in all, below")
+        let done = app.buttons["home-sites-done"]
+        XCTAssertTrue(app.scrollUntilExists(done), "the Sites tab's Done count, below")
+        XCTAssertTrue(done.label.hasSuffix(" sites done") || done.label == "1 site done", done.label)
+        done.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["sites-list"].waitForExistence(timeout: 5), "tapping the count opens the Sites tab")
     }
 
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run counts it as sent and says the site showed no

@@ -173,11 +173,11 @@ Every guide's … menu (Solve and send, the guided steps, Email links) has **Ope
 "Scanned 598 sites" (`home-auto-counts`; not those still to do), and "Next run Jan 26, 2027", from the automatic page's last count (`AppModel.activityCounts`,
 worked out away from the main thread when the app comes to the front, when a run ends, when the page opens, and a second after a site is done in Solve and
 send). What was done is not on the card: it said "358 done", then "Opted out of 344 · Not found on 14", which read as the run's own work when the person had
-done most in Solve and send; the automatic page has the groups. The title is "Automatic opt-out", and green "Automatic opt-out: complete" once nothing is left
-for anyone. Below the day's work the streak row shows the streak and the total, "405 sites done in all" (`AppModel.doneInAll`): every site opted out of in any
-way (a form sent by a run or by the person, also one the site did not confirm, or a request emailed; `ActivitySummary.optedOutIDs`) and every site the
-automatic run found no work on (the page's "No action needed": not listed, covered by a platform, holding data only on others; never one the person set
-aside), each once. It said "405 requests sent so far", which counted forms only. Earlier the card said "All 34 sites went through this period", counting
+done most in Solve and send; the automatic page has the groups. The title is green "Automatic opt-out: complete", with a check, once the run has nothing left to
+try (sites moved to semi-automatic are the person's, in the queue; build 64 waited for those too, so the check never showed), else "Automatic opt-out". Below the day's work the streak row shows the streak and "427 sites done", the Sites tab's own "Done" count (`AppModel.doneSiteCount`, the
+same `SiteStatus.of`: a send that still holds, a recent look that found no listing, or a shared task such as an official service), so the two screens always
+agree; tapping it opens the Sites tab (`home-sites-done`). It said "405 requests sent so far" (forms ever sent, over every site), then "418 sites done in all" (sends ever, not only those still holding), and
+neither matched the Sites tab. Earlier the card said "All 34 sites went through this period", counting
 only the plan's automatic sites. While a run works it is "Opting you out in the background" with its progress.
 
 **What automatic protection does (first run and Settings).** `AutoExplainer` says it in plain words, with the number of sites a pass tries: first it tries every site where the form is known and can be filled and sent without a person; every 3 months it sends again to the sites that went through; every 6 months it re-tests all of them from the start; on any pass a site that does not go through is never marked done and moves to the semi-automated queue with the reason. It never solves a CAPTCHA or accepts terms, and some sites email a link whose click is the person's. **The automatic opt-out page (`AutoActivityView`).** Built to be read without scrolling, like the site page. The top card is laid out in "The automatic opt-out page" below: one dates line, the four counts and the slim "still to do" line, the run's progress while it

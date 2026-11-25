@@ -53,6 +53,27 @@ class ReleaseGate(unittest.TestCase):
         self.assertIn("uncommitted", G.check(SHA, True, True, api({"ci.yml": [run()]}), target="testflight")[0])
         self.assertIn("integration.yml has not run", G.check(SHA, False, True, api({"ci.yml": [run()]}))[0], "the App Store is the default, and needs Integration")
 
+    def test_a_commit_confirmed_by_hand_skips_githubs_api_but_not_the_local_checks(self):
+        def refuse(url): raise AssertionError("GitHub's API is not asked")
+        for target in ("testflight", "app-store"):
+            self.assertEqual(G.check(SHA, dirty=False, on_main=True, get=refuse, target=target, confirmed=SHA[:7]), [])
+            self.assertEqual(G.check(SHA, dirty=False, on_main=True, get=refuse, target=target, confirmed=SHA), [])
+        problems = G.check(SHA, dirty=True, on_main=False, get=refuse, target="testflight", confirmed=SHA[:7])
+        self.assertEqual(len(problems), 2, "uncommitted changes and a commit not on main still stop it")
+
+    def test_a_confirmation_must_name_the_commit_being_released(self):
+        def refuse(url): raise AssertionError("GitHub's API is not asked")
+        for wrong in ("b" * 7, "aaaaaa", "", "a" * 41):
+            problems = G.check(SHA, dirty=False, on_main=True, get=refuse, target="testflight", confirmed=wrong)
+            self.assertEqual(len(problems), 1, wrong)
+            self.assertIn("does not name", problems[0])
+
+    def test_when_githubs_api_refuses_the_gate_says_how_to_confirm_by_hand(self):
+        def limited(url): raise OSError("HTTP Error 403: rate limit exceeded")
+        problems = G.check(SHA, dirty=False, on_main=True, get=limited, target="testflight")
+        self.assertEqual(len(problems), 1)
+        self.assertIn("--confirmed " + SHA[:7], problems[0])
+
 
 if __name__ == "__main__":
     unittest.main()

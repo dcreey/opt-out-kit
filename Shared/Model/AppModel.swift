@@ -918,32 +918,25 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// The home card's number and the run's part of the total below it (decided 2026-11-25): the card says only how many sites the run has looked at; the
-    /// total counts every site opted out of in any way plus the sites the run found no work on (not listed, covered by a platform, holding data only on
-    /// others), each once (`doneInAll`).
+    /// The home card's number (decided 2026-11-25): only how many sites the run has looked at. What was done is the total below the day's work, the Sites
+    /// tab's own "Done" count (`doneSiteCount`), so the two always agree.
     struct ActivityCounts: Equatable {
         var groups: [ActivityGroup: Int]
-        /// Sites the run found nothing to do on: "No action needed", but not those the person set aside.
-        var noWorkIDs: Set<String>
-        init(_ rows: [ActivityRow]) {
-            groups = Dictionary(grouping: rows, by: \.group).mapValues(\.count)
-            noWorkIDs = Set(rows.filter { $0.group == .noAction && !$0.setAside }.map(\.id))
-        }
-        init(groups: [ActivityGroup: Int], noWorkIDs: Set<String> = []) { self.groups = groups; self.noWorkIDs = noWorkIDs }
+        init(_ rows: [ActivityRow]) { groups = Dictionary(grouping: rows, by: \.group).mapValues(\.count) }
+        init(groups: [ActivityGroup: Int]) { self.groups = groups }
         subscript(_ g: ActivityGroup) -> Int? { groups[g] }
         var total: Int { groups.values.reduce(0, +) }
         /// Every site the run has looked at: the page's sites but those still to do.
         var scanned: Int { total - stillToDo }
         var needsYou: Int { groups[.needsYou] ?? 0 }
         var stillToDo: Int { groups[.notTried] ?? 0 }
-        var complete: Bool { needsYou == 0 && stillToDo == 0 }
+        /// The run has nothing left to try: green and "complete" on the card. Sites moved to semi-automatic are the person's, in the queue, and do not hold it
+        /// back (decided 2026-11-25; build 64 waited for those too, so the check never showed).
+        var complete: Bool { stillToDo == 0 }
     }
 
     /// The home card's line: "Scanned 598 sites".
     static func activityCountsLine(_ c: ActivityCounts) -> String { Loc.f("Scanned %lld sites", c.scanned) }
-
-    /// The total under the day's work: every site opted out of in any way, ever, and every site the automatic run found no work on, each once.
-    static func doneInAll(_ summary: ActivitySummary, _ counts: ActivityCounts?) -> Int { summary.optedOutIDs.union(counts?.noWorkIDs ?? []).count }
 
     private func endOptOutRun(interrupted: Bool) {
         refreshActivityCounts()
@@ -1023,8 +1016,6 @@ final class AppModel: ObservableObject {
         let domain: String
         let group: ActivityGroup
         let line: String
-        /// The person set the site aside themselves: no work for a run, but not something the run found (`ActivityCounts.noWorkIDs` leaves it out).
-        var setAside = false
     }
 
     /// The automatic page's one status line, above its counts (decided 2026-11-24): "Last run Nov 24, 2026 · Next run Jan 26, 2027", or the half that is known.
@@ -1143,7 +1134,7 @@ final class AppModel: ObservableObject {
             case .notTried:
                 // The reason is worked out now, not taken from the last run (which is forgotten when the app closes).
                 let attempts = progress.optOutAttempts[e.id] ?? []
-                if progress.isParked(e.id, now: now) { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.t("You set it aside"), setAside: true) }
+                if progress.isParked(e.id, now: now) { return ActivityRow(id: e.id, domain: e.domain, group: .noAction, line: Loc.t("You set it aside")) }
                 if let why = reason(e) {
                     switch why {
                     case .tooSoon:

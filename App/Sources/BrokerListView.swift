@@ -108,7 +108,7 @@ struct BrokerListView: View {
                     Section {
                         NavigationLink { AutoActivityView() } label: {
                             // Only how many sites the run has looked at, then the next run (decided 2026-11-25): what was done, by the run or by the person, is the
-                            // total below the day's work. Complete only when nothing is left for anyone. The lines start under the title's words, not under its
+                            // total below the day's work. Complete once the run has nothing left to try (what moved to the person is in the queue). The lines start under the title's words, not under its
                             // symbol (docs/UX.md, "Alignment").
                             let counts = model.activityCounts
                             let complete = counts?.complete ?? false
@@ -187,8 +187,8 @@ struct BrokerListView: View {
                     }
                 }
                 if !waiting, !model.needsKindChoice {
-                    let summary = model.activitySummary, done = AppModel.doneInAll(summary, model.activityCounts)
-                    if done > 0 || summary.streak > 0 { ProgressRow(streak: summary.streak, done: done) }
+                    let streak = model.activitySummary.streak, done = model.doneSiteCount
+                    if done > 0 || streak > 0 { ProgressRow(streak: streak, done: done) }
                 }
                 let firstTasks = model.queue.flatMap(\.tasks).filter { t in
                     if case .platform = t.kind { return !model.isDone(t) && !waiting }
@@ -539,9 +539,11 @@ struct TodayCard: View {
     }
 }
 
-/// Encouragement that only goes up: a streak of days and every site done so far, in all: opted out of by the run, in Solve and send or by email, and the
-/// sites the automatic run found no work on (decided 2026-11-25; it said "405 requests sent so far", which read as the run's own work).
+/// Encouragement: a streak of days and how many sites are done, the Sites tab's own "Done" count (`AppModel.doneSiteCount`: a send that still holds, a
+/// recent look that found no listing, or a shared task such as an official service), so the two always agree (decided 2026-11-25; it said "405 requests
+/// sent so far", which read as the automatic run's own work).
 struct ProgressRow: View {
+    @EnvironmentObject var model: AppModel
     let streak: Int
     let done: Int
 
@@ -553,11 +555,16 @@ struct ProgressRow: View {
                     Spacer()
                 }
                 if done > 0 {
-                    Label(done == 1 ? Loc.t("1 site done in all") : Loc.f("%lld sites done in all", done), systemImage: "checkmark.shield.fill").foregroundStyle(.green)
+                    // Tapping the count opens the Sites tab, whose Done list it counts (decided 2026-11-25).
+                    Button { model.requestedTab = 1 } label: {
+                        Label(done == 1 ? Loc.t("1 site done") : Loc.f("%lld sites done", done), systemImage: "checkmark.shield.fill").foregroundStyle(.green)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("home-sites-done")
+                    .accessibilityHint(Loc.t("Opens the Sites tab"))
                 }
             }
             .font(.subheadline.bold())
-            .accessibilityIdentifier("progress-row")
         }
     }
 }

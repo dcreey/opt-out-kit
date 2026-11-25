@@ -3462,22 +3462,6 @@ final class DailyResetAndSummaryTests: XCTestCase {
         XCTAssertEqual(left.first?.kind, "people_search"); XCTAssertEqual(left.first(where: { $0.kind == "adtech" })?.count, 9)
     }
 
-    /// The home page's total, in all: every site opted out of in any way (a form sent, by a run or by the person, also one the site did not confirm, or a
-    /// request emailed), each once; a failure is not one (decided 2026-11-25).
-    func testTheTotalOptedOutCountsEverySiteOnceInAnyWay() {
-        let entries = (0..<5).map { entry($0, "people_search") }
-        let d = Date().addingTimeInterval(-86_400)
-        let attempts: [String: [OptOutAttempt]] = [
-            "s0": [OptOutAttempt(date: d, outcome: "submitted"), OptOutAttempt(date: d, outcome: "emailed")],
-            "s1": [OptOutAttempt(date: d, outcome: "emailed")],
-            "s2": [OptOutAttempt(date: d, outcome: "failed", detail: AutoOptOut.sentUnconfirmed)],
-            "s3": [OptOutAttempt(date: d, outcome: "failed"), OptOutAttempt(date: d, outcome: "challenged")],
-        ]
-        let s = ActivitySummary.build(entries: entries, attempts: attempts)
-        XCTAssertEqual(s.optedOutIDs, ["s0", "s1", "s2"], "a sent form, an emailed request and an unconfirmed send; never a failure")
-        XCTAssertEqual(s.sites, 2, "requests sent: forms only")
-    }
-
     func testTheSummaryCountsSitesEmailsAndTheMostRecentDay() {
         let entries = [entry(0, "people_search"), entry(1, "people_search"), entry(2, "adtech"), entry(3, "adtech")]
         let cal = Calendar(identifier: .gregorian), now = Date(), d1 = now.addingTimeInterval(-3 * 86_400), d2 = now.addingTimeInterval(-86_400)
