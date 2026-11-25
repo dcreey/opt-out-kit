@@ -176,6 +176,8 @@ final class LiveFormPickerTests: XCTestCase {
         XCTAssertTrue(LiveFormPicker.isDedicatedOptOut(device, pageContext: ctx))
         XCTAssertFalse(LiveFormPicker.isDedicatedOptOut(newsletter, pageContext: ctx))
         XCTAssertFalse(LiveFormPicker.isDedicatedOptOut(contact, pageContext: ctx), "a contact form on an opt-out page is still a contact form")
+        let erasure = form("e", [("email", "Email")], buttons: ["Request erasure"], text: "Right to Erasure")
+        XCTAssertTrue(LiveFormPicker.isDedicatedOptOut(erasure, pageContext: ctx), "\"erasure\" is a removal word (trustsuperset.com)")
     }
 
     /// Melissa's suppression list for deceased people is not the opt-out of a living person.

@@ -165,6 +165,32 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertEqual(counts.total, m.activityRows(for: me).count, "the same sites as the page")
     }
 
+    /// A site that comes into the run while it goes (here: set aside, and brought back during the run) is tried before the run ends, so a finished run
+    /// leaves nothing "still to do" (build 65 left courtcasefinder.com there, never tried, and the card never showed complete).
+    func testASiteThatJoinsTheRunWhileItGoesIsTriedBeforeItEnds() async throws {
+        let m = model()
+        let me = try withProfile(m)
+        m.setAuto(scan: false, optOut: true)
+        let late = try XCTUnwrap(m.willTry(m.remainingDomains(of: m.runDomains(for: me, kind: .full), for: me), for: me).sorted().last)
+        let lateID = try XCTUnwrap(m.directory.first { $0.domain == late }?.id)
+        m.skipSite(lateID)
+        XCTAssertFalse(m.runDomains(for: me, kind: .full).contains(late), "set aside: not in the run's list as it starts")
+        final class Seen: @unchecked Sendable { var pages: [String] = []; var broughtBack = false }
+        struct BringsBack: FormSubmitter {
+            let seen: Seen; let model: AppModel; let site: String
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome {
+                seen.pages.append(form.page.host ?? "")
+                if !seen.broughtBack { seen.broughtBack = true; await MainActor.run { model.bringBack(site) } }          // the person brings it back mid-run
+                return .submitted(awaitingEmail: false)
+            }
+        }
+        let seen = Seen()
+        await m.runAutoOptOut(for: me, submitter: BringsBack(seen: seen, model: m, site: lateID))
+        XCTAssertTrue(m.progress.optOutAttempts[lateID]?.isEmpty == false, "\(late) was tried before the run ended")
+        XCTAssertFalse(m.activityRows(for: me).contains { $0.group == .notTried }, "nothing is left still to do")
+        XCTAssertNil(m.autoBusy)
+    }
+
     /// A site done in Solve and send updates the card once the person pauses: three sites in a row work the numbers out once, not three times.
     func testSitesDoneInSolveAndSendUpdateTheCardOnceThePersonPauses() async throws {
         let m = model()

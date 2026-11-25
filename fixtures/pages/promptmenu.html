@@ -1,0 +1,22 @@
+<h1>Privacy request ({{site}})</h1>
+<!-- trustsuperset.com (Radix menus): "Request Type" is a button showing its prompt "Select request type" (marked data-placeholder); its list opens on a press. -->
+<form id="f" method="POST" action="/{{site}}/send">
+  <label>Email Address * <input type="email" name="email" required></label><br>
+  <label for="rt">Request Type *</label>
+  <button type="button" role="combobox" id="rt" aria-expanded="false" data-placeholder=""><span style="pointer-events:none">Select request type</span></button>
+  <input type="hidden" name="request_type" id="rtv">
+  <div role="listbox" id="list" style="display:none">
+    <div role="option" data-v="rectification">Right to Rectification</div>
+    <div role="option" data-v="erasure">Right to Erasure</div>
+    <div role="option" data-v="portability">Right to Data Portability</div>
+    <div role="option" data-v="optout">Right to Opt-out of Sales</div>
+  </div><br>
+  <p id="err"></p><button type="submit">Submit Request</button>
+</form>
+<script>
+var rt = document.getElementById('rt'), list = document.getElementById('list');
+rt.addEventListener('click', function () { list.style.display = 'block'; rt.setAttribute('aria-expanded', 'true'); });
+[].forEach.call(list.querySelectorAll('[role=option]'), function (o) { o.addEventListener('click', function () {
+  document.getElementById('rtv').value = o.getAttribute('data-v'); rt.firstChild.textContent = o.textContent; rt.removeAttribute('data-placeholder'); list.style.display = 'none'; }); });
+document.getElementById('f').addEventListener('submit', function (e) { if (!document.getElementById('rtv').value) { e.preventDefault(); document.getElementById('err').textContent = 'Please select a request type'; } });
+</script>

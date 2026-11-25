@@ -1,7 +1,10 @@
 (function(state){
   // Shown: a size, and not hidden by visibility or a see-through box (saymine's closed lists keep their size, hidden with visibility and opacity).
+  // A list still fading in counts as shown: with the app off screen the page is not drawn, so a menu's fade-in (MUI, Radix) never moves past its first frame
+  // and its options would read as hidden for good (DataGrail's "relationship" menu was left empty in a background run).
+  var fading=function(e){try{return !!e.getAnimations&&e.getAnimations().some(function(a){return a.playState!=='finished';});}catch(x){return false;}};
   var shown=function(e){var r=e.getBoundingClientRect(); if(!(r.width>0&&r.height>0)||getComputedStyle(e).visibility==='hidden') return false;
-    for(var p=e,i=0;p&&i<8;p=p.parentElement,i++){if(getComputedStyle(p).opacity==='0') return false;} return true;};
+    for(var p=e,i=0;p&&i<8;p=p.parentElement,i++){if(getComputedStyle(p).opacity==='0'&&!fading(p)) return false;} return true;};
   // A menu about a company ("Country / Territory of Registration of Company 1", dnb.com) is not the person's: it is left alone, as the type-ahead step does.
   var aboutCompany=function(e){var t=(e.getAttribute('aria-label')||'')+' '+(e.getAttribute('aria-labelledby')||'').split(/\s+/).map(function(id){var n=id&&document.getElementById(id); return n?n.innerText:'';}).join(' ');
     var p=e.parentElement; for(var i=0;i<3&&p;i++,p=p.parentElement){if(p.querySelectorAll('input,select,[role=combobox]').length>1) break; t+=' '+(p.innerText||'').slice(0,120);}
@@ -12,8 +15,11 @@
   // A value that reads as a prompt ("select your country of residence", shown by choreograph.com as if chosen) is no choice.
   var chosen=function(e){var f=frame(e), v=f&&f.querySelector('[class*=singleValue],[class*=single-value],[class*=multiValue],[class*=multi-value]');
     return !!v&&!/^\s*(choose|select|pick|please (choose|select))\b/i.test(v.innerText||'');};
+  // A menu showing only its prompt ("Select request type" on trustsuperset.com's Radix menus, marked data-placeholder) holds no choice either: it is empty.
+  var prompt=function(e){return e.tagName!=='INPUT'&&(e.hasAttribute('data-placeholder')||!!e.querySelector('[data-placeholder]')||
+    /^(choose|select|pick|please (choose|select))\b[^\n]{0,40}$/i.test((e.innerText||'').replace(/\s+/g,' ').trim()));};
   var els=[].slice.call(document.querySelectorAll('[role=combobox],[aria-haspopup=listbox],.MuiSelect-select')).filter(function(e){
-    return (shown(e)||(frame(e)&&shown(frame(e))))&&e.getAttribute('data-ook-menu')!=='1'&&((e.innerText||e.value||'').replace(/[​\s]/g,'')==='')&&!chosen(e)&&!aboutCompany(e);});
+    return (shown(e)||(frame(e)&&shown(frame(e))))&&e.getAttribute('data-ook-menu')!=='1'&&((e.innerText||e.value||'').replace(/[​\s]/g,'')===''||prompt(e))&&!chosen(e)&&!aboutCompany(e);});
   // A home-made menu (saymine and others): a box that shows only a placeholder ("Choose state", "Select...") beside a list of options that is hidden until the box is
   // pressed. The innermost such box is pressed; one already showing a choice is not, and nothing inside a real <select> is.
   if(!els.length){

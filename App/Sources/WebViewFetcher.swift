@@ -450,6 +450,7 @@ extension FormRun {
         await session.settlePage(maxWait: 10)
         _ = await session.declineBanner()
 
+        if let refused = await session.accessRefused() { return refused }
         if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
         if let why = await session.visibleChallenge() { return .challenged(why) }
@@ -527,6 +528,23 @@ extension WebViewSession {
     }
 
     /// True when the page just loaded is an error page, which means the recorded link has moved or died.
+    /// The site answered 401, 403 or 451. A firewall's waiting page ("Just a moment...") is given up to 10 seconds to pass by itself, as a page whose check
+    /// passes does; one still there is a human check, the person's to clear. Otherwise the site refused the connection: blocked, not gone (the link is right).
+    /// Nil when the page is there to work on.
+    func accessRefused() async -> SubmitOutcome? {
+        guard LinkRules.refusesAccess(status: httpStatus) else { return nil }
+        var waited: TimeInterval = 0
+        let limit = SiteRun.wait(upTo: 10)
+        while LinkRules.refusesAccess(status: httpStatus), LinkRules.isChallengePage(await visibleText()), waited < limit {
+            try? await Task.sleep(nanoseconds: 500_000_000); waited += 0.5
+        }
+        guard LinkRules.refusesAccess(status: httpStatus) else { await settlePage(maxWait: 6); return nil }       // it passed: the page itself has loaded
+        // The waiting page is named as what it is (`visible-challenge` reads its "Verifying you are human" as a bare "a human check").
+        if LinkRules.isChallengePage(await visibleText()) { return .challenged(AutoOptOut.firewallCheck) }
+        if let why = await visibleChallenge() { return .challenged(why) }
+        return .failed(FormRun.pageRefused)
+    }
+
     func pageLooksMissing() async -> Bool {
         let text = await visibleText()
         return LinkRules.isErrorPage(PageSnapshot(url: webView.url ?? URL(string: "https://invalid.example")!, status: httpStatus,

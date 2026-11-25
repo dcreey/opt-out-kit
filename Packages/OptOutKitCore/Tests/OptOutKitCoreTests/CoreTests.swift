@@ -2016,6 +2016,11 @@ final class LinkFinderTests: XCTestCase {
         }
     }
     private final class VisitLog: @unchecked Sendable { var urls: [String] = [] }
+    /// A site whose pages never load (a firewall dropping the connection).
+    private struct Silent: PageInspector {
+        let log = VisitLog()
+        func snapshot(_ url: URL) async -> PageSnapshot? { log.urls.append(url.absoluteString); return nil }
+    }
 
     private let portalForm = FormSnapshot(action: URL(string: "https://x.example/request-portal/")!, method: "post",
                                           fields: [FormField(type: "text", name: "first", label: "First"), FormField(type: "email", name: "email", label: "Email")], hasSubmit: true)
@@ -2027,6 +2032,18 @@ final class LinkFinderTests: XCTestCase {
         XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, title: "Oops! That page can't be found.")))
         XCTAssertTrue(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, text: "Error 404. Sorry, the page you are looking for doesn't exist.")))
         XCTAssertFalse(LinkRules.isErrorPage(PageSnapshot(url: u("https://x.example/a"), status: 200, title: "Request Portal", text: "Welcome to the privacy request portal.")))
+    }
+
+    /// A site that refuses the connection (401, 403, 451: a firewall blocking a VPN or a country) has not moved its page: blocked, not gone (2026-11-25 export).
+    func testARefusedConnectionIsNotAPageThatIsGone() {
+        for status in [401, 403, 451] { XCTAssertTrue(LinkRules.refusesAccess(status: status), "\(status)") }
+        for status in [200, 404, 410, 500] { XCTAssertFalse(LinkRules.refusesAccess(status: status), "\(status)") }
+        XCTAssertFalse(LinkRules.refusesAccess(status: nil))
+        // Cloudflare's waiting page, answered with 403 (truepeoplesearch.com, hireez.com): a human check, the person's, never "gone".
+        for text in ["Just a moment...", "www.truepeoplesearch.com\nVerifying you are human. This may take a few seconds.", "Performing security verification",
+                     "app.hireez.com needs to review the security of your connection before proceeding."] { XCTAssertTrue(LinkRules.isChallengePage(text), text) }
+        XCTAssertFalse(LinkRules.isChallengePage("Privacy rights request. Enter your email to opt out."))
+        XCTAssertTrue(AutoOptOut.isHumanCheck(outcome: "challenged", detail: AutoOptOut.firewallCheck))
     }
 
     func testAnOptOutLinkOutranksAPrivacyLink() {
@@ -2096,6 +2113,17 @@ final class LinkFinderTests: XCTestCase {
         XCTAssertNil(result.form)
         XCTAssertLessThanOrEqual(result.visited.count, 3)
         XCTAssertNotNil(result.reason)
+    }
+
+    /// Looking for a moved link is bounded (build 65's run stood at "458 of 458" for four minutes doing this, and Stop did nothing): a page that does not
+    /// load counts toward the limit, so a site answering nothing is not tried at all 16 guesses, and no page is opened after the deadline.
+    func testLookingForAMovedLinkStopsAtItsLimitEvenWhenNoPageLoads() async {
+        let silent = Silent()
+        _ = await OptOutLinkFinder(inspector: silent, maxPages: 6).find(from: u("https://x.example/"))
+        XCTAssertEqual(silent.log.urls.count, 6, "six pages tried, not every guess")
+        let late = Silent()
+        _ = await OptOutLinkFinder(inspector: late).find(from: u("https://x.example/"), deadline: Date(timeIntervalSince1970: 100), now: { Date(timeIntervalSince1970: 200) })
+        XCTAssertTrue(late.log.urls.isEmpty, "nothing is opened once the time is up")
     }
 
     func testDoesNotWanderOffToUnrelatedSitesOrSocialLinks() async {

@@ -1,5 +1,5 @@
 (function(loose){
-  var pref=[/delet|remov|erase/i,/opt.?out|do not sell|do not share/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
+  var pref=[/delet|remov|eras(e|ure)/i,/opt.?out|do not sell|do not share/i], skip=/access|transfer|inaccur|correct|updat|appeal|know/i;
   var els=[].slice.call(document.querySelectorAll('button,a,[role=button],div,span,p')).filter(function(e){
     var t=(e.innerText||'').replace(/\s+/g,' ').trim(); var r=e.getBoundingClientRect();
     return (/^start .{3,50} request$/i.test(t)||/^(exert (my )?right to opt.?out|delete (my|your) (user )?(personal )?(data|information)|delete and opt.?out|opt.?out of (the )?(sale|sharing)( (and|or) sharing)?( of (my|your) (personal )?(data|information))?|i am the person opting out[\s\S]{0,70}|i am (a )?consumer[\s\S]{0,50}|opt.?out form|individual: opt.?out.{0,30})$/i.test(t)||(loose&&e.tagName!=='A'&&/^(opt.?out|do not sell( or share)?( my (personal )?(information|data))?|delete( my (data|information|account))?|remove me)$/i.test(t)))&&r.width>0&&r.height>0&&e.children.length<=2;});

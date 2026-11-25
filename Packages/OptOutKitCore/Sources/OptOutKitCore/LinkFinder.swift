@@ -67,6 +67,17 @@ public enum LinkRules {
         return linkWeights.reduce(0) { sum, w in hay.range(of: w.0, options: .regularExpression) != nil ? sum + w.1 : sum }
     }
 
+    /// A page the site would not show to this connection (401, 403, 451: a firewall that blocks a VPN, a country or a bot) is there, not gone: the link is
+    /// right and is kept (the 2026-11-25 export: truepeoplesearch.com and hireez.com answered 403 and were recorded as "the page was gone").
+    public static func refusesAccess(status: Int?) -> Bool { [401, 403, 451].contains(status ?? 0) }
+
+    /// A firewall's waiting page in front of the site ("Just a moment...", "Verifying you are human", "Performing security verification", "needs to review the
+    /// security of your connection": Cloudflare's, answered with 403 to truepeoplesearch.com and hireez.com): a human check, not a missing page.
+    public static func isChallengePage(_ text: String) -> Bool {
+        String(text.prefix(600)).range(of: "just a moment\\.*|verifying (that )?you are (a )?human|performing security verification|needs to review the security of your connection|checking (if the site connection is secure|your browser)|attention required",
+                                        options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
     /// An error page can still carry a search box, which is not an opt-out form.
     public static func isErrorPage(_ page: PageSnapshot) -> Bool {
         if let status = page.status, status >= 400 { return true }
@@ -125,7 +136,9 @@ public struct OptOutLinkFinder: Sendable {
 
     private struct Candidate { var priority: Int; var depth: Int; var url: URL; var trail: [URL] }
 
-    public func find(from home: URL) async -> FinderResult {
+    /// `deadline`: no page is opened after it (an automatic run looks for moved links after its sites and must not stand still: build 65 spent four
+    /// minutes here with Stop not working). A page that does not load counts toward `maxPages` too, so a site that answers nothing is not tried at every guess.
+    public func find(from home: URL, deadline: Date? = nil, now: @Sendable () -> Date = Date.init) async -> FinderResult {
         var queue: [Candidate] = [Candidate(priority: 0, depth: 0, url: home, trail: [home])]
         var seen: Set<String> = [home.absoluteString]
         for path in LinkRules.guessPaths {
@@ -134,10 +147,12 @@ public struct OptOutLinkFinder: Sendable {
             }
         }
         var visited: [URL] = []
+        var opened = 0
         let ownDomain = LinkRules.registrable(home.host)
-        while !queue.isEmpty, visited.count < maxPages {
+        while !queue.isEmpty, opened < maxPages, deadline.map({ now() < $0 }) ?? true {
             queue.sort { ($0.priority, $0.depth) > ($1.priority, $1.depth) }
             let next = queue.removeFirst()
+            opened += 1
             guard let page = await inspector.snapshot(next.url) else { continue }
             visited.append(next.url)
             if LinkRules.isErrorPage(page) { continue }

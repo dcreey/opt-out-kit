@@ -102,6 +102,38 @@ final class LinkHealingTests: XCTestCase {
         XCTAssertTrue(submitter.calls.pages.contains { $0.hasPrefix("/request-portal") }, "a site whose page was gone was tried again at its new address")
         XCTAssertNotNil(m.directory.first { m.healedLink(for: $0.id) != nil }, "and the new address was remembered")
     }
+
+    /// Looking for moved links after the sites is part of the run: its steps move the count (iOS takes a run whose count stands still for stalled), and Stop
+    /// ends it. Build 65 stood at "458 of 458" here for four minutes with Stop doing nothing, until iOS took the background time back.
+    func testLookingForMovedLinksAfterTheSitesMovesTheCountAndStopsWhenThePersonPressesStop() async throws {
+        struct AlwaysGone: FormSubmitter {
+            func submit(_ form: OptOutForm, plan: FillPlan, dryRun: Bool) async -> SubmitOutcome { .failed(FormRun.pageGone) }
+        }
+        final class Box: @unchecked Sendable { var model: AppModel?; var hosts: Set<String> = []; var progress: [(done: Int, total: Int)] = [] }
+        struct Watching: PageInspector {
+            let box: Box
+            func snapshot(_ url: URL) async -> PageSnapshot? {
+                await MainActor.run {
+                    box.hosts.insert(url.host ?? "")
+                    if let p = box.model?.autoProgress { box.progress.append(p) }
+                    if box.hosts.count == 2 { box.model?.stopAutoOptOut() }          // the person presses Stop while the second site is looked at
+                }
+                return nil
+            }
+        }
+        let m = model()
+        var me = try XCTUnwrap(m.selectedPerson)
+        me.names = [NameEntry(kind: .legal, name: "Pat Example")]; me.birthdate = "1985-03-14"; me.emails = ["pat@example.com"]
+        me.addresses = [Address(street: "1 Main St", city: "Springfield", state: "IL", zip: "62701")]
+        m.update(me); m.setContactEmail("pat@example.com")
+        let box = Box(); box.model = m
+        await m.runAutoOptOut(for: me, automaticOnly: false, submitter: AlwaysGone(), inspector: Watching(box: box))
+        XCTAssertEqual(box.hosts.count, 2, "Stop ended the search after the site it was on, of the ten gone sites")
+        let first = try XCTUnwrap(box.progress.first), last = try XCTUnwrap(box.progress.last)
+        XCTAssertGreaterThan(first.total, first.done, "each search is a step still to do, not past a finished count")
+        XCTAssertGreaterThan(last.done, first.done, "the count moved while the run looked")
+        XCTAssertNil(m.autoBusy, "and the run ended")
+    }
 }
 
 

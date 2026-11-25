@@ -938,6 +938,14 @@ final class AppModel: ObservableObject {
     /// The home card's line: "Scanned 598 sites".
     static func activityCountsLine(_ c: ActivityCounts) -> String { Loc.f("Scanned %lld sites", c.scanned) }
 
+    /// The steps after the sites (looking for moved links, trying those sites again) count in the run's progress like sites do.
+    private func healSteps(more: Int = 0, done: Int = 0) {
+        guard autoBusy == "optout", let p = autoProgress, more > 0 || done > 0 else { return }
+        let next = (done: min(p.done + done, p.total + more), total: p.total + more)
+        autoProgress = next
+        continuedRun?.report(done: next.done, total: next.total)
+    }
+
     private func endOptOutRun(interrupted: Bool) {
         refreshActivityCounts()
         logRun(.runEnded, detail: interrupted ? "stopped before every site was done" : "every site done")
@@ -1325,10 +1333,11 @@ final class AppModel: ObservableObject {
             }
             runnable = tryNow
         }
+        var pinned = false          // the sites were named (`-only-domains`): the run takes on no others
         #if DEBUG
         // Simulator work: `-only-domains a.com,b.com` runs just those sites, whatever group they are in.
         let args = ProcessInfo.processInfo.arguments
-        if let i = args.firstIndex(of: "-only-domains"), args.indices.contains(i + 1) { runnable = Set(args[i + 1].split(separator: ",").map(String.init)) }
+        if let i = args.firstIndex(of: "-only-domains"), args.indices.contains(i + 1) { runnable = Set(args[i + 1].split(separator: ",").map(String.init)); pinned = true }
         #endif
         let ownsBusy = autoBusy == nil && !dryRun
         if ownsBusy { beginOptOutRun(total: runnable?.count ?? directory.count, useContinued: submitter == nil) }
@@ -1384,17 +1393,46 @@ final class AppModel: ObservableObject {
         interrupted = !dryRun && results.count < expected
         if interrupted { runCutOff = true }
         NSLog("OptOutRun: %d of %d sites have a result%@", results.count, expected, interrupted ? " (cut off; the rest waits)" : "")
-        // A page that has gone is usually a moved link: look for the new one and try that site again, once.
-        if !dryRun {
+        // A page that has gone is usually a moved link: look for the new one and try that site again, once. Each look is a step of the run (the count moves,
+        // so iOS does not take the run for stalled), has at most a site's time (`AutoOptOut.siteLimit`), and Stop ends it: build 65 stood at "458 of 458"
+        // here for four minutes, Stop did nothing, and iOS took the background time back.
+        if !dryRun, !shouldStopRun {
             let gone = results.filter { if case .failed(let why) = $0.1 { return why == FormRun.pageGone } else { return false } }.prefix(10)
             var retry: [DirectoryEntry] = []
+            healSteps(more: gone.count)
             for (entry, _) in gone {
-                if let original = sites[id: entry.id], await healLink(for: original, inspector: inspector) != nil { retry.append(resolved(original)) }
+                if shouldStopRun { break }
+                if let original = sites[id: entry.id], await healLink(for: original, inspector: inspector, deadline: Date().addingTimeInterval(AutoOptOut.siteLimit)) != nil { retry.append(resolved(original)) }
+                healSteps(done: 1)
             }
-            if !retry.isEmpty {
-                let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false, period: runPeriod(now: now),
-                                             onResult: { [weak self] entry, result, said in await self?.recordAutoResult(entry, result, pageSaid: said, for: person.id, dryRun: false) })
+            if !retry.isEmpty, !shouldStopRun {
+                healSteps(more: retry.count)
+                let again = await engine.run(entries: retry, person: person, progress: household.progress(for: person.id), now: now, dryRun: false,
+                                             progressCallback: { _, _ in Task { @MainActor in self.healSteps(done: 1) } }, period: runPeriod(now: now),
+                                             onResult: { [weak self] entry, result, said in await self?.recordAutoResult(entry, result, pageSaid: said, for: person.id, dryRun: false) },
+                                             shouldStop: { [weak self] in await self?.shouldStopRun ?? true })
                 for (entry, result) in again { if let i = results.firstIndex(where: { $0.0.id == entry.id }) { results[i] = (entry, result) } }
+            }
+        }
+        // The run's list was worked out when it started; the page works it out again with the same rules when it is drawn. A site that came into the pass
+        // while the run went (its hold ended, it was brought back, a link was healed) was shown as "still to do" by a run that had finished, and stayed so:
+        // build 65 left courtcasefinder.com there, never tried. Before it ends, a run that went through its list takes on every site its rules now give it
+        // and it has not tried this pass, once.
+        if !dryRun, !interrupted, automaticOnly, !pinned, !shouldStopRun {
+            let had = Set(results.map(\.0.domain))
+            let now = Date()
+            let due = willTry(remainingDomains(of: runDomains(for: original, kind: kind, now: now), for: original, now: now), for: original, everySite: everySite, now: now)
+            let more = directory.filter { due.contains($0.domain) && !had.contains($0.domain) && !triedThisPass($0) }.map(resolved)
+                .filter { AutoOptOut.standIn($0).optOutForm != nil }
+            if !more.isEmpty {
+                NSLog("OptOutRun: %d sites came into the run while it went", more.count)
+                healSteps(more: more.count)
+                let late = await engine.run(entries: more, person: person, progress: household.progress(for: person.id), now: now, dryRun: false,
+                                            progressCallback: { _, _ in Task { @MainActor in self.healSteps(done: 1) } }, period: everySite ? nil : runPeriod(now: now),
+                                            onResult: { [weak self] entry, result, said in await self?.recordAutoResult(entry, result, pageSaid: said, for: person.id, dryRun: false) },
+                                            shouldStop: { [weak self] in await self?.shouldStopRun ?? true })
+                results += late
+                if late.count < more.count { interrupted = true; runCutOff = true }
             }
         }
         NSLog("OptOutRun: run returned %d results, interrupted=%d", results.count, interrupted ? 1 : 0)
@@ -1989,9 +2027,9 @@ final class AppModel: ObservableObject {
     /// Looks for a site's current opt-out form by crawling from its home page, and remembers it on this device. Sends nothing
     /// anywhere and uses no personal data. Returns the new link, or nil if none was found.
     @discardableResult
-    func healLink(siteID: String, domain: String, inspector: PageInspector? = nil) async -> HealedLink? {
+    func healLink(siteID: String, domain: String, inspector: PageInspector? = nil, deadline: Date? = nil) async -> HealedLink? {
         guard let home = URL(string: "https://\(domain)/") else { return nil }
-        let result = await OptOutLinkFinder(inspector: inspector ?? makeInspector()).find(from: home)
+        let result = await OptOutLinkFinder(inspector: inspector ?? makeInspector()).find(from: home, deadline: deadline)
         guard let form = result.form else { return nil }
         let link = HealedLink(siteID: siteID, form: form)
         household.saveHealedLink(link)
@@ -1999,8 +2037,8 @@ final class AppModel: ObservableObject {
         return link
     }
 
-    func healLink(for entry: DirectoryEntry, inspector: PageInspector? = nil) async -> HealedLink? {
-        await healLink(siteID: entry.id, domain: entry.domain, inspector: inspector)
+    func healLink(for entry: DirectoryEntry, inspector: PageInspector? = nil, deadline: Date? = nil) async -> HealedLink? {
+        await healLink(siteID: entry.id, domain: entry.domain, inspector: inspector, deadline: deadline)
     }
 
     func healLink(for broker: Broker, inspector: PageInspector? = nil) async -> HealedLink? {

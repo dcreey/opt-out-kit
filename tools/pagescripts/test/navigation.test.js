@@ -91,6 +91,10 @@ test('"Start Deletion Request" is pressed over "Start Access Request"', () => {
   const seen = clicks(w, ['acc', 'del', 'oo']);
   assert.equal(call(w, 'advance-to-request-form', false), 'Start Deletion Request');
   assert.deepEqual(seen, ['del']);
+  const gdpr = page('<button id=oo>Start Opt Out Request</button><button id=er>Start Erasure Request</button>');
+  const pressed = clicks(gdpr, ['oo', 'er']);
+  assert.equal(call(gdpr, 'advance-to-request-form', false), 'Start Erasure Request', '"Erasure" is a deletion (trustsuperset.com\'s wording)');
+  assert.deepEqual(pressed, ['er']);
 });
 
 test('choreograph.com\'s request links: "delete and opt out" is pressed over "opt out" and "do not sell my personal information"', () => {

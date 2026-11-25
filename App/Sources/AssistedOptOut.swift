@@ -343,7 +343,7 @@ final class WebAssistedPage: AssistedPage {
             // timing: a run that waited long enough gave up on the site, one that did not counted the vanished form as a confirmation.)
             if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen, FormRun.saysStillWorking(newText) { return .failed(AutoOptOut.sentUnconfirmed) }
             // The send button itself now says "Submitting…" (cashmereai.com, read before its answer came): sent, not confirmed, which counts as sent.
-            if !errorSeen, FormRun.saysSending(newText) { return .failed(AutoOptOut.sentUnconfirmed) }
+            if FormRun.sentButUnanswered(newText) { return .failed(AutoOptOut.sentUnconfirmed) }
             if (!now.visible || (!now.url.isEmpty && now.url != was.url)), !errorSeen { return .submitted(awaitingEmail: false) }
         }
         if let stepBefore, let stepNow = await formSignature(), stepNow != stepBefore, !stepNow.isEmpty { return .challenged(PageFlow.nextStepMarker) }

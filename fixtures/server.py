@@ -136,6 +136,12 @@ class Handler(BaseHTTPRequestHandler):
                 RECEIVED.append({'site': site, 'path': what, 'fields': fields, 'at': time.time()})
         if kind == 'down':
             return self.send(503, 'Service unavailable')
+        # Kinds 'firewall' and 'refused' (2026-11-25 export): the site answers 403. 'firewall' shows a Cloudflare-style waiting page that never passes
+        # (truepeoplesearch.com, hireez.com); 'refused' a bare "Access denied" (a firewall blocking the connection). Neither page has moved.
+        if kind == 'firewall' and what == 'optout':
+            return self.send(403, SHELL.format(title='Just a moment...', body='<h1>Just a moment...</h1><p>Verifying you are human. This may take a few seconds.</p>'))
+        if kind == 'refused' and what == 'optout':
+            return self.send(403, SHELL.format(title='Access denied', body='<h1>Access denied</h1><p>You do not have permission to access this server.</p>'))
         # Kind 'hang': the form is received, and the answer never comes (the page stays loading, as a slow site's does after its form is posted).
         if kind == 'hang' and what == 'send':
             time.sleep(150)

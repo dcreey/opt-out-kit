@@ -432,6 +432,26 @@ final class PrematureDoneTests: XCTestCase {
         XCTAssertFalse(FormRun.saysSending("By submitting this form you agree to our terms."))
         XCTAssertFalse(FormRun.saysStillWorking("Please wait ... Your opt-out request is complete."), "a page that also says it is complete is finished")
         if case .submitted = FormRun.classify("Processing your request. Please wait while we process your request.") { XCTFail("not a confirmation") }
+        // The send button reading "Processing..." (equifax.com, theworknumber.com): sent, the answer not in yet.
+        XCTAssertTrue(FormRun.saysSending("Processing...\nActions you can take")); XCTAssertFalse(FormRun.saysSending("We are processing requests within 15 days."))
+        // As the run decides it, on equifax.com's whole new text: its standing "will be processed within 15 days" does not count as the site answering.
+        let equifax = "Processing...\nActions you can take\nYou can select to limit the use and disclosure of your sensitive personal information, opt-out of the sharing and selling of your personal information, or opt-in to the sharing and selling of your personal information. All requests will be processed within 15 days of receipt."
+        XCTAssertTrue(FormRun.sentButUnanswered(equifax))
+        XCTAssertTrue(FormRun.sentButUnanswered("Submitting…"))
+        XCTAssertFalse(FormRun.sentButUnanswered("Submitting…\nEmail is required"), "a refusal beside it wins")
+        XCTAssertFalse(FormRun.sentButUnanswered("Processing...\nEnter the 6-digit code we sent you"), "a code to type is not sent")
+        XCTAssertFalse(FormRun.sentButUnanswered("Your request has been received."), "no button at work")
+    }
+
+    /// What the 2026-11-25 run export showed: confirmations that were missed (jmr-media.com's "No further action is required" read as the error "is required",
+    /// atmospherik.ai's "Opt-out recorded", inmar.com's "submited to be opted out"), and the arrests sites refusing a phone connecting from another country.
+    func testTheNovember25thConfirmationsAndTheWrongCountryAreReadAsTheySay() {
+        let jmr = "Request Received\nRequest ID:\n99635477\nYour request has been received.\nWe have recorded your request and forwarded it for processing where applicable. You will receive an acknowledgment email shortly.\nNo further action is required at this time.\nReturn to homepage"
+        for said in [jmr, "Opt-out recorded on this browser and against your email address.", "pat@example.com submited to be opted out. Please allow 3 days."] {
+            guard case .submitted = FormRun.classifyConfirmed(said) else { return XCTFail("a confirmation: \(said)") }
+        }
+        XCTAssertEqual(FormRun.classify("Email is required"), .rejected("the site showed an error after sending"), "a real required-box error is still one")
+        XCTAssertEqual(FormRun.classifyConfirmed("Sorry, this form does not accept submissions from your country."), .rejected(FormRun.wrongCountry))
     }
 
     /// georgiacourtrecords.us and the other courtrecords.us sites: the form searches first and answered "No data was found, try other criteria", which the run

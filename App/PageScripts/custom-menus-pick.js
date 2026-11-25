@@ -1,13 +1,17 @@
 (function(state){
   // Only options that show: a closed list kept at its size but hidden by visibility or opacity (saymine's Country beside its State) is not the open menu.
+  // A list still fading in counts as shown: with the app off screen the page is not drawn, so a menu's fade-in (MUI, Radix) never moves past its first frame
+  // and its options would read as hidden for good (DataGrail's "relationship" menu was left empty in a background run).
+  var fading=function(e){try{return !!e.getAnimations&&e.getAnimations().some(function(a){return a.playState!=='finished';});}catch(x){return false;}};
   var shown=function(e){var r=e.getBoundingClientRect(); if(!(r.width>0&&r.height>0)||getComputedStyle(e).visibility==='hidden') return false;
-    for(var p=e,i=0;p&&i<8;p=p.parentElement,i++){if(getComputedStyle(p).opacity==='0') return false;} return true;};
+    for(var p=e,i=0;p&&i<8;p=p.parentElement,i++){if(getComputedStyle(p).opacity==='0'&&!fading(p)) return false;} return true;};
   var opts=[].slice.call(document.querySelectorAll('[role=option],li[role=menuitem],[role=listbox] li,li[data-label],li[class*=option]')).filter(shown);
   var bad=/employee|customer|client|vendor|partner|supplier|business|contractor|applicant|agent|representative|former|prospect/i;
+  // "Right to Erasure" is a deletion (trustsuperset.com; "erase" alone missed it and the run chose "Opt-out of Sales").
   // A request-type menu (azira.com's TrustArc form: Access, Delete, Opt-out, Do not sell, Withdraw consent, Limit, Correct): deletion, then opting out. A request to
   // see, correct, update or move the data is never chosen, not even as the last option of a list.
   var neverRequest=/\b(access|know|correct|updat|edit|rectif|portab|transfer|copy of|appeal|withdraw)/i;
-  var good=[/delet|remov|erase|be forgotten/i,/opt.?out|do not sell|do not share|unsubscribe/i,/consumer|individual|myself|data subject|(the )?person (it|the request) is about|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
+  var good=[/delet|remov|eras(e|ure)|be forgotten/i,/opt.?out|do not sell|do not share|unsubscribe/i,/consumer|individual|myself|data subject|(the )?person (it|the request) is about|general public|member of the public/i,/^\s*(none|n\/a|not applicable|no relationship)/i,/\bother\b/i];
   bad=new RegExp(bad.source+'|'+neverRequest.source,'i');
   // The person's own state first, when the menu lists places (the name escaped so it is matched as written).
   if(state) good.unshift(new RegExp('^\\s*'+state.replace(/[.*+?^${}()|[\]\\\/]/g,'\\$&')+'\\b','i'));

@@ -568,6 +568,7 @@ extension FormRun {
         if await session.denyCookies() != nil { await session.settlePage(maxWait: 4) }
         if await session.denyCookies() != nil { await session.settlePage(maxWait: 4) }      // prompts that load late
         await session.hideConsentOverlays()
+        if let refused = await session.accessRefused() { return refused }
         if await session.pageLooksMissing() { return .failed(FormRun.pageGone) }
         if await session.hasTermsPrompt() { return .challenged("a terms prompt that you need to accept yourself") }
 

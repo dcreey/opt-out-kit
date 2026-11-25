@@ -1,0 +1,12 @@
+<h1>Your privacy choices ({{site}})</h1>
+<!-- equifax.com: pressing send turns the button into "Processing..." beside standing words that say requests "will be processed within 15 days"; the answer never shows. -->
+<p>Actions you can take. All requests will be processed within 15 days of receipt.</p>
+<form id="f" method="POST" action="/{{site}}/send">
+  <label>Email * <input type="email" name="email" required></label><br><label>First name * <input name="first" required></label><br>
+  <label><input type="checkbox" name="optout" value="1"> Opt out of the sale and sharing of my personal information</label><br>
+  <button type="submit" id="go">Submit request</button>
+</form>
+<script>
+document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); var b = document.getElementById('go'); b.textContent = 'Processing...'; b.disabled = true;
+  fetch(this.action, { method: 'POST', body: new URLSearchParams(new FormData(this)) }); });
+</script>

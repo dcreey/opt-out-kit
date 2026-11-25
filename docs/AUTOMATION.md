@@ -148,7 +148,12 @@ payment, ID or phone call, site blocked me, other) and leaves that site alone fo
 - **In the app.** Before a guide runs, the page it opens is checked. If it is an error page the app crawls the site (home page,
   then the most promising privacy and opt-out links, at most 6 pages and 3 hops) for the real opt-out form, saves the new link on
   the phone, and loads it. If nothing is found the guide says so: the person has to find the page on the site themselves.
-  "Report: link broken" and the weekly opt-out (a page that is gone is searched again and the site retried once) do the same.
+  "Report: link broken" and the weekly opt-out (a page that is gone is searched again and the site retried once) do the same. A page that does not load counts
+  toward the 6, so a site answering nothing is not tried at every guess. In the automatic run, the search comes after every site (at most 10 gone sites) and is
+  part of the run: each search is a step of the progress count (iOS takes a run whose count stands still for stalled), has at most a site's 60 seconds (no
+  page is opened after that, `OptOutLinkFinder.find(deadline:)`), and Stop ends it after the site it is on, as do the retries after it. Build 65 stood at
+  "458 of 458 … Working…" for four minutes here, Stop did nothing, and iOS took the background time back (`LinkHealingTests.testLookingForMovedLinksAfterTheSitesMovesTheCountAndStopsWhenThePersonPressesStop`,
+  `CoreTests.testLookingForAMovedLinkStopsAtItsLimitEvenWhenNoPageLoads`).
   The site page has "Find the current opt-out page" and "Go back to the recorded link". No personal data is used for the search.
 - **In the pipeline.** `.github/workflows/profile.yml` runs weekly: it re-profiles all 856 directory sites, then
   `tools/check_links.py` checks every hand-written broker link and every generated form page, crawls for a replacement when one
@@ -165,7 +170,10 @@ The run has two kinds, both sending the forms themselves, one site at a time (`A
 
 For a new person the first full pass comes before anything else: the Queue shows it as step 1 and holds back the semi-automated queue until it has finished (`AutoSettings.firstPassPending`), so the queue starts with exactly the sites that need a person. See [UX.md](UX.md).
 
-**A run is finished only when every site has a result.** A run that stopped early (Stop, the app suspended, iOS taking its background time back) stays pending; it is never recorded as a finished pass, and it never carries on by itself (below, "Keeping a run going"). Every run, including a repeat, also takes every site a full pass covers that no run has ever tried (`AppModel.runDomains`), so a site never reached is not left for six months. Stop has its own flag, which coming back to the app does not clear.
+**A run is finished only when every site has a result.** The run's list is worked out as it starts and the page works its own out again with the same
+rules, so a site that comes into the pass while the run goes (a hold that ended, a site brought back, a link healed) showed as "still to do" under a run
+that had finished, and nothing ever tried it (build 65: courtcasefinder.com, and the card never showed complete). Before it ends, a run that went through
+its list works it out again and takes on, once, every site its rules now give it that it has not tried this pass; those count as steps of the run. A run that stopped early (Stop, the app suspended, iOS taking its background time back) stays pending; it is never recorded as a finished pass, and it never carries on by itself (below, "Keeping a run going"). Every run, including a repeat, also takes every site a full pass covers that no run has ever tried (`AppModel.runDomains`), so a site never reached is not left for six months. Stop has its own flag, which coming back to the app does not clear.
 
 **A new person in California** makes the DROP request first: the Queue shows it as step 1, the automatic pass as step 2 and semi-automatic as step 3, and the first pass does not start until the request is made (`AppModel.firstPassWaitsForPlatform`), because until then every site DROP reaches is held. Outside California DROP is not offered, holds nothing and is not in the plan.
 
@@ -241,6 +249,14 @@ Tests: `AutoOptOutTests.testABackgroundRunTriesOnlySites...`, `testAFullPassTrie
 Two background tasks are registered (`dev.optoutkit.app.scan` daily, `.optout` weekly) and the app also runs anything due
 each time it opens, which is the reliable path. iOS decides when background tasks run, and it is **unproven** that the hidden
 web view works inside one on a device. Treat open-the-app catch-up as the dependable behaviour until tested on a phone.
+
+What the run exports show of a run with the app off screen (`ContinuedRun`'s background time): on build 60 nearly every site went quiet ("the site stopped
+answering"); on build 65 (2026-11-25, another person's phone, 457 of 458 sites off screen) pages loaded and forms were sent, but the page is not drawn, so
+anything that waits for a frame stands still: a menu's fade-in never ends (handled, docs/FORM-FILLING.md, "A menu still fading in"), and about 45 sites ended
+with nothing read from the page ("no opt-out form was found", "the page was gone") that the owner's phone sends. Some of the "gone" pages answered 403:
+truepeoplesearch.com and hireez.com put Cloudflare's waiting page in front ("Just a moment..."), which off screen may never finish. A 401, 403 or 451 is no
+longer taken for a moved link: a waiting page that does not pass within 10 seconds is a human check, any other refusal says "the site would not show its page
+to this phone" (docs/FORM-FILLING.md). The rest are not explained yet.
 
 ## Not built / next
 

@@ -5,6 +5,8 @@ import OptOutKitCore
 enum FormRun {
     /// The failure text for a page that is gone, so callers can tell a moved link from other failures and try to heal it.
     static let pageGone = "the page was gone (not found)"
+    /// The failure text for a page the site would not show to this phone (`LinkRules.refusesAccess`): the link is right, the connection was refused.
+    static let pageRefused = "the site would not show its page to this phone (it blocked the connection; a VPN can cause this)"
 
     /// The lines of `after` that were not in `before`.
     nonisolated static func newText(before: String, after: String) -> String {
@@ -92,9 +94,22 @@ enum FormRun {
     }
 
     /// A page that says it is still working on the request ("Processing your request", "Please wait", "Do not close this page"): sent, but not confirmed.
-    /// The page's send button now reads "Submitting…" or "Sending…" (cashmereai.com): the press went through and the site has not answered yet.
+    /// The page's send button now reads "Submitting…", "Sending…" (cashmereai.com) or "Processing..." (equifax.com and theworknumber.com, read before their
+    /// answer came): the press went through and the site has not answered yet.
     nonisolated static func saysSending(_ text: String) -> Bool {
-        text.split(whereSeparator: \.isNewline).contains { $0.range(of: "^\\s*(submitting|sending)(\\.{3}|…)?\\s*$", options: [.regularExpression, .caseInsensitive]) != nil }
+        text.split(whereSeparator: \.isNewline).contains { $0.range(of: "^\\s*(submitting|sending|processing)(\\.{3}|…)?\\s*$", options: [.regularExpression, .caseInsensitive]) != nil }
+    }
+
+    /// New text after a press that says the button is still at work ("Submitting…", "Processing...") and nothing that says the site refused, wants a code or a
+    /// check: sent, not confirmed. Standing words that only read as a reply ("All requests will be processed within 15 days", beside equifax.com's
+    /// "Processing...") do not stop it, as they did when any reading but "no success message" counted as the site answering.
+    nonisolated static func sentButUnanswered(_ newText: String) -> Bool {
+        guard saysSending(newText), !rejectsCode(newText), !asksForCode(newText) else { return false }
+        switch classify(newText) {
+        case .rejected, .challenged: return false
+        case .failed(let why): return why == "no success message was shown"
+        default: return true
+        }
     }
 
     nonisolated static func saysStillWorking(_ text: String) -> Bool {
@@ -132,8 +147,18 @@ enum FormRun {
         return "the site says a required box was left empty"
     }
 
+    /// What a site that takes requests only from some countries is reported as.
+    nonisolated static let wrongCountry = "the site does not take requests from the country the phone was connecting from (a VPN can cause this)"
+
     nonisolated static func classify(_ text: String) -> SubmitOutcome {
-        let t = text.lowercased()
+        // "No further action is required at this time" (jmr-media.com's confirmation) says nothing is missing: it is not the error wording "is required".
+        let t = text.lowercased().replacingOccurrences(of: "no (further|other|additional|more) (action|steps?)[^.\\n]{0,20} (is|are) (required|needed)|nothing (else|more|further) is (required|needed)",
+                                                       with: " ", options: .regularExpression)
+        // A form that takes requests only from some countries ("Sorry, this form does not accept submissions from your country", the arrests sites, when the phone
+        // connected through a VPN or from abroad): the site refused, and says why.
+        if t.range(of: "(does not|doesn.t|do not|cannot|can.t) accept (submissions|requests|entries) from your (country|region|location)|not available (in|from) your (country|region|location)", options: .regularExpression) != nil {
+            return .rejected(wrongCountry)
+        }
         // A bare "Too many requests" page: the site is limiting us, which says nothing about the form. Reported as that, not as a failed attempt.
         if t.range(of: "too many requests|rate.?limit(ed)?|error 429|429 too many", options: .regularExpression) != nil { return .failed(AutoOptOut.rateLimited) }
         // A required box left empty ("This field is mandatory" under "State"): said as that, with the box's name when the page shows it above the message.
@@ -142,7 +167,7 @@ enum FormRun {
         if t.range(of: "problem with your submission|review the fields|fields? (have|has) an error|error occurred|something went wrong|please (try again|correct)|is required|invalid|could not be (processed|verified)", options: .regularExpression) != nil {
             return .rejected("the site showed an error after sending")
         }
-        let success = t.range(of: "follow-?up e-?mail|(we|you)('ll| will) (send|email|receive)[^.]{0,40}(e-?mail|link)|thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|(profile|listing|record)s? (has |have |was |were |is |are )?(now |been |successfully )*blocked|(successfully|been) blocked|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been|was) (received|processed|successful)", options: .regularExpression) != nil
+        let success = t.range(of: "follow-?up e-?mail|(we|you)('ll| will) (send|email|receive)[^.]{0,40}(e-?mail|link)|thank you|thanks for|success(ful(ly)?)?\\b|request (has been |was )?(received|submitted|processed|sent|logged|recorded)|(profile|listing|record)s? (has |have |was |were |is |are )?(now |been |successfully )*blocked|(successfully|been) blocked|we (will|'ll) (process|review|be in touch|contact)|your (request|submission) (is|has been)|we (have )?received (your|the)|thank you[.,!]? we|we have received|has been (received|submitted|processed)|check your (e-?mail|inbox)|confirm your (e-?mail|request)|sent you an? e-?mail|verification (e-?mail|link)|allow up to [0-9]+ days|will be (removed|processed|deleted)|opt-?out (has been |was |is )?(received|processed|successful|recorded)|submit+ed to be (opted.?out|removed|deleted)|please allow [0-9]+ (business )?days", options: .regularExpression) != nil
         let needsEmail = mentionsEmailFollowUp(t)
         if success { return .submitted(awaitingEmail: needsEmail) }
         if t.range(of: "please enter|please provide", options: .regularExpression) != nil {

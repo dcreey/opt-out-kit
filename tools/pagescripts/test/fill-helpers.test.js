@@ -146,6 +146,10 @@ test('request-type tiles take deletion, and "I am a" tiles take Other or Consume
   assert.equal(run(w, 'choose-tile-buttons'), 2);
   assert.deepEqual(clicked.sort(), ['con', 'del'], 'each chosen tile tapped once, though its heading and the block around it both read "I am a"');
   assert.equal(w.document.getElementById('del').getAttribute('data-ook-auto'), '1');
+  const gdpr = page('<div><p>Select request type</p><div><button type=button id=oo>Opt out of sales</button><button type=button id=er>Right to Erasure</button></div></div>');
+  const tapped = []; for (const id of ['oo', 'er']) gdpr.document.getElementById(id).addEventListener('click', () => tapped.push(id));
+  assert.equal(run(gdpr, 'choose-tile-buttons'), 1);
+  assert.deepEqual(tapped, ['er'], '"Erasure" is a deletion, before an opt-out');
 });
 
 test('tiles the person tapped, a tile already selected, or a group handled once are not tapped again', () => {

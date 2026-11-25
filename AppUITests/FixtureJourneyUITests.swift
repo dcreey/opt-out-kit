@@ -493,6 +493,42 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(app.descendants(matching: .any)["sites-list"].waitForExistence(timeout: 5), "tapping the count opens the Sites tab")
     }
 
+    /// As a user I want the forms the 2026-11-25 run (another person's phone) left undone handled correctly, one fixture page per shape:
+    /// - trustsuperset.com (`promptmenu`): a request-type menu showing only its prompt ("Select request type") is opened and Erasure chosen.
+    /// - jmr-media.com (`norequired`): a confirmation ending "No further action is required" counts as sent, not as an error.
+    /// - the arrests.org sites from abroad (`wrongcountry`): "does not accept submissions from your country" says so, and suggests a VPN.
+    /// - equifax.com (`processing`): a button left at "Processing...", beside "requests will be processed within 15 days", counts as sent, not confirmed.
+    /// - truepeoplesearch.com (`firewall`): a 403 with Cloudflare's "Just a moment..." that never passes is a human check, never "the page was gone".
+    /// - a site that blocks the connection (`refused`): a bare 403 says the site would not show its page to this phone.
+    func testTheFormsReportedOnTheNovember25thRunAreFilledAndReadCorrectly() {
+        let app = XCUIApplication()
+        let sites = ["promptmenu", "norequired", "wrongcountry", "processing", "firewall", "refused"]
+        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile", "-only-domains", sites.map { "\($0)-1.fixture.test" }.joined(separator: ",")] + server.launchArguments
+        app.launch()
+        app.tab("Settings", 3).tap()
+        let activity = app.buttons["auto-activity"]
+        XCTAssertTrue(app.scrollUntilExists(activity)); activity.tap()
+        XCTAssertTrue(app.buttons["auto-run-now"].waitForExistence(timeout: 10)); app.buttons["auto-run-now"].tap()
+        XCTAssertTrue(app.buttons["run-report-done"].waitForExistence(timeout: 300), "the run finished and reported")
+        add(XCTAttachment(screenshot: app.screenshot()))
+        func sends(_ kind: String) -> [[String: String]] { server.requests.filter { $0.site == "fx_\(kind)_1" && $0.path == "send" }.map(\.fields) }
+        XCTAssertEqual(sends("promptmenu").first?["request_type"], "erasure", "the prompt-only menu was opened and a deletion chosen: \(server.requests.map { "\($0.site) \($0.path)" })")
+        app.buttons["run-report-done"].tap()
+        // The sent sites first: the helper leaves the group it opened open, so a needs-you site looked up before would leave that list showing.
+        let processing = siteLine(app, "processing-1.fixture.test")
+        XCTAssertTrue(processing.hasPrefix("sent") && processing.localizedCaseInsensitiveContains("did not show a confirmation"), processing)
+        let jmr = siteLine(app, "norequired-1.fixture.test")
+        XCTAssertTrue(jmr.hasPrefix("sent"), jmr)
+        let abroad = siteLine(app, "wrongcountry-1.fixture.test")
+        XCTAssertTrue(abroad.hasPrefix("needsYou") && abroad.localizedCaseInsensitiveContains("VPN"), abroad)
+        XCTAssertEqual(sends("processing").first?["email"], "pat@example.com")
+        let firewall = siteLine(app, "firewall-1.fixture.test")
+        XCTAssertTrue(firewall.hasPrefix("needsYou") && firewall.localizedCaseInsensitiveContains("Cloudflare"), firewall)
+        XCTAssertFalse(firewall.localizedCaseInsensitiveContains("gone"), firewall)
+        let refused = siteLine(app, "refused-1.fixture.test")
+        XCTAssertTrue(refused.hasPrefix("needsYou") && refused.localizedCaseInsensitiveContains("would not show its page"), refused)
+    }
+
     /// As a user I want to see what happened when a site takes my request but never confirms it in time: the run counts it as sent and says the site showed no
     /// confirmation (decided 2026-11-24), and for that
     /// site I can see what its page said and a screenshot of how the page looked, so I can judge it myself.
@@ -608,7 +644,8 @@ final class FixtureJourneyUITests: UITestCase {
             guard count.waitForExistence(timeout: 5) else { continue }
             count.tap()
             let row = app.buttons["period-site-\(domain)"]
-            if row.waitForExistence(timeout: 3) { return "\(g): \(row.label)" }
+            // The group is closed again before answering, so the next lookup does not find a row of this group still showing under another's label.
+            if row.waitForExistence(timeout: 3) { let line = "\(g): \(row.label)"; count.tap(); return line }
             count.tap()
         }
         return "no row for \(domain)"

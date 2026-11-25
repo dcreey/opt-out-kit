@@ -20,6 +20,8 @@ test('removing the listing beats a gentler choice, and deleting beats opting out
   assert.equal(r.out.chosen, 1);
   const d = choose(radio('t', 'a', 'Opt out of sale') + radio('t', 'b', 'Delete my data') + radio('t', 'c', 'Access my data'));
   assert.equal(d.$('#b').checked, true);
+  const e = choose(radio('t', 'a', 'Right to Rectification') + radio('t', 'b', 'Right to Erasure') + radio('t', 'c', 'Right to Data Portability'));
+  assert.equal(e.$('#b').checked, true, '"Erasure" is a removal request');
 });
 
 test('a group of only access, correction or marketing choices is left alone; a required one is reported unresolved', () => {

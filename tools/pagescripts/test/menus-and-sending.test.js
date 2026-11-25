@@ -26,6 +26,31 @@ test('an empty custom menu is opened once and marked; one that already shows a c
   assert.equal(call(w, 'custom-menus-open', ''), '', 'not opened a second time');
 });
 
+test('a menu showing only its prompt ("Select request type", trustsuperset.com\'s Radix menus) is opened; one showing a choice is not', () => {
+  const w = page('<div><label>Request Type*</label><button type=button role=combobox id=rt data-placeholder=""><span>Select request type</span></button></div>' +
+    '<div><label>Pronoun</label><button type=button role=combobox id=pr>She</button></div>');
+  const seen = clicks(w, ['rt', 'pr']);
+  assert.notEqual(call(w, 'custom-menus-open', ''), '');
+  assert.deepEqual(seen, ['rt']);
+  assert.equal(call(w, 'custom-menus-open', ''), '', 'the menu showing a choice is left alone');
+  const unmarked = page('<div><label>Country</label><button type=button role=combobox id=c><span>Select country</span></button></div>');
+  assert.notEqual(call(unmarked, 'custom-menus-open', ''), '', 'a prompt is known by its words too');
+  const rights = page('<div role=listbox><div role=option>Right to Rectification</div><div role=option>Right to Opt-out of Sales</div><div role=option>Right to Erasure</div></div>');
+  assert.equal(call(rights, 'custom-menus-pick', 'Illinois'), 'Right to Erasure', '"Erasure" is a deletion, chosen before an opt-out');
+});
+
+test('a menu still fading in is read as open: off screen the page is not drawn and the fade never ends (DataGrail\'s relationship menu); a closed list is not', () => {
+  const w = page('<div class=paper id=paper style="opacity:0"><ul role=listbox><li role=option id=a>Employee</li><li role=option id=o>Other</li></ul></div>');
+  w.document.getElementById('paper').getAnimations = () => [{ playState: 'running' }];
+  const seen = clicks(w, ['a', 'o']);
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Other');
+  assert.deepEqual(seen, ['o']);
+  const closed = page('<div style="opacity:0"><ul role=listbox><li role=option id=o>Other</li></ul></div>');
+  const none = clicks(closed, ['o']);
+  assert.equal(call(closed, 'custom-menus-pick', 'Illinois'), '');
+  assert.deepEqual(none, [], 'a list hidden with no fade under way is not open');
+});
+
 test('a script that focuses a box never lets the browser scroll to it (a person reading the page would be moved)', () => {
   const watch = (w) => { const calls = []; const f = w.HTMLElement.prototype.focus; w.HTMLElement.prototype.focus = function (o) { calls.push(o); return f.call(this, o); }; return calls; };
   const menu = page('<div><span>State</span><input role=combobox id=m></div>');

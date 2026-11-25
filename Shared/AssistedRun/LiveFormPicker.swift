@@ -67,7 +67,7 @@ enum LiveFormPicker {
     }
 
     private static let marketing = try! NSRegularExpression(pattern: "subscribe|free trial|get started|sign.?up|log.?in|sign.?in|search|book a|demo|contact us|get in touch|newsletter|join|download|add another", options: .caseInsensitive)
-    private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|erase|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
+    private static let optOut = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|don.?t sell|do-not-sell|privacy|delete|deletion|remove|eras(e|ure)|request|rights|unsubscribe|suppress|removal", options: .caseInsensitive)
     /// A form that signs someone up for something, or only sends a message to sales: never filled in, whatever the page around it says.
     private static let signup = try! NSRegularExpression(pattern: "subscribe|newsletter|sign.?up|register(?!ed)|create (an? )?account|\\bjoin\\b|waitlist|\\bdemo\\b|free trial|get started|contact sales|talk to|activation|log.?in|sign.?in|shortlist|get in touch|send message|contact us|request a (quote|call)|book a|get my [a-z ]*(guide|report)|show my report|free (guide|report)", options: .caseInsensitive)
     /// Newsletter and marketing language in the words around a form's inputs.
@@ -94,7 +94,7 @@ enum LiveFormPicker {
     }
     private static let removalHeading = try! NSRegularExpression(pattern: "remove[ -](your|my)[ -](personal[ -])?(info|information|data|record|listing)|opt.?out|do not sell|delete (your|my)", options: .caseInsensitive)
     private static let searchButton = try! NSRegularExpression(pattern: "^\\s*search( now)?\\s*$", options: .caseInsensitive)
-    private static let ownWords = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|unsubscribe|delete|remove|erase", options: .caseInsensitive)
+    private static let ownWords = try! NSRegularExpression(pattern: "opt.?(me.?)?out|do not sell|unsubscribe|delete|remove|eras(e|ure)", options: .caseInsensitive)
 
     /// Sites whose way to opt out is their contact form (they have no request form and no email), so it is the form to fill: the request goes in its message box.
     /// Matched against the page's address and title (`pageContext`). Never a general rule: a contact form is refused everywhere else.

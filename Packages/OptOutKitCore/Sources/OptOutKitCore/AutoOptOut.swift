@@ -505,6 +505,8 @@ public struct AutoOptOut: Sendable {
     /// The reason shown while a page says the site's search found no record of the person (`SubmitOutcome.notListed`).
     public static let noRecordFound = "the site found no record of you"
 
+    /// A firewall's waiting page in front of the site that did not pass by itself (`LinkRules.isChallengePage`): a human check (`isHumanCheck`, "cloudflare").
+    public static let firewallCheck = "a Cloudflare check in front of the site"
     public static let rateLimited = "the site said too many requests; wait a few minutes and try it again"
 
     public static func result(for outcome: SubmitOutcome) -> AutoOptOutResult {
