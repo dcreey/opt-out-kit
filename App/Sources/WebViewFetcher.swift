@@ -486,6 +486,10 @@ extension WebViewSession {
     func screenshotJPEG(quality: CGFloat = 0.6, aroundForm token: String? = nil) async -> Data? {
         MainThreadWatch.note("screenshot")
         defer { MainThreadWatch.note("after screenshot") }
+        // iOS does not draw a web view while the app is off the screen, so a picture asked for then never comes back. A background run waited for it until
+        // the site went quiet and gave the site up, before pressing send or after its answer had been read: 163 of a run's 204 sites in the export of
+        // 2026-11-24, every one while the app was away. Off the screen there is no picture; the page's words are still kept.
+        guard UIApplication.shared.applicationState == .active else { RunStep.note("no picture: the app is off the screen"); return nil }
         if webView.frame.isEmpty { webView.frame = CGRect(x: 0, y: 0, width: 390, height: 800) }
         // The web view is kept almost invisible in a hidden window; a snapshot would inherit that and come out nearly transparent.
         let previousAlpha = webView.alpha

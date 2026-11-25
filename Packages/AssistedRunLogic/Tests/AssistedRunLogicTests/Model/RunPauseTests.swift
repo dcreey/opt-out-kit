@@ -40,6 +40,13 @@ final class RunPauseTests: XCTestCase {
         while (m.autoProgress?.done ?? 0) < 2 && waited < 300 { try await Task.sleep(nanoseconds: 100_000_000); waited += 1 }
         phone.appIsActive = false
         m.appDidEnterBackground()
+        // A quick glance away and back. iOS still reports the app inactive as it comes back; the log writes it as on the screen, with how long it was away
+        // (the export of 2026-11-24 showed every "foreground" as away).
+        try await Task.sleep(nanoseconds: 50_000_000)
+        m.logRun(.foreground)          // what `appDidBecomeActive` writes during a run
+        let back = try XCTUnwrap(m.currentRunLog().entries.last { $0.event == RunLog.Event.foreground.rawValue })
+        XCTAssertEqual(back.appActive, true)
+        XCTAssertNotNil(back.awayFor, "with how long it was away")
         m.continuedRunExpired(appActive: false)
         await run.value
         let done = (m.optOutRun[me.id] ?? []).count
@@ -59,6 +66,14 @@ final class RunPauseTests: XCTestCase {
         XCTAssertFalse(m.askToResume)
         XCTAssertEqual(m.autoSettings.optOutResumePending, true, "Not now: the run still waits")
         XCTAssertNil(m.autoBusy)
+        // Not now is not asked again (decided 2026-11-24): leaving and coming back, or the due-check, neither asks nor carries the run on.
+        phone.appIsActive = false; m.appDidEnterBackground()
+        phone.appIsActive = true; m.appDidBecomeActive()
+        XCTAssertFalse(m.askToResume, "Not now: not asked again when the app comes back")
+        await m.runDueAutomation()
+        XCTAssertNil(m.autoBusy, "nor carried on by itself")
+        XCTAssertEqual((m.optOutRun[me.id] ?? []).count, done)
+        XCTAssertTrue(m.runStoppedByPerson, "it waits for Run now, as after Stop")
 
         let log = m.currentRunLog().entries
         for e in [RunLog.Event.runStarted, .background, .backgroundTimeEnded, .paused, .site, .runEnded, .resumeAsked, .resumeDeclined] {
@@ -76,17 +91,14 @@ final class RunPauseTests: XCTestCase {
         XCTAssertTrue(json.contains(AppModel.pausedBackgroundTimeEnded), "and why the run paused")
         XCTAssertTrue(json.contains("\"background-time-ended\""))
 
-        // Asked again on the next return; Carry on carries it on, and the pause is cleared.
-        phone.appIsActive = false; m.appDidEnterBackground(); phone.appIsActive = true
-        m.appDidBecomeActive()
-        XCTAssertTrue(m.askToResume)
-        m.resumeRun()
+        // Run now carries it on, and the pause and the stop are cleared.
+        m.runAutomaticNow()
         waited = 0
         while m.autoBusy == nil && waited < 100 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
         while m.autoBusy != nil && waited < 3000 { try await Task.sleep(nanoseconds: 20_000_000); waited += 1 }
         XCTAssertGreaterThan((m.optOutRun[me.id] ?? []).count, 0)
         XCTAssertNil(m.autoSettings.pauseReason, "carried on: no longer paused")
-        XCTAssertTrue(events(m).contains(RunLog.Event.resumeAccepted.rawValue))
+        XCTAssertFalse(m.runStoppedByPerson, "nor waiting for Run now")
         XCTAssertTrue(m.currentRunLog().entries.contains { $0.event == RunLog.Event.runStarted.rawValue && ($0.detail ?? "").contains("carried on") }, "the log says it was carried on")
     }
 
@@ -113,12 +125,16 @@ final class RunPauseTests: XCTestCase {
         XCTAssertTrue(events(again).contains(RunLog.Event.runStarted.rawValue), "the log from before the close is still there")
         XCTAssertTrue(events(again).contains(RunLog.Event.site.rawValue))
         XCTAssertTrue(events(again).contains(RunLog.Event.foundCutOff.rawValue))
-        // A run the person stopped is not asked about.
-        again.declineResume()
-        let more = Task { await again.runAutoOptOut(for: again.people.first { $0.relationship == .me }!, submitter: Slow()) }
+        // Carry on carries it on; a run the person then stops is not asked about.
+        again.resumeRun()
+        XCTAssertFalse(again.askToResume)
+        XCTAssertTrue(events(again).contains(RunLog.Event.resumeAccepted.rawValue))
         waited = 0
         while (again.autoProgress?.done ?? 0) < 1 && waited < 300 { try await Task.sleep(nanoseconds: 50_000_000); waited += 1 }
-        again.stopAutoOptOut(); await more.value
+        XCTAssertNotNil(again.autoBusy, "carried on")
+        again.stopAutoOptOut()
+        waited = 0
+        while again.autoBusy != nil && waited < 600 { try await Task.sleep(nanoseconds: 50_000_000); waited += 1 }
         again.appDidBecomeActive()
         XCTAssertFalse(again.askToResume, "stopped by the person: not asked")
     }

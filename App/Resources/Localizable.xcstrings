@@ -2531,6 +2531,29 @@
     }
    }
   },
+  "A run cannot send this form: it is in your semi-automated queue": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Une exécution ne peut pas envoyer ce formulaire : il est dans votre file semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Una ejecución no puede enviar este formulario: está en tu cola semiautomática"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Ein Durchlauf kann dieses Formular nicht senden: Es steht in Ihrer halbautomatischen Warteschlange"
+     }
+    }
+   }
+  },
   "A service you chose works better, for example a contacts app that identifies callers.": {
    "extractionState": "manual",
    "localizations": {
@@ -14855,75 +14878,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Nie Bedingungen, die automatisierten Zugriff verbieten oder nahelegen"
-     }
-    }
-   }
-  },
-  "Never tried": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jamais essayé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nunca probado"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nie versucht"
-     }
-    }
-   }
-  },
-  "Never went through": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jamais passé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nunca se envió"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nie durchgegangen"
-     }
-    }
-   }
-  },
-  "Never went through (tried %lld times): %@": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Jamais passé (%lld essais) : %@"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nunca se envió (%lld intentos): %@"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nie durchgegangen (%lld Versuche): %@"
      }
     }
    }
@@ -27762,6 +27716,52 @@
     }
    }
   },
+  "Tried %lld times, never sent: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Essayé %lld fois, jamais envoyé : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Intentado %lld veces, nunca enviado: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld-mal versucht, nie gesendet: %@"
+     }
+    }
+   }
+  },
+  "Tried once, never sent: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Essayé une fois, jamais envoyé : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Intentado una vez, nunca enviado: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Einmal versucht, nie gesendet: %@"
+     }
+    }
+   }
+  },
   "Turn it off any time": {
    "extractionState": "manual",
    "localizations": {
@@ -30430,25 +30430,25 @@
     }
    }
   },
-  "Working in the background: %lld of %lld sites. You can leave this screen.": {
+  "Working in the background: %lld of the %lld sites this run tries. You can leave this screen.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "En cours en arrière-plan : %lld sites sur %lld. Vous pouvez quitter cet écran."
+      "value": "En cours en arrière-plan : %lld des %lld sites de cette exécution. Vous pouvez quitter cet écran."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Trabajando en segundo plano: %lld de %lld sitios. Puedes salir de esta pantalla."
+      "value": "Trabajando en segundo plano: %lld de los %lld sitios de esta ejecución. Puedes salir de esta pantalla."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Läuft im Hintergrund: %lld von %lld Seiten. Sie können diesen Bildschirm verlassen."
+      "value": "Läuft im Hintergrund: %lld von %lld Websites dieses Durchlaufs. Sie können diesen Bildschirm verlassen."
      }
     }
    }

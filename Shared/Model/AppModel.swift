@@ -648,9 +648,11 @@ final class AppModel: ObservableObject {
     func logRun(_ event: RunLog.Event, site: String? = nil, detail: String? = nil, now: Date = Date()) {
         if runLog.entries.isEmpty, !runLogLoaded { runLog = runLogStore.load() }
         runLogLoaded = true
-        let active = platform.appIsActive
+        // Coming back to the front is written as on the screen: iOS still reports the app inactive while it does (the export of 2026-11-24 showed every
+        // "foreground" as away).
+        let active = event == .foreground || platform.appIsActive
         runLog.add(RunLogEntry(date: now, event: event.rawValue, site: site, detail: detail, appActive: active,
-                               awayFor: active ? nil : leftScreenAt.map { (now.timeIntervalSince($0) * 10).rounded() / 10 }))
+                               awayFor: active && event != .foreground ? nil : leftScreenAt.map { (now.timeIntervalSince($0) * 10).rounded() / 10 }))
         let log = runLog, logs = runLogStore
         saveQueue.async { try? logs.save(log) }
     }
@@ -981,28 +983,36 @@ final class AppModel: ObservableObject {
     func activityRows(for person: Person, now: Date = Date()) -> [ActivityRow] { Self.activityPage(activityInputs(for: person, now: now)).rows }
 
     /// Every site any run has dealt with, and every site the automatic run takes on, with its standing over all runs combined: how often it was sent and
-    /// tried, and its latest result. For the "Every site, all runs" page.
-    func allRunsRows(for person: Person) -> [ActivityRow] {
+    /// tried, and its latest result. For the "Every site, all runs" page, in the automatic page's words (decided 2026-11-24): moved to semi-automatic (tried,
+    /// never sent), sent (at least once), no action needed (not listed, only for other people, set aside) and still to do (no run has tried it yet). "Handled
+    /// previously" is the current run's word only: over every run, a site an earlier run sent is sent.
+    func allRunsRows(for person: Person, now: Date = Date()) -> [ActivityRow] {
         let attempts = household.progress(for: person.id).optOutAttempts
-        var ids = Set(automaticSites(for: person).map(\.id)).union(autoSettings.periodTargetIDs(person: person.id.uuidString))
-        for (id, list) in attempts where list.contains(where: { !$0.wasEmailed }) { ids.insert(id) }
         let progress = household.progress(for: person.id)
+        // The same sites as the automatic page (`automaticRunSiteIDs`): a new person saw 490 still to do there and 36 here, and later 503 there and 595 here.
+        let inputs = activityInputs(for: person, now: now)
+        let pass = Set(AutoOptOut.backgroundSites(.full, entries: inputs.entries, person: inputs.plans.person, progress: progress, now: now, plans: inputs.plans).map(\.domain))
+        let ids = Self.automaticRunSiteIDs(inputs, pass: pass)
         return RunPeriods.allRuns(siteIDs: Array(ids), attempts: attempts).compactMap { s -> ActivityRow? in
             guard let e = sites[id: s.id] else { return nil }
-            // The same rule as the automatic page: a site a recent look found no listing on is not listed here too, unless a request went through (the two pages
-            // disagreed: 3 not listed on one, 0 on the other).
-            var group = s.group
-            if group != .sent, progress.notListedRecently(e.id) { group = .notListed }
-            let line: String
-            switch group {
-            case .sent: line = s.sends == 1 ? Loc.f("Sent once, on %@", Loc.date(s.lastSent ?? Date())) : Loc.f("Sent %lld times, last on %@", s.sends, Loc.date(s.lastSent ?? Date()))
-            case .needsYou:
-                let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
-                line = Loc.f("Never went through (tried %lld times): %@", s.tries, last)
-            case .notTried, .noAction, .earlier: line = Loc.t("No run has tried it yet")
-            case .notListed: line = Loc.f("Not listed: the site found no record of you on %@", Loc.date(progress.latestSiteCheck(e.id)?.date ?? s.last?.date ?? Date()))
+            func row(_ g: ActivityGroup, _ line: String) -> ActivityRow { ActivityRow(id: e.id, domain: e.domain, group: g, line: line) }
+            switch s.group {
+            case .sent:
+                return row(.sent, s.sends == 1 ? Loc.f("Sent once, on %@", Loc.date(s.lastSent ?? now)) : Loc.f("Sent %lld times, last on %@", s.sends, Loc.date(s.lastSent ?? now)))
+            default: break
             }
-            return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
+            // Nothing to do, whatever earlier tries did: the same rules as the automatic page.
+            if let only = e.onlyFor { return row(.noAction, Loc.f("Only holds data on %@: nothing to do unless that is you", only.who)) }
+            if progress.isParked(e.id, now: now) { return row(.noAction, Loc.t("You set it aside")) }
+            // A site a recent look found no listing on is not listed here too (the two pages disagreed: 3 not listed on one, 0 on the other).
+            if s.group == .notListed || progress.notListedRecently(e.id, now: now) {
+                return row(.noAction, Loc.f("Not listed: the site found no record of you on %@", Loc.date(progress.latestSiteCheck(e.id)?.date ?? s.last?.date ?? now)))
+            }
+            if s.group == .needsYou {
+                let last = s.last.map { ReviewItem(id: e.id, domain: e.domain, outcome: $0.outcome, detail: $0.detail, date: $0.date, hasScreenshot: false).label } ?? ""
+                return row(.needsYou, s.tries == 1 ? Loc.f("Tried once, never sent: %@", last) : Loc.f("Tried %lld times, never sent: %@", s.tries, last))
+            }
+            return row(.notTried, Loc.t("No run has tried it yet"))
         }.sorted { $0.domain < $1.domain }
     }
 
@@ -1028,12 +1038,18 @@ final class AppModel: ObservableObject {
                        since: autoSettings.runStarted)
     }
 
+    /// The sites both pages count (decided 2026-11-24: "Every site, all runs" counted 595 and the automatic page 503): every site the automatic run takes
+    /// on (`pass`, the full pass, and the plan's automatic sites) and every site any attempt has reached, so the two pages always add up to the same total.
+    nonisolated static func automaticRunSiteIDs(_ i: ActivityInputs, pass: Set<String>) -> Set<String> {
+        var ids = i.automaticIDs
+        for e in i.entries where pass.contains(e.domain) || (i.progress.optOutAttempts[e.id]?.contains { !$0.wasEmailed } ?? false) { ids.insert(e.id) }
+        return ids
+    }
+
     /// The page's groups and the number "Run now" would try, each site's form checked once. The same rules as `runDomains`, `remainingDomains`,
     /// `willTry` and `skipReason` (a test holds them equal); build 47 worked the page out on the main thread in seconds, after every site of a run.
     nonisolated static func activityPage(_ i: ActivityInputs) -> (rows: [ActivityRow], runNow: Int) {
         let now = i.now, progress = i.progress, period = i.period
-        let inWindow: (OptOutAttempt) -> Bool = { a in i.since.map { a.date >= $0 } ?? (period?.contains(a.date) ?? true) }
-        let ran: (OptOutAttempt) -> Bool = { ["challenged", "rejected", "failed"].contains($0.outcome) && inWindow($0) }
         // Every site a full pass covers, whatever kind the next run is: a repeat period must not make the others vanish from the page.
         let fullSites = AutoOptOut.backgroundSites(.full, entries: i.entries, person: i.plans.person, progress: progress, now: now, plans: i.plans)
         let pass = Set(fullSites.map(\.domain))
@@ -1046,8 +1062,7 @@ final class AppModel: ObservableObject {
             let r = skipResult(AutoOptOut.standIn(e), plans: i.plans, progress: progress, everySite: false, hold: i.holds[e.id], period: period, now: now)
             reasons[e.id] = r; return r
         }
-        var ids = i.automaticIDs
-        for e in i.entries where pass.contains(e.domain) || (progress.optOutAttempts[e.id]?.contains(where: ran) ?? false) { ids.insert(e.id) }
+        let ids = automaticRunSiteIDs(i, pass: pass)
         let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let rows = RunPeriods.activity(siteIDs: Array(ids), attempts: progress.optOutAttempts, period: period, since: i.since).compactMap { s -> ActivityRow? in
             guard let e = byID[s.id] else { return nil }
@@ -1078,6 +1093,13 @@ final class AppModel: ObservableObject {
                     case .needsData, .needsYou: return ActivityRow(id: e.id, domain: e.domain, group: .needsYou, line: why.label)
                     default: line = why.label
                     }
+                } else if !pass.contains(e.domain) {
+                    // Tried before, but a run no longer takes it on (its form asks for a code, the person's listing, or something else a run cannot do): it is in
+                    // the semi-automated queue, so it is counted there, not as still to do.
+                    let last = attempts.last
+                    if let last, last.wasEmailed { return ActivityRow(id: e.id, domain: e.domain, group: .earlier, line: Loc.f("You emailed your request on %@", Loc.date(last.date))) }
+                    if let last, AutoOptOut.lastAttemptNeedsPerson(last) { return ActivityRow(id: e.id, domain: e.domain, group: .needsYou, line: AppModel.leftForPersonLine(last)) }
+                    return ActivityRow(id: e.id, domain: e.domain, group: .needsYou, line: Loc.t("A run cannot send this form: it is in your semi-automated queue"))
                 } else if !nextPass.contains(e.domain) {
                     let last = attempts.last
                     if let last, last.wasEmailed { return ActivityRow(id: e.id, domain: e.domain, group: .earlier, line: Loc.f("You emailed your request on %@", Loc.date(last.date))) }
@@ -1191,9 +1213,12 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// The person said not now: the run waits (Run now on the automatic page carries it on), and they are asked again the next time the app comes to the front.
+    /// The person said not now: the run waits until they press Run now on the automatic page (which carries it on), as if they had pressed Stop. They are not
+    /// asked again (decided 2026-11-24: "Not now" asked again each time the app came back to the front).
     func declineResume() {
         askToResume = false
+        household.updateAuto { $0.stoppedByPerson = true }
+        save()
         logRun(.resumeDeclined)
     }
 

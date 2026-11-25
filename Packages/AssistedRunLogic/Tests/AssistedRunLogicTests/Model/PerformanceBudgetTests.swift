@@ -53,10 +53,12 @@ final class PerformanceBudgetTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(times.count, 5, "redrawn during the run")
         let sorted = times.sorted(), median = sorted[sorted.count / 2], worst = sorted.last ?? 0
         let afterRun = redraw(m, me)
-        let report = String(format: "redraws during the run: %d, median %.0f ms, worst %.0f ms; first after the run %.0f ms", times.count, median * 1000, worst * 1000, afterRun * 1000)
+        let pageStart = Date(); _ = m.allRunsRows(for: me); let allRunsPage = Date().timeIntervalSince(pageStart)
+        let report = String(format: "redraws during the run: %d, median %.0f ms, worst %.0f ms; first after the run %.0f ms; every site, all runs %.0f ms", times.count, median * 1000, worst * 1000, afterRun * 1000, allRunsPage * 1000)
         print("PerformanceBudget: " + report)
         add(XCTAttachment(string: report))
         XCTAssertLessThan(median, Self.redrawBudget, "a redraw during a run is too slow: \(report)")
         XCTAssertLessThan(afterRun, Self.afterRunBudget, "the redraw after a run is too slow: \(report)")
+        XCTAssertLessThan(allRunsPage, Self.afterRunBudget, "opening \"Every site, all runs\" is too slow: \(report)")
     }
 }

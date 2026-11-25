@@ -49,7 +49,42 @@ final class AutoProtectionTests: XCTestCase {
         let all = Dictionary(m.allRunsRows(for: me).map { ($0.id, $0) }, uniquingKeysWith: { x, _ in x })
         XCTAssertEqual(all[a]?.group, .sent); XCTAssertEqual(all[b]?.group, .needsYou); XCTAssertEqual(all[c]?.group, .needsYou)
         XCTAssertTrue(all[a]?.line.contains("once") == true, "\(all[a]?.line ?? "")")
-        XCTAssertTrue(m.allRunsRows(for: me).contains { $0.group == .notTried }, "sites no run has reached are listed as never tried")
+        // In the automatic page's words (decided 2026-11-24): tried and never sent is moved to semi-automatic, with how often it was tried.
+        XCTAssertEqual(all[b]?.line.hasPrefix("Tried once, never sent: "), true, all[b]?.line ?? "")
+        XCTAssertTrue(m.allRunsRows(for: me).allSatisfy { [.needsYou, .sent, .noAction, .notTried].contains($0.group) }, "only the four groups of every run")
+        XCTAssertTrue(m.allRunsRows(for: me).contains { $0.group == .notTried }, "sites no run has reached are still to do")
+    }
+
+    /// Before any run, both pages count the same sites still to do: every site a full pass takes on (a new person saw 490 on the automatic page and 36 on
+    /// "Every site, all runs"), in the same words.
+    func testBothPagesCountTheSameSitesStillToDoBeforeAnyRun() throws {
+        let m = model()
+        let me = try withProfile(m)
+        let page = m.activityRows(for: me).filter { $0.group == .notTried }.map(\.id)
+        let all = m.allRunsRows(for: me).filter { $0.group == .notTried }.map(\.id)
+        XCTAssertGreaterThan(page.count, 100)
+        XCTAssertEqual(Set(all), Set(page), "the same sites still to do on both pages")
+        XCTAssertTrue(m.allRunsRows(for: me).allSatisfy { $0.group == .notTried && $0.line == "No run has tried it yet" })
+    }
+
+    /// Both pages count the same sites, so their totals agree (decided 2026-11-24: "Every site, all runs" showed 595 and the automatic page 503): every site
+    /// the run takes on and every site any attempt has reached. A site tried before that a run no longer takes on is in the semi-automated queue on both.
+    func testBothPagesCountTheSameSitesSoTheirTotalsAgree() throws {
+        let m = model()
+        let me = try withProfile(m)
+        let automatic = m.automaticSites(for: me)
+        let outside = try XCTUnwrap(m.directory.first { !AutoOptOut.backgroundAttemptable(m.resolved($0), person: me, progress: m.progress) && $0.onlyFor == nil },
+                                    "a site the run does not take on")
+        let earlier = Date().addingTimeInterval(-40 * 86_400), now = Date().addingTimeInterval(-60)
+        m.recordAttemptForTesting(OptOutAttempt(date: earlier, outcome: "failed", detail: "no success message was shown"), site: outside.id)
+        m.recordAttemptForTesting(OptOutAttempt(date: earlier, outcome: "submitted"), site: automatic[0].id)
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "challenged", detail: "a reCAPTCHA checkbox"), site: automatic[1].id)
+        m.setRunStartedForTesting(Date().addingTimeInterval(-3600))
+        let page = m.activityRows(for: me), all = m.allRunsRows(for: me)
+        XCTAssertEqual(Set(page.map(\.id)), Set(all.map(\.id)), "the same sites on both pages")
+        XCTAssertEqual(page.count, all.count, "so the totals agree")
+        XCTAssertEqual(page.first { $0.id == outside.id }?.group, .needsYou, "tried before, no longer the run's: in the semi-automated queue")
+        XCTAssertEqual(all.first { $0.id == outside.id }?.group, .needsYou)
     }
 
     /// A second run in a period puts every site in one of five groups (decided 2026-11-24: the first run's sends were among 323 "Not tried"): moved to

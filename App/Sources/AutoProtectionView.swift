@@ -124,37 +124,10 @@ struct AutoActivityView: View {
     /// The page's five groups, in order (decided 2026-11-24). `notListed` is folded into "No action needed" by `AppModel.activityPage`.
     static let groups: [ActivityGroup] = [.needsYou, .sent, .noAction, .earlier, .notTried]
 
-    private func title(_ g: ActivityGroup) -> String {
-        switch g {
-        case .needsYou: return Loc.t("Moved to semi-automatic")
-        case .sent: return Loc.t("Sent")
-        case .noAction, .notListed: return Loc.t("No action needed")
-        case .earlier: return Loc.t("Handled previously")
-        case .notTried: return Loc.t("Still to do")
-        }
-    }
-    private func color(_ g: ActivityGroup) -> Color {
-        switch g { case .needsYou: return .blue; case .sent: return .green; case .noAction, .notListed: return .teal; case .earlier: return .mint; case .notTried: return .secondary }
-    }
-    private func icon(_ g: ActivityGroup) -> String {
-        switch g {
-        case .needsYou: return "hand.point.up.left.fill"
-        case .sent: return "checkmark.circle.fill"
-        case .noAction, .notListed: return "minus.circle"
-        case .earlier: return "clock.arrow.circlepath"
-        case .notTried: return "circle.dashed"
-        }
-    }
-
     private func tile(_ g: ActivityGroup, label: String) -> some View {
         let n = activity.filter { $0.group == g }.count
         return Button { toggle(g) } label: {
-            VStack(spacing: 2) {
-                Text(verbatim: loaded ? "\(n)" : "–").font(.title2.bold()).foregroundStyle(color(g))
-                Text(label).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity, minHeight: 64).padding(.vertical, 6)
-            .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+            CountTile(group: g, count: loaded ? "\(n)" : "–", label: label)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("activity-count-\(g.rawValue)")
@@ -173,17 +146,17 @@ struct AutoActivityView: View {
                     Text(dates).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("run-dates")
                 }
                 HStack(spacing: 8) {
-                    tile(.needsYou, label: Loc.t("Semi-automatic"))
-                    tile(.sent, label: title(.sent))
-                    tile(.noAction, label: title(.noAction))
-                    tile(.earlier, label: title(.earlier))
+                    tile(.needsYou, label: ActivityGroup.needsYou.tileLabel)
+                    tile(.sent, label: ActivityGroup.sent.tileLabel)
+                    tile(.noAction, label: ActivityGroup.noAction.tileLabel)
+                    tile(.earlier, label: ActivityGroup.earlier.tileLabel)
                 }
                 let left = activity.filter { $0.group == .notTried }.count
                 if loaded, left > 0 {
                     // The sites still to do: a slim line under the four counts, not a fifth tile (it was the largest thing on the page).
                     Button { toggle(.notTried) } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: icon(.notTried))
+                            Image(systemName: ActivityGroup.notTried.icon)
                             Text(Loc.f("%lld still to do", left))
                             Spacer()
                             Image(systemName: isOpen(.notTried) ? "chevron.down" : "chevron.right").font(.caption)
@@ -197,7 +170,7 @@ struct AutoActivityView: View {
                     VStack(alignment: .leading, spacing: 3) {
                         if let p = model.autoProgress {
                             ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
-                            Text("Working in the background: \(p.done) of \(p.total) sites. You can leave this screen.").font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-working")
+                            Text(Loc.f("Working in the background: %lld of the %lld sites this run tries. You can leave this screen.", p.done, p.total)).font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("auto-working")
                         } else {
                             ProgressView().accessibilityIdentifier("auto-working")
                         }
@@ -246,7 +219,7 @@ struct AutoActivityView: View {
                 } header: {
                     Button { toggle(g) } label: {
                         HStack {
-                            Label(title(g), systemImage: icon(g)).foregroundStyle(color(g))
+                            Label(g.title, systemImage: g.icon).foregroundStyle(g.color)
                             Text(verbatim: "\(items.count)").foregroundStyle(.secondary)
                             Spacer()
                             Image(systemName: isOpen(g) ? "chevron.down" : "chevron.right").foregroundStyle(.secondary)
@@ -325,7 +298,7 @@ struct AutoActivityView: View {
 
     private func activityRow(_ r: AppModel.ActivityRow) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: icon(r.group)).foregroundStyle(color(r.group))
+            Image(systemName: r.group.icon).foregroundStyle(r.group.color)
             VStack(alignment: .leading, spacing: 1) {
                 Text(verbatim: r.domain).font(.footnote)
                 Text(r.line).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
@@ -349,12 +322,7 @@ struct AllRunsView: View {
             Section {
                 HStack(spacing: 8) {
                     ForEach(Self.groups, id: \.self) { g in
-                        VStack(spacing: 2) {
-                            Text(verbatim: "\(rows.filter { $0.group == g }.count)").font(.title2.bold()).foregroundStyle(color(g))
-                            Text(title(g)).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
-                        }
-                        .frame(maxWidth: .infinity).padding(.vertical, 8)
-                        .background(color(g).opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                        CountTile(group: g, count: "\(rows.filter { $0.group == g }.count)", label: g.tileLabel)
                         .accessibilityIdentifier("all-runs-count-\(g.rawValue)")
                     }
                 }
@@ -368,7 +336,7 @@ struct AllRunsView: View {
                                 NavigationLink { DirectoryInfoView(entry: entry) } label: { row(r) }.accessibilityIdentifier("all-runs-site-\(r.domain)")
                             } else { row(r) }
                         }
-                    } header: { Label(title(g), systemImage: icon(g)).foregroundStyle(color(g)).textCase(nil) }
+                    } header: { Label(g.title, systemImage: g.icon).foregroundStyle(g.color).textCase(nil) }
                 }
             }
         }
@@ -385,11 +353,51 @@ struct AllRunsView: View {
             Text(r.line).font(.caption).foregroundStyle(.secondary)
         }
     }
-    /// Every run together has four groups (`RunPeriods.allRuns`); the automatic page's own ones never show here.
-    static let groups: [ActivityGroup] = [.needsYou, .sent, .notListed, .notTried]
-    private func title(_ g: ActivityGroup) -> String {
-        switch g { case .needsYou: return Loc.t("Never went through"); case .sent: return Loc.t("Sent"); case .notListed, .noAction, .earlier: return Loc.t("Not listed"); case .notTried: return Loc.t("Never tried") }
+    /// Every run together has four groups (`AppModel.allRunsRows`): "Handled previously" is the current run's word only.
+    static let groups: [ActivityGroup] = [.needsYou, .sent, .noAction, .notTried]
+}
+
+/// The automatic opt-out page's groups, in the same words, colours and symbols on "Every site, all runs" (decided 2026-11-24: that page still said "Never went
+/// through", "Not listed" and "Never tried").
+extension ActivityGroup {
+    var title: String {
+        switch self {
+        case .needsYou: return Loc.t("Moved to semi-automatic")
+        case .sent: return Loc.t("Sent")
+        case .noAction, .notListed: return Loc.t("No action needed")
+        case .earlier: return Loc.t("Handled previously")
+        case .notTried: return Loc.t("Still to do")
+        }
     }
-    private func color(_ g: ActivityGroup) -> Color { switch g { case .needsYou: return .orange; case .sent: return .green; case .notListed, .noAction, .earlier: return .teal; case .notTried: return .secondary } }
-    private func icon(_ g: ActivityGroup) -> String { switch g { case .needsYou: return "exclamationmark.circle"; case .sent: return "checkmark.circle.fill"; case .notListed, .noAction, .earlier: return "person.crop.circle.badge.xmark"; case .notTried: return "circle.dashed" } }
+    /// The shorter words under a count.
+    var tileLabel: String { self == .needsYou ? Loc.t("Semi-automatic") : title }
+    var color: Color {
+        switch self { case .needsYou: return .blue; case .sent: return .green; case .noAction, .notListed: return .teal; case .earlier: return .mint; case .notTried: return .secondary }
+    }
+    var icon: String {
+        switch self {
+        case .needsYou: return "hand.point.up.left.fill"
+        case .sent: return "checkmark.circle.fill"
+        case .noAction, .notListed: return "minus.circle"
+        case .earlier: return "clock.arrow.circlepath"
+        case .notTried: return "circle.dashed"
+        }
+    }
+}
+
+/// One count at the top of the automatic page and of "Every site, all runs". Every label keeps room for two lines (decided 2026-11-24: "Sent" took one
+/// line and the others two, so its number sat lower than theirs): the numbers line up across the row, and so do the first lines of the labels.
+struct CountTile: View {
+    let group: ActivityGroup
+    let count: String
+    let label: String
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(verbatim: count).font(.title2.bold()).foregroundStyle(group.color)
+            Text(label).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                .lineLimit(2, reservesSpace: true).minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity, alignment: .top).padding(.vertical, 8)
+        .background(group.color.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+    }
 }

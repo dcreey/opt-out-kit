@@ -195,15 +195,19 @@ fills, and a missing profile detail: all in the semi-automated queue), **Sent** 
 listed, only holds data on other people, covered by a platform request, set aside), **Handled previously** (sent or emailed by an earlier run this period: "Sent
 <date>, in an earlier run") and **Still to do** (what Run now would try, and a site waiting for the next full re-test). The first four are the counts at the top;
 "Still to do" is a slim line under them ("489 still to do ›") while any is left. The dates line, the counts, that line, a run's progress and the two buttons are one
-block with no lines across it. Each opens its list; a group's explanation shows only while it is open. The groups are what the run under way, or
+block with no lines across it. Each count's label keeps room for two lines (`CountTile`, shared with "Every site, all runs"), so the numbers and the
+labels line up across the row however many lines a label takes ("Sent" sat lower than the rest until 2026-11-24). Each opens its list; a group's explanation shows only while it is open. The groups are what the run under way, or
 the last one, did since it started. Above the counts, one line gives the dates: "Last run Nov 24, 2026 · Next run Jan 26, 2027" (or the half that is
 known). The lines that were under the counts (when this run started, the period, "Last run ...: sent 0 of 4", what the next run does, "It carried on after a
 pause", "Stopped. Nothing runs by itself ...", "Run now tries the N sites ...") were taken out on 2026-11-24: the counts say it, and a stopped run asks
-"Carry on with the opt-out run?" when the person comes back. While a run works, its progress bar and "Working in the background: N of M sites" show under
+"Carry on with the opt-out run?" when the person comes back. While a run works, its progress bar and "Working in the background: N of the M sites this run tries" (a run tries only what is left, so M is not the page's total) show under
 the counts. A new run (Run now after a run has finished, Re-test all, the scheduled run) starts them afresh; a run that was stopped or cut
 off and is carried on is the same run. Before the first run of build 54, which records when a run starts, the page shows the period instead. At the bottom,
-**Every site, all runs** opens every run combined: each site the automatic run has dealt with or takes on, grouped as sent at least once, not listed (the latest try found no record of the person), never went through (tried,
-never sent) and never tried, with how often it was sent or tried; a site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
+**Every site, all runs** opens every run combined: the same sites as the automatic page, so the two totals agree (`AppModel.automaticRunSiteIDs`: every site the
+run takes on and every site any attempt has reached; decided 2026-11-24, when they showed 595 and 503), in the automatic page's words, colours and symbols (decided 2026-11-24; it said "Never went through", "Not listed" and "Never tried"):
+**Moved to semi-automatic** (tried, never sent: "Tried 3 times, never sent: ..."), **Sent** (at least once: "Sent once, on ..." or "Sent 4 times, last on ..."),
+**No action needed** (not listed, only holds data on other people, set aside) and **Still to do** ("No run has tried it yet"). "Handled previously" is the
+current run's word only. A site opens its page, with its latest screenshot. (It replaced "Screenshots of the last run";
 the run report still has "Review every site and its screenshot".)
 
 **Export this run, screenshots and all** (below it) gives the run to the system share sheet as one zip, `exnay-run.zip`: `run.json` lists every site of the page in its
@@ -217,8 +221,8 @@ screen; docs/AUTOMATION.md, "The run log") and each screenshot's date: an attemp
 **Carry on with the opt-out run?** A run that stopped before finishing (iOS took back its background time, the app left the screen, or the app was closed) is
 never carried on by itself. When the app next comes to the front, an alert asks "Carry on with the opt-out run?" and says why it stopped ("It stopped when iOS
 took back its time to run in the background.", "... when you left the app.", "... when the app was closed."), then "Carry on with the sites it has not done yet?
-Keep the app open while it runs, so iOS does not stop it again." **Carry on** (`resume-run`) runs it; **Not now** (`resume-not-now`) leaves it, and Run now on
-the automatic opt-out page still carries it on. The notification that says a run paused still says to open Exnay to carry on.
+Keep the app open while it runs, so iOS does not stop it again." **Carry on** (`resume-run`) runs it; **Not now** (`resume-not-now`) leaves it as if Stop had
+been pressed: it is not asked again (decided 2026-11-24; it asked each time the app came back), and Run now on the automatic opt-out page carries it on. The notification that says a run paused still says to open Exnay to carry on.
 
 **A site only for some people.** A site whose `only_for` says it holds data only on one group (agile-ed.com: people who work in US schools) shows "Not for
 you, unless you are in its group" in its header and a card at the top of its page: "Only holds data on ...", what that means, and the site's own words. On the

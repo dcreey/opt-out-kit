@@ -434,8 +434,7 @@ final class BackgroundPassesAppTests: XCTestCase {
         }
     }
 
-    /// A site a recent look found no listing on is counted on both pages (they showed 3 not listed and 0): "No action needed" on the automatic page, "Not listed"
-    /// on "Every site, all runs".
+    /// A site a recent look found no listing on is counted the same on both pages (they showed 3 not listed and 0): "No action needed", its line "Not listed".
     func testBothPagesCountASiteNotListedTheSameWay() throws {
         let m = AppModel(store: HouseholdStore(url: FileManager.default.temporaryDirectory.appendingPathComponent("ook-\(UUID()).sealed"), keys: FixedKey()),
                          defaults: UserDefaults(suiteName: "ook.test.\(UUID())")!)
@@ -449,7 +448,9 @@ final class BackgroundPassesAppTests: XCTestCase {
         let row = try XCTUnwrap(m.activityRows(for: p).first { $0.id == site.id })
         XCTAssertEqual(row.group, .noAction, "no action needed on the automatic page")
         XCTAssertTrue(row.line.hasPrefix("Not listed"), row.line)
-        XCTAssertEqual(m.allRunsRows(for: p).first { $0.id == site.id }?.group, .notListed, "not listed on the every-site page")
+        let all = try XCTUnwrap(m.allRunsRows(for: p).first { $0.id == site.id })
+        XCTAssertEqual(all.group, .noAction, "no action needed on the every-site page too")
+        XCTAssertTrue(all.line.hasPrefix("Not listed"), all.line)
     }
 
     func testTheFirstRunIsAFullPassAndASiteThatDoesNotGoThroughIsLeftWithThePerson() async throws {
