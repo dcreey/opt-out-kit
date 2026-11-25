@@ -12,25 +12,25 @@ test('a menu about a company (dnb.com: "Country / Territory of Registration of C
   const w = page('<div><span id=c>Select in Country / Territory of Registration of Company 1</span><input role=combobox id=co aria-labelledby=c></div>' +
     '<div><span id=r>Select in Resident of</span><input role=combobox id=res aria-labelledby=r></div>');
   const seen = clicks(w, ['co', 'res']);
-  assert.notEqual(run(w, 'custom-menus-open'), '');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '');
   assert.deepEqual(seen, ['res']);
-  assert.equal(run(w, 'custom-menus-open'), '', 'and the company menu is not opened after it');
+  assert.equal(call(w, 'custom-menus-open', ''), '', 'and the company menu is not opened after it');
 });
 
 test('an empty custom menu is opened once and marked; one that already shows a choice is not', () => {
   const w = page('<div><span>Relationship</span><div role=combobox id=m></div></div><div role=combobox id=set>Consumer</div>');
   const seen = clicks(w, ['m', 'set']);
-  assert.notEqual(run(w, 'custom-menus-open'), '', 'something was opened (the app only checks that the answer is not empty)');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '', 'something was opened (the app only checks that the answer is not empty)');
   assert.deepEqual(seen, ['m']);
   assert.equal(w.document.getElementById('m').getAttribute('data-ook-menu'), '1');
-  assert.equal(run(w, 'custom-menus-open'), '', 'not opened a second time');
+  assert.equal(call(w, 'custom-menus-open', ''), '', 'not opened a second time');
 });
 
 test('a script that focuses a box never lets the browser scroll to it (a person reading the page would be moved)', () => {
   const watch = (w) => { const calls = []; const f = w.HTMLElement.prototype.focus; w.HTMLElement.prototype.focus = function (o) { calls.push(o); return f.call(this, o); }; return calls; };
   const menu = page('<div><span>State</span><input role=combobox id=m></div>');
   const menuCalls = watch(menu);
-  assert.notEqual(run(menu, 'custom-menus-open'), '');
+  assert.notEqual(call(menu, 'custom-menus-open', ''), '');
   const rich = page('<form><div contenteditable="true" data-ook=m></div></form>');
   const richCalls = watch(rich);
   callJSON(rich, 'fill-live', JSON.stringify([{ name: 'm', candidates: ['Please delete my data.'], label: '' }]), 'false');
@@ -78,17 +78,17 @@ test('a home-made menu showing only "Choose state" over a hidden list is opened,
     '<li class="dropdown__option" data-label=Illinois id=il>Illinois</li></ul></div><div><span>Choose a colour</span></div>';
   const w = page(html);
   w.document.getElementById('l').addEventListener('click', () => { w.document.getElementById('p').style.display = 'block'; });
-  assert.notEqual(run(w, 'custom-menus-open'), '', 'the placeholder box was pressed');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '', 'the placeholder box was pressed');
   assert.equal(w.document.getElementById('p').style.display, 'block', 'the press reached the box (the innermost one, the placeholder, inside its label) and opened the list');
   assert.equal(w.document.querySelectorAll('[data-ook-menu]').length, 1, 'one box pressed and marked');
   const picked = clicks(w, ['il']);
   assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Illinois');
   assert.deepEqual(picked, ['il']);
-  assert.equal(run(w, 'custom-menus-open'), '', 'not pressed again; "Choose a colour" has no list of options beside it');
+  assert.equal(call(w, 'custom-menus-open', ''), '', 'not pressed again; "Choose a colour" has no list of options beside it');
   const chosen = page('<div><label>Illinois</label><ul style="display:none"><li>Alabama</li><li>Alaska</li><li>Illinois</li></ul></div>');
-  assert.equal(run(chosen, 'custom-menus-open'), '', 'a box already showing a choice is left alone');
+  assert.equal(call(chosen, 'custom-menus-open', ''), '', 'a box already showing a choice is left alone');
   const real = page('<select><option>Choose state</option><option>Alabama</option></select>');
-  assert.equal(run(real, 'custom-menus-open'), '', 'a real menu is not one of these');
+  assert.equal(call(real, 'custom-menus-open', ''), '', 'a real menu is not one of these');
 });
 
 test('saymine as it really is (360mediadirect.com): closed lists keep their size, hidden by visibility and opacity; State is opened and Illinois taken, never the closed Country list\'s "United States"', () => {
@@ -100,10 +100,45 @@ test('saymine as it really is (360mediadirect.com): closed lists keep their size
   const w = page(html, { webkitBoxes: true });
   w.document.getElementById('statel').addEventListener('click', () => { const p = w.document.getElementById('statep'); p.style.visibility = 'visible'; p.style.opacity = '1'; });
   const seen = clicks(w, ['country-UnitedStates', 'state-Illinois']);
-  assert.notEqual(run(w, 'custom-menus-open'), '', 'the State placeholder was pressed, though its closed options keep their size');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '', 'the State placeholder was pressed, though its closed options keep their size');
   assert.equal(w.document.getElementById('statep').style.visibility, 'visible', 'and its list opened');
   assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'Illinois');
   assert.deepEqual(seen, ['state-Illinois'], 'the hidden Country list\'s "United States" was never clicked');
+});
+
+test('a Country or State menu the page set to another place is opened and set to the person\'s (360mediadirect.com and blackbaud.com showed "Mexico" on the phone)', () => {
+  // saymine as on the phone: each menu in its own block with its title, a value already shown, the list closed (hidden by visibility and opacity).
+  const dd = (id, title, shown, items) => `<div class=mine-dropdown id=${id}><label class=dropdown__header>${title} *</label><div class=dropdown__wrapper>` +
+    `<input type=checkbox class=dropdown__checkbox id=dropdown-${id}><label class=dropdown__label for=dropdown-${id} id=${id}l><span class=dropdown__selected-value>${shown}</span></label>` +
+    `<ul class=dropdown__panel id=${id}p style="visibility:hidden;opacity:0">` + items.map((t) => `<li class=dropdown__option data-label="${t}" id="${id}-${t.replace(/ /g, '')}">${t}</li>`).join('') + '</ul></div></div>';
+  const html = '<form>' + dd('country', 'Country', 'Mexico', ['Canada', 'Mexico', 'United States']) + dd('state', 'State', 'Zacatecas', ['Jalisco', 'Zacatecas']) + '</form>';
+  const w = page(html, { webkitBoxes: true });
+  const openOn = (id) => w.document.getElementById(id + 'l').addEventListener('click', () => { const p = w.document.getElementById(id + 'p'); p.style.visibility = 'visible'; p.style.opacity = '1'; });
+  openOn('country'); openOn('state');
+  const seen = clicks(w, ['country-UnitedStates', 'country-Mexico']);
+  assert.notEqual(call(w, 'custom-menus-open', 'Illinois'), '', 'the Country menu showing Mexico was opened');
+  assert.equal(w.document.getElementById('countryp').style.visibility, 'visible');
+  assert.equal(call(w, 'custom-menus-pick', 'Illinois'), 'United States');
+  assert.deepEqual(seen, ['country-UnitedStates']);
+  // The page then shows the US: Country reads United States, State has the person's choices.
+  const ok = page('<form>' + dd('country', 'Country', 'United States', ['Canada', 'United States']) + dd('state', 'State', 'Illinois', ['Alabama', 'Illinois']) + '</form>', { webkitBoxes: true });
+  assert.equal(call(ok, 'custom-menus-open', 'Illinois'), '', 'a menu already showing the person\'s country and state is left alone');
+  // Without the person's state nothing is known to be wrong: only empty menus are opened, as before.
+  const none = page('<form>' + dd('country', 'Country', 'Mexico', ['Mexico', 'United States']) + '</form>', { webkitBoxes: true });
+  assert.equal(call(none, 'custom-menus-open', ''), '');
+  // A menu about a company keeps its place.
+  const company = page('<form><div class=x><label>Company country</label><div role=combobox id=cc>Mexico</div></div></form>');
+  assert.equal(call(company, 'custom-menus-open', 'Illinois'), '');
+});
+
+test('a type-to-search menu whose typing box is see-through until typed into is opened, also when it shows its prompt as a value (choreograph.com: react-select)', () => {
+  const sel = (id, shown) => `<div class=rs-container><div class="rs__control" id=${id}c><div class="rs__value-container"><div class="rs__single-value">${shown}</div>` +
+    `<input role=combobox id=${id} style="opacity:0" value=""></div></div></div>`;
+  const w = page('<main>' + sel('lang', 'English') + '<p>Please select your country of residence to continue.</p>' + sel('country', 'select your country of residence') + '</main>');
+  const seen = clicks(w, ['lang', 'country']);
+  assert.notEqual(call(w, 'custom-menus-open', 'Illinois'), '', 'the country menu was opened');
+  assert.deepEqual(seen, ['country'], 'not the language menu, which shows a real choice');
+  assert.equal(call(w, 'custom-menus-open', 'Illinois'), '', 'and nothing else is left to open');
 });
 
 test('"I am a": "Data subject making a request" is taken, never the authorized agent (dnb.com, eyeota.com, netwisedata.com: TrustArc)', () => {
@@ -127,11 +162,11 @@ test('a request-type menu takes deletion, then opting out; never access, correct
 
 test('a menu that did not open on the first press is pressed once more, and only once', () => {
   const w = page('<div><span>Type of Request</span><input role=combobox id=m></div>');
-  assert.notEqual(run(w, 'custom-menus-open'), '');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '');
   assert.equal(call(w, 'custom-menus-pick', ''), '', 'no options showed');
-  assert.notEqual(run(w, 'custom-menus-open'), '', 'pressed again');
+  assert.notEqual(call(w, 'custom-menus-open', ''), '', 'pressed again');
   assert.equal(call(w, 'custom-menus-pick', ''), '');
-  assert.equal(run(w, 'custom-menus-open'), '', 'not a third time');
+  assert.equal(call(w, 'custom-menus-open', ''), '', 'not a third time');
 });
 
 test('a state with regex characters in its name is matched as written', () => {
@@ -221,6 +256,19 @@ test('once the person has touched the page, a form with a required box still emp
   const stored = page('<form><input name=email value=a><input name=case required><button id=go>Send</button></form>');
   stored.__ookUserAt = Date.now();
   assert.equal(call(stored, 'press-submit', 'email'), 'invalid', 'the stored-plan press too');
+});
+
+test('a form marked novalidate checks itself, so it is pressed even with the browser\'s check failing (arrests.org: "myself" and "agent" both required, one ticked)', () => {
+  const html = '<form data-ook-form="f0" novalidate><label><input type=checkbox name=who required checked> I am submitting this request for myself.</label>' +
+    '<label><input type=checkbox name=who required> I am an authorized agent</label><input name=first value=Pat required><button type=submit id=go>Submit</button></form>';
+  const w = page(html);
+  w.__ookUserAt = Date.now();
+  const seen = clicks(w, ['go']);
+  assert.equal(call(w, 'press-live-submit', 'f0'), true);
+  assert.deepEqual(seen, ['go'], 'pressed');
+  const stored = page('<form novalidate><input name=email value=a><input name=case required><button id=go>Send</button></form>');
+  stored.__ookUserAt = Date.now();
+  assert.equal(call(stored, 'press-submit', 'email'), true, 'the stored-plan press too');
 });
 
 // ---- fill-fields.js and press-submit.js (the stored-plan path)

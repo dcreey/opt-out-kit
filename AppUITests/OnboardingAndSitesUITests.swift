@@ -269,30 +269,9 @@ final class DirectoryUITests: UITestCase {
     }
 }
 
-final class ExposureScanUITests: UITestCase {
-    /// As a user I want to check where I am listed: the app searches each site that can be checked for my name, and says which ones list me and which do not.
-    /// Three fixture brokers answer a name search (two list anyone named Pat, one lists nobody); nothing else is contacted.
-    func testScanSearchesEachSiteForMyNameAndSaysWhichListMe() throws {
-        let server = try FixtureBrokers.start()
-        let app = XCUIApplication()
-        // A complete made-up profile, so the check has someone to search for (typing a profile is tested in ProfileEditorUITests).
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
-        app.launch()
-
-        app.tab("Sites", 1).tap()
-        XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]), "the scan is low on the Sites tab")
-        app.buttons["scan-exposure"].tap()
-        app.buttons["start-scan"].tap()
-        let summary = app.staticTexts["scan-summary"]
-        XCTAssertTrue(summary.waitForExistence(timeout: 60))
-        XCTAssertEqual(summary.label, "Found a listing on 3 of 4 sites checked.", "three of the four fixture brokers list me")
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'listed-1.fixture.test'")).firstMatch.exists, "the site that lists me is shown")
-        let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "scan-results"; shot.lifetime = .keepAlways; add(shot)
-    }
-}
-
 final class QuickCheckUITests: UITestCase {
-    func testLookingAtASiteEarnsPoints() {
+    /// Quick checks keep what the person saw, without points (the points card was taken off on 2026-11-24).
+    func testLookingAtASiteIsSaved() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"]          // looking a site up needs a complete profile
         app.launch()
@@ -301,7 +280,7 @@ final class QuickCheckUITests: UITestCase {
         app.buttons["quick-checks"].tap()
         XCTAssertTrue(app.buttons["answer-clean"].waitForExistence(timeout: 5))
         app.buttons["answer-clean"].tap()
-        XCTAssertTrue(app.staticTexts["earned"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["5 pts"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["answer-saved"].waitForExistence(timeout: 3), "the answer was kept")
+        XCTAssertFalse(app.staticTexts["quick-points"].exists, "and no points are shown")
     }
 }

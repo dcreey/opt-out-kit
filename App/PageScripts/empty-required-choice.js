@@ -1,4 +1,5 @@
 (function(token){var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return '';
+  //#include bot-trap
   // The words naming a box: its label[for], else a wrapping label's own shown words.
   var own=function(e){var t=''; if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
     // A wrapping label's own words: its shown text (innerText: a label in a hidden bot trap shows none) without the options of a menu inside it.
@@ -7,7 +8,7 @@
     return t;};
   var label=function(e){return own(e).replace(/\s+/g,' ').replace(/\*|\(required\)/gi,'').trim().slice(0,60);};
   var els=[].slice.call(f.querySelectorAll('select,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]),textarea,[contenteditable=""],[contenteditable="true"]'));
-  for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0) continue;
+  for(var i=0;i<els.length;i++){var e=els[i], r=e.getBoundingClientRect(); if(r.width<=0||r.height<=0||botTrap(e)) continue;
     var req=e.required||e.getAttribute('aria-required')==='true'||/\*|\(required\)/i.test(own(e));
     if(!req) continue;
     var empty=e.tagName==='SELECT'?(!e.value||e.selectedIndex<=0&&!e.options[e.selectedIndex].value):!((('value' in e)?e.value:e.innerText)||'').trim();

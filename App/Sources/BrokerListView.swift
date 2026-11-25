@@ -50,8 +50,8 @@ struct BrokerListView: View {
                         if let platform {
                             // In California: DROP's one request first; it reaches every registered broker, and until it is made those sites are held.
                             NavigationLink(value: platform) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Label(Loc.f("Step 1: %@", platform.title), systemImage: "building.columns").font(.headline)
+                                IconRow(icon: "building.columns") {
+                                    Text(Loc.f("Step 1: %@", platform.title)).font(.headline)
                                     Text("One request reaches every registered data broker in California. Do it first: the automatic opt-out then leaves those sites to it.")
                                         .font(.footnote).foregroundStyle(.secondary)
                                 }
@@ -80,8 +80,8 @@ struct BrokerListView: View {
                         if model.autoBusy == nil && platform == nil {
                             Button { model.runAutomaticNow() } label: { Label("Start", systemImage: "play.fill") }.accessibilityIdentifier("first-pass-start")
                         }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Label(platform == nil ? Loc.t("Step 2: semi-automatic") : Loc.t("Step 3: semi-automatic"), systemImage: "hand.point.up.left").font(.headline).foregroundStyle(.secondary)
+                        IconRow(icon: "hand.point.up.left", tint: .secondary) {
+                            Text(platform == nil ? Loc.t("Step 2: semi-automatic") : Loc.t("Step 3: semi-automatic")).font(.headline).foregroundStyle(.secondary)
                             Text(platform == nil ? Loc.t("Opens when step 1 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send.")
                                                  : Loc.t("Opens when step 2 finishes. Then we know which sites need you for one step, like a check: we fill in each form, you clear the check and send."))
                                 .font(.footnote).foregroundStyle(.secondary)
@@ -94,8 +94,8 @@ struct BrokerListView: View {
                     Section {
                         // Tapping it opens the status of the run: what is done and what needs you.
                         NavigationLink { AutoActivityView() } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Label("Opting you out in the background", systemImage: "bolt.fill").font(.headline)
+                            IconRow(icon: "bolt.fill", spacing: 6) {
+                                Text("Opting you out in the background").font(.headline)
                                 if let p = model.autoProgress {
                                     ProgressView(value: Double(p.done), total: Double(max(p.total, 1)))
                                     Text("\(p.done) of \(p.total) sites. We will only ask you about the ones that need you.").font(.footnote).foregroundStyle(.secondary)
@@ -107,25 +107,15 @@ struct BrokerListView: View {
                 } else if model.autoOptOutStarted, let last = model.autoSettings.lastOptOut {
                     Section {
                         NavigationLink { AutoActivityView() } label: {
-                            if let tally = model.currentPeriodTally, tally.total > 0 {
-                                // This period's standing: how many went through, how many are left. Nothing left: the task is complete until the next period.
-                                let left = tally.total - tally.handled
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Label(left == 0 ? "Automatic opt-out: complete" : "Automatic opt-out", systemImage: left == 0 ? "checkmark.seal.fill" : "bolt.fill")
-                                        .font(.headline).foregroundStyle(left == 0 ? Color.green : Color.primary)
-                                    if left == 0 {
-                                        Text(Loc.f("All %lld sites went through this period.", tally.total)).font(.footnote).foregroundStyle(.secondary)
-                                        if let next = model.autoSettings.nextOptOutDate() { Text(Loc.f("Next run %@", Loc.date(next))).font(.caption).foregroundStyle(.secondary) }
-                                    } else {
-                                        ProgressView(value: Double(tally.handled), total: Double(tally.total))
-                                        Text(Loc.f("This period: %lld sent, %lld remaining", tally.handled, left)).font(.footnote).foregroundStyle(.secondary)
-                                    }
-                                }
-                            } else {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Label("Automatic opt-out", systemImage: "bolt.fill").font(.headline)
-                                    Text(Loc.f("Last run %@: %lld sent.", Loc.date(last, time: false), model.autoSettings.lastSent ?? 0)).font(.footnote).foregroundStyle(.secondary)
-                                }
+                            // The automatic page's own numbers, in short (decided 2026-11-24): what is done and what moved to the person, then the next run.
+                            // Complete when nothing is left for a run. The lines start under the title's words, not under its symbol (docs/UX.md, "Alignment").
+                            let counts = model.activityCounts
+                            let complete = counts.map { ($0[.notTried] ?? 0) == 0 } ?? false
+                            IconRow(icon: complete ? "checkmark.seal.fill" : "bolt.fill", tint: complete ? .green : .accentColor) {
+                                Text(complete ? "Automatic opt-out: complete" : "Automatic opt-out").font(.headline).foregroundStyle(complete ? Color.green : Color.primary)
+                                if let counts { Text(AppModel.activityCountsLine(counts)).font(.footnote).foregroundStyle(.secondary) }
+                                if let next = model.autoSettings.nextOptOutDate() { Text(Loc.f("Next run %@", Loc.date(next))).font(.footnote).foregroundStyle(.secondary) }
+                                else if counts == nil { Text(Loc.f("Last run %@", Loc.date(last))).font(.footnote).foregroundStyle(.secondary) }
                             }
                         }
                         .accessibilityIdentifier("home-auto-status")
@@ -157,8 +147,8 @@ struct BrokerListView: View {
                 if !model.gpcSetupDone {
                     Section {
                         NavigationLink { GPCSetupView() } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Label("Turn on Global Privacy Control", systemImage: "hand.raised.square").font(.headline)
+                            IconRow(icon: "hand.raised.square") {
+                                Text("Turn on Global Privacy Control").font(.headline)
                                 Text("One setting in your browser, about 5 minutes. It tells every site you visit not to sell or share your data.").font(.footnote).foregroundStyle(.secondary)
                             }
                         }.accessibilityIdentifier("gpc-setup-task")

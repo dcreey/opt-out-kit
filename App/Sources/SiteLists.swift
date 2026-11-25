@@ -6,14 +6,12 @@ struct SiteRowView: View {
     let row: SiteRow
 
     var body: some View {
-        HStack(alignment: .top) {
-            Image(systemName: symbol).foregroundStyle(color).padding(.top, 2)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(row.domain).font(.headline)
-                Text(detail).font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer()
+        // The shared row, so the site's name starts where the words of the page's other rows do (docs/UX.md, "Alignment").
+        IconRow(icon: symbol, tint: color, spacing: 2) {
+            Text(row.domain).font(.headline)
+            Text(detail).font(.caption).foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
 

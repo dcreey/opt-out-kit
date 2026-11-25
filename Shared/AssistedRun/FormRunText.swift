@@ -92,6 +92,11 @@ enum FormRun {
     }
 
     /// A page that says it is still working on the request ("Processing your request", "Please wait", "Do not close this page"): sent, but not confirmed.
+    /// The page's send button now reads "Submitting…" or "Sending…" (cashmereai.com): the press went through and the site has not answered yet.
+    nonisolated static func saysSending(_ text: String) -> Bool {
+        text.split(whereSeparator: \.isNewline).contains { $0.range(of: "^\\s*(submitting|sending)(\\.{3}|…)?\\s*$", options: [.regularExpression, .caseInsensitive]) != nil }
+    }
+
     nonisolated static func saysStillWorking(_ text: String) -> Bool {
         text.range(of: "processing your (request|submission)|being processed|please wait|do not (close|leave|refresh) (this|the) (page|window)|still (working|processing)", options: [.regularExpression, .caseInsensitive]) != nil
             && !looksFinished(text)

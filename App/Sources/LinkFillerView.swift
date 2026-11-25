@@ -120,7 +120,8 @@ struct LinkFillerView: View {
             }
             .navigationTitle("Email links")
             .toolbarColorScheme(filler.webView != nil ? .dark : nil, for: .navigationBar)          // the guide above the page is black: the title stays readable on it
-            .navigationBarTitleDisplayMode(.inline)
+            // The large title at the left, as on Queue, Sites and Settings (it was small and centred, decided 2026-11-24); small while a page is open under the guide.
+            .navigationBarTitleDisplayMode(filler.webView != nil ? .inline : .large)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { showTour = true } label: { Image(systemName: "questionmark.circle") }.accessibilityLabel("How this works") } }
         }
         .overlay { if filler.busy, filler.webView == nil { LoadingMark(title: Loc.t("Loading the page…"), cancel: { filler.cancelLoading(); returnToChooser() }).transition(.opacity) } }

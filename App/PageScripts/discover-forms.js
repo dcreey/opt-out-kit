@@ -1,4 +1,5 @@
 (function(){
+  //#include bot-trap
   var vis=function(e){var r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!(r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none')) return false;if(r.right<=0||r.left>=window.innerWidth+2000) return false;for(var a=e.parentElement,n=0;a&&n<8;a=a.parentElement,n++){var as=getComputedStyle(a);if(as.overflow!=='visible'&&a.getBoundingClientRect().height<=0) return false;}return true;};
   var label=function(e){var t='';
     if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
@@ -34,14 +35,15 @@
       if(['hidden','submit','button','image','reset'].indexOf(type)>=0||nestedCE(e)||(type==='textarea'&&e.tagName!=='TEXTAREA'&&!vis(e))) return;
       var token=ftoken+'-'+j; e.setAttribute('data-ook',token);
       var l=label(e);
-      fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e),disabled:!!e.disabled});});
+      // A bot trap (`bot-trap`: hidden from assistive tech, or out of the tab order in a box one pixel tall) shows to no person: not visible, so it is not filled.
+      fields.push({token:token,name:e.name||e.id||'',type:type,label:l,required:!!e.required||/\*/.test(l),visible:vis(e)&&!botTrap(e),disabled:!!e.disabled});});
     var buttons=[]; f.querySelectorAll('button,input[type=submit],input[type=button],[role=button]').forEach(function(b){
       if(vis(b)) buttons.push(((b.innerText||b.value||'')+'').trim().slice(0,60));});
     out.push({token:ftoken,action:f.getAttribute('action')||'',method:f.method||'get',visible:vis(f),fields:fields,buttons:buttons,
               text:(f.innerText||'').replace(/\s+/g,' ').trim().slice(0,240),ctx:(ctxEl(f).innerText||'').replace(/\s+/g,' ').trim().slice(0,600),head:headOf(f)});});
   // Single-page request portals put their inputs on the page without a <form>. Treat the loose inputs as one form.
   var loose=[].slice.call(document.querySelectorAll('input,select,textarea'+ceSel)).filter(function(e){
-    return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e)&&!nestedCE(e);});
+    return !e.closest('form')&&['hidden','submit','button','image','reset','search'].indexOf(e.type)<0&&vis(e)&&!nestedCE(e)&&!botTrap(e);});
   // A rich-text box alone is no form (a comment box); it joins the loose boxes only beside real inputs.
   if(!loose.some(function(e){return e.tagName==='INPUT'||e.tagName==='SELECT'||e.tagName==='TEXTAREA';})) loose=[];
   if(loose.length>=1&&document.body){

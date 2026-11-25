@@ -60,7 +60,8 @@ function install(window, { webkitBoxes = false } = {}) {
     // A frame is 300 x 150 unless told otherwise, as in a browser (the scripts ignore frames under 40 pixels: tracking pixels, the badge).
     const st = this.style || {};
     const w = this.tagName === 'IFRAME' ? (parseFloat(st.width) || +this.getAttribute('width') || 300) : 200;
-    const h = this.tagName === 'IFRAME' ? (parseFloat(st.height) || +this.getAttribute('height') || 150) : 30;
+    // A height written in pixels is kept (a bot trap's 1-pixel box); anything else is 30, a line of a form.
+    const h = this.tagName === 'IFRAME' ? (parseFloat(st.height) || +this.getAttribute('height') || 150) : (/^\d+(\.\d+)?px$/.test(st.height || '') ? parseFloat(st.height) : 30);
     return { x: o.x, y: o.y, top: o.y, left: o.x, right: o.x + w, bottom: o.y + h, width: w, height: h };
   };
   Object.defineProperty(window.HTMLElement.prototype, 'offsetParent', { configurable: true, get() { return hidden(this) ? null : (this.parentElement || doc.body); } });

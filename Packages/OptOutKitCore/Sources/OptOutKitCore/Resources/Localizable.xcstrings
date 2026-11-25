@@ -2899,29 +2899,6 @@
     }
    }
   },
-  "Covering Tracks": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sur la piste"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Borrando huellas"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Spuren verwischen"
-     }
-    }
-   }
-  },
   "Credit and financial accounts": {
    "extractionState": "manual",
    "localizations": {
@@ -3612,29 +3589,6 @@
     }
    }
   },
-  "Exposed": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Exposé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Expuesto"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Exponiert"
-     }
-    }
-   }
-  },
   "Family-history sites that draw on public records, censuses and other databases to build family trees, sometimes including living people.": {
    "extractionState": "manual",
    "localizations": {
@@ -4068,29 +4022,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Georgia"
-     }
-    }
-   }
-  },
-  "Ghost": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fantôme"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fantasma"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Geist"
      }
     }
    }
@@ -5222,29 +5153,6 @@
     }
    }
   },
-  "Low Profile": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Profil bas"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Perfil bajo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Unauffällig"
-     }
-    }
-   }
-  },
   "Lower priority": {
    "extractionState": "manual",
    "localizations": {
@@ -6299,29 +6207,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Noch nicht verstanden"
-     }
-    }
-   }
-  },
-  "Off the Grid": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Hors réseau"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fuera de la red"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Unsichtbar"
      }
     }
    }

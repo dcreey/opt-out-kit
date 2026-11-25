@@ -111,7 +111,7 @@ The aim is completion. Most people quit after the first few sites, and brokers r
 | Family combos | PeopleConnect clears four brands in one run, so the app shows "4 sites cleared" | Rewards the high-leverage opt-outs first |
 | Boss brokers | Tier C flows with a phone call or ID step get a bigger reward and extra coaching | Makes the dreaded steps the best ones |
 | Quarterly streak | Keeps a streak alive by completing the re-check round | Targets the real failure, which is re-listing |
-| Verified points | Points are paid when a re-check finds you gone, not when you tap "Done" | A skipped step can't be gamed, since "Done" is on trust |
+| Verified points | Points are paid when a re-check finds you gone, not when you tap "Done" | A skipped step can't be gamed, since "Done" is on trust. (Taken off on 2026-11-24: the points card did not work well; docs/UX.md, "The Sites tab".) |
 | Next-best step | One button opens the next broker in priority order | Cuts the decision cost |
 
 **Rules that protect the privacy goal**

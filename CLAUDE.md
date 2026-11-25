@@ -4,6 +4,11 @@
 
 Read `docs/PRINCIPLES.md`. Never add a server, account, analytics, telemetry, paywall or anything that sends a person's data anywhere but the broker; if a task seems to need one, stop and ask.
 
+## Layout
+
+Text lines up on every page: the words of every row start at the same place, lines under a row's title start under its words (not its symbol), and text
+sharing a row is aligned on one line. Use `IconRow` and `CountTile`; see `docs/UX.md`, "Alignment".
+
 ## Keep the docs current
 
 Every change to behavior updates the docs in the same piece of work, before it is committed:

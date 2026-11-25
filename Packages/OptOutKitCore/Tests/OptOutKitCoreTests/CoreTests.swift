@@ -821,41 +821,8 @@ final class BrowserSpecTests: XCTestCase {
     }
 }
 
-final class ScoringTests: XCTestCase {
+final class SelfCheckTests: XCTestCase {
     private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
-
-    func testPointsAreForLookingNotForTappingDone() {
-        var p = OptOutKitCore.Progress()
-        XCTAssertEqual(Score.compute(p, brokers: []).points, 0)
-        p.recordSiteCheck(.removed, site: "a", source: .selfReported, on: t0)
-        p.recordSiteCheck(.stillListed, site: "b", source: .selfReported, on: t0)
-        p.recordSiteCheck(.removed, site: "c", source: .automatic, on: t0)
-        p.recordSiteCheck(.inconclusive, site: "d", source: .automatic, on: t0)
-        XCTAssertEqual(Score.compute(p, brokers: []).points, 5 + 3 + 2)
-    }
-
-    func testOnlyTheLatestLookAtASiteCounts() {
-        var p = OptOutKitCore.Progress()
-        p.recordSiteCheck(.removed, site: "a", source: .selfReported, on: t0)
-        p.recordSiteCheck(.stillListed, site: "a", source: .selfReported, on: t0 + 86_400)
-        XCTAssertEqual(Score.compute(p, brokers: []).points, 3, "a re-listing replaces the old clean look; no double counting")
-    }
-
-    func testVerifiedOptOutsEarnTenAndLevelsAdvance() {
-        let b = Broker(id: "b", name: "B", tier: .A, covers: nil, signals: nil, fields: nil,
-                       steps: [Step(say: "x")], recheckDays: 30, verified: nil, processingDays: 3)
-        var p = OptOutKitCore.Progress()
-        p.complete(b, step: 0, now: t0)
-        XCTAssertEqual(Score.compute(p, brokers: [b]).points, 0, "submitted is not verified")
-        p.record(.removed, for: "b", on: t0 + 4 * 86_400)
-        p.record(.removed, for: "b", on: t0 + 6 * 86_400)
-        let s = Score.compute(p, brokers: [b])
-        XCTAssertEqual(s.points, 10)
-        XCTAssertEqual(s.level.name, "Exposed")
-        XCTAssertEqual(s.nextLevelAt, 25)
-        for i in 0..<5 { p.recordSiteCheck(.removed, site: "s\(i)", source: .selfReported, on: t0) }
-        XCTAssertEqual(Score.compute(p, brokers: [b]).level.name, "Covering Tracks")
-    }
 
     func testOldSavedRecordsWithoutASourceStillDecode() throws {
         let json = Data(#"{"date": 0, "result": "removed"}"#.utf8)
@@ -1065,10 +1032,9 @@ final class SafetyFlagTests: XCTestCase {
 final class PaywallAnswerTests: XCTestCase {
     private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
 
-    func testBlockedByPaymentEarnsPointsButIsNeverAVerdict() {
+    func testBlockedByPaymentIsALookButNeverAVerdict() {
         var p = OptOutKitCore.Progress()
         p.recordSiteCheck(.paywalled, site: "a", source: .selfReported, on: t0)
-        XCTAssertEqual(Score.compute(p, brokers: []).points, 2)
         XCTAssertFalse(CheckResult.paywalled.isConclusive)
         XCTAssertNotNil(p.latestSiteCheck("a"), "it counts as a look, so the site is not asked about again soon")
     }

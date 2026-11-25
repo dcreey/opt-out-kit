@@ -434,7 +434,7 @@ extension WebViewSession {
         var set = 0
         // Every empty menu on the form is set, however many there are: the loop ends when none is left (the bound only guards against a page that keeps adding menus).
         for _ in 0..<60 {
-            let open = PageScript.source("custom-menus-open")
+            let open = PageScript.call("custom-menus-open", state ?? "")
             guard let label = (await evalLive(open)) as? String, !label.isEmpty else { break }
             try? await Task.sleep(nanoseconds: 700_000_000)
             let pick = PageScript.call("custom-menus-pick", state ?? "")

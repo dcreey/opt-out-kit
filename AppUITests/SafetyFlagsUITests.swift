@@ -58,6 +58,6 @@ final class SafetyFlagsUITests: UITestCase {
         again.launch()
         again.tab("Sites", 1).tap()
         XCTAssertTrue(again.scrollUntilExists(again.staticTexts["search-blocked"]), "searching is off, with the reason")      // low on the Sites tab
-        XCTAssertFalse(again.buttons["scan-exposure"].isEnabled)
+        XCTAssertFalse(again.buttons["quick-checks"].isEnabled)
     }
 }

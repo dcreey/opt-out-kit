@@ -117,3 +117,15 @@ test('the heading before a form and the text around it are kept, so the picker c
   assert.equal(out[1].head, 'Newsletter');
   assert.match(out[0].text, /Send/);
 });
+
+test('the arrests.org bot traps (random words for a label, out of the tab order, a box one pixel tall, hidden from assistive tech) are not visible boxes', () => {
+  const { out } = forms(`<form><label for=n>First</label><input id=n name=first required>
+    <div style="height:1px"><label for=t1>Privacy Address</label><input id=t1 name="wpforms[fields][1]" tabindex="-1"></div>
+    <div aria-hidden="true"><label for=t2>Request: Authorization: of</label><input id=t2 name="wpforms[fields][8]"></div>
+    <div><label for=ok>Additional details</label><input id=ok name=details tabindex="-1"></div></form>`);
+  const f = out[0];
+  assert.equal(field(f, 'first').visible, true);
+  assert.equal(field(f, 'wpforms[fields][1]').visible, false, 'out of the tab order in a one-pixel box');
+  assert.equal(field(f, 'wpforms[fields][8]').visible, false, 'hidden from assistive tech');
+  assert.equal(field(f, 'details').visible, true, 'out of the tab order alone is not a trap: a box of normal size shows');
+});

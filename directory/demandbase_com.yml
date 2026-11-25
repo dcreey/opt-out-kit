@@ -23,10 +23,10 @@ persistence:
   result: 'unknown'
   reup_months: 12
 live_form:
-  checked: '2026-10-25'
+  checked: '2026-11-24'
   found: true
-  page: 'https://demandbase.privacyportal.co/'
-  blockers: ['check:a bot check']
+  page: 'https://www.demandbase.com/privacy-center.html?ketch_preferences_tab=rightsTab'
+  blockers: ['check: a reCAPTCHA checkbox']
 regions:
   list: ['US', 'EU', 'UK']
   evidence: 'listed on the IAB Europe TCF vendor list as Demandbase, Inc.; on the UK ICO register of fee payers as Demandbase Limited (ref ZB321215)'

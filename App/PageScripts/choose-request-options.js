@@ -1,6 +1,7 @@
 (function(token,ownerMayConfirm){
   var f=document.querySelector('[data-ook-form="'+token+'"]'); if(!f) return JSON.stringify({chosen:0,unresolved:[]});
   //#include ownership
+  //#include bot-trap
   var label=function(e){var t='';
     if(e.id){var l=document.querySelector('label[for="'+e.id+'"]'); if(l) t=l.innerText;}
     if(!t){var p=e.closest('label'); if(p) t=p.innerText;}
@@ -25,8 +26,9 @@
   var gi=0, keyOf=function(r){if(r.name) return 'n:'+r.name; var p=r.parentElement;
     while(p&&p!==f&&p.querySelectorAll('input[type=radio]').length<2) p=p.parentElement;
     if(!p) return 'g'+(gi++); if(!p.getAttribute('data-ook-rg')) p.setAttribute('data-ook-rg',String(gi++)); return 'c:'+p.getAttribute('data-ook-rg');};
-  f.querySelectorAll('input[type=radio]').forEach(function(r){var k=keyOf(r); (groups[k]=groups[k]||[]).push(r);});
-  var agentQ=/authori[sz]ed agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
+  f.querySelectorAll('input[type=radio]').forEach(function(r){if(botTrap(r)) return; var k=keyOf(r); (groups[k]=groups[k]||[]).push(r);});
+  // A question named only in code ("authorizedAgent", astoriacompany.com's No / Yes) is the same question.
+  var agentQ=/authori[sz]ed[ _-]?agent|on behalf|acting as (an )?agency|submitting (this )?request (on|for)|are you (an? )?(agent|agency)/i;
   // "Are you submitting this request for yourself?" is the opposite question: Yes is the person's answer.
   var selfQ=/for (yourself|myself)|request for (yourself|yourself or)|are you (the )?(person|individual|consumer) (whose|this)/i;
   var removal=/\b(remov|delet|eras)\w*\b.{0,12}\b(my|me)\b.{0,12}\b(info|information|record|records|listing|profile|data)\b/i;
@@ -54,11 +56,11 @@
     if(pick){markAuto(pick); pick.click(); if(!pick.checked){pick.checked=true; pick.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}
     else if(rs.some(function(r){return r.required;})) unresolved.push(label(rs[0])||k);});
   f.querySelectorAll('input[type=checkbox]').forEach(function(c){var t=label(c);
-    if(c.checked||!t||touched(c)||autoDone(c)) return;
+    if(c.checked||!t||touched(c)||autoDone(c)||botTrap(c)) return;
     // "I am submitting this request for myself" (next to "...on behalf of someone else"): the person is asking for themselves.
     if(/\b(for )?myself\b|\bfor me\b|\bmy own\b/i.test(t)&&!notSelf.test(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++; return;}
     if(yesOrOptOut(t)||isDecl(t)){markAuto(c); c.click(); if(!c.checked){c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));} chosen++;}});
-  f.querySelectorAll('select').forEach(function(s){
+  f.querySelectorAll('select').forEach(function(s){if(botTrap(s)) return;
     var lf=s.id?document.querySelector('label[for="'+s.id+'"]'):null;
     var l=((s.name||'')+' '+(s.getAttribute('aria-label')||'')+' '+(lf?lf.innerText:'')).toLowerCase();
     var near=(s.closest('div')?s.closest('div').innerText:'').toLowerCase().slice(0,120);

@@ -127,6 +127,18 @@ final class AutoProtectionTests: XCTestCase {
         if m.autoSettings.nextOptOutDate() != nil { XCTAssertTrue(line.contains(" · Next run "), line) }
     }
 
+    /// The Queue tab's card says the automatic page's numbers in short: done (sent, handled previously, no action needed), moved to semi-automatic, and still
+    /// to do while any is left (it said "All 34 sites went through this period", counting only the plan's automatic sites; 2026-11-24).
+    func testTheQueueCardSaysThePagesNumbers() throws {
+        XCTAssertEqual(AppModel.activityCountsLine([.sent: 3, .earlier: 303, .noAction: 2, .needsYou: 195]), "308 done · 195 moved to semi-automatic")
+        XCTAssertEqual(AppModel.activityCountsLine([.sent: 1, .notTried: 9]), "1 done · 9 still to do")
+        let m = model()
+        let me = try withProfile(m)
+        m.noteActivity(m.activityRows(for: me))
+        let counts = try XCTUnwrap(m.activityCounts)
+        XCTAssertEqual(counts.values.reduce(0, +), m.activityRows(for: me).count, "the same sites as the page")
+    }
+
     /// A new run starts the page afresh; a run that is stopped and carried on, or a Re-test all of a pass under way, is the same run.
     func testANewRunStartsThePageAfreshAndACarriedOnRunDoesNot() {
         var s = AutoSettings()

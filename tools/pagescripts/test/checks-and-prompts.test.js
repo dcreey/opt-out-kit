@@ -20,6 +20,13 @@ test('a page that asks the person to prove they are human is a check, named for 
   assert.equal(run(page('<iframe src="https://newassets.hcaptcha.com/captcha/v1/x"></iframe>'), 'visible-challenge'), 'an hCaptcha');
 });
 
+test('a picture code to type beside its box is a check (OneTrust webforms, blackbaud.com); a typed answer, or a box with no picture, is not', () => {
+  const form = (value, pic) => page(`<form><div class=captcha><div>${pic ? '<img src="data:image/png;base64,AA" alt="">' : ''}<input type=text id=captchaCode placeholder="Captcha" value="${value}"></div></div></form>`);
+  assert.equal(run(form('', true), 'visible-challenge'), 'a captcha code to type');
+  assert.equal(run(form('X7K2P', true), 'visible-challenge'), null, 'the person typed it');
+  assert.equal(run(form('', false), 'visible-challenge'), null, 'no picture beside it');
+});
+
 test('a reCAPTCHA that refused the send is reported, so only the person\'s own press can get past it', () => {
   assert.equal(run(page('<p>The reCAPTCHA could not be verified. Please try again.</p>'), 'visible-challenge'), 'a reCAPTCHA that rejected the automatic send');
 });

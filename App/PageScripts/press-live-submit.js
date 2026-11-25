@@ -11,8 +11,10 @@
   if(!pick&&bs.length) pick=bs[bs.length-1];
   if(pick&&refuse(pick)) return false;
   // Once the person has touched the page, a form with a required box still empty is not pressed: the browser would only scroll to that box (moving the
-  // page under their finger) and send nothing. The app says a required box is still empty instead.
-  if(window.__ookUserAt&&f.tagName==='FORM'&&f.checkValidity&&!f.checkValidity()) return 'invalid';
+  // page under their finger) and send nothing. The app says a required box is still empty instead. Only a form the browser checks: one marked novalidate
+  // checks itself and the browser neither stops nor scrolls (the arrests.org portals mark both "myself" and "agent" boxes required, one ticked is enough,
+  // and the browser's own check, failing on the other, held every one of them back as "a required box is still empty").
+  if(window.__ookUserAt&&f.tagName==='FORM'&&!f.noValidate&&f.checkValidity&&!f.checkValidity()) return 'invalid';
   if(pick){window.__ookUserAt||pick.scrollIntoView({block:'center'}); pick.click(); return true;}
   if([].slice.call(f.querySelectorAll('button,input[type=submit],[role=button]')).some(refuse)) return false;
   if(f.requestSubmit){f.requestSubmit(); return true;} f.submit(); return true;})

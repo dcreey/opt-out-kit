@@ -28,7 +28,6 @@ extension StatusSummary {
 /// field opens the search screen, which lists every site with its filters.
 struct SitesView: View {
     @EnvironmentObject var model: AppModel
-    @State private var showScan = false
     @State private var showQuick = false
     /// Everything on this tab pushes by value (the search screen, then a site's task from it): mixing a pushed-by-flag screen with
     /// value links made a tapped site's page fail to open.
@@ -80,28 +79,20 @@ struct SitesView: View {
                         Text("These sites do not answer any more, so there is nothing to opt out of. We keep the proof we collected.")
                     }
                 }
+                // The points card ("Exposed", a level and points) and "Scan for … listings" were taken off (decided 2026-11-24): they did not work well;
+                // an automatic scan belongs with the automatic run (future work). Quick checks stay, without points.
                 Section {
-                    scoreCard
                     Button { model.requireProfile { showQuick = true } } label: {
                         Label("Quick checks (\(model.quickCheckQueue.count) sites)", systemImage: "bolt.fill")
                     }
                     .disabled(model.searchBlockedReason != nil)
                     .accessibilityIdentifier("quick-checks")
-                } footer: {
-                    Text("Look a site up yourself in 20 seconds and mark what you see. Each look earns points.")
-                }
-                Section {
-                    Button { model.requireProfile { showScan = true } } label: {
-                        Label("Scan for \(model.selectedPerson?.displayName ?? "my") listings", systemImage: "dot.radiowaves.left.and.right")
-                    }
-                    .disabled(model.searchBlockedReason != nil)
-                    .accessibilityIdentifier("scan-exposure")
                     if let reason = model.searchBlockedReason {
                         Label(reason, systemImage: "hand.raised").font(.footnote).foregroundStyle(.orange)
                             .accessibilityIdentifier("search-blocked")
                     }
                 } footer: {
-                    Text("Searches \(ExposureScan.scannable(model.directory).count) sites that can be checked automatically. Nothing is submitted.")
+                    Text("Look a site up yourself in 20 seconds and mark what you see.")
                 }
             }
             .accessibilityIdentifier("sites-list")
@@ -116,26 +107,7 @@ struct SitesView: View {
             .navigationDestination(for: SiteSearchRoute.self) { _ in SiteSearchView(state: search) }
             .planDestinations()
             .coach(.sites)
-            .sheet(isPresented: $showScan) { ExposureView() }
             .sheet(isPresented: $showQuick) { QuickCheckView() }
-        }
-    }
-
-    private var scoreCard: some View {
-        let score = model.score
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(score.level.name).font(.headline)
-                Spacer()
-                Text("\(score.points) pts").font(.headline).foregroundStyle(.tint)
-                    .accessibilityIdentifier("score-points")
-            }
-            if let next = score.nextLevelAt {
-                ProgressView(value: Double(score.points - score.level.from), total: Double(next - score.level.from))
-                Text("\(next - score.points) points to the next level").font(.caption).foregroundStyle(.secondary)
-            } else {
-                Text("Top level").font(.caption).foregroundStyle(.secondary)
-            }
         }
     }
 
@@ -168,9 +140,7 @@ struct SitesView: View {
 
     private func row(_ broker: Broker) -> some View {
         let summary = model.household.summary(for: broker)
-        return HStack(alignment: .top) {
-            Image(systemName: summary.symbol).foregroundStyle(summary.color).padding(.top, 2)
-            VStack(alignment: .leading, spacing: 2) {
+        return IconRow(icon: summary.symbol, tint: summary.color, spacing: 2) {
                 Text(broker.name).font(.headline)
                 Text(summary.label).font(.caption).foregroundStyle(summary.color)
                 if let covers = broker.covers, !covers.isEmpty {
@@ -179,9 +149,8 @@ struct SitesView: View {
                 if let e = Directory.entry(for: broker, in: model.directory), let note = platformNote(for: e) {
                     Text(note).font(.caption).foregroundStyle(.teal)
                 }
-            }
-            Spacer()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -729,126 +698,21 @@ struct DirectoryInfoView: View {
 
 
 /// "Where am I listed?": runs the scan for the selected person and groups what it found.
-struct ExposureView: View {
-    @EnvironmentObject var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var confirmed = false
-
-    var body: some View {
-        NavigationStack {
-            List {
-                if let person = model.selectedPerson {
-                    let results = model.exposure[person.id]
-                    if let progress = model.scanProgress {
-                        Section {
-                            ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
-                            Text("Checked \(progress.done) of \(progress.total) sites").font(.footnote)
-                        }
-                    } else if let results = results.map(rolledUp) {
-                        summary(results)
-                        group("Listed", .stillListed, results, color: .red)
-                        group(Loc.t("Not found"), .removed, results, color: .green)
-                        group(Loc.t("Could not tell"), .inconclusive, results, color: .orange)
-                    } else {
-                        Section {
-                            Text("This searches each site for \(person.displayName) the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.")
-                            Button("Scan \(ExposureScan.scannable(model.directory).count) sites", systemImage: "play.fill") {
-                                Task { await model.scanExposure(for: person) }
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .accessibilityIdentifier("start-scan")
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Where you're listed")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-        }
-    }
-
-    /// One row per site as the person knows it: a hand-written flow and the sites it clears (Spokeo and FreePeopleDirectory) are
-    /// one row, listed if any of them is.
-    private func rolledUp(_ results: [ScanResult]) -> [ScanResult] {
-        var out: [ScanResult] = []
-        var index: [String: Int] = [:]
-        let rank: [CheckResult: Int] = [.stillListed: 0, .inconclusive: 1, .removed: 2]
-        for r in results {
-            let key = Directory.owner(of: r.entry, brokers: model.brokers)?.id ?? r.entry.id
-            if let i = index[key] {
-                if rank[r.outcome.result, default: 3] < rank[out[i].outcome.result, default: 3] { out[i] = r }
-            } else { index[key] = out.count; out.append(r) }
-        }
-        return out
-    }
-
-    private func summary(_ results: [ScanResult]) -> some View {
-        let listed = results.filter { $0.outcome.result == .stillListed }.count
-        return Section {
-            Text("Found a listing on \(listed) of \(results.count) sites checked.").font(.headline)
-                .accessibilityIdentifier("scan-summary")
-        }
-    }
-
-    @ViewBuilder
-    private func group(_ title: String, _ result: CheckResult, _ all: [ScanResult], color: Color) -> some View {
-        let rows = all.filter { $0.outcome.result == result }
-        if !rows.isEmpty {
-            Section("\(title) (\(rows.count))") {
-                ForEach(rows) { r in
-                    NavigationLink {
-                        if let owner = Directory.owner(of: r.entry, brokers: model.brokers) { BrokerInfoView(broker: owner) }
-                        else { DirectoryInfoView(entry: r.entry) }
-                    } label: {
-                        VStack(alignment: .leading) {
-                            Text(Directory.owner(of: r.entry, brokers: model.brokers)?.name ?? r.entry.domain)
-                            if result == .inconclusive {
-                                Text(reason(r.outcome.reason)).font(.caption).foregroundStyle(color)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func reason(_ r: InconclusiveReason?) -> String {
-        switch r {
-        case .blocked: return Loc.t("The site blocked the check")
-        case .unrecognizedPage: return Loc.t("The page looked different than expected")
-        case .network: return Loc.t("No connection")
-        case .missingProfileData: return Loc.t("Add a full name (and city) to this profile")
-        case .needsBrowser: return Loc.t("Needs a browser check")
-        case .termsGate: return Loc.t("Behind terms you must accept yourself")
-        default: return Loc.t("Could not tell")
-        }
-    }
-}
-
-
-/// One site at a time: open its search, look for yourself, tell us. Points come from looking, not from the answer.
 struct QuickCheckView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @State private var skipped = Set<String>()
     @State private var browserURL: URL?
-    @State private var lastEarned: Int?
+    /// The site just answered, said under the next one so the person sees the answer was kept.
+    @State private var lastSaved: String?
 
     private var current: DirectoryEntry? { model.quickCheckQueue.first { !skipped.contains($0.id) } }
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack {
-                        Text(model.score.level.name).font(.headline)
-                        Spacer()
-                        Text("\(model.score.points) pts").bold().accessibilityIdentifier("quick-points")
-                    }
-                    if let lastEarned {
-                        Label("+\(lastEarned) points", systemImage: "sparkles").foregroundStyle(.green)
-                            .accessibilityIdentifier("earned")
-                    }
+                if let lastSaved {
+                    Section { Label(Loc.f("Saved what you saw on %@", lastSaved), systemImage: "checkmark").foregroundStyle(.green).accessibilityIdentifier("answer-saved") }
                 }
                 if let site = current, let person = model.selectedPerson {
                     Section {
@@ -858,10 +722,10 @@ struct QuickCheckView: View {
                             .buttonStyle(.bordered)
                     }
                     Section("What did you see?") {
-                        answer(Loc.t("I'm listed here"), .stillListed, +3, site, "exclamationmark.triangle", .red)
-                        answer(Loc.t("Not found"), .removed, +5, site, "checkmark.circle", .green)
-                        answer(Loc.t("Blocked by payment"), .paywalled, +2, site, "creditcard", .orange)
-                        Button("Skip this one") { skipped.insert(site.id); lastEarned = nil }
+                        answer(Loc.t("I'm listed here"), .stillListed, site, "exclamationmark.triangle", .red)
+                        answer(Loc.t("Not found"), .removed, site, "checkmark.circle", .green)
+                        answer(Loc.t("Blocked by payment"), .paywalled, site, "creditcard", .orange)
+                        Button("Skip this one") { skipped.insert(site.id); lastSaved = nil }
                             .accessibilityIdentifier("answer-skip")
                     }
                 } else {
@@ -875,11 +739,25 @@ struct QuickCheckView: View {
         }
     }
 
-    private func answer(_ title: String, _ result: CheckResult, _ points: Int, _ site: DirectoryEntry, _ symbol: String, _ color: Color) -> some View {
-        Button { model.recordSelfCheck(result, site: site); lastEarned = points } label: {
+    private func answer(_ title: String, _ result: CheckResult, _ site: DirectoryEntry, _ symbol: String, _ color: Color) -> some View {
+        Button { model.recordSelfCheck(result, site: site); lastSaved = site.domain } label: {
             Label(title, systemImage: symbol).foregroundStyle(color)
         }
         .accessibilityIdentifier({ switch result { case .removed: return "answer-clean"; case .paywalled: return "answer-paywalled"; default: return "answer-listed" } }())
+    }
+}
+
+/// A row with a symbol and a title, and lines under the title (docs/UX.md, "Alignment"): every line starts where the title's words start, never under the
+/// symbol, and the symbol sits on the title's first line. A Label followed by Text in a VStack put the details under the symbol (the Queue tab's automatic
+/// opt-out card, 2026-11-24).
+struct IconRow<Content: View>: View {
+    let icon: String
+    var tint: Color = .accentColor
+    var spacing: CGFloat = 4
+    @ViewBuilder let content: Content
+    // A Label, so its words start where every other row's do in the same list (a plain row with a symbol is a Label too).
+    var body: some View {
+        Label { VStack(alignment: .leading, spacing: spacing) { content } } icon: { Image(systemName: icon).foregroundStyle(tint) }
     }
 }
 
@@ -996,8 +874,8 @@ struct LockedSitesView: View {
             }
             Section {
                 ForEach(sites) { e in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Label(e.domain, systemImage: "lock").font(.headline)
+                    IconRow(icon: "lock", spacing: 2) {
+                        Text(e.domain).font(.headline)
                         Text(e.name).font(.caption).foregroundStyle(.secondary)
                     }
                 }

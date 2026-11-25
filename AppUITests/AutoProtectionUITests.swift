@@ -81,8 +81,7 @@ final class AutoProtectionUITests: UITestCase {
         XCTAssertTrue(app.buttons["answer-paywalled"].waitForExistence(timeout: 5))
         shot(app, "4-quick-check-blocked-by-payment")
         app.buttons["answer-paywalled"].tap()
-        XCTAssertTrue(app.staticTexts["earned"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["2 pts"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["answer-saved"].waitForExistence(timeout: 3), "the answer was kept")
     }
 
     /// A site on the automatic status page must open its page and stay there. (It once bounced straight back: the page declared a navigation destination of

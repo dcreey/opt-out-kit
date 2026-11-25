@@ -190,8 +190,8 @@ a missing robots.txt (404) allows. The crawl stays at about one request per seco
 ## Quick checks (the guided fallback)
 
 For every site without an automatic check, the app's Quick checks screen sends the person to look for themselves and asks
-what they saw. It pays points for looking, not for the answer (5 for "not found", 3 for an honest "I'm listed"), keeps
-only the latest look per site, and never leaves the phone. Levels run from Exposed to Off the Grid.
+what they saw. It keeps only the latest look per site, and it never leaves the phone. (It paid points for looking, with levels from "Exposed" to "Off the
+Grid", until 2026-11-24, when the points were taken off the Sites tab: docs/UX.md, "The Sites tab".)
 
 
 ## Manual review of the sites with no readable form

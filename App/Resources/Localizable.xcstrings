@@ -829,6 +829,29 @@
     }
    }
   },
+  "%lld done": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld faits"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld hechos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld erledigt"
+     }
+    }
+   }
+  },
   "%lld earlier opt-outs are due to be repeated. They are back in your daily batches.": {
    "extractionState": "manual",
    "localizations": {
@@ -986,6 +1009,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld weitere wurden diesmal nicht versucht:"
+     }
+    }
+   }
+  },
+  "%lld moved to semi-automatic": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld passés en semi-automatique"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld pasados a semiautomático"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld in halbautomatisch verschoben"
      }
     }
    }
@@ -1170,52 +1216,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld Seiten, je ein Tipp"
-     }
-    }
-   }
-  },
-  "%lld points to the next level": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Encore %lld points avant le niveau suivant"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Faltan %lld puntos para el siguiente nivel"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Noch %lld Punkte bis zur nächsten Stufe"
-     }
-    }
-   }
-  },
-  "%lld pts": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%lld pts"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%lld pts"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "%lld Pkt."
      }
     }
    }
@@ -1538,29 +1538,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "%lld. %@"
-     }
-    }
-   }
-  },
-  "+%lld points": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "+%lld points"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "+%lld puntos"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "+%lld Punkte"
      }
     }
    }
@@ -2941,29 +2918,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Fügen Sie die Adresse eines Familienmitglieds hinzu, dann gelten für diese Person die Regeln ihres Bundesstaats. Broker außerhalb dieser Staaten nehmen Opt-out-Anfragen meist trotzdem an – und genau das sendet diese App."
-     }
-    }
-   }
-  },
-  "Add a full name (and city) to this profile": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ajoutez un nom complet (et une ville) à ce profil"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Añade un nombre completo (y una ciudad) a este perfil"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ergänzen Sie in diesem Profil einen vollständigen Namen (und eine Stadt)"
      }
     }
    }
@@ -4919,29 +4873,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Bevor wir jemanden austragen"
-     }
-    }
-   }
-  },
-  "Behind terms you must accept yourself": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Derrière des conditions que vous devez accepter vous-même"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Tras términos que debes aceptar tú"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Hinter Bedingungen, die Sie selbst akzeptieren müssen"
      }
     }
    }
@@ -7016,29 +6947,6 @@
     }
    }
   },
-  "Could not tell": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Impossible de savoir"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "No se pudo saber"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nicht feststellbar"
-     }
-    }
-   }
-  },
   "Country": {
    "extractionState": "manual",
    "localizations": {
@@ -7173,29 +7081,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Abgedeckt durch %@: dessen eine Anfrage erledigt diese Seite"
-     }
-    }
-   }
-  },
-  "Covering Tracks": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sur la piste"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Borrando huellas"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Spuren verwischen"
      }
     }
    }
@@ -9247,29 +9132,6 @@
     }
    }
   },
-  "Exposed": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Exposé"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Expuesto"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Exponiert"
-     }
-    }
-   }
-  },
   "Family members only: someone who asked you to, or a child you are the parent or guardian of. Their details stay on this phone. Mark children as under 18 so the app never searches for them.": {
    "extractionState": "manual",
    "localizations": {
@@ -10052,29 +9914,6 @@
     }
    }
   },
-  "Found a listing on %lld of %lld sites checked.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fiche trouvée sur %lld des %lld sites vérifiés."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Ficha encontrada en %lld de %lld sitios comprobados."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Eintrag auf %lld von %lld geprüften Websites gefunden."
-     }
-    }
-   }
-  },
   "Found automatically by following links from the home page (%lld hop%@). Nothing here has been submitted.": {
    "extractionState": "manual",
    "localizations": {
@@ -10370,29 +10209,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Erste Schritte"
-     }
-    }
-   }
-  },
-  "Ghost": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fantôme"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fantasma"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Geist"
      }
     }
    }
@@ -13341,25 +13157,25 @@
     }
    }
   },
-  "Look a site up yourself in 20 seconds and mark what you see. Each look earns points.": {
+  "Look a site up yourself in 20 seconds and mark what you see.": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Cherchez vous-même un site en 20 secondes et notez ce que vous voyez. Chaque recherche rapporte des points."
+      "value": "Cherchez-vous sur un site en 20 secondes et notez ce que vous voyez."
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Busca un sitio tú mismo en 20 segundos y anota lo que ves. Cada búsqueda da puntos."
+      "value": "Búscate en un sitio en 20 segundos y marca lo que ves."
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "Such selbst in 20 Sekunden nach einer Seite und halte fest, was du siehst. Jede Suche bringt Punkte."
+      "value": "Suchen Sie sich in 20 Sekunden auf einer Website und markieren Sie, was Sie sehen."
      }
     }
    }
@@ -13475,29 +13291,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Louisiana"
-     }
-    }
-   }
-  },
-  "Low Profile": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Profil bas"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Perfil bajo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Unauffällig"
      }
     }
    }
@@ -14629,29 +14422,6 @@
     }
    }
   },
-  "Needs a browser check": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nécessite une vérification dans un navigateur"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Necesita una comprobación en un navegador"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Braucht eine Prüfung im Browser"
-     }
-    }
-   }
-  },
   "Needs a form submission to search": {
    "extractionState": "manual",
    "localizations": {
@@ -15269,29 +15039,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Keine Bestätigung: %@"
-     }
-    }
-   }
-  },
-  "No connection": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Pas de connexion"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Sin conexión"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Keine Verbindung"
      }
     }
    }
@@ -16442,29 +16189,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Aus"
-     }
-    }
-   }
-  },
-  "Off the Grid": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Hors réseau"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Fuera de la red"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Unsichtbar"
      }
     }
    }
@@ -20609,48 +20333,25 @@
     }
    }
   },
-  "Scan %lld sites": {
+  "Saved what you saw on %@": {
    "extractionState": "manual",
    "localizations": {
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Analyser %lld sites"
+      "value": "Ce que vous avez vu sur %@ est enregistré"
      }
     },
     "es": {
      "stringUnit": {
       "state": "translated",
-      "value": "Analizar %lld sitios"
+      "value": "Se guardó lo que viste en %@"
      }
     },
     "de": {
      "stringUnit": {
       "state": "translated",
-      "value": "%lld Websites scannen"
-     }
-    }
-   }
-  },
-  "Scan for %@ listings": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Chercher les fiches de %@"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Buscar fichas de %@"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nach Einträgen von %@ suchen"
+      "value": "Gespeichert, was Sie auf %@ gesehen haben"
      }
     }
    }
@@ -20904,29 +20605,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Websites nach Name oder Webadresse suchen"
-     }
-    }
-   }
-  },
-  "Searches %lld sites that can be checked automatically. Nothing is submitted.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cherche sur %lld sites vérifiables automatiquement. Rien n'est envoyé."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Busca en %lld sitios que se pueden comprobar automáticamente. No se envía nada."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Durchsucht %lld Websites, die automatisch geprüft werden können. Nichts wird abgeschickt."
      }
     }
    }
@@ -25255,29 +24933,6 @@
     }
    }
   },
-  "The page looked different than expected": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La page avait un autre aspect que prévu"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "La página se veía distinta de lo esperado"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die Seite sah anders aus als erwartet"
-     }
-    }
-   }
-  },
   "The page mentions a human check and we have not loaded it to see whether one appears.": {
    "extractionState": "manual",
    "localizations": {
@@ -25504,29 +25159,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Die Website hat mich blockiert"
-     }
-    }
-   }
-  },
-  "The site blocked the check": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Le site a bloqué la vérification"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "El sitio bloqueó la comprobación"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Die Website hat die Prüfung blockiert"
      }
     }
    }
@@ -27141,29 +26773,6 @@
     }
    }
   },
-  "This searches each site for %@ the way you would by typing the name into its website. Each site sees that search. Nothing is submitted and nothing is saved.": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Cela cherche %@ sur chaque site comme vous le feriez en saisissant le nom sur son site web. Chaque site voit cette recherche. Rien n'est envoyé et rien n'est enregistré."
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Esto busca a %@ en cada sitio como lo harías tú escribiendo el nombre en su web. Cada sitio ve esa búsqueda. No se envía nada y no se guarda nada."
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Das sucht auf jeder Website nach %@, so wie Sie den Namen auf ihrer Website eintippen würden. Jede Website sieht diese Suche. Nichts wird abgeschickt und nichts gespeichert."
-     }
-    }
-   }
-  },
   "This site %@.": {
    "extractionState": "manual",
    "localizations": {
@@ -27574,29 +27183,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Heute: %@"
-     }
-    }
-   }
-  },
-  "Top level": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Niveau maximal"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Nivel máximo"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Höchste Stufe"
      }
     }
    }
@@ -30173,29 +29759,6 @@
      "stringUnit": {
       "state": "translated",
       "value": "Wo Sie wohnen"
-     }
-    }
-   }
-  },
-  "Where you're listed": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Où vous figurez"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Dónde apareces"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Wo Sie gelistet sind"
      }
     }
    }

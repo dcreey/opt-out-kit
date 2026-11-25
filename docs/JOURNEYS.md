@@ -27,7 +27,7 @@ See docs/TESTING.md, "End-to-end tests against fixture pages". These run the rea
 for a release): `FixtureJourneyUITests` (Run now over every kind of page; stopping a run and carrying on; a site that never confirms, its page ended once given up and its screenshot not blank; a site that answers with an
 error; the run's report leading to the semi-automated sites; Solve and send through a plain form, a Cloudflare box, an "I'm not a robot" box, a choice that reveals
 the form, an email promise, an emailed code and a wrong one, a page with no form and a page that is down; a word I change in the form that the app does not undo; skipping a site and bringing it back; marking a site done
-by hand), `FixtureGuideUITests` (a hand-written guide, to the end), `SolveAndSendUITests`, `ExposureScanUITests` and the first-pass / status-page tests of
+by hand), `FixtureGuideUITests` (a hand-written guide, to the end), `SolveAndSendUITests` and the first-pass / status-page tests of
 `AutoProtectionUITests`. The only fake left is the weekly job's sending over the real catalog (`-uitest-fake-submit`). This covers stories 11 (part), 12, 14, 15, 16,
 20, 21, 24, 25 (part), 26, 29, 30 (part), 31, 32, 38, 39 and 40 (part); stories 43 to 47 (follow-ups, email opt-out, Email links, GPC, mail app), 49 and 50
 (erase and upgrade), 51 to 54 are still to do. The profile, onboarding and settings screens need no broker, so they are unchanged.
@@ -127,7 +127,7 @@ Each line: the story, the test, what it proves.
 | **I see ten sites per group (Up next, Done, Skipped), open "See all", and narrow by region** | `testTheSitesTabShowsTenPerGroup...` | Status pre-chosen, chips present, the list narrows |
 | **I search for a brand (TruthFinder) and land on the flow that handles it** | `testSitesTabSearchAndStatus` | The search matches by the handling flow's name |
 | **I search for a site, open it, and read how it is opted out** (shared opt-out, where the form posts) | `DirectoryUITests.testSitesTabListsAndSearches...` | Site page details |
-| **I check whether I am listed** (scan), and **answer a quick check for points** | `ExposureScanUITests`, `QuickCheckUITests`, `testBlockedByPaymentIsAnAnswer...` | The scan shows a summary (fake); two quick-check answers award points |
+| **I answer a quick check** (the scan and the points were taken off the Sites tab on 2026-11-24) | `QuickCheckUITests`, `testBlockedByPaymentIsAnAnswer...` | Two quick-check answers are kept ("Saved what you saw on …"), with no points shown |
 | **The queue shows what to tackle and where to start** | `BrokerListUITests` | The list of broker kinds and "Start here" exist |
 
 ### Checks of layout and affordances (not journeys)

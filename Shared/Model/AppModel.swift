@@ -317,8 +317,6 @@ final class AppModel: ObservableObject {
         }
     }
 
-    var score: Score { Score.compute(progress, brokers: brokers) }
-
     // MARK: Platforms (California DROP and the like)
 
     /// Platforms the selected person may use, with the sites each one reaches listed on its walkthrough.
@@ -888,7 +886,31 @@ final class AppModel: ObservableObject {
     func memoryWarning() { if autoBusy != nil || household.autoSettings.optOutResumePending == true { logRun(.memoryWarning) } }
 
     /// The run is over. One that stopped early (the app went to the background) stays pending; one that went through every site is finished.
+    /// How many sites are in each of the automatic page's groups, as last worked out (`activityPage`), for the Queue tab's card: the same numbers as the
+    /// page, never worked out while the Queue tab draws (decided 2026-11-24: the card counted only the plan's 34 automatic sites, the page 503).
+    @Published private(set) var activityCounts: [ActivityGroup: Int]?
+    func noteActivity(_ rows: [ActivityRow]) { activityCounts = Dictionary(grouping: rows, by: \.group).mapValues(\.count) }
+    /// Works the groups out again away from the main thread and keeps the counts.
+    func refreshActivityCounts() {
+        guard let p = selectedPerson, storageProblem == nil else { return }
+        let inputs = activityInputs(for: p)
+        Task { [weak self] in
+            let rows = await Task.detached(priority: .utility) { AppModel.activityPage(inputs).rows }.value
+            self?.noteActivity(rows)
+        }
+    }
+
+    /// The Queue tab card's line under the dates: "308 done · 195 moved to semi-automatic" (done: sent, handled previously, no action needed).
+    static func activityCountsLine(_ c: [ActivityGroup: Int]) -> String {
+        let done = (c[.sent] ?? 0) + (c[.earlier] ?? 0) + (c[.noAction] ?? 0), semi = c[.needsYou] ?? 0, left = c[.notTried] ?? 0
+        var parts = [Loc.f("%lld done", done)]
+        if semi > 0 { parts.append(Loc.f("%lld moved to semi-automatic", semi)) }
+        if left > 0 { parts.append(Loc.f("%lld still to do", left)) }
+        return parts.joined(separator: " · ")
+    }
+
     private func endOptOutRun(interrupted: Bool) {
+        refreshActivityCounts()
         logRun(.runEnded, detail: interrupted ? "stopped before every site was done" : "every site done")
         // Stopped early and not by the person, with no pause written down: whatever stopped it, the person is asked, like any other stop.
         if interrupted, household.autoSettings.stoppedByPerson != true, household.autoSettings.pausedAt == nil, !personStopRequested {
@@ -1174,7 +1196,7 @@ final class AppModel: ObservableObject {
     func appDidBecomeActive() {
         protectedDataAvailable()
         // Each site's form is checked against the person once, away from the main thread, so the automatic opt-out page and the start of a run are quick.
-        if let p = selectedPerson, storageProblem == nil { let inputs = activityInputs(for: p); Task.detached(priority: .utility) { _ = AppModel.activityPage(inputs) } }
+        refreshActivityCounts()
         endBackgroundTime()
         refreshReminders()
         // A quick glance away: the run was only asked to stop, so let it go on.

@@ -12,10 +12,10 @@ registered_in: ['CA', 'OR', 'TX']
 signals: []
 profiled: '2026-10-22'
 live_form:
-  checked: '2026-10-23'
+  checked: '2026-11-24'
   found: true
-  page: 'https://www.rrd.com/opinion-centers/unsubscribe'
-  blockers: []
+  page: 'https://privacyportal.onetrust.com/webform/45e4be25-919b-483f-9f95-12809576a2b3/6e633594-9a81-48bb-97ab-6fb29bf46019'
+  blockers: ['check: a reCAPTCHA checkbox']
 about:
   category: 'marketing_services'
   summary: 'Valassis Communications, Inc. is a marketing and direct-mail services company. RRD offers the most trusted portfolio of marketing, packaging, print, and supply chain solutions. We transform customer touchpoints into moments of impact. Its own pages mention home addresses, phone numbers, email addresses, age or birthdate, job title and employer, education. Its policy names these buyers or recipients: advertisers and marketers; business customers and sales teams.'

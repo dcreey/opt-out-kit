@@ -100,7 +100,7 @@ struct AutoActivityView: View {
             let inputs = model.activityInputs(for: p)
             let page = await Task.detached(priority: .userInitiated) { AppModel.activityPage(inputs) }.value
             guard !Task.isCancelled else { return }
-            activity = page.rows; loaded = true
+            activity = page.rows; loaded = true; model.noteActivity(page.rows)
         }
         .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
             Button("Re-test every site") { model.runFullRetestNow() }
@@ -297,12 +297,9 @@ struct AutoActivityView: View {
     }
 
     private func activityRow(_ r: AppModel.ActivityRow) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: r.group.icon).foregroundStyle(r.group.color)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(verbatim: r.domain).font(.footnote)
-                Text(r.line).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
-            }
+        IconRow(icon: r.group.icon, tint: r.group.color, spacing: 1) {
+            Text(verbatim: r.domain).font(.footnote)
+            Text(r.line).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
         }
     }
 

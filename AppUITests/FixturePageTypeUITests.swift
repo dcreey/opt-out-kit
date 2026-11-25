@@ -406,17 +406,4 @@ final class FixturePageTypeUITests: UITestCase {
         XCTAssertTrue(app.buttons["assisted-write-email"].waitForExistence(timeout: 40), "the email is offered: Write the email")
         XCTAssertTrue(server.sentSites.isEmpty)
     }
-
-    /// A name search whose results are built by script (the site needs a real browser): the scan waits for them and still finds my listing.
-    func testAScanOfASiteWhoseResultsAreBuiltByScriptFindsMyListing() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-uitest-reset", "-uitest-seed-profile"] + server.launchArguments
-        app.launch()
-        app.tab("Sites", 1).tap()
-        XCTAssertTrue(app.scrollUntilExists(app.buttons["scan-exposure"]))
-        app.buttons["scan-exposure"].tap()
-        app.buttons["start-scan"].tap()
-        XCTAssertTrue(app.staticTexts["scan-summary"].waitForExistence(timeout: 90))
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'scriptlisted-1.fixture.test'")).firstMatch.exists, "the script-built listing was found")
-    }
 }

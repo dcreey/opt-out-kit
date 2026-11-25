@@ -8,7 +8,7 @@ tier: 'B'
 automation: 'guided'
 confidence: 'medium'
 opt_out_url: 'https://www.apollo.io/privacy-policy/remove'
-contact_email: 'u003eprivacy@apollo.io'
+contact_email: 'privacy@apollo.io'
 contact_email_source: 'page'
 opt_out_form:
   page: 'https://www.apollo.io/privacy-policy/remove'
@@ -25,6 +25,11 @@ profiled: '2026-10-22'
 live_check:
   checked: '2026-10-22'
   blockers: []
+live_form:
+  checked: '2026-11-24'
+  found: true
+  page: 'https://www.apollo.io/privacy-policy/remove'
+  blockers: ['business', 'code']
 run_check:
   date: '2026-10-23'
   result: 'confirmed'

@@ -123,3 +123,18 @@ test('"I am a (an)": Customer / Authorized Agent takes the one answer that is no
   const two = choose('<label for=t>I am a</label><select id=t><option value=""></option><option value=c>Customer</option><option value=e>Employee</option><option value=a>Agent</option></select>');
   assert.equal(two.$('#t').value, '', 'two answers of the person\'s own kind: not guessed');
 });
+
+test('a required group in a bot trap is not a choice to ask about, and no trap box is ticked (arrests.org)', () => {
+  const r = choose('<div aria-hidden="true">' + radio('p', 'p1', 'Privacy Authorization: Yes', 'required') + radio('p', 'p2', 'No') + '</div>' +
+    '<div style="height:1px">' + box('tb', 'Opt-out of the sale', 'tabindex="-1"') + '</div>' + box('self', 'I am submitting this request for myself.'));
+  assert.deepEqual(r.out.unresolved, [], 'the trap group is not reported');
+  assert.equal(r.$('#p1').checked || r.$('#p2').checked, false, 'nor answered');
+  assert.equal(r.$('#tb').checked, false, 'the trap box is not ticked');
+  assert.equal(r.$('#self').checked, true, 'the real box is');
+});
+
+test('"authorizedAgent" named only in code, with plain No / Yes answers, is the agent question: No (astoriacompany.com)', () => {
+  const r = choose('<div><span>Are you submitting as an agent?</span></div><div>' + radio('authorizedAgent', 'n', 'No', 'required') + radio('authorizedAgent', 'y', 'Yes', 'required') + '</div>');
+  assert.equal(r.$('#n').checked, true);
+  assert.deepEqual(r.out.unresolved, []);
+});

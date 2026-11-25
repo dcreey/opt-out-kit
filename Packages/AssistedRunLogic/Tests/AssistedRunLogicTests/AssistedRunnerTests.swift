@@ -427,6 +427,9 @@ final class PrematureDoneTests: XCTestCase {
         XCTAssertTrue(FormRun.saysStillWorking("Processing your request\nPlease wait while we process your request. Do not close this page."))
         XCTAssertTrue(FormRun.saysStillWorking("Your submission is being processed."))
         XCTAssertFalse(FormRun.saysStillWorking("Thank you. Your request has been received."))
+        // The send button reading "Submitting…" (cashmereai.com): sent, the answer not in yet; never a sentence that merely mentions submitting.
+        XCTAssertTrue(FormRun.saysSending("Submitting…")); XCTAssertTrue(FormRun.saysSending("Sending..."))
+        XCTAssertFalse(FormRun.saysSending("By submitting this form you agree to our terms."))
         XCTAssertFalse(FormRun.saysStillWorking("Please wait ... Your opt-out request is complete."), "a page that also says it is complete is finished")
         if case .submitted = FormRun.classify("Processing your request. Please wait while we process your request.") { XCTFail("not a confirmation") }
     }

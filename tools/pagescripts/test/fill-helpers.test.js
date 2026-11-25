@@ -169,3 +169,18 @@ test('OneTrust tiles: "Are you an authorized agent ...?" gets No and "Select a R
   const hit = []; lone.document.getElementById('emp').addEventListener('click', () => hit.push(1));
   assert.equal(run(lone, 'choose-tile-buttons'), 0, 'a lone tile that is not the person\'s answer is not tapped');
 });
+
+test('a required bot trap is never "a required box still empty" (arrests.org: "Privacy Address", hidden from assistive tech, one pixel tall)', () => {
+  const w = page(`<form data-ook-form="f0"><label>First * <input value="Pat" required></label>
+    <div style="height:1px"><label>Privacy Address <input required tabindex="-1"></label></div>
+    <div aria-hidden="true"><label>Privacy Authorization: <select required><option value="">Choose</option><option>Yes</option></select></label></div></form>`);
+  assert.equal(call(w, 'empty-required-choice', 'f0'), '');
+});
+
+test('bot-trap: hidden from assistive tech, off the page, or out of the tab order inside a box one pixel tall; nothing else', () => {
+  const w = page(`<div aria-hidden="true"><input id=a></div><div style="position:absolute;left:-9999px"><input id=b></div>
+    <div style="height:1px"><input id=c tabindex="-1"></div><div style="height:1px"><input id=d></div><input id=e tabindex="-1"><input id=f>`);
+  w.eval('(function(){' + require('../harness').source('bot-trap') + '; window.__trap = botTrap;})()');
+  const t = (id) => w.__trap(w.document.getElementById(id));
+  assert.deepEqual(['a', 'b', 'c', 'd', 'e', 'f'].map(t), [true, true, true, false, false, false]);
+});
