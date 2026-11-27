@@ -950,7 +950,7 @@
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Une exécution réelle n’a pas abouti : vous faites celui-ci avec un guide."
+      "value": "Une exécution réelle n'a pas abouti : vous faites celui-ci avec un guide."
      }
     },
     "es": {
@@ -973,7 +973,7 @@
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Une exécution réelle le %@ n’a pas abouti (%@) : vous faites celui-ci avec un guide."
+      "value": "Une exécution réelle le %@ n'a pas abouti (%@) : vous faites celui-ci avec un guide."
      }
     },
     "es": {

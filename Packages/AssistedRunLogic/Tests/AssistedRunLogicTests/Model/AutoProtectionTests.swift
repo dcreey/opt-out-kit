@@ -55,6 +55,103 @@ final class AutoProtectionTests: XCTestCase {
         XCTAssertTrue(m.allRunsRows(for: me).contains { $0.group == .notTried }, "sites no run has reached are still to do")
     }
 
+    /// The automatic page's counts: a row for this run and one below for every run of this period, each site once and in one count only (decided 2026-11-27:
+    /// every site is sent again each period, so a send from an earlier period is not counted). Worked out from the same plain inputs away from the main
+    /// thread, and the export carries them too.
+    func testThePeriodsCountsHoldEverySiteOnceAndNothingSentInAnEarlierPeriod() throws {
+        let m = model()
+        let me = try withProfile(m)
+        m.startPeriodForTesting()          // the period began yesterday
+        let ids = m.automaticSites(for: me).prefix(5).map(\.id)
+        XCTAssertEqual(ids.count, 5)
+        let lastPeriod = Date().addingTimeInterval(-3 * 86_400), earlierRun = Date().addingTimeInterval(-12 * 3600)
+        let started = Date().addingTimeInterval(-3600), now = Date().addingTimeInterval(-60)
+        m.recordAttemptForTesting(OptOutAttempt(date: lastPeriod, outcome: "submitted"), site: ids[0])          // sent in the last period only
+        m.recordAttemptForTesting(OptOutAttempt(date: earlierRun, outcome: "submitted"), site: ids[1])          // an earlier run this period sent it...
+        m.recordAttemptForTesting(OptOutAttempt(date: earlierRun, outcome: "challenged", detail: "a check"), site: ids[2])
+        m.recordAttemptForTesting(OptOutAttempt(date: earlierRun, outcome: "submitted"), site: ids[4])
+        m.setRunStartedForTesting(started)
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "submitted"), site: ids[1])          // ...and this run sent it again
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "submitted"), site: ids[3])
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "challenged", detail: "a check"), site: ids[4])          // sent this period, stopped this run
+        let inputs = m.activityInputs(for: me)
+        let current = AppModel.groupCounts(AppModel.activityPage(inputs).rows)
+        let periodRows = AppModel.periodPage(inputs), period = AppModel.groupCounts(periodRows)
+        let group = Dictionary(periodRows.map { ($0.id, $0.group) }, uniquingKeysWith: { x, _ in x })
+        XCTAssertEqual(current[.sent], 2, "this run sent two")
+        XCTAssertEqual(current[.needsYou], 1, "and a check stopped one")
+        XCTAssertEqual(period[.sent], 3, "this period sent three different sites: the one sent twice counts once")
+        XCTAssertNotEqual(group[ids[0]], .sent, "a send from the last period is not this period's: it is sent again")
+        XCTAssertEqual(group[ids[4]], .sent, "sent this period and stopped by a check later: sent, not needing the person as well")
+        XCTAssertEqual(group[ids[2]], .needsYou, "an earlier run's check this period still needs the person")
+        XCTAssertEqual(Set(periodRows.map(\.id)).count, periodRows.count, "each site once")
+        XCTAssertEqual(period.values.reduce(0, +), periodRows.count, "so the groups add up to the sites")
+
+        let files = m.runExportFiles(for: me, rows: m.activityRows(for: me))
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let export = try decoder.decode(RunExport.self, from: try XCTUnwrap(files.first?.data))
+        XCTAssertEqual(export.countsThisPeriod["sent"], 3)
+        XCTAssertEqual(export.counts["sent"], 2)
+    }
+
+    /// Some sites under "Needs you" are tried again by Run now, and the page says how many and why (decided 2026-11-27): a page that did not load or a form
+    /// that did not finish may go through next time; a human check, a code or a field only the person can fill is never tried again.
+    func testThePageSaysWhichSitesThatNeedYouRunNowTriesAgainAndWhy() throws {
+        let m = model()
+        let me = try withProfile(m)
+        m.startPeriodForTesting()
+        let ids = m.automaticSites(for: me).prefix(4).map(\.id)
+        XCTAssertEqual(ids.count, 4)
+        m.setRunStartedForTesting(Date().addingTimeInterval(-3600))
+        let now = Date().addingTimeInterval(-60)
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "failed", detail: "the page was gone (not found)"), site: ids[0])
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "failed", detail: "timed out loading the page"), site: ids[1])
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "failed", detail: "no confirmation and the form stayed"), site: ids[2])
+        m.recordAttemptForTesting(OptOutAttempt(date: now, outcome: "challenged", detail: "a reCAPTCHA checkbox"), site: ids[3])
+        XCTAssertEqual(m.autoSettings.nextRunKind(now: Date()), .full, "the first run of a period is a full pass")
+        let full = AppModel.activityPage(m.activityInputs(for: me))
+        XCTAssertEqual(full.rows.filter { $0.group == .needsYou }.count, 4, "all four need the person")
+        XCTAssertEqual(full.retry, AppModel.RetryCounts(pageDidNotLoad: 2, formNotFinished: 1, fullPass: 1), "a full pass tries the check again too")
+        XCTAssertLessThanOrEqual(full.retry.total, full.runNow, "they are among what Run now tries, with the sites not reached yet")
+        XCTAssertEqual(AppModel.retryLine(full.retry),
+                       "Run now tries 4 of these again, since a run may get through: the page did not load (2), the form did not finish (1), a full pass tries checks again, as they change (1)")
+        m.updateAutoForTesting { $0.lastFullRun = Date() }
+        XCTAssertEqual(m.autoSettings.nextRunKind(now: Date()), .repeatSent)
+        let repeatPass = AppModel.activityPage(m.activityInputs(for: me))
+        XCTAssertEqual(repeatPass.retry, AppModel.RetryCounts(pageDidNotLoad: 2, formNotFinished: 1), "a repeat pass never tries the human check again")
+        XCTAssertEqual(AppModel.retryLine(repeatPass.retry),
+                       "Run now tries 3 of these again, since a run may get through: the page did not load (2), the form did not finish (1)")
+        XCTAssertNil(AppModel.retryLine(AppModel.RetryCounts()), "no line when Run now tries none of them")
+    }
+
+    /// The card is green once a run ended on its own, even with sites still to do (decided 2026-11-26: a site a stuck run never reached left it plain for two
+    /// months), and says how many more can run. Not while a run works, waits to carry on, is paused, or was stopped by the person.
+    func testTheCardIsGreenOnceARunEndedAndSaysHowManyMoreSitesCanRun() throws {
+        let m = model()
+        _ = try withProfile(m)
+        func rows(_ left: Int) -> [AppModel.ActivityRow] {
+            [AppModel.ActivityRow(id: "a", domain: "a.example", group: .sent, line: "")]
+                + (0..<left).map { AppModel.ActivityRow(id: "n\($0)", domain: "n\($0).example", group: .notTried, line: "") }
+        }
+        XCTAssertFalse(m.autoCardComplete, "nothing worked out yet")
+        m.noteActivity(rows(0))
+        XCTAssertTrue(m.autoCardComplete)
+        XCTAssertNil(AppModel.moreToRunLine(try XCTUnwrap(m.activityCounts)))
+        m.noteActivity(rows(1))
+        XCTAssertTrue(m.autoCardComplete, "a run that ended with one site still to do is complete")
+        XCTAssertEqual(AppModel.moreToRunLine(try XCTUnwrap(m.activityCounts)), "1 more site can run automatically")
+        m.noteActivity(rows(48))
+        XCTAssertEqual(AppModel.moreToRunLine(try XCTUnwrap(m.activityCounts)), "48 more sites can run automatically")
+        m.updateAutoForTesting { $0.optOutResumePending = true }
+        XCTAssertFalse(m.autoCardComplete, "a run waiting to carry on is not complete")
+        m.updateAutoForTesting { $0.optOutResumePending = nil; $0.pausedAt = Date() }
+        XCTAssertFalse(m.autoCardComplete, "nor a paused one")
+        m.updateAutoForTesting { $0.pausedAt = nil; $0.stoppedByPerson = true }
+        XCTAssertFalse(m.autoCardComplete, "nor one the person stopped")
+        m.noteActivity(rows(0))
+        XCTAssertTrue(m.autoCardComplete, "nothing left to try is complete whatever stopped the run")
+    }
+
     /// Before any run, both pages count the same sites still to do: every site a full pass takes on (a new person saw 490 on the automatic page and 36 on
     /// "Every site, all runs"), in the same words.
     func testBothPagesCountTheSameSitesStillToDoBeforeAnyRun() throws {
@@ -132,7 +229,7 @@ final class AutoProtectionTests: XCTestCase {
     func testTheCardSaysWhatWasScannedAndTheTotalIsTheSitesTabsDoneCount() throws {
         XCTAssertEqual(AppModel.activityCountsLine(.init(groups: [.sent: 10, .earlier: 334, .noAction: 14, .needsYou: 240])), "Scanned 598 sites")
         XCTAssertEqual(AppModel.activityCountsLine(.init(groups: [.sent: 6, .needsYou: 1, .notTried: 61])), "Scanned 7 sites", "sites still to do were not scanned")
-        XCTAssertTrue(AppModel.ActivityCounts(groups: [.sent: 10, .earlier: 334, .noAction: 14, .needsYou: 240]).complete, "complete once the run has nothing left to try, whatever moved to the person")
+        XCTAssertTrue(AppModel.ActivityCounts(groups: [.sent: 10, .earlier: 334, .noAction: 14, .needsYou: 240]).complete, "nothing left to try, whatever moved to the person")
         XCTAssertFalse(AppModel.ActivityCounts(groups: [.sent: 5, .notTried: 1]).complete, "not while a site is still to do")
 
         let m = model()

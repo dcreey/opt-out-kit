@@ -930,10 +930,58 @@ final class AppModel: ObservableObject {
         var scanned: Int { total - stillToDo }
         var needsYou: Int { groups[.needsYou] ?? 0 }
         var stillToDo: Int { groups[.notTried] ?? 0 }
-        /// The run has nothing left to try: green and "complete" on the card. Sites moved to semi-automatic are the person's, in the queue, and do not hold it
-        /// back (decided 2026-11-25; build 64 waited for those too, so the check never showed).
+        /// The run has nothing left to try. Sites moved to semi-automatic are the person's, in the queue, and do not hold it back (decided 2026-11-25;
+        /// build 64 waited for those too, so the check never showed).
         var complete: Bool { stillToDo == 0 }
     }
+
+    /// Green and "complete" on the card: once the run has nothing left to try, and also once a run ended on its own with sites still to do (decided
+    /// 2026-11-26: a site that joined the catalog, or that a stuck run never reached, left the card plain until the next run two months on). The card then
+    /// says how many more can run (`moreToRunLine`). Not while a run works, waits to carry on, is paused, or was stopped by the person.
+    var autoCardComplete: Bool {
+        guard let c = activityCounts, autoBusy == nil else { return false }
+        if c.complete { return true }
+        return !autoSettings.resumable && autoSettings.pausedAt == nil && autoSettings.stoppedByPerson != true
+    }
+
+    /// The card's line under the scanned count while sites are still to do: "1 more site can run automatically".
+    static func moreToRunLine(_ c: ActivityCounts) -> String? {
+        switch c.stillToDo {
+        case 0: return nil
+        case 1: return Loc.t("1 more site can run automatically")
+        default: return Loc.f("%lld more sites can run automatically", c.stillToDo)
+        }
+    }
+
+    /// The sites under "Needs you" that Run now tries again, by why (decided 2026-11-27): a site stopped by a human check, a code or a field only the person
+    /// can fill is tried again only by a full pass (every 6 months, or the first: checks and forms change); every other failure may be passing (the page did
+    /// not load) or the app's own shortcoming (the form did not finish), so any run tries it again.
+    struct RetryCounts: Equatable, Sendable {
+        var pageDidNotLoad = 0
+        var formNotFinished = 0
+        /// Stopped by a check, a code or a field only the person can fill, and the next run is a full pass, which tries every site.
+        var fullPass = 0
+        var total: Int { pageDidNotLoad + formNotFinished + fullPass }
+        /// The site's page never came up: gone, refused, timed out, or the connection failed.
+        nonisolated static func pageDidNotLoad(_ detail: String?) -> Bool {
+            let d = (detail ?? "").lowercased()
+            return [FormRun.pageGone, FormRun.pageRefused, FormRun.wrongCountry, "timed out", "did not load", "could not be reached", "connection", "network", "offline"]
+                .contains { d.contains($0.lowercased()) }
+        }
+    }
+
+    /// The automatic page's line under the counts: "Run now tries 3 of these again, since a run may get through: the page did not load (2), the form did not finish (1)".
+    static func retryLine(_ r: RetryCounts) -> String? {
+        guard r.total > 0 else { return nil }
+        var why: [String] = []
+        if r.pageDidNotLoad > 0 { why.append(Loc.f("the page did not load (%lld)", r.pageDidNotLoad)) }
+        if r.formNotFinished > 0 { why.append(Loc.f("the form did not finish (%lld)", r.formNotFinished)) }
+        if r.fullPass > 0 { why.append(Loc.f("a full pass tries checks again, as they change (%lld)", r.fullPass)) }
+        return Loc.f("Run now tries %lld of these again, since a run may get through: %@", r.total, why.joined(separator: ", "))
+    }
+
+    /// How many rows are in each group: the automatic page's "This period so far" row (`periodPage`).
+    nonisolated static func groupCounts(_ rows: [ActivityRow]) -> [ActivityGroup: Int] { Dictionary(grouping: rows, by: \.group).mapValues(\.count) }
 
     /// The home card's line: "Scanned 598 sites".
     static func activityCountsLine(_ c: ActivityCounts) -> String { Loc.f("Scanned %lld sites", c.scanned) }
@@ -1045,15 +1093,26 @@ final class AppModel: ObservableObject {
     /// tried, and its latest result. For the "Every site, all runs" page, in the automatic page's words (decided 2026-11-24): moved to semi-automatic (tried,
     /// never sent), sent (at least once), no action needed (not listed, only for other people, set aside) and still to do (no run has tried it yet). "Handled
     /// previously" is the current run's word only: over every run, a site an earlier run sent is sent.
-    func allRunsRows(for person: Person, now: Date = Date()) -> [ActivityRow] {
-        let attempts = household.progress(for: person.id).optOutAttempts
-        let progress = household.progress(for: person.id)
+    func allRunsRows(for person: Person, now: Date = Date()) -> [ActivityRow] { Self.allRunsPage(activityInputs(for: person, now: now)) }
+
+    /// The page's sites over every run of the current period, each site once in one group: a site sent in any run this period is sent, even if a later run
+    /// was stopped by a check. The automatic page's second row of counts, "This period so far" (decided 2026-11-27: every site is sent again each period, so a
+    /// send from an earlier period is not counted; an all-time row counted it). The same rules as the page itself, without the run's start.
+    nonisolated static func periodPage(_ i: ActivityInputs) -> [ActivityRow] {
+        var whole = i
+        whole.since = nil
+        return activityPage(whole).rows
+    }
+
+    /// `allRunsRows` from plain values, so it can be worked out away from the main thread.
+    nonisolated static func allRunsPage(_ i: ActivityInputs) -> [ActivityRow] {
+        let now = i.now, progress = i.progress, attempts = progress.optOutAttempts
         // The same sites as the automatic page (`automaticRunSiteIDs`): a new person saw 490 still to do there and 36 here, and later 503 there and 595 here.
-        let inputs = activityInputs(for: person, now: now)
-        let pass = Set(AutoOptOut.backgroundSites(.full, entries: inputs.entries, person: inputs.plans.person, progress: progress, now: now, plans: inputs.plans).map(\.domain))
-        let ids = Self.automaticRunSiteIDs(inputs, pass: pass)
+        let pass = Set(AutoOptOut.backgroundSites(.full, entries: i.entries, person: i.plans.person, progress: progress, now: now, plans: i.plans).map(\.domain))
+        let ids = automaticRunSiteIDs(i, pass: pass)
+        let byID = Dictionary(i.entries.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         return RunPeriods.allRuns(siteIDs: Array(ids), attempts: attempts).compactMap { s -> ActivityRow? in
-            guard let e = sites[id: s.id] else { return nil }
+            guard let e = byID[s.id] else { return nil }
             func row(_ g: ActivityGroup, _ line: String) -> ActivityRow { ActivityRow(id: e.id, domain: e.domain, group: g, line: line) }
             switch s.group {
             case .sent:
@@ -1107,7 +1166,7 @@ final class AppModel: ObservableObject {
 
     /// The page's groups and the number "Run now" would try, each site's form checked once. The same rules as `runDomains`, `remainingDomains`,
     /// `willTry` and `skipReason` (a test holds them equal); build 47 worked the page out on the main thread in seconds, after every site of a run.
-    nonisolated static func activityPage(_ i: ActivityInputs) -> (rows: [ActivityRow], runNow: Int) {
+    nonisolated static func activityPage(_ i: ActivityInputs) -> (rows: [ActivityRow], runNow: Int, retry: RetryCounts) {
         let now = i.now, progress = i.progress, period = i.period
         // Every site a full pass covers, whatever kind the next run is: a repeat period must not make the others vanish from the page.
         let fullSites = AutoOptOut.backgroundSites(.full, entries: i.entries, person: i.plans.person, progress: progress, now: now, plans: i.plans)
@@ -1171,8 +1230,15 @@ final class AppModel: ObservableObject {
             return ActivityRow(id: e.id, domain: e.domain, group: group, line: line)
         }.sorted { $0.domain < $1.domain }
         let remaining = AutoOptOut.notSent(in: period, i.entries.filter { nextPass.contains($0.domain) }, progress: progress)
-        let runNow = Set(remaining.filter { reason($0) == nil }.map(\.domain)).count
-        return (rows, runNow)
+        let runNowDomains = Set(remaining.filter { reason($0) == nil }.map(\.domain))
+        // The sites that need you that Run now tries again (decided 2026-11-27): each did not go through for a reason a run can get past, said by kind.
+        var retry = RetryCounts()
+        for r in rows where r.group == .needsYou && runNowDomains.contains(r.domain) {
+            let last = progress.optOutAttempts[r.id]?.last
+            if let last, AutoOptOut.lastAttemptNeedsPerson(last) { retry.fullPass += 1 }
+            else if RetryCounts.pageDidNotLoad(last?.detail) { retry.pageDidNotLoad += 1 } else { retry.formNotFinished += 1 }
+        }
+        return (rows, runNowDomains.count, retry)
     }
 
     /// The line of a site a human check stopped: says so first, then which check (decided 2026-11-24: "Stopped: a reCAPTCHA checkbox" and "Waits for the next
@@ -1486,6 +1552,7 @@ final class AppModel: ObservableObject {
 
     func resetProgressForTesting() { household.mutateProgress(for: selectedID) { $0.optOutAttempts = [:] } }
     func setRunStartedForTesting(_ date: Date) { household.updateAuto { $0.runStarted = date } }
+    func updateAutoForTesting(_ change: (inout AutoSettings) -> Void) { household.updateAuto(change) }
     func startPeriodForTesting() { household.updateAuto { $0.periodAnchor = Date().addingTimeInterval(-86_400) } }
     /// A full pass finished then, so the next run is a repeat.
     func setLastFullRunForTesting(_ date: Date) { household.updateAuto { $0.lastFullRun = date } }

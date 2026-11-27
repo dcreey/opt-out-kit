@@ -45,6 +45,8 @@ struct RunExport: Codable, Equatable {
     let periodEnd: Date?
     /// How many sites are in each group.
     let counts: [String: Int]
+    /// The same groups over every run of this period, each site once (`AppModel.periodPage`): the page's "This period so far" row.
+    let countsThisPeriod: [String: Int]
     let sites: [Site]
     /// Why the run last paused, when it has not finished (`AutoSettings.pauseReason`).
     let pausedAt: Date?
@@ -65,6 +67,7 @@ struct RunExport: Codable, Equatable {
     by an earlier run this period) and still to do ("notTried"). For each: its group and the line the page shows, its opt-out page, its latest attempts (outcome, detail, and what the page said),
     its latest search, and "screenshot", the picture in this archive of what the site showed at the end of an attempt (null when none was kept), with
     "screenshotTaken": an attempt given up before sending keeps no picture, so the one here can be from an earlier attempt.
+    "countsThisPeriod" is each group over every run of the period, each site once, as the page's "This period so far" row shows it.
     "log" is what happened to the run as it went: when it started, paused and ended and why, when the app left the screen and came back, and each site's
     result with whether the app was on screen (and, for a site given up, the step it was on).
 
@@ -77,13 +80,13 @@ extension AppModel {
     /// archive built away from the main thread; the sealed screenshots are read here.
     func runExport(for person: Person, now: Date = Date()) async -> Data {
         let inputs = activityInputs(for: person, now: now)
-        let rows = await Task.detached(priority: .userInitiated) { AppModel.activityPage(inputs).rows }.value
-        let files = runExportFiles(for: person, rows: rows, now: now)
+        let (rows, thisPeriod) = await Task.detached(priority: .userInitiated) { (AppModel.activityPage(inputs).rows, AppModel.periodPage(inputs)) }.value
+        let files = runExportFiles(for: person, rows: rows, thisPeriod: thisPeriod, now: now)
         return await Task.detached(priority: .userInitiated) { StoredZip.make(files, date: now) }.value
     }
 
     /// The files of the export, in the archive's order: run.json, README.txt, then the screenshots.
-    func runExportFiles(for person: Person, rows: [ActivityRow], now: Date = Date()) -> [(name: String, data: Data)] {
+    func runExportFiles(for person: Person, rows: [ActivityRow], thisPeriod: [ActivityRow]? = nil, now: Date = Date()) -> [(name: String, data: Data)] {
         let progress = household.progress(for: person.id)
         let order = Dictionary(uniqueKeysWithValues: RunExport.groupOrder.enumerated().map { ($1, $0) })
         let sorted = rows.sorted { (order[$0.group] ?? 9, $0.domain) < (order[$1.group] ?? 9, $1.domain) }
@@ -109,7 +112,7 @@ extension AppModel {
         let counts = Dictionary(grouping: rows, by: \.group.rawValue).mapValues(\.count)
         let export = RunExport(app: "Exnay", build: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "", exported: now,
                                runStarted: autoSettings.runStarted, lastRun: autoSettings.lastOptOut, periodStart: period?.start, periodEnd: period?.end,
-                               counts: counts, sites: listed, pausedAt: autoSettings.pausedAt, pauseReason: autoSettings.pauseReason,
+                               counts: counts, countsThisPeriod: AppModel.groupCounts(thisPeriod ?? AppModel.periodPage(activityInputs(for: person, now: now))).reduce(into: [:]) { $0[$1.key.rawValue] = $1.value }, sites: listed, pausedAt: autoSettings.pausedAt, pauseReason: autoSettings.pauseReason,
                                log: currentRunLog().since(autoSettings.runStarted))
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]

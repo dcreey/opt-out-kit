@@ -108,13 +108,16 @@ struct BrokerListView: View {
                     Section {
                         NavigationLink { AutoActivityView() } label: {
                             // Only how many sites the run has looked at, then the next run (decided 2026-11-25): what was done, by the run or by the person, is the
-                            // total below the day's work. Complete once the run has nothing left to try (what moved to the person is in the queue). The lines start under the title's words, not under its
+                            // total below the day's work. Complete once the run has nothing left to try (what moved to the person is in the queue), or once a run ended on its own with sites still to do, saying how many more can run (`autoCardComplete`). The lines start under the title's words, not under its
                             // symbol (docs/UX.md, "Alignment").
                             let counts = model.activityCounts
-                            let complete = counts?.complete ?? false
+                            let complete = model.autoCardComplete
                             IconRow(icon: complete ? "checkmark.seal.fill" : "bolt.fill", tint: complete ? .green : .accentColor) {
                                 Text(complete ? "Automatic opt-out: complete" : "Automatic opt-out").font(.headline).foregroundStyle(complete ? Color.green : Color.primary)
                                 if let counts { Text(AppModel.activityCountsLine(counts)).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("home-auto-counts") }
+                                if let counts, let more = AppModel.moreToRunLine(counts) {
+                                    Text(more).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("home-auto-more")
+                                }
                                 if let next = model.autoSettings.nextOptOutDate() { Text(Loc.f("Next run %@", Loc.date(next))).font(.footnote).foregroundStyle(.secondary) }
                                 else if counts == nil { Text(Loc.f("Last run %@", Loc.date(last))).font(.footnote).foregroundStyle(.secondary) }
                             }

@@ -967,6 +967,29 @@
     }
    }
   },
+  "%lld more sites can run automatically": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encore %lld sites peuvent être traités automatiquement"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld sitios más pueden hacerse automáticamente"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "%lld weitere Websites können automatisch laufen"
+     }
+    }
+   }
+  },
   "%lld more were not tried this time:": {
    "extractionState": "manual",
    "localizations": {
@@ -1515,6 +1538,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "1 früheres Opt-out muss wiederholt werden. Es ist wieder in Ihren Tagesblöcken."
+     }
+    }
+   }
+  },
+  "1 more site can run automatically": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Encore 1 site peut être traité automatiquement"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 sitio más puede hacerse automáticamente"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "1 weitere Website kann automatisch laufen"
      }
     }
    }
@@ -2284,7 +2330,7 @@
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Une exécution réelle n’a pas abouti : vous faites celui-ci avec un guide."
+      "value": "Une exécution réelle n'a pas abouti : vous faites celui-ci avec un guide."
      }
     },
     "es": {
@@ -2307,7 +2353,7 @@
     "fr": {
      "stringUnit": {
       "state": "translated",
-      "value": "Une exécution réelle le %@ n’a pas abouti (%@) : vous faites celui-ci avec un guide."
+      "value": "Une exécution réelle le %@ n'a pas abouti (%@) : vous faites celui-ci avec un guide."
      }
     },
     "es": {
@@ -14169,29 +14215,6 @@
     }
    }
   },
-  "Moved to semi-automatic": {
-   "extractionState": "manual",
-   "localizations": {
-    "fr": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Passés en semi-automatique"
-     }
-    },
-    "es": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "Pasados a semiautomático"
-     }
-    },
-    "de": {
-     "stringUnit": {
-      "state": "translated",
-      "value": "In halbautomatisch verschoben"
-     }
-    }
-   }
-  },
   "Moving through the legislature, not law yet: %@. %@": {
    "extractionState": "manual",
    "localizations": {
@@ -14487,6 +14510,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Braucht Sie (%lld)"
+     }
+    }
+   }
+  },
+  "Needs you, we'll help": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "À vous, on vous aide"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Le toca a usted, le ayudamos"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Für Sie, wir helfen"
      }
     }
    }
@@ -20168,6 +20214,29 @@
      "stringUnit": {
       "state": "translated",
       "value": "Jetzt starten"
+     }
+    }
+   }
+  },
+  "Run now tries %lld of these again, since a run may get through: %@": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "« Lancer maintenant » réessaie %lld de ces sites, car un passage peut aboutir : %@"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "«Ejecutar ahora» vuelve a intentar %lld de estos, porque una ejecución puede lograrlo: %@"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "„Jetzt starten“ versucht %lld davon erneut, weil ein Durchlauf durchkommen kann: %@"
      }
     }
    }
@@ -26635,6 +26704,52 @@
     }
    }
   },
+  "This period so far": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette période jusqu’ici"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Este periodo hasta ahora"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Zeitraum bisher"
+     }
+    }
+   }
+  },
+  "This run": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Cette exécution"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Esta ejecución"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "Dieser Lauf"
+     }
+    }
+   }
+  },
   "This site %@.": {
    "extractionState": "manual",
    "localizations": {
@@ -32224,6 +32339,29 @@
     }
    }
   },
+  "a full pass tries checks again, as they change (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "un passage complet réessaie les vérifications, qui changent (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "una pasada completa reintenta las verificaciones, que cambian (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "ein vollständiger Durchlauf versucht Prüfungen erneut, da sie sich ändern (%lld)"
+     }
+    }
+   }
+  },
   "across %lld days. Every request counts.": {
    "extractionState": "manual",
    "localizations": {
@@ -32289,6 +32427,52 @@
      "stringUnit": {
       "state": "translated",
       "value": "in der Richtlinie nicht genannt"
+     }
+    }
+   }
+  },
+  "the form did not finish (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "le formulaire n'a pas abouti (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "el formulario no se completó (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "das Formular wurde nicht fertig (%lld)"
+     }
+    }
+   }
+  },
+  "the page did not load (%lld)": {
+   "extractionState": "manual",
+   "localizations": {
+    "fr": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "la page ne s'est pas chargée (%lld)"
+     }
+    },
+    "es": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "la página no cargó (%lld)"
+     }
+    },
+    "de": {
+     "stringUnit": {
+      "state": "translated",
+      "value": "die Seite wurde nicht geladen (%lld)"
      }
     }
    }

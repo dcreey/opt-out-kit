@@ -480,16 +480,33 @@ final class FixtureJourneyUITests: UITestCase {
         XCTAssertTrue(submitting.hasPrefix("sent") && submitting.localizedCaseInsensitiveContains("did not show a confirmation"), submitting)
         let captcha = siteLine(app, "captchacode-1.fixture.test")
         XCTAssertTrue(captcha.hasPrefix("needsYou") && captcha.localizedCaseInsensitiveContains("human check"), captcha)
+        // Two rows of counts, this run's and this period's, and no "Handled previously" count (rules: AutoProtectionTests, the period's counts).
+        let page = XCTAttachment(screenshot: app.screenshot()); page.name = "automatic-page"; page.lifetime = .keepAlways; add(page)
+        XCTAssertTrue(app.buttons["activity-count-needsYou"].label.contains("Needs you"), app.buttons["activity-count-needsYou"].label)
+        let periodSent = app.descendants(matching: .any)["period-total-sent"]
+        XCTAssertTrue(periodSent.exists && periodSent.label.hasPrefix("6"), periodSent.exists ? periodSent.label : "no row for this period")
+        XCTAssertFalse(app.buttons["activity-count-earlier"].exists)
+        // The run went through every site, so the next is a repeat pass: it never tries the human check again, and the page says no retry (rules:
+        // AutoProtectionTests, which sites that need you Run now tries again).
+        XCTAssertFalse(app.descendants(matching: .any)["activity-retry"].exists, app.descendants(matching: .any)["activity-retry"].label)
         // The Queue tab's card says the same sites in short, without crediting the run with the person's work (rules: AutoProtectionTests, the card's numbers).
         app.tab("Queue", 0).tap()
         let counts = app.staticTexts["home-auto-counts"]
         XCTAssertTrue(counts.waitForExistence(timeout: 10), "the card's numbers")
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "queue-card"; shot.lifetime = .keepAlways; add(shot)
         XCTAssertEqual(counts.label, "Scanned 7 sites")
+        // The run was pinned to the fixture sites, so the catalog's other sites are still to do: the run ended on its own, so the card is green and says how
+        // many more can run (rules: AutoProtectionTests.testTheCardIsGreenOnceARunEndedAndSaysHowManyMoreSitesCanRun).
+        XCTAssertTrue(app.buttons["home-auto-status"].label.contains("complete"), app.buttons["home-auto-status"].label)
+        let more = app.staticTexts["home-auto-more"]
+        XCTAssertTrue(more.exists && more.label.hasSuffix("more sites can run automatically"), more.exists ? more.label : "no line about the sites still to do")
         let done = app.buttons["home-sites-done"]
         XCTAssertTrue(app.scrollUntilExists(done), "the Sites tab's Done count, below")
         XCTAssertTrue(done.label.hasSuffix(" sites done") || done.label == "1 site done", done.label)
-        done.tap()
+        // It sits just above the tab bar, which XCTest can count as covering it ("not hittable"): tapped where it shows.
+        var swipes = 0
+        while !done.isHittable && swipes < 2 { app.swipeUp(velocity: .slow); swipes += 1 }
+        done.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(app.descendants(matching: .any)["sites-list"].waitForExistence(timeout: 5), "tapping the count opens the Sites tab")
     }
 
@@ -640,7 +657,8 @@ final class FixtureJourneyUITests: UITestCase {
             if app.scrollUntilExists(activity) { activity.tap() }
         }
         for g in ["needsYou", "notTried", "sent", "noAction", "earlier"] {
-            let count = app.buttons["activity-count-\(g)"]
+            // "Handled previously" has no count at the top (decided 2026-11-26): its group's header opens it.
+            let count = g == "earlier" ? app.buttons["activity-group-earlier"] : app.buttons["activity-count-\(g)"]
             guard count.waitForExistence(timeout: 5) else { continue }
             count.tap()
             let row = app.buttons["period-site-\(domain)"]

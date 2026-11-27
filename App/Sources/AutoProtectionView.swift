@@ -70,6 +70,10 @@ struct AutoActivityView: View {
     @State private var open: Set<ActivityGroup> = []
     @Environment(\.dismiss) private var dismiss
     @State private var activity: [AppModel.ActivityRow] = []
+    /// The sites under "Needs you" that Run now tries again, and why (`AppModel.RetryCounts`).
+    @State private var retry = AppModel.RetryCounts()
+    /// Each group's count over every run of this period (`AppModel.periodPage`), the row under the current run's.
+    @State private var thisPeriod: [ActivityGroup: Int] = [:]
     /// The groups have been worked out once (the counts show a placeholder until then, a moment after the page opens).
     @State private var loaded = false
     /// Stop was tapped: the run starts no more sites and ends when the ones in progress finish.
@@ -98,9 +102,9 @@ struct AutoActivityView: View {
             // Worked out away from the main thread, so the page opens at once and the app stays quick while a run moves on.
             guard let p = model.selectedPerson else { return }
             let inputs = model.activityInputs(for: p)
-            let page = await Task.detached(priority: .userInitiated) { AppModel.activityPage(inputs) }.value
+            let (page, all) = await Task.detached(priority: .userInitiated) { (AppModel.activityPage(inputs), AppModel.periodPage(inputs)) }.value
             guard !Task.isCancelled else { return }
-            activity = page.rows; loaded = true; model.noteActivity(page.rows)
+            activity = page.rows; retry = page.retry; thisPeriod = AppModel.groupCounts(all); loaded = true; model.noteActivity(page.rows)
         }
         .confirmationDialog("Re-test every site now?", isPresented: $confirmRetest, titleVisibility: .visible) {
             Button("Re-test every site") { model.runFullRetestNow() }
@@ -121,9 +125,13 @@ struct AutoActivityView: View {
         return q.isEmpty ? activity : activity.filter { $0.domain.localizedCaseInsensitiveContains(q) }
     }
 
+    /// The counts at the top, in both rows: "Handled previously" has none (decided 2026-11-26), since every run's counts hold those sites.
+    static let countGroups: [ActivityGroup] = [.needsYou, .sent, .noAction]
+
     /// The page's five groups, in order (decided 2026-11-24). `notListed` is folded into "No action needed" by `AppModel.activityPage`.
     static let groups: [ActivityGroup] = [.needsYou, .sent, .noAction, .earlier, .notTried]
 
+    /// This run's count of a group; tapping it opens the group's list.
     private func tile(_ g: ActivityGroup, label: String) -> some View {
         let n = activity.filter { $0.group == g }.count
         return Button { toggle(g) } label: {
@@ -136,7 +144,8 @@ struct AutoActivityView: View {
     private func toggle(_ g: ActivityGroup) { withAnimation { if open.contains(g) { open.remove(g) } else { open.insert(g) } } }
 
     /// Everything at a glance (decided 2026-11-24: the lines about when the run started, the period, the last run's count, a pause and what Run now tries were
-    /// taken out): one line with the last and next run dates, the four counts and, while any is left, the sites still to do (each opens its list), the run's
+    /// taken out): one line with the last and next run dates, the three counts with every run's under each (decided 2026-11-26: the fourth, "Handled
+    /// previously", went, since every run's counts hold those sites) and, while any is left, the sites still to do (each opens its list), the run's
     /// progress while it works, and the two buttons.
     @ViewBuilder private func statusSection(for person: Person) -> some View {
         Section {
@@ -145,11 +154,28 @@ struct AutoActivityView: View {
                 if let dates = model.runDatesLine {
                     Text(dates).font(.footnote).foregroundStyle(.secondary).accessibilityIdentifier("run-dates")
                 }
-                HStack(spacing: 8) {
-                    tile(.needsYou, label: ActivityGroup.needsYou.tileLabel)
-                    tile(.sent, label: ActivityGroup.sent.tileLabel)
-                    tile(.noAction, label: ActivityGroup.noAction.tileLabel)
-                    tile(.earlier, label: ActivityGroup.earlier.tileLabel)
+                // Two short rows (decided 2026-11-26): this run on top, every run of this period below (decided 2026-11-27), each site once and in one count only.
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("This run").font(.caption.bold()).foregroundStyle(.secondary)
+                    HStack(spacing: 8) {
+                        ForEach(Self.countGroups, id: \.self) { g in tile(g, label: g.tileLabel) }
+                    }
+                    Text("This period so far").font(.caption.bold()).foregroundStyle(.secondary).padding(.top, 4)
+                    HStack(spacing: 8) {
+                        ForEach(Self.countGroups, id: \.self) { g in
+                            CountTile(group: g, count: loaded ? "\(thisPeriod[g] ?? 0)" : "–", label: g.tileLabel)
+                                .accessibilityElement(children: .combine).accessibilityIdentifier("period-total-\(g.rawValue)")
+                        }
+                    }
+                }
+                if loaded, let line = AppModel.retryLine(retry) {
+                    // Some sites that need you are tried again by Run now (decided 2026-11-27): how many, and why a run may now get through.
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "arrow.clockwise")
+                        Text(line)
+                    }
+                    .font(.footnote).foregroundStyle(.secondary)
+                    .accessibilityElement(children: .combine).accessibilityIdentifier("activity-retry")
                 }
                 let left = activity.filter { $0.group == .notTried }.count
                 if loaded, left > 0 {
@@ -359,15 +385,16 @@ struct AllRunsView: View {
 extension ActivityGroup {
     var title: String {
         switch self {
-        case .needsYou: return Loc.t("Moved to semi-automatic")
+        // Decided 2026-11-26: "Moved to semi-automatic", now "Needs you, we'll help": the person finishes these, with the app's guided flow.
+        case .needsYou: return Loc.t("Needs you, we'll help")
         case .sent: return Loc.t("Sent")
         case .noAction, .notListed: return Loc.t("No action needed")
         case .earlier: return Loc.t("Handled previously")
         case .notTried: return Loc.t("Still to do")
         }
     }
-    /// The shorter words under a count.
-    var tileLabel: String { self == .needsYou ? Loc.t("Semi-automatic") : title }
+    /// The words under a count: the group's title ("Semi-automatic" did not say the sites are the person's to do, with the app's help; decided 2026-11-26).
+    var tileLabel: String { title }
     var color: Color {
         switch self { case .needsYou: return .blue; case .sent: return .green; case .noAction, .notListed: return .teal; case .earlier: return .mint; case .notTried: return .secondary }
     }
@@ -382,19 +409,18 @@ extension ActivityGroup {
     }
 }
 
-/// One count at the top of the automatic page and of "Every site, all runs". Every label keeps room for two lines (decided 2026-11-24: "Sent" took one
-/// line and the others two, so its number sat lower than theirs): the numbers line up across the row, and so do the first lines of the labels.
+/// One count at the top of the automatic page (a row for this run, one for every run) and of "Every site, all runs". Short (decided 2026-11-26): the number,
+/// and its label on one line, shrunk to fit rather than wrapped, so the numbers and labels line up across a row (decided 2026-11-24: "Sent" sat lower).
 struct CountTile: View {
     let group: ActivityGroup
     let count: String
     let label: String
     var body: some View {
-        VStack(spacing: 2) {
-            Text(verbatim: count).font(.title2.bold()).foregroundStyle(group.color)
-            Text(label).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
-                .lineLimit(2, reservesSpace: true).minimumScaleFactor(0.8)
+        VStack(spacing: 1) {
+            Text(verbatim: count).font(.title3.bold()).foregroundStyle(group.color)
+            Text(label).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.7)
         }
-        .frame(maxWidth: .infinity, alignment: .top).padding(.vertical, 8)
+        .frame(maxWidth: .infinity).padding(.vertical, 6).padding(.horizontal, 4)
         .background(group.color.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
     }
 }
